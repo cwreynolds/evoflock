@@ -2,13 +2,21 @@
 //  main.cpp
 //  evoflock
 //
-//  Created by Craig Reynolds on 1/6/24.
+//  Created by Craig Reynolds on January 6, 2024.
 //
 
 #include <iostream>
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
+#include "Vec3.h"
+
+void run_unit_tests()
+{
+    Vec3::unit_test();
+    std::cout << "All unit tests pass." << std::endl;
+}
+
+int main(int argc, const char * argv[])
+{
+    run_unit_tests();
     return 0;
 }

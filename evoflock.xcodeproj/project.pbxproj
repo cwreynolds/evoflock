@@ -28,6 +28,7 @@
 		841F3D612B49EE6C00483276 /* Vec3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Vec3.h; sourceTree = "<group>"; };
 		841F3D622B4A1C8100483276 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		841F3D632B4A1C8D00483276 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		841F3D642B4C73A500483276 /* Utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +48,7 @@
 				841F3D622B4A1C8100483276 /* LICENSE */,
 				841F3D5F2B49E9FE00483276 /* main.cpp */,
 				841F3D632B4A1C8D00483276 /* README.md */,
+				841F3D642B4C73A500483276 /* Utilities.h */,
 				841F3D612B49EE6C00483276 /* Vec3.h */,
 				841F3D562B49E90000483276 /* Products */,
 			);

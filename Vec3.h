@@ -11,6 +11,7 @@
 //------------------------------------------------------------------------------
 
 #pragma once
+#include "Utilities.h"
 #include <cmath>
 #include <cassert>
 #include <sstream>
@@ -18,54 +19,86 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // TODO 20240106 move this to utilities later
-inline float sq(float x) { return x * x; }
-float util_random2(float a, float b) { return (a + b) / 2; }
+//inline float sq(float x) { return x * x; }
+//float util_random2(float a, float b) { return (a + b) / 2; }
 
 
 
-// for debugging: prints one line with a given C expression, an equals sign,
-// and the value of the expression.  For example "angle = 35.6"
-#define debugPrint(e) { grabPrintLock(); debugPrintNL(e); }
-
-// Original (circa 2002) "non locking" version, in case it is ever useful.
-#define debugPrintNL(e) (std::cout << #e" = " << (e) << std::endl << std::flush)
-
-// Use global mutex to allow synchronizing console output from parallel threads.
-// (Written as a macro since the lock_guard is released at the end of a block.)
-#define grabPrintLock() \
-std::lock_guard<std::recursive_mutex> pl_(DebugPrint::getPrintMutex());
-
-// Define a global, static std::recursive_mutex to allow synchronizing console
-// output from parallel threads.
+//    // for debugging: prints one line with a given C expression, an equals sign,
+//    // and the value of the expression.  For example "angle = 35.6"
+//    #define debugPrint(e) { grabPrintLock(); debugPrintNL(e); }
 //
-// TODO maybe make constructor do the work now done by "debugPrint(e)" macro?
+//    // Original (circa 2002) "non locking" version, in case it is ever useful.
+//    #define debugPrintNL(e) (std::cout << #e" = " << (e) << std::endl << std::flush)
 //
-class DebugPrint
-{
-public:
-    static std::recursive_mutex& getPrintMutex()
-    {
-        static std::recursive_mutex print_mutex_;
-        return print_mutex_;
-    }
-};
+//    // Use global mutex to allow synchronizing console output from parallel threads.
+//    // (Written as a macro since the lock_guard is released at the end of a block.)
+//    #define grabPrintLock() \
+//    std::lock_guard<std::recursive_mutex> pl_(DebugPrint::getPrintMutex());
+//
+//    // Define a global, static std::recursive_mutex to allow synchronizing console
+//    // output from parallel threads.
+//    //
+//    // TODO maybe make constructor do the work now done by "debugPrint(e)" macro?
+//    //
+//    class DebugPrint
+//    {
+//    public:
+//        static std::recursive_mutex& getPrintMutex()
+//        {
+//            static std::recursive_mutex print_mutex_;
+//            return print_mutex_;
+//        }
+//    };
 
-// This value works on my laptop with Python 3.10
-double epsilon = 0.00000000000001;
+//    // This value works on my laptop with Python 3.10
+//    double epsilon = 0.00000000000001;
+
+// QQQ
+// TODO 20240107 0.00000000000001 was not working in C++, must return to this!!!
+double epsilon = 0.000001;
+
+
 
 //bool util_within_epsilon(float a, float b) { return true; } // MOCK!!
 //bool util_within_epsilon(float a, float b, float e) { return true; } // MOCK!!
 
+//// True when a and b differ by no more than epsilon.
+//bool util_within_epsilon(float a, float b, double e=epsilon)
+//{
+//    debugPrint(a)
+//    debugPrint(b)
+//    debugPrint(e)
+//    debugPrint(a - b)
+//    debugPrint(std::abs(a - b))
+//    debugPrint(std::abs(a - b) <= e)
+//    debugPrint(std::to_string(a))
+//    debugPrint(std::to_string(b))
+//    return std::abs(a - b) <= e;
+//}
+
 // True when a and b differ by no more than epsilon.
-bool util_within_epsilon(float a, float b, double e=epsilon)
+bool util_within_epsilon(double a, double b, double e=epsilon)
 {
-    debugPrint(a)
-    debugPrint(b)
-    debugPrint(e)
-    debugPrint(std::abs(a - b) <= e)
+    // TODO 20240107 0.00000000000001 was not working in C++, must return to this!!!
+//    debugPrint(a)
+//    debugPrint(b)
+//    debugPrint(e)
+//    debugPrint(a - b)
+//    debugPrint(a == b)
+//    debugPrint(std::abs(a - b))
+//    debugPrint(std::abs(a - b) <= e)
+//    debugPrint(std::to_string(a))
+//    debugPrint(std::to_string(b))
     return std::abs(a - b) <= e;
 }
 
+
+// True when x is between given bounds.
+bool util_between(float x, float a, float b)
+{
+    return (std::min(a, b) <= x) and (x <= std::max(a, b));
+}
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //import math
@@ -419,11 +452,18 @@ public:
     bool is_equal_within_epsilon(const Vec3& other) const
     {
         // bigger_epsilon = util.epsilon * 10  # Got occasional fail with default.
-        float bigger_epsilon = 0; // TODO
+//        float bigger_epsilon = 0; // TODO QQQ
+//        float bigger_epsilon = 0.000001; // TODO QQQ
+        float bigger_epsilon = epsilon; // TODO QQQ
         return (util_within_epsilon(x(), other.x(), bigger_epsilon) and
                 util_within_epsilon(y(), other.y(), bigger_epsilon) and
                 util_within_epsilon(z(), other.z(), bigger_epsilon));
     }
+    static bool is_equal_within_epsilon(const Vec3& a, const Vec3& b)
+    {
+        return a.is_equal_within_epsilon(b);
+    }
+
     
     //    # Rotate X and Y values about the Z axis by given angle.
     //    # This is used in combination with a LocalSpace transform to get model in
@@ -498,46 +538,47 @@ public:
     //                break
     //        return v / m;
 
-    //    # class RandomSequence
-    //    # Vec3 randomUnitVector();
-    //    # does Python allow the trick where RandomSequence is defined one
-    //    # place but RandomSequence::randomUnitVector() is defined elsewhere?
-    //    # oh, maybe yes: https://stackoverflow.com/a/2982/1991373
-
-    // Generate a random point in an axis aligned box, given two opposite corners.
-    static Vec3 random_point_in_axis_aligned_box(const Vec3& a, const Vec3& b)
-    {
-        return Vec3(util_random2(std::min(a.x(), b.x()), std::max(a.x(), b.x())),
-                    util_random2(std::min(a.y(), b.y()), std::max(a.y(), b.y())),
-                    util_random2(std::min(a.z(), b.z()), std::max(a.z(), b.z())));
-    }
-    
-    // Generate a random point inside a unit diameter disk centered on origin.
-    static Vec3 random_point_in_unit_radius_sphere()
-    {
-        Vec3 v;
-        do
-        {
-            v = Vec3::random_point_in_axis_aligned_box(Vec3(-1, -1, -1),
-                                                       Vec3(1, 1, 1));
-        }
-        while (v.length_squared() > 1);
-        return v;
-    }
-
-    // Generate a random unit vector.
-    static Vec3 random_unit_vector()
-    {
-        Vec3 v;
-        float m = 0;
-        do
-        {
-            v = Vec3::random_point_in_unit_radius_sphere();
-            m = v.length();
-        }
-        while (m == 0);
-        return v / m;
-    }
+//    //    # class RandomSequence
+//    //    # Vec3 randomUnitVector();
+//    //    # does Python allow the trick where RandomSequence is defined one
+//    //    # place but RandomSequence::randomUnitVector() is defined elsewhere?
+//    //    # oh, maybe yes: https://stackoverflow.com/a/2982/1991373
+//
+//    // Generate a random point in an axis aligned box, given two opposite corners.
+//    static Vec3 random_point_in_axis_aligned_box(const Vec3& a, const Vec3& b)
+//    {
+//        return Vec3(util_random2(std::min(a.x(), b.x()), std::max(a.x(), b.x())),
+//                    util_random2(std::min(a.y(), b.y()), std::max(a.y(), b.y())),
+//                    util_random2(std::min(a.z(), b.z()), std::max(a.z(), b.z())));
+//    }
+//    
+//    // Generate a random point inside a unit diameter disk centered on origin.
+//    static Vec3 random_point_in_unit_radius_sphere()
+//    {
+//        Vec3 v;
+//        do
+//        {
+//            v = Vec3::random_point_in_axis_aligned_box(Vec3(-1, -1, -1),
+//                                                       Vec3(1, 1, 1));
+//            debugPrint(v.length())
+//        }
+//        while (v.length_squared() > 1);
+//        return v;
+//    }
+//
+//    // Generate a random unit vector.
+//    static Vec3 random_unit_vector()
+//    {
+//        Vec3 v;
+//        float m = 0;
+//        do
+//        {
+//            v = Vec3::random_point_in_unit_radius_sphere();
+//            m = v.length();
+//        }
+//        while (m == 0);
+//        return v / m;
+//    }
 
     //
     //    # Given any number of Vec3s, return the one with the max length.
@@ -556,9 +597,14 @@ public:
 
     // TODO 20240107 started to implement this as a variadic function, but then
     //               could not recall if Vec3::max() is still used.
-//    // Given any number of Vec3s, return the one with the max length.
-//    static Vec3 max(const Vec3& any_number_of_Vec3s...)
+    // Given any number of Vec3s, return the one with the max length.
+//    static Vec3 max(const Vec3 any_number_of_Vec3s...)
 //    {
+//        va_list args;
+//        va_start(args, any_number_of_Vec3s);
+//
+//        
+//        
 //        longest = Vec3()
 //        magnitude2 = 0
 //        for v in any_number_of_Vec3s:
@@ -569,258 +615,73 @@ public:
 //        return longest
 //    }
 
-    ////////////////////////////////////////////////////////////////////////////
-    
-
-
-    //    @staticmethod
-    //    def unit_test():
-    
-    static void unit_test()
+    static Vec3 max(const std::vector<Vec3> any_number_of_Vec3s)
     {
-        //        v000 = Vec3(0, 0, 0)
-        //        v100 = Vec3(1, 0, 0)
-        //        v010 = Vec3(0, 1, 0)
-        //        v001 = Vec3(0, 0, 1)
-        //        v011 = Vec3(0, 1, 1)
-        //        v101 = Vec3(1, 0, 1)
-        //        v110 = Vec3(1, 1, 0)
-        //        v111 = Vec3(1, 1, 1)
-        //        v123 = Vec3(1, 2, 3)
-        //        v236 = Vec3(2, 3, 6)
-
-        Vec3 v000(0, 0, 0);
-        Vec3 v100(1, 0, 0);
-        Vec3 v010(0, 1, 0);
-        Vec3 v001(0, 0, 1);
-        Vec3 v011(0, 1, 1);
-        Vec3 v101(1, 0, 1);
-        Vec3 v110(1, 1, 0);
-        Vec3 v111(1, 1, 1);
-        Vec3 v123(1, 2, 3);
-        Vec3 v236(2, 3, 6);
-
-        //        assert str(Vec3(1, 2, 3)) == 'Vec3(1, 2, 3)'
-        //        assert Vec3(1, 2, 3) == Vec3(1, 2, 3)
-        //        assert Vec3(0, 0, 0) != Vec3(1, 0, 0)
-        //        assert Vec3(0, 0, 0) != Vec3(0, 1, 0)
-        //        assert Vec3(0, 0, 0) != Vec3(0, 0, 1)
-        //        assert Vec3(1, 2, 3) == Vec3.from_array([1, 2, 3])
-        //        assert np.array_equal(Vec3(1, 2, 3).asarray(), [1, 2, 3])
-        //        assert Vec3(1, 2, 3).dot(Vec3(4, 5, 6)) == 32
-        //        assert Vec3(2, 3, 6).length() == 7
-        //        assert Vec3(2, 3, 6).normalize() == Vec3(2, 3, 6) / 7
-        //        assert Vec3(3, 0, 0).truncate(2) == Vec3(2, 0, 0)
-        //        assert Vec3(1, 0, 0).truncate(2) == Vec3(1, 0, 0)
-        //        assert Vec3(1, 2, 3) + Vec3(4, 5, 6) == Vec3(5, 7, 9)
-        //        assert Vec3(5, 7, 9) - Vec3(4, 5, 6) == Vec3(1, 2, 3)
-        //        assert -Vec3(1, 2, 3) == Vec3(-1, -2, -3)
-        //        assert Vec3(1, 2, 3) * 2 == Vec3(2, 4, 6)
-        //        assert 2 * Vec3(1, 2, 3) == Vec3(2, 4, 6)
-        //        assert Vec3(2, 4, 6) / 2 == Vec3(1, 2, 3)
-        //        assert Vec3(1, 2, 3) < Vec3(-1, -2, -4)
+        Vec3 longest;
+        float magnitude2 = 0;
         
+        for (const Vec3& v : any_number_of_Vec3s)
+        {
+            float vm2 = v.length_squared();
+            if (magnitude2 < vm2)
+            {
+                magnitude2 = vm2;
+                longest = v;
+            }
+        }
         
-//        std::stringstream ss;
-//        ss << Vec3(1, 2, 3);
-//        assert (str(Vec3(1, 2, 3)) == 'Vec3(1, 2, 3)');
-//        assert (ss.str() == "Vec3(1, 2, 3)");
-        
-//        std::cout << "Vec3(1, 2, 3).to_string() = " << Vec3(1, 2, 3).to_string() << std::endl;
-        
-        assert(Vec3(1, 2, 3).to_string() == "Vec3(1, 2, 3)");
-        assert (Vec3(1, 2, 3) == Vec3(1, 2, 3));
-        assert (Vec3(0, 0, 0) != Vec3(1, 0, 0));
-        assert (Vec3(0, 0, 0) != Vec3(0, 1, 0));
-        assert (Vec3(0, 0, 0) != Vec3(0, 0, 1));
-//        assert (Vec3(1, 2, 3) == Vec3.from_array([1, 2, 3]));
-//        assert (np.array_equal(Vec3(1, 2, 3).asarray(), [1, 2, 3]));
-        assert (Vec3(1, 2, 3).dot(Vec3(4, 5, 6)) == 32);
-        assert (Vec3(2, 3, 6).length() == 7);
-        assert (Vec3(2, 3, 6).normalize() == Vec3(2, 3, 6) / 7);
-        assert (Vec3(3, 0, 0).truncate(2) == Vec3(2, 0, 0));
-        assert (Vec3(1, 0, 0).truncate(2) == Vec3(1, 0, 0));
-        assert (Vec3(1, 2, 3) + Vec3(4, 5, 6) == Vec3(5, 7, 9));
-        assert (Vec3(5, 7, 9) - Vec3(4, 5, 6) == Vec3(1, 2, 3));
-        assert (-Vec3(1, 2, 3) == Vec3(-1, -2, -3));
-        assert (Vec3(1, 2, 3) * 2 == Vec3(2, 4, 6));
-//        assert (2 * Vec3(1, 2, 3) == Vec3(2, 4, 6));
-        assert (Vec3(2, 4, 6) / 2 == Vec3(1, 2, 3));
-        assert (Vec3(1, 2, 3) < Vec3(-1, -2, -4));
-        
-
-        //        (n, l) = v123.normalize_and_length()
-        //        assert (n == v123.normalize()) and (l == v123.length())
-        //
-        //        assert v000.is_zero_length()
-        //        assert not v111.is_zero_length()
-        //
-        //        assert v000.normalize_or_0() == v000
-        //        assert v236.normalize_or_0() == Vec3(2, 3, 6) / 7
-        //
-        //        assert not v000.is_unit_length()
-        //        assert not v111.is_unit_length()
-        //        assert v123.normalize().is_unit_length()
-        //
-        //        assert Vec3.max(v000) == v000
-        //        assert Vec3.max(v000, v111) == v111
-        //        assert Vec3.max(v111, v000) == v111
-        //        assert Vec3.max(v123, v111, v236, v000) == v236
-        //
-        //        for i in range(20):
-        //            r = Vec3.random_point_in_axis_aligned_box(v236, v123)
-        //            assert util.between(r.x, v123.x, v236.x)
-        //            assert util.between(r.y, v123.y, v236.y)
-        //            assert util.between(r.z, v123.z, v236.z)
-        //
-        //            r = Vec3.random_point_in_unit_radius_sphere()
-        //            assert r.length() <= 1
-        //
-        //            r = Vec3.random_unit_vector()
-        //            assert util.within_epsilon(r.length(), 1)
-
-        
-        
-        // Normalize and return length
-        // TODO in c++17 should be able to say:
-        //      auto [normalize, length] = foo.normalize_and_length();
-
-        auto [n, l] = v123.normalize_and_length();
-        assert ((n == v123.normalize()) && (l == v123.length()));
-
-        assert (v000.is_zero_length());
-        assert (! v111.is_zero_length());
-
-        assert (v000.normalize_or_0() == v000);
-        assert (v236.normalize_or_0() == Vec3(2, 3, 6) / 7);
-
-        assert (! v000.is_unit_length());
-        assert (! v111.is_unit_length());
-//        debugPrint(v123.normalize().is_unit_length())
-        assert (v123.normalize().is_unit_length());
-
-//        assert Vec3.max(v000) == v000
-//        assert Vec3.max(v000, v111) == v111
-//        assert Vec3.max(v111, v000) == v111
-//        assert Vec3.max(v123, v111, v236, v000) == v236
-//
-//        for i in range(20)
-//        {
-//            r = Vec3.random_point_in_axis_aligned_box(v236, v123)
-//            assert util.between(r.x, v123.x, v236.x)
-//            assert util.between(r.y, v123.y, v236.y)
-//            assert util.between(r.z, v123.z, v236.z)
-//            
-//            r = Vec3.random_point_in_unit_radius_sphere()
-//            assert r.length() <= 1
-//            
-//            r = Vec3.random_unit_vector()
-//            assert util.within_epsilon(r.length(), 1)
-//
-//        }
-
-        //        f33 = 0.3333333333333334
-        //        f66 = 0.6666666666666665
-        //        x_norm = Vec3(1, 0, 0)
-        //        diag_norm = Vec3(1, 1, 1).normalize()
-        //        assert Vec3(2, 4, 8).parallel_component(x_norm) == Vec3(2, 0, 0)
-        //        assert Vec3(2, 4, 8).perpendicular_component(x_norm) == Vec3(0, 4, 8)
-        //        assert x_norm.parallel_component(diag_norm) == Vec3(f33, f33, f33)
-        //        assert x_norm.perpendicular_component(diag_norm) == Vec3(f66, -f33, -f33)
-        //
-        //        a = Vec3(1, 2, 3).normalize()
-        //        b = Vec3(-9, 7, 5).normalize()
-        //        c = Vec3(1, 0, 0)
-        //        assert a.is_parallel(a)
-        //        assert a.is_parallel(-a)
-        //        assert not a.is_parallel(b)
-        //        assert a.is_perpendicular(a.find_perpendicular())
-        //        assert b.is_perpendicular(b.find_perpendicular())
-        //        assert c.is_perpendicular(c.find_perpendicular())
-        //        assert not a.is_perpendicular(b)
-        //
-        //        e = Vec3(2, 4, 8)
-        //        f = Vec3(2, 4, 8 - util.epsilon / 2)
-        //        assert e.is_equal_within_epsilon(e)
-        //        assert e.is_equal_within_epsilon(f)
-        //
-        //        i = Vec3(1, 0, 0)
-        //        j = Vec3(0, 1, 0)
-        //        k = Vec3(0, 0, 1)
-        //        assert i.cross(j) == k
-        //        assert j.cross(k) == i
-        //        assert k.cross(i) == j
-        //        assert i.cross(k) == -j
-        //        assert j.cross(i) == -k
-        //        assert k.cross(j) == -i
-        //
-        //        pi2 = math.pi / 2
-        //        pi3 = math.pi / 3
-        //        pi4 = math.pi / 4
-        //        pi5 = math.pi / 5
-        //        ang = math.acos(1 / math.sqrt(3))
-        //
-        //        assert k.angle_between(k) == 0
-        //        assert i.angle_between(j) == pi2
-        //        assert util.within_epsilon(i.angle_between(Vec3(1, 1, 0)), pi4)
-        //
-        //        assert Vec3.axis_angle(v100, math.pi) == v100 * math.pi
-        //        assert Vec3.axis_angle(v111, pi3) == v111.normalize() * pi3
-        //
-        //        assert Vec3.rotate_vec_to_vec(i, j) == v001 * pi2
-        //        assert Vec3.is_equal_within_epsilon(Vec3.rotate_vec_to_vec(v100, v110),
-        //                                            Vec3.axis_angle(v001, pi4))
-        //        assert Vec3.is_equal_within_epsilon(Vec3.rotate_vec_to_vec(v111, v001),
-        //                                            Vec3.axis_angle(Vec3(1,-1,0), ang))
-        //
-        //        spi3 = math.sqrt(3) / 2                         # sin(60°), sin(pi/3)
-        //        cpi3 = 0.5                                      # cos(60°), cos(pi/3)
-        //        spi5 = math.sqrt((5 / 8) - (math.sqrt(5) / 8))  # sin(36°), sin(pi/5)
-        //        cpi5 = (1 + math.sqrt(5)) / 4                   # cos(36°), cos(pi/5)
-        //
-        //        assert Vec3.is_equal_within_epsilon(v111.rotate_xy_about_z(pi2),
-        //                                            Vec3(1, -1, 1))
-        //        assert Vec3.is_equal_within_epsilon(v111.rotate_xy_about_z(pi3),
-        //                                            Vec3(cpi3 + spi3, cpi3 - spi3, 1))
-        //        assert Vec3.is_equal_within_epsilon(v111.rotate_xy_about_z(pi5),
-        //                                            Vec3(cpi5 + spi5, cpi5 - spi5, 1))
-        //
-        //        assert Vec3.is_equal_within_epsilon(v111.rotate_xz_about_y(pi2),
-        //                                            Vec3(1, 1, -1))
-        //        assert Vec3.is_equal_within_epsilon(v111.rotate_xz_about_y(pi3),
-        //                                            Vec3(cpi3 + spi3, 1, cpi3 - spi3))
-        //        assert Vec3.is_equal_within_epsilon(v111.rotate_xz_about_y(pi5),
-        //                                            Vec3(cpi5 + spi5, 1, cpi5 - spi5))
-        //
-        //        v = Vec3(4, 5, 6)
-        //        v += Vec3(1, 2, 3)
-        //        assert v == Vec3(5, 7, 9), 'Vec3: test +='
-        //        v = Vec3(5, 7, 9)
-        //        v -= Vec3(4, 5, 6)
-        //        assert v == Vec3(1, 2, 3), 'Vec3: test -='
-        //        v = Vec3(1, 2, 3)
-        //        v *= 2
-        //        assert v == Vec3(2, 4, 6), 'Vec3: test *='
-        //        v = Vec3(2, 4, 6)
-        //        v /= 2
-        //        assert v == Vec3(1, 2, 3), 'Vec3: test /='
-        //
-        //        # assert unmodified:
-        //        assert v000 == Vec3(0, 0, 0)
-        //        assert v100 == Vec3(1, 0, 0)
-        //        assert v010 == Vec3(0, 1, 0)
-        //        assert v001 == Vec3(0, 0, 1)
-        //        assert v011 == Vec3(0, 1, 1)
-        //        assert v101 == Vec3(1, 0, 1)
-        //        assert v110 == Vec3(1, 1, 0)
-        //        assert v111 == Vec3(1, 1, 1)
-        //        assert v123 == Vec3(1, 2, 3)
-        //        assert v236 == Vec3(2, 3, 6)
-        
+        return longest;
     }
-    ////////////////////////////////////////////////////////////////////////////
 
-    //
+    
+//    // just for reference:
+//
+//    int sum_variadic(int count, ...)
+//    {
+//        va_list args;
+//        
+//        va_start(args, count);
+//        int sum = 0;
+//        for (int i = 0; i < count; i++)
+//        {
+//            sum += va_arg(args, int);
+//        }
+//        va_end(args);
+//        return sum;
+//    }
+//
+//    void simple_printf(const char* fmt...) // C-style "const char* fmt, ..." is also valid
+//    {
+//        va_list args;
+//        va_start(args, fmt);
+//        
+//        while (*fmt != '\0')
+//        {
+//            if (*fmt == 'd')
+//            {
+//                int i = va_arg(args, int);
+//                std::cout << i << '\n';
+//            }
+//            else if (*fmt == 'c')
+//            {
+//                // note automatic conversion to integral type
+//                int c = va_arg(args, int);
+//                std::cout << static_cast<char>(c) << '\n';
+//            }
+//            else if (*fmt == 'f')
+//            {
+//                double d = va_arg(args, double);
+//                std::cout << d << '\n';
+//            }
+//            ++fmt;
+//        }
+//        
+//        va_end(args);
+//    }
+
+    
+    ////////////////////////////////////////////////////////////////////////////
+    
     
 //    std::string to_string()
 //    {
@@ -833,18 +694,50 @@ public:
 ////        return "Vec3(" + xss.str() + xss.str() + xss.str();
 //        return "Vec3(" + xss.str() + xss.str() + xss.str() + ")";
 //    }
+    
+//    std::string to_string() const
+//    {
+//        std::stringstream xss;
+//        std::stringstream yss;
+//        std::stringstream zss;
+//        xss << x();
+//        yss << y();
+//        zss << z();
+//        std::string c = ", ";
+//        return "Vec3(" + xss.str() + c + yss.str() + c + zss.str() + ")";
+//    }
 
     std::string to_string() const
     {
-        std::stringstream xss;
-        std::stringstream yss;
-        std::stringstream zss;
-        xss << x();
-        yss << y();
-        zss << z();
-        std::string c = ", ";
-        return "Vec3(" + xss.str() + c + yss.str() + c + zss.str() + ")";
+//        std::stringstream xss;
+//        std::stringstream yss;
+//        std::stringstream zss;
+        std::stringstream ss;
+//        xss << x();
+//        yss << y();
+//        zss << z();
+//        std::string c = ", ";
+//        return "Vec3(" + xss.str() + c + yss.str() + c + zss.str() + ")";
+        
+        ss << "Vec3(" << x() << ", " << y() << ", " << z() << ")";
+        return ss.str();
     }
+
+    //    // Serialize Vec2 object to stream.
+    //    inline std::ostream& operator<<(std::ostream& os, const Vec3& v)
+    //    {
+    //        os << "(" << v.x() << ", " << v.y() << ", " << v.z() << ")";
+    //        return os;
+    //    }
+
+    
+    
+
+    ////////////////////////////////////////////////////////////////////////////
+
+    static void unit_test_out_of_line();
+
+    static void unit_test();
 
 private:
     float x_ = 0;
@@ -864,6 +757,468 @@ inline std::ostream& operator<<(std::ostream& os, const Vec3& v)
 {
     os << v.to_string();
     return os;
+}
+
+
+
+//    # class RandomSequence
+//    # Vec3 randomUnitVector();
+//    # does Python allow the trick where RandomSequence is defined one
+//    # place but RandomSequence::randomUnitVector() is defined elsewhere?
+//    # oh, maybe yes: https://stackoverflow.com/a/2982/1991373
+
+//    // Generate a random point in an axis aligned box, given two opposite corners.
+//    //static Vec3 random_point_in_axis_aligned_box(const Vec3& a, const Vec3& b)
+//    inline Vec3 random_point_in_axis_aligned_box(const Vec3& a, const Vec3& b)
+//    {
+//        return Vec3(util_random2(std::min(a.x(), b.x()), std::max(a.x(), b.x())),
+//                    util_random2(std::min(a.y(), b.y()), std::max(a.y(), b.y())),
+//                    util_random2(std::min(a.z(), b.z()), std::max(a.z(), b.z())));
+//    }
+
+// Generate a random point in an axis aligned box, given two opposite corners.
+inline Vec3 RandomSequence::random_point_in_axis_aligned_box(Vec3 a, Vec3 b)
+{
+    return Vec3(random2(std::min(a.x(), b.x()), std::max(a.x(), b.x())),
+                random2(std::min(a.y(), b.y()), std::max(a.y(), b.y())),
+                random2(std::min(a.z(), b.z()), std::max(a.z(), b.z())));
+}
+
+
+//    // Generate a random point inside a unit diameter disk centered on origin.
+//    static Vec3 random_point_in_unit_radius_sphere()
+//    {
+//        Vec3 v;
+//        do
+//        {
+//            v = Vec3::random_point_in_axis_aligned_box(Vec3(-1, -1, -1),
+//                                                       Vec3(1, 1, 1));
+//            debugPrint(v.length())
+//        }
+//        while (v.length_squared() > 1);
+//        return v;
+//    }
+//
+//    // Generate a random unit vector.
+//    static Vec3 random_unit_vector()
+//    {
+//        Vec3 v;
+//        float m = 0;
+//        do
+//        {
+//            v = Vec3::random_point_in_unit_radius_sphere();
+//            m = v.length();
+//        }
+//        while (m == 0);
+//        return v / m;
+//    }
+
+// Generate a random point inside a unit diameter disk centered on origin.
+inline Vec3 RandomSequence::random_point_in_unit_radius_sphere()
+{
+    Vec3 v;
+    do
+    {
+        v = random_point_in_axis_aligned_box(Vec3(-1, -1, -1), Vec3(1, 1, 1));
+    }
+    while (v.length() > 1);
+    return v;
+}
+
+// Generate a random unit vector.
+inline Vec3 RandomSequence::random_unit_vector()
+{
+    Vec3 v;
+    float m = 0;
+    do
+    {
+        v = random_point_in_unit_radius_sphere();
+        m = v.length();
+    }
+    while (m == 0);
+    return v / m;
+}
+
+
+//    // TODO 20240108 QQQ
+
+
+inline void Vec3::unit_test_out_of_line()
+{
+    RandomSequence rs;
+    rs.randomUnitVector();
+    rs.random_unit_vector();
+}
+
+
+//    @staticmethod
+//    def unit_test():
+
+inline void Vec3::unit_test()
+{
+    //        v000 = Vec3(0, 0, 0)
+    //        v100 = Vec3(1, 0, 0)
+    //        v010 = Vec3(0, 1, 0)
+    //        v001 = Vec3(0, 0, 1)
+    //        v011 = Vec3(0, 1, 1)
+    //        v101 = Vec3(1, 0, 1)
+    //        v110 = Vec3(1, 1, 0)
+    //        v111 = Vec3(1, 1, 1)
+    //        v123 = Vec3(1, 2, 3)
+    //        v236 = Vec3(2, 3, 6)
+    
+    Vec3 v000(0, 0, 0);
+    Vec3 v100(1, 0, 0);
+    Vec3 v010(0, 1, 0);
+    Vec3 v001(0, 0, 1);
+    Vec3 v011(0, 1, 1);
+    Vec3 v101(1, 0, 1);
+    Vec3 v110(1, 1, 0);
+    Vec3 v111(1, 1, 1);
+    Vec3 v123(1, 2, 3);
+    Vec3 v236(2, 3, 6);
+    
+    //        assert str(Vec3(1, 2, 3)) == 'Vec3(1, 2, 3)'
+    //        assert Vec3(1, 2, 3) == Vec3(1, 2, 3)
+    //        assert Vec3(0, 0, 0) != Vec3(1, 0, 0)
+    //        assert Vec3(0, 0, 0) != Vec3(0, 1, 0)
+    //        assert Vec3(0, 0, 0) != Vec3(0, 0, 1)
+    //        assert Vec3(1, 2, 3) == Vec3.from_array([1, 2, 3])
+    //        assert np.array_equal(Vec3(1, 2, 3).asarray(), [1, 2, 3])
+    //        assert Vec3(1, 2, 3).dot(Vec3(4, 5, 6)) == 32
+    //        assert Vec3(2, 3, 6).length() == 7
+    //        assert Vec3(2, 3, 6).normalize() == Vec3(2, 3, 6) / 7
+    //        assert Vec3(3, 0, 0).truncate(2) == Vec3(2, 0, 0)
+    //        assert Vec3(1, 0, 0).truncate(2) == Vec3(1, 0, 0)
+    //        assert Vec3(1, 2, 3) + Vec3(4, 5, 6) == Vec3(5, 7, 9)
+    //        assert Vec3(5, 7, 9) - Vec3(4, 5, 6) == Vec3(1, 2, 3)
+    //        assert -Vec3(1, 2, 3) == Vec3(-1, -2, -3)
+    //        assert Vec3(1, 2, 3) * 2 == Vec3(2, 4, 6)
+    //        assert 2 * Vec3(1, 2, 3) == Vec3(2, 4, 6)
+    //        assert Vec3(2, 4, 6) / 2 == Vec3(1, 2, 3)
+    //        assert Vec3(1, 2, 3) < Vec3(-1, -2, -4)
+    
+    
+    //        std::stringstream ss;
+    //        ss << Vec3(1, 2, 3);
+    //        assert (str(Vec3(1, 2, 3)) == 'Vec3(1, 2, 3)');
+    //        assert (ss.str() == "Vec3(1, 2, 3)");
+    
+    //        std::cout << "Vec3(1, 2, 3).to_string() = " << Vec3(1, 2, 3).to_string() << std::endl;
+    
+    assert(Vec3(1, 2, 3).to_string() == "Vec3(1, 2, 3)");
+    assert (Vec3(1, 2, 3) == Vec3(1, 2, 3));
+    assert (Vec3(0, 0, 0) != Vec3(1, 0, 0));
+    assert (Vec3(0, 0, 0) != Vec3(0, 1, 0));
+    assert (Vec3(0, 0, 0) != Vec3(0, 0, 1));
+    //        assert (Vec3(1, 2, 3) == Vec3.from_array([1, 2, 3]));
+    //        assert (np.array_equal(Vec3(1, 2, 3).asarray(), [1, 2, 3]));
+    assert (Vec3(1, 2, 3).dot(Vec3(4, 5, 6)) == 32);
+    assert (Vec3(2, 3, 6).length() == 7);
+    assert (Vec3(2, 3, 6).normalize() == Vec3(2, 3, 6) / 7);
+    assert (Vec3(3, 0, 0).truncate(2) == Vec3(2, 0, 0));
+    assert (Vec3(1, 0, 0).truncate(2) == Vec3(1, 0, 0));
+    assert (Vec3(1, 2, 3) + Vec3(4, 5, 6) == Vec3(5, 7, 9));
+    assert (Vec3(5, 7, 9) - Vec3(4, 5, 6) == Vec3(1, 2, 3));
+    assert (-Vec3(1, 2, 3) == Vec3(-1, -2, -3));
+    assert (Vec3(1, 2, 3) * 2 == Vec3(2, 4, 6));
+    //        assert (2 * Vec3(1, 2, 3) == Vec3(2, 4, 6));
+    assert (Vec3(2, 4, 6) / 2 == Vec3(1, 2, 3));
+    assert (Vec3(1, 2, 3) < Vec3(-1, -2, -4));
+    
+    
+    //        (n, l) = v123.normalize_and_length()
+    //        assert (n == v123.normalize()) and (l == v123.length())
+    //
+    //        assert v000.is_zero_length()
+    //        assert not v111.is_zero_length()
+    //
+    //        assert v000.normalize_or_0() == v000
+    //        assert v236.normalize_or_0() == Vec3(2, 3, 6) / 7
+    //
+    //        assert not v000.is_unit_length()
+    //        assert not v111.is_unit_length()
+    //        assert v123.normalize().is_unit_length()
+    //
+    //        assert Vec3.max(v000) == v000
+    //        assert Vec3.max(v000, v111) == v111
+    //        assert Vec3.max(v111, v000) == v111
+    //        assert Vec3.max(v123, v111, v236, v000) == v236
+    //
+    //        for i in range(20):
+    //            r = Vec3.random_point_in_axis_aligned_box(v236, v123)
+    //            assert util.between(r.x, v123.x, v236.x)
+    //            assert util.between(r.y, v123.y, v236.y)
+    //            assert util.between(r.z, v123.z, v236.z)
+    //
+    //            r = Vec3.random_point_in_unit_radius_sphere()
+    //            assert r.length() <= 1
+    //
+    //            r = Vec3.random_unit_vector()
+    //            assert util.within_epsilon(r.length(), 1)
+    
+    
+    
+    // Normalize and return length
+    // TODO in c++17 should be able to say:
+    //      auto [normalize, length] = foo.normalize_and_length();
+    
+    auto [n, l] = v123.normalize_and_length();
+    assert ((n == v123.normalize()) && (l == v123.length()));
+    
+    assert (v000.is_zero_length());
+    assert (! v111.is_zero_length());
+    
+    assert (v000.normalize_or_0() == v000);
+    assert (v236.normalize_or_0() == Vec3(2, 3, 6) / 7);
+    
+    assert (! v000.is_unit_length());
+    assert (! v111.is_unit_length());
+    //        debugPrint(v123.normalize().is_unit_length())
+    //        debugPrint(v123.to_string())
+    //        debugPrint(v123.normalize().to_string())
+    //        debugPrint(v123.normalize().length())
+    assert (v123.normalize().is_unit_length());
+    
+    //        Vec3 max
+    //        assert Vec3.max(v000) == v000
+    //        assert Vec3.max(v000, v111) == v111
+    //        assert Vec3.max(v111, v000) == v111
+    //        assert Vec3.max(v123, v111, v236, v000) == v236
+    
+    // Note that unlike in Python, these are wrapped in curly braces because
+    // they are actually initializers for an std::vector<Vec3>.
+    assert (Vec3::max({v000}) == v000);
+    assert (Vec3::max({v000, v111}) == v111);
+    assert (Vec3::max({v111, v000}) == v111);
+    assert (Vec3::max({v123, v111, v236, v000}) == v236);
+    
+    //        for i in range(20)
+    //        {
+    //            r = Vec3.random_point_in_axis_aligned_box(v236, v123)
+    //            assert util.between(r.x, v123.x, v236.x)
+    //            assert util.between(r.y, v123.y, v236.y)
+    //            assert util.between(r.z, v123.z, v236.z)
+    //
+    //            r = Vec3.random_point_in_unit_radius_sphere()
+    //            assert r.length() <= 1
+    //
+    //            r = Vec3.random_unit_vector()
+    //            assert util.within_epsilon(r.length(), 1)
+    //
+    //        }
+    
+    
+    // TODO 20240108 QQQ
+    RandomSequence rs;
+    for (int i = 0; i < 20; i++)
+    {
+        Vec3 r = rs.random_point_in_axis_aligned_box(v236, v123);
+        assert (util_between(r.x(), v123.x(), v236.x()));
+        assert (util_between(r.y(), v123.y(), v236.y()));
+        assert (util_between(r.z(), v123.z(), v236.z()));
+        
+        r = rs.random_point_in_unit_radius_sphere();
+        assert (r.length() <= 1);
+        
+        r = rs.random_unit_vector();
+        assert (util_within_epsilon(r.length(), 1));
+    }
+
+//    std::cout << "YAY" << std::endl;
+    
+    //        f33 = 0.3333333333333334
+    //        f66 = 0.6666666666666665
+    //        x_norm = Vec3(1, 0, 0)
+    //        diag_norm = Vec3(1, 1, 1).normalize()
+    //        assert Vec3(2, 4, 8).parallel_component(x_norm) == Vec3(2, 0, 0)
+    //        assert Vec3(2, 4, 8).perpendicular_component(x_norm) == Vec3(0, 4, 8)
+    //        assert x_norm.parallel_component(diag_norm) == Vec3(f33, f33, f33)
+    //        assert x_norm.perpendicular_component(diag_norm) == Vec3(f66, -f33, -f33)
+
+    float f33 = 0.3333333333333334;
+    float f66 = 0.6666666666666665;
+    Vec3 x_norm(1, 0, 0);
+    Vec3 diag_norm = Vec3(1, 1, 1).normalize();
+    assert (Vec3(2, 4, 8).parallel_component(x_norm) == Vec3(2, 0, 0));
+    assert (Vec3(2, 4, 8).perpendicular_component(x_norm) == Vec3(0, 4, 8));
+//    assert (x_norm.parallel_component(diag_norm) == Vec3(f33, f33, f33));
+//    assert (x_norm.perpendicular_component(diag_norm) == Vec3(f66, -f33, -f33));
+    assert (Vec3::is_equal_within_epsilon(x_norm.parallel_component(diag_norm),
+                                          Vec3(f33, f33, f33)));
+    assert (Vec3::is_equal_within_epsilon(x_norm.perpendicular_component(diag_norm),
+                                          Vec3(f66, -f33, -f33)));
+
+    //        a = Vec3(1, 2, 3).normalize()
+    //        b = Vec3(-9, 7, 5).normalize()
+    //        c = Vec3(1, 0, 0)
+    //        assert a.is_parallel(a)
+    //        assert a.is_parallel(-a)
+    //        assert not a.is_parallel(b)
+    //        assert a.is_perpendicular(a.find_perpendicular())
+    //        assert b.is_perpendicular(b.find_perpendicular())
+    //        assert c.is_perpendicular(c.find_perpendicular())
+    //        assert not a.is_perpendicular(b)
+    
+    Vec3 a = Vec3(1, 2, 3).normalize();
+    Vec3 b = Vec3(-9, 7, 5).normalize();
+    Vec3 c = Vec3(1, 0, 0);
+    assert (a.is_parallel(a));
+    assert (a.is_parallel(-a));
+    assert (! a.is_parallel(b));
+    assert (a.is_perpendicular(a.find_perpendicular()));
+    assert (b.is_perpendicular(b.find_perpendicular()));
+    assert (c.is_perpendicular(c.find_perpendicular()));
+    assert (not a.is_perpendicular(b));
+
+    //        e = Vec3(2, 4, 8)
+    //        f = Vec3(2, 4, 8 - util.epsilon / 2)
+    //        assert e.is_equal_within_epsilon(e)
+    //        assert e.is_equal_within_epsilon(f)
+
+    Vec3 e = Vec3(2, 4, 8);
+//    Vec3 f = Vec3(2, 4, 8 - epsilon / 2);
+    Vec3 f = Vec3(2, 4, 8 - epsilon * 2);
+    assert (e.is_equal_within_epsilon(e));
+    assert (! e.is_equal_within_epsilon(f));
+
+    //        i = Vec3(1, 0, 0)
+    //        j = Vec3(0, 1, 0)
+    //        k = Vec3(0, 0, 1)
+    //        assert i.cross(j) == k
+    //        assert j.cross(k) == i
+    //        assert k.cross(i) == j
+    //        assert i.cross(k) == -j
+    //        assert j.cross(i) == -k
+    //        assert k.cross(j) == -i
+    
+    Vec3 i(1, 0, 0);
+    Vec3 j(0, 1, 0);
+    Vec3 k(0, 0, 1);
+    assert (i.cross(j) == k);
+    assert (j.cross(k) == i);
+    assert (k.cross(i) == j);
+    assert (i.cross(k) == -j);
+    assert (j.cross(i) == -k);
+    assert (k.cross(j) == -i);
+
+
+    //        pi2 = math.pi / 2
+    //        pi3 = math.pi / 3
+    //        pi4 = math.pi / 4
+    //        pi5 = math.pi / 5
+    //        ang = math.acos(1 / math.sqrt(3))
+    //
+    //        assert k.angle_between(k) == 0
+    //        assert i.angle_between(j) == pi2
+    //        assert util.within_epsilon(i.angle_between(Vec3(1, 1, 0)), pi4)
+    //
+    //        assert Vec3.axis_angle(v100, math.pi) == v100 * math.pi
+    //        assert Vec3.axis_angle(v111, pi3) == v111.normalize() * pi3
+    //
+    //        assert Vec3.rotate_vec_to_vec(i, j) == v001 * pi2
+    //        assert Vec3.is_equal_within_epsilon(Vec3.rotate_vec_to_vec(v100, v110),
+    //                                            Vec3.axis_angle(v001, pi4))
+    //        assert Vec3.is_equal_within_epsilon(Vec3.rotate_vec_to_vec(v111, v001),
+    //                                            Vec3.axis_angle(Vec3(1,-1,0), ang))
+    //
+    //        spi3 = math.sqrt(3) / 2                         # sin(60°), sin(pi/3)
+    //        cpi3 = 0.5                                      # cos(60°), cos(pi/3)
+    //        spi5 = math.sqrt((5 / 8) - (math.sqrt(5) / 8))  # sin(36°), sin(pi/5)
+    //        cpi5 = (1 + math.sqrt(5)) / 4                   # cos(36°), cos(pi/5)
+    //
+    //        assert Vec3.is_equal_within_epsilon(v111.rotate_xy_about_z(pi2),
+    //                                            Vec3(1, -1, 1))
+    //        assert Vec3.is_equal_within_epsilon(v111.rotate_xy_about_z(pi3),
+    //                                            Vec3(cpi3 + spi3, cpi3 - spi3, 1))
+    //        assert Vec3.is_equal_within_epsilon(v111.rotate_xy_about_z(pi5),
+    //                                            Vec3(cpi5 + spi5, cpi5 - spi5, 1))
+    //
+    //        assert Vec3.is_equal_within_epsilon(v111.rotate_xz_about_y(pi2),
+    //                                            Vec3(1, 1, -1))
+    //        assert Vec3.is_equal_within_epsilon(v111.rotate_xz_about_y(pi3),
+    //                                            Vec3(cpi3 + spi3, 1, cpi3 - spi3))
+    //        assert Vec3.is_equal_within_epsilon(v111.rotate_xz_about_y(pi5),
+    //                                            Vec3(cpi5 + spi5, 1, cpi5 - spi5))
+
+    float pi = std::acos(-1);
+    float pi2 = pi / 2;
+    float pi3 = pi / 3;
+    float pi4 = pi / 4;
+    float pi5 = pi / 5;
+    float ang = std::acos(1 / std::sqrt(3));
+    
+//    assert ((k.angle_between(k) == 0));
+//    assert i.angle_between(j) == pi2
+//    assert util.within_epsilon(i.angle_between(Vec3(1, 1, 0)), pi4)
+    assert (Vec3::angle_between(k, k) == 0);
+    assert (Vec3::angle_between(i, j) == pi2);
+    assert (util_within_epsilon(Vec3::angle_between(i, Vec3(1, 1, 0)), pi4));
+
+    assert (Vec3::axis_angle(v100, pi) == v100 * pi);
+    assert (Vec3::axis_angle(v111, pi3) == v111.normalize() * pi3);
+    
+    assert (Vec3::rotate_vec_to_vec(i, j) == v001 * pi2);
+    assert (Vec3::is_equal_within_epsilon(Vec3::rotate_vec_to_vec(v100, v110),
+                                          Vec3::axis_angle(v001, pi4)));
+    assert (Vec3::is_equal_within_epsilon(Vec3::rotate_vec_to_vec(v111, v001),
+                                          Vec3::axis_angle(Vec3(1,-1,0), ang)));
+
+    
+    float spi3 = std::sqrt(3) / 2;                         // sin(60°), sin(pi/3)
+    float cpi3 = 0.5;                                      // cos(60°), cos(pi/3)
+    float spi5 = std::sqrt((5 / 8) - (std::sqrt(5) / 8));  // sin(36°), sin(pi/5)
+    float cpi5 = (1 + std::sqrt(5)) / 4;                   // cos(36°), cos(pi/5)
+    
+    assert (Vec3::is_equal_within_epsilon(v111.rotate_xy_about_z(pi2),
+                                          Vec3(1, -1, 1)));
+    assert (Vec3::is_equal_within_epsilon(v111.rotate_xy_about_z(pi3),
+                                          Vec3(cpi3 + spi3, cpi3 - spi3, 1)));
+    
+//    debugPrint(v111.rotate_xy_about_z(pi5))
+//    debugPrint(Vec3(cpi5 + spi5, cpi5 - spi5, 1))
+//    v111.rotate_xy_about_z(pi5) = Vec3(1.3968, 0.221232, 1)
+//    Vec3(cpi5 + spi5, cpi5 - spi5, 1) = Vec3(nan, nan, 1)
+//
+//    
+//    assert (Vec3::is_equal_within_epsilon(v111.rotate_xy_about_z(pi5),
+//                                          Vec3(cpi5 + spi5, cpi5 - spi5, 1)));
+    
+/* *****************************************************************************
+    assert Vec3.is_equal_within_epsilon(v111.rotate_xz_about_y(pi2),
+                                        Vec3(1, 1, -1))
+    assert Vec3.is_equal_within_epsilon(v111.rotate_xz_about_y(pi3),
+                                        Vec3(cpi3 + spi3, 1, cpi3 - spi3))
+    assert Vec3.is_equal_within_epsilon(v111.rotate_xz_about_y(pi5),
+                                        Vec3(cpi5 + spi5, 1, cpi5 - spi5))
+ **************************************************************************** */
+    
+    
+    //        v = Vec3(4, 5, 6)
+    //        v += Vec3(1, 2, 3)
+    //        assert v == Vec3(5, 7, 9), 'Vec3: test +='
+    //        v = Vec3(5, 7, 9)
+    //        v -= Vec3(4, 5, 6)
+    //        assert v == Vec3(1, 2, 3), 'Vec3: test -='
+    //        v = Vec3(1, 2, 3)
+    //        v *= 2
+    //        assert v == Vec3(2, 4, 6), 'Vec3: test *='
+    //        v = Vec3(2, 4, 6)
+    //        v /= 2
+    //        assert v == Vec3(1, 2, 3), 'Vec3: test /='
+    //
+    //        # assert unmodified:
+    //        assert v000 == Vec3(0, 0, 0)
+    //        assert v100 == Vec3(1, 0, 0)
+    //        assert v010 == Vec3(0, 1, 0)
+    //        assert v001 == Vec3(0, 0, 1)
+    //        assert v011 == Vec3(0, 1, 1)
+    //        assert v101 == Vec3(1, 0, 1)
+    //        assert v110 == Vec3(1, 1, 0)
+    //        assert v111 == Vec3(1, 1, 1)
+    //        assert v123 == Vec3(1, 2, 3)
+    //        assert v236 == Vec3(2, 3, 6)
+    
 }
 
 ////////////////////////////////////////////////////////////////////////////////

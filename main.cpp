@@ -7,8 +7,9 @@
 //
 //------------------------------------------------------------------------------
 
-#include <iostream>
 #include "Vec3.h"
+#include "Utilities.h"
+#include <iostream>
 
 void run_unit_tests()
 {
@@ -19,13 +20,6 @@ void run_unit_tests()
 int main(int argc, const char * argv[])
 {
     run_unit_tests();
-//    {
-//        // this takes ~1 second to run in "release" mode.
-//        Timer foo_timer("foo");
-//        for (int i = 0; i < 460000; i++)
-//        {
-//            Vec3::unit_test();
-//        }
-//    }
+//    executions_per_second(Vec3::unit_test);
     return 0;
 }

@@ -18,89 +18,6 @@
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// TODO 20240106 move this to utilities later
-//inline float sq(float x) { return x * x; }
-//float util_random2(float a, float b) { return (a + b) / 2; }
-
-
-
-//    // for debugging: prints one line with a given C expression, an equals sign,
-//    // and the value of the expression.  For example "angle = 35.6"
-//    #define debugPrint(e) { grabPrintLock(); debugPrintNL(e); }
-//
-//    // Original (circa 2002) "non locking" version, in case it is ever useful.
-//    #define debugPrintNL(e) (std::cout << #e" = " << (e) << std::endl << std::flush)
-//
-//    // Use global mutex to allow synchronizing console output from parallel threads.
-//    // (Written as a macro since the lock_guard is released at the end of a block.)
-//    #define grabPrintLock() \
-//    std::lock_guard<std::recursive_mutex> pl_(DebugPrint::getPrintMutex());
-//
-//    // Define a global, static std::recursive_mutex to allow synchronizing console
-//    // output from parallel threads.
-//    //
-//    // TODO maybe make constructor do the work now done by "debugPrint(e)" macro?
-//    //
-//    class DebugPrint
-//    {
-//    public:
-//        static std::recursive_mutex& getPrintMutex()
-//        {
-//            static std::recursive_mutex print_mutex_;
-//            return print_mutex_;
-//        }
-//    };
-
-//    // This value works on my laptop with Python 3.10
-//    double epsilon = 0.00000000000001;
-
-// QQQ
-// TODO 20240107 0.00000000000001 was not working in C++, must return to this!!!
-double epsilon = 0.000001;
-
-
-
-//bool util_within_epsilon(float a, float b) { return true; } // MOCK!!
-//bool util_within_epsilon(float a, float b, float e) { return true; } // MOCK!!
-
-//// True when a and b differ by no more than epsilon.
-//bool util_within_epsilon(float a, float b, double e=epsilon)
-//{
-//    debugPrint(a)
-//    debugPrint(b)
-//    debugPrint(e)
-//    debugPrint(a - b)
-//    debugPrint(std::abs(a - b))
-//    debugPrint(std::abs(a - b) <= e)
-//    debugPrint(std::to_string(a))
-//    debugPrint(std::to_string(b))
-//    return std::abs(a - b) <= e;
-//}
-
-// True when a and b differ by no more than epsilon.
-bool util_within_epsilon(double a, double b, double e=epsilon)
-{
-    // TODO 20240107 0.00000000000001 was not working in C++, must return to this!!!
-//    debugPrint(a)
-//    debugPrint(b)
-//    debugPrint(e)
-//    debugPrint(a - b)
-//    debugPrint(a == b)
-//    debugPrint(std::abs(a - b))
-//    debugPrint(std::abs(a - b) <= e)
-//    debugPrint(std::to_string(a))
-//    debugPrint(std::to_string(b))
-    return std::abs(a - b) <= e;
-}
-
-
-// True when x is between given bounds.
-bool util_between(float x, float a, float b)
-{
-    return (std::min(a, b) <= x) and (x <= std::max(a, b));
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 //import math
 //import numpy as np
 //import Utilities as util
@@ -220,7 +137,10 @@ public:
     Vec3 operator*(float s) const { return { x() * s, y() * s, z() * s}; }
     Vec3 operator/(float s) const { return { x() / s, y() / s, z() / s}; }
     Vec3 operator-() const { return *this * -1; }
-    
+    Vec3 operator+=(const Vec3& rhs) { return *this = *this + rhs; }
+    Vec3 operator-=(const Vec3& rhs) { return *this = *this - rhs; }
+    Vec3 operator*=(float s) { return *this = *this * s; }
+    Vec3 operator/=(float s) { return *this = *this / s; }
 
     // Vector operations dot product, length (norm), normalize.
     float dot(const Vec3& v) const
@@ -246,10 +166,10 @@ public:
 //        { return util_within_epsilon(length_squared(), 1); }
     bool is_unit_length() const
     {
-        return util_within_epsilon(length_squared(), 1);
+        return within_epsilon(length_squared(), 1);
     }
     bool is_zero_length() const
-        { return util_within_epsilon(length_squared(), 0); }
+        { return within_epsilon(length_squared(), 0); }
 
     Vec3 truncate(float max_length)
     {
@@ -382,7 +302,7 @@ public:
         // assert that given vectors are unit length to see if it ever comes up.
         assert (is_unit_length());
         assert (other.is_unit_length());
-        return util_within_epsilon(dot(other), 0);
+        return within_epsilon(dot(other), 0);
     }
     
     // Check if two unit vectors are parallel (or anti-parallel).
@@ -392,7 +312,7 @@ public:
         // assert that given vectors are unit length to see if it ever comes up.
         assert (is_unit_length());
         assert (other.is_unit_length());
-        return util_within_epsilon(abs(dot(other)), 1);
+        return within_epsilon(abs(dot(other)), 1);
     }
 
     //    # Given a (unit) vector, return some vector that is purpendicular.
@@ -455,9 +375,9 @@ public:
 //        float bigger_epsilon = 0; // TODO QQQ
 //        float bigger_epsilon = 0.000001; // TODO QQQ
         float bigger_epsilon = epsilon; // TODO QQQ
-        return (util_within_epsilon(x(), other.x(), bigger_epsilon) and
-                util_within_epsilon(y(), other.y(), bigger_epsilon) and
-                util_within_epsilon(z(), other.z(), bigger_epsilon));
+        return (within_epsilon(x(), other.x(), bigger_epsilon) and
+                within_epsilon(y(), other.y(), bigger_epsilon) and
+                within_epsilon(z(), other.z(), bigger_epsilon));
     }
     static bool is_equal_within_epsilon(const Vec3& a, const Vec3& b)
     {
@@ -957,12 +877,6 @@ inline void Vec3::unit_test()
     //            r = Vec3.random_unit_vector()
     //            assert util.within_epsilon(r.length(), 1)
     
-    
-    
-    // Normalize and return length
-    // TODO in c++17 should be able to say:
-    //      auto [normalize, length] = foo.normalize_and_length();
-    
     auto [n, l] = v123.normalize_and_length();
     assert ((n == v123.normalize()) && (l == v123.length()));
     
@@ -1014,15 +928,15 @@ inline void Vec3::unit_test()
     for (int i = 0; i < 20; i++)
     {
         Vec3 r = rs.random_point_in_axis_aligned_box(v236, v123);
-        assert (util_between(r.x(), v123.x(), v236.x()));
-        assert (util_between(r.y(), v123.y(), v236.y()));
-        assert (util_between(r.z(), v123.z(), v236.z()));
+        assert (between(r.x(), v123.x(), v236.x()));
+        assert (between(r.y(), v123.y(), v236.y()));
+        assert (between(r.z(), v123.z(), v236.z()));
         
         r = rs.random_point_in_unit_radius_sphere();
         assert (r.length() <= 1);
         
         r = rs.random_unit_vector();
-        assert (util_within_epsilon(r.length(), 1));
+        assert (within_epsilon(r.length(), 1));
     }
 
 //    std::cout << "YAY" << std::endl;
@@ -1153,7 +1067,7 @@ inline void Vec3::unit_test()
 //    assert util.within_epsilon(i.angle_between(Vec3(1, 1, 0)), pi4)
     assert (Vec3::angle_between(k, k) == 0);
     assert (Vec3::angle_between(i, j) == pi2);
-    assert (util_within_epsilon(Vec3::angle_between(i, Vec3(1, 1, 0)), pi4));
+    assert (within_epsilon(Vec3::angle_between(i, Vec3(1, 1, 0)), pi4));
 
     assert (Vec3::axis_angle(v100, pi) == v100 * pi);
     assert (Vec3::axis_angle(v111, pi3) == v111.normalize() * pi3);
@@ -1165,35 +1079,54 @@ inline void Vec3::unit_test()
                                           Vec3::axis_angle(Vec3(1,-1,0), ang)));
 
     
+//        float spi3 = std::sqrt(3) / 2;                         // sin(60°), sin(pi/3)
+//        float cpi3 = 0.5;                                      // cos(60°), cos(pi/3)
+//
+//    //        spi5 = math.sqrt((5 / 8) - (math.sqrt(5) / 8))   # sin(36°), sin(pi/5)
+//    //  float spi5 = std::sqrt((5 / 8) - (std::sqrt(5) / 8));  // sin(36°), sin(pi/5)
+//    //    float spi5 = std::sin(pi5);
+//      float spi5 = std::sqrt((5.0 / 8) - (std::sqrt(5) / 8)); // sin(36°), sin(pi/5)
+//
+//        float cpi5 = (1 + std::sqrt(5)) / 4;                   // cos(36°), cos(pi/5)
+
     float spi3 = std::sqrt(3) / 2;                         // sin(60°), sin(pi/3)
     float cpi3 = 0.5;                                      // cos(60°), cos(pi/3)
-    float spi5 = std::sqrt((5 / 8) - (std::sqrt(5) / 8));  // sin(36°), sin(pi/5)
+    float spi5 = std::sqrt((5.0 / 8) - (std::sqrt(5) / 8));// sin(36°), sin(pi/5)
     float cpi5 = (1 + std::sqrt(5)) / 4;                   // cos(36°), cos(pi/5)
+
     
+    
+//    //    debugPrint(spi3)
+//    //    debugPrint(cpi3)
+//        debugPrint(std::sin(pi5))
+//        debugPrint(spi5)
+//    //    debugPrint(cpi5)
+//
+//        debugPrint(std::sqrt(5) / 8)
+//        debugPrint((5 / 8) - (std::sqrt(5) / 8))
+
     assert (Vec3::is_equal_within_epsilon(v111.rotate_xy_about_z(pi2),
                                           Vec3(1, -1, 1)));
     assert (Vec3::is_equal_within_epsilon(v111.rotate_xy_about_z(pi3),
                                           Vec3(cpi3 + spi3, cpi3 - spi3, 1)));
     
-//    debugPrint(v111.rotate_xy_about_z(pi5))
-//    debugPrint(Vec3(cpi5 + spi5, cpi5 - spi5, 1))
-//    v111.rotate_xy_about_z(pi5) = Vec3(1.3968, 0.221232, 1)
-//    Vec3(cpi5 + spi5, cpi5 - spi5, 1) = Vec3(nan, nan, 1)
-//
-//    
-//    assert (Vec3::is_equal_within_epsilon(v111.rotate_xy_about_z(pi5),
-//                                          Vec3(cpi5 + spi5, cpi5 - spi5, 1)));
+//        debugPrint(v111.rotate_xy_about_z(pi5))
+//        debugPrint(Vec3(cpi5 + spi5, cpi5 - spi5, 1))
+//    //    Prints:
+//    //    v111.rotate_xy_about_z(pi5) = Vec3(1.3968, 0.221232, 1)
+//    //    Vec3(cpi5 + spi5, cpi5 - spi5, 1) = Vec3(nan, nan, 1)
     
-/* *****************************************************************************
-    assert Vec3.is_equal_within_epsilon(v111.rotate_xz_about_y(pi2),
-                                        Vec3(1, 1, -1))
-    assert Vec3.is_equal_within_epsilon(v111.rotate_xz_about_y(pi3),
-                                        Vec3(cpi3 + spi3, 1, cpi3 - spi3))
-    assert Vec3.is_equal_within_epsilon(v111.rotate_xz_about_y(pi5),
-                                        Vec3(cpi5 + spi5, 1, cpi5 - spi5))
- **************************************************************************** */
+    assert (Vec3::is_equal_within_epsilon(v111.rotate_xy_about_z(pi5),
+                                          Vec3(cpi5 + spi5, cpi5 - spi5, 1)));
     
     
+    assert (Vec3::is_equal_within_epsilon(v111.rotate_xz_about_y(pi2),
+                                         Vec3(1, 1, -1)));
+    assert (Vec3::is_equal_within_epsilon(v111.rotate_xz_about_y(pi3),
+                                         Vec3(cpi3 + spi3, 1, cpi3 - spi3)));
+    assert (Vec3::is_equal_within_epsilon(v111.rotate_xz_about_y(pi5),
+                                         Vec3(cpi5 + spi5, 1, cpi5 - spi5)));
+
     //        v = Vec3(4, 5, 6)
     //        v += Vec3(1, 2, 3)
     //        assert v == Vec3(5, 7, 9), 'Vec3: test +='
@@ -1206,7 +1139,22 @@ inline void Vec3::unit_test()
     //        v = Vec3(2, 4, 6)
     //        v /= 2
     //        assert v == Vec3(1, 2, 3), 'Vec3: test /='
-    //
+
+    Vec3 v;
+    v = Vec3(4, 5, 6);
+    v += Vec3(1, 2, 3);
+    assert (v == Vec3(5, 7, 9) && "Vec3: test +=");
+    v = Vec3(5, 7, 9);
+    v -= Vec3(4, 5, 6);
+    assert (v == Vec3(1, 2, 3) && "Vec3: test -=");
+    v = Vec3(1, 2, 3);
+    v *= 2;
+    assert (v == Vec3(2, 4, 6) && "Vec3: test *=");
+    v = Vec3(2, 4, 6);
+    v /= 2;
+    assert (v == Vec3(1, 2, 3) && "Vec3: test /=");
+    
+
     //        # assert unmodified:
     //        assert v000 == Vec3(0, 0, 0)
     //        assert v100 == Vec3(1, 0, 0)
@@ -1218,7 +1166,19 @@ inline void Vec3::unit_test()
     //        assert v111 == Vec3(1, 1, 1)
     //        assert v123 == Vec3(1, 2, 3)
     //        assert v236 == Vec3(2, 3, 6)
-    
+
+    // assert unmodified:
+    assert (v000 == Vec3(0, 0, 0));
+    assert (v100 == Vec3(1, 0, 0));
+    assert (v010 == Vec3(0, 1, 0));
+    assert (v001 == Vec3(0, 0, 1));
+    assert (v011 == Vec3(0, 1, 1));
+    assert (v101 == Vec3(1, 0, 1));
+    assert (v110 == Vec3(1, 1, 0));
+    assert (v111 == Vec3(1, 1, 1));
+    assert (v123 == Vec3(1, 2, 3));
+    assert (v236 == Vec3(2, 3, 6));
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

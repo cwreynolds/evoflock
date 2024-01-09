@@ -23,6 +23,7 @@
 
 
 #pragma once
+#include <iostream>
 #include <cstdlib>
 #include <chrono>
 #include <thread>
@@ -227,14 +228,28 @@ private:
 //    # True when x is between given bounds.
 //    def between(x, a, b):
 //        return (min(a, b) <= x) and (x <= max(a, b))
-//
+
+
 //    # This value works on my laptop with Python 3.10
 //    epsilon = 0.00000000000001
 //
 //    # True when a and b differ by no more than epsilon.
 //    def within_epsilon(a, b, e=epsilon):
 //        return abs(a - b) <= e
-//
+
+// This value works on my laptop with Python 3.10
+//double epsilon = 0.00000000000001;
+// TODO 20240107 0.00000000000001 was not working in C++, must return to this!!!
+//               might this be a float vs double issue?
+double epsilon = 0.000001;
+
+// True when a and b differ by no more than epsilon.
+bool within_epsilon(double a, double b, double e=epsilon)
+{
+    return std::abs(a - b) <= e;
+}
+
+
 //    # Taken from https://en.wikipedia.org/wiki/Logistic_function
 //    #def logistic(x, k, L, x0):
 //    #    return L / (1 + math.exp(-k * (x - x0)))
@@ -400,3 +415,16 @@ private:
 };
 
 //------------------------------------------------------------------------------
+
+// Measure the execution time of a given "work load" function (of no arguments)
+// and an optional suggested repetition count.
+float executions_per_second(std::function<void()> work_load, int count = 500000)
+{
+    Timer timer;
+    for (int i = 0; i < count; i++) { work_load(); }
+    float executions_per_second = count / timer.elapsedSeconds();
+    float seconds_per_execution = 1 / executions_per_second;
+    debugPrint(seconds_per_execution)
+    debugPrint(executions_per_second)
+    return executions_per_second;
+}

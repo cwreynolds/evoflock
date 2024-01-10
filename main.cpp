@@ -14,12 +14,15 @@
 void run_unit_tests()
 {
     Vec3::unit_test();
-    std::cout << "All unit tests pass." << std::endl;
+    util::unit_test();
+    std::cout << "All unit tests OK." << std::endl;
 }
 
 int main(int argc, const char * argv[])
 {
     run_unit_tests();
 //    executions_per_second(Vec3::unit_test);
+//    debugPrint(argc)
+//    debugPrint(Vec3(1, 2, 3) * 2)
     return 0;
 }

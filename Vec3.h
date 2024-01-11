@@ -170,18 +170,38 @@ public:
                 cross(reference).normalize());
     }
 
+//    // Check if two vectors are within epsilon of being equal.
+//    bool is_equal_within_epsilon(const Vec3& other) const
+//    {
+//        // bigger_epsilon = util.epsilon * 10  # Got occasional fail with default.
+//        float bigger_epsilon = util::epsilon; // TODO QQQ
+//        return (util::within_epsilon(x(), other.x(), bigger_epsilon) and
+//                util::within_epsilon(y(), other.y(), bigger_epsilon) and
+//                util::within_epsilon(z(), other.z(), bigger_epsilon));
+//    }
+//    static bool is_equal_within_epsilon(const Vec3& a, const Vec3& b)
+//    {
+//        return a.is_equal_within_epsilon(b);
+//    }
+    
     // Check if two vectors are within epsilon of being equal.
-    bool is_equal_within_epsilon(const Vec3& other) const
+    bool is_equal_within_epsilon(const Vec3& other,
+                                 float epsilon=util::epsilon) const
     {
         // bigger_epsilon = util.epsilon * 10  # Got occasional fail with default.
-        float bigger_epsilon = util::epsilon; // TODO QQQ
-        return (util::within_epsilon(x(), other.x(), bigger_epsilon) and
-                util::within_epsilon(y(), other.y(), bigger_epsilon) and
-                util::within_epsilon(z(), other.z(), bigger_epsilon));
+//        float bigger_epsilon = util::epsilon; // TODO QQQ
+//        return (util::within_epsilon(x(), other.x(), bigger_epsilon) and
+//                util::within_epsilon(y(), other.y(), bigger_epsilon) and
+//                util::within_epsilon(z(), other.z(), bigger_epsilon));
+        return (util::within_epsilon(x(), other.x(), epsilon) and
+                util::within_epsilon(y(), other.y(), epsilon) and
+                util::within_epsilon(z(), other.z(), epsilon));
     }
-    static bool is_equal_within_epsilon(const Vec3& a, const Vec3& b)
+    static bool is_equal_within_epsilon(const Vec3& a,
+                                        const Vec3& b,
+                                        float epsilon=util::epsilon)
     {
-        return a.is_equal_within_epsilon(b);
+        return a.is_equal_within_epsilon(b, epsilon);
     }
 
     // Rotate X and Y values about the Z axis by given angle.

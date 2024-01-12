@@ -22,12 +22,12 @@ public:
     
     // Constructors
     Vec3() {}
-    Vec3(float x, float y, float z) : x_(x), y_(y), z_(z) {}
+    Vec3(double x, double y, double z) : x_(x), y_(y), z_(z) {}
 
     // Accessors
-    float x() const { return x_; }
-    float y() const { return y_; }
-    float z() const { return z_; }
+    double x() const { return x_; }
+    double y() const { return y_; }
+    double z() const { return z_; }
 
     // Basic operators.
     bool operator==(const Vec3 v) const
@@ -39,19 +39,19 @@ public:
         { return { x() + v.x(), y() + v.y(), z() + v.z() }; }
     Vec3 operator-(Vec3 v) const
         { return { x() - v.x(), y() - v.y(), z() - v.z() }; }
-    Vec3 operator*(float s) const { return { x() * s, y() * s, z() * s}; }
-    Vec3 operator/(float s) const { return { x() / s, y() / s, z() / s}; }
+    Vec3 operator*(double s) const { return { x() * s, y() * s, z() * s}; }
+    Vec3 operator/(double s) const { return { x() / s, y() / s, z() / s}; }
     Vec3 operator-() const { return *this * -1; }
     Vec3 operator+=(const Vec3& rhs) { return *this = *this + rhs; }
     Vec3 operator-=(const Vec3& rhs) { return *this = *this - rhs; }
-    Vec3 operator*=(float s) { return *this = *this * s; }
-    Vec3 operator/=(float s) { return *this = *this / s; }
+    Vec3 operator*=(double s) { return *this = *this * s; }
+    Vec3 operator/=(double s) { return *this = *this / s; }
 
     // Vector operations dot product, length (norm), normalize.
-    float dot(const Vec3& v) const
+    double dot(const Vec3& v) const
         { return x() * v.x() + y() * v.y() + z() * v.z(); }
-    float length() const { return std::sqrt(sq(x()) + sq(y()) + sq(z())); }
-    float length_squared() const { return sq(x()) + sq(y()) + sq(z()); }
+    double length() const { return std::sqrt(sq(x()) + sq(y()) + sq(z())); }
+    double length_squared() const { return sq(x()) + sq(y()) + sq(z()); }
     Vec3 normalize() const { return *this / length(); }
     
     // Normalize except if input is zero length, then return that.
@@ -61,9 +61,9 @@ public:
     // Normalize and return length
     // TODO in c++17 should be able to say:
     //      auto [normalize, length] = foo.normalize_and_length();
-    std::tuple<Vec3, float> normalize_and_length()
+    std::tuple<Vec3, double> normalize_and_length()
     {
-        float original_length = length();
+        double original_length = length();
         return  {*this / original_length, original_length};
     }
 
@@ -77,9 +77,9 @@ public:
     }
 
     // Returns vector parallel to "this" but no longer than "max_length"
-    Vec3 truncate(float max_length)
+    Vec3 truncate(double max_length)
     {
-        float len = length();
+        double len = length();
         return len <= max_length ? *this : *this * (max_length / len);
     }
     
@@ -87,7 +87,7 @@ public:
     Vec3 parallel_component(const Vec3& unit_basis)
     {
         assert (unit_basis.is_unit_length());
-        float projection = dot(unit_basis);
+        double projection = dot(unit_basis);
         return unit_basis * projection;
     }
     
@@ -112,7 +112,7 @@ public:
     // Get angle between two arbitrary direction vectors. (Visualize two vectors
     // placed tail to tail, the angle is measured on the plane containing both.
     // See https://commons.wikimedia.org/wiki/File:Inner-product-angle.svg)
-    static float angle_between(const Vec3& a, const Vec3& b)
+    static double angle_between(const Vec3& a, const Vec3& b)
     {
         return std::acos(a.dot(b) / (a.length() * b.length()));
     }
@@ -122,7 +122,7 @@ public:
     // allowed, as defined by the direction of the first argument. The return
     // value is effectively the axis with its length set to the angle (expressed
     // in radians). See https://en.wikipedia.org/wiki/Axis–angle_representation
-    static Vec3 axis_angle(const Vec3& axis, float angle)
+    static Vec3 axis_angle(const Vec3& axis, double angle)
     {
         Vec3 aa;
         if (angle != 0 && axis.length_squared() > 0)
@@ -169,37 +169,19 @@ public:
                 Vec3(0, 1, 0) :          // perpendicular to "reference"
                 cross(reference).normalize());
     }
-
-//    // Check if two vectors are within epsilon of being equal.
-//    bool is_equal_within_epsilon(const Vec3& other) const
-//    {
-//        // bigger_epsilon = util.epsilon * 10  # Got occasional fail with default.
-//        float bigger_epsilon = util::epsilon; // TODO QQQ
-//        return (util::within_epsilon(x(), other.x(), bigger_epsilon) and
-//                util::within_epsilon(y(), other.y(), bigger_epsilon) and
-//                util::within_epsilon(z(), other.z(), bigger_epsilon));
-//    }
-//    static bool is_equal_within_epsilon(const Vec3& a, const Vec3& b)
-//    {
-//        return a.is_equal_within_epsilon(b);
-//    }
     
     // Check if two vectors are within epsilon of being equal.
     bool is_equal_within_epsilon(const Vec3& other,
-                                 float epsilon=util::epsilon) const
+                                 double epsilon=util::epsilon) const
     {
         // bigger_epsilon = util.epsilon * 10  # Got occasional fail with default.
-//        float bigger_epsilon = util::epsilon; // TODO QQQ
-//        return (util::within_epsilon(x(), other.x(), bigger_epsilon) and
-//                util::within_epsilon(y(), other.y(), bigger_epsilon) and
-//                util::within_epsilon(z(), other.z(), bigger_epsilon));
         return (util::within_epsilon(x(), other.x(), epsilon) and
                 util::within_epsilon(y(), other.y(), epsilon) and
                 util::within_epsilon(z(), other.z(), epsilon));
     }
     static bool is_equal_within_epsilon(const Vec3& a,
                                         const Vec3& b,
-                                        float epsilon=util::epsilon)
+                                        double epsilon=util::epsilon)
     {
         return a.is_equal_within_epsilon(b, epsilon);
     }
@@ -208,28 +190,28 @@ public:
     // This is used in combination with a LocalSpace transform to get model in
     // correct orientation. A more generalized "rotate about given axis by given
     // angle" might be nice to have for convenience.
-    Vec3 rotate_xy_about_z(float angle)
+    Vec3 rotate_xy_about_z(double angle)
     {
-        float s = std::sin(angle);
-        float c = std::cos(angle);
+        double s = std::sin(angle);
+        double c = std::cos(angle);
         return Vec3(x() * c + y() * s, y() * c - x() * s, z());
     }
     
-    Vec3 rotate_xz_about_y(float angle)
+    Vec3 rotate_xz_about_y(double angle)
     {
-        float s = std::sin(angle);
-        float c = std::cos(angle);
+        double s = std::sin(angle);
+        double c = std::cos(angle);
         return Vec3(x() * c + z() * s, y(), z() * c - x() * s);
     }
 
     static Vec3 max(const std::vector<Vec3> any_number_of_Vec3s)
     {
         Vec3 longest;
-        float magnitude2 = 0;
+        double magnitude2 = 0;
         
         for (const Vec3& v : any_number_of_Vec3s)
         {
-            float vm2 = v.length_squared();
+            double vm2 = v.length_squared();
             if (magnitude2 < vm2)
             {
                 magnitude2 = vm2;
@@ -313,8 +295,8 @@ public:
             assert (util::within_epsilon(r.length(), 1));
         }
         
-        float f33 = 0.3333333333333334;
-        float f66 = 0.6666666666666665;
+        double f33 = 0.3333333333333334;
+        double f66 = 0.6666666666666665;
         Vec3 x_norm(1, 0, 0);
         Vec3 diag_norm = Vec3(1, 1, 1).normalize();
         assert (Vec3(2, 4, 8).parallel_component(x_norm) == Vec3(2, 0, 0));
@@ -350,12 +332,12 @@ public:
         assert (j.cross(i) == -k);
         assert (k.cross(j) == -i);
         
-        float pi = std::acos(-1);
-        float pi2 = pi / 2;
-        float pi3 = pi / 3;
-        float pi4 = pi / 4;
-        float pi5 = pi / 5;
-        float ang = std::acos(1 / std::sqrt(3));
+        double pi = std::acos(-1);
+        double pi2 = pi / 2;
+        double pi3 = pi / 3;
+        double pi4 = pi / 4;
+        double pi5 = pi / 5;
+        double ang = std::acos(1 / std::sqrt(3));
         
         assert (Vec3::angle_between(k, k) == 0);
         assert (Vec3::angle_between(i, j) == pi2);
@@ -370,10 +352,10 @@ public:
         assert (Vec3::is_equal_within_epsilon(Vec3::rotate_vec_to_vec(v111, v001),
                                               Vec3::axis_angle(Vec3(1,-1,0), ang)));
         
-        float spi3 = std::sqrt(3) / 2;                         // sin(60°), sin(pi/3)
-        float cpi3 = 0.5;                                      // cos(60°), cos(pi/3)
-        float spi5 = std::sqrt((5.0 / 8) - (std::sqrt(5) / 8));// sin(36°), sin(pi/5)
-        float cpi5 = (1 + std::sqrt(5)) / 4;                   // cos(36°), cos(pi/5)
+        double spi3 = std::sqrt(3) / 2;                         // sin(60°), sin(pi/3)
+        double cpi3 = 0.5;                                      // cos(60°), cos(pi/3)
+        double spi5 = std::sqrt((5.0 / 8) - (std::sqrt(5) / 8));// sin(36°), sin(pi/5)
+        double cpi5 = (1 + std::sqrt(5)) / 4;                   // cos(36°), cos(pi/5)
         assert (Vec3::is_equal_within_epsilon(v111.rotate_xy_about_z(pi2),
                                               Vec3(1, -1, 1)));
         assert (Vec3::is_equal_within_epsilon(v111.rotate_xy_about_z(pi3),
@@ -414,9 +396,9 @@ public:
         assert (v236 == Vec3(2, 3, 6));
     }
 private:
-    float x_ = 0;
-    float y_ = 0;
-    float z_ = 0;
+    double x_ = 0;
+    double y_ = 0;
+    double z_ = 0;
 };
 
 // Serialize Vec2 object to stream.
@@ -451,7 +433,7 @@ inline Vec3 RandomSequence::random_point_in_unit_radius_sphere()
 inline Vec3 RandomSequence::random_unit_vector()
 {
     Vec3 v;
-    float m = 0;
+    double m = 0;
     do
     {
         v = random_point_in_unit_radius_sphere();

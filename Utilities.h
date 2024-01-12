@@ -36,23 +36,23 @@ T interpolate(const F& alpha, const T& x0, const T& x1)
 // Constrain a given value "x" to be between two bounds: "bound0" and "bound1"
 // (without regard to order). Returns x if it is between the bounds, otherwise
 // returns the nearer bound.
-inline float clip(float x, float bound0, float bound1)
+inline double clip(double x, double bound0, double bound1)
 {
-    float clipped = x;
-    float min = std::min(bound0, bound1);
-    float max = std::max(bound0, bound1);
+    double clipped = x;
+    double min = std::min(bound0, bound1);
+    double max = std::max(bound0, bound1);
     if (clipped < min) clipped = min;
     if (clipped > max) clipped = max;
     return clipped;
 }
 
-inline float clip01 (const float x)
+inline double clip01 (const double x)
 {
     return clip(x, 0, 1);
 }
 
 // True when x is between given bounds (low ≤ x ≤ high)
-inline bool between(float x, float a, float b)
+inline bool between(double x, double a, double b)
 {
     return (std::min(a, b) <= x) && (x <= std::max(a, b));
 }
@@ -74,32 +74,31 @@ inline uint32_t rehash32bits(uint64_t u64)
 }
 
 // Taken from https://en.wikipedia.org/wiki/Logistic_function
-float logistic(float x, float k, float L, float x0)
+double logistic(double x, double k, double L, double x0)
 {
-    x = std::max(x, -50.0f);  // TODO wait, what? Hack around an overflow issue?
     return L / (1 + std::exp(-k * (x - x0)));
 }
 // Logistic sigmoid (s-curve) from ~(0,0) to ~(1,1), ~0 if x<0, ~1 if x>1
 // (See a plot of this function via Wolfram|Alpha: https://bit.ly/3sUYbeJ)
-float unit_sigmoid_on_01(float x) { return logistic(x, 12, 1, 0.5);}
+double unit_sigmoid_on_01(double x) { return logistic(x, 12, 1, 0.5);}
 
 // Remap a value specified relative to a pair of bounding values
 // to the corresponding value relative to another pair of bounds.
 // Inspired by (dyna:remap-interval y y0 y1 z0 z1) circa 1984.
-inline float remap_interval(float x,
-                            float in0, float in1,
-                            float out0, float out1)
+inline double remap_interval(double x,
+                             double in0, double in1,
+                             double out0, double out1)
 {
     // Remap if input range is nonzero, otherwise blend them evenly.
-    float input_range = in1 - in0;
-    float blend = (input_range == 0) ? 0.5 : ((x - in0) / input_range);
+    double input_range = in1 - in0;
+    double blend = (input_range == 0) ? 0.5 : ((x - in0) / input_range);
     return interpolate(blend, out0, out1);
 }
 
 // Like remapInterval but the result is clipped to remain between out0 and out1
-inline float remap_interval_clip(float x,
-                                 float in0, float in1,
-                                 float out0, float out1)
+inline double remap_interval_clip(double x,
+                                  double in0, double in1,
+                                  double out0, double out1)
 {
     return clip(remap_interval(x, in0, in1, out0, out1), out0, out1);
 }
@@ -108,32 +107,29 @@ inline float remap_interval_clip(float x,
 
 // Utility for blending per-step values into accumulators for low pass filtering.
 // TODO 20230110 for initial Python to C++ translation I'll assume this is for
-//               floats, but it needs to be templated for any type.
+//               doubles, but it needs to be templated for any type.
 class Blender
 {
 public:
-    Blender(float initial_value = none)
+    Blender(double initial_value = none)
     {
         value = initial_value;
     }
     // "smoothness" controls how much smoothing. Values around 0.8-0.9 seem most
     // useful. smoothness=1 is infinite smoothing. smoothness=0 is no smoothing.
-    float blend(float new_value, float smoothness)
+    double blend(double new_value, double smoothness)
     {
         value = ((value == none) ?
                  new_value :
                  interpolate(smoothness, new_value, value));
         return value;
     }
-    inline static const float none = std::numeric_limits<float>::infinity();
-    float value;
+    inline static const double none = std::numeric_limits<double>::infinity();
+    double value;
 };
 
-// This value works on my laptop with Python 3.10
-//double epsilon = 0.00000000000001;
-// TODO 20240107 0.00000000000001 was not working in C++, must return to this!!!
-//               might this be a float vs double issue?
-double epsilon = 0.000001;
+// This value works on my laptop with Python 3.10 and c++17
+double epsilon = 0.000000000000001;
 
 // True when a and b differ by no more than epsilon.
 bool within_epsilon(double a, double b, double e=epsilon)
@@ -162,14 +158,14 @@ typedef std::chrono::high_resolution_clock TimeClock;
 typedef std::chrono::time_point<TimeClock> TimePoint;
 typedef std::chrono::duration<double> TimeDuration;
 
-// TimeDuration to seconds as float.
-inline float time_duration_in_seconds(TimeDuration time_duration)
+// TimeDuration to seconds as double.
+inline double time_duration_in_seconds(TimeDuration time_duration)
 {
     return time_duration.count();
 }
 
 // TimePoint difference in seconds.
-inline float time_diff_in_seconds(TimePoint start, TimePoint end)
+inline double time_diff_in_seconds(TimePoint start, TimePoint end)
 {
     TimeDuration dt = end - start;
     return time_duration_in_seconds(dt);
@@ -206,7 +202,7 @@ public:
             << elapsedSeconds() << " seconds" << std::endl;
         }
     }
-    float elapsedSeconds() const
+    double elapsedSeconds() const
     {
         return time_diff_in_seconds(start_time_, TimeClock::now());
     }
@@ -218,12 +214,12 @@ private:
 
 // Measure the execution time of a given "work load" function (of no arguments)
 // and an optional suggested repetition count.
-float executions_per_second(std::function<void()> work_load, int count = 500000)
+double executions_per_second(std::function<void()> work_load, int count = 500000)
 {
     Timer timer;
     for (int i = 0; i < count; i++) { work_load(); }
-    float executions_per_second = count / timer.elapsedSeconds();
-    float seconds_per_execution = 1 / executions_per_second;
+    double executions_per_second = count / timer.elapsedSeconds();
+    double seconds_per_execution = 1 / executions_per_second;
     std::cout << "seconds_per_execution = " << seconds_per_execution << std::endl;
     std::cout << "executions_per_second = " << executions_per_second << std::endl;
     return executions_per_second;
@@ -302,16 +298,16 @@ public:
     static uint32_t defaultSeed() { return 688395321; }
     
     // TODO look at removing the old versions of these utilities.
-    // Returns a float randomly distributed between 0 and 1
-    float frandom01() { return float(nextInt()) / float(maxIntValue()); }
-    // Returns a float randomly distributed between lowerBound and upperBound
-    float frandom2(float a, float b) { return util::interpolate(frandom01(), a, b); }
+    // Returns a double randomly distributed between 0 and 1
+    double frandom01() { return double(nextInt()) / double(maxIntValue()); }
+    // Returns a double randomly distributed between lowerBound and upperBound
+    double frandom2(double a, double b) { return util::interpolate(frandom01(), a, b); }
     // Returns an int randomly distributed between 0 and n-1.
     int randomN(int n) { return nextInt() % n; }
     int randomN(size_t n) { return nextInt() % n; }
-    // int/float overloads of random2(), returns value between INCLUSIVE bounds.
+    // int/double overloads of random2(), returns value between INCLUSIVE bounds.
     int random2(int i, int j) { assert(i<=j); return i + randomN(j - i + 1); }
-    float random2(float i, float j) { return frandom2(i, j); }
+    double random2(double i, double j) { return frandom2(i, j); }
     // Returns true or false with equal likelihood.
     bool randomBool() { return random2(0, 1); }
     // Return random element of given std::vector.
@@ -343,5 +339,5 @@ private:
 { std::lock_guard<std::recursive_mutex> pl_(util::DebugPrint::getPrintMutex());\
   std::cout << #e" = " << (e) << std::endl << std::flush; }
 
-// Square a float
-inline float sq(float f) { return f * f; }
+// Square a double
+inline double sq(double f) { return f * f; }

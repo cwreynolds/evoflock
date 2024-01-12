@@ -93,7 +93,7 @@ public:
         assert (ls.is_orthonormal() && "handmade ls is orthonormal");
         assert (r.is_orthonormal() && "randomized ls is still orthonormal");
 
-        float e = util::epsilon * 10;
+        double e = util::epsilon * 10;
         assert (a.is_equal_within_epsilon(r.globalize(r.localize(a)), e));
         assert (a.is_equal_within_epsilon(r.localize(r.globalize(a)), e));
         assert (b.is_equal_within_epsilon(r.globalize(r.localize(b)), e));

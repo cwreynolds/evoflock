@@ -42,14 +42,14 @@ public:
     void setIJKP(Vec3 i, Vec3 j, Vec3 k, Vec3 p) { i_=i; j_=j; k_=k; p_=p; }
     
     // Transforms a global space position into the local space of this object.
-    Vec3 localize(Vec3 global_vector)
+    Vec3 localize(Vec3 global_vector) const
     {
         Vec3 v = global_vector - p();
         return Vec3(v.dot(i()), v.dot(j()), v.dot(k()));
     }
     
     // Transforms a local space position to the global space.
-    Vec3 globalize(Vec3 local_vector)
+    Vec3 globalize(Vec3 local_vector) const
     {
         return ((i() * local_vector.x()) +
                 (j() * local_vector.y()) +
@@ -58,7 +58,7 @@ public:
     }
 
     // Checks that basis vectors are unit length and mutually perpendicular.
-    bool is_orthonormal()
+    bool is_orthonormal() const
     {
         return (i().is_unit_length() and
                 j().is_unit_length() and

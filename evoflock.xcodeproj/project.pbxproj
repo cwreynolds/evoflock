@@ -23,6 +23,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		840B67B62B5C28D1008AE661 /* shape.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shape.h; sourceTree = "<group>"; };
 		841F3D552B49E90000483276 /* evoflock */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = evoflock; sourceTree = BUILT_PRODUCTS_DIR; };
 		841F3D5F2B49E9FE00483276 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		841F3D612B49EE6C00483276 /* Vec3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Vec3.h; sourceTree = "<group>"; };
@@ -52,6 +53,7 @@
 				843278062B50594E00CF4AEC /* LocalSpace.h */,
 				841F3D5F2B49E9FE00483276 /* main.cpp */,
 				841F3D632B4A1C8D00483276 /* README.md */,
+				840B67B62B5C28D1008AE661 /* shape.h */,
 				841F3D642B4C73A500483276 /* Utilities.h */,
 				841F3D612B49EE6C00483276 /* Vec3.h */,
 				841F3D562B49E90000483276 /* Products */,

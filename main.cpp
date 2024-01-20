@@ -11,14 +11,16 @@
 #include "Agent.h"
 #include "Utilities.h"
 #include "LocalSpace.h"
+#include "shape.h"
 #include <iostream>
 
 void run_unit_tests()
 {
     util::unit_test();
     Vec3::unit_test();
-    Agent::unit_test();
+    shape::unit_test();
     LocalSpace::unit_test();
+    Agent::unit_test();
     std::cout << "All unit tests OK." << std::endl;
 }
 

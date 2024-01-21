@@ -229,6 +229,26 @@ public:
         return ss.str();
     }
 
+    // Essentially a "None"/"null"/"false" which is also of type Vec3. Currently
+    // used to represent a point of intersection which is either a Vec3 or None.
+    static Vec3 none()
+    {
+        static Vec3 none_(std::numeric_limits<double>::quiet_NaN(),
+                          std::numeric_limits<double>::quiet_NaN(),
+                          std::numeric_limits<double>::quiet_NaN());
+        return none_;
+    }
+    // Tests for None.
+    bool is_none() const
+    {
+        return std::isnan(x()) && std::isnan(y()) && std::isnan(z());
+    }
+    // Like "==" but works for None: equal_for_none(none(), none()) is true.
+    static bool equal_for_none(const Vec3& a, const Vec3& b)
+    {
+        return (a == b) or (a.is_none() and b.is_none());
+    }
+
     static void unit_test()
     {
         Vec3 v000(0, 0, 0);
@@ -383,6 +403,15 @@ public:
         v /= 2;
         assert (v == Vec3(1, 2, 3) && "Vec3: test /=");
         
+        assert(Vec3() == Vec3());
+        assert(none() != none());  // IEEE definition of NaN.
+        assert(Vec3() != none());
+        assert(none().is_none());
+        assert(not Vec3().is_none());
+        assert(equal_for_none(Vec3(), Vec3()));
+        assert(equal_for_none(none(), none()));
+        assert(not equal_for_none(Vec3(), none()));
+
         // Verify unmodified:
         assert (v000 == Vec3(0, 0, 0));
         assert (v100 == Vec3(1, 0, 0));

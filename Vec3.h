@@ -77,14 +77,14 @@ public:
     }
 
     // Returns vector parallel to "this" but no longer than "max_length"
-    Vec3 truncate(double max_length)
+    Vec3 truncate(double max_length) const
     {
         double len = length();
         return len <= max_length ? *this : *this * (max_length / len);
     }
     
     // return component of vector parallel to a unit basis vector
-    Vec3 parallel_component(const Vec3& unit_basis)
+    Vec3 parallel_component(const Vec3& unit_basis) const
     {
         assert (unit_basis.is_unit_length());
         double projection = dot(unit_basis);
@@ -92,7 +92,7 @@ public:
     }
     
     // return component of vector perpendicular to a unit basis vector
-    Vec3 perpendicular_component(const Vec3& unit_basis)
+    Vec3 perpendicular_component(const Vec3& unit_basis) const
     {
         return *this - parallel_component(unit_basis);
     }
@@ -141,7 +141,7 @@ public:
     }
 
     // Check if two vectors are perpendicular.
-    bool is_perpendicular(const Vec3& other)
+    bool is_perpendicular(const Vec3& other) const
     {
         // TODO 20230430 Should it check for unit length, or normalize? For now,
         // assert that given vectors are unit length to see if it ever comes up.
@@ -151,7 +151,7 @@ public:
     }
     
     // Check if two unit vectors are parallel (or anti-parallel).
-    bool is_parallel(const Vec3& other)
+    bool is_parallel(const Vec3& other) const
     {
         // TODO 20230430 Should it check for unit length, or normalize? For now,
         // assert that given vectors are unit length to see if it ever comes up.
@@ -162,7 +162,7 @@ public:
 
     // Given a (unit) vector, return some vector that is perpendicular.
     // (There are infinitely many such vectors, one is chosen arbitrarily.)
-    Vec3 find_perpendicular()
+    Vec3 find_perpendicular() const
     {
         Vec3 reference(1, 0, 0);         // Any vector NOT parallel to "this"
         return (is_parallel(reference) ? // parallel to "reference"?
@@ -190,14 +190,14 @@ public:
     // This is used in combination with a LocalSpace transform to get model in
     // correct orientation. A more generalized "rotate about given axis by given
     // angle" might be nice to have for convenience.
-    Vec3 rotate_xy_about_z(double angle)
+    Vec3 rotate_xy_about_z(double angle) const
     {
         double s = std::sin(angle);
         double c = std::cos(angle);
         return Vec3(x() * c + y() * s, y() * c - x() * s, z());
     }
     
-    Vec3 rotate_xz_about_y(double angle)
+    Vec3 rotate_xz_about_y(double angle) const
     {
         double s = std::sin(angle);
         double c = std::cos(angle);

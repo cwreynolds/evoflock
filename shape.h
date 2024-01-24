@@ -1,16 +1,14 @@
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 //  shape.h -- new flock experiments
 //
-//  A steerable agent base class for a 3d self-propelled object.
-
 //  Geometric utilities to help describe 3d shapes, particularly for the
 //  ray-shape intersection calculations used in obstacle avoidance.
 //
 //  Created by Craig Reynolds on January 20, 2024.
 //  (Based on earlier C++ and Python versions.)
 //  MIT License -- Copyright © 2024 Craig Reynolds
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 #pragma once
 #include "Vec3.h"
@@ -37,10 +35,7 @@ Vec3 ray_sphere_intersection(const Vec3& ray_origin,
                              const Vec3& sphere_center)
 {
     Vec3 intersection = Vec3::none();
-
-    // TODO 20240120 new, copy to python?
-    assert(ray_tangent.is_unit_length());
-    
+    assert(ray_tangent.is_unit_length());  // TODO 20240120 new, copy to python?
     Vec3 c = sphere_center;
     double r = sphere_radius;
     // Origin/endpoint and tangent (basis) of ray.
@@ -64,7 +59,6 @@ Vec3 ray_sphere_intersection(const Vec3& ray_origin,
     }
     return intersection;
 }
-
 
 
 // Returns the point of intersection of a ray (half-line) and a plane. Or it
@@ -127,18 +121,46 @@ Vec3 ray_cylinder_intersection(const Vec3& ray_endpoint, const Vec3& ray_tangent
     return intersection;
 }
 
-
+// Distance between two 3d lines. To provide a quick reject for an Agent's path
+// and a CylinderObstacle when computing avoidance. This version is for lines.
+// Could be made to work for rays and segments to provide better performance.
+// Derivation from https://math.stackexchange.com/a/2217845/516283
+//
+double distance_between_lines(const Vec3& origin1, const Vec3& tangent1,
+                              const Vec3& origin2, const Vec3& tangent2)
+{
+    double distance = 0;
+    Vec3 rd = origin1 - origin2;
+    if (tangent1.is_parallel(tangent2))
+    {
+        // Distance between parallel lines.
+        Vec3 q = rd.cross(tangent1);
+        distance = std::sqrt(q.dot(q) / sq(tangent2.length()));
+    }
+    else
+    {
+        // Distance between skew lines.
+        Vec3 n = tangent1.cross(tangent2);
+        distance = std::abs(n.dot(rd)) / n.length();
+    }
+    return distance;
+}
 
 void unit_test()
 {
-    Vec3 zzz(0, 0, 0);
-    Vec3 ooo(1, 1, 1);
-    Vec3 ozz(1, 0, 0);
-    Vec3 zoz(0, 1, 0);
-    Vec3 mzz(-1, 0, 0);
+    Vec3 zzz = Vec3(0, 0, 0);
+    Vec3 ooo = Vec3(1, 1, 1);
+    Vec3 ozz = Vec3(1, 0, 0);
+    Vec3 zoz = Vec3(0, 1, 0);
+    Vec3 zzo = Vec3(0, 0, 1);
+    Vec3 zoo = Vec3(0, 1, 1);
+    Vec3 ozo = Vec3(1, 0, 1);
+    Vec3 ooz = Vec3(1, 1, 0);
+    Vec3 mzz = Vec3(-1, 0, 0);
+    Vec3 zmz = Vec3(0, -1, 0);
     Vec3 ddd = ooo.normalize();
+    Vec3 ddz = ooz.normalize();
 
-    
     // Unit tests for ray_sphere_intersection()
     auto rsi = [](Vec3 result, Vec3 ao, Vec3 at, double sr, Vec3 sc,
                   std::string description)
@@ -193,14 +215,20 @@ void unit_test()
             assert(intersection == result);
         }
     };
-    rci(Vec3(1, 0, 0),
-        Vec3(2, 0, 0),
-        Vec3(-1, 0, 0),
-        Vec3(0, -1, 0),
-        Vec3(0, 1, 0),
-        1,
-        2,
+    rci(ozz, ozz * 2, mzz, zmz, zoz, 1, 2,
         "ray endpoint outside cylinder (+x), pointing toward cylinder");
+    
+    // Unit tests for distance_between_lines()
+    assert (2 == distance_between_lines(zoz, ozz, zmz, zzo));
+    assert (0 == distance_between_lines(zzz, ozz, zzz, zzo));
+    assert (0 == distance_between_lines(zzz, zoz, zoz, ozz));
+    assert (2 == distance_between_lines(zzz, zoz, Vec3(5, 0, 2), ddz));
+    // Parallel line case.
+    assert (1 == distance_between_lines(zzz, zzo, ozz, zzo));
+    // Closed form answer from:
+    // https://onlinemschool.com/math/assistance/cartesian_coordinate/p_line/
+    assert (std::sqrt(2) / std::sqrt(3) ==
+            distance_between_lines(zzz, ddd, ozo, Vec3(-1, 0, 1).normalize()));
 }
 
 }  // end of namespace shape

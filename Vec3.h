@@ -15,6 +15,7 @@
 #include <cmath>
 #include <cassert>
 #include <sstream>
+#include <iomanip> // TODO 20240113 to capture agent trajectories for unit_test.
 
 class Vec3
 {
@@ -221,11 +222,14 @@ public:
         
         return longest;
     }
-
-    std::string to_string() const
+    
+    // Convert to printable string.
+    // Defaults to "float" precision. Use 15 for full "double" (64bit) precision.
+    std::string to_string(int precision = 6) const
     {
         std::stringstream ss;
-        ss << "Vec3(" << x() << ", " << y() << ", " << z() << ")";
+        ss << std::setprecision(precision)
+           << "Vec3(" << x() << ", " << y() << ", " << z() << ")";
         return ss.str();
     }
 

@@ -13,6 +13,7 @@
 
 #pragma once
 #include "Vec3.h"
+#include "shape.h"
 
 class Obstacle
 {
@@ -32,15 +33,6 @@ public:
     virtual Vec3 ray_intersection(const Vec3& origin,
                                   const Vec3& tangent,
                                   double body_radius) const {return Vec3();}
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240127 I think this is never used, or at least never SHOULD be.
-    // Normal to the obstacle at a given point of interest.
-//    virtual Vec3 normal_at_poi(const Vec3& poi) const
-//    {
-//        return normal_at_poi(poi, Vec3::none());
-//    }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     virtual Vec3 normal_at_poi(const Vec3& poi,
                                const Vec3& agent_position) const {return Vec3();}
@@ -119,10 +111,10 @@ public:
     
     void draw() const override
     {
-//        def draw(self):
-//            if not self.tri_mesh:
-//                self.tri_mesh = Draw.make_everted_sphere(self.radius, self.center)
-//            Draw.adjust_static_scene_object(self.tri_mesh)
+        //def draw(self):
+        //    if not self.tri_mesh:
+        //        self.tri_mesh = Draw.make_everted_sphere(self.radius, self.center)
+        //    Draw.adjust_static_scene_object(self.tri_mesh)
     }
 
     std::string to_string() const override { return "EvertedSphereObstacle"; }
@@ -315,22 +307,21 @@ private:
 class Collision
 {
 public:
-    Collision(const Obstacle& obstacle_,
+    Collision(Obstacle& obstacle_,
               double time_to_collision_,
               double dist_to_collision_,
-              const Vec3& point_of_impact_,
-              const Vec3& normal_at_poi_)
-      : obstacle(obstacle_),
+              Vec3 point_of_impact_,
+              Vec3 normal_at_poi_)
+      : obstacle(&obstacle_),
         time_to_collision(time_to_collision_),
         dist_to_collision(dist_to_collision_),
         point_of_impact(point_of_impact_),
         normal_at_poi(normal_at_poi_) {}
-    
-    const Obstacle& obstacle;
+    Obstacle* obstacle;
     double time_to_collision;
     double dist_to_collision;
-    const Vec3& point_of_impact;
-    const Vec3& normal_at_poi;
+    Vec3 point_of_impact;
+    Vec3 normal_at_poi;
 };
 
 
@@ -349,15 +340,17 @@ inline void Obstacle::unit_test()
     assert(co.to_string() == "CylinderObstacle");
 
     // Verify Collision can at least be instantiated and can read back obstacle.
-    assert(&Collision(o, 1, 2, Vec3(), Vec3(1, 2, 3)).obstacle == &o);
+    assert(Collision(o, 1, 2, Vec3(), Vec3(1, 2, 3)).obstacle == &o);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // WIP prototype, slightly more testing, at least “historical repeatablity”.
+    // WIP prototype, slightly more testing, at least “historical repeatability”.
     Vec3 eso_ri = eso.ray_intersection(Vec3(-2, 4, -3),           // ray origin
                                        Vec3(1, 3, -5).normalize(),// ray tangent
                                        0.5);
     // debugPrint(eso_ri.to_string_double_precision())
-    Vec3 eso_ri_expected(-1.41115141100798, 5.76654576697607, -5.94424294496012);
+    Vec3 eso_ri_expected(-1.41115141100798,  // Recorded 20240127
+                         5.76654576697607,
+                         -5.94424294496012);
     double e = util::epsilon * 10;
     assert(Vec3::is_equal_within_epsilon(eso_ri, eso_ri_expected, e));
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

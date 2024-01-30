@@ -81,6 +81,14 @@ public:
     // Very basic roll control: use global UP as reference up.
     Vec3 up_reference(Vec3 acceleration) { return Vec3(0, 1, 0); }
     
+    // Given an arbitrary steering force, return the component purely lateral
+    // (perpendicular) to our forward basis. This is the part that steers/turns
+    // our heading but leaves speed unchanged.
+    Vec3 pure_lateral_steering(const Vec3& raw_steering)
+    {
+        return raw_steering.perpendicular_component(forward());
+    }
+    
     // TODO 20240113 experiment, return read-only const ref to LS.
     const LocalSpace& ls() const { return ls_; }
     

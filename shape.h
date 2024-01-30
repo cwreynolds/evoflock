@@ -99,7 +99,7 @@ Vec3 ray_cylinder_intersection(const Vec3& ray_endpoint, const Vec3& ray_tangent
     Vec3 b = cyl_endpoint;  // The 3d cylinder endpoint on its axis.
     Vec3 a = cyl_tangent;   // Unit 3d vector parallel to cylinder axis.
     double r = cyl_radius;  // Scalar cylinder radius.
-    double h = cyl_length;  // Scalar length along axis between endpoints.
+//    double h = cyl_length;  // Scalar length along axis between endpoints.
     Vec3 o = ray_endpoint;  // The 3d origin/end/endpoint of ray.
     Vec3 n = ray_tangent;   // Unit 3d vector parallel to ray.
     assert (a.is_unit_length());

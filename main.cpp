@@ -7,12 +7,13 @@
 //
 //------------------------------------------------------------------------------
 
-#include "Vec3.h"
 #include "Agent.h"
-#include "Utilities.h"
+#include "Boid.h"
 #include "LocalSpace.h"
-#include "shape.h"
 #include "obstacle.h"
+#include "shape.h"
+#include "Utilities.h"
+#include "Vec3.h"
 #include <iostream>
 
 void run_unit_tests()
@@ -23,6 +24,7 @@ void run_unit_tests()
     shape::unit_test();
     Obstacle::unit_test();
     Agent::unit_test();
+    Boid::unit_test();
     std::cout << "All unit tests OK." << std::endl;
 }
 
@@ -30,7 +32,5 @@ int main(int argc, const char * argv[])
 {
     run_unit_tests();
 //    util::executions_per_second(Vec3::unit_test);
-//    debugPrint(argc)
-//    debugPrint(Vec3(1, 2, 3) * 2)
     return 0;
 }

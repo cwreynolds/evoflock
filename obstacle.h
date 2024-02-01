@@ -355,3 +355,6 @@ inline void Obstacle::unit_test()
     assert(Vec3::is_equal_within_epsilon(eso_ri, eso_ri_expected, e));
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
+
+typedef std::vector<Obstacle*> ObstaclePtrList;
+typedef std::vector<Collision> CollisionList;

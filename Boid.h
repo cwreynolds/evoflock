@@ -1,4 +1,4 @@
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //
 //  Boid.h -- new flock experiments
 //
@@ -11,7 +11,7 @@
 //  Created by Craig Reynolds on January 27, 2024.
 //  (Based on earlier C++ and Python versions.)
 //  MIT License -- Copyright © 2024 Craig Reynolds
-//-------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 
 #pragma once
@@ -21,37 +21,23 @@
 #include "obstacle.h"
 #include <algorithm>  // For sort.
 
-class Boid;
-//typedef std::vector<Boid*> BoidGroup;
-typedef std::vector<Boid*> BoidPtrList;
-typedef std::vector<Obstacle*> ObstaclePtrList;
-typedef std::vector<Collision> CollisionList;
 
-//    class Flock;
-//
-//    // TODO 20240127 temporary mock
-//    class Flock
-//    {
-//    public:
-//        bool wrap_vs_avoid() { return false; }
-//        double min_time_to_collide() { return 1; }
-//        bool avoid_blend_mode() { return true; }
-//        ObstaclePtrList obstacles() { return {}; }
-//        BoidPtrList boids()  { return {}; }
-//    };
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240201 prototype FlockParameters.
 
-// TODO 20240127 temporary mock
-class Flock
+// Basically a container for all flocking parameters relevant to optimization.
+class FlockParameters
 {
 public:
-    bool wrap_vs_avoid();
-    double min_time_to_collide();
-    bool avoid_blend_mode();
-    ObstaclePtrList obstacles();
-    BoidPtrList boids();
 };
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+class Boid;
+typedef std::vector<Boid*> BoidPtrList;
+
+class Flock;
 
 class Draw
 {
@@ -113,6 +99,15 @@ private:  // move to bottom of class later
     
     inline static RandomSequence rs_;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
+    bool flock_wrap_vs_avoid = false;
+    double flock_min_time_to_collide = 0.8;  // react to predicted impact (seconds)
+    bool flock_avoid_blend_mode = true; // obstacle avoid: blend vs hard switch
+    ObstaclePtrList flock_obstacles;  // Flock's current list of obstacles.
+    BoidPtrList flock_boids;  // List of boids in flock.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 public:
     // Constructor
     Boid() : Agent()
@@ -143,7 +138,7 @@ public:
         Vec3 s = steer_to_separate(neighbors) * weight_separate_;
         Vec3 a = steer_to_align(neighbors) * weight_align_;
         Vec3 c = steer_to_cohere(neighbors) * weight_cohere_;
-        Vec3 o = steer_to_avoid(time_step) * weight_avoid_;
+        Vec3 o = steer_to_avoid() * weight_avoid_;
         Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
         combined_steering = anti_stall_adjustment(combined_steering);
         annotation(s, a, c, o, combined_steering);
@@ -205,13 +200,17 @@ public:
     // (I will collide with obstacle within Flock.min_time_to_collide seconds)
     // and "static" avoidance (I should fly away from this obstacle, for everted
     // containment obstacles).
-    Vec3 steer_to_avoid(double time_step)
+    Vec3 steer_to_avoid()
     {
         Vec3 avoid;
         avoid_obstacle_annotation(0, Vec3::none(), 0);
-        if (not flock_->wrap_vs_avoid())
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
+//        if (not flock_->wrap_vs_avoid())
+        if (not flock_wrap_vs_avoid)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
-            Vec3 predict_avoid = steer_for_predictive_avoidance(time_step);
+            Vec3 predict_avoid = steer_for_predictive_avoidance();
             Vec3 static_avoid = fly_away_from_obstacles();
             avoid = Vec3::max({static_avoid, predict_avoid});
         }
@@ -220,22 +219,27 @@ public:
     }
     
     // Steering force component for predictive obstacles avoidance.
-    Vec3 steer_for_predictive_avoidance(double time_step)
+    Vec3 steer_for_predictive_avoidance()
     {
         double weight = 0;
         Vec3 avoidance;
         CollisionList collisions = predict_future_collisions();
-        if ((time_step > 0) and (not collisions.empty()))
+        if (not collisions.empty())
         {
             const Collision& first_collision = collisions.front();
             Vec3 poi = first_collision.point_of_impact;
             Vec3 normal = first_collision.normal_at_poi;
             Vec3 pure_steering = pure_lateral_steering(normal);
             avoidance = pure_steering.normalize();
-            double min_dist = speed() * flock_->min_time_to_collide();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
+//            double min_dist = speed() * flock_->min_time_to_collide();
+            double min_dist = speed() * flock_min_time_to_collide;
             // Near enough to require avoidance steering?
             bool near = min_dist > first_collision.dist_to_collision;
-            if (flock_->avoid_blend_mode())
+//            if (flock_->avoid_blend_mode())
+            if (flock_avoid_blend_mode)
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             {
                 // Smooth weight transition from 80% to 120% of min dist.
                 double d = util::remap_interval(first_collision.dist_to_collision,
@@ -260,7 +264,11 @@ public:
         Vec3 p = position();
         Vec3 f = forward();
         double max_distance = body_radius_ * 20;  // TODO tuning parameter?
-        for (Obstacle* obstacle : flock_->obstacles())
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
+//        for (Obstacle* obstacle : flock_->obstacles())
+        for (Obstacle* obstacle : flock_obstacles)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             Vec3 oa = obstacle->fly_away(p, f, max_distance, body_radius_);
             double weight = oa.length();
@@ -352,7 +360,11 @@ public:
         auto sorted = [&](const Boid* a, const Boid* b){
             return distance_squared_from_me(a) < distance_squared_from_me(b); };
         // TODO 20240129 look also at std::partial_sort() and std::stable_sort()
-        BoidPtrList all_boids = flock_->boids();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
+//        BoidPtrList all_boids = flock_->boids();
+        BoidPtrList all_boids = flock_boids;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         std::sort(all_boids.begin(), all_boids.end(), sorted);
         
 //        // TODO 20240129 probably a better way to do this:
@@ -483,7 +495,11 @@ public:
     CollisionList predict_future_collisions() const
     {
         CollisionList collisions;
-        for (Obstacle* obstacle : flock_->obstacles())
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
+//        for (Obstacle* obstacle : flock_->obstacles())
+        for (Obstacle* obstacle : flock_obstacles)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             Vec3 point_of_impact = obstacle->ray_intersection(position(),
                                                               forward(),

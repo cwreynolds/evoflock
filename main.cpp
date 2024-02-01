@@ -9,6 +9,7 @@
 
 #include "Agent.h"
 #include "Boid.h"
+#include "flock.h"
 #include "LocalSpace.h"
 #include "obstacle.h"
 #include "shape.h"
@@ -25,6 +26,7 @@ void run_unit_tests()
     Obstacle::unit_test();
     Agent::unit_test();
     Boid::unit_test();
+    Flock::unit_test();
     std::cout << "All unit tests OK." << std::endl;
 }
 

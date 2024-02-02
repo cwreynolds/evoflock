@@ -22,18 +22,6 @@
 #include <algorithm>  // For sort.
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240201 prototype FlockParameters.
-
-// Basically a container for all flocking parameters relevant to optimization.
-class FlockParameters
-{
-public:
-};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 class Boid;
 typedef std::vector<Boid*> BoidPtrList;
 
@@ -45,62 +33,142 @@ public:
     static const bool enable = false;
 };
 
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240201 prototype FlockParameters.
+
+// Basically a container for all flocking parameters relevant to optimization.
+class FlockParameters
+{
+public:
+    double max_speed = 20.0;    // Speed upper limit (m/s)
+    double max_force = 100.0;     // Acceleration upper limit (m/s²)
+    double min_speed = max_speed * 0.3;  // TODO 20231225 ad hoc factor.
+    double speed = min_speed;
+    double body_radius = 0.5;   // "assume a spherical boid" -- unit diameter
+    
+    double sphere_radius = 0;
+    Vec3 sphere_center;
+    
+    // Tuning parameters
+    double weight_forward  = 4;
+    double weight_separate = 23;
+    double weight_align    = 12;
+    double weight_cohere   = 18;
+    double weight_avoid    = 40;
+    double max_dist_separate = 15 * body_radius;
+    double max_dist_align    = 100;
+    double max_dist_cohere   = 100;  // TODO 20231017 should this be ∞ or
+                                     // should the behavior just ignore it?
+    
+    double exponent_separate = 1;  // TODO 20231019 are these useful? Or should
+    double exponent_align    = 1;  // it just assume 1/dist is used to weight
+    double exponent_cohere   = 1;  // all neighbors in all three behaviors?
+    // Cosine of threshold angle (max angle from forward to be seen)
+    double angle_separate = -0.707;  // 135°
+    double angle_align    =  0.940;  // 20°
+    double angle_cohere   =  0;      // 90°
+    
+};
+
+//QQQ
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 class Boid : public Agent
 {
 private:  // move to bottom of class later
     
-    double max_speed_ = 20.0;    // Speed upper limit (m/s)
-    double max_force_ = 100.0;     // Acceleration upper limit (m/s²)
-    double min_speed_ = max_speed_ * 0.3;  // TODO 20231225 ad hoc factor.
-    double speed_ = min_speed_;
-    double body_radius_ = 0.5;   // "assume a spherical boid" -- unit diameter
+//    double max_speed_ = 20.0;    // Speed upper limit (m/s)
+//    double max_force_ = 100.0;     // Acceleration upper limit (m/s²)
+//    double min_speed_ = max_speed_ * 0.3;  // TODO 20231225 ad hoc factor.
+//    double speed_ = min_speed_;
+//    double body_radius_ = 0.5;   // "assume a spherical boid" -- unit diameter
     
     // TODO 20240129 should be wrapped in accessor.
     Flock* flock_ = nullptr;
     
-    double sphere_radius_ = 0;
-    Vec3 sphere_center_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240201 prototype FlockParameters.
+    // (oh, maybe this should be a pointer to a shared fp defined in Flock?)
+    FlockParameters fp_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//    double sphere_radius_ = 0;
+//    Vec3 sphere_center_;
+//    // Set during sense/plan phase, saved for steer phase.
+//    Vec3 next_steer_;
+    
     // Set during sense/plan phase, saved for steer phase.
     Vec3 next_steer_;
-    // Low pass filter for steering vector.
-    util::Blender steer_memory_;
-    // Low pass filter for roll control ("up" target).
-    util::Blender up_memory_;
-    // Cache of nearest neighbors, updating "occasionally".
-    //    std::vector<Boid*> cached_nearest_neighbors_;
-    BoidPtrList cached_nearest_neighbors_;
-    // Seconds between neighbor refresh (Set to zero to turn off caching.)
-    double neighbor_refresh_rate_ = 0.5;
-    double time_since_last_neighbor_refresh_ = 0;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240201 template-ized version of Blender
+
+//    // Low pass filter for steering vector.
+//    util::Blender steer_memory_;
+//    // Low pass filter for roll control ("up" target).
+//    util::Blender up_memory_;
+
+//    // Low pass filter for steering vector.
+//    util::Blender<Vec3> steer_memory_;
+//    // Low pass filter for roll control ("up" target).
+//    util::Blender<Vec3> up_memory_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//    // Cache of nearest neighbors, updating "occasionally".
+//    //    std::vector<Boid*> cached_nearest_neighbors_;
+//    BoidPtrList cached_nearest_neighbors_;
+//    // Seconds between neighbor refresh (Set to zero to turn off caching.)
+//    double neighbor_refresh_rate_ = 0.5;
+//    double time_since_last_neighbor_refresh_ = 0;
 
     // Vec3 wander_state_;     // For wander_steer()
     Vec3 color_;
     Vec3 annote_avoid_poi_ = Vec3();  // This might be too elaborate: two vals
     double annote_avoid_weight_ = 0;    // per boid just for avoid annotation.
     
-    // Tuning parameters
-    double weight_forward_  = 4;
-    double weight_separate_ = 23;
-    double weight_align_    = 12;
-    double weight_cohere_   = 18;
-    double weight_avoid_    = 40;
-    double max_dist_separate_ = 15 * body_radius_;
-    double max_dist_align_    = 100;
-    double max_dist_cohere_   = 100;  // TODO 20231017 should this be ∞ or
-    // should the behavior just ignore it?
+//        // Tuning parameters
+//        double weight_forward_  = 4;
+//        double weight_separate_ = 23;
+//        double weight_align_    = 12;
+//        double weight_cohere_   = 18;
+//        double weight_avoid_    = 40;
+//    //    double max_dist_separate_ = 15 * body_radius_;
+//        double max_dist_separate_ = 15 * fp().body_radius;
+//        double max_dist_align_    = 100;
+//        double max_dist_cohere_   = 100;  // TODO 20231017 should this be ∞ or
+//        // should the behavior just ignore it?
+//
+//        double exponent_separate_ = 1;  // TODO 20231019 are these useful? Or should
+//        double exponent_align_    = 1;  // it just assume 1/dist is used to weight
+//        double exponent_cohere_   = 1;  // all neighbors in all three behaviors?
+//        // Cosine of threshold angle (max angle from forward to be seen)
+//        double angle_separate_ = -0.707;  // 135°
+//        double angle_align_    =  0.940;  // 20°
+//        double angle_cohere_   =  0;      // 90°
     
-    double exponent_separate_ = 1;  // TODO 20231019 are these useful? Or should
-    double exponent_align_    = 1;  // it just assume 1/dist is used to weight
-    double exponent_cohere_   = 1;  // all neighbors in all three behaviors?
-    // Cosine of threshold angle (max angle from forward to be seen)
-    double angle_separate_ = -0.707;  // 135°
-    double angle_align_    =  0.940;  // 20°
-    double angle_cohere_   =  0;      // 90°
     
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20240201 do these seem like FlockParameters or Boid state?
+    // Low pass filter for steering vector.
+    util::Blender<Vec3> steer_memory_;
+    // Low pass filter for roll control ("up" target).
+    util::Blender<Vec3> up_memory_;
+    
+    // Cache of nearest neighbors, updating "occasionally".
+    BoidPtrList cached_nearest_neighbors_;
+    // Seconds between neighbor refresh (Set to zero to turn off caching.)
+    double neighbor_refresh_rate_ = 0.5;
+    double time_since_last_neighbor_refresh_ = 0;
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     inline static RandomSequence rs_;
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
+    //               The first three of these easily belong in FlockParameters.
+    //               What about the lists of boids and obtacles?
     bool flock_wrap_vs_avoid = false;
     double flock_min_time_to_collide = 0.8;  // react to predicted impact (seconds)
     bool flock_avoid_blend_mode = true; // obstacle avoid: blend vs hard switch
@@ -109,6 +177,13 @@ private:  // move to bottom of class later
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 public:
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20230201 experimental FlockParameters support
+    FlockParameters& fp() { return fp_; }
+    const FlockParameters& fp() const { return fp_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     // Constructor
     Boid() : Agent()
     {
@@ -117,28 +192,40 @@ public:
         color_ = Vec3(mrbc(), mrbc(), mrbc());
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20230201 experimental FlockParameters support
+
     // Determine and store desired steering for this simulation step
     void plan_next_steer(double time_step)
     {
         next_steer_ = steer_to_flock(time_step);
+//        fp().next_steer = steer_to_flock(time_step);
     }
 
     // Apply desired steering for this simulation step
     void apply_next_steer(double time_step)
     {
         steer(next_steer_, time_step);
+//        steer(fp().next_steer, time_step);
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Basic flocking behavior. Computes steering force for one simulation step
     // (an animation frame) for one boid in a flock.
     Vec3 steer_to_flock(double time_step)
     {
         BoidPtrList neighbors = nearest_neighbors(time_step);
-        Vec3 f = forward() * weight_forward_;
-        Vec3 s = steer_to_separate(neighbors) * weight_separate_;
-        Vec3 a = steer_to_align(neighbors) * weight_align_;
-        Vec3 c = steer_to_cohere(neighbors) * weight_cohere_;
-        Vec3 o = steer_to_avoid() * weight_avoid_;
+//        Vec3 f = forward() * weight_forward_;
+//        Vec3 s = steer_to_separate(neighbors) * weight_separate_;
+//        Vec3 a = steer_to_align(neighbors) * weight_align_;
+//        Vec3 c = steer_to_cohere(neighbors) * weight_cohere_;
+//        Vec3 o = steer_to_avoid() * weight_avoid_;
+        Vec3 f = forward() * fp().weight_forward;
+        Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
+        Vec3 a = steer_to_align(neighbors) * fp().weight_align;
+        Vec3 c = steer_to_cohere(neighbors) * fp().weight_cohere;
+        Vec3 o = steer_to_avoid() * fp().weight_avoid;
         Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
         combined_steering = anti_stall_adjustment(combined_steering);
         annotation(s, a, c, o, combined_steering);
@@ -153,9 +240,12 @@ public:
         {
             Vec3 offset = position() - neighbor->position();
             double dist = offset.length();
-            double weight = 1 / std::pow(dist, exponent_separate_);
-            weight *= 1 - util::unit_sigmoid_on_01(dist / max_dist_separate_);
-            weight *= angle_weight(neighbor, angle_separate_);
+//            double weight = 1 / std::pow(dist, exponent_separate_);
+//            weight *= 1 - util::unit_sigmoid_on_01(dist / max_dist_separate_);
+//            weight *= angle_weight(neighbor, angle_separate_);
+            double weight = 1 / std::pow(dist, fp().exponent_separate);
+            weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_separate);
+            weight *= angle_weight(neighbor, fp().angle_separate);
             direction += offset * weight;
         }
         return direction.normalize_or_0();
@@ -169,9 +259,12 @@ public:
         {
             Vec3 heading_offset = neighbor->forward() - forward();
             double dist = (neighbor->position() - position()).length();
-            double weight = 1 / pow(dist, exponent_align_);
-            weight *= 1 - util::unit_sigmoid_on_01(dist / max_dist_align_);
-            weight *= angle_weight(neighbor, angle_align_);
+//            double weight = 1 / pow(dist, exponent_align_);
+//            weight *= 1 - util::unit_sigmoid_on_01(dist / max_dist_align_);
+//            weight *= angle_weight(neighbor, angle_align_);
+            double weight = 1 / pow(dist, fp().exponent_align);
+            weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_align);
+            weight *= angle_weight(neighbor, fp().angle_align);
             direction += heading_offset.normalize() * weight;
         }
         return direction.normalize_or_0();
@@ -185,9 +278,12 @@ public:
         for (Boid* neighbor : neighbors)
         {
             double dist = (neighbor->position() - position()).length();
-            double weight = 1 / pow(dist, exponent_cohere_);
-            weight *= 1 - util::unit_sigmoid_on_01(dist / max_dist_cohere_);
-            weight *= angle_weight(neighbor, angle_cohere_);
+//            double weight = 1 / pow(dist, exponent_cohere_);
+//            weight *= 1 - util::unit_sigmoid_on_01(dist / max_dist_cohere_);
+//            weight *= angle_weight(neighbor, angle_cohere_);
+            double weight = 1 / pow(dist, fp().exponent_cohere);
+            weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_cohere);
+            weight *= angle_weight(neighbor, fp().angle_cohere);
             neighbor_center += neighbor->position() * weight;
             total_weight += weight;
         }
@@ -263,14 +359,24 @@ public:
         Vec3 avoidance;
         Vec3 p = position();
         Vec3 f = forward();
-        double max_distance = body_radius_ * 20;  // TODO tuning parameter?
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20230201 experimental FlockParameters support
+//        double max_distance = body_radius_ * 20;  // TODO tuning parameter?
+        double max_distance = fp().body_radius * 20;  // TODO tuning parameter?
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
 //        for (Obstacle* obstacle : flock_->obstacles())
         for (Obstacle* obstacle : flock_obstacles)
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
-            Vec3 oa = obstacle->fly_away(p, f, max_distance, body_radius_);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20230201 experimental FlockParameters support
+//            Vec3 oa = obstacle->fly_away(p, f, max_distance, body_radius_);
+            Vec3 oa = obstacle->fly_away(p, f, max_distance, fp().body_radius);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             double weight = oa.length();
             avoid_obstacle_annotation(2, obstacle->nearest_point(p), weight);
             avoidance += oa;
@@ -318,11 +424,19 @@ public:
     {
         Vec3 adjusted = raw_steering;
         double prevention_margin = 1.5;
-        if (speed() < (min_speed_ * prevention_margin))
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20230201 experimental FlockParameters support
+//        if (speed() < (min_speed_ * prevention_margin))
+        if (speed() < (fp().min_speed * prevention_margin))
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             if (raw_steering.dot(forward()) < 0)
             {
-                Vec3 ahead = forward() * max_force_ * 0.9;
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20230201 experimental FlockParameters support
+//                Vec3 ahead = forward() * max_force_ * 0.9;
+                Vec3 ahead = forward() * fp().max_force * 0.9;
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 Vec3 side = raw_steering.perpendicular_component(forward());
                 adjusted = ahead + side;
             }
@@ -408,16 +522,26 @@ public:
     //    def smoothed_steering(self, steer):
     //        return self.steer_memory.blend(steer, 0.8) # Ad hoc smoothness param.
     
+    //    // Ad hoc low-pass filtering of steering force. Blends this step's newly
+    //    // determined "raw" steering into a per-boid accumulator, then returns that
+    //    // smoothed value to use for actually steering the boid this simulation step.
+    //    Vec3 smoothed_steering(Vec3 steer)
+    //    {
+    //        // TODO 20240128 for now, skip smoothing
+    //        // return steer_memory_.blend(steer, 0.8);  // Ad hoc smoothness param.
+    //        return steer;
+    //    }
+
     // Ad hoc low-pass filtering of steering force. Blends this step's newly
     // determined "raw" steering into a per-boid accumulator, then returns that
     // smoothed value to use for actually steering the boid this simulation step.
     Vec3 smoothed_steering(Vec3 steer)
     {
-        // TODO 20240128 for now, skip smoothing
-        // return steer_memory_.blend(steer, 0.8);  // Ad hoc smoothness param.
-        return steer;
+//        return fp().steer_memory.blend(steer, 0.8);  // Ad hoc smoothness param.
+        return steer_memory_.blend(steer, 0.8);  // Ad hoc smoothness param.
     }
-    
+
+
     //    # Draw this Boid's “body” -- currently an irregular tetrahedron.
     //    def draw(self, color=None):
     //        if Draw.enable:
@@ -480,15 +604,38 @@ public:
     //        self.up_memory.value = self.up_memory.value.normalize()
     //        return self.up_memory.value
     
+//    // Bird-like roll control: blends vector toward path curvature center with
+//    //global up. Overrides method in base class Agent
+//    Vec3 up_reference(const Vec3& acceleration)
+//    {
+//        //    new_up = acceleration + Vec3(0, 0.01, 0)  # slight bias toward global up
+//        //    self.up_memory.blend(new_up, 0.999)
+//        //    self.up_memory.value = self.up_memory.value.normalize()
+//        //    return self.up_memory.value
+//        return acceleration; // TODO 20240130 MOCK FIX!
+//    }
+
     // Bird-like roll control: blends vector toward path curvature center with
-    //global up. Overrides method in base class Agent
+    // global up. Overrides method in base class Agent
     Vec3 up_reference(const Vec3& acceleration)
     {
         //    new_up = acceleration + Vec3(0, 0.01, 0)  # slight bias toward global up
         //    self.up_memory.blend(new_up, 0.999)
         //    self.up_memory.value = self.up_memory.value.normalize()
         //    return self.up_memory.value
-        return acceleration; // TODO 20240130 MOCK FIX!
+//        return acceleration; // TODO 20240130 MOCK FIX!
+        
+//        // Slight bias to global up
+//        Vec3 new_up = acceleration + Vec3(0, 0.01, 0);
+//        fp().up_memory.blend(new_up, 0.999);
+//        fp().up_memory.value = fp().up_memory.value.normalize();
+//        return fp().up_memory.value;
+
+        // Slight bias to global up
+        Vec3 new_up = acceleration + Vec3(0, 0.01, 0);
+        up_memory_.blend(new_up, 0.999);
+        up_memory_.value = up_memory_.value.normalize();
+        return up_memory_.value;
     }
 
     // Returns a list of future collisions sorted by time, with soonest first.
@@ -501,9 +648,13 @@ public:
         for (Obstacle* obstacle : flock_obstacles)
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20230201 experimental FlockParameters support
             Vec3 point_of_impact = obstacle->ray_intersection(position(),
                                                               forward(),
-                                                              body_radius_);
+//                                                              body_radius_);
+                                                              fp().body_radius);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (not point_of_impact.is_none())
             {
                 double dist_to_collision = (point_of_impact - position()).length();

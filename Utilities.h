@@ -106,29 +106,33 @@ inline double remap_interval_clip(double x,
 // Note: "class Pairings" was here in the Python version. Still needed?
 
 // Utility for blending per-step values into accumulators for low pass filtering.
-// TODO 20230110 for initial Python to C++ translation I'll assume this is for
-//               doubles, but it needs to be templated for any type.
+template<typename T>
 class Blender
 {
 public:
-    Blender(double initial_value = none)
-    {
-        value = initial_value;
-    }
+    
+    Blender() {}
+    // TODO 20240201 Initially, lets only do the "no initial_value" version
+    //               since untyped "none" is problematic in c++.
+    //    Blender(double initial_value = none)
+    //    {
+    //        value = initial_value;
+    //    }
+
     // "smoothness" controls how much smoothing. Values around 0.8-0.9 seem most
     // useful. smoothness=1 is infinite smoothing. smoothness=0 is no smoothing.
-    double blend(double new_value, double smoothness)
+    T blend(T new_value, double smoothness)
     {
-        value = ((value == none) ?
-                 new_value :
-                 interpolate(smoothness, new_value, value));
+        value = first ? new_value : interpolate(smoothness, new_value, value);
+        first = false;
         return value;
     }
-    inline static const double none = std::numeric_limits<double>::infinity();
-    double value;
+    T value;
+private:
+    bool first = true;
 };
 
-// This value works on my laptop with Python 3.10 and c++17
+// This value (aka 1e-15) works on my laptop with c++17 (uses 1e-14 for python)
 double epsilon = 0.000000000000001;
 
 // True when a and b differ by no more than epsilon.
@@ -259,9 +263,8 @@ static void unit_test()
     assert (!std::isnan(remap_interval(1, 1, 1, 2, 3)));
     assert (!std::isnan(remap_interval_clip(1, 1, 1, 2, 3)));
 
-    Blender b;
-    assert (b.value == Blender::none);
-    b.blend(1.2, Blender::none);
+    Blender<double> b;
+    b.blend(1.2, 0);
     assert (within_epsilon(b.value, 1.2));
     b.blend(3.4, 0.9);
     assert (within_epsilon(b.value, 1.42));

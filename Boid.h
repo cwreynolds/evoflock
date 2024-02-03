@@ -30,7 +30,10 @@ class Flock;
 class Draw
 {
 public:
-    static const bool enable = false;
+    bool enable() { return false; }
+    double frame_duration() const { return 1.0 / 60.0; }
+    bool poll_events() const { return true; }
+    int frame_counter() const { return 0; }
 };
 
 
@@ -47,8 +50,9 @@ public:
     double speed = min_speed;
     double body_radius = 0.5;   // "assume a spherical boid" -- unit diameter
     
-    double sphere_radius = 0;
-    Vec3 sphere_center;
+//    double sphere_radius = 0;
+    double sphere_radius = 50;
+   Vec3 sphere_center;
     
     // Tuning parameters
     double weight_forward  = 4;
@@ -87,10 +91,15 @@ private:  // move to bottom of class later
     // TODO 20240129 should be wrapped in accessor.
     Flock* flock_ = nullptr;
     
+    
+    Draw* draw_ = nullptr;
+
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240201 prototype FlockParameters.
     // (oh, maybe this should be a pointer to a shared fp defined in Flock?)
-    FlockParameters fp_;
+//    FlockParameters fp_;
+    FlockParameters* fp_ = nullptr;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //    double sphere_radius_ = 0;
@@ -180,8 +189,25 @@ public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20230201 experimental FlockParameters support
-    FlockParameters& fp() { return fp_; }
-    const FlockParameters& fp() const { return fp_; }
+//    FlockParameters& fp() { return fp_; }
+//    const FlockParameters& fp() const { return fp_; }
+
+    FlockParameters& fp() { return *fp_; }
+    const FlockParameters& fp() const { return *fp_; }
+    void set_fp(FlockParameters* fp) { fp_ = fp; }
+    
+    
+    Draw& draw() { return *draw_; }
+    const Draw& draw() const { return *draw_; }
+    void set_draw(Draw* draw) { draw_ = draw; }
+
+    
+    // Seconds between neighbor refresh (Set to zero to turn off caching.)
+    double neighbor_refresh_rate() const { return neighbor_refresh_rate_; }
+
+    void set_time_since_last_neighbor_refresh(double tslnr)
+        { time_since_last_neighbor_refresh_ = tslnr; }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Constructor
@@ -192,24 +218,17 @@ public:
         color_ = Vec3(mrbc(), mrbc(), mrbc());
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20230201 experimental FlockParameters support
-
     // Determine and store desired steering for this simulation step
     void plan_next_steer(double time_step)
     {
         next_steer_ = steer_to_flock(time_step);
-//        fp().next_steer = steer_to_flock(time_step);
     }
 
     // Apply desired steering for this simulation step
     void apply_next_steer(double time_step)
     {
         steer(next_steer_, time_step);
-//        steer(fp().next_steer, time_step);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Basic flocking behavior. Computes steering force for one simulation step
     // (an animation frame) for one boid in a flock.
@@ -577,7 +596,8 @@ public:
                     const Vec3& avoidance,
                     const Vec3& combined)
     {
-        if (Draw::enable)
+//        if (Draw::enable)
+        if (draw_->enable())
         {
             //    scale = 0.05
             //    center = self.position

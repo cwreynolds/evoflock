@@ -33,6 +33,18 @@ void run_unit_tests()
 int main(int argc, const char * argv[])
 {
     run_unit_tests();
+    
 //    util::executions_per_second(Vec3::unit_test);
+    
+    Flock flock;
+    flock.set_fixed_time_step(true);
+    flock.set_fixed_fps(60);
+    flock.set_max_simulation_steps(1000);
+    
+    {
+        util::Timer t("Basic flock test: 200 boids 1000 frames");
+        flock.run();
+    }
+    
     return 0;
 }

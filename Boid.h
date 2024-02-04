@@ -24,16 +24,32 @@
 
 class Boid;
 typedef std::vector<Boid*> BoidPtrList;
+typedef std::vector<Boid> BoidInstanceList;
 
 class Flock;
 
+// TODO 20240203 moce of Draw class for prototyping
 class Draw
 {
 public:
     bool enable() { return false; }
-    double frame_duration() const { return 1.0 / 60.0; }
+    double frame_duration() const { return frame_duration_; }
     bool poll_events() const { return true; }
-    int frame_counter() const { return 0; }
+    int frame_counter() const { return frame_counter_; }
+
+    // Measure how much wall clock time has elapsed for this simulation step.
+    void measure_frame_duration()
+    {
+        util::TimePoint frame_end_time = util::TimeClock::now();
+        frame_duration_ = util::time_diff_in_seconds(frame_end_time,
+                                                     frame_start_time);
+        frame_start_time = frame_end_time;
+        frame_counter_ += 1;
+    }
+    
+    util::TimePoint frame_start_time;
+    double frame_duration_ = 0; // measured in seconds
+    int frame_counter_ = 0;
 };
 
 
@@ -181,13 +197,28 @@ private:  // move to bottom of class later
     bool flock_wrap_vs_avoid = false;
     double flock_min_time_to_collide = 0.8;  // react to predicted impact (seconds)
     bool flock_avoid_blend_mode = true; // obstacle avoid: blend vs hard switch
-    ObstaclePtrList flock_obstacles;  // Flock's current list of obstacles.
-    BoidPtrList flock_boids;  // List of boids in flock.
+//    ObstaclePtrList flock_obstacles;  // Flock's current list of obstacles.
+    ObstaclePtrList* flock_obstacles_;  // Flock's current list of obstacles.
+//    BoidPtrList flock_boids;  // List of boids in flock.
+    BoidPtrList* flock_boids_;  // List of boids in flock.
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    
+    BoidPtrList& flock_boids() { return *flock_boids_; }
+    const BoidPtrList& flock_boids() const { return *flock_boids_; }
+    void set_flock_boids(BoidPtrList* bpl) { flock_boids_ = bpl; }
+    
+    ObstaclePtrList& flock_obstacles() { return *flock_obstacles_; }
+    const ObstaclePtrList& flock_obstacles() const { return *flock_obstacles_; }
+    void set_flock_obstacles(ObstaclePtrList* opl) { flock_obstacles_ = opl; }
+    
+
+    
+    
     // TODO 20230201 experimental FlockParameters support
 //    FlockParameters& fp() { return fp_; }
 //    const FlockParameters& fp() const { return fp_; }
@@ -208,6 +239,12 @@ public:
     void set_time_since_last_neighbor_refresh(double tslnr)
         { time_since_last_neighbor_refresh_ = tslnr; }
 
+    
+    // Cache of nearest neighbors, updating "occasionally".
+    const BoidPtrList& cached_nearest_neighbors() const
+    {
+        return cached_nearest_neighbors_;
+    }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Constructor
@@ -388,7 +425,8 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
 //        for (Obstacle* obstacle : flock_->obstacles())
-        for (Obstacle* obstacle : flock_obstacles)
+//        for (Obstacle* obstacle : flock_obstacles)
+        for (Obstacle* obstacle : flock_obstacles())
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -485,6 +523,60 @@ public:
         return cached_nearest_neighbors_;
     }
 
+//        // Recomputes a cached list of the N Boids nearest this one.
+//        void recompute_nearest_neighbors(int n=7)
+//        {
+//            auto distance_squared_from_me = [&](const Boid* boid){
+//                return (boid->position() - position()).length_squared(); };
+//            auto sorted = [&](const Boid* a, const Boid* b){
+//                return distance_squared_from_me(a) < distance_squared_from_me(b); };
+//            // TODO 20240129 look also at std::partial_sort() and std::stable_sort()
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
+//    //        BoidPtrList all_boids = flock_->boids();
+//            BoidPtrList all_boids = flock_boids;
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            std::sort(all_boids.begin(), all_boids.end(), sorted);
+//
+//    //        // TODO 20240129 probably a better way to do this:
+//    //        cached_nearest_neighbors_.clear();
+//    //        for (int i = 0; i < n; i++)
+//    //        {
+//    //            cached_nearest_neighbors_.push_back(all_boids[i]);
+//    //        }
+//
+//
+//    //            cached_nearest_neighbors_.resize(n);
+//    //    //        std::copy(cached_nearest_neighbors_.begin(),
+//    //    //                  cached_nearest_neighbors_.begin() + n,
+//    //    //                  all_boids.begin());
+//    //            auto cnnb = cached_nearest_neighbors_.begin();
+//    //            std::copy(cnnb, cnnb + n, all_boids.begin());
+//
+//    //        std::vector<int> count = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+//    //        std::vector<int> seven(7);
+//    //        std::copy(count.begin(), count.begin() + 7, seven.begin());
+//    //        show(count);
+//    //        show(seven);
+//
+//    //        // Set cached_nearest_neighbors_ to nearest "n" in all_boids.
+//    //        cached_nearest_neighbors_.resize(n);
+//    //        auto cnnb = cached_nearest_neighbors_.begin();
+//    //        std::copy(cnnb, cnnb + n, all_boids.begin());
+//
+//            // Set "cached_nearest_neighbors_" to nearest "n" in "all_boids".
+//            cached_nearest_neighbors_.resize(n);
+//            auto abb = all_boids.begin();
+//
+//            debugPrint(all_boids.size())
+//            debugPrint(cached_nearest_neighbors_.size())
+//
+//            std::copy(abb, abb + n, cached_nearest_neighbors_.begin());
+//
+//
+//            time_since_last_neighbor_refresh_ = 0;
+//        }
+
     // Recomputes a cached list of the N Boids nearest this one.
     void recompute_nearest_neighbors(int n=7)
     {
@@ -496,7 +588,9 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
 //        BoidPtrList all_boids = flock_->boids();
-        BoidPtrList all_boids = flock_boids;
+//        BoidPtrList all_boids = flock_boids;
+//        BoidPtrList all_boids = *flock_boids_;
+        BoidPtrList all_boids = flock_boids();
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         std::sort(all_boids.begin(), all_boids.end(), sorted);
         
@@ -534,6 +628,8 @@ public:
         
         time_since_last_neighbor_refresh_ = 0;
     }
+
+    
     
     //    # Ad hoc low-pass filtering of steering force. Blends this step's newly
     //    # determined "raw" steering into a per-boid accumulator, then returns that
@@ -665,7 +761,8 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
 //        for (Obstacle* obstacle : flock_->obstacles())
-        for (Obstacle* obstacle : flock_obstacles)
+//        for (Obstacle* obstacle : flock_obstacles)
+        for (Obstacle* obstacle : flock_obstacles())
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

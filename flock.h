@@ -98,7 +98,6 @@
 //            self.setup()
 
 
-//bool ok_to_run = single_step or not simulation_paused;
 
 
 // TODO 20240127 temporary mock
@@ -136,6 +135,12 @@ private:
     BoidPtrList boids_;
     ObstaclePtrList obstacles_;
     
+    // TODO 20240203 very prototype allocate boids inside std::vector<boid>
+    // std::vector of Boid INSTANCES, used to automatically allocate/deallocate.
+    BoidInstanceList boid_instance_list_;
+    
+
+    
     Draw draw_;
 
     
@@ -151,6 +156,14 @@ private:
 
     int total_stalls_ = 0;
     
+    int total_avoid_fail = 0;      // count pass through containment sphere.
+
+    int cumulative_sep_fail_ = 0;   // separation fail: a pair of boids touch.
+
+    
+    //            self.fps = util.Blender()
+    util::Blender<double> fps_;
+
 //    Flock(int boid_count = 200,
 //          double sphere_diameter = 100,
 //          Vec3 sphere_center = Vec3(),
@@ -164,6 +177,13 @@ public:
     FlockParameters& fp() { return fp_; }
     const FlockParameters& fp() const { return fp_; }
     
+//    std::vector<Boid> boid_instance_list_;
+//    BoidInstanceList boid_instance_list_;
+
+    BoidInstanceList& boid_instance_list() { return boid_instance_list_; }
+    const BoidInstanceList& boid_instance_list()const{return boid_instance_list_;}
+
+    
     BoidPtrList& boids() { return boids_; }
     const BoidPtrList& boids() const { return boids_; }
     
@@ -176,8 +196,13 @@ public:
     
 
     double max_simulation_steps() const { return max_simulation_steps_; }
+    void set_max_simulation_steps(double mss) { max_simulation_steps_ = mss; }
+
     bool fixed_time_step() const { return fixed_time_step_; }
+    void set_fixed_time_step(bool fts) { fixed_time_step_ = fts; }
+
     int fixed_fps() const { return fixed_fps_; }
+    void set_fixed_fps(int ffps) { fixed_fps_ = ffps; }
 
     
     // TODO 20240131 temp for testing, maybe keep?
@@ -188,6 +213,8 @@ public:
 
     
     
+    
+
     // Constructor
     //        def __init__(self,
     //                     boid_count = 200,
@@ -284,51 +311,81 @@ public:
     //            print('Exit at step:', Draw.frame_counter)
     
     
+//        // Run boids simulation.
+//        void run()
+//        {
+//            // draw = Draw() ## ?? currently unused but should contain draw state
+//    //        Draw draw;
+//            // Draw.start_visualizer(self.sphere_radius, self.sphere_center)
+//            // Flock.vis_pairs.add_pair(Draw.vis, self)  # Pairing for key handlers.
+//            // self.register_single_key_commands() # For Open3D visualizer GUI.
+//    //        self.make_boids(self.boid_count, self.sphere_radius, self.sphere_center)
+//            make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
+//            // self.draw()
+//            // self.cycle_obstacle_selection()
+//            // while self.still_running():
+//            while (still_running())
+//            {
+//    //            if self.run_simulation_this_frame():
+//                if (run_simulation_this_frame())
+//                {
+//                    // Draw.clear_scene()
+//    //                self.fly_flock(1 / self.fixed_fps
+//    //                               if self.fixed_time_step or not Draw.enable
+//    //                               else Draw.frame_duration)
+//    //                    fly_flock((fixed_time_step() or not Draw::enable) ?
+//    //                              1.0 / fixed_fps() :
+//    //    //                          Draw::frame_duration);
+//    //                              draw.frame_duration());
+//
+//                    fly_flock((fixed_time_step() or not draw().enable()) ?
+//                              1.0 / fixed_fps() :
+//                              draw().frame_duration());
+//
+//    //                self.sphere_wrap_around()
+//                    sphere_wrap_around();
+//                    // self.draw()
+//                    // Draw.update_scene()
+//    //                 self.log_stats()
+//    //                 self.update_fps()
+//                    log_stats();
+//                    update_fps();
+//
+//                }
+//            }
+//            // Draw.close_visualizer()
+//    //        print('Exit at step:', Draw.frame_counter)
+//    //        std::cout << "Exit at step:" << Draw::frame_counter << std::endl;
+//            std::cout << "Exit at step:" << draw().frame_counter() << std::endl;
+//        }
+
     // Run boids simulation.
     void run()
     {
-        // draw = Draw() ## ?? currently unused but should contain draw state
-//        Draw draw;
         // Draw.start_visualizer(self.sphere_radius, self.sphere_center)
         // Flock.vis_pairs.add_pair(Draw.vis, self)  # Pairing for key handlers.
         // self.register_single_key_commands() # For Open3D visualizer GUI.
-//        self.make_boids(self.boid_count, self.sphere_radius, self.sphere_center)
         make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
         // self.draw()
         // self.cycle_obstacle_selection()
         // while self.still_running():
         while (still_running())
         {
-//            if self.run_simulation_this_frame():
             if (run_simulation_this_frame())
             {
                 // Draw.clear_scene()
-//                self.fly_flock(1 / self.fixed_fps
-//                               if self.fixed_time_step or not Draw.enable
-//                               else Draw.frame_duration)
-//                    fly_flock((fixed_time_step() or not Draw::enable) ?
-//                              1.0 / fixed_fps() :
-//    //                          Draw::frame_duration);
-//                              draw.frame_duration());
-
                 fly_flock((fixed_time_step() or not draw().enable()) ?
                           1.0 / fixed_fps() :
                           draw().frame_duration());
-
-//                self.sphere_wrap_around()
                 sphere_wrap_around();
                 // self.draw()
                 // Draw.update_scene()
-//                 self.log_stats()
-//                 self.update_fps()
                 log_stats();
                 update_fps();
-
             }
         }
         // Draw.close_visualizer()
-//        print('Exit at step:', Draw.frame_counter)
-        std::cout << "Exit at step:" << Draw::frame_counter << std::endl;
+        std::cout << "Exit at step:" << draw().frame_counter() << std::endl;
     }
 
     
@@ -372,46 +429,89 @@ public:
     //                b.time_since_last_neighbor_refresh = t
 
     
+//        // Populate this flock by creating "count" boids with uniformly distributed
+//        // random positions inside a sphere with the given "radius" and "center".
+//        // Each boid has a uniformly distributed random orientation.
+//
+//    //    def make_boids(self, count, radius, center):
+//        void make_boids(int count, double radius, Vec3 center)
+//        {
+//            RandomSequence rs; // TODO 20240202 temporary
+//    //        for i in range(count):
+//            for (int i = 0; i < count; i++)
+//            {
+//    //            boid = Boid(self)
+//                Boid* boid = new Boid;
+//
+//    //            boid.sphere_radius = radius
+//    //            boid.sphere_center = center
+//                boid->set_fp(&fp());
+//
+//                boid->set_draw(&draw());
+//
+//    //            boid.ls = boid.ls.randomize_orientation()
+//                boid->set_ls(boid->ls().randomize_orientation());
+//
+//    //            boid.ls.p = (center + (radius * 0.95 *
+//    //                                   Vec3.random_point_in_unit_radius_sphere()))
+//
+//                Vec3 p(center +
+//                       (rs.random_point_in_unit_radius_sphere() * radius * 0.95));
+//                boid->setPosition(p);
+//
+//    //            self.boids.append(boid)
+//
+//                boids().push_back(boid);
+//            }
+//    //        # Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
+//    //        for b in self.boids:
+//    //            b.recompute_nearest_neighbors()
+//    //            t = util.frandom01() * b.neighbor_refresh_rate
+//    //            b.time_since_last_neighbor_refresh = t
+//
+//            // Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
+//            for (Boid* boid : boids())
+//            {
+//                boid->recompute_nearest_neighbors();
+//                double t = rs.frandom01() * boid->neighbor_refresh_rate();
+//                boid->set_time_since_last_neighbor_refresh(t);
+//            }
+//        }
+
+    
+    
     // Populate this flock by creating "count" boids with uniformly distributed
     // random positions inside a sphere with the given "radius" and "center".
     // Each boid has a uniformly distributed random orientation.
-    
-//    def make_boids(self, count, radius, center):
     void make_boids(int count, double radius, Vec3 center)
     {
         RandomSequence rs; // TODO 20240202 temporary
-//        for i in range(count):
-        for (int i; i < count; i++)
+        // Allocate default Boid instances.
+//        boid_instance_list_.resize(boid_count());
+        boid_instance_list().resize(boid_count());
+        // Construct BoidPtrList.
+//        for (Boid& boid : boid_instance_list_) { boids().push_back(&boid); }
+        for (Boid& boid : boid_instance_list()) { boids().push_back(&boid); }
+        // Set up each new Boid.
+//        for (int i = 0; i < count; i++)
+        for (Boid* boid : boids())
         {
-//            boid = Boid(self)
-            Boid* boid = new Boid;
-            
-//            boid.sphere_radius = radius
-//            boid.sphere_center = center
+//            Boid* boid = new Boid;
             boid->set_fp(&fp());
+            boid->set_draw(&draw());
             
-            boid->set_draw(draw());
-            
-//            boid.ls = boid.ls.randomize_orientation()
-            boid->set_ls(boid->ls().randomize_orientation());
+            boid->set_flock_boids(&boids());
+            boid->set_flock_obstacles(&obstacles());
 
-//            boid.ls.p = (center + (radius * 0.95 *
-//                                   Vec3.random_point_in_unit_radius_sphere()))
-            
+            boid->set_ls(boid->ls().randomize_orientation());
             Vec3 p(center +
                    (rs.random_point_in_unit_radius_sphere() * radius * 0.95));
             boid->setPosition(p);
-            
-//            self.boids.append(boid)
-            
-            boids().push_back(boid);
+//            boids().push_back(boid);
         }
-//        # Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
-//        for b in self.boids:
-//            b.recompute_nearest_neighbors()
-//            t = util.frandom01() * b.neighbor_refresh_rate
-//            b.time_since_last_neighbor_refresh = t
-
+        
+//        std::cout << "finished 'Set up each new Boid.'" << std::endl;
+        
         // Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
         for (Boid* boid : boids())
         {
@@ -481,7 +581,51 @@ public:
     //                    boid.recompute_nearest_neighbors()
     //                    if not self.wrap_vs_avoid:
     //                        self.total_avoid_fail += 1
-    //
+    
+    
+    
+    // When a Boid gets more than "radius" from "sphere_center", teleport it to
+    // the other side of the world, just inside of its antipodal point.
+    void sphere_wrap_around()
+    {
+//        radius = self.sphere_radius
+//        center = self.sphere_center
+
+        double radius = fp().sphere_radius;
+        Vec3 center = fp().sphere_center;
+
+//        for boid in self.boids:
+        for (Boid* boid : boids())
+        {
+//            bp = boid.position
+            Vec3 bp = boid->position();
+            
+//            distance_from_center = (bp - center).length()
+            double distance_from_center = (bp - center).length();
+
+//            if distance_from_center > radius:
+            if (distance_from_center > radius)
+            {
+//                new_position = (center - bp).normalize() * radius * 0.95
+                Vec3 new_position = (center - bp).normalize() * radius * 0.95;
+                
+//                boid.ls.p = new_position
+//                boid.recompute_nearest_neighbors()
+                boid->setPosition(new_position);
+                boid->recompute_nearest_neighbors();
+
+//                if not self.wrap_vs_avoid:
+//                    self.total_avoid_fail += 1
+                if (not wrap_vs_avoid())
+                {
+                    total_avoid_fail += 1;
+                }
+            }
+        }
+    }
+
+    
+    
     //        # Calculate and log various statistics for flock.
     //        def log_stats(self):
     //            if not self.simulation_paused:
@@ -520,13 +664,115 @@ public:
     //                              '00')[0:5] +
     //                          ', avoid_fail=' + str(self.total_avoid_fail) +
     //                          ', stalls=' + str(self.total_stalls))
-    //
-    //        # Keep track of a smoothed (LPF) version of frames per second metric.
-    //        def update_fps(self):
-    //            self.fps.blend(self.fixed_fps if self.fixed_time_step
-    //                                          else int(1 / Draw.frame_duration),
-    //                           0.95)
     
+    
+    // Calculate and log various statistics for flock.
+    void log_stats()
+    {
+//        if not self.simulation_paused:
+        if (not simulation_paused_)
+        {
+//            Draw.measure_frame_duration()
+            draw().measure_frame_duration();
+
+//            if Draw.frame_counter % 100 == 0:
+            if (draw().frame_counter() % 100 == 0)
+            {
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20240203 very temp for debugging
+                debugPrint(boids().at(0)->position())
+                debugPrint(boids().at(0)->forward())
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                
+                
+                
+//                average_speed = mean([b.speed for b in self.boids])
+                double average_speed = 0;
+                for (Boid* b : boids()) { average_speed += b->speed(); }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20240203 very temp for debugging
+                debugPrint(boids().at(0)->speed())
+                debugPrint(average_speed)
+                debugPrint(boid_count())
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                average_speed /= boid_count();
+
+                // Loop over all unique pairs of distinct boids: ab==ba, not aa
+                double min_sep = std::numeric_limits<double>::infinity();
+                double ave_sep = 0;
+                //    pair_count = 0
+                //    # Via https://stackoverflow.com/a/942551/1991373
+                //    for (p, q) in itertools.combinations(self.boids, 2):
+                //        dist = (p.position - q.position).length()
+                //        if min_sep > dist:
+                //            min_sep = dist
+                //        ave_sep += dist
+                //        pair_count += 1
+                //        if dist < 2 * p.body_radius:
+                //            self.cumulative_sep_fail += 1
+                //    ave_sep /= pair_count
+                //
+                
+//                max_nn_dist = 0
+//                for b in self.boids:
+//                    n = b.cached_nearest_neighbors[0]
+//                    dist = (b.position - n.position).length()
+//                    if max_nn_dist < dist:
+//                        max_nn_dist = dist
+
+                double max_nn_dist = 0;
+                for (Boid* b : boids())
+                {
+                    Boid* n = b->cached_nearest_neighbors().at(0);
+                    double  dist = (b->position() - n->position()).length();
+                    if (max_nn_dist < dist) { max_nn_dist = dist; }
+                }
+
+
+//                print(str(Draw.frame_counter) +
+//                      ' fps=' + str(round(self.fps.value)) +
+//                      ', ave_speed=' + str(average_speed)[0:5] +
+//                      ', min_sep=' + str(min_sep)[0:5] +
+//                      ', ave_sep=' + str(ave_sep)[0:5] +
+//                      ', max_nn_dist=' + str(max_nn_dist)[0:5] +
+//                      ', cumulative_sep_fail/boid=' +
+//                          (str(self.cumulative_sep_fail / len(self.boids)) +
+//                          '00')[0:5] +
+//                      ', avoid_fail=' + str(self.total_avoid_fail) +
+//                      ', stalls=' + str(self.total_stalls))
+
+                std::cout << draw().frame_counter();
+//                std::cout << " fps=" << 0; // round(self.fps.value));
+                std::cout << " fps=" << fps_.value;
+                std::cout << ", ave_speed=" << average_speed;
+                std::cout << ", min_sep=" << min_sep;
+                std::cout << ", ave_sep=" << ave_sep;
+                std::cout << ", max_nn_dist=" << max_nn_dist;
+                std::cout << ", cumulative_sep_fail/boid=" <<
+                             cumulative_sep_fail_ / boid_count();
+                std::cout << ", avoid_fail=" << total_avoid_fail;
+                std::cout << ", stalls=" << + total_stalls_;
+                std::cout << std::endl;
+            }
+        }
+    }
+
+    //    # Keep track of a smoothed (LPF) version of frames per second metric.
+    //    def update_fps(self):
+    //        self.fps.blend(self.fixed_fps if self.fixed_time_step
+    //                                      else int(1 / Draw.frame_duration),
+    //                       0.95)
+
+    // Keep track of a smoothed (LPF) version of frames per second metric.
+    void update_fps()
+    {
+//        fps_.blend(self.fixed_fps if self.fixed_time_step
+//                       else int(1 / Draw.frame_duration),
+//                       0.95)
+        double fd = draw().frame_duration();
+        fps_.blend((fixed_time_step() ? fixed_fps() : int(1 / fd)),
+                   0.95);
+    }
     
     //        # Based on pause/play and single step. Called once per frame from main loop.
     //        def run_simulation_this_frame(self):

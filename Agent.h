@@ -37,6 +37,7 @@ public:
     void setPosition(Vec3 side) { ls_.setP(side); }
     void setSpeed(double speed) { speed_ = speed; }
     void setMaxSpeed(double max_speed) { max_speed_ = max_speed; }
+    void setMaxForce(double max_force) { max_force_ = max_force; }
 
     // Get current velocity vector.
     Vec3 velocity() const { return forward() * speed(); }

@@ -225,8 +225,19 @@ public:
 
     FlockParameters& fp() { return *fp_; }
     const FlockParameters& fp() const { return *fp_; }
-    void set_fp(FlockParameters* fp) { fp_ = fp; }
     
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20240204 AHA `Agent::speed_` is not being set to the value passed in as `FlockParameters::speed`
+//    void set_fp(FlockParameters* fp) { fp_ = fp; }
+    void set_fp(FlockParameters* fp)
+    {
+        fp_ = fp;
+        setSpeed(fp->speed);
+        setMaxSpeed(fp->max_speed);
+        setMaxForce(fp->max_force);
+    }
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     
     Draw& draw() { return *draw_; }
     const Draw& draw() const { return *draw_; }
@@ -296,9 +307,6 @@ public:
         {
             Vec3 offset = position() - neighbor->position();
             double dist = offset.length();
-//            double weight = 1 / std::pow(dist, exponent_separate_);
-//            weight *= 1 - util::unit_sigmoid_on_01(dist / max_dist_separate_);
-//            weight *= angle_weight(neighbor, angle_separate_);
             double weight = 1 / std::pow(dist, fp().exponent_separate);
             weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_separate);
             weight *= angle_weight(neighbor, fp().angle_separate);
@@ -315,9 +323,6 @@ public:
         {
             Vec3 heading_offset = neighbor->forward() - forward();
             double dist = (neighbor->position() - position()).length();
-//            double weight = 1 / pow(dist, exponent_align_);
-//            weight *= 1 - util::unit_sigmoid_on_01(dist / max_dist_align_);
-//            weight *= angle_weight(neighbor, angle_align_);
             double weight = 1 / pow(dist, fp().exponent_align);
             weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_align);
             weight *= angle_weight(neighbor, fp().angle_align);
@@ -334,9 +339,6 @@ public:
         for (Boid* neighbor : neighbors)
         {
             double dist = (neighbor->position() - position()).length();
-//            double weight = 1 / pow(dist, exponent_cohere_);
-//            weight *= 1 - util::unit_sigmoid_on_01(dist / max_dist_cohere_);
-//            weight *= angle_weight(neighbor, angle_cohere_);
             double weight = 1 / pow(dist, fp().exponent_cohere);
             weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_cohere);
             weight *= angle_weight(neighbor, fp().angle_cohere);
@@ -485,6 +487,7 @@ public:
         // TODO 20230201 experimental FlockParameters support
 //        if (speed() < (min_speed_ * prevention_margin))
         if (speed() < (fp().min_speed * prevention_margin))
+//        if (speed() < (min_speed() * prevention_margin))
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             if (raw_steering.dot(forward()) < 0)
@@ -493,6 +496,7 @@ public:
                 // TODO 20230201 experimental FlockParameters support
 //                Vec3 ahead = forward() * max_force_ * 0.9;
                 Vec3 ahead = forward() * fp().max_force * 0.9;
+//                Vec3 ahead = forward() * max_force() * 0.9;
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 Vec3 side = raw_steering.perpendicular_component(forward());
                 adjusted = ahead + side;
@@ -523,60 +527,6 @@ public:
         return cached_nearest_neighbors_;
     }
 
-//        // Recomputes a cached list of the N Boids nearest this one.
-//        void recompute_nearest_neighbors(int n=7)
-//        {
-//            auto distance_squared_from_me = [&](const Boid* boid){
-//                return (boid->position() - position()).length_squared(); };
-//            auto sorted = [&](const Boid* a, const Boid* b){
-//                return distance_squared_from_me(a) < distance_squared_from_me(b); };
-//            // TODO 20240129 look also at std::partial_sort() and std::stable_sort()
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
-//    //        BoidPtrList all_boids = flock_->boids();
-//            BoidPtrList all_boids = flock_boids;
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            std::sort(all_boids.begin(), all_boids.end(), sorted);
-//
-//    //        // TODO 20240129 probably a better way to do this:
-//    //        cached_nearest_neighbors_.clear();
-//    //        for (int i = 0; i < n; i++)
-//    //        {
-//    //            cached_nearest_neighbors_.push_back(all_boids[i]);
-//    //        }
-//
-//
-//    //            cached_nearest_neighbors_.resize(n);
-//    //    //        std::copy(cached_nearest_neighbors_.begin(),
-//    //    //                  cached_nearest_neighbors_.begin() + n,
-//    //    //                  all_boids.begin());
-//    //            auto cnnb = cached_nearest_neighbors_.begin();
-//    //            std::copy(cnnb, cnnb + n, all_boids.begin());
-//
-//    //        std::vector<int> count = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-//    //        std::vector<int> seven(7);
-//    //        std::copy(count.begin(), count.begin() + 7, seven.begin());
-//    //        show(count);
-//    //        show(seven);
-//
-//    //        // Set cached_nearest_neighbors_ to nearest "n" in all_boids.
-//    //        cached_nearest_neighbors_.resize(n);
-//    //        auto cnnb = cached_nearest_neighbors_.begin();
-//    //        std::copy(cnnb, cnnb + n, all_boids.begin());
-//
-//            // Set "cached_nearest_neighbors_" to nearest "n" in "all_boids".
-//            cached_nearest_neighbors_.resize(n);
-//            auto abb = all_boids.begin();
-//
-//            debugPrint(all_boids.size())
-//            debugPrint(cached_nearest_neighbors_.size())
-//
-//            std::copy(abb, abb + n, cached_nearest_neighbors_.begin());
-//
-//
-//            time_since_last_neighbor_refresh_ = 0;
-//        }
-
     // Recomputes a cached list of the N Boids nearest this one.
     void recompute_nearest_neighbors(int n=7)
     {
@@ -585,74 +535,20 @@ public:
         auto sorted = [&](const Boid* a, const Boid* b){
             return distance_squared_from_me(a) < distance_squared_from_me(b); };
         // TODO 20240129 look also at std::partial_sort() and std::stable_sort()
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
-//        BoidPtrList all_boids = flock_->boids();
-//        BoidPtrList all_boids = flock_boids;
-//        BoidPtrList all_boids = *flock_boids_;
         BoidPtrList all_boids = flock_boids();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         std::sort(all_boids.begin(), all_boids.end(), sorted);
-        
-//        // TODO 20240129 probably a better way to do this:
-//        cached_nearest_neighbors_.clear();
-//        for (int i = 0; i < n; i++)
-//        {
-//            cached_nearest_neighbors_.push_back(all_boids[i]);
-//        }
-        
-        
-//            cached_nearest_neighbors_.resize(n);
-//    //        std::copy(cached_nearest_neighbors_.begin(),
-//    //                  cached_nearest_neighbors_.begin() + n,
-//    //                  all_boids.begin());
-//            auto cnnb = cached_nearest_neighbors_.begin();
-//            std::copy(cnnb, cnnb + n, all_boids.begin());
-
-//        std::vector<int> count = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-//        std::vector<int> seven(7);
-//        std::copy(count.begin(), count.begin() + 7, seven.begin());
-//        show(count);
-//        show(seven);
-        
-//        // Set cached_nearest_neighbors_ to nearest "n" in all_boids.
-//        cached_nearest_neighbors_.resize(n);
-//        auto cnnb = cached_nearest_neighbors_.begin();
-//        std::copy(cnnb, cnnb + n, all_boids.begin());
-
         // Set "cached_nearest_neighbors_" to nearest "n" in "all_boids".
         cached_nearest_neighbors_.resize(n);
-        auto abb = all_boids.begin();
+        auto abb = all_boids.begin() + 1; // + 1 meaning to skip THIS boid.
         std::copy(abb, abb + n, cached_nearest_neighbors_.begin());
-
-        
         time_since_last_neighbor_refresh_ = 0;
     }
-
     
-    
-    //    # Ad hoc low-pass filtering of steering force. Blends this step's newly
-    //    # determined "raw" steering into a per-boid accumulator, then returns that
-    //    # smoothed value to use for actually steering the boid this simulation step.
-    //    def smoothed_steering(self, steer):
-    //        return self.steer_memory.blend(steer, 0.8) # Ad hoc smoothness param.
-    
-    //    // Ad hoc low-pass filtering of steering force. Blends this step's newly
-    //    // determined "raw" steering into a per-boid accumulator, then returns that
-    //    // smoothed value to use for actually steering the boid this simulation step.
-    //    Vec3 smoothed_steering(Vec3 steer)
-    //    {
-    //        // TODO 20240128 for now, skip smoothing
-    //        // return steer_memory_.blend(steer, 0.8);  // Ad hoc smoothness param.
-    //        return steer;
-    //    }
-
     // Ad hoc low-pass filtering of steering force. Blends this step's newly
     // determined "raw" steering into a per-boid accumulator, then returns that
     // smoothed value to use for actually steering the boid this simulation step.
     Vec3 smoothed_steering(Vec3 steer)
     {
-//        return fp().steer_memory.blend(steer, 0.8);  // Ad hoc smoothness param.
         return steer_memory_.blend(steer, 0.8);  // Ad hoc smoothness param.
     }
 
@@ -791,7 +687,15 @@ public:
         return collisions;
     }
 
-    
+    // For debugging: does this boid instance appear to be valid?
+    // TODO 20230204 if needed again, should check other invariants.
+    bool is_valid() const
+    {
+        return ((speed() == 0 or std::isnormal(speed())) and
+                true);
+    }
+    void assert_valid() const { assert(is_valid()); }
+
     static void unit_test()
     {
         Boid b;

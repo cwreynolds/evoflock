@@ -176,9 +176,6 @@ public:
     
     FlockParameters& fp() { return fp_; }
     const FlockParameters& fp() const { return fp_; }
-    
-//    std::vector<Boid> boid_instance_list_;
-//    BoidInstanceList boid_instance_list_;
 
     BoidInstanceList& boid_instance_list() { return boid_instance_list_; }
     const BoidInstanceList& boid_instance_list()const{return boid_instance_list_;}
@@ -209,7 +206,7 @@ public:
     
     // Number of boids in Flock.
     int boid_count() const { return boid_count_; }
-//    int boid_count() const { return int(boids().size()); }
+    void set_boid_count(int bc) { boid_count_ = bc; }
 
     
     
@@ -278,86 +275,13 @@ public:
     }
     
     
-    
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240205 these were very early "just to get it running" hacks.
+    //               Replace using fp().
     bool wrap_vs_avoid() { return false; }
     double min_time_to_collide() { return 1; }
     bool avoid_blend_mode() { return true; }
-//    ObstaclePtrList obstacles() { return {}; }
-//    BoidPtrList boids()  { return boids_; }
-    
-    
-    //        # Run boids simulation. (Currently runs until stopped by user.)
-    //        def run(self):
-    //            draw = Draw() ## ?? currently unused but should contain draw state
-    //            Draw.start_visualizer(self.sphere_radius, self.sphere_center)
-    //            Flock.vis_pairs.add_pair(Draw.vis, self)  # Pairing for key handlers.
-    //            self.register_single_key_commands() # For Open3D visualizer GUI.
-    //            self.make_boids(self.boid_count, self.sphere_radius, self.sphere_center)
-    //            self.draw()
-    //            self.cycle_obstacle_selection()
-    //            while self.still_running():
-    //                if self.run_simulation_this_frame():
-    //                    Draw.clear_scene()
-    //                    self.fly_flock(1 / self.fixed_fps
-    //                                   if self.fixed_time_step or not Draw.enable
-    //                                   else Draw.frame_duration)
-    //                    self.sphere_wrap_around()
-    //                    self.draw()
-    //                    Draw.update_scene()
-    //                    self.log_stats()
-    //                    self.update_fps()
-    //            Draw.close_visualizer()
-    //            print('Exit at step:', Draw.frame_counter)
-    
-    
-//        // Run boids simulation.
-//        void run()
-//        {
-//            // draw = Draw() ## ?? currently unused but should contain draw state
-//    //        Draw draw;
-//            // Draw.start_visualizer(self.sphere_radius, self.sphere_center)
-//            // Flock.vis_pairs.add_pair(Draw.vis, self)  # Pairing for key handlers.
-//            // self.register_single_key_commands() # For Open3D visualizer GUI.
-//    //        self.make_boids(self.boid_count, self.sphere_radius, self.sphere_center)
-//            make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
-//            // self.draw()
-//            // self.cycle_obstacle_selection()
-//            // while self.still_running():
-//            while (still_running())
-//            {
-//    //            if self.run_simulation_this_frame():
-//                if (run_simulation_this_frame())
-//                {
-//                    // Draw.clear_scene()
-//    //                self.fly_flock(1 / self.fixed_fps
-//    //                               if self.fixed_time_step or not Draw.enable
-//    //                               else Draw.frame_duration)
-//    //                    fly_flock((fixed_time_step() or not Draw::enable) ?
-//    //                              1.0 / fixed_fps() :
-//    //    //                          Draw::frame_duration);
-//    //                              draw.frame_duration());
-//
-//                    fly_flock((fixed_time_step() or not draw().enable()) ?
-//                              1.0 / fixed_fps() :
-//                              draw().frame_duration());
-//
-//    //                self.sphere_wrap_around()
-//                    sphere_wrap_around();
-//                    // self.draw()
-//                    // Draw.update_scene()
-//    //                 self.log_stats()
-//    //                 self.update_fps()
-//                    log_stats();
-//                    update_fps();
-//
-//                }
-//            }
-//            // Draw.close_visualizer()
-//    //        print('Exit at step:', Draw.frame_counter)
-//    //        std::cout << "Exit at step:" << Draw::frame_counter << std::endl;
-//            std::cout << "Exit at step:" << draw().frame_counter() << std::endl;
-//        }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Run boids simulation.
     void run()
@@ -380,6 +304,16 @@ public:
                 sphere_wrap_around();
                 // self.draw()
                 // Draw.update_scene()
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // 20240204 temp
+                if (draw().frame_counter() % 10 == 0)
+                {
+                    std::cout << "speed=" << boids().at(0)->speed()
+                              << " pos=" << boids().at(0)->position() << std::endl;
+                }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                 log_stats();
                 update_fps();
             }
@@ -388,98 +322,6 @@ public:
         std::cout << "Exit at step:" << draw().frame_counter() << std::endl;
     }
 
-    
-    
-    //        # Populate this flock by creating "count" boids with uniformly distributed
-    //        # random positions inside a sphere with the given "radius" and "center".
-    //        # Each boid has a uniformly distributed random orientation.
-    //        def make_boids(self, count, radius, center):
-    //            for i in range(count):
-    //                boid = Boid(self)
-    //                boid.sphere_radius = radius
-    //                boid.sphere_center = center
-    //                boid.ls = boid.ls.randomize_orientation()
-    //                boid.ls.p = (center + (radius * 0.95 *
-    //                                       Vec3.random_point_in_unit_radius_sphere()))
-    //                self.boids.append(boid)
-    //            # Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
-    //            for b in self.boids:
-    //                b.recompute_nearest_neighbors()
-    //                t = util.frandom01() * b.neighbor_refresh_rate
-    //                b.time_since_last_neighbor_refresh = t
-    
-    
-    
-    //        # Populate this flock by creating "count" boids with uniformly distributed
-    //        # random positions inside a sphere with the given "radius" and "center".
-    //        # Each boid has a uniformly distributed random orientation.
-    //        def make_boids(self, count, radius, center):
-    //            for i in range(count):
-    //                boid = Boid(self)
-    //                boid.sphere_radius = radius
-    //                boid.sphere_center = center
-    //                boid.ls = boid.ls.randomize_orientation()
-    //                boid.ls.p = (center + (radius * 0.95 *
-    //                                       Vec3.random_point_in_unit_radius_sphere()))
-    //                self.boids.append(boid)
-    //            # Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
-    //            for b in self.boids:
-    //                b.recompute_nearest_neighbors()
-    //                t = util.frandom01() * b.neighbor_refresh_rate
-    //                b.time_since_last_neighbor_refresh = t
-
-    
-//        // Populate this flock by creating "count" boids with uniformly distributed
-//        // random positions inside a sphere with the given "radius" and "center".
-//        // Each boid has a uniformly distributed random orientation.
-//
-//    //    def make_boids(self, count, radius, center):
-//        void make_boids(int count, double radius, Vec3 center)
-//        {
-//            RandomSequence rs; // TODO 20240202 temporary
-//    //        for i in range(count):
-//            for (int i = 0; i < count; i++)
-//            {
-//    //            boid = Boid(self)
-//                Boid* boid = new Boid;
-//
-//    //            boid.sphere_radius = radius
-//    //            boid.sphere_center = center
-//                boid->set_fp(&fp());
-//
-//                boid->set_draw(&draw());
-//
-//    //            boid.ls = boid.ls.randomize_orientation()
-//                boid->set_ls(boid->ls().randomize_orientation());
-//
-//    //            boid.ls.p = (center + (radius * 0.95 *
-//    //                                   Vec3.random_point_in_unit_radius_sphere()))
-//
-//                Vec3 p(center +
-//                       (rs.random_point_in_unit_radius_sphere() * radius * 0.95));
-//                boid->setPosition(p);
-//
-//    //            self.boids.append(boid)
-//
-//                boids().push_back(boid);
-//            }
-//    //        # Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
-//    //        for b in self.boids:
-//    //            b.recompute_nearest_neighbors()
-//    //            t = util.frandom01() * b.neighbor_refresh_rate
-//    //            b.time_since_last_neighbor_refresh = t
-//
-//            // Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
-//            for (Boid* boid : boids())
-//            {
-//                boid->recompute_nearest_neighbors();
-//                double t = rs.frandom01() * boid->neighbor_refresh_rate();
-//                boid->set_time_since_last_neighbor_refresh(t);
-//            }
-//        }
-
-    
-    
     // Populate this flock by creating "count" boids with uniformly distributed
     // random positions inside a sphere with the given "radius" and "center".
     // Each boid has a uniformly distributed random orientation.
@@ -487,31 +329,20 @@ public:
     {
         RandomSequence rs; // TODO 20240202 temporary
         // Allocate default Boid instances.
-//        boid_instance_list_.resize(boid_count());
         boid_instance_list().resize(boid_count());
         // Construct BoidPtrList.
-//        for (Boid& boid : boid_instance_list_) { boids().push_back(&boid); }
         for (Boid& boid : boid_instance_list()) { boids().push_back(&boid); }
         // Set up each new Boid.
-//        for (int i = 0; i < count; i++)
         for (Boid* boid : boids())
         {
-//            Boid* boid = new Boid;
             boid->set_fp(&fp());
             boid->set_draw(&draw());
-            
             boid->set_flock_boids(&boids());
             boid->set_flock_obstacles(&obstacles());
-
             boid->set_ls(boid->ls().randomize_orientation());
-            Vec3 p(center +
-                   (rs.random_point_in_unit_radius_sphere() * radius * 0.95));
-            boid->setPosition(p);
-//            boids().push_back(boid);
+            boid->setPosition(center + (rs.random_point_in_unit_radius_sphere() *
+                                        radius * 0.95));
         }
-        
-//        std::cout << "finished 'Set up each new Boid.'" << std::endl;
-        
         // Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
         for (Boid* boid : boids())
         {
@@ -680,8 +511,8 @@ public:
             {
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20240203 very temp for debugging
-                debugPrint(boids().at(0)->position())
-                debugPrint(boids().at(0)->forward())
+//                debugPrint(boids().at(0)->position())
+//                debugPrint(boids().at(0)->forward())
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 
                 
@@ -691,9 +522,9 @@ public:
                 for (Boid* b : boids()) { average_speed += b->speed(); }
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20240203 very temp for debugging
-                debugPrint(boids().at(0)->speed())
-                debugPrint(average_speed)
-                debugPrint(boid_count())
+//                debugPrint(boids().at(0)->speed())
+//                debugPrint(average_speed)
+//                debugPrint(boid_count())
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 average_speed /= boid_count();
 

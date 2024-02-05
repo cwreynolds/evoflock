@@ -252,6 +252,15 @@ public:
     {
         return (a == b) or (a.is_none() and b.is_none());
     }
+    
+    // For debugging: does this Vec3 instance appear to be valid?
+    bool is_valid() const
+    {
+        return ((x() == 0 or std::isnormal(x())) and
+                (y() == 0 or std::isnormal(y())) and
+                (z() == 0 or std::isnormal(z())));
+    }
+    void assert_valid() const { assert(is_valid()); }
 
     static void unit_test()
     {
@@ -266,6 +275,10 @@ public:
         Vec3 v123(1, 2, 3);
         Vec3 v236(2, 3, 6);
         
+        assert(v123.x() == 1);
+        assert(v123.y() == 2);
+        assert(v123.z() == 3);
+
         assert(Vec3(1, 2, 3).to_string() == "Vec3(1, 2, 3)");
         assert (Vec3(1, 2, 3) == Vec3(1, 2, 3));
         assert (Vec3(0, 0, 0) != Vec3(1, 0, 0));
@@ -415,6 +428,9 @@ public:
         assert(equal_for_none(Vec3(), Vec3()));
         assert(equal_for_none(none(), none()));
         assert(not equal_for_none(Vec3(), none()));
+
+        assert(v123.is_valid());
+        assert(not none().is_valid());
 
         // Verify unmodified:
         assert (v000 == Vec3(0, 0, 0));

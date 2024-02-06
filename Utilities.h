@@ -229,6 +229,50 @@ double executions_per_second(std::function<void()> work_load, int count = 500000
     return executions_per_second;
 }
 
+//    // Apply a given function of two arguments to every unique pairwise combination
+//    // of elements from the given collection, as a std::vector.
+//    template<typename T>
+//    void apply_to_pairwise_combinations(std::function<void(T p, T q)> pair_func,
+//                                        const std::vector<T>& collection)
+//    {
+//        for (int p = 0; p < collection.size(); p++)
+//        {
+//            for (int q = p + 1; q < collection.size(); q++)
+//            {
+//                pair_func(p, q);
+//            }
+//        }
+//    }
+
+//    // Apply a given function of two arguments to every unique pairwise combination
+//    // of elements from the given collection, as a std::vector.
+//    template<typename T, typename F>
+//    void apply_to_pairwise_combinations(F pair_func,
+//                                        const std::vector<T>& collection)
+//    {
+//        for (int p = 0; p < collection.size(); p++)
+//        {
+//            for (int q = p + 1; q < collection.size(); q++)
+//            {
+//                pair_func(p, q);
+//            }
+//        }
+//    }
+
+// TODO 20240205 this is how I verified it was working as expected. Make a unit
+// test based on this idea?
+//    void combination_test()
+//    {
+//        std::vector<int> input = {0, 1, 2, 3, 4};
+//
+//        auto print_pair = [](int p, int q)
+//        {
+//            std::cout << "(" << p << ", " << q << ")" << std::endl;
+//        };
+//
+//        apply_to_pairwise_combinations<int>(print_pair, input);
+//    }
+
 
 static void unit_test()
 {

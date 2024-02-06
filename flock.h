@@ -1,25 +1,9 @@
-//-------------------------------------------------------------------------------
-//
-//  flock.h -- new flock experiments
-
-//  Flock class, holds a collection of Boids, handles drawing and UI.
-//
-//  This file was just a script to run simulations after importing components of
-//  the flock model (Boid, Vec3, draw) defined as classes in other files. But the
-//  Boid class started to accumulate "static" methods related to a flock of boids
-//  (make_flock, run_flock, draw_flock). I decided to formalize that with a Flock
-//  class, defined here. This also handles mode settings from the Open3D GUI.
-//
-//  Created by Craig Reynolds on January 31, 2024.
-//  (Based on earlier C++ and Python versions.)
-//  MIT License -- Copyright © 2024 Craig Reynolds
-//-------------------------------------------------------------------------------
-
 
 #pragma once
 #include "Vec3.h"
 #include "Utilities.h"
 #include "Boid.h"
+#include "obstacle.h"
 
 
 
@@ -230,47 +214,58 @@ public:
     // Yes for now, lets just skip args to the constructor to avoid worrying
     // about which parameters are or aren't included there. New answer: none are.
     //
-//    Flock(int boid_count = 200,
-//          double sphere_diameter = 100,
-//          Vec3 sphere_center = Vec3(),
-//          double max_simulation_steps = std::numeric_limits<double>::infinity(),
-//          bool fixed_time_step = false,
-//          int fixed_fps = 60,
-//          int seed = 1234567890)
-    Flock()
+    //    Flock(int boid_count = 200,
+    //          double sphere_diameter = 100,
+    //          Vec3 sphere_center = Vec3(),
+    //          double max_simulation_steps = std::numeric_limits<double>::infinity(),
+    //          bool fixed_time_step = false,
+    //          int fixed_fps = 60,
+    //          int seed = 1234567890)
+    
+    //        Flock()
+    //        {
+    //            //            self.boid_count = boid_count              # Number of boids in Flock.
+    //    //        boid_count_ = boid_count;
+    //    //        fp().sphere_center = sphere_center;
+    //
+    //
+    //            //            self.sphere_radius = sphere_diameter / 2  # Radius of boid containment.
+    //            //            self.sphere_center = sphere_center        # Center of boid containment.
+    //            //            self.max_simulation_steps = max_simulation_steps # exit after n frames.
+    //            //            self.fixed_time_step = fixed_time_step    # fixed time step vs realtime.
+    //            //            self.fixed_fps = fixed_fps                # frame rate for fixed fps.
+    //            //            self.boids = []                # List of boids in flock.
+    //            //            self.selected_boid_index = 0   # Index of boid tracked by camera.
+    //            //            self.total_avoid_fail = 0      # count pass through containment sphere.
+    //            //            self.cumulative_sep_fail = 0   # separation fail: a pair of boids touch.
+    //            //            self.simulation_paused = False # Simulation stopped, display continues.
+    //            //            self.single_step = False       # perform one simulation step then pause.
+    //            //            self.enable_annotation = True
+    //            //            self.tracking_camera = False
+    //            //            self.wrap_vs_avoid = False
+    //            //            self.avoid_blend_mode = True   # obstacle avoid: blend vs hard switch
+    //            //            self.min_time_to_collide = 0.8 # react to predicted impact (seconds)
+    //            //            self.fps = util.Blender()
+    //            //            # Flock's current list of obstacles.
+    //            //            self.obstacles = []
+    //            //            # Switchable pre-defined obstacle sets.
+    //            //            self.obstacle_presets = self.pre_defined_obstacle_sets()
+    //            //            self.obstacle_selection_counter = 0
+    //            //            self.total_stalls = 0
+    //            //            # If there is ever a need to have multiple Flock instances at the same
+    //            //            # time, these steps with global effect should be reconsidered:
+    //            //            Draw.set_random_seeds(seed)
+    //            //            self.setup()
+    //
+    //        }
+    
+    // TODO 20240205 temporary scaffolding to include one sphere obstacle.
+    EvertedSphereObstacle temp_eso_;
+    
+    Flock() : temp_eso_(fp().sphere_radius, fp().sphere_center)
     {
-        //            self.boid_count = boid_count              # Number of boids in Flock.
-//        boid_count_ = boid_count;
-//        fp().sphere_center = sphere_center;
-        
-        
-        //            self.sphere_radius = sphere_diameter / 2  # Radius of boid containment.
-        //            self.sphere_center = sphere_center        # Center of boid containment.
-        //            self.max_simulation_steps = max_simulation_steps # exit after n frames.
-        //            self.fixed_time_step = fixed_time_step    # fixed time step vs realtime.
-        //            self.fixed_fps = fixed_fps                # frame rate for fixed fps.
-        //            self.boids = []                # List of boids in flock.
-        //            self.selected_boid_index = 0   # Index of boid tracked by camera.
-        //            self.total_avoid_fail = 0      # count pass through containment sphere.
-        //            self.cumulative_sep_fail = 0   # separation fail: a pair of boids touch.
-        //            self.simulation_paused = False # Simulation stopped, display continues.
-        //            self.single_step = False       # perform one simulation step then pause.
-        //            self.enable_annotation = True
-        //            self.tracking_camera = False
-        //            self.wrap_vs_avoid = False
-        //            self.avoid_blend_mode = True   # obstacle avoid: blend vs hard switch
-        //            self.min_time_to_collide = 0.8 # react to predicted impact (seconds)
-        //            self.fps = util.Blender()
-        //            # Flock's current list of obstacles.
-        //            self.obstacles = []
-        //            # Switchable pre-defined obstacle sets.
-        //            self.obstacle_presets = self.pre_defined_obstacle_sets()
-        //            self.obstacle_selection_counter = 0
-        //            self.total_stalls = 0
-        //            # If there is ever a need to have multiple Flock instances at the same
-        //            # time, these steps with global effect should be reconsidered:
-        //            Draw.set_random_seeds(seed)
-        //            self.setup()
+        // TODO 20240205 temporary scaffolding to include one sphere obstacle.
+        obstacles().push_back(&temp_eso_);
         
     }
     
@@ -497,40 +492,25 @@ public:
     //                          ', stalls=' + str(self.total_stalls))
     
     
+    
+    
     // Calculate and log various statistics for flock.
     void log_stats()
     {
-//        if not self.simulation_paused:
         if (not simulation_paused_)
         {
-//            Draw.measure_frame_duration()
             draw().measure_frame_duration();
-
-//            if Draw.frame_counter % 100 == 0:
             if (draw().frame_counter() % 100 == 0)
             {
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240203 very temp for debugging
-//                debugPrint(boids().at(0)->position())
-//                debugPrint(boids().at(0)->forward())
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                
-                
-                
-//                average_speed = mean([b.speed for b in self.boids])
                 double average_speed = 0;
                 for (Boid* b : boids()) { average_speed += b->speed(); }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240203 very temp for debugging
-//                debugPrint(boids().at(0)->speed())
-//                debugPrint(average_speed)
-//                debugPrint(boid_count())
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 average_speed /= boid_count();
-
+                
                 // Loop over all unique pairs of distinct boids: ab==ba, not aa
                 double min_sep = std::numeric_limits<double>::infinity();
                 double ave_sep = 0;
+                
+                
                 //    pair_count = 0
                 //    # Via https://stackoverflow.com/a/942551/1991373
                 //    for (p, q) in itertools.combinations(self.boids, 2):
@@ -544,12 +524,78 @@ public:
                 //    ave_sep /= pair_count
                 //
                 
-//                max_nn_dist = 0
-//                for b in self.boids:
-//                    n = b.cached_nearest_neighbors[0]
-//                    dist = (b.position - n.position).length()
-//                    if max_nn_dist < dist:
-//                        max_nn_dist = dist
+
+                int pair_count = 0;
+//                # Via https://stackoverflow.com/a/942551/1991373
+//                for (p, q) in itertools.combinations(self.boids, 2):
+                
+//                    auto examine_pair = [&](Boid* p, Boid* q)
+//                    {
+//    //                    std::cout << "(" << p << ", " << q << ")" << std::endl;
+//                        
+//                        
+//    //                    dist = (p.position - q.position).length()
+//                        double dist = (p->position() - q->position()).length();
+//
+//    //                    if min_sep > dist:
+//    //                        min_sep = dist
+//                        if (min_sep > dist) { min_sep = dist; }
+//                            
+//    //                    ave_sep += dist
+//    //                    pair_count += 1
+//                        ave_sep += dist;
+//                        pair_count += 1;
+//
+//    //                    if dist < 2 * p.body_radius:
+//    //                        self.cumulative_sep_fail += 1
+//                        if (dist < (2 * fp().body_radius))
+//                        {
+//                            cumulative_sep_fail_ += 1;
+//                        }
+//                    };
+                
+//    //                auto examine_pair = [&](Boid* p, Boid* q)
+//    //                std::function<void(Boid*, Boid*)> examine_pair = [&](Boid* p, Boid* q)
+//    //                auto examine_pair = [&](const Boid* p, const Boid* q)
+//                    std::function<void(const Boid*, const Boid*)> examine_pair = [&](const Boid* p, const Boid* q)
+//                    {
+//                        double dist = (p->position() - q->position()).length();
+//                        if (min_sep > dist) { min_sep = dist; }
+//                        ave_sep += dist;
+//                        pair_count += 1;
+//                        if (dist<(2*fp().body_radius)) {cumulative_sep_fail_ += 1;}
+//                    };
+//
+//                    util::apply_to_pairwise_combinations(examine_pair, boids());
+
+
+                // TODO 20240205 intended to use apply_to_pairwise_combinations()
+                for (int ip = 0; ip < boids().size(); ip++)
+                {
+                    for (int iq = ip + 1; iq < boids().size(); iq++)
+                    {
+                        Boid* p = boids()[ip];
+                        Boid* q = boids()[iq];
+                        double dist = (p->position() - q->position()).length();
+                        if (min_sep > dist) { min_sep = dist; }
+                        ave_sep += dist;
+                        pair_count += 1;
+                        if (dist < (2 * fp().body_radius))
+                        {
+                            cumulative_sep_fail_ += 1;
+                        }
+                    }
+                }
+                ave_sep /= pair_count;
+            
+            
+                
+                //                max_nn_dist = 0
+                //                for b in self.boids:
+                //                    n = b.cached_nearest_neighbors[0]
+                //                    dist = (b.position - n.position).length()
+                //                    if max_nn_dist < dist:
+                //                        max_nn_dist = dist
 
                 double max_nn_dist = 0;
                 for (Boid* b : boids())
@@ -558,20 +604,7 @@ public:
                     double  dist = (b->position() - n->position()).length();
                     if (max_nn_dist < dist) { max_nn_dist = dist; }
                 }
-
-
-//                print(str(Draw.frame_counter) +
-//                      ' fps=' + str(round(self.fps.value)) +
-//                      ', ave_speed=' + str(average_speed)[0:5] +
-//                      ', min_sep=' + str(min_sep)[0:5] +
-//                      ', ave_sep=' + str(ave_sep)[0:5] +
-//                      ', max_nn_dist=' + str(max_nn_dist)[0:5] +
-//                      ', cumulative_sep_fail/boid=' +
-//                          (str(self.cumulative_sep_fail / len(self.boids)) +
-//                          '00')[0:5] +
-//                      ', avoid_fail=' + str(self.total_avoid_fail) +
-//                      ', stalls=' + str(self.total_stalls))
-
+                
                 std::cout << draw().frame_counter();
 //                std::cout << " fps=" << 0; // round(self.fps.value));
                 std::cout << " fps=" << fps_.value;
@@ -588,6 +621,7 @@ public:
         }
     }
 
+    
     //    # Keep track of a smoothed (LPF) version of frames per second metric.
     //    def update_fps(self):
     //        self.fps.blend(self.fixed_fps if self.fixed_time_step
@@ -615,14 +649,6 @@ public:
     // Based on pause/play and single step. Called once per frame from main loop.
     bool run_simulation_this_frame()
     {
-//        ok_to_run = self.single_step or not self.simulation_paused
-//        self.single_step = False
-//        return ok_to_run
-        
-//        bool simulation_paused_ = false; // Simulation stopped, display continues.
-//        bool single_step_ = false;       // perform one simulation step then pause.
-
-        
         bool ok_to_run = single_step_ or not simulation_paused_;
         single_step_ = false;
         return ok_to_run;
@@ -833,9 +859,6 @@ public:
     // Simulation continues running until this returns false.
     bool still_running()
     {
-//        a = True if not Draw.enable else Draw.vis.poll_events()
-//        b = Draw.frame_counter < self.max_simulation_steps
-//        return a and b
         bool a = (not draw().enable()) ? true : draw().poll_events();
         bool b = draw().frame_counter() < max_simulation_steps();
         return a and b;

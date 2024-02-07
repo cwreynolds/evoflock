@@ -450,50 +450,6 @@ public:
         }
     }
 
-    
-    
-    //        # Calculate and log various statistics for flock.
-    //        def log_stats(self):
-    //            if not self.simulation_paused:
-    //                Draw.measure_frame_duration()
-    //                if Draw.frame_counter % 100 == 0:
-    //                    average_speed = mean([b.speed for b in self.boids])
-    //                    # Loop over all unique pairs of distinct boids: ab==ba, not aa
-    //                    min_sep = math.inf
-    //                    ave_sep = 0
-    //                    pair_count = 0
-    //                    # Via https://stackoverflow.com/a/942551/1991373
-    //                    for (p, q) in itertools.combinations(self.boids, 2):
-    //                        dist = (p.position - q.position).length()
-    //                        if min_sep > dist:
-    //                            min_sep = dist
-    //                        ave_sep += dist
-    //                        pair_count += 1
-    //                        if dist < 2 * p.body_radius:
-    //                            self.cumulative_sep_fail += 1
-    //                    ave_sep /= pair_count
-    //                    #
-    //                    max_nn_dist = 0
-    //                    for b in self.boids:
-    //                        n = b.cached_nearest_neighbors[0]
-    //                        dist = (b.position - n.position).length()
-    //                        if max_nn_dist < dist:
-    //                            max_nn_dist = dist
-    //                    print(str(Draw.frame_counter) +
-    //                          ' fps=' + str(round(self.fps.value)) +
-    //                          ', ave_speed=' + str(average_speed)[0:5] +
-    //                          ', min_sep=' + str(min_sep)[0:5] +
-    //                          ', ave_sep=' + str(ave_sep)[0:5] +
-    //                          ', max_nn_dist=' + str(max_nn_dist)[0:5] +
-    //                          ', cumulative_sep_fail/boid=' +
-    //                              (str(self.cumulative_sep_fail / len(self.boids)) +
-    //                              '00')[0:5] +
-    //                          ', avoid_fail=' + str(self.total_avoid_fail) +
-    //                          ', stalls=' + str(self.total_stalls))
-    
-    
-    
-    
     // Calculate and log various statistics for flock.
     void log_stats()
     {
@@ -507,95 +463,20 @@ public:
                 average_speed /= boid_count();
                 
                 // Loop over all unique pairs of distinct boids: ab==ba, not aa
+                // Loop over all unique pairs of distinct boid (ab==ba, not aa)
                 double min_sep = std::numeric_limits<double>::infinity();
                 double ave_sep = 0;
-                
-                
-                //    pair_count = 0
-                //    # Via https://stackoverflow.com/a/942551/1991373
-                //    for (p, q) in itertools.combinations(self.boids, 2):
-                //        dist = (p.position - q.position).length()
-                //        if min_sep > dist:
-                //            min_sep = dist
-                //        ave_sep += dist
-                //        pair_count += 1
-                //        if dist < 2 * p.body_radius:
-                //            self.cumulative_sep_fail += 1
-                //    ave_sep /= pair_count
-                //
-                
-
                 int pair_count = 0;
-//                # Via https://stackoverflow.com/a/942551/1991373
-//                for (p, q) in itertools.combinations(self.boids, 2):
-                
-//                    auto examine_pair = [&](Boid* p, Boid* q)
-//                    {
-//    //                    std::cout << "(" << p << ", " << q << ")" << std::endl;
-//                        
-//                        
-//    //                    dist = (p.position - q.position).length()
-//                        double dist = (p->position() - q->position()).length();
-//
-//    //                    if min_sep > dist:
-//    //                        min_sep = dist
-//                        if (min_sep > dist) { min_sep = dist; }
-//                            
-//    //                    ave_sep += dist
-//    //                    pair_count += 1
-//                        ave_sep += dist;
-//                        pair_count += 1;
-//
-//    //                    if dist < 2 * p.body_radius:
-//    //                        self.cumulative_sep_fail += 1
-//                        if (dist < (2 * fp().body_radius))
-//                        {
-//                            cumulative_sep_fail_ += 1;
-//                        }
-//                    };
-                
-//    //                auto examine_pair = [&](Boid* p, Boid* q)
-//    //                std::function<void(Boid*, Boid*)> examine_pair = [&](Boid* p, Boid* q)
-//    //                auto examine_pair = [&](const Boid* p, const Boid* q)
-//                    std::function<void(const Boid*, const Boid*)> examine_pair = [&](const Boid* p, const Boid* q)
-//                    {
-//                        double dist = (p->position() - q->position()).length();
-//                        if (min_sep > dist) { min_sep = dist; }
-//                        ave_sep += dist;
-//                        pair_count += 1;
-//                        if (dist<(2*fp().body_radius)) {cumulative_sep_fail_ += 1;}
-//                    };
-//
-//                    util::apply_to_pairwise_combinations(examine_pair, boids());
-
-
-                // TODO 20240205 intended to use apply_to_pairwise_combinations()
-                for (int ip = 0; ip < boids().size(); ip++)
+                auto examine_pair = [&](const Boid* p, const Boid* q)
                 {
-                    for (int iq = ip + 1; iq < boids().size(); iq++)
-                    {
-                        Boid* p = boids()[ip];
-                        Boid* q = boids()[iq];
-                        double dist = (p->position() - q->position()).length();
-                        if (min_sep > dist) { min_sep = dist; }
-                        ave_sep += dist;
-                        pair_count += 1;
-                        if (dist < (2 * fp().body_radius))
-                        {
-                            cumulative_sep_fail_ += 1;
-                        }
-                    }
-                }
+                    double dist = (p->position() - q->position()).length();
+                    if (min_sep > dist) { min_sep = dist; }
+                    ave_sep += dist;
+                    pair_count += 1;
+                    if (dist<(2*fp().body_radius)) {cumulative_sep_fail_ += 1;}
+                };
+                util::apply_to_pairwise_combinations(examine_pair, boids());
                 ave_sep /= pair_count;
-            
-            
-                
-                //                max_nn_dist = 0
-                //                for b in self.boids:
-                //                    n = b.cached_nearest_neighbors[0]
-                //                    dist = (b.position - n.position).length()
-                //                    if max_nn_dist < dist:
-                //                        max_nn_dist = dist
 
                 double max_nn_dist = 0;
                 for (Boid* b : boids())

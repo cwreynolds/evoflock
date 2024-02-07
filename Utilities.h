@@ -229,50 +229,21 @@ double executions_per_second(std::function<void()> work_load, int count = 500000
     return executions_per_second;
 }
 
-//    // Apply a given function of two arguments to every unique pairwise combination
-//    // of elements from the given collection, as a std::vector.
-//    template<typename T>
-//    void apply_to_pairwise_combinations(std::function<void(T p, T q)> pair_func,
-//                                        const std::vector<T>& collection)
-//    {
-//        for (int p = 0; p < collection.size(); p++)
-//        {
-//            for (int q = p + 1; q < collection.size(); q++)
-//            {
-//                pair_func(p, q);
-//            }
-//        }
-//    }
-
-//    // Apply a given function of two arguments to every unique pairwise combination
-//    // of elements from the given collection, as a std::vector.
-//    template<typename T, typename F>
-//    void apply_to_pairwise_combinations(F pair_func,
-//                                        const std::vector<T>& collection)
-//    {
-//        for (int p = 0; p < collection.size(); p++)
-//        {
-//            for (int q = p + 1; q < collection.size(); q++)
-//            {
-//                pair_func(p, q);
-//            }
-//        }
-//    }
-
-// TODO 20240205 this is how I verified it was working as expected. Make a unit
-// test based on this idea?
-//    void combination_test()
-//    {
-//        std::vector<int> input = {0, 1, 2, 3, 4};
-//
-//        auto print_pair = [](int p, int q)
-//        {
-//            std::cout << "(" << p << ", " << q << ")" << std::endl;
-//        };
-//
-//        apply_to_pairwise_combinations<int>(print_pair, input);
-//    }
-
+// Given an indexable collection of objects of type "T" (std::vector<T>) apply a
+// given function of two arguments (pair_func(T a, T b)) to each unique pairwise
+// combination of elements from the collection. (The function has wildcard type
+// "F" to avoid fussy details.)
+template<typename T, typename F>
+void apply_to_pairwise_combinations(F pair_func, const std::vector<T>& collection)
+{
+    for (int p = 0; p < collection.size(); p++)
+    {
+        for (int q = p + 1; q < collection.size(); q++)
+        {
+            pair_func(collection[p], collection[q]);
+        }
+    }
+}
 
 static void unit_test()
 {
@@ -314,6 +285,12 @@ static void unit_test()
     assert (within_epsilon(b.value, 1.42));
     b.blend(5.6, 0.5);
     assert (within_epsilon(b.value, 3.51));
+    
+    int pi = 0;
+    std::vector<int> pairs = {0,1, 0,2, 0,3, 0,4, 1,2, 1,3, 1,4, 2,3, 2,4, 3,4};
+    apply_to_pairwise_combinations([&](int p, int q){assert(p == pairs[pi++]);
+                                                     assert(q == pairs[pi++]);},
+                                   std::vector<int>({0, 1, 2, 3, 4}));
 
     // TODO 20230409 test random-number utilities, later RandomSequence.
 }

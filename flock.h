@@ -1,3 +1,17 @@
+// -------------------------------------------------------------------------------
+// 
+//  flock.h -- new flock experiments
+//
+//  Flock class.
+//
+//  Contains a collection of Boids and manages a simulation run.
+//
+//  MIT License -- Copyright © 2023 Craig Reynolds
+// 
+//  Created by Craig Reynolds on February 1, 2024.
+//  (Based on earlier C++ and Python versions.)
+//  MIT License -- Copyright © 2024 Craig Reynolds
+// -------------------------------------------------------------------------------
 
 #pragma once
 #include "Vec3.h"
@@ -5,129 +19,16 @@
 #include "Boid.h"
 #include "obstacle.h"
 
-
-
-//    #-------------------------------------------------------------------------------
-//    #
-//    # flock.py -- new flock experiments
-//    #
-//    # Flock class, and top level script for running flock simulations.
-//    #
-//    # This file was just a script to run simulations after importing components of
-//    # the flock model (Boid, Vec3, draw) defined as classes in other files. But the
-//    # Boid class started to accumulate "static" methods related to a flock of boids
-//    # (make_flock, run_flock, draw_flock). I decided to formalize that with a Flock
-//    # class, defined here. This also handles mode settings from the Open3D GUI.
-//    #
-//    # This file still functions as a top level script which does:  Flock().run()
-//    #
-//    # MIT License -- Copyright © 2023 Craig Reynolds
-//    #
-//    #-------------------------------------------------------------------------------
-//
-//    import sys
-//    import math
-//    import itertools
-//    import open3d as o3d
-//    from Vec3 import Vec3
-//    from Boid import Boid
-//    from Draw import Draw
-//    from Agent import Agent
-//    import Utilities as util
-//    from statistics import mean
-//    from LocalSpace import LocalSpace
-//    from obstacle import EvertedSphereObstacle
-//    from obstacle import PlaneObstacle
-//    from obstacle import CylinderObstacle
-//    import shape
-//
-
-//
-//    class Flock:
-//        def __init__(self,
-//                     boid_count = 200,
-//                     sphere_diameter = 100,
-//                     sphere_center = Vec3(),
-//                     max_simulation_steps = math.inf,
-//                     fixed_time_step = False,
-//                     fixed_fps = 60,
-//                     seed = 1234567890):
-//            self.boid_count = boid_count              # Number of boids in Flock.
-//            self.sphere_radius = sphere_diameter / 2  # Radius of boid containment.
-//            self.sphere_center = sphere_center        # Center of boid containment.
-//            self.max_simulation_steps = max_simulation_steps # exit after n frames.
-//            self.fixed_time_step = fixed_time_step    # fixed time step vs realtime.
-//            self.fixed_fps = fixed_fps                # frame rate for fixed fps.
-//            self.boids = []                # List of boids in flock.
-//            self.selected_boid_index = 0   # Index of boid tracked by camera.
-//            self.total_avoid_fail = 0      # count pass through containment sphere.
-//            self.cumulative_sep_fail = 0   # separation fail: a pair of boids touch.
-//            self.simulation_paused = False # Simulation stopped, display continues.
-//            self.single_step = False       # perform one simulation step then pause.
-//            self.enable_annotation = True
-//            self.tracking_camera = False
-//            self.wrap_vs_avoid = False
-//            self.avoid_blend_mode = True   # obstacle avoid: blend vs hard switch
-//            self.min_time_to_collide = 0.8 # react to predicted impact (seconds)
-//            self.fps = util.Blender()
-//            # Flock's current list of obstacles.
-//            self.obstacles = []
-//            # Switchable pre-defined obstacle sets.
-//            self.obstacle_presets = self.pre_defined_obstacle_sets()
-//            self.obstacle_selection_counter = 0
-//            self.total_stalls = 0
-//            # If there is ever a need to have multiple Flock instances at the same
-//            # time, these steps with global effect should be reconsidered:
-//            Draw.set_random_seeds(seed)
-//            self.setup()
-
-
-
-
-// TODO 20240127 temporary mock
 class Flock
 {
 private:
-//    int boid_count_ = 200;         // Number of boids in Flock.
-//    double sphere_radius_ = 50;     // Radius of boid containment.
-//    Vec3 sphere_center_;            // Center of boid containment.
-//    double max_simulation_steps_ = std::numeric_limits<double>::infinity();
-//    bool fixed_time_step_ = false;  // fixed time step vs realtime.
-//    int fixed_fps_ = 60;            // frame rate for fixed fps.
-//    BoidPtrList boids_;             // List of boids in flock.
-
-    //            self.boids = []                # List of boids in flock.
-    //            self.selected_boid_index = 0   # Index of boid tracked by camera.
-    //            self.total_avoid_fail = 0      # count pass through containment sphere.
-    //            self.cumulative_sep_fail = 0   # separation fail: a pair of boids touch.
-    //            self.simulation_paused = False # Simulation stopped, display continues.
-    //            self.single_step = False       # perform one simulation step then pause.
-    //            self.enable_annotation = True
-    //            self.tracking_camera = False
-    //            self.wrap_vs_avoid = False
-    //            self.avoid_blend_mode = True   # obstacle avoid: blend vs hard switch
-    //            self.min_time_to_collide = 0.8 # react to predicted impact (seconds)
-    //            self.fps = util.Blender()
-    //            # Flock's current list of obstacles.
-    //            self.obstacles = []
-    //            # Switchable pre-defined obstacle sets.
-    //            self.obstacle_presets = self.pre_defined_obstacle_sets()
-    //            self.obstacle_selection_counter = 0
-    //            self.total_stalls = 0
-    
+    // TODO move to bottom of class definition.
     FlockParameters fp_;
     BoidPtrList boids_;
     ObstaclePtrList obstacles_;
-    
-    // TODO 20240203 very prototype allocate boids inside std::vector<boid>
-    // std::vector of Boid INSTANCES, used to automatically allocate/deallocate.
     BoidInstanceList boid_instance_list_;
-    
-
-    
     Draw draw_;
 
-    
     // TODO Parameters that may (or may not?) be better kept separate from FP.
     int boid_count_ = 200;
     double max_simulation_steps_ = std::numeric_limits<double>::infinity();
@@ -139,22 +40,10 @@ private:
     bool single_step_ = false;       // perform one simulation step then pause.
 
     int total_stalls_ = 0;
-    
     int total_avoid_fail = 0;      // count pass through containment sphere.
-
     int cumulative_sep_fail_ = 0;   // separation fail: a pair of boids touch.
 
-    
-    //            self.fps = util.Blender()
     util::Blender<double> fps_;
-
-//    Flock(int boid_count = 200,
-//          double sphere_diameter = 100,
-//          Vec3 sphere_center = Vec3(),
-//          double max_simulation_steps = std::numeric_limits<double>::infinity(),
-//          bool fixed_time_step = false,
-//          int fixed_fps = 60,
-//          int seed = 1234567890)
 
 public:
     
@@ -164,7 +53,6 @@ public:
     BoidInstanceList& boid_instance_list() { return boid_instance_list_; }
     const BoidInstanceList& boid_instance_list()const{return boid_instance_list_;}
 
-    
     BoidPtrList& boids() { return boids_; }
     const BoidPtrList& boids() const { return boids_; }
     
@@ -173,8 +61,6 @@ public:
     
     Draw& draw() { return draw_; }
     const Draw& draw() const { return draw_; }
-
-    
 
     double max_simulation_steps() const { return max_simulation_steps_; }
     void set_max_simulation_steps(double mss) { max_simulation_steps_ = mss; }
@@ -185,26 +71,11 @@ public:
     int fixed_fps() const { return fixed_fps_; }
     void set_fixed_fps(int ffps) { fixed_fps_ = ffps; }
 
-    
-    // TODO 20240131 temp for testing, maybe keep?
-    
     // Number of boids in Flock.
     int boid_count() const { return boid_count_; }
     void set_boid_count(int bc) { boid_count_ = bc; }
 
     
-    
-    
-
-    // Constructor
-    //        def __init__(self,
-    //                     boid_count = 200,
-    //                     sphere_diameter = 100,
-    //                     sphere_center = Vec3(),
-    //                     max_simulation_steps = math.inf,
-    //                     fixed_time_step = False,
-    //                     fixed_fps = 60,
-    //                     seed = 1234567890):
     
 
     // TODO 20240131 since c++ has no keyword syntax, perhaps move to creating a
@@ -213,52 +84,7 @@ public:
     //
     // Yes for now, lets just skip args to the constructor to avoid worrying
     // about which parameters are or aren't included there. New answer: none are.
-    //
-    //    Flock(int boid_count = 200,
-    //          double sphere_diameter = 100,
-    //          Vec3 sphere_center = Vec3(),
-    //          double max_simulation_steps = std::numeric_limits<double>::infinity(),
-    //          bool fixed_time_step = false,
-    //          int fixed_fps = 60,
-    //          int seed = 1234567890)
-    
-    //        Flock()
-    //        {
-    //            //            self.boid_count = boid_count              # Number of boids in Flock.
-    //    //        boid_count_ = boid_count;
-    //    //        fp().sphere_center = sphere_center;
-    //
-    //
-    //            //            self.sphere_radius = sphere_diameter / 2  # Radius of boid containment.
-    //            //            self.sphere_center = sphere_center        # Center of boid containment.
-    //            //            self.max_simulation_steps = max_simulation_steps # exit after n frames.
-    //            //            self.fixed_time_step = fixed_time_step    # fixed time step vs realtime.
-    //            //            self.fixed_fps = fixed_fps                # frame rate for fixed fps.
-    //            //            self.boids = []                # List of boids in flock.
-    //            //            self.selected_boid_index = 0   # Index of boid tracked by camera.
-    //            //            self.total_avoid_fail = 0      # count pass through containment sphere.
-    //            //            self.cumulative_sep_fail = 0   # separation fail: a pair of boids touch.
-    //            //            self.simulation_paused = False # Simulation stopped, display continues.
-    //            //            self.single_step = False       # perform one simulation step then pause.
-    //            //            self.enable_annotation = True
-    //            //            self.tracking_camera = False
-    //            //            self.wrap_vs_avoid = False
-    //            //            self.avoid_blend_mode = True   # obstacle avoid: blend vs hard switch
-    //            //            self.min_time_to_collide = 0.8 # react to predicted impact (seconds)
-    //            //            self.fps = util.Blender()
-    //            //            # Flock's current list of obstacles.
-    //            //            self.obstacles = []
-    //            //            # Switchable pre-defined obstacle sets.
-    //            //            self.obstacle_presets = self.pre_defined_obstacle_sets()
-    //            //            self.obstacle_selection_counter = 0
-    //            //            self.total_stalls = 0
-    //            //            # If there is ever a need to have multiple Flock instances at the same
-    //            //            # time, these steps with global effect should be reconsidered:
-    //            //            Draw.set_random_seeds(seed)
-    //            //            self.setup()
-    //
-    //        }
-    
+        
     // TODO 20240205 temporary scaffolding to include one sphere obstacle.
     EvertedSphereObstacle temp_eso_;
     
@@ -266,9 +92,7 @@ public:
     {
         // TODO 20240205 temporary scaffolding to include one sphere obstacle.
         obstacles().push_back(&temp_eso_);
-        
     }
-    
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240205 these were very early "just to get it running" hacks.
@@ -346,7 +170,6 @@ public:
             boid->set_time_since_last_neighbor_refresh(t);
         }
     }
-
     
     //        # Draw each boid in flock.
     //        def draw(self):
@@ -364,20 +187,6 @@ public:
     //                    self.tracking_camera and
     //                    self.selected_boid().is_neighbor(boid))
     
-    
-    //        # Fly each boid in flock for one simulation step. Consists of two sequential
-    //        # steps to avoid artifacts from order of boids. First a "sense/plan" phase
-    //        # which computes the desired steering based on current state. Then an "act"
-    //        # phase which actually moves the boids.
-    //        def fly_flock(self, time_step):
-    //            for boid in self.boids:
-    //                boid.plan_next_steer(time_step)
-    //            for boid in self.boids:
-    //                boid.apply_next_steer(time_step)
-    //            for boid in self.boids:
-    //                if boid.speed < (boid.min_speed - util.epsilon):
-    //                    self.total_stalls += 1
-    
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
     // which computes the desired steering based on current state. Then an "act"
@@ -390,62 +199,22 @@ public:
         for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
     }
     
-
-    
-    
-    //        # When a Boid gets more than "radius" from the origin, teleport it to the
-    //        # other side of the world, just inside of its antipodal point.
-    //        def sphere_wrap_around(self):
-    //            radius = self.sphere_radius
-    //            center = self.sphere_center
-    //            for boid in self.boids:
-    //                bp = boid.position
-    //                distance_from_center = (bp - center).length()
-    //                if distance_from_center > radius:
-    //                    new_position = (center - bp).normalize() * radius * 0.95
-    //                    boid.ls.p = new_position
-    //                    boid.recompute_nearest_neighbors()
-    //                    if not self.wrap_vs_avoid:
-    //                        self.total_avoid_fail += 1
-    
-    
-    
     // When a Boid gets more than "radius" from "sphere_center", teleport it to
     // the other side of the world, just inside of its antipodal point.
     void sphere_wrap_around()
     {
-//        radius = self.sphere_radius
-//        center = self.sphere_center
-
         double radius = fp().sphere_radius;
         Vec3 center = fp().sphere_center;
-
-//        for boid in self.boids:
         for (Boid* boid : boids())
         {
-//            bp = boid.position
             Vec3 bp = boid->position();
-            
-//            distance_from_center = (bp - center).length()
             double distance_from_center = (bp - center).length();
-
-//            if distance_from_center > radius:
             if (distance_from_center > radius)
             {
-//                new_position = (center - bp).normalize() * radius * 0.95
                 Vec3 new_position = (center - bp).normalize() * radius * 0.95;
-                
-//                boid.ls.p = new_position
-//                boid.recompute_nearest_neighbors()
                 boid->setPosition(new_position);
                 boid->recompute_nearest_neighbors();
-
-//                if not self.wrap_vs_avoid:
-//                    self.total_avoid_fail += 1
-                if (not wrap_vs_avoid())
-                {
-                    total_avoid_fail += 1;
-                }
+                if (not wrap_vs_avoid()) { total_avoid_fail += 1; }
             }
         }
     }
@@ -487,7 +256,7 @@ public:
                 }
                 
                 std::cout << draw().frame_counter();
-//                std::cout << " fps=" << 0; // round(self.fps.value));
+                // std::cout << " fps=" << 0; // round(self.fps.value));
                 std::cout << " fps=" << fps_.value;
                 std::cout << ", ave_speed=" << average_speed;
                 std::cout << ", min_sep=" << min_sep;
@@ -502,30 +271,13 @@ public:
         }
     }
 
-    
-    //    # Keep track of a smoothed (LPF) version of frames per second metric.
-    //    def update_fps(self):
-    //        self.fps.blend(self.fixed_fps if self.fixed_time_step
-    //                                      else int(1 / Draw.frame_duration),
-    //                       0.95)
-
     // Keep track of a smoothed (LPF) version of frames per second metric.
     void update_fps()
     {
-//        fps_.blend(self.fixed_fps if self.fixed_time_step
-//                       else int(1 / Draw.frame_duration),
-//                       0.95)
         double fd = draw().frame_duration();
         fps_.blend((fixed_time_step() ? fixed_fps() : int(1 / fd)),
                    0.95);
     }
-    
-    //        # Based on pause/play and single step. Called once per frame from main loop.
-    //        def run_simulation_this_frame(self):
-    //            ok_to_run = self.single_step or not self.simulation_paused
-    //            self.single_step = False
-    //            return ok_to_run
-    
     
     // Based on pause/play and single step. Called once per frame from main loop.
     bool run_simulation_this_frame()
@@ -729,13 +481,6 @@ public:
     //        def single_step_if_paused(self):
     //            if self.simulation_paused:
     //                self.set_single_step_mode()
-    
-    //        # Simulation continues running until this returns False.
-    //        def still_running(self):
-    //            a = True if not Draw.enable else Draw.vis.poll_events()
-    //            b = Draw.frame_counter < self.max_simulation_steps
-    //            return a and b
-    
     
     // Simulation continues running until this returns false.
     bool still_running()

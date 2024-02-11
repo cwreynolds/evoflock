@@ -133,6 +133,7 @@ public:
                 }
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+                if (not simulation_paused_) { draw().measure_frame_duration(); }
                 log_stats();
                 update_fps();
             }
@@ -222,52 +223,47 @@ public:
     // Calculate and log various statistics for flock.
     void log_stats()
     {
-        if (not simulation_paused_)
+        if ((not simulation_paused_) and (draw().frame_counter() % 100 == 0))
         {
-            draw().measure_frame_duration();
-            if (draw().frame_counter() % 100 == 0)
+            double average_speed = 0;
+            for (Boid* b : boids()) { average_speed += b->speed(); }
+            average_speed /= boid_count();
+            
+            // Loop over all unique pairs of distinct boid (ab==ba, not aa)
+            double min_sep = std::numeric_limits<double>::infinity();
+            double ave_sep = 0;
+            int pair_count = 0;
+            auto examine_pair = [&](const Boid* p, const Boid* q)
             {
-                double average_speed = 0;
-                for (Boid* b : boids()) { average_speed += b->speed(); }
-                average_speed /= boid_count();
-                
-                // Loop over all unique pairs of distinct boids: ab==ba, not aa
-                // Loop over all unique pairs of distinct boid (ab==ba, not aa)
-                double min_sep = std::numeric_limits<double>::infinity();
-                double ave_sep = 0;
-                int pair_count = 0;
-                auto examine_pair = [&](const Boid* p, const Boid* q)
-                {
-                    double dist = (p->position() - q->position()).length();
-                    if (min_sep > dist) { min_sep = dist; }
-                    ave_sep += dist;
-                    pair_count += 1;
-                    if (dist<(2*fp().body_radius)) {cumulative_sep_fail_ += 1;}
-                };
-                util::apply_to_pairwise_combinations(examine_pair, boids());
-                ave_sep /= pair_count;
-
-                double max_nn_dist = 0;
-                for (Boid* b : boids())
-                {
-                    Boid* n = b->cached_nearest_neighbors().at(0);
-                    double  dist = (b->position() - n->position()).length();
-                    if (max_nn_dist < dist) { max_nn_dist = dist; }
-                }
-                
-                std::cout << draw().frame_counter();
-                // std::cout << " fps=" << 0; // round(self.fps.value));
-                std::cout << " fps=" << fps_.value;
-                std::cout << ", ave_speed=" << average_speed;
-                std::cout << ", min_sep=" << min_sep;
-                std::cout << ", ave_sep=" << ave_sep;
-                std::cout << ", max_nn_dist=" << max_nn_dist;
-                std::cout << ", cumulative_sep_fail/boid=" <<
-                             cumulative_sep_fail_ / boid_count();
-                std::cout << ", avoid_fail=" << total_avoid_fail;
-                std::cout << ", stalls=" << + total_stalls_;
-                std::cout << std::endl;
+                double dist = (p->position() - q->position()).length();
+                if (min_sep > dist) { min_sep = dist; }
+                ave_sep += dist;
+                pair_count += 1;
+                if (dist < (2 * fp().body_radius)){ cumulative_sep_fail_ += 1; }
+            };
+            util::apply_to_pairwise_combinations(examine_pair, boids());
+            ave_sep /= pair_count;
+            
+            double max_nn_dist = 0;
+            for (Boid* b : boids())
+            {
+                Boid* n = b->cached_nearest_neighbors().at(0);
+                double  dist = (b->position() - n->position()).length();
+                if (max_nn_dist < dist) { max_nn_dist = dist; }
             }
+            
+            std::cout << draw().frame_counter();
+            // std::cout << " fps=" << 0; // round(self.fps.value));
+            std::cout << " fps=" << fps_.value;
+            std::cout << ", ave_speed=" << average_speed;
+            std::cout << ", min_sep=" << min_sep;
+            std::cout << ", ave_sep=" << ave_sep;
+            std::cout << ", max_nn_dist=" << max_nn_dist;
+            std::cout << ", cumulative_sep_fail/boid=" <<
+                         cumulative_sep_fail_ / boid_count();
+            std::cout << ", avoid_fail=" << total_avoid_fail;
+            std::cout << ", stalls=" << + total_stalls_;
+            std::cout << std::endl;
         }
     }
 

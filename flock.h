@@ -111,7 +111,9 @@ public:
         make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
         // self.draw()
         // self.cycle_obstacle_selection()
-        // while self.still_running():
+
+        save_centers_to_file_start();
+
         while (still_running())
         {
             if (run_simulation_this_frame())
@@ -121,6 +123,7 @@ public:
                           1.0 / fixed_fps() :
                           draw().frame_duration());
                 sphere_wrap_around();
+                save_centers_to_file_1_step();
                 // self.draw()
                 // Draw.update_scene()
                 
@@ -128,8 +131,8 @@ public:
                 // 20240204 temp
                 if (draw().frame_counter() % 10 == 0)
                 {
-                    std::cout << "speed=" << boids().at(0)->speed()
-                              << " pos=" << boids().at(0)->position() << std::endl;
+//                    std::cout << "speed=" << boids().at(0)->speed()
+//                              << " pos=" << boids().at(0)->position() << std::endl;
                 }
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -138,6 +141,7 @@ public:
                 update_fps();
             }
         }
+        save_centers_to_file_end();
         // Draw.close_visualizer()
         std::cout << "Exit at step:" << draw().frame_counter() << std::endl;
     }
@@ -182,7 +186,35 @@ public:
     //                for boid in self.boids:
     //                    boid.draw(color=(Vec3(0, 1, 0) if
     //                                     self.is_neighbor_of_selected(boid) else None))
-    //
+
+    
+    void save_centers_to_file_start() const
+    {
+        std::cout << "boid_centers = [" << std::endl;
+    }
+    
+    void save_centers_to_file_end() const
+    {
+        std::cout << "]" << std::endl;
+    }
+
+    // Write Boid center positions to file (initially: to console)
+    void save_centers_to_file_1_step() const
+    {
+        bool first = true;
+        std::cout << "[";
+        for (Boid* boid : boids())
+        {
+            Vec3 p = boid->position();
+            if (not first) { std::cout << ","; }
+            std::cout << "[";
+            std::cout << p.x() << "," << p.y() << "," << p.z();
+            std::cout << "]";
+            first = false;
+        }
+        std::cout << "]" << std::endl;
+    }
+    
     //        def is_neighbor_of_selected(self, boid):
     //            return (self.enable_annotation and
     //                    self.tracking_camera and
@@ -229,7 +261,7 @@ public:
             for (Boid* b : boids()) { average_speed += b->speed(); }
             average_speed /= boid_count();
             
-            // Loop over all unique pairs of distinct boid (ab==ba, not aa)
+            // Loop over all unique pairs of distinct boids (ab==ba, not aa)
             double min_sep = std::numeric_limits<double>::infinity();
             double ave_sep = 0;
             int pair_count = 0;

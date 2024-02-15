@@ -18,6 +18,7 @@
 #include "Utilities.h"
 #include "Boid.h"
 #include "obstacle.h"
+#include <fstream>  // for logging simulation data to file.
 
 class Flock
 {
@@ -187,34 +188,48 @@ public:
     //                    boid.draw(color=(Vec3(0, 1, 0) if
     //                                     self.is_neighbor_of_selected(boid) else None))
 
-    
-    void save_centers_to_file_start() const
+    // TODO just WIP for prototyping
+    std::ofstream* boid_center_data_stream_;
+    bool save_boid_centers_ = true;
+
+    void save_centers_to_file_start()
     {
-        std::cout << "boid_centers = [" << std::endl;
-    }
-    
-    void save_centers_to_file_end() const
-    {
-        std::cout << "]" << std::endl;
+        if (save_boid_centers_)
+        {
+            std::string file_name = "/Users/cwr/Desktop/boid_centers.py";
+            boid_center_data_stream_ = new std::ofstream{file_name};
+            (*boid_center_data_stream_) << "boid_centers = [" << std::endl;
+        }
     }
 
-    // Write Boid center positions to file (initially: to console)
+    void save_centers_to_file_end() const
+    {
+        if (save_boid_centers_)
+        {
+            (*boid_center_data_stream_) << "]" << std::endl;
+            boid_center_data_stream_->close();
+            delete boid_center_data_stream_;
+        }
+    }
+
+    // Write Boid center positions to file.
     void save_centers_to_file_1_step() const
     {
-        bool first = true;
-        std::cout << "[";
-        for (Boid* boid : boids())
+        if (save_boid_centers_)
         {
-            Vec3 p = boid->position();
-            if (not first) { std::cout << ","; }
-            std::cout << "[";
-            std::cout << p.x() << "," << p.y() << "," << p.z();
-            std::cout << "]";
-            first = false;
+            std::ofstream& output = *boid_center_data_stream_;
+            output << "[";
+            for (Boid* boid : boids())
+            {
+                Vec3 p = boid->position();
+                output << "[";
+                output << p.x() << "," << p.y() << "," << p.z();
+                output << "],";
+            }
+            output << "]," << std::endl;
         }
-        std::cout << "]" << std::endl;
     }
-    
+
     //        def is_neighbor_of_selected(self, boid):
     //            return (self.enable_annotation and
     //                    self.tracking_camera and

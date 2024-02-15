@@ -39,11 +39,16 @@ int main(int argc, const char * argv[])
     Flock flock;
     flock.set_fixed_time_step(true);
     flock.set_fixed_fps(60);
+    
 //    flock.set_max_simulation_steps(1000);
 //    flock.set_boid_count(200);
 //    flock.set_boid_count(1000);
-    flock.set_max_simulation_steps(10);
-    flock.set_boid_count(10);
+    
+//    flock.set_max_simulation_steps(10);
+//    flock.set_boid_count(10);
+
+    flock.set_max_simulation_steps(1000);
+    flock.set_boid_count(200);
 
     std::stringstream timer_caption;
     timer_caption << "Basic flock test: " << flock.boid_count() << " boids "

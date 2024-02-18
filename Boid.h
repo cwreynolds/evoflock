@@ -202,6 +202,8 @@ public:
         Vec3 direction;
         for (Boid* neighbor : neighbors)
         {
+            assert(neighbor);
+            
             Vec3 offset = position() - neighbor->position();
             double dist = offset.length();
             double weight = 1 / std::pow(dist, fp().exponent_separate);
@@ -223,7 +225,7 @@ public:
             double weight = 1 / pow(dist, fp().exponent_align);
             weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_align);
             weight *= angle_weight(neighbor, fp().angle_align);
-            direction += heading_offset.normalize() * weight;
+            direction += heading_offset.normalize_or_0() * weight;
         }
         return direction.normalize_or_0();
     }
@@ -396,6 +398,10 @@ public:
             return distance_squared_from_me(a) < distance_squared_from_me(b); };
         // TODO 20240129 look also at std::partial_sort() and std::stable_sort()
         BoidPtrList all_boids = flock_boids();
+        
+        // TODO 20240215 experimental
+        assert((all_boids.size() > n) && "neighborhood > flock size");
+
         std::sort(all_boids.begin(), all_boids.end(), sorted);
         // Set "cached_nearest_neighbors_" to nearest "n" in "all_boids".
         cached_nearest_neighbors_.resize(n);

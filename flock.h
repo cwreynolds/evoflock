@@ -160,13 +160,16 @@ public:
         // Set up each new Boid.
         for (Boid* boid : boids())
         {
-            boid->set_fp(&fp());
-            boid->set_draw(&draw());
-            boid->set_flock_boids(&boids());
-            boid->set_flock_obstacles(&obstacles());
-            boid->set_ls(boid->ls().randomize_orientation());
-            boid->setPosition(center + (rs.random_point_in_unit_radius_sphere() *
-                                        radius * 0.95));
+//            boid->set_fp(&fp());
+//            boid->set_draw(&draw());
+//            boid->set_flock_boids(&boids());
+//            boid->set_flock_obstacles(&obstacles());
+//            boid->set_ls(boid->ls().randomize_orientation());
+//            boid->setPosition(center + (rs.random_point_in_unit_radius_sphere() *
+//                                        radius * 0.95));
+            
+            init_boid(boid, radius, center, rs);
+
         }
         // Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
         for (Boid* boid : boids())
@@ -177,6 +180,51 @@ public:
         }
     }
     
+    //def init_boid(self, boid, radius, center):
+    //    boid.sphere_radius = radius
+    //    boid.sphere_center = center
+    //
+    //    # uniform over whole sphere enclosure
+    //    #    boid.ls = boid.ls.randomize_orientation()
+    //    #    boid.ls.p = (center + (radius * 0.95 *
+    //    #                           Vec3.random_point_in_unit_radius_sphere()))
+    //
+    //    mean_forward = Vec3(1, 0, 0)
+    //    noise_forward = Vec3.random_point_in_unit_radius_sphere() * 0.1
+    //    new_forward = (mean_forward + noise_forward).normalize()
+    //    boid.ls.rotate_to_new_forward(new_forward)
+    //    center_of_clump = center + Vec3(radius * -0.66, 0, 0)
+    //    offset_in_clump = radius * 0.33 * Vec3.random_point_in_unit_radius_sphere()
+    //    boid.ls.p = center_of_clump + offset_in_clump
+
+    void init_boid(Boid* boid, double radius, Vec3 center, RandomSequence& rs)
+    {
+//        boid.sphere_radius = radius;
+//        boid.sphere_center = center;
+        
+        // uniform over whole sphere enclosure
+        //    boid.ls = boid.ls.randomize_orientation()
+        //    boid.ls.p = (center + (radius * 0.95 *
+        //                           Vec3.random_point_in_unit_radius_sphere()))
+
+        boid->set_fp(&fp());
+        boid->set_draw(&draw());
+        boid->set_flock_boids(&boids());
+        boid->set_flock_obstacles(&obstacles());
+
+        Vec3 mean_forward(1, 0, 0);
+        Vec3 noise_forward = rs.random_point_in_unit_radius_sphere() * 0.1;
+        Vec3 new_forward = (mean_forward + noise_forward).normalize();
+//        boid->ls = boid->ls.rotate_to_new_forward(new_forward);
+        boid->set_ls(boid->ls().rotate_to_new_forward(new_forward));
+
+        Vec3 center_of_clump = center + Vec3(radius * -0.66, 0, 0);
+        Vec3 offset_in_clump = (rs.random_point_in_unit_radius_sphere() *
+                                radius * 0.33);
+//        boid.ls.p = center_of_clump + offset_in_clump
+        boid->setPosition(center_of_clump + offset_in_clump);
+    }
+
     //        # Draw each boid in flock.
     //        def draw(self):
     //            if Draw.enable:

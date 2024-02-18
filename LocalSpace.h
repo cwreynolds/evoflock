@@ -77,7 +77,37 @@ public:
         jj = kk.cross(ii).normalize();
         return LocalSpace(ii, jj, kk, p());
     }
+    
+//    # Given a "new_forward" direction, rotate this LocalSpace about its position
+//    # to align with the new forward, while keeping the new up direction as close
+//    # as possible to the given "reference_up" (defaults to old up: self.j). The
+//    # intent is to find the smallest rotation needed to meet these constraints.
+//        def rotate_to_new_forward(self, new_forward, reference_up=None):
+//        if not reference_up:
+//        reference_up = self.j
+//        assert new_forward.is_unit_length()
+//        assert reference_up.is_unit_length()
+//        new_side = reference_up.cross(new_forward).normalize()
+//        new_up = new_forward.cross(new_side).normalize()
+//        self.set_state_ijkp(new_side, new_up, new_forward, self.p)
 
+    // Given a "new_forward" direction, rotate this LocalSpace about its position
+    // to align with the new forward, while keeping the new up direction as close
+    // as possible to the given "reference_up" (defaults to old up: self.j). The
+    // intent is to find the smallest rotation needed to meet these constraints.
+    LocalSpace rotate_to_new_forward(Vec3 new_forward) const
+    {
+        return rotate_to_new_forward(new_forward, j());
+    }
+    LocalSpace rotate_to_new_forward(Vec3 new_forward, Vec3 reference_up) const
+    {
+        assert(new_forward.is_unit_length());
+        assert(reference_up.is_unit_length());
+        Vec3 new_side = reference_up.cross(new_forward).normalize();
+        Vec3 new_up = new_forward.cross(new_side).normalize();
+        return LocalSpace(new_side, new_up, new_forward, p());
+    }
+    
     static void unit_test()
     {
         Vec3 ls_i = Vec3(1, 2, 3).normalize();
@@ -98,6 +128,18 @@ public:
         assert (a.is_equal_within_epsilon(r.localize(r.globalize(a)), e));
         assert (b.is_equal_within_epsilon(r.globalize(r.localize(b)), e));
         assert (b.is_equal_within_epsilon(r.localize(r.globalize(b)), e));
+        
+        const LocalSpace o;  // original for comparison
+        Vec3 diag_ypz = (o.j() + o.k()).normalize();
+        Vec3 diag_ymz = (o.j() - o.k()).normalize();
+        LocalSpace m = o.rotate_to_new_forward(diag_ypz);
+        assert(m.is_orthonormal());
+        assert(m.i().is_equal_within_epsilon(o.i()));
+        assert(m.j().is_equal_within_epsilon(diag_ymz));
+        LocalSpace n = o.rotate_to_new_forward(o.i());
+        assert(n.is_orthonormal());
+        assert(n.i().is_equal_within_epsilon(-o.k()));
+        assert(n.j().is_equal_within_epsilon(o.j()));
     }
     
 private:

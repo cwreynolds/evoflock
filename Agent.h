@@ -56,6 +56,29 @@ public:
         update_speed_and_local_space(acceleration, time_step);
     }
 
+//    // Applies given acceleration to Agent's dynamic and geometric state.
+//    void update_speed_and_local_space(Vec3 acceleration, double time_step)
+//    {
+//        Vec3 new_velocity = velocity() + (acceleration * time_step);
+//        double new_speed = new_velocity.length();
+//        setSpeed(util::clip(new_speed, 0, max_speed()));
+//        // Update geometric state when moving.
+//        if (speed() > 0)
+//        {
+//            Vec3 new_forward = new_velocity / new_speed;
+//            // Reorthonormalize to correspond to new_forward
+//            //            ref_up = self.up_reference(acceleration * time_step)
+//            Vec3 ref_up = up_reference(acceleration * time_step);
+//            Vec3 new_side = ref_up.cross(new_forward).normalize();
+//            Vec3 new_up = new_forward.cross(new_side).normalize();
+//            Vec3 clipped_velocity = new_forward * speed();
+//            Vec3 new_position = position() + (clipped_velocity * time_step);
+//            // Set new geometric state.
+//            ls_.setIJKP(new_side, new_up, new_forward, new_position);
+//            assert (ls().is_orthonormal());
+//        }
+//    }
+
     // Applies given acceleration to Agent's dynamic and geometric state.
     void update_speed_and_local_space(Vec3 acceleration, double time_step)
     {
@@ -66,15 +89,25 @@ public:
         if (speed() > 0)
         {
             Vec3 new_forward = new_velocity / new_speed;
-            // Reorthonormalize to correspond to new_forward
-            //            ref_up = self.up_reference(acceleration * time_step)
-            Vec3 ref_up = up_reference(acceleration * time_step);
-            Vec3 new_side = ref_up.cross(new_forward).normalize();
-            Vec3 new_up = new_forward.cross(new_side).normalize();
-            Vec3 clipped_velocity = new_forward * speed();
-            Vec3 new_position = position() + (clipped_velocity * time_step);
-            // Set new geometric state.
-            ls_.setIJKP(new_side, new_up, new_forward, new_position);
+            
+            
+
+//            // Reorthonormalize to correspond to new_forward
+//            Vec3 ref_up = up_reference(acceleration * time_step);
+//            Vec3 new_side = ref_up.cross(new_forward).normalize();
+//            Vec3 new_up = new_forward.cross(new_side).normalize();
+//            Vec3 clipped_velocity = new_forward * speed();
+//            Vec3 new_position = position() + (clipped_velocity * time_step);
+//            // Set new geometric state.
+//            ls_.setIJKP(new_side, new_up, new_forward, new_position);
+            
+            
+            // Rotate LocalSpace to align with new_forward.
+            Vec3 reference_up = up_reference(acceleration * time_step);
+            set_ls(ls().rotate_to_new_forward(new_forward, reference_up));
+            // Set new position.
+            setPosition(position() + (new_forward * speed() * time_step));
+
             assert (ls().is_orthonormal());
         }
     }

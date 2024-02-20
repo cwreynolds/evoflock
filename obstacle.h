@@ -45,7 +45,13 @@ public:
                           const Vec3& agent_forward,
                           double max_distance,
                           double body_radius) const { return Vec3(); }
-
+    
+    // Signed distance function.
+    // (From a query point to the nearest point on Obstacle's surface: negative
+    // inside, positive outside, zero at surface. Very similar to nearest_point(),
+    // maybe they can be combined?)
+    virtual double signed_distance(const Vec3& query_point) const { return 0; }
+    
     virtual void draw() const {}
     
     virtual std::string to_string() const { return "Obstacle"; }
@@ -107,6 +113,14 @@ public:
             }
         }
         return avoidance;
+    }
+    
+    // Signed distance function. (From a query point to the nearest point on
+    // Obstacle's surface: negative inside, positive outside, zero at surface.)
+    double signed_distance(const Vec3& query_point) const override
+    {
+        double distance_to_center = (query_point - center_).length();
+        return distance_to_center - radius_;
     }
     
     void draw() const override
@@ -196,6 +210,15 @@ public:
         return avoidance;
     }
 
+    // Signed distance function. (From a query point to the nearest point on
+    // Obstacle's surface: negative inside, positive outside, zero at surface.)
+    double signed_distance(const Vec3& query_point) const override
+    {
+        Vec3 nearest_point_on_plane = nearest_point(query_point);
+        Vec3 from_plane_to_query_point = query_point - nearest_point_on_plane;
+        return from_plane_to_query_point.dot(normal_);
+    }
+    
     std::string to_string() const override { return "PlaneObstacle"; }
 
 private:
@@ -275,6 +298,14 @@ public:
         return avoidance;
     }
 
+    // Signed distance function. (From a query point to the nearest point on
+    // Obstacle's surface: negative inside, positive outside, zero at surface.)
+    double signed_distance(const Vec3& query_point) const override
+    {
+        Vec3 point_on_axis = nearest_point_on_axis(query_point);
+        double distance_to_axis = (query_point - point_on_axis).length();
+        return distance_to_axis - radius_;
+    }
     
     void draw() const override
     {

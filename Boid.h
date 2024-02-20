@@ -19,8 +19,8 @@
 #include "Utilities.h"
 #include "Agent.h"
 #include "obstacle.h"
-#include <algorithm>  // For sort.
-
+#include <algorithm>  // For sorting cached_nearest_neighbors_.
+#include <map>        // For last_sdf_per_obstacle_
 
 class Boid;
 typedef std::vector<Boid*> BoidPtrList;
@@ -101,6 +101,12 @@ private:  // move to bottom of class later
     Vec3 annote_avoid_poi_ = Vec3();  // This might be too elaborate: two vals
     double annote_avoid_weight_ = 0;  // per boid just for avoid annotation.
     
+    // Per boid map from Obstacle to previous signed_distance_function value.
+    // TODO 20240219 needs to be reset when obstacles change.
+    std::map<Obstacle*, double> last_sdf_per_obstacle_;
+    // Cumulative count: how many avoidance failures (collisions) has it had?
+    int avoidance_failure_counter_ = 0;
+
     // Low pass filter for steering vector.
     util::Blender<Vec3> steer_memory_;
     // Low pass filter for roll control ("up" target).
@@ -159,7 +165,9 @@ public:
     {
         return cached_nearest_neighbors_;
     }
-    
+
+    int avoidance_failure_counter() const {return avoidance_failure_counter_;};
+
     // Constructor
     Boid() : Agent()
     {
@@ -484,7 +492,8 @@ public:
     }
 
     // Returns a list of future collisions sorted by time, with soonest first.
-    CollisionList predict_future_collisions() const
+    // (Maintains avoidance_failure_counter_ and last_sdf_per_obstacle_ map.)
+    CollisionList predict_future_collisions()
     {
         CollisionList collisions;
         for (Obstacle* obstacle : flock_obstacles())
@@ -503,6 +512,18 @@ public:
                                                dist_to_collision,
                                                point_of_impact,
                                                normal_at_poi));
+                // If we encountered this obstacle before, check for collision.
+                double current_sdf = obstacle->signed_distance(position());
+                if (last_sdf_per_obstacle_.count(obstacle))
+                {
+                    double previous_sdf = last_sdf_per_obstacle_[obstacle];
+                    if (util::zero_crossing(current_sdf, previous_sdf))
+                    {
+                        avoidance_failure_counter_ += 1;
+                        std::cout << "uh oh!" << std::endl;
+                    }
+                }
+                last_sdf_per_obstacle_[obstacle] = current_sdf;
             }
         }
         auto sorted = [&](const Collision& a, const Collision& b)

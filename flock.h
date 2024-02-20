@@ -41,7 +41,6 @@ private:
     bool single_step_ = false;       // perform one simulation step then pause.
 
     int total_stalls_ = 0;
-    int total_avoid_fail = 0;      // count pass through containment sphere.
     int cumulative_sep_fail_ = 0;   // separation fail: a pair of boids touch.
 
     util::Blender<double> fps_;
@@ -85,16 +84,12 @@ public:
     //
     // Yes for now, lets just skip args to the constructor to avoid worrying
     // about which parameters are or aren't included there. New answer: none are.
-        
-    // TODO 20240205 temporary scaffolding to include one sphere obstacle.
-    EvertedSphereObstacle temp_eso_;
-    
-    Flock() : temp_eso_(fp().sphere_radius, fp().sphere_center)
+
+    Flock()
     {
-        // TODO 20240205 temporary scaffolding to include one sphere obstacle.
-        obstacles().push_back(&temp_eso_);
+        pre_defined_obstacle_sets();
     }
-    
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240205 these were very early "just to get it running" hacks.
     //               Replace using fp().
@@ -123,7 +118,6 @@ public:
                 fly_flock((fixed_time_step() or not draw().enable()) ?
                           1.0 / fixed_fps() :
                           draw().frame_duration());
-                sphere_wrap_around();
                 save_centers_to_file_1_step();
                 // self.draw()
                 // Draw.update_scene()
@@ -294,26 +288,6 @@ public:
         double ts = fp().min_speed - util::epsilon;
         for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
     }
-    
-    // When a Boid gets more than "radius" from "sphere_center", teleport it to
-    // the other side of the world, just inside of its antipodal point.
-    void sphere_wrap_around()
-    {
-        double radius = fp().sphere_radius;
-        Vec3 center = fp().sphere_center;
-        for (Boid* boid : boids())
-        {
-            Vec3 bp = boid->position();
-            double distance_from_center = (bp - center).length();
-            if (distance_from_center > radius)
-            {
-                Vec3 new_position = (center - bp).normalize() * radius * 0.95;
-                boid->setPosition(new_position);
-                boid->recompute_nearest_neighbors();
-                if (not wrap_vs_avoid()) { total_avoid_fail += 1; }
-            }
-        }
-    }
 
     // Calculate and log various statistics for flock.
     void log_stats()
@@ -340,11 +314,13 @@ public:
             ave_sep /= pair_count;
             
             double max_nn_dist = 0;
+            int total_avoid_fail = 0;
             for (Boid* b : boids())
             {
                 Boid* n = b->cached_nearest_neighbors().at(0);
                 double  dist = (b->position() - n->position()).length();
                 if (max_nn_dist < dist) { max_nn_dist = dist; }
+                total_avoid_fail += b->avoidance_failure_counter();
             }
             
             std::cout << draw().frame_counter();
@@ -482,45 +458,62 @@ public:
     //            else:
     //                description += 'none'
     //            print(description + '\n')
-    //
-    //        # Builds a list of preset obstacle combinations, each a list of Obstacles.
-    //        def pre_defined_obstacle_sets(self):
-    //            main_sphere = EvertedSphereObstacle(self.sphere_radius, self.sphere_center)
-    //            plane_obstacle = PlaneObstacle()
-    //
-    //            cep = Vec3(0, self.sphere_radius + 0.1, 0)
-    //            cobs = CylinderObstacle(10, cep, -cep)
-    //
-    //            scep = Vec3(-1, 1, 1) * self.sphere_radius * 0.8
-    //            squat_cyl_obs = CylinderObstacle(20, scep, -scep)
-    //
-    //            diag = Vec3(1,1,1).normalize()
-    //            uncentered_cyl_obs = CylinderObstacle(5, diag * 5, diag * 30)
-    //
-    //            # 6 symmetric cylinders on main axes.
-    //            c3r =  4 / 30 * self.sphere_radius
-    //            c3o = 15 / 30 * self.sphere_radius
-    //            c3h = 20 / 30 * self.sphere_radius
-    //            cyl3x = CylinderObstacle(c3r, Vec3(-c3h, 0, c3o), Vec3(c3h, 0, c3o))
-    //            cyl3y = CylinderObstacle(c3r, Vec3(c3o, -c3h, 0), Vec3(c3o, c3h, 0))
-    //            cyl3z = CylinderObstacle(c3r, Vec3(0, c3o, -c3h), Vec3(0, c3o, c3h))
-    //            c3o = - c3o
-    //            cyl3p = CylinderObstacle(c3r, Vec3(-c3h, 0, c3o), Vec3(c3h, 0, c3o))
-    //            cyl3q = CylinderObstacle(c3r, Vec3(c3o, -c3h, 0), Vec3(c3o, c3h, 0))
-    //            cyl3r = CylinderObstacle(c3r, Vec3(0, c3o, -c3h), Vec3(0, c3o, c3h))
-    //
-    //            # Preset obstacle combinations:
-    //            return [[main_sphere],
-    //                    [main_sphere, plane_obstacle],
-    //                    [main_sphere, uncentered_cyl_obs],
-    //                    [main_sphere, cyl3x, cyl3y, cyl3z, cyl3p, cyl3q, cyl3r],
-    //                    [main_sphere, cobs],
-    //                    [main_sphere, plane_obstacle, cobs],
-    //                    [cobs],
-    //                    [squat_cyl_obs],
-    //                    [squat_cyl_obs, main_sphere],
-    //                    [squat_cyl_obs, plane_obstacle],
-    //                    []]
+
+    
+        
+    void pre_defined_obstacle_sets()
+    {
+        obstacles().push_back(new EvertedSphereObstacle(fp().sphere_radius,
+                                                        fp().sphere_center));
+     
+        // TODO 20240218 experiments for "sim starts in more flock-like state"
+        double ecr = fp().sphere_radius;
+        Vec3 ect = fp().sphere_center + Vec3(ecr * 0.6, ecr, 0);
+        Vec3 ecb = fp().sphere_center + Vec3(ecr * 0.6, -ecr, 0);
+        obstacles().push_back(new CylinderObstacle(ecr * 0.2, ect, ecb));
+        
+        
+        //# Builds a list of preset obstacle combinations, each a list of Obstacles.
+        //def pre_defined_obstacle_sets(self):
+        //    main_sphere = EvertedSphereObstacle(self.sphere_radius, self.sphere_center)
+        //    plane_obstacle = PlaneObstacle()
+        //
+        //    cep = Vec3(0, self.sphere_radius + 0.1, 0)
+        //    cobs = CylinderObstacle(10, cep, -cep)
+        //
+        //    scep = Vec3(-1, 1, 1) * self.sphere_radius * 0.8
+        //    squat_cyl_obs = CylinderObstacle(20, scep, -scep)
+        //
+        //    diag = Vec3(1,1,1).normalize()
+        //    uncentered_cyl_obs = CylinderObstacle(5, diag * 5, diag * 30)
+        //
+        //    # 6 symmetric cylinders on main axes.
+        //    c3r =  4 / 30 * self.sphere_radius
+        //    c3o = 15 / 30 * self.sphere_radius
+        //    c3h = 20 / 30 * self.sphere_radius
+        //    cyl3x = CylinderObstacle(c3r, Vec3(-c3h, 0, c3o), Vec3(c3h, 0, c3o))
+        //    cyl3y = CylinderObstacle(c3r, Vec3(c3o, -c3h, 0), Vec3(c3o, c3h, 0))
+        //    cyl3z = CylinderObstacle(c3r, Vec3(0, c3o, -c3h), Vec3(0, c3o, c3h))
+        //    c3o = - c3o
+        //    cyl3p = CylinderObstacle(c3r, Vec3(-c3h, 0, c3o), Vec3(c3h, 0, c3o))
+        //    cyl3q = CylinderObstacle(c3r, Vec3(c3o, -c3h, 0), Vec3(c3o, c3h, 0))
+        //    cyl3r = CylinderObstacle(c3r, Vec3(0, c3o, -c3h), Vec3(0, c3o, c3h))
+        //
+        //    # Preset obstacle combinations:
+        //    return [[main_sphere],
+        //            [main_sphere, plane_obstacle],
+        //            [main_sphere, uncentered_cyl_obs],
+        //            [main_sphere, cyl3x, cyl3y, cyl3z, cyl3p, cyl3q, cyl3r],
+        //            [main_sphere, cobs],
+        //            [main_sphere, plane_obstacle, cobs],
+        //            [cobs],
+        //            [squat_cyl_obs],
+        //            [squat_cyl_obs, main_sphere],
+        //            [squat_cyl_obs, plane_obstacle],
+        //            []]
+
+    }
+    
     //
     //        # Print mini-help on shell.
     //        def print_help(self):

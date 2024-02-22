@@ -119,6 +119,10 @@ private:  // move to bottom of class later
     double time_since_last_neighbor_refresh_ = 0;
     
     inline static RandomSequence rs_;
+
+    // Used to generate unique string names for Boid instances
+    std::string name_;
+    static inline int name_counter_ = 0;
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
@@ -168,12 +172,15 @@ public:
 
     int avoidance_failure_counter() const {return avoidance_failure_counter_;};
 
+    std::string name() const { return name_; }
+    
     // Constructor
     Boid() : Agent()
     {
         // Temp? Pick a random midrange boid color.
         auto mrbc = [](){ return rs_.frandom2(0.5, 0.8); };
         color_ = Vec3(mrbc(), mrbc(), mrbc());
+        name_ = "boid_" + std::to_string(name_counter_++);
     }
 
     // Determine and store desired steering for this simulation step
@@ -269,7 +276,7 @@ public:
         {
             Vec3 predict_avoid = steer_for_predictive_avoidance();
             Vec3 static_avoid = fly_away_from_obstacles();
-            avoid = Vec3::max({static_avoid, predict_avoid});
+            avoid = static_avoid + predict_avoid;
         }
         avoid_obstacle_annotation(3, Vec3::none(), 0);
         return avoid;
@@ -480,13 +487,14 @@ public:
     //    def is_neighbor(self, other_boid):
     //        return other_boid in self.flock.selected_boid().cached_nearest_neighbors
 
+
     // Bird-like roll control: blends vector toward path curvature center with
     // global up. Overrides method in base class Agent
     Vec3 up_reference(const Vec3& acceleration)
     {
-        // Slight bias to global up
-        Vec3 new_up = acceleration + Vec3(0, 0.01, 0);
-        up_memory_.blend(new_up, 0.999);
+        Vec3 global_up_scaled = Vec3(0, acceleration.length(), 0);
+        Vec3 new_up = acceleration + global_up_scaled;
+        up_memory_.blend(new_up, 0.9);
         up_memory_.value = up_memory_.value.normalize();
         return up_memory_.value;
     }
@@ -520,7 +528,11 @@ public:
                     if (util::zero_crossing(current_sdf, previous_sdf))
                     {
                         avoidance_failure_counter_ += 1;
-                        std::cout << "uh oh!" << std::endl;
+                        //std::cout << "  " + (name() + ":       ").substr(0,11)
+                        //    << avoidance_failure_counter_ << " ["
+                        //    << std::to_string(previous_sdf).substr(0,5) << " "
+                        //    << std::to_string(current_sdf).substr(0,5) << "] "
+                        //    << obstacle->to_string() << std::endl;
                     }
                 }
                 last_sdf_per_obstacle_[obstacle] = current_sdf;

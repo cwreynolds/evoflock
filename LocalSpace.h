@@ -97,7 +97,7 @@ public:
     // intent is to find the smallest rotation needed to meet these constraints.
     LocalSpace rotate_to_new_forward(Vec3 new_forward) const
     {
-        return rotate_to_new_forward(new_forward, j());
+        return rotate_to_new_forward(new_forward, Vec3(0, 1, 0));
     }
     LocalSpace rotate_to_new_forward(Vec3 new_forward, Vec3 reference_up) const
     {

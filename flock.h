@@ -330,8 +330,8 @@ public:
             std::cout << ", min_sep=" << min_sep;
             std::cout << ", ave_sep=" << ave_sep;
             std::cout << ", max_nn_dist=" << max_nn_dist;
-            std::cout << ", cumulative_sep_fail/boid=" <<
-                         cumulative_sep_fail_ / boid_count();
+            std::cout << ", cumulative_sep_fail/boid="
+                      << cumulative_sep_fail_ / float(boid_count());
             std::cout << ", avoid_fail=" << total_avoid_fail;
             std::cout << ", stalls=" << + total_stalls_;
             std::cout << std::endl;

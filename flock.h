@@ -210,8 +210,8 @@ public:
         Vec3 noise_forward = rs.random_point_in_unit_radius_sphere() * 0.1;
         Vec3 new_forward = (mean_forward + noise_forward).normalize();
 //        boid->ls = boid->ls.rotate_to_new_forward(new_forward);
-        boid->set_ls(boid->ls().rotate_to_new_forward(new_forward));
-
+//        boid->set_ls(boid->ls().rotate_to_new_forward(new_forward));
+        boid->set_ls(boid->ls().rotate_to_new_forward(new_forward, Vec3(0, 1, 0)));
         Vec3 center_of_clump = center + Vec3(radius * -0.66, 0, 0);
         Vec3 offset_in_clump = (rs.random_point_in_unit_radius_sphere() *
                                 radius * 0.33);

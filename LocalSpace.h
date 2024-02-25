@@ -95,10 +95,10 @@ public:
     // to align with the new forward, while keeping the new up direction as close
     // as possible to the given "reference_up" (defaults to old up: self.j). The
     // intent is to find the smallest rotation needed to meet these constraints.
-    LocalSpace rotate_to_new_forward(Vec3 new_forward) const
-    {
-        return rotate_to_new_forward(new_forward, Vec3(0, 1, 0));
-    }
+//    LocalSpace rotate_to_new_forward(Vec3 new_forward) const
+//    {
+//        return rotate_to_new_forward(new_forward, Vec3(0, 1, 0));
+//    }
     LocalSpace rotate_to_new_forward(Vec3 new_forward, Vec3 reference_up) const
     {
         assert(new_forward.is_unit_length());
@@ -132,11 +132,11 @@ public:
         const LocalSpace o;  // original for comparison
         Vec3 diag_ypz = (o.j() + o.k()).normalize();
         Vec3 diag_ymz = (o.j() - o.k()).normalize();
-        LocalSpace m = o.rotate_to_new_forward(diag_ypz);
+        LocalSpace m = o.rotate_to_new_forward(diag_ypz, Vec3(0, 1, 0));
         assert(m.is_orthonormal());
         assert(m.i().is_equal_within_epsilon(o.i()));
         assert(m.j().is_equal_within_epsilon(diag_ymz));
-        LocalSpace n = o.rotate_to_new_forward(o.i());
+        LocalSpace n = o.rotate_to_new_forward(o.i(), Vec3(0, 1, 0));
         assert(n.is_orthonormal());
         assert(n.i().is_equal_within_epsilon(-o.k()));
         assert(n.j().is_equal_within_epsilon(o.j()));

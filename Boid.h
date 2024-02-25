@@ -488,15 +488,28 @@ public:
     //        return other_boid in self.flock.selected_boid().cached_nearest_neighbors
 
 
+//    // Bird-like roll control: blends vector toward path curvature center with
+//    // global up. Overrides method in base class Agent
+//    Vec3 up_reference(const Vec3& acceleration)
+//    {
+//        Vec3 global_up_scaled = Vec3(0, acceleration.length(), 0);
+//        Vec3 new_up = acceleration + global_up_scaled;
+//        up_memory_.blend(new_up, 0.9);
+//        up_memory_.value = up_memory_.value.normalize();
+//        return up_memory_.value;
+//    }
+
     // Bird-like roll control: blends vector toward path curvature center with
     // global up. Overrides method in base class Agent
     Vec3 up_reference(const Vec3& acceleration)
     {
         Vec3 global_up_scaled = Vec3(0, acceleration.length(), 0);
         Vec3 new_up = acceleration + global_up_scaled;
-        up_memory_.blend(new_up, 0.9);
-        up_memory_.value = up_memory_.value.normalize();
-        return up_memory_.value;
+//        up_memory_.blend(new_up, 0.9);
+//        up_memory_.value = up_memory_.value.normalize();
+//        return up_memory_.value;
+        up_memory_.blend(new_up, 0.95);
+        return up_memory_.value.normalize();
     }
 
     // Returns a list of future collisions sorted by time, with soonest first.

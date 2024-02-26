@@ -10,6 +10,7 @@
 #include "Agent.h"
 #include "Boid.h"
 #include "flock.h"
+#include "GP.h"
 #include "LocalSpace.h"
 #include "obstacle.h"
 #include "shape.h"
@@ -27,6 +28,10 @@ void run_unit_tests()
     Agent::unit_test();
     Boid::unit_test();
     Flock::unit_test();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240224 very preliminary test
+    LazyPredator::unit_test();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << "All unit tests OK." << std::endl;
 }
 

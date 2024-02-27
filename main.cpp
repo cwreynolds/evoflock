@@ -67,7 +67,7 @@ int main(int argc, const char * argv[])
                   << flock.max_simulation_steps() << " frames";
     {
         util::Timer t(timer_caption.str());
-        flock.run();
+//        flock.run();
     }
 
     return 0;

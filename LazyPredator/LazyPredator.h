@@ -19,16 +19,16 @@
 #pragma once
 
 #include "Population.h"
-//#include "UnitTests.h"
+#include "UnitTests.h"
 
 // TODO 20240224 very temp for testing
 namespace LazyPredator
 {
 
-static void unit_test()
-{
-    // Just testing that I can instantiate a functional LazyPredator class.
-    assert(Population().getMigrationLikelihood());
-}
+//    static void unit_test()
+//    {
+//        // Just testing that I can instantiate a functional LazyPredator class.
+//        assert(Population().getMigrationLikelihood());
+//    }
 
 }

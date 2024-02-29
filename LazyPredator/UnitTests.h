@@ -145,6 +145,18 @@ private:
                 "ClassB", "ClassB", {"Float"},
                 [](GpTree& t)
                 {
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20240228 WIP debugging any_cast issue in UnitTests.h
+                    // QQQ
+                    // Maybe should be looking at GpTree::eval() ?
+
+                    debugPrint(typeid(t).name())
+                    debugPrint(typeid(t.getSubtree(0)).name())
+                    debugPrint(typeid(t.getSubtree(0).eval()).name())
+                    debugPrint(std::any_cast<float>(t.getSubtree(0).eval()))
+                    
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                     return std::any(new ClassB(t.evalSubtree<float>(0)));
                 }
             },
@@ -290,6 +302,7 @@ private:
 
 static void unit_test()
 {
+/*
     // population_allocation_of_individuals
     {
         bool start_with_none = st(Individual::getLeakCount() == 0);
@@ -619,32 +632,33 @@ static void unit_test()
 //        return ok;
         assert(ok && "gp_tree_utility");
     }
-
+*/
+    
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 //        // TODO 20240226 OOPS!! getting "std::bad_any_cast: bad any cast"
 //
-//        // gp_type_deleter
-//    //    bool gp_type_deleter()
-//        {
-//            int individuals = 100;
-//            int max_tree_size = 100;
-//            LPRS().setSeed(65053574);
-//            bool constructed, destructed;
-//            // Block to contain lifetime of Population "p".
-//            {
-//                // Make a Population of Individuals from FunctionSet "treeEvalObjects".
-//                Population p(individuals, max_tree_size, TestFS::treeEvalObjects());
-//                // Force early evaluation of each Individual's GpTree.
-//                p.applyToAllIndividuals([](Individual* i){ i->treeValue(); });
-//                // Verify instances of ClassA have been constructed.
-//                constructed = st(TestFS::ClassA::getLeakCount() > 0);
-//            }
-//            // Verify all objects of ClassA that were constructed were also destroyed.
-//            destructed = st(TestFS::ClassA::getLeakCount() == 0);
-//    //        return constructed && destructed;
-//            assert(constructed && destructed && "gp_type_deleter");
-//        }
+        // gp_type_deleter
+    //    bool gp_type_deleter()
+        {
+            int individuals = 100;
+            int max_tree_size = 100;
+            LPRS().setSeed(65053574);
+            bool constructed, destructed;
+            // Block to contain lifetime of Population "p".
+            {
+                // Make a Population of Individuals from FunctionSet "treeEvalObjects".
+                Population p(individuals, max_tree_size, TestFS::treeEvalObjects());
+                // Force early evaluation of each Individual's GpTree.
+                p.applyToAllIndividuals([](Individual* i){ i->treeValue(); });
+                // Verify instances of ClassA have been constructed.
+                constructed = st(TestFS::ClassA::getLeakCount() > 0);
+            }
+            // Verify all objects of ClassA that were constructed were also destroyed.
+            destructed = st(TestFS::ClassA::getLeakCount() == 0);
+    //        return constructed && destructed;
+            assert(constructed && destructed && "gp_type_deleter");
+        }
 //
 //
 //

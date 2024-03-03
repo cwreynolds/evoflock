@@ -49,9 +49,9 @@ public:
       : GpType(name, range_min, range_max, defaultJiggleScale()) {}
     // Constructor for ranged numeric types, plus custom jiggle scale.
     template <typename T>
-    GpType(const std::string& name, T range_min, T range_max, float jiggle_scale)
+    GpType(const std::string& name, T range_min, T range_max, double jiggle_scale)
       : GpType(name,
-               [=](){ return std::any(LPRS().random2(range_min, range_max)); },
+               [=](){ return std::any(T(LPRS().random2(range_min, range_max))); },
                any_to_string<T>,
                [=](std::any x) { return jiggle(std::any_cast<T>(x), range_min,
                                                range_max, jiggle_scale); }){}
@@ -131,13 +131,13 @@ public:
     // uniformly distributed on the interval [-m, +m] where m is: ((range_max -
     // range_min) * jiggle_factor). The interval [-m, +m] is then "pre-clipped"
     // to the range of the GpType.
-    static float defaultJiggleScale() { return 0.05; }
+    static double defaultJiggleScale() { return 0.05; }
     // Utility template function for jiggle mutation handlers.
-    template <typename T> static T jiggle(T x, T min, T max, float jiggle_scale)
+    template <typename T> static T jiggle(T x, T min, T max, double jiggle_scale)
     {
         T max_jiggle = (max - min) * jiggle_scale;
-        return LPRS().random2(std::max(min, x - max_jiggle),
-                              std::min(max, x + max_jiggle));
+        return T(LPRS().random2(std::max(min, x - max_jiggle),
+                                std::min(max, x + max_jiggle)));
     }
 private:
     std::string name_;

@@ -145,18 +145,6 @@ private:
                 "ClassB", "ClassB", {"Float"},
                 [](GpTree& t)
                 {
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20240228 WIP debugging any_cast issue in UnitTests.h
-                    // QQQ
-                    // Maybe should be looking at GpTree::eval() ?
-
-                    debugPrint(typeid(t).name())
-                    debugPrint(typeid(t.getSubtree(0)).name())
-                    debugPrint(typeid(t.getSubtree(0).eval()).name())
-                    debugPrint(std::any_cast<float>(t.getSubtree(0).eval()))
-                    
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
                     return std::any(new ClassB(t.evalSubtree<float>(0)));
                 }
             },
@@ -288,21 +276,12 @@ private:
     return _e_ok;                                          \
 }()
 
-//    // Used only in UnitTests::allTestsOK()
-//    #define logAndTally(e)                       \
-//    {                                            \
-//        bool _e_ok = e();                        \
-//        std::cout << "\t";                       \
-//        std::cout << (_e_ok ? "pass" : "FAIL");  \
-//        std::cout << " " << #e;                  \
-//        std::cout << std::endl << std::flush;    \
-//        if (!_e_ok) all_tests_passed = false;    \
-//    }
-
-
 static void unit_test()
 {
-/*
+    bool verbose = true;
+    auto maybe_log= [&](std::string s)
+        { if (verbose) { std::cout << "    " << s << std::endl; } return true; };
+    
     // population_allocation_of_individuals
     {
         bool start_with_none = st(Individual::getLeakCount() == 0);
@@ -315,12 +294,11 @@ static void unit_test()
                                   st(Individual::getLeakCount() == target_count));
         }
         bool end_with_none = st(Individual::getLeakCount() == 0);
-        assert (start_with_none && match_target_count && end_with_none
-                && "population_allocation_of_individuals");
+        assert (start_with_none && match_target_count && end_with_none &&
+                maybe_log("population_allocation_of_individuals"));
     }
 
     // random_program_size_limit
-//    bool random_program_size_limit()
     {
         bool all_ok = true;
         int total_subtests = 1000;
@@ -340,12 +318,10 @@ static void unit_test()
                        st(actual_size == gp_tree.size()));
             if (!ok) all_ok = false;
         }
-//        return all_ok;
-        assert(all_ok && "random_program_size_limit") ;
+        assert(all_ok && maybe_log("random_program_size_limit")) ;
     }
 
     // gp_function_weighted_select
-//    bool gp_function_weighted_select()
     {
         bool result = true;
         LPRS().setSeed(46102969);
@@ -381,20 +357,18 @@ static void unit_test()
         // Verify that weightedRandomSelect() returns null for enpty function list.
         std::vector<GpFunction*> no_functions;
         result = result && st(fs.weightedRandomSelect(no_functions) == nullptr);
-//        return result;
-        assert(result && "gp_function_weighted_select");
+        assert(result && maybe_log("gp_function_weighted_select"));
     }
     
     // gp_tree_construction
-//    bool gp_tree_construction()
     {
-        GpTree root;                                      // make empty tree
+        GpTree root;                                  // make empty tree
         bool created_empty = st(root.subtrees().empty()); // verify empty
-        root.addSubtrees(2);                              // add 2 subtrees under r
-        GpTree& st0 = root.getSubtree(0);                 // name for subtree r.0
-        GpTree& st1 = root.getSubtree(1);                 // name for subtree r.1
-        st1.addSubtrees(1);                               // add 1 subtree under r.1
-        GpTree& st10 = root.getSubtree(1).getSubtree(0);  // name for subtree r.1.a
+        root.addSubtrees(2);                          // add 2 subtrees under r
+        GpTree& st0 = root.getSubtree(0);             // name for subtree r.0
+        GpTree& st1 = root.getSubtree(1);             // name for subtree r.1
+        st1.addSubtrees(1);                           // add 1 subtree under r.1
+        GpTree& st10 = root.getSubtree(1).getSubtree(0);// name for st r.1.a
         // Set leaf values to names as character string.
         GpType str("String");
         root.setRootValue(std::string("r"), str);
@@ -412,18 +386,6 @@ static void unit_test()
         gp_tree_2 = gp_tree_0;
         
         // Check for tree depth, breath, and labels. And assignments.
-//        return (created_empty &&
-//                st(root.subtrees().size() == 2) &&
-//                st(st0.subtrees().size() == 0) &&
-//                st(st1.subtrees().size() == 1) &&
-//                st(st10.subtrees().size() == 0) &&
-//                st(std::any_cast<std::string>(root.getRootValue()) == "r") &&
-//                st(std::any_cast<std::string>(st0.getRootValue())  == "r.0") &&
-//                st(std::any_cast<std::string>(st1.getRootValue())  == "r.1") &&
-//                st(std::any_cast<std::string>(st10.getRootValue()) == "r.1.a") &&
-//                st(GpTree::match<int>(gp_tree_0, gp_tree_1)) &&
-//                st(GpTree::match<int>(gp_tree_0, gp_tree_2)) &&
-//                st(GpTree::match<int>(gp_tree_1, gp_tree_2)));
         assert(created_empty &&
                st(root.subtrees().size() == 2) &&
                st(st0.subtrees().size() == 0) &&
@@ -436,11 +398,10 @@ static void unit_test()
                st(GpTree::match<int>(gp_tree_0, gp_tree_1)) &&
                st(GpTree::match<int>(gp_tree_0, gp_tree_2)) &&
                st(GpTree::match<int>(gp_tree_1, gp_tree_2)) &&
-               "gp_tree_construction");
+               maybe_log("gp_tree_construction"));
     }
 
     // gp_tree_eval_simple -- For simple case of "plain old data" types.
-//    bool gp_tree_eval_simple()  // For simple case of "plain old data" types.
     {
         // Construct a tree for "AddInt(1, Floor(2.5))"
         int leaf1 = 1;                            // Leaf value Int 1
@@ -463,21 +424,15 @@ static void unit_test()
         st10.setRootValue(leaf25, type_float);    // Subtree 1,0 is leaf Float 2.5.
         st1.setRootFunction(gp_func_floor);       // Subtree 1 has function Floor.
         
-//        return (st(gp_tree.getRootType() == &type_int) &&
-//                st(&gp_tree.getRootFunction() == &gp_func_addint) &&
-//                st(st1.getRootType() == &type_int) &&
-//                st(&st1.getRootFunction() == &gp_func_floor) &&
-//                st(std::any_cast<int>(gp_tree.eval()) == expected));
         assert(st(gp_tree.getRootType() == &type_int) &&
                st(&gp_tree.getRootFunction() == &gp_func_addint) &&
                st(st1.getRootType() == &type_int) &&
                st(&st1.getRootFunction() == &gp_func_floor) &&
                st(std::any_cast<int>(gp_tree.eval()) == expected) &&
-               "gp_tree_eval_simple");
+               maybe_log("gp_tree_eval_simple"));
     }
 
     // gp_tree_eval_objects
-//    bool gp_tree_eval_objects()
     {
         // Construct a tree for "ClassA(ClassB(0.5), ClassC(1, 2)"
         float leaf0_5 = 0.5;                     // Leaf value Float 0.5
@@ -510,12 +465,10 @@ static void unit_test()
         std::string expected = "ClassA(ClassB(0.5), ClassC(1, 2))";
         bool tree_as_expected = st(expected == result->to_string());
         gp_tree.deleteCachedValues();           // Clean up: run GpType deleters.
-//        return (tree_as_expected);
-        assert(tree_as_expected && "gp_tree_eval_objects");
+        assert(tree_as_expected && maybe_log("gp_tree_eval_objects"));
     }
 
     // gp_tree_crossover
-//    bool gp_tree_crossover()
     {
         bool ok = true;
         int retries = 50;
@@ -591,12 +544,10 @@ static void unit_test()
         float p_to_q_ratio = float(total_P) / float(total_Q);
         ok = ok && st(between(p_to_q_ratio, 0.8, 1.2));
         FunctionSet::function_filter = nullptr;
-//        return ok;
-        assert(ok && "gp_tree_crossover");
+        assert(ok && maybe_log("gp_tree_crossover"));
     }
 
     // gp_tree_utility
-//    bool gp_tree_utility()
     {
         // Make several random GpTrees. Call GpTree::collectVectorOfSubtrees() and
         // GpTree::collectSetOfTypes() on each. Then descend through tree verifying
@@ -629,121 +580,106 @@ static void unit_test()
             // Check "gp_tree".
             check(&gp_tree);
         }
-//        return ok;
-        assert(ok && "gp_tree_utility");
+        assert(ok && maybe_log("gp_tree_utility"));
     }
-*/
-    
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//        // TODO 20240226 OOPS!! getting "std::bad_any_cast: bad any cast"
-//
-        // gp_type_deleter
-    //    bool gp_type_deleter()
-        {
-            int individuals = 100;
-            int max_tree_size = 100;
-            LPRS().setSeed(65053574);
-            bool constructed, destructed;
-            // Block to contain lifetime of Population "p".
-            {
-                // Make a Population of Individuals from FunctionSet "treeEvalObjects".
-                Population p(individuals, max_tree_size, TestFS::treeEvalObjects());
-                // Force early evaluation of each Individual's GpTree.
-                p.applyToAllIndividuals([](Individual* i){ i->treeValue(); });
-                // Verify instances of ClassA have been constructed.
-                constructed = st(TestFS::ClassA::getLeakCount() > 0);
-            }
-            // Verify all objects of ClassA that were constructed were also destroyed.
-            destructed = st(TestFS::ClassA::getLeakCount() == 0);
-    //        return constructed && destructed;
-            assert(constructed && destructed && "gp_type_deleter");
-        }
-//
-//
-//
-//        // subpopulation_and_stats
-//    //    bool subpopulation_and_stats()
-//        {
-//            bool ok = true;
-//            LPRS().setSeed(239473519);
-//            const FunctionSet& fs = TestFS::treeEval();
-//            // Test getStepCount().
-//            {
-//                Population p(10, 2, 10, fs);
-//                p.setLoggerFunction([](Population& p){});  // Do nothing logger.
-//                int steps = 10;
-//                p.run(steps, [](TournamentGroup tg){ return tg; });  // Identity tf.
-//                ok = ok && st(p.getStepCount() == steps);
-//            }
-//            // Test that each subpopulation has correct count of Individuals,
-//            // given random total numbers of Individuals and subpopulations.
-//            for (int i = 0; i < 20; i++)
-//            {
-//                int count = LPRS().random2(5, 25);
-//                int demes = LPRS().random2(1, count);
-//                Population p(count, demes, 10, fs);
-//                ok = ok && st(p.getIndividualCount() == count);
-//                ok = ok && st(p.getSubpopulationCount() == demes);
-//                for (int s = 0; s < p.getSubpopulationCount(); s++)
-//                {
-//                    int size_of_subpop = int(p.subpopulation(s).size());
-//                    int fair_share = count / demes;
-//                    ok = ok && st(std::abs(size_of_subpop - fair_share) <= 1);
-//                }
-//            }
-//            // Test averageTreeSize(). Compute average three ways, ensure they match.
-//            {
-//                int individual_count = 100;
-//                Population p(individual_count, 2, 20, fs);
-//                float sum1 = 0;
-//                float sum2 = 0;
-//                p.applyToAllIndividuals([&](Individual* i){sum1+=(i->tree().size());});
-//                for (int i = 0; i < p.getSubpopulationCount(); i++)
-//                {
-//                    for (auto& j : p.subpopulation(i)) { sum2 += j->tree().size(); }
-//                }
-//                float average_tree_size_1 = sum1 / p.getIndividualCount();
-//                float average_tree_size_2 = sum2 / p.getIndividualCount();
-//                ok = ok && st(p.averageTreeSize() == average_tree_size_1);
-//                ok = ok && st(p.averageTreeSize() == average_tree_size_2);
-//            }
-//            // Test averageFitness(). Compute average three ways, ensure they match.
-//            {
-//                int individual_count = 100;
-//                Population p(individual_count);
-//                float sum1 = 0;
-//                float sum2 = 0;
-//                // Function to set each Individual to next value of counter.
-//                float counter = 0;
-//                auto set_fitnesses_keep_sum = [&](Individual* i)
-//                {
-//                    sum1 += counter;
-//                    i->setFitness(counter++);
-//                };
-//                p.applyToAllIndividuals(set_fitnesses_keep_sum);
-//                // Directly iterate through all individuals in Population
-//                for (int i = 0; i < p.getSubpopulationCount(); i++)
-//                {
-//                    for (auto& j : p.subpopulation(i)) { sum2 += j->getFitness(); }
-//                }
-//                float average_fitness_1 = sum1 / p.getIndividualCount();
-//                float average_fitness_2 = sum2 / p.getIndividualCount();
-//                ok = ok && st(p.averageFitness() == average_fitness_1);
-//                ok = ok && st(p.averageFitness() == average_fitness_2);
-//            }
-//            // Make sure all of the Individuals have been properly cleaned up.
-//            ok = ok && st(Individual::getLeakCount() == 0);
-//    //        return ok;
-//            assert(ok && "subpopulation_and_stats");
-//        }
-//
-//
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    // gp_type_deleter
+    {
+        int individuals = 100;
+        int max_tree_size = 100;
+        LPRS().setSeed(65053574);
+        bool constructed, destructed;
+        // Block to contain lifetime of Population "p".
+        {
+            // Make a Population of Individuals from FunctionSet "treeEvalObjects".
+            Population p(individuals, max_tree_size, TestFS::treeEvalObjects());
+            // Force early evaluation of each Individual's GpTree.
+            p.applyToAllIndividuals([](Individual* i){ i->treeValue(); });
+            // Verify instances of ClassA have been constructed.
+            constructed = st(TestFS::ClassA::getLeakCount() > 0);
+        }
+        // Verify all objects of ClassA that were constructed were also destroyed.
+        destructed = st(TestFS::ClassA::getLeakCount() == 0);
+        assert(constructed && destructed && maybe_log("gp_type_deleter"));
+    }
+
+
+
+    // subpopulation_and_stats
+    {
+        bool ok = true;
+        LPRS().setSeed(239473519);
+        const FunctionSet& fs = TestFS::treeEval();
+        // Test getStepCount().
+        {
+            Population p(10, 2, 10, fs);
+            p.setLoggerFunction([](Population& p){});  // Do nothing logger.
+            int steps = 10;
+            p.run(steps, [](TournamentGroup tg){ return tg; });  // Identity tf.
+            ok = ok && st(p.getStepCount() == steps);
+        }
+        // Test that each subpopulation has correct count of Individuals,
+        // given random total numbers of Individuals and subpopulations.
+        for (int i = 0; i < 20; i++)
+        {
+            int count = LPRS().random2(5, 25);
+            int demes = LPRS().random2(1, count);
+            Population p(count, demes, 10, fs);
+            ok = ok && st(p.getIndividualCount() == count);
+            ok = ok && st(p.getSubpopulationCount() == demes);
+            for (int s = 0; s < p.getSubpopulationCount(); s++)
+            {
+                int size_of_subpop = int(p.subpopulation(s).size());
+                int fair_share = count / demes;
+                ok = ok && st(std::abs(size_of_subpop - fair_share) <= 1);
+            }
+        }
+        // Test averageTreeSize(). Compute average three ways, ensure they match.
+        {
+            int individual_count = 100;
+            Population p(individual_count, 2, 20, fs);
+            float sum1 = 0;
+            float sum2 = 0;
+            p.applyToAllIndividuals([&](Individual* i){sum1+=(i->tree().size());});
+            for (int i = 0; i < p.getSubpopulationCount(); i++)
+            {
+                for (auto& j : p.subpopulation(i)) { sum2 += j->tree().size(); }
+            }
+            float average_tree_size_1 = sum1 / p.getIndividualCount();
+            float average_tree_size_2 = sum2 / p.getIndividualCount();
+            ok = ok && st(p.averageTreeSize() == average_tree_size_1);
+            ok = ok && st(p.averageTreeSize() == average_tree_size_2);
+        }
+        // Test averageFitness(). Compute average three ways, ensure they match.
+        {
+            int individual_count = 100;
+            Population p(individual_count);
+            float sum1 = 0;
+            float sum2 = 0;
+            // Function to set each Individual to next value of counter.
+            float counter = 0;
+            auto set_fitnesses_keep_sum = [&](Individual* i)
+            {
+                sum1 += counter;
+                i->setFitness(counter++);
+            };
+            p.applyToAllIndividuals(set_fitnesses_keep_sum);
+            // Directly iterate through all individuals in Population
+            for (int i = 0; i < p.getSubpopulationCount(); i++)
+            {
+                for (auto& j : p.subpopulation(i)) { sum2 += j->getFitness(); }
+            }
+            float average_fitness_1 = sum1 / p.getIndividualCount();
+            float average_fitness_2 = sum2 / p.getIndividualCount();
+            ok = ok && st(p.averageFitness() == average_fitness_1);
+            ok = ok && st(p.averageFitness() == average_fitness_2);
+        }
+        // Make sure all of the Individuals have been properly cleaned up.
+        ok = ok && st(Individual::getLeakCount() == 0);
+        assert(ok && maybe_log("subpopulation_and_stats"));
+    }
     
     // subpopulation_migration
-//    bool subpopulation_migration()
     {
         bool ok = true;
         int subpops = 5;
@@ -771,13 +707,11 @@ static void unit_test()
             ok = ok && st(set_contains(before, i));
         };
         population.applyToAllIndividuals(verify_same_individuals);
-//        return ok;
-        assert(ok && "subpopulation_migration");
+        assert(ok && maybe_log("subpopulation_migration"));
     }
 
     // Reset LazyPredator's global RandomSequence to default seed.
     LPRS().setSeed();
-
 }
 
 }  // end of namespace LazyPredator

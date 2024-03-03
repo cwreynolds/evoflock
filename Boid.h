@@ -54,11 +54,13 @@ public:
 class FlockParameters
 {
 public:
-    double max_speed = 20.0;    // Speed upper limit (m/s)
-    double max_force = 100.0;     // Acceleration upper limit (m/s²)
-    double min_speed = max_speed * 0.3;  // TODO 20231225 ad hoc factor.
-    double speed = min_speed;
-    double body_radius = 0.5;   // "assume a spherical boid" -- unit diameter
+    double max_speed = 20.0;                          // Speed upper limit (m/s)
+    double max_force = 100.0;                         // Max acceleration (m/s²)
+//    double min_speed = max_speed * 0.3;  // TODO 20231225 ad hoc factor.
+    double min_speed_factor = 0.3;
+    double min_speed = max_speed * min_speed_factor;  // Speed lower limit (m/s)
+    double speed = min_speed;                         // init speed is min
+    double body_radius = 0.5;      // "assume a spherical boid" -- unit diameter
     
     double sphere_radius = 50;
     Vec3 sphere_center;

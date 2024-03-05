@@ -24,18 +24,18 @@ public:
                const std::string& return_type_name,
                const std::vector<std::string>& parameter_type_names,
                std::function<std::any(GpTree& t)> eval)
-    : GpFunction(name, return_type_name, parameter_type_names, eval, 1) {}
+      : GpFunction(name, return_type_name, parameter_type_names, eval, 1) {}
     
     GpFunction(const std::string& name,
                const std::string& return_type_name,
                const std::vector<std::string>& parameter_type_names,
                std::function<std::any(GpTree& t)> eval,
                float selection_weight)
-    : name_(name),
-    return_type_name_(return_type_name),
-    parameter_type_names_(parameter_type_names),
-    eval_(eval),
-    selection_weight_(selection_weight) {}
+      : name_(name),
+        return_type_name_(return_type_name),
+        parameter_type_names_(parameter_type_names),
+        eval_(eval),
+        selection_weight_(selection_weight) {}
     // String name of this GpFunction.
     const std::string& name() const { return name_; }
     // String name of this GpFunction's return type.

@@ -15,6 +15,8 @@
 // TODO 20240226 For now, a modified copy of LazyPredator is in a subdirectory.
 #include "LazyPredator/LazyPredator.h"
 
+namespace LP = LazyPredator;
+
 
 // TODO 20230303 mock
 // Run flock simulation with given parameters, return a scalar fitness on [0,1].
@@ -27,13 +29,28 @@ double run_flock_simulation (double p0,  double p1,  double p2,  double p3,
     return 0;
 }
 
+
+// TODO 20240304 so for example, here is the first random tree from:
+//
+//     int max_tree_size = 20;
+//     std::string root_type = "Fitness_0_1";
+//     FunctionSet::makeRandomTree(max_tree_size, root_type, tree):
+//
+//     Run_Flock(57.4155, 35.5876, 95.5118, 92.8331,           // speeds
+//               78.8442, 13.9993, 97.2554, 37.0498, 39.6934,  // weights
+//               90.704,                                       // max dist sep
+//               5.53134, 9.07756, 1.08763,                    // exponents
+//               0.534839, 0.0996812, 0.405398)                // angle
+
+
 // This is a degenerate GP function set, for what is essentially a GA problem:
 // selecting a set of real number parameters for a flock simulation, via an
 // absolute and fixed fitness metric. There is only one function, all GpTrees
 // are exactly one function deep, differing only in their parameter values.
-LazyPredator::FunctionSet evo_flock_gp_function_set =
+LazyPredator::FunctionSet evoflock_gp_function_set =
 {
     {
+        { "Fitness_0_1", 0.0,   1.0 },
         { "Real_0_1",    0.0,   1.0 },
         { "Real_0_10",   0.0,  10.0 },
         { "Real_0_100",  0.0, 100.0 },
@@ -46,7 +63,7 @@ LazyPredator::FunctionSet evo_flock_gp_function_set =
             "Run_Flock",
             
             // Return type (in this case it returns a fitness on [0,1]):
-            "Real_0_1",
+            "Fitness_0_1",
             
             // Function parameter type list:
             //     TODO cf "FlockParameters" for details

@@ -278,7 +278,7 @@ private:
 
 static void unit_test()
 {
-    bool verbose = true;
+    bool verbose = false;
     auto maybe_log= [&](std::string s)
         { if (verbose) { std::cout << "    " << s << std::endl; } return true; };
     

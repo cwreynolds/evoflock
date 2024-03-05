@@ -321,6 +321,28 @@ public:
     // leaf values such as numeric constants. Values of 2 or more exclude those.
     int getCrossoverMinSize() const { return crossover_min_size_; }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240305 adding crossover_function_hook_ for custom crossover.
+    
+    typedef std::function<void(const GpTree& parent0,
+                               const GpTree& parent1,
+                               GpTree& offspring,
+                               int min_size,
+                               int max_size,
+                               int fs_min_size)>
+            crossover_function_type;
+    
+    void setCrossoverFunction(crossover_function_type cof)
+    {
+        crossover_function_hook_ = cof;
+    }
+    crossover_function_type getCrossoverFunction() const
+    {
+        return crossover_function_hook_;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 private:
     // These maps are used both to store the GpType and GpFunction objects,
     // plus to look up those objects from their character string names.
@@ -337,6 +359,10 @@ private:
     // GpTrees during crossover. The default of 1 allows all subtrees including
     // leaf values such as numeric constants. Values of 2 or more exclude those.
     int crossover_min_size_ = 1;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240305 adding crossover_function_hook_ for custom crossover.
+    crossover_function_type crossover_function_hook_ = GpTree::crossover;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 #undef name_lookup_util

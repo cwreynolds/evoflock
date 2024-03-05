@@ -128,12 +128,24 @@ public:
         parent1->incrementTournamentsSurvived();
         // Create new offspring tree by crossing-over these two parents.
         GpTree new_tree;
-        GpTree::crossover(parent0->tree(),
-                          parent1->tree(),
-                          new_tree,
-                          getMinCrossoverTreeSize(),
-                          getMaxCrossoverTreeSize(),
-                          getFunctionSet()->getCrossoverMinSize());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240305 adding crossover_function_hook_ for custom crossover.
+
+//        GpTree::crossover(parent0->tree(),
+//                          parent1->tree(),
+//                          new_tree,
+//                          getMinCrossoverTreeSize(),
+//                          getMaxCrossoverTreeSize(),
+//                          getFunctionSet()->getCrossoverMinSize());
+
+        auto crossover = getFunctionSet()->getCrossoverFunction();
+        crossover(parent0->tree(),
+                  parent1->tree(),
+                  new_tree,
+                  getMinCrossoverTreeSize(),
+                  getMaxCrossoverTreeSize(),
+                  getFunctionSet()->getCrossoverMinSize());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Mutate constants in new tree.
         new_tree.mutate();
         // Create new offspring Individual from new tree.

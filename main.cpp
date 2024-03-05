@@ -142,20 +142,28 @@ int main(int argc, const char * argv[])
     evoflock_gp_function_set.makeRandomTree(max_tree_size, root_type, tree2);
     debugPrint(tree2.to_string())
 
-    LP::GpTree::crossover(tree1, tree2, tree3,
-                          min_tree_size, max_tree_size,
-                          evoflock_gp_function_set.getCrossoverMinSize());
-    std::cout << std::endl;
-    debugPrint(tree3.to_string())
+//    LP::GpTree::crossover(tree1, tree2, tree3,
+//                          min_tree_size, max_tree_size,
+//                          evoflock_gp_function_set.getCrossoverMinSize());
+//    std::cout << std::endl;
+//    debugPrint(tree3.to_string())
 
 
-    my_new_crossover(tree1, tree2, tree4,
-                     min_tree_size, max_tree_size,
-                     evoflock_gp_function_set.getCrossoverMinSize());
+//    my_new_crossover(tree1, tree2, tree4,
+//                     min_tree_size, max_tree_size,
+//                     evoflock_gp_function_set.getCrossoverMinSize());
+//    std::cout << std::endl;
+//    debugPrint(tree4.to_string())
+
+    
+    evoflock_gp_function_set.setCrossoverFunction(my_new_crossover);
+    auto crossover = evoflock_gp_function_set.getCrossoverFunction();
+    crossover(tree1, tree2, tree4,
+              min_tree_size, max_tree_size,
+              evoflock_gp_function_set.getCrossoverMinSize());
     std::cout << std::endl;
     debugPrint(tree4.to_string())
 
-    
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20240304

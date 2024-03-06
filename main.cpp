@@ -72,36 +72,36 @@ int main(int argc, const char * argv[])
 {
     run_unit_tests();
     
-//    util::executions_per_second(Vec3::unit_test);
-    
-    Flock flock;
-    flock.set_fixed_time_step(true);
-//    flock.set_fixed_fps(60);
-    flock.set_fixed_fps(30);
-
-//    flock.set_max_simulation_steps(1000);
-//    flock.set_boid_count(200);
-//    flock.set_boid_count(1000);
-    
-//    flock.set_max_simulation_steps(10);
-//    flock.set_boid_count(10);
-
-    flock.set_max_simulation_steps(1000);
-    flock.set_boid_count(200);
-
-//    flock.set_max_simulation_steps(1000);
-//    flock.set_boid_count(10);
-//    flock.set_max_simulation_steps(500);
-//    flock.set_boid_count(8);
-//    flock.set_boid_count(10);
-
-//    std::stringstream timer_caption;
-//    timer_caption << "Basic flock test: " << flock.boid_count() << " boids "
-//                  << flock.max_simulation_steps() << " frames";
-//    {
-//        util::Timer t(timer_caption.str());
-//        flock.run();
-//    }
+//    //    util::executions_per_second(Vec3::unit_test);
+//
+//        Flock flock;
+//        flock.set_fixed_time_step(true);
+//    //    flock.set_fixed_fps(60);
+//        flock.set_fixed_fps(30);
+//
+//    //    flock.set_max_simulation_steps(1000);
+//    //    flock.set_boid_count(200);
+//    //    flock.set_boid_count(1000);
+//
+//    //    flock.set_max_simulation_steps(10);
+//    //    flock.set_boid_count(10);
+//
+//        flock.set_max_simulation_steps(1000);
+//        flock.set_boid_count(200);
+//
+//    //    flock.set_max_simulation_steps(1000);
+//    //    flock.set_boid_count(10);
+//    //    flock.set_max_simulation_steps(500);
+//    //    flock.set_boid_count(8);
+//    //    flock.set_boid_count(10);
+//
+//    //    std::stringstream timer_caption;
+//    //    timer_caption << "Basic flock test: " << flock.boid_count() << " boids "
+//    //                  << flock.max_simulation_steps() << " frames";
+//    //    {
+//    //        util::Timer t(timer_caption.str());
+//    //        flock.run();
+//    //    }
 
     //--------------------------------------------------------------------------
 
@@ -115,54 +115,56 @@ int main(int argc, const char * argv[])
 //    debugPrint(individual->tree().to_string())
 //    debugPrint(individual->tree().isLeaf())
     
-    evoflock_gp_function_set.print();
+//    evoflock_gp_function_set.print();
     
-//    int max_tree_size = 5;
-//    int max_tree_size = 50;
-    int min_tree_size = 2;
-    int max_tree_size = 20;
-    std::string root_type = "Fitness_0_1";
+    //--------------------------------------------------------------------------
 
-//    // This seems to suggest LP::FunctionSet::randomFunctionOfTypeInSize() is
-//    // not returning our one function even when we supply the return type:
-//    // (This must be "that convention": the first defined type is the root type)
-//    LP::GpTree tree;
-//    evoflock_gp_function_set.makeRandomTree(max_tree_size, root_type, tree);
-//    debugPrint(tree.to_string())
-
-    // This seems to suggest LP::FunctionSet::randomFunctionOfTypeInSize() is
-    // not returning our one function even when we supply the return type:
-    // (This must be "that convention": the first defined type is the root type)
-    LP::GpTree tree1;
-    LP::GpTree tree2;
-    LP::GpTree tree3;
-    LP::GpTree tree4;
-    evoflock_gp_function_set.makeRandomTree(max_tree_size, root_type, tree1);
-    debugPrint(tree1.to_string())
-    evoflock_gp_function_set.makeRandomTree(max_tree_size, root_type, tree2);
-    debugPrint(tree2.to_string())
-
-//    LP::GpTree::crossover(tree1, tree2, tree3,
-//                          min_tree_size, max_tree_size,
-//                          evoflock_gp_function_set.getCrossoverMinSize());
-//    std::cout << std::endl;
-//    debugPrint(tree3.to_string())
-
-
-//    my_new_crossover(tree1, tree2, tree4,
-//                     min_tree_size, max_tree_size,
-//                     evoflock_gp_function_set.getCrossoverMinSize());
-//    std::cout << std::endl;
-//    debugPrint(tree4.to_string())
-
-    
-    evoflock_gp_function_set.setCrossoverFunction(my_new_crossover);
-    auto crossover = evoflock_gp_function_set.getCrossoverFunction();
-    crossover(tree1, tree2, tree4,
-              min_tree_size, max_tree_size,
-              evoflock_gp_function_set.getCrossoverMinSize());
-    std::cout << std::endl;
-    debugPrint(tree4.to_string())
+//    //    int max_tree_size = 5;
+//    //    int max_tree_size = 50;
+//        int min_tree_size = 2;
+//        int max_tree_size = 20;
+//        std::string root_type = "Fitness_0_1";
+//
+//    //    // This seems to suggest LP::FunctionSet::randomFunctionOfTypeInSize() is
+//    //    // not returning our one function even when we supply the return type:
+//    //    // (This must be "that convention": the first defined type is the root type)
+//    //    LP::GpTree tree;
+//    //    evoflock_gp_function_set.makeRandomTree(max_tree_size, root_type, tree);
+//    //    debugPrint(tree.to_string())
+//
+//        // This seems to suggest LP::FunctionSet::randomFunctionOfTypeInSize() is
+//        // not returning our one function even when we supply the return type:
+//        // (This must be "that convention": the first defined type is the root type)
+//        LP::GpTree tree1;
+//        LP::GpTree tree2;
+//        LP::GpTree tree3;
+//        LP::GpTree tree4;
+//        evoflock_gp_function_set.makeRandomTree(max_tree_size, root_type, tree1);
+//        debugPrint(tree1.to_string())
+//        evoflock_gp_function_set.makeRandomTree(max_tree_size, root_type, tree2);
+//        debugPrint(tree2.to_string())
+//
+//    //    LP::GpTree::crossover(tree1, tree2, tree3,
+//    //                          min_tree_size, max_tree_size,
+//    //                          evoflock_gp_function_set.getCrossoverMinSize());
+//    //    std::cout << std::endl;
+//    //    debugPrint(tree3.to_string())
+//
+//
+//    //    my_new_crossover(tree1, tree2, tree4,
+//    //                     min_tree_size, max_tree_size,
+//    //                     evoflock_gp_function_set.getCrossoverMinSize());
+//    //    std::cout << std::endl;
+//    //    debugPrint(tree4.to_string())
+//
+//
+//        evoflock_gp_function_set.setCrossoverFunction(my_new_crossover);
+//        auto crossover = evoflock_gp_function_set.getCrossoverFunction();
+//        crossover(tree1, tree2, tree4,
+//                  min_tree_size, max_tree_size,
+//                  evoflock_gp_function_set.getCrossoverMinSize());
+//        std::cout << std::endl;
+//        debugPrint(tree4.to_string())
 
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
@@ -195,6 +197,31 @@ int main(int argc, const char * argv[])
 //            debugPrint(i->tree().to_string())
 //        }
 //    });
+    
+    //--------------------------------------------------------------------------
+    
+    int individuals = 100;
+    int subpops = 5;
+    int max_evolution_steps = 100;
+    int min_tree_size = 2;
+    int max_tree_size = 20;
+    LazyPredator::Population population(individuals,
+                                        subpops,
+                                        max_tree_size,
+                                        min_tree_size,
+                                        max_tree_size,
+                                        evoflock_gp_function_set);
+    util::Timer t("Evolution run.");
+    for (int i = 0; i < max_evolution_steps; i++)
+    {
+//        population.evolutionStep([&]
+//                                 (LazyPredator::TournamentGroup tg)
+//                                 { return tournamentFunction(tg); });
+        population.evolutionStep([&]
+                                 (LazyPredator::TournamentGroup tg)
+                                 { return tg; });
+    }
+    
     //--------------------------------------------------------------------------
 
     return 0;

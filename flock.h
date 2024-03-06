@@ -233,6 +233,8 @@ public:
     // TODO just WIP for prototyping
     std::ofstream* boid_center_data_stream_;
     bool save_boid_centers_ = true;
+    void setSaveBoidCenters(bool save) { save_boid_centers_ = save; }
+    bool getSaveBoidCenters() const { return save_boid_centers_; }
 
     void save_centers_to_file_start()
     {
@@ -288,11 +290,17 @@ public:
         double ts = fp().min_speed - util::epsilon;
         for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
     }
+    
+    int log_stat_interval_ = 100;
+    int getLogStatInterval() const { return log_stat_interval_; }
+    void setLogStatInterval(int steps) { log_stat_interval_ = steps; }
 
     // Calculate and log various statistics for flock.
     void log_stats()
     {
-        if ((not simulation_paused_) and (draw().frame_counter() % 100 == 0))
+//        if ((not simulation_paused_) and (draw().frame_counter() % 100 == 0))
+        if ((not simulation_paused_) and
+            (draw().frame_counter() % getLogStatInterval() == 0))
         {
             double average_speed = 0;
             for (Boid* b : boids()) { average_speed += b->speed(); }

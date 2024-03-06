@@ -12,21 +12,150 @@
 
 #pragma once
 
+#include "flock.h"
+
 // TODO 20240226 For now, a modified copy of LazyPredator is in a subdirectory.
 #include "LazyPredator/LazyPredator.h"
 
 namespace LP = LazyPredator;
 
 
-// TODO 20230303 mock
+
+
+
+//    //    Flock flock;
+//    //    flock.set_fixed_time_step(true);
+//    //    flock.set_fixed_fps(30);
+//    //    flock.set_max_simulation_steps(1000);
+//    //    flock.set_boid_count(200);
+//    //
+//    //    flock.run();
+//
+//
+//    // TODO 20230303 mock
+//    // Run flock simulation with given parameters, return a scalar fitness on [0,1].
+//    inline
+//    double run_flock_simulation (double p0,  double p1,  double p2,  double p3,
+//                                 double p4,  double p5,  double p6,  double p7,
+//                                 double p8,  double p9,  double p10, double p11,
+//                                 double p12, double p13, double p14, double p15)
+//    {
+//        return 0;
+//    }
+
+
+
+
+
+
+
+//    {
+//        "Real_0_100",
+//        "Real_0_100",
+//        "Real_0_100",
+//        "Real_0_100",
+//
+//        "Real_0_100",
+//        "Real_0_100",
+//        "Real_0_100",
+//        "Real_0_100",
+//        "Real_0_100",
+//
+//        "Real_0_200",
+//
+//        "Real_0_10",
+//        "Real_0_10",
+//        "Real_0_10",
+//
+//        // Cosine of threshold angle (max angle from forward to be seen)
+//        "Real_m1_p1",
+//        "Real_m1_p1",
+//        "Real_m1_p1",
+//    }
+
+//    // Run flock simulation with given parameters, return a scalar fitness on [0,1].
+//    inline
+//    double run_flock_simulation (double p0,  // max_force
+//                                 double p1,  // max_speed (enforce min < max by sorting?)
+//                                 double p2,  // min_speed (enforce min < max by sorting?)
+//                                 double p3,  // speed
+//
+//                                 double p4,  // weight_forward
+//                                 double p5,  // weight_separate
+//                                 double p6,  // weight_align
+//                                 double p7,  // weight_cohere
+//                                 double p8,  // weight_avoid
+//
+//                                 double p9,  // max_dist_separate_in_body_radii
+//
+//                                 double p10,   // exponent_separate
+//                                 double p11,   // exponent_align
+//                                 double p12,   // exponent_cohere
+//
+//                                 double p13,  // angle_separate
+//                                 double p14,  // angle_align
+//                                 double p15)  // angle_cohere
+
+
+
 // Run flock simulation with given parameters, return a scalar fitness on [0,1].
-inline
-double run_flock_simulation (double p0,  double p1,  double p2,  double p3,
-                             double p4,  double p5,  double p6,  double p7,
-                             double p8,  double p9,  double p10, double p11,
-                             double p12, double p13, double p14, double p15)
+inline double run_flock_simulation (double max_force,
+                                    double max_speed,  //  (enforce min < max by sorting?)
+                                    double min_speed,  //  (enforce min < max by sorting?)
+                                    double speed,
+                                    
+                                    double weight_forward,
+                                    double weight_separate,
+                                    double weight_align,
+                                    double weight_cohere,
+                                    double weight_avoid,
+                                    
+                                    double max_dist_separate_in_body_radii,
+                                    
+                                    double exponent_separate, 
+                                    double exponent_align, 
+                                    double exponent_cohere, 
+                                    
+                                    double angle_separate,
+                                    double angle_align,
+                                    double angle_cohere)
+
 {
-    return 0;
+    double fitness = 0;
+
+    Flock flock;
+    flock.set_boid_count(200);
+    flock.set_fixed_fps(30);
+    flock.set_fixed_time_step(true);
+    flock.set_max_simulation_steps(1000);
+    flock.setLogStatInterval(1000);
+    flock.setSaveBoidCenters(false);
+    
+    flock.fp().max_force = max_force;
+    flock.fp().max_speed = std::max(min_speed, max_speed);
+    flock.fp().min_speed = std::min(min_speed, max_speed);
+    flock.fp().speed = util::clip(speed, min_speed, max_speed);
+
+    flock.fp().weight_forward = weight_forward;
+    flock.fp().weight_separate = weight_separate;
+    flock.fp().weight_align = weight_align;
+    flock.fp().weight_cohere = weight_cohere;
+    flock.fp().weight_avoid = weight_avoid;
+
+    flock.fp().max_dist_separate = (max_dist_separate_in_body_radii *
+                                    flock.fp().body_radius);
+    
+    flock.fp().exponent_separate = exponent_separate;
+    flock.fp().exponent_align = exponent_align;
+    flock.fp().exponent_cohere = exponent_cohere;
+
+    flock.fp().angle_separate = angle_separate;
+    flock.fp().angle_align = angle_align;
+    flock.fp().angle_cohere = angle_cohere;
+    
+    flock.run();
+
+    return fitness;
 }
 
 
@@ -71,8 +200,8 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
             //     TODO should body_radius be held constant at 0.5?
             {
                 "Real_0_100",  // max_force
-                "Real_0_100",  // max_speed (enforce min < max by sorting?)
-                "Real_0_100",  // min_speed (enforce min < max by sorting?)
+                "Real_0_100",  // max_speed
+                "Real_0_100",  // min_speed
                 "Real_0_100",  // speed
                 
                 "Real_0_100",  // weight_forward
@@ -92,7 +221,7 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
                 // Cosine of threshold angle (max angle from forward to be seen)
                 "Real_m1_p1",  // angle_separate
                 "Real_m1_p1",  // angle_align
-                "Real_m1_p1",  // angle_separate
+                "Real_m1_p1",  // angle_cohere
             },
             
             // Evaluation function, which runs a flock simulation with the given

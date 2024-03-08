@@ -97,11 +97,71 @@ namespace LP = LazyPredator;
 //                                 double p15)  // angle_cohere
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240307 working on fitness function
+
+// TODO 20240307 OH! how do I get a pointer to the flock?
+
+//Flock flock;
+//
+//flock
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240307 working on fitness function
+
+// TODO 20240307 OH! how do I get a pointer to the flock?
+
+
+// Make function with this type (seems like it ought to return a double?)
+// typedef std::function<float(Individual*)> FitnessFunction;
+
+//    inline float evoflock_fitness_function(LazyPredator::Individual* individual)
+//    {
+//        double fitness = 1;
+//
+//        // The least separation over all boids on all simulation steps.
+//        //    double min_sep_dist_whole_sim = std::numeric_limits<double>::infinity();
+//
+//        // Largest separation over all boids on all simulation steps.
+//        //    double max_nn_dist_whole_sim = 0;
+//
+//
+//
+//        debugPrint(individual->tree().to_string())
+//        debugPrint(std::any_cast<double>(individual->tree().getRootValue()) )
+//
+//        return fitness;
+//    }
+
+inline float evoflock_fitness_function(LazyPredator::Individual* individual)
+{
+//    double fitness = 1;
+    
+    // The least separation over all boids on all simulation steps.
+    //    double min_sep_dist_whole_sim = std::numeric_limits<double>::infinity();
+    
+    // Largest separation over all boids on all simulation steps.
+    //    double max_nn_dist_whole_sim = 0;
+    
+    
+    
+//    debugPrint(individual->tree().to_string())
+//    debugPrint(std::any_cast<double>(individual->tree().getRootValue()))
+    
+    return std::any_cast<double>(individual->tree().getRootValue());
+}
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 // Run flock simulation with given parameters, return a scalar fitness on [0,1].
 inline double run_flock_simulation (double max_force,
-                                    double max_speed,  //  (enforce min < max by sorting?)
-                                    double min_speed,  //  (enforce min < max by sorting?)
+                                    double max_speed,
+                                    double min_speed,
                                     double speed,
                                     
                                     double weight_forward,
@@ -121,7 +181,31 @@ inline double run_flock_simulation (double max_force,
                                     double angle_cohere)
 
 {
-    double fitness = 0;
+//    std::cout << "Inside run_flock_simulation()" << std::endl;
+//    
+//    debugPrint(max_force)
+//    debugPrint(max_speed)
+//    debugPrint(min_speed)
+//    debugPrint(speed)
+//
+//    debugPrint(weight_forward)
+//    debugPrint(weight_separate)
+//    debugPrint(weight_align)
+//    debugPrint(weight_cohere)
+//    debugPrint(weight_avoid)
+//
+//    debugPrint(max_dist_separate_in_body_radii)
+//
+//    debugPrint(exponent_separate)
+//    debugPrint(exponent_align)
+//    debugPrint(exponent_cohere)
+//
+//    debugPrint(angle_separate)
+//    debugPrint(angle_align)
+//    debugPrint(angle_cohere)
+
+
+    
 
     Flock flock;
     flock.set_boid_count(200);
@@ -155,8 +239,59 @@ inline double run_flock_simulation (double max_force,
     
     flock.run();
 
+    // The least separation over all boids on all simulation steps.
+    //    double min_sep_dist_whole_sim = std::numeric_limits<double>::infinity();
+    
+    // Largest separation over all boids on all simulation steps.
+    //    double max_nn_dist_whole_sim = 0;
+
+    
+//    // TODO total mock:
+//    double fitness = (flock.min_sep_dist_whole_sim *
+//                      flock.max_nn_dist_whole_sim *
+//                      flock.total_avoid_fail_whole_sim);
+
+    auto quadratic_01_clip = [](double x, double min, double max)
+    {
+        double f = util::remap_interval_clip(x, min, max, 0, 1);
+        return f * f;
+    };
+    
+    double minsep = flock.min_sep_dist_whole_sim;
+    double maxsep = flock.max_nn_dist_whole_sim;
+    double collide = flock.total_avoid_fail_whole_sim;
+    
+    double minsep_limit = flock.fp().body_radius * 6; // TODO ad hoc
+    double maxsep_limit = flock.fp().body_radius * 30; // TODO ad hoc
+
+    double minsep_fitness = 1 - quadratic_01_clip(minsep, minsep_limit, 0);
+    double maxsep_fitness = 1 - (quadratic_01_clip(maxsep, 0, maxsep_limit) * 0.5);
+    double collide_fitness = 1.0 / (collide + 1);
+    
+    
+    double fitness = minsep_fitness * maxsep_fitness * collide_fitness;
+
+    debugPrint(minsep_fitness)
+    debugPrint(maxsep_fitness)
+    debugPrint(collide_fitness)
+    debugPrint(fitness)
+
     return fitness;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // TODO 20240304 so for example, here is the first random tree from:

@@ -289,8 +289,50 @@ public:
         for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
         double ts = fp().min_speed - util::epsilon;
         for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240307 working on fitness function
+        
+        
+        // TOD code stolen from log_stats()
+        
+//        double max_nn_dist = 0;
+//        int total_avoid_fail = 0;
+        
+        total_avoid_fail_whole_sim = 0;
+        for (Boid* b : boids())
+        {
+            Boid* n = b->cached_nearest_neighbors().at(0);
+            double  dist = (b->position() - n->position()).length();
+//            if (max_nn_dist < dist) { max_nn_dist = dist; }
+            if (max_nn_dist_whole_sim < dist) { max_nn_dist_whole_sim = dist; }
+//            total_avoid_fail += b->avoidance_failure_counter();
+            
+            if (min_sep_dist_whole_sim > dist) { min_sep_dist_whole_sim = dist;}
+            
+            total_avoid_fail_whole_sim += b->avoidance_failure_counter();
+
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240307 working on fitness function
+    
+    // do I want accessors for these?
+    
+    // The least separation over all boids on all simulation steps.
+    double min_sep_dist_whole_sim = std::numeric_limits<double>::infinity();
+    
+    // Largest separation over all boids on all simulation steps.
+    double max_nn_dist_whole_sim = 0;
+
+    // Count obstacle avoidance failures over all boids on all simulation steps.
+    // (Computed anew each step by summing each boid's lifetime count.)
+    int total_avoid_fail_whole_sim = 0;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     int log_stat_interval_ = 100;
     int getLogStatInterval() const { return log_stat_interval_; }
     void setLogStatInterval(int steps) { log_stat_interval_ = steps; }

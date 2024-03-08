@@ -200,29 +200,73 @@ int main(int argc, const char * argv[])
     
     //--------------------------------------------------------------------------
     
+//        int individuals = 100;
+//        int subpops = 5;
+//        int max_evolution_steps = 100;
+//        int min_tree_size = 2;
+//        int max_tree_size = 20;
+//        LazyPredator::Population population(individuals,
+//                                            subpops,
+//                                            max_tree_size,
+//                                            min_tree_size,
+//                                            max_tree_size,
+//                                            evoflock_gp_function_set);
+//        util::Timer t("Evolution run.");
+//        for (int i = 0; i < max_evolution_steps; i++)
+//        {
+//    //        population.evolutionStep([&]
+//    //                                 (LazyPredator::TournamentGroup tg)
+//    //                                 { return tournamentFunction(tg); });
+//            population.evolutionStep([&]
+//                                     (LazyPredator::TournamentGroup tg)
+//                                     { return tg; });
+//        }
+    
+    //--------------------------------------------------------------------------
+    // TODO 20240307 working on fitness function
+
+    // use fitness_function based version of
+    // LazyPredator::Population::evolutionStep(FitnessFunction fitness_function)
+    
+    // Make function with this type (seems like it ought to return a double?)
+    // typedef std::function<float(Individual*)> FitnessFunction;
+
+    std::cout << "Creating population" << std::endl;
+
+//    int individuals = 100;
+//    int subpops = 5;
+//    int max_evolution_steps = 100;
+
+//    int individuals = 10;
+//    int subpops = 1;
+//    int max_evolution_steps = 10;
+
     int individuals = 100;
     int subpops = 5;
-    int max_evolution_steps = 100;
+    int max_evolution_steps = 1000;
+
     int min_tree_size = 2;
     int max_tree_size = 20;
+    
     LazyPredator::Population population(individuals,
                                         subpops,
                                         max_tree_size,
                                         min_tree_size,
                                         max_tree_size,
                                         evoflock_gp_function_set);
+    
+    std::cout << "Run evolution." << std::endl;
+
     util::Timer t("Evolution run.");
     for (int i = 0; i < max_evolution_steps; i++)
     {
-//        population.evolutionStep([&]
-//                                 (LazyPredator::TournamentGroup tg)
-//                                 { return tournamentFunction(tg); });
-        population.evolutionStep([&]
-                                 (LazyPredator::TournamentGroup tg)
-                                 { return tg; });
+        std::cout << std::endl;
+        population.evolutionStep(evoflock_fitness_function);
+        std::cout << std::endl;
     }
-    
+
     //--------------------------------------------------------------------------
 
+    
     return 0;
 }

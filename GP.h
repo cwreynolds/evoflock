@@ -214,6 +214,7 @@ inline double run_flock_simulation (double max_force,
     flock.set_max_simulation_steps(1000);
     flock.setLogStatInterval(1000);
     flock.setSaveBoidCenters(false);
+    flock.log_prefix = "    ";
     
     flock.fp().max_force = max_force;
     flock.fp().max_speed = std::max(min_speed, max_speed);
@@ -251,11 +252,13 @@ inline double run_flock_simulation (double max_force,
 //                      flock.max_nn_dist_whole_sim *
 //                      flock.total_avoid_fail_whole_sim);
 
-    auto quadratic_01_clip = [](double x, double min, double max)
-    {
-        double f = util::remap_interval_clip(x, min, max, 0, 1);
-        return f * f;
-    };
+//    auto quadratic_01_clip = [](double x, double min, double max)
+//    {
+//        double f = util::remap_interval_clip(x, min, max, 0, 1);
+//        return f * f;
+//    };
+    
+    double tiny = 0.1;
     
     double minsep = flock.min_sep_dist_whole_sim;
     double maxsep = flock.max_nn_dist_whole_sim;
@@ -264,18 +267,56 @@ inline double run_flock_simulation (double max_force,
     double minsep_limit = flock.fp().body_radius * 6; // TODO ad hoc
     double maxsep_limit = flock.fp().body_radius * 30; // TODO ad hoc
 
-    double minsep_fitness = 1 - quadratic_01_clip(minsep, minsep_limit, 0);
-    double maxsep_fitness = 1 - (quadratic_01_clip(maxsep, 0, maxsep_limit) * 0.5);
+//    double minsep_fitness = 1 - quadratic_01_clip(minsep, minsep_limit, 0);
+    double minsep_fitness = util::remap_interval_clip(minsep, 0, minsep_limit, tiny, 1);
+
+//    double maxsep_fitness = 1 - (quadratic_01_clip(maxsep, 0, maxsep_limit) * 0.5);
+    double maxsep_fitness = util::remap_interval_clip(maxsep,
+                                                      minsep_limit, maxsep_limit,
+                                                      1, tiny);
+
     double collide_fitness = 1.0 / (collide + 1);
     
     
-    double fitness = minsep_fitness * maxsep_fitness * collide_fitness;
+    double ave_speed = (flock.sum_all_speed_whole_sim /
+                        (flock.max_simulation_steps() * flock.boid_count()));
+//    double ave_speed_fitness = 1 - (1 / (ave_speed + 1));
+    // TODO 20 is roughly the target speed.
+//    double ave_speed_fitness = util::remap_interval_clip(ave_speed, 0, 20, 0, 1);
+    double ave_speed_fitness = util::remap_interval_clip(ave_speed, 0, 20, tiny, 1);
 
-    debugPrint(minsep_fitness)
-    debugPrint(maxsep_fitness)
-    debugPrint(collide_fitness)
-    debugPrint(fitness)
+    
+//    double fitness = minsep_fitness * maxsep_fitness * collide_fitness;
+    double fitness = (minsep_fitness *
+                      maxsep_fitness *
+                      collide_fitness *
+                      ave_speed_fitness);
 
+    
+    // save the current settings
+    std::ios::fmtflags old_settings = std::cout.flags(); //save previous format flags int old_precision = cout.precision();! // save previous precision setting
+    size_t old_precision = std::cout.precision(); // save previous precision setting
+    
+    int p = 6;
+    int w = 10;
+//    std::cout << "    minsep    " << std::setprecision(p) << std::setw(w) << minsep_fitness << " (" << minsep <<  ")" << std::endl;
+//    std::cout << "    maxsep    " << std::setprecision(p) << std::setw(w) << maxsep_fitness << " (" << maxsep <<  ")" << std::endl;
+//    std::cout << "    collide   " << std::setprecision(p) << std::setw(w) << collide_fitness << " (" << collide <<  ")" << std::endl;
+//    std::cout << "    ave_speed " << std::setprecision(p) << std::setw(w) << ave_speed_fitness << " (" << ave_speed <<  ")" << std::endl;
+//    std::cout << "    fitness   " << std::setprecision(p) << std::setw(w) << std::fixed << fitness << std::endl;
+//    std::cout << std::endl;
+
+    std::cout << "    minsep    " << std::setprecision(p) << std::setw(w) << std::fixed << minsep_fitness << " (" << minsep <<  ")" << std::endl;
+    std::cout << "    maxsep    " << std::setprecision(p) << std::setw(w) << std::fixed << maxsep_fitness << " (" << maxsep <<  ")" << std::endl;
+    std::cout << "    collide   " << std::setprecision(p) << std::setw(w) << std::fixed << collide_fitness << " (" << collide <<  ")" << std::endl;
+    std::cout << "    ave_speed " << std::setprecision(p) << std::setw(w) << std::fixed << ave_speed_fitness << " (" << ave_speed <<  ")" << std::endl;
+    std::cout << "    fitness   " << std::setprecision(p) << std::setw(w) << std::fixed << fitness << std::endl;
+    std::cout << std::endl;
+
+    // restore output format flags and precision
+    std::cout.flags(old_settings);
+    std::cout.precision(old_precision);
+    
     return fitness;
 }
 

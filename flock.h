@@ -138,7 +138,12 @@ public:
         }
         save_centers_to_file_end();
         // Draw.close_visualizer()
-        std::cout << "Exit at step:" << draw().frame_counter() << std::endl;
+//        std::cout << "Exit at step:" << draw().frame_counter() << std::endl;
+        if (max_simulation_steps() == std::numeric_limits<double>::infinity())
+        {
+            std::cout << log_prefix << "Exit at step: ";
+            std::cout << draw().frame_counter() << std::endl;
+        }
     }
 
     // Populate this flock by creating "count" boids with uniformly distributed
@@ -311,6 +316,8 @@ public:
             
             total_avoid_fail_whole_sim += b->avoidance_failure_counter();
 
+            sum_all_speed_whole_sim += b->speed();
+
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -331,6 +338,9 @@ public:
     // (Computed anew each step by summing each boid's lifetime count.)
     int total_avoid_fail_whole_sim = 0;
     
+    // Average speed over all boids on all simulation steps.
+    double sum_all_speed_whole_sim = 0;
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     int log_stat_interval_ = 100;
@@ -373,6 +383,7 @@ public:
                 total_avoid_fail += b->avoidance_failure_counter();
             }
             
+            std::cout << log_prefix;
             std::cout << draw().frame_counter();
             // std::cout << " fps=" << 0; // round(self.fps.value));
             std::cout << " fps=" << fps_.value;
@@ -387,6 +398,8 @@ public:
             std::cout << std::endl;
         }
     }
+    
+    std::string log_prefix;
 
     // Keep track of a smoothed (LPF) version of frames per second metric.
     void update_fps()

@@ -232,22 +232,11 @@ int main(int argc, const char * argv[])
     // typedef std::function<float(Individual*)> FitnessFunction;
 
     std::cout << "Creating population" << std::endl;
-
-//    int individuals = 100;
-//    int subpops = 5;
-//    int max_evolution_steps = 100;
-
-//    int individuals = 10;
-//    int subpops = 1;
-//    int max_evolution_steps = 10;
-
-    int individuals = 100;
-    int subpops = 5;
-    int max_evolution_steps = 1000;
-
+    int individuals = 200;
+    int subpops = 20;
+    int max_evolution_steps = 10000;
     int min_tree_size = 2;
     int max_tree_size = 20;
-    
     LazyPredator::Population population(individuals,
                                         subpops,
                                         max_tree_size,
@@ -256,11 +245,9 @@ int main(int argc, const char * argv[])
                                         evoflock_gp_function_set);
     
     std::cout << "Run evolution." << std::endl;
-
     util::Timer t("Evolution run.");
     for (int i = 0; i < max_evolution_steps; i++)
     {
-        std::cout << std::endl;
         population.evolutionStep(evoflock_fitness_function);
         std::cout << std::endl;
     }

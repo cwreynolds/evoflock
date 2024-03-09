@@ -235,21 +235,48 @@ public:
     //                    boid.draw(color=(Vec3(0, 1, 0) if
     //                                     self.is_neighbor_of_selected(boid) else None))
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     // TODO just WIP for prototyping
     std::ofstream* boid_center_data_stream_;
     bool save_boid_centers_ = true;
     void setSaveBoidCenters(bool save) { save_boid_centers_ = save; }
     bool getSaveBoidCenters() const { return save_boid_centers_; }
 
+//    void save_centers_to_file_start()
+//    {
+//        if (save_boid_centers_)
+//        {
+//            std::string file_name = "/Users/cwr/Desktop/boid_centers.py";
+//            boid_center_data_stream_ = new std::ofstream{file_name};
+//            (*boid_center_data_stream_) << "boid_centers = [" << std::endl;
+//        }
+//    }
+    
+    
+    static inline int save_boid_centers_count_ = 0;
+
+    std::string save_centers_to_file_pathname()
+    {
+        return ("/Users/cwr/Desktop/flock_data/boid_centers_" +
+                std::to_string(save_boid_centers_count_++) +
+                ".py");
+    }
+    
+    
     void save_centers_to_file_start()
     {
         if (save_boid_centers_)
         {
-            std::string file_name = "/Users/cwr/Desktop/boid_centers.py";
+//            std::string file_name = "/Users/cwr/Desktop/boid_centers.py";
+            std::string file_name = save_centers_to_file_pathname();
+            std::cout << "Opening " << file_name << std::endl;
             boid_center_data_stream_ = new std::ofstream{file_name};
             (*boid_center_data_stream_) << "boid_centers = [" << std::endl;
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void save_centers_to_file_end() const
     {

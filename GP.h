@@ -20,193 +20,69 @@
 namespace LP = LazyPredator;
 
 
-
-
-
-//    //    Flock flock;
-//    //    flock.set_fixed_time_step(true);
-//    //    flock.set_fixed_fps(30);
-//    //    flock.set_max_simulation_steps(1000);
-//    //    flock.set_boid_count(200);
-//    //
-//    //    flock.run();
-//
-//
-//    // TODO 20230303 mock
-//    // Run flock simulation with given parameters, return a scalar fitness on [0,1].
-//    inline
-//    double run_flock_simulation (double p0,  double p1,  double p2,  double p3,
-//                                 double p4,  double p5,  double p6,  double p7,
-//                                 double p8,  double p9,  double p10, double p11,
-//                                 double p12, double p13, double p14, double p15)
-//    {
-//        return 0;
-//    }
-
-
-
-
-
-
-
-//    {
-//        "Real_0_100",
-//        "Real_0_100",
-//        "Real_0_100",
-//        "Real_0_100",
-//
-//        "Real_0_100",
-//        "Real_0_100",
-//        "Real_0_100",
-//        "Real_0_100",
-//        "Real_0_100",
-//
-//        "Real_0_200",
-//
-//        "Real_0_10",
-//        "Real_0_10",
-//        "Real_0_10",
-//
-//        // Cosine of threshold angle (max angle from forward to be seen)
-//        "Real_m1_p1",
-//        "Real_m1_p1",
-//        "Real_m1_p1",
-//    }
-
-//    // Run flock simulation with given parameters, return a scalar fitness on [0,1].
-//    inline
-//    double run_flock_simulation (double p0,  // max_force
-//                                 double p1,  // max_speed (enforce min < max by sorting?)
-//                                 double p2,  // min_speed (enforce min < max by sorting?)
-//                                 double p3,  // speed
-//
-//                                 double p4,  // weight_forward
-//                                 double p5,  // weight_separate
-//                                 double p6,  // weight_align
-//                                 double p7,  // weight_cohere
-//                                 double p8,  // weight_avoid
-//
-//                                 double p9,  // max_dist_separate_in_body_radii
-//
-//                                 double p10,   // exponent_separate
-//                                 double p11,   // exponent_align
-//                                 double p12,   // exponent_cohere
-//
-//                                 double p13,  // angle_separate
-//                                 double p14,  // angle_align
-//                                 double p15)  // angle_cohere
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240307 working on fitness function
-
-// TODO 20240307 OH! how do I get a pointer to the flock?
-
-//Flock flock;
-//
-//flock
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240307 working on fitness function
-
-// TODO 20240307 OH! how do I get a pointer to the flock?
-
-
-// Make function with this type (seems like it ought to return a double?)
-// typedef std::function<float(Individual*)> FitnessFunction;
-
-//    inline float evoflock_fitness_function(LazyPredator::Individual* individual)
-//    {
-//        double fitness = 1;
-//
-//        // The least separation over all boids on all simulation steps.
-//        //    double min_sep_dist_whole_sim = std::numeric_limits<double>::infinity();
-//
-//        // Largest separation over all boids on all simulation steps.
-//        //    double max_nn_dist_whole_sim = 0;
-//
-//
-//
-//        debugPrint(individual->tree().to_string())
-//        debugPrint(std::any_cast<double>(individual->tree().getRootValue()) )
-//
-//        return fitness;
-//    }
-
+// Fitness function, simply returns Individual's tree's value (computing it and
+// caching it on first call).
 inline float evoflock_fitness_function(LazyPredator::Individual* individual)
 {
-//    double fitness = 1;
-    
-    // The least separation over all boids on all simulation steps.
-    //    double min_sep_dist_whole_sim = std::numeric_limits<double>::infinity();
-    
-    // Largest separation over all boids on all simulation steps.
-    //    double max_nn_dist_whole_sim = 0;
-    
-    
-    
-//    debugPrint(individual->tree().to_string())
-//    debugPrint(std::any_cast<double>(individual->tree().getRootValue()))
-    
     return std::any_cast<double>(individual->tree().getRootValue());
 }
 
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+// TODO 20240309 temp?
+void fitness_logger(double minsep_fitness, double minsep,
+                    double maxsep_fitness, double maxsep,
+                    double collide_fitness, double collide,
+                    double ave_speed_fitness, double ave_speed,
+                    double fitness)
+{
+    // Save current settings for formatting float/double values
+    std::ios::fmtflags old_settings = std::cout.flags();
+    size_t old_precision = std::cout.precision();
+    
+    auto print = [](std::string label, double fitness, double raw = -1)
+    {
+        std::cout << label;
+        std::cout << std::setprecision(6) << std::setw(10) << std::fixed;
+        std::cout << fitness;
+        if (raw > -1) { std::cout << " (" << raw <<  ")"; }
+        std::cout << std::endl;
+    };
+    print("    minsep    ", minsep_fitness,    minsep);
+    print("    maxsep    ", maxsep_fitness,    maxsep);
+    print("    collide   ", collide_fitness,   collide);
+    print("    ave_speed ", ave_speed_fitness, ave_speed);
+    print("    fitness   ", fitness);
+    std::cout << std::endl;
+    
+    // restore output format flags and precision
+    std::cout.flags(old_settings);
+    std::cout.precision(old_precision);
+}
 
 // Run flock simulation with given parameters, return a scalar fitness on [0,1].
-inline double run_flock_simulation (double max_force,
-                                    double max_speed,
-                                    double min_speed,
-                                    double speed,
-                                    
-                                    double weight_forward,
-                                    double weight_separate,
-                                    double weight_align,
-                                    double weight_cohere,
-                                    double weight_avoid,
-                                    
-                                    double max_dist_separate_in_body_radii,
-                                    
-                                    double exponent_separate, 
-                                    double exponent_align, 
-                                    double exponent_cohere, 
-                                    
-                                    double angle_separate,
-                                    double angle_align,
-                                    double angle_cohere)
-
+inline double run_flock_simulation(double max_force,
+                                   double max_speed,
+                                   double min_speed,
+                                   double speed,
+                                   
+                                   double weight_forward,
+                                   double weight_separate,
+                                   double weight_align,
+                                   double weight_cohere,
+                                   double weight_avoid,
+                                   
+                                   double max_dist_separate_in_body_radii,
+                                   
+                                   double exponent_separate,
+                                   double exponent_align,
+                                   double exponent_cohere,
+                                   
+                                   double angle_separate,
+                                   double angle_align,
+                                   double angle_cohere,
+                                   
+                                   bool write_flock_data_file = false)
 {
-//    std::cout << "Inside run_flock_simulation()" << std::endl;
-//    
-//    debugPrint(max_force)
-//    debugPrint(max_speed)
-//    debugPrint(min_speed)
-//    debugPrint(speed)
-//
-//    debugPrint(weight_forward)
-//    debugPrint(weight_separate)
-//    debugPrint(weight_align)
-//    debugPrint(weight_cohere)
-//    debugPrint(weight_avoid)
-//
-//    debugPrint(max_dist_separate_in_body_radii)
-//
-//    debugPrint(exponent_separate)
-//    debugPrint(exponent_align)
-//    debugPrint(exponent_cohere)
-//
-//    debugPrint(angle_separate)
-//    debugPrint(angle_align)
-//    debugPrint(angle_cohere)
-
-
-    
-
+    // Initialize Flock object and run simulation.
     Flock flock;
     flock.set_boid_count(200);
     flock.set_fixed_fps(30);
@@ -215,49 +91,29 @@ inline double run_flock_simulation (double max_force,
     flock.setLogStatInterval(1000);
     flock.setSaveBoidCenters(false);
     flock.log_prefix = "    ";
+    flock.setSaveBoidCenters(write_flock_data_file);
     
     flock.fp().max_force = max_force;
     flock.fp().max_speed = std::max(min_speed, max_speed);
     flock.fp().min_speed = std::min(min_speed, max_speed);
     flock.fp().speed = util::clip(speed, min_speed, max_speed);
-
     flock.fp().weight_forward = weight_forward;
     flock.fp().weight_separate = weight_separate;
     flock.fp().weight_align = weight_align;
     flock.fp().weight_cohere = weight_cohere;
     flock.fp().weight_avoid = weight_avoid;
-
     flock.fp().max_dist_separate = (max_dist_separate_in_body_radii *
                                     flock.fp().body_radius);
-    
     flock.fp().exponent_separate = exponent_separate;
     flock.fp().exponent_align = exponent_align;
     flock.fp().exponent_cohere = exponent_cohere;
-
     flock.fp().angle_separate = angle_separate;
     flock.fp().angle_align = angle_align;
     flock.fp().angle_cohere = angle_cohere;
     
     flock.run();
 
-    // The least separation over all boids on all simulation steps.
-    //    double min_sep_dist_whole_sim = std::numeric_limits<double>::infinity();
-    
-    // Largest separation over all boids on all simulation steps.
-    //    double max_nn_dist_whole_sim = 0;
-
-    
-//    // TODO total mock:
-//    double fitness = (flock.min_sep_dist_whole_sim *
-//                      flock.max_nn_dist_whole_sim *
-//                      flock.total_avoid_fail_whole_sim);
-
-//    auto quadratic_01_clip = [](double x, double min, double max)
-//    {
-//        double f = util::remap_interval_clip(x, min, max, 0, 1);
-//        return f * f;
-//    };
-    
+    // Compute fitness and return it as value of GpTree.
     double tiny = 0.1;
     
     double minsep = flock.min_sep_dist_whole_sim;
@@ -267,71 +123,54 @@ inline double run_flock_simulation (double max_force,
     double minsep_limit = flock.fp().body_radius * 6; // TODO ad hoc
     double maxsep_limit = flock.fp().body_radius * 30; // TODO ad hoc
 
-//    double minsep_fitness = 1 - quadratic_01_clip(minsep, minsep_limit, 0);
-    double minsep_fitness = util::remap_interval_clip(minsep, 0, minsep_limit, tiny, 1);
-
-//    double maxsep_fitness = 1 - (quadratic_01_clip(maxsep, 0, maxsep_limit) * 0.5);
+    double minsep_fitness = util::remap_interval_clip(minsep,
+                                                      0, minsep_limit,
+                                                      tiny, 1);
     double maxsep_fitness = util::remap_interval_clip(maxsep,
                                                       minsep_limit, maxsep_limit,
                                                       1, tiny);
-
+    // For plot of this see: https://bitly.ws/3fqEu
     double collide_fitness = 1.0 / (collide + 1);
-    
     
     double ave_speed = (flock.sum_all_speed_whole_sim /
                         (flock.max_simulation_steps() * flock.boid_count()));
-//    double ave_speed_fitness = 1 - (1 / (ave_speed + 1));
     // TODO 20 is roughly the target speed.
-//    double ave_speed_fitness = util::remap_interval_clip(ave_speed, 0, 20, 0, 1);
     double ave_speed_fitness = util::remap_interval_clip(ave_speed, 0, 20, tiny, 1);
 
-    
-//    double fitness = minsep_fitness * maxsep_fitness * collide_fitness;
     double fitness = (minsep_fitness *
                       maxsep_fitness *
                       collide_fitness *
                       ave_speed_fitness);
-
-    
-    // save the current settings
-    std::ios::fmtflags old_settings = std::cout.flags(); //save previous format flags int old_precision = cout.precision();! // save previous precision setting
-    size_t old_precision = std::cout.precision(); // save previous precision setting
-    
-    int p = 6;
-    int w = 10;
-//    std::cout << "    minsep    " << std::setprecision(p) << std::setw(w) << minsep_fitness << " (" << minsep <<  ")" << std::endl;
-//    std::cout << "    maxsep    " << std::setprecision(p) << std::setw(w) << maxsep_fitness << " (" << maxsep <<  ")" << std::endl;
-//    std::cout << "    collide   " << std::setprecision(p) << std::setw(w) << collide_fitness << " (" << collide <<  ")" << std::endl;
-//    std::cout << "    ave_speed " << std::setprecision(p) << std::setw(w) << ave_speed_fitness << " (" << ave_speed <<  ")" << std::endl;
-//    std::cout << "    fitness   " << std::setprecision(p) << std::setw(w) << std::fixed << fitness << std::endl;
-//    std::cout << std::endl;
-
-    std::cout << "    minsep    " << std::setprecision(p) << std::setw(w) << std::fixed << minsep_fitness << " (" << minsep <<  ")" << std::endl;
-    std::cout << "    maxsep    " << std::setprecision(p) << std::setw(w) << std::fixed << maxsep_fitness << " (" << maxsep <<  ")" << std::endl;
-    std::cout << "    collide   " << std::setprecision(p) << std::setw(w) << std::fixed << collide_fitness << " (" << collide <<  ")" << std::endl;
-    std::cout << "    ave_speed " << std::setprecision(p) << std::setw(w) << std::fixed << ave_speed_fitness << " (" << ave_speed <<  ")" << std::endl;
-    std::cout << "    fitness   " << std::setprecision(p) << std::setw(w) << std::fixed << fitness << std::endl;
-    std::cout << std::endl;
-
-    // restore output format flags and precision
-    std::cout.flags(old_settings);
-    std::cout.precision(old_precision);
-    
+    fitness_logger(minsep_fitness, minsep, maxsep_fitness, maxsep,
+                   collide_fitness, collide, ave_speed_fitness, ave_speed,
+                   fitness);
     return fitness;
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
+// Wrote this to run at the end of evolution on the top-10 fitness individuals
+// of population in order to record flock data for playback
+inline float rerun_flock_simulation(const LazyPredator::Individual* individual)
+{
+    LazyPredator::GpTree t = individual->tree(); // copy tree
+    return run_flock_simulation(t.evalSubtree<double>(0),
+                                t.evalSubtree<double>(1),
+                                t.evalSubtree<double>(2),
+                                t.evalSubtree<double>(3),
+                                t.evalSubtree<double>(4),
+                                t.evalSubtree<double>(5),
+                                t.evalSubtree<double>(6),
+                                t.evalSubtree<double>(7),
+                                t.evalSubtree<double>(8),
+                                t.evalSubtree<double>(9),
+                                t.evalSubtree<double>(10),
+                                t.evalSubtree<double>(11),
+                                t.evalSubtree<double>(12),
+                                t.evalSubtree<double>(13),
+                                t.evalSubtree<double>(14),
+                                t.evalSubtree<double>(15),
+                                true);  // write flock data file
+}
 
 
 

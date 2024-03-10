@@ -57,6 +57,15 @@ public:
     virtual std::string to_string() const { return "Obstacle"; }
     
     static void unit_test();  // Defined at bottom of file.
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240309 WIP inside/outside-ness for Obstacles
+    enum ExcludeFrom { inside, outside, neither };
+    virtual void setExcludeFrom(ExcludeFrom ef) { exclude_from_ = ef; }
+    virtual ExcludeFrom getExcludeFrom() const { return exclude_from_; }
+private:
+    ExcludeFrom exclude_from_ = neither;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 
@@ -66,6 +75,17 @@ public:
     EvertedSphereObstacle(double radius, const Vec3& center)
       : Obstacle(), radius_(radius), center_(center) {}
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240309 WIP inside/outside-ness for Obstacles
+    
+    EvertedSphereObstacle(double radius, const Vec3& center, ExcludeFrom ef)
+      : Obstacle(), radius_(radius), center_(center)
+    {
+        setExcludeFrom(ef);
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 ray_intersection(const Vec3& origin,
                           const Vec3& tangent,
@@ -238,6 +258,36 @@ public:
         Vec3 offset = endpoint1 - endpoint0;
         std::tie(tangent_, length_) = offset.normalize_and_length();
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240309 WIP inside/outside-ness for Obstacles
+        
+//    CylinderObstacle(double radius,
+//                     const Vec3& endpoint0,
+//                     const Vec3& endpoint1,
+//                     ExcludeFrom ef) : Obstacle()
+//    {
+//        radius_ = radius;
+//        endpoint_ = endpoint0;
+//        Vec3 offset = endpoint1 - endpoint0;
+//        std::tie(tangent_, length_) = offset.normalize_and_length();
+//        setExcludeFrom(ef);
+//    }
+
+    CylinderObstacle(double radius,
+                     const Vec3& endpoint0,
+                     const Vec3& endpoint1,
+                     ExcludeFrom ef)
+      : CylinderObstacle(radius, endpoint0, endpoint1)
+    {
+//        radius_ = radius;
+//        endpoint_ = endpoint0;
+//        Vec3 offset = endpoint1 - endpoint0;
+//        std::tie(tangent_, length_) = offset.normalize_and_length();
+        setExcludeFrom(ef);
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Nearest point on the infinite line containing cylinder's axis.
     Vec3 nearest_point_on_axis(const Vec3& query_point) const

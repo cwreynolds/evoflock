@@ -345,6 +345,11 @@ public:
 
             sum_all_speed_whole_sim += b->speed();
 
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240309 reconsider minsep
+            double min_dist = fp().body_radius * 3;
+            if (dist < min_dist) { count_minsep_violations_whole_sim++; }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -366,7 +371,14 @@ public:
     int total_avoid_fail_whole_sim = 0;
     
     // Average speed over all boids on all simulation steps.
-    double sum_all_speed_whole_sim = 0;
+    int sum_all_speed_whole_sim = 0;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240309 reconsider minsep
+    
+    int count_minsep_violations_whole_sim = 0;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -553,16 +565,25 @@ public:
         
     void pre_defined_obstacle_sets()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240309 WIP inside/outside-ness for Obstacles
+
+//        obstacles().push_back(new EvertedSphereObstacle(fp().sphere_radius,
+//                                                        fp().sphere_center));
         obstacles().push_back(new EvertedSphereObstacle(fp().sphere_radius,
-                                                        fp().sphere_center));
-     
+                                                        fp().sphere_center,
+                                                        Obstacle::outside));
+
         // TODO 20240218 experiments for "sim starts in more flock-like state"
         double ecr = fp().sphere_radius;
         Vec3 ect = fp().sphere_center + Vec3(ecr * 0.6, ecr, 0);
         Vec3 ecb = fp().sphere_center + Vec3(ecr * 0.6, -ecr, 0);
-        obstacles().push_back(new CylinderObstacle(ecr * 0.2, ect, ecb));
-        
-        
+//        obstacles().push_back(new CylinderObstacle(ecr * 0.2, ect, ecb));
+        obstacles().push_back(new CylinderObstacle(ecr * 0.2, ect, ecb,
+                                                   Obstacle::inside));
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         //# Builds a list of preset obstacle combinations, each a list of Obstacles.
         //def pre_defined_obstacle_sets(self):
         //    main_sphere = EvertedSphereObstacle(self.sphere_radius, self.sphere_center)

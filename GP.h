@@ -116,22 +116,50 @@ inline double run_flock_simulation(double max_force,
     // Compute fitness and return it as value of GpTree.
     double tiny = 0.1;
     
-    double minsep = flock.min_sep_dist_whole_sim;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240309 reconsider minsep
+//    double minsep = flock.min_sep_dist_whole_sim;
+    double minsep = flock.count_minsep_violations_whole_sim;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double maxsep = flock.max_nn_dist_whole_sim;
     double collide = flock.total_avoid_fail_whole_sim;
     
     double minsep_limit = flock.fp().body_radius * 6; // TODO ad hoc
     double maxsep_limit = flock.fp().body_radius * 30; // TODO ad hoc
 
-    double minsep_fitness = util::remap_interval_clip(minsep,
-                                                      0, minsep_limit,
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240309 reconsider minsep
+
+//    double minsep_fitness = util::remap_interval_clip(minsep,
+//                                                      0, minsep_limit,
+//                                                      tiny, 1);
+
+    auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
+
+    double minsep_fitness = util::remap_interval_clip(inv_count_01(minsep),
+                                                      0, 1,
                                                       tiny, 1);
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
+    
+    
     double maxsep_fitness = util::remap_interval_clip(maxsep,
                                                       minsep_limit, maxsep_limit,
                                                       1, tiny);
-    // For plot of this see: https://bitly.ws/3fqEu
-    double collide_fitness = 1.0 / (collide + 1);
     
+    
+    // For plot of this see: https://bitly.ws/3fqEu
+//    double collide_invert = 1.0 / (collide + 1);
+//    double collide_fitness = util::remap_interval_clip(collide_invert,
+//                                                       0, 1,
+//                                                       tiny, 1);
+//    double collide_invert = 1.0 / (collide + 1);
+    double collide_fitness = util::remap_interval_clip(inv_count_01(collide),
+                                                       0, 1,
+                                                       tiny, 1);
+
     double ave_speed = (flock.sum_all_speed_whole_sim /
                         (flock.max_simulation_steps() * flock.boid_count()));
     // TODO 20 is roughly the target speed.

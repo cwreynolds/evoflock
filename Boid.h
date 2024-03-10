@@ -540,7 +540,20 @@ public:
                 if (last_sdf_per_obstacle_.count(obstacle))
                 {
                     double previous_sdf = last_sdf_per_obstacle_[obstacle];
-                    if (util::zero_crossing(current_sdf, previous_sdf))
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20240309 WIP inside/outside-ness for Obstacles
+//                    if (util::zero_crossing(current_sdf, previous_sdf))
+
+//                    auto ef = obstacle->getExcludeFrom();
+//                    if (util::zero_crossing(current_sdf, previous_sdf) or
+//                        ((current_sdf > 0) and (ef == Obstacle::inside)) or
+//                        ((current_sdf < 0) and (ef == Obstacle::outside)))
+
+                        auto ef = obstacle->getExcludeFrom();
+                    if (util::zero_crossing(current_sdf, previous_sdf) or
+                        ((current_sdf < 0) and (ef == Obstacle::inside)) or
+                        ((current_sdf > 0) and (ef == Obstacle::outside)))
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     {
                         avoidance_failure_counter_ += 1;
                         //std::cout << "  " + (name() + ":       ").substr(0,11)

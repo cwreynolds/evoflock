@@ -232,11 +232,20 @@ int main(int argc, const char * argv[])
     // typedef std::function<float(Individual*)> FitnessFunction;
 
     std::cout << "Creating population" << std::endl;
-    int individuals = 200;
+//        int individuals = 200;
+//        int subpops = 20;
+//    //    int max_evolution_steps = 10000;
+//    //    int max_evolution_steps = 100;
+//    //    int max_evolution_steps = 20;
+//        int max_evolution_steps = 10000;
+//        int min_tree_size = 2;
+//        int max_tree_size = 20;
+    
+//    int individuals = 200;
+    int individuals = 500;
     int subpops = 20;
 //    int max_evolution_steps = 10000;
-//    int max_evolution_steps = 100;
-    int max_evolution_steps = 20;
+    int max_evolution_steps = 20000;
     int min_tree_size = 2;
     int max_tree_size = 20;
     LazyPredator::Population population(individuals,

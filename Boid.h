@@ -549,7 +549,7 @@ public:
 //                        ((current_sdf > 0) and (ef == Obstacle::inside)) or
 //                        ((current_sdf < 0) and (ef == Obstacle::outside)))
 
-                        auto ef = obstacle->getExcludeFrom();
+                    auto ef = obstacle->getExcludeFrom();
                     if (util::zero_crossing(current_sdf, previous_sdf) or
                         ((current_sdf < 0) and (ef == Obstacle::inside)) or
                         ((current_sdf > 0) and (ef == Obstacle::outside)))
@@ -561,6 +561,22 @@ public:
                         //    << std::to_string(previous_sdf).substr(0,5) << " "
                         //    << std::to_string(current_sdf).substr(0,5) << "] "
                         //    << obstacle->to_string() << std::endl;
+
+                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                        // TODO 20240310 log failures
+//                        std::cout << "avoidance failure" << std::endl;
+                        
+                        
+                        if (this == flock_boids().at(0))
+                        {
+                            std::cout << draw().frame_counter() << ": ";
+                            std::cout << obstacle->to_string() << " counter=";
+                            std::cout << avoidance_failure_counter_ << " ";
+                            std::cout << obstacle->getExcludeFromAsString();
+                            std::cout << std::endl;
+                        }
+
+                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                     }
                 }
                 last_sdf_per_obstacle_[obstacle] = current_sdf;

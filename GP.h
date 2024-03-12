@@ -27,6 +27,7 @@ inline float evoflock_fitness_function(LazyPredator::Individual* individual)
     return std::any_cast<double>(individual->tree().getRootValue());
 }
 
+
 // TODO 20240309 temp?
 void fitness_logger(double minsep_fitness, double minsep,
                     double maxsep_fitness, double maxsep,
@@ -58,6 +59,124 @@ void fitness_logger(double minsep_fitness, double minsep,
     std::cout.precision(old_precision);
 }
 
+
+// Return a FlockParameters object with all given parameter values
+inline FlockParameters init_flock_parameters(double max_force,
+                                             double max_speed,
+                                             double min_speed,
+                                             double speed,
+                                             
+                                             double weight_forward,
+                                             double weight_separate,
+                                             double weight_align,
+                                             double weight_cohere,
+                                             double weight_avoid,
+                                             
+                                             double max_dist_separate_in_body_radii,
+                                             
+                                             double exponent_separate,
+                                             double exponent_align,
+                                             double exponent_cohere,
+                                             
+                                             double angle_separate,
+                                             double angle_align,
+                                             double angle_cohere)
+{
+    FlockParameters fp;
+    fp.max_force = max_force;
+    fp.max_speed = std::max(min_speed, max_speed);
+    fp.min_speed = std::min(min_speed, max_speed);
+    fp.speed = util::clip(speed, min_speed, max_speed);
+    fp.weight_forward = weight_forward;
+    fp.weight_separate = weight_separate;
+    fp.weight_align = weight_align;
+    fp.weight_cohere = weight_cohere;
+    fp.weight_avoid = weight_avoid;
+    fp.max_dist_separate = (max_dist_separate_in_body_radii *
+                                    fp.body_radius);
+    fp.exponent_separate = exponent_separate;
+    fp.exponent_align = exponent_align;
+    fp.exponent_cohere = exponent_cohere;
+    fp.angle_separate = angle_separate;
+    fp.angle_align = angle_align;
+    fp.angle_cohere = angle_cohere;
+    return fp;
+}
+
+
+// Initialize basic run parameters of Flock object
+inline void init_flock(Flock& flock)
+{
+    flock.set_boid_count(200);
+    flock.set_fixed_fps(30);
+    flock.set_fixed_time_step(true);
+    flock.set_max_simulation_steps(1000);
+    flock.setLogStatInterval(1000);
+    flock.setSaveBoidCenters(false);
+    flock.log_prefix = "    ";
+}
+
+
+inline double measure_fitness_after_flock_simulation(const Flock& flock)
+{
+    // Compute fitness and return it as value of GpTree.
+    double tiny = 0.1;
+    
+    double boid_count = flock.boid_count();
+    double minsep = (flock.count_minsep_violations_whole_sim / boid_count);
+    double maxsep = flock.max_nn_dist_whole_sim;
+    double collide = (flock.total_avoid_fail_whole_sim / boid_count);
+
+    double minsep_limit = flock.fp().body_radius * 6; // TODO ad hoc
+    double maxsep_limit = flock.fp().body_radius * 30; // TODO ad hoc
+    
+    // For plot of this see: https://bitly.ws/3fqEu
+    auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
+
+    double minsep_fitness = util::remap_interval_clip(inv_count_01(minsep),
+                                                      0, 1,
+                                                      tiny, 1);
+    double maxsep_fitness = util::remap_interval_clip(maxsep,
+                                                      minsep_limit, maxsep_limit,
+                                                      1, tiny);
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20240310 disable maxsep
+    maxsep_fitness = 1;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    double collide_fitness = util::remap_interval_clip(inv_count_01(collide),
+                                                       0, 1,
+                                                       tiny, 1);
+    
+    double ave_speed = (flock.sum_all_speed_whole_sim /
+                        (flock.max_simulation_steps() * flock.boid_count()));
+    // TODO 20 is roughly the target speed.
+    double ave_speed_fitness = util::remap_interval_clip(ave_speed, 0, 20, tiny, 1);
+    
+    double fitness = (minsep_fitness *
+                      maxsep_fitness *
+                      collide_fitness *
+                      ave_speed_fitness);
+    fitness_logger(minsep_fitness, minsep, maxsep_fitness, maxsep,
+                   collide_fitness, collide, ave_speed_fitness, ave_speed,
+                   fitness);
+    return fitness;
+
+}
+
+
+// Run flock simulation with given parameters, return a scalar fitness on [0,1].
+inline double run_flock_simulation(const FlockParameters& fp,
+                                   bool write_flock_data_file = false)
+{
+    Flock flock;
+    init_flock(flock);
+    flock.setSaveBoidCenters(write_flock_data_file);
+    flock.fp() = fp;
+    flock.run();
+    return measure_fitness_after_flock_simulation(flock);
+}
+
+
 // Run flock simulation with given parameters, return a scalar fitness on [0,1].
 inline double run_flock_simulation(double max_force,
                                    double max_speed,
@@ -82,97 +201,35 @@ inline double run_flock_simulation(double max_force,
                                    
                                    bool write_flock_data_file = false)
 {
-    // Initialize Flock object and run simulation.
-    Flock flock;
-    flock.set_boid_count(200);
-    flock.set_fixed_fps(30);
-    flock.set_fixed_time_step(true);
-    flock.set_max_simulation_steps(1000);
-    flock.setLogStatInterval(1000);
-    flock.setSaveBoidCenters(false);
-    flock.log_prefix = "    ";
-    flock.setSaveBoidCenters(write_flock_data_file);
+    FlockParameters fp = init_flock_parameters(max_force,
+                                               max_speed,
+                                               min_speed,
+                                               speed,
+                                               
+                                               weight_forward,
+                                               weight_separate,
+                                               weight_align,
+                                               weight_cohere,
+                                               weight_avoid,
+                                               
+                                               max_dist_separate_in_body_radii,
+                                               
+                                               exponent_separate,
+                                               exponent_align,
+                                               exponent_cohere,
+                                               
+                                               angle_separate,
+                                               angle_align,
+                                               angle_cohere);
     
-    flock.fp().max_force = max_force;
-    flock.fp().max_speed = std::max(min_speed, max_speed);
-    flock.fp().min_speed = std::min(min_speed, max_speed);
-    flock.fp().speed = util::clip(speed, min_speed, max_speed);
-    flock.fp().weight_forward = weight_forward;
-    flock.fp().weight_separate = weight_separate;
-    flock.fp().weight_align = weight_align;
-    flock.fp().weight_cohere = weight_cohere;
-    flock.fp().weight_avoid = weight_avoid;
-    flock.fp().max_dist_separate = (max_dist_separate_in_body_radii *
-                                    flock.fp().body_radius);
-    flock.fp().exponent_separate = exponent_separate;
-    flock.fp().exponent_align = exponent_align;
-    flock.fp().exponent_cohere = exponent_cohere;
-    flock.fp().angle_separate = angle_separate;
-    flock.fp().angle_align = angle_align;
-    flock.fp().angle_cohere = angle_cohere;
-    
-    flock.run();
+    return run_flock_simulation(fp, write_flock_data_file);
+}
 
-    // Compute fitness and return it as value of GpTree.
-    double tiny = 0.1;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240309 reconsider minsep
-//    double minsep = flock.min_sep_dist_whole_sim;
-    double minsep = flock.count_minsep_violations_whole_sim;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    double maxsep = flock.max_nn_dist_whole_sim;
-    double collide = flock.total_avoid_fail_whole_sim;
-    
-    double minsep_limit = flock.fp().body_radius * 6; // TODO ad hoc
-    double maxsep_limit = flock.fp().body_radius * 30; // TODO ad hoc
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240309 reconsider minsep
-
-//    double minsep_fitness = util::remap_interval_clip(minsep,
-//                                                      0, minsep_limit,
-//                                                      tiny, 1);
-
-    auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
-
-    double minsep_fitness = util::remap_interval_clip(inv_count_01(minsep),
-                                                      0, 1,
-                                                      tiny, 1);
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-    
-    
-    double maxsep_fitness = util::remap_interval_clip(maxsep,
-                                                      minsep_limit, maxsep_limit,
-                                                      1, tiny);
-    
-    
-    // For plot of this see: https://bitly.ws/3fqEu
-//    double collide_invert = 1.0 / (collide + 1);
-//    double collide_fitness = util::remap_interval_clip(collide_invert,
-//                                                       0, 1,
-//                                                       tiny, 1);
-//    double collide_invert = 1.0 / (collide + 1);
-    double collide_fitness = util::remap_interval_clip(inv_count_01(collide),
-                                                       0, 1,
-                                                       tiny, 1);
-
-    double ave_speed = (flock.sum_all_speed_whole_sim /
-                        (flock.max_simulation_steps() * flock.boid_count()));
-    // TODO 20 is roughly the target speed.
-    double ave_speed_fitness = util::remap_interval_clip(ave_speed, 0, 20, tiny, 1);
-
-    double fitness = (minsep_fitness *
-                      maxsep_fitness *
-                      collide_fitness *
-                      ave_speed_fitness);
-    fitness_logger(minsep_fitness, minsep, maxsep_fitness, maxsep,
-                   collide_fitness, collide, ave_speed_fitness, ave_speed,
-                   fitness);
-    return fitness;
+// Run flock simulation with given parameters, return a scalar fitness on [0,1].
+inline double run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
+{
+    return run_flock_simulation(FlockParameters(), write_flock_data_file);
 }
 
 

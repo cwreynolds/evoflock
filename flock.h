@@ -349,9 +349,17 @@ public:
             // TODO 20240309 reconsider minsep
             double min_dist = fp().body_radius * 3;
             if (dist < min_dist) { count_minsep_violations_whole_sim++; }
+            
+//            if (dist < min_dist) { debugPrint(count_minsep_violations_whole_sim) }
+
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
+        
+//        std::cout << draw().frame_counter() << ": "
+//                  << total_avoid_fail_whole_sim << std::endl;
 
+        
+        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     

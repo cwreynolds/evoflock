@@ -63,6 +63,14 @@ public:
     enum ExcludeFrom { inside, outside, neither };
     virtual void setExcludeFrom(ExcludeFrom ef) { exclude_from_ = ef; }
     virtual ExcludeFrom getExcludeFrom() const { return exclude_from_; }
+    
+    std::string getExcludeFromAsString() const
+    {
+        if (getExcludeFrom() == 0) { return "inside";}
+        if (getExcludeFrom() == 1) { return "outside";}
+        if (getExcludeFrom() == 2) { return "neither";}
+        return "unknown";
+    }
 private:
     ExcludeFrom exclude_from_ = neither;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

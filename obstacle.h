@@ -71,6 +71,46 @@ public:
         if (getExcludeFrom() == 2) { return "neither";}
         return "unknown";
     }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20240311 add Boid::detectObstacleViolations()
+//    void detectObstacleViolations()
+//    {
+//        for (Obstacle* obstacle : flock_obstacles())
+//        {
+//            //            double current_sdf = obstacle->signed_distance(position());
+//            
+//            obstacle->constraintViolation(position());
+//        }
+//    }
+    
+//        virtual bool constraintViolation(const Vec3& query_point) const
+//        {
+//    //        virtual double signed_distance(const Vec3& query_point) const { return 0; }
+//    //        auto ef = obstacle->getExcludeFrom();
+//
+//
+//    //        if (util::zero_crossing(current_sdf, previous_sdf) or
+//    //            ((current_sdf < 0) and (ef == Obstacle::inside)) or
+//    //            ((current_sdf > 0) and (ef == Obstacle::outside)))
+//
+//            ExcludeFrom ef = getExcludeFrom();
+//            double sdf = signed_distance(query_point);
+//            return (((sdf < 0) and (ef == inside)) or
+//                    ((sdf > 0) and (ef == outside)));
+//        }
+
+    // TODO 20240312 WIP: maybe make args "current_point" and "previous_point"
+    virtual bool constraintViolation(const Vec3& query_point) const
+    {
+        ExcludeFrom ef = getExcludeFrom();
+        double sdf = signed_distance(query_point);
+        return (((sdf < 0) and (ef == inside)) or
+                ((sdf > 0) and (ef == outside)));
+    }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 private:
     ExcludeFrom exclude_from_ = neither;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

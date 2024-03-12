@@ -210,6 +210,10 @@ public:
         Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
         combined_steering = anti_stall_adjustment(combined_steering);
         annotation(s, a, c, o, combined_steering);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240311 add Boid::detectObstacleViolations()
+        detectObstacleViolations();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return combined_steering;
     }
     
@@ -535,51 +539,49 @@ public:
                                                dist_to_collision,
                                                point_of_impact,
                                                normal_at_poi));
-                // If we encountered this obstacle before, check for collision.
-                double current_sdf = obstacle->signed_distance(position());
-                if (last_sdf_per_obstacle_.count(obstacle))
-                {
-                    double previous_sdf = last_sdf_per_obstacle_[obstacle];
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20240309 WIP inside/outside-ness for Obstacles
-//                    if (util::zero_crossing(current_sdf, previous_sdf))
+                
+                
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20240311 add Boid::detectObstacleViolations()
 
+//                // If we encountered this obstacle before, check for collision.
+//                double current_sdf = obstacle->signed_distance(position());
+//                if (last_sdf_per_obstacle_.count(obstacle))
+//                {
+//                    double previous_sdf = last_sdf_per_obstacle_[obstacle];
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // TODO 20240309 WIP inside/outside-ness for Obstacles
+//
 //                    auto ef = obstacle->getExcludeFrom();
 //                    if (util::zero_crossing(current_sdf, previous_sdf) or
-//                        ((current_sdf > 0) and (ef == Obstacle::inside)) or
-//                        ((current_sdf < 0) and (ef == Obstacle::outside)))
-
-                    auto ef = obstacle->getExcludeFrom();
-                    if (util::zero_crossing(current_sdf, previous_sdf) or
-                        ((current_sdf < 0) and (ef == Obstacle::inside)) or
-                        ((current_sdf > 0) and (ef == Obstacle::outside)))
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    {
-                        avoidance_failure_counter_ += 1;
-                        //std::cout << "  " + (name() + ":       ").substr(0,11)
-                        //    << avoidance_failure_counter_ << " ["
-                        //    << std::to_string(previous_sdf).substr(0,5) << " "
-                        //    << std::to_string(current_sdf).substr(0,5) << "] "
-                        //    << obstacle->to_string() << std::endl;
-
-                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                        // TODO 20240310 log failures
-//                        std::cout << "avoidance failure" << std::endl;
-                        
-                        
-                        if (this == flock_boids().at(0))
-                        {
-                            std::cout << draw().frame_counter() << ": ";
-                            std::cout << obstacle->to_string() << " counter=";
-                            std::cout << avoidance_failure_counter_ << " ";
-                            std::cout << obstacle->getExcludeFromAsString();
-                            std::cout << std::endl;
-                        }
-
-                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                    }
-                }
-                last_sdf_per_obstacle_[obstacle] = current_sdf;
+//                        ((current_sdf < 0) and (ef == Obstacle::inside)) or
+//                        ((current_sdf > 0) and (ef == Obstacle::outside)))
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    {
+//                        avoidance_failure_counter_ += 1;
+//                        //std::cout << "  " + (name() + ":       ").substr(0,11)
+//                        //    << avoidance_failure_counter_ << " ["
+//                        //    << std::to_string(previous_sdf).substr(0,5) << " "
+//                        //    << std::to_string(current_sdf).substr(0,5) << "] "
+//                        //    << obstacle->to_string() << std::endl;
+//
+//                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                        // TODO 20240310 log failures
+//                        
+//                        if (this == flock_boids().at(0))
+//                        {
+//                            std::cout << draw().frame_counter() << ": ";
+//                            std::cout << obstacle->to_string() << " counter=";
+//                            std::cout << avoidance_failure_counter_ << " ";
+//                            std::cout << obstacle->getExcludeFromAsString();
+//                            std::cout << std::endl;
+//                        }
+//
+//                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                    }
+//                }
+//                last_sdf_per_obstacle_[obstacle] = current_sdf;
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             }
         }
         auto sorted = [&](const Collision& a, const Collision& b)
@@ -587,6 +589,30 @@ public:
         std::sort(collisions.begin(), collisions.end(), sorted);
         return collisions;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240311 add Boid::detectObstacleViolations()
+    void detectObstacleViolations()
+    {
+        for (Obstacle* obstacle : flock_obstacles())
+        {
+            if (obstacle->constraintViolation(position()))
+            {
+                avoidance_failure_counter_ += 1;
+                
+//                // TODO 20240311 temp:
+//                if (this == flock_boids().at(0))
+//                {
+//                    std::cout << draw().frame_counter() << ": ";
+//                    std::cout << obstacle->to_string() << " counter=";
+//                    std::cout << avoidance_failure_counter_ << " ";
+//                    std::cout << obstacle->getExcludeFromAsString();
+//                    std::cout << std::endl;
+//                }
+            }
+        }
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // For debugging: does this boid instance appear to be valid?
     // TODO 20230204 if needed again, should check other invariants.

@@ -42,48 +42,56 @@ int main(int argc, const char * argv[])
 
     //--------------------------------------------------------------------------
     
-//    int individuals = 500;
+//        int individuals = 500;
+//        int subpops = 20;
+//    //    int max_evolution_steps = 20000;  // TODO 20240311 3000 may be enough
+//    //                                      // based on last evening's run
+//        int max_evolution_steps = 3000;
+//        int min_tree_size = 2;
+//        int max_tree_size = 20;
+    
+    int individuals = 500;
 //    int subpops = 20;
-//    int max_evolution_steps = 20000;  // TODO 20240311 3000 may be enough based on last evening's run
-//    int min_tree_size = 2;
-//    int max_tree_size = 20;
-//    
-//    std::cout << "Create population." << std::endl;
-//    util::Timer t("Create population.");
-//    LazyPredator::Population population(individuals,
-//                                        subpops,
-//                                        max_tree_size,
-//                                        min_tree_size,
-//                                        max_tree_size,
-//                                        evoflock_gp_function_set);
-//    
-//    {
-//        std::cout << "Run evolution." << std::endl;
-//        util::Timer t("Run evolution.");
-//        for (int i = 0; i < max_evolution_steps; i++)
-//        {
-//            population.evolutionStep(evoflock_fitness_function);
-//            std::cout << std::endl;
-//        }
-//    }
-//    
-//    std::cout << std::endl;
-//    std::cout << std::endl;
-//    for (int i = 0; i < 10; i++)
-//    {
-//        const LP::Individual* individual = population.nthBestFitness(i);
-//        std::cout << individual->tree().to_string() << std::endl;
-//        double fitness = rerun_flock_simulation(individual);
-//        debugPrint(fitness);
-//    }
+//    int subpops = 10;
+    int subpops = 20;
+//    int max_evolution_steps = 3000;
+    int max_evolution_steps = 20000;
+    int min_tree_size = 2;
+    int max_tree_size = 20;
+
+    std::cout << "Create population." << std::endl;
+    util::Timer t("Create population.");
+    LazyPredator::Population population(individuals,
+                                        subpops,
+                                        max_tree_size,
+                                        min_tree_size,
+                                        max_tree_size,
+                                        evoflock_gp_function_set);
+    
+    {
+        std::cout << "Run evolution." << std::endl;
+        util::Timer t("Run evolution.");
+        for (int i = 0; i < max_evolution_steps; i++)
+        {
+            population.evolutionStep(evoflock_fitness_function);
+            std::cout << std::endl;
+        }
+    }
+    
+    std::cout << std::endl;
+    std::cout << std::endl;
+    for (int i = 0; i < 10; i++)
+    {
+        const LP::Individual* individual = population.nthBestFitness(i);
+        std::cout << individual->tree().to_string() << std::endl;
+        double fitness = rerun_flock_simulation(individual);
+        debugPrint(fitness);
+    }
 
     //--------------------------------------------------------------------------
-    
-//    double fitness = run_flock_simulation(FlockParameters());
+        
+//    double fitness = run_hand_tuned_flock_simulation(true);
 //    debugPrint(fitness);
-    
-    double fitness = run_hand_tuned_flock_simulation(true);
-    debugPrint(fitness);
 
     //--------------------------------------------------------------------------
     

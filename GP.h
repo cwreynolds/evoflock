@@ -28,11 +28,21 @@ inline float evoflock_fitness_function(LazyPredator::Individual* individual)
 }
 
 
+
+//    fitness_logger(nn_sep_fitness, nn_sep_err,
+//                   collide_fitness, collide,
+//                   ave_speed_fitness, ave_speed,
+//                   fitness);
+
+
 // TODO 20240309 temp?
-void fitness_logger(double minsep_fitness, double minsep,
-                    double maxsep_fitness, double maxsep,
+//void fitness_logger(double nn_sep_fitness, double nn_sep_err,
+//                    double collide_fitness, double collide,
+//                    double ave_speed_fitness, double ave_speed,
+//                    double fitness)
+void fitness_logger(double nn_sep_fitness, double nn_sep_err,
                     double collide_fitness, double collide,
-                    double ave_speed_fitness, double ave_speed,
+                    double speed_err_fitness, double speed_err,
                     double fitness)
 {
     // Save current settings for formatting float/double values
@@ -47,10 +57,12 @@ void fitness_logger(double minsep_fitness, double minsep,
         if (raw > -1) { std::cout << " (" << raw <<  ")"; }
         std::cout << std::endl;
     };
-    print("    minsep    ", minsep_fitness,    minsep);
-    print("    maxsep    ", maxsep_fitness,    maxsep);
+//    print("    minsep    ", minsep_fitness,    minsep);
+//    print("    maxsep    ", maxsep_fitness,    maxsep);
+    print("    nn_sep_err", nn_sep_fitness,    nn_sep_err);
     print("    collide   ", collide_fitness,   collide);
-    print("    ave_speed ", ave_speed_fitness, ave_speed);
+//    print("    ave_speed ", ave_speed_fitness, ave_speed);
+    print("    speed_err ", speed_err_fitness, speed_err);
     print("    fitness   ", fitness);
     std::cout << std::endl;
     
@@ -117,47 +129,159 @@ inline void init_flock(Flock& flock)
 }
 
 
+//    inline double measure_fitness_after_flock_simulation(const Flock& flock)
+//    {
+//        // Compute fitness and return it as value of GpTree.
+//        double tiny = 0.1;
+//
+//        double boid_count = flock.boid_count();
+//
+//    //    double minsep = (flock.count_minsep_violations_whole_sim / boid_count);
+//    //    double maxsep = flock.max_nn_dist_whole_sim;
+//
+//        double nn_sep_err = (flock.count_nn_sep_violations_whole_sim / boid_count);
+//
+//        double collide = (flock.total_avoid_fail_whole_sim / boid_count);
+//
+//        double speed_err = (flock.count_speed_violations_whole_sim / boid_count);
+//
+//
+//    //    double minsep_limit = flock.fp().body_radius * 6; // TODO ad hoc
+//    //    double maxsep_limit = flock.fp().body_radius * 30; // TODO ad hoc
+//
+//        // For plot of this see: https://bitly.ws/3fqEu
+//        auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
+//
+//    //    double minsep_fitness = util::remap_interval_clip(inv_count_01(minsep),
+//    //                                                      0, 1,
+//    //                                                      tiny, 1);
+//    //    double maxsep_fitness = util::remap_interval_clip(maxsep,
+//    //                                                      minsep_limit, maxsep_limit,
+//    //                                                      1, tiny);
+//    //    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//    //    // TODO 20240310 disable maxsep
+//    //    maxsep_fitness = 1;
+//    //    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//
+//        double nn_sep_fitness = util::remap_interval_clip(inv_count_01(nn_sep_err),
+//                                                          0, 1,
+//                                                          tiny, 1);
+//
+//
+//
+//        double collide_fitness = util::remap_interval_clip(inv_count_01(collide),
+//                                                           0, 1,
+//                                                           tiny, 1);
+//
+//    //    double ave_speed = (flock.sum_all_speed_whole_sim /
+//    //                        (flock.max_simulation_steps() * flock.boid_count()));
+//
+//
+//
+//
+//        // TODO 20 is roughly the target speed.
+//    //    double ave_speed_fitness = util::remap_interval_clip(ave_speed, 0, 20, tiny, 1);
+//        double speed_err_fitness = util::remap_interval_clip(inv_count_01(speed_err),
+//                                                             0, 1,
+//                                                             tiny, 1);
+//
+//
+//    //    double fitness = (minsep_fitness *
+//    //                      maxsep_fitness *
+//    //                      collide_fitness *
+//    //                      ave_speed_fitness);
+//    //    double fitness = (nn_sep_fitness *
+//    //                      collide_fitness *
+//    //                      ave_speed_fitness);
+//        double fitness = (nn_sep_fitness *
+//                          collide_fitness *
+//                          speed_err_fitness);
+//    //    fitness_logger(minsep_fitness, minsep,
+//    //                   maxsep_fitness, maxsep,
+//    //                   collide_fitness, collide,
+//    //                   ave_speed_fitness, ave_speed,
+//    //                   fitness);
+//    //    fitness_logger(nn_sep_fitness, nn_sep_err,
+//    //                   collide_fitness, collide,
+//    //                   ave_speed_fitness, ave_speed,
+//    //                   fitness);
+//        fitness_logger(nn_sep_fitness, nn_sep_err,
+//                       collide_fitness, collide,
+//                       speed_err_fitness, speed_err,
+//                       fitness);
+//
+//        return fitness;
+//
+//    }
+
+
 inline double measure_fitness_after_flock_simulation(const Flock& flock)
 {
     // Compute fitness and return it as value of GpTree.
     double tiny = 0.1;
+//    double boid_count = flock.boid_count();
     
-    double boid_count = flock.boid_count();
-    double minsep = (flock.count_minsep_violations_whole_sim / boid_count);
-    double maxsep = flock.max_nn_dist_whole_sim;
-    double collide = (flock.total_avoid_fail_whole_sim / boid_count);
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20240313 these values seem to be so large that the fitness values
+    // are all very close to 0. Trying to find some principled way to scale them
+    // down.
+    // Had been dividing by boid_count.
+    // What about 1 / (boid count * step_count)?
+    
+    // Normalize down to "count per boid per step".
+    double norm = flock.boid_count() * flock.max_simulation_steps();
 
-    double minsep_limit = flock.fp().body_radius * 6; // TODO ad hoc
-    double maxsep_limit = flock.fp().body_radius * 30; // TODO ad hoc
-    
+//    double nn_sep_err = (flock.count_nn_sep_violations_whole_sim / boid_count);
+//    double collide = (flock.total_avoid_fail_whole_sim / boid_count);
+//    double speed_err = (flock.count_speed_violations_whole_sim / boid_count);
+
+    double nn_sep_err = flock.count_nn_sep_violations_whole_sim / norm;
+    double collide    = flock.total_avoid_fail_whole_sim        / norm;
+    double speed_err  = flock.count_speed_violations_whole_sim  / norm;
+
+
+    // TODO 20240313 oh! but maybe the "hyperbolic" 1/count is not needed since
+    //               we now already scale it down to "bad behavior per boid per
+    //               step" which is already on [0, 1]
+    //
+    //               For a multi-agent simulation we can count the good (or bad)
+    //               outcomes each step for each agent. Then “normalize” that
+    //               count by dividing it by agent count times step count. This
+    //               is then a number on [0,1] averaging the good/bad events.
+    //
+    // Wait, I saw this go by (20240313):
+    //     speed_err   0.550000 (1.000000)
+    // Why isn't that 0.5?
+    // Oh, its from the "tiny" isn't it?
+    //
+    // Move this to util, add unit tests
     // For plot of this see: https://bitly.ws/3fqEu
-    auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
+//    auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
 
-    double minsep_fitness = util::remap_interval_clip(inv_count_01(minsep),
+    auto inv_count_01 = [](double count)
+    {
+        assert (count >= 0);
+        return  1.0 / (count + 1);
+    };
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    double nn_sep_fitness = util::remap_interval_clip(inv_count_01(nn_sep_err),
                                                       0, 1,
                                                       tiny, 1);
-    double maxsep_fitness = util::remap_interval_clip(maxsep,
-                                                      minsep_limit, maxsep_limit,
-                                                      1, tiny);
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20240310 disable maxsep
-    maxsep_fitness = 1;
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     double collide_fitness = util::remap_interval_clip(inv_count_01(collide),
                                                        0, 1,
                                                        tiny, 1);
-    
-    double ave_speed = (flock.sum_all_speed_whole_sim /
-                        (flock.max_simulation_steps() * flock.boid_count()));
-    // TODO 20 is roughly the target speed.
-    double ave_speed_fitness = util::remap_interval_clip(ave_speed, 0, 20, tiny, 1);
-    
-    double fitness = (minsep_fitness *
-                      maxsep_fitness *
+    double speed_err_fitness = util::remap_interval_clip(inv_count_01(speed_err),
+                                                         0, 1,
+                                                         tiny, 1);
+    double fitness = (nn_sep_fitness *
                       collide_fitness *
-                      ave_speed_fitness);
-    fitness_logger(minsep_fitness, minsep, maxsep_fitness, maxsep,
-                   collide_fitness, collide, ave_speed_fitness, ave_speed,
+                      speed_err_fitness);
+    fitness_logger(nn_sep_fitness, nn_sep_err,
+                   collide_fitness, collide,
+                   speed_err_fitness, speed_err,
                    fitness);
     return fitness;
 

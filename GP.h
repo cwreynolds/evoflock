@@ -216,11 +216,81 @@ inline void init_flock(Flock& flock)
 //    }
 
 
+//    inline double measure_fitness_after_flock_simulation(const Flock& flock)
+//    {
+//        // Compute fitness and return it as value of GpTree.
+//        double tiny = 0.1;
+//    //    double boid_count = flock.boid_count();
+//
+//        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//        // TODO 20240313 these values seem to be so large that the fitness values
+//        // are all very close to 0. Trying to find some principled way to scale them
+//        // down.
+//        // Had been dividing by boid_count.
+//        // What about 1 / (boid count * step_count)?
+//
+//        // Normalize down to "count per boid per step".
+//        double norm = flock.boid_count() * flock.max_simulation_steps();
+//
+//    //    double nn_sep_err = (flock.count_nn_sep_violations_whole_sim / boid_count);
+//    //    double collide = (flock.total_avoid_fail_whole_sim / boid_count);
+//    //    double speed_err = (flock.count_speed_violations_whole_sim / boid_count);
+//
+//        double nn_sep_err = flock.count_nn_sep_violations_whole_sim / norm;
+//        double collide    = flock.total_avoid_fail_whole_sim        / norm;
+//        double speed_err  = flock.count_speed_violations_whole_sim  / norm;
+//
+//
+//        // TODO 20240313 oh! but maybe the "hyperbolic" 1/count is not needed since
+//        //               we now already scale it down to "bad behavior per boid per
+//        //               step" which is already on [0, 1]
+//        //
+//        //               For a multi-agent simulation we can count the good (or bad)
+//        //               outcomes each step for each agent. Then “normalize” that
+//        //               count by dividing it by agent count times step count. This
+//        //               is then a number on [0,1] averaging the good/bad events.
+//        //
+//        // Wait, I saw this go by (20240313):
+//        //     speed_err   0.550000 (1.000000)
+//        // Why isn't that 0.5?
+//        // Oh, its from the "tiny" isn't it?
+//        //
+//        // Move this to util, add unit tests
+//        // For plot of this see: https://bitly.ws/3fqEu
+//    //    auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
+//
+//        auto inv_count_01 = [](double count)
+//        {
+//            assert (count >= 0);
+//            return  1.0 / (count + 1);
+//        };
+//
+//        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//        double nn_sep_fitness = util::remap_interval_clip(inv_count_01(nn_sep_err),
+//                                                          0, 1,
+//                                                          tiny, 1);
+//        double collide_fitness = util::remap_interval_clip(inv_count_01(collide),
+//                                                           0, 1,
+//                                                           tiny, 1);
+//        double speed_err_fitness = util::remap_interval_clip(inv_count_01(speed_err),
+//                                                             0, 1,
+//                                                             tiny, 1);
+//        double fitness = (nn_sep_fitness *
+//                          collide_fitness *
+//                          speed_err_fitness);
+//        fitness_logger(nn_sep_fitness, nn_sep_err,
+//                       collide_fitness, collide,
+//                       speed_err_fitness, speed_err,
+//                       fitness);
+//        return fitness;
+//
+//    }
+
 inline double measure_fitness_after_flock_simulation(const Flock& flock)
 {
     // Compute fitness and return it as value of GpTree.
     double tiny = 0.1;
-//    double boid_count = flock.boid_count();
     
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20240313 these values seem to be so large that the fitness values
@@ -231,51 +301,67 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
     
     // Normalize down to "count per boid per step".
     double norm = flock.boid_count() * flock.max_simulation_steps();
-
-//    double nn_sep_err = (flock.count_nn_sep_violations_whole_sim / boid_count);
-//    double collide = (flock.total_avoid_fail_whole_sim / boid_count);
-//    double speed_err = (flock.count_speed_violations_whole_sim / boid_count);
-
+    
+//    //    double nn_sep_err = (flock.count_nn_sep_violations_whole_sim / boid_count);
+//    //    double collide = (flock.total_avoid_fail_whole_sim / boid_count);
+//    //    double speed_err = (flock.count_speed_violations_whole_sim / boid_count);
+    
     double nn_sep_err = flock.count_nn_sep_violations_whole_sim / norm;
     double collide    = flock.total_avoid_fail_whole_sim        / norm;
     double speed_err  = flock.count_speed_violations_whole_sim  / norm;
-
-
-    // TODO 20240313 oh! but maybe the "hyperbolic" 1/count is not needed since
-    //               we now already scale it down to "bad behavior per boid per
-    //               step" which is already on [0, 1]
-    //
-    //               For a multi-agent simulation we can count the good (or bad)
-    //               outcomes each step for each agent. Then “normalize” that
-    //               count by dividing it by agent count times step count. This
-    //               is then a number on [0,1] averaging the good/bad events.
-    //
-    // Wait, I saw this go by (20240313):
-    //     speed_err   0.550000 (1.000000)
-    // Why isn't that 0.5?
-    // Oh, its from the "tiny" isn't it?
-    //
-    // Move this to util, add unit tests
-    // For plot of this see: https://bitly.ws/3fqEu
-//    auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
-
-    auto inv_count_01 = [](double count)
-    {
-        assert (count >= 0);
-        return  1.0 / (count + 1);
-    };
-
+    
+    
+//    // TODO 20240313 oh! but maybe the "hyperbolic" 1/count is not needed since
+//    //               we now already scale it down to "bad behavior per boid per
+//    //               step" which is already on [0, 1]
+//    //
+//    //               For a multi-agent simulation we can count the good (or bad)
+//    //               outcomes each step for each agent. Then “normalize” that
+//    //               count by dividing it by agent count times step count. This
+//    //               is then a number on [0,1] averaging the good/bad events.
+//    //
+//    // Wait, I saw this go by (20240313):
+//    //     speed_err   0.550000 (1.000000)
+//    // Why isn't that 0.5?
+//    // Oh, its from the "tiny" isn't it?
+//    //
+//    // Move this to util, add unit tests
+//    // For plot of this see: https://bitly.ws/3fqEu
+//    //    auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
+//    
+//    auto inv_count_01 = [](double count)
+//    {
+//        assert (count >= 0);
+//        return  1.0 / (count + 1);
+//    };
+    
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    
+//    double nn_sep_fitness = util::remap_interval_clip(inv_count_01(nn_sep_err),
+//                                                      0, 1,
+//                                                      tiny, 1);
+//    double collide_fitness = util::remap_interval_clip(inv_count_01(collide),
+//                                                       0, 1,
+//                                                       tiny, 1);
+//    double speed_err_fitness = util::remap_interval_clip(inv_count_01(speed_err),
+//                                                         0, 1,
+//                                                         tiny, 1);
 
-    double nn_sep_fitness = util::remap_interval_clip(inv_count_01(nn_sep_err),
-                                                      0, 1,
-                                                      tiny, 1);
-    double collide_fitness = util::remap_interval_clip(inv_count_01(collide),
-                                                       0, 1,
-                                                       tiny, 1);
-    double speed_err_fitness = util::remap_interval_clip(inv_count_01(speed_err),
-                                                         0, 1,
-                                                         tiny, 1);
+    double nn_sep_fitness = util::remap_interval_clip(nn_sep_err, 0, 1, 1, tiny);
+    double collide_fitness = util::remap_interval_clip(collide, 0, 1, 1, tiny);
+    double speed_err_fitness = util::remap_interval_clip(speed_err, 0, 1, 1, tiny);
+    
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20240314 try per-fitness-factor weightings
+    
+    nn_sep_fitness =    util::remap_interval_clip(nn_sep_fitness,    0, 1, 0.5,  1);
+    collide_fitness =   util::remap_interval_clip(collide_fitness,   0, 1, 0,    1);
+    speed_err_fitness = util::remap_interval_clip(speed_err_fitness, 0, 1, 0.75, 1);
+
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
     double fitness = (nn_sep_fitness *
                       collide_fitness *
                       speed_err_fitness);
@@ -284,7 +370,6 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
                    speed_err_fitness, speed_err,
                    fitness);
     return fitness;
-
 }
 
 

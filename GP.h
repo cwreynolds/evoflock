@@ -355,16 +355,29 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     // TODO 20240314 try per-fitness-factor weightings
     
-    nn_sep_fitness =    util::remap_interval_clip(nn_sep_fitness,    0, 1, 0.5,  1);
-    collide_fitness =   util::remap_interval_clip(collide_fitness,   0, 1, 0,    1);
-    speed_err_fitness = util::remap_interval_clip(speed_err_fitness, 0, 1, 0.75, 1);
-
+//    nn_sep_fitness =    util::remap_interval_clip(nn_sep_fitness,    0, 1, 0.5,  1);
+//    collide_fitness =   util::remap_interval_clip(collide_fitness,   0, 1, 0,    1);
+//    speed_err_fitness = util::remap_interval_clip(speed_err_fitness, 0, 1, 0.75, 1);
     
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20240315 more extreme emphasis on obstacle avoidance
 
-    double fitness = (nn_sep_fitness *
-                      collide_fitness *
-                      speed_err_fitness);
+    nn_sep_fitness =    util::remap_interval_clip(nn_sep_fitness,    0, 1, 0.8, 1);
+    collide_fitness =   util::remap_interval_clip(collide_fitness,   0, 1, 0,   1);
+    speed_err_fitness = util::remap_interval_clip(speed_err_fitness, 0, 1, 0.9, 1);
+    
+    // TODO 20240315 experimental non-linearity
+    // (Wolfram Alpha plot: https://tinyurl.com/bdew7a92)
+    auto nonlin = [](double x) { return (x + pow(x, 10)) / 2; };
+
+//    nn_sep_fitness =    nonlin(nn_sep_fitness);
+//    collide_fitness =   nonlin(collide_fitness);
+//    speed_err_fitness = nonlin(speed_err_fitness);
+//
+//    double fitness = (nn_sep_fitness * collide_fitness * speed_err_fitness);
+    
+    double fitness = nonlin(nn_sep_fitness * collide_fitness * speed_err_fitness);
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     fitness_logger(nn_sep_fitness, nn_sep_err,
                    collide_fitness, collide,
                    speed_err_fitness, speed_err,

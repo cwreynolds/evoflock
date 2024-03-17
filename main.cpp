@@ -68,8 +68,10 @@ int main(int argc, const char * argv[])
 //        int max_tree_size = 20;
 
 //    int individuals = 600;
-    int individuals = 400;
-    int subpops = 30;
+//    int individuals = 400;
+    int individuals = 500;
+//    int subpops = 30;
+    int subpops = 25;
     int max_evolution_steps = 30000;
     int min_tree_size = 2;
     int max_tree_size = 20;

@@ -309,18 +309,6 @@ public:
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240309 WIP inside/outside-ness for Obstacles
-        
-//    CylinderObstacle(double radius,
-//                     const Vec3& endpoint0,
-//                     const Vec3& endpoint1,
-//                     ExcludeFrom ef) : Obstacle()
-//    {
-//        radius_ = radius;
-//        endpoint_ = endpoint0;
-//        Vec3 offset = endpoint1 - endpoint0;
-//        std::tie(tangent_, length_) = offset.normalize_and_length();
-//        setExcludeFrom(ef);
-//    }
 
     CylinderObstacle(double radius,
                      const Vec3& endpoint0,
@@ -328,11 +316,15 @@ public:
                      ExcludeFrom ef)
       : CylinderObstacle(radius, endpoint0, endpoint1)
     {
-//        radius_ = radius;
-//        endpoint_ = endpoint0;
-//        Vec3 offset = endpoint1 - endpoint0;
-//        std::tie(tangent_, length_) = offset.normalize_and_length();
         setExcludeFrom(ef);
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20240317 something like this should be in unit tests.
+        //               put this temp test here because no accessors for IVs.
+        assert(radius == radius_);
+        assert(endpoint0 == endpoint_);
+        assert(tangent_ == (endpoint1 - endpoint0).normalize());
+        assert(length_ == (endpoint1 - endpoint0).length());
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

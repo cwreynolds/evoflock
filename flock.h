@@ -632,8 +632,14 @@ public:
         Vec3 ect = fp().sphere_center + Vec3(ecr * 0.6, ecr, 0);
         Vec3 ecb = fp().sphere_center + Vec3(ecr * 0.6, -ecr, 0);
 //        obstacles().push_back(new CylinderObstacle(ecr * 0.2, ect, ecb));
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240316 why avoiding sphere but collide with cylinder?
         obstacles().push_back(new CylinderObstacle(ecr * 0.2, ect, ecb,
                                                    Obstacle::inside));
+//        obstacles().push_back(new CylinderObstacle(ecr * 0.5, ect, ecb,
+//                                                   Obstacle::inside));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -67,10 +67,7 @@ int main(int argc, const char * argv[])
 //        int min_tree_size = 2;
 //        int max_tree_size = 20;
 
-//    int individuals = 600;
-//    int individuals = 400;
     int individuals = 500;
-//    int subpops = 30;
     int subpops = 25;
     int max_evolution_steps = 30000;
     int min_tree_size = 2;
@@ -84,7 +81,7 @@ int main(int argc, const char * argv[])
                                         min_tree_size,
                                         max_tree_size,
                                         evoflock_gp_function_set);
-    
+
     {
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
@@ -94,7 +91,7 @@ int main(int argc, const char * argv[])
             std::cout << std::endl;
         }
     }
-    
+
     std::cout << std::endl;
     std::cout << std::endl;
     for (int i = 0; i < 10; i++)

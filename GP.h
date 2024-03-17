@@ -122,8 +122,15 @@ inline void init_flock(Flock& flock)
     flock.set_boid_count(200);
     flock.set_fixed_fps(30);
     flock.set_fixed_time_step(true);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240316 why avoiding sphere but collide with cylinder?
+//    flock.set_max_simulation_steps(1000);
+//    flock.setLogStatInterval(1000);
+//    flock.set_max_simulation_steps(10);
+//    flock.set_max_simulation_steps(200);
     flock.set_max_simulation_steps(1000);
-    flock.setLogStatInterval(1000);
+    flock.setLogStatInterval(flock.max_simulation_steps());
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     flock.setSaveBoidCenters(false);
     flock.log_prefix = "    ";
 }
@@ -424,16 +431,27 @@ inline double run_flock_simulation(double max_force,
                                    bool write_flock_data_file = false)
 {
     FlockParameters fp = init_flock_parameters(max_force,
-                                               max_speed,
-                                               min_speed,
+                                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                               // TODO 20240316 why avoiding sphere
+                                               // but collide with cylinder?
+//                                               max_speed,
+//                                               min_speed,
+                                               20,
+                                               20,
+                                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                                speed,
                                                
                                                weight_forward,
                                                weight_separate,
                                                weight_align,
                                                weight_cohere,
+                                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                               // TODO 20240316 why avoiding sphere
+                                               // but collide with cylinder?
                                                weight_avoid,
-                                               
+//                                               100,  // QQQQQQQQQQQQQQQQQQQQQQQQ
+                                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                                                max_dist_separate_in_body_radii,
                                                
                                                exponent_separate,

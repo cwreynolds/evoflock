@@ -92,7 +92,13 @@ inline FlockParameters init_flock_parameters(double max_force,
                                              
                                              double angle_separate,
                                              double angle_align,
-                                             double angle_cohere)
+                                             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                             // TODO 20240318 move more values to FlockParameters.
+//                                             double angle_cohere)
+                                             double angle_cohere,
+                                             double fly_away_max_dist_in_br,
+                                             double min_time_to_collide)
+                                             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     FlockParameters fp;
     fp.max_force = max_force;
@@ -104,14 +110,18 @@ inline FlockParameters init_flock_parameters(double max_force,
     fp.weight_align = weight_align;
     fp.weight_cohere = weight_cohere;
     fp.weight_avoid = weight_avoid;
-    fp.max_dist_separate = (max_dist_separate_in_body_radii *
-                                    fp.body_radius);
+    fp.max_dist_separate = max_dist_separate_in_body_radii * fp.body_radius;
     fp.exponent_separate = exponent_separate;
     fp.exponent_align = exponent_align;
     fp.exponent_cohere = exponent_cohere;
     fp.angle_separate = angle_separate;
     fp.angle_align = angle_align;
     fp.angle_cohere = angle_cohere;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240318 move more values to FlockParameters.
+    fp.fly_away_max_dist_in_br = fly_away_max_dist_in_br;
+    fp.min_time_to_collide = min_time_to_collide;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     return fp;
 }
 
@@ -427,7 +437,13 @@ inline double run_flock_simulation(double max_force,
                                    double angle_separate,
                                    double angle_align,
                                    double angle_cohere,
-                                   
+
+                                   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                   // TODO 20240318 move more values to FlockParameters.
+                                   double fly_away_max_dist_in_br,
+                                   double min_time_to_collide,
+                                   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                                    bool write_flock_data_file = false)
 {
     FlockParameters fp = init_flock_parameters(max_force,
@@ -460,8 +476,14 @@ inline double run_flock_simulation(double max_force,
                                                
                                                angle_separate,
                                                angle_align,
-                                               angle_cohere);
-    
+                                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                               // TODO 20240318 move more values to FlockParameters.
+//                                               angle_cohere);
+                                               angle_cohere,
+                                               fly_away_max_dist_in_br,
+                                               min_time_to_collide);
+                                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     return run_flock_simulation(fp, write_flock_data_file);
 }
 
@@ -493,7 +515,12 @@ inline float rerun_flock_simulation(const LazyPredator::Individual* individual)
                                 t.evalSubtree<double>(12),
                                 t.evalSubtree<double>(13),
                                 t.evalSubtree<double>(14),
+                                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                // TODO 20240318 move more values to FlockParameters.
                                 t.evalSubtree<double>(15),
+                                t.evalSubtree<double>(16),
+                                t.evalSubtree<double>(17),
+                                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                 true);  // write flock data file
 }
 
@@ -551,6 +578,8 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
                 "Real_0_100",  // weight_avoid
 
                 "Real_0_200",  // max_dist_separate_in_body_radii
+                // TODO set to 100, essentially infinity, in the FlockParameters
+                // class. Keep them that way for now but needs to be revisited.
                 //"Real_0_200",  // max_dist_align_in_body_radii
                 //"Real_0_200",  // max_dist_cohere_in_body_radii
 
@@ -562,6 +591,12 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
                 "Real_m1_p1",  // angle_separate
                 "Real_m1_p1",  // angle_align
                 "Real_m1_p1",  // angle_cohere
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20240318 move more values to FlockParameters.
+                "Real_0_100", // fly_away_max_dist_in_br
+                "Real_0_10",  // min_time_to_collide
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             },
             
             // Evaluation function, which runs a flock simulation with the given
@@ -583,7 +618,13 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
                                                     t.evalSubtree<double>(12),
                                                     t.evalSubtree<double>(13),
                                                     t.evalSubtree<double>(14),
-                                                    t.evalSubtree<double>(15));
+                                                    //~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                                    // TODO 20240318 move more values to FlockParameters.
+//                                                    t.evalSubtree<double>(15));
+                                                    t.evalSubtree<double>(15),
+                                                    t.evalSubtree<double>(16),
+                                                    t.evalSubtree<double>(17));
+                                                    //~~~~~~~~~~~~~~~~~~~~~~~~~~
                 return std::any(fitness);
             }
         }

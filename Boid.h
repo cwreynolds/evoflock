@@ -71,6 +71,7 @@ public:
     double weight_align    = 12;
     double weight_cohere   = 18;
     double weight_avoid    = 40;
+    // TODO 20240318 should this (or all 3) be "_in_br" ?
     double max_dist_separate = 15 * body_radius;
     double max_dist_align    = 100;
     double max_dist_cohere   = 100;  // TODO 20231017 should this be ∞ or
@@ -83,6 +84,15 @@ public:
     double angle_separate = -0.707;  // 135°
     double angle_align    =  0.940;  // 20°
     double angle_cohere   =  0;      // 90°
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240318 move more values to FlockParameters.
+    double fly_away_max_dist_in_br = 20;  // max fly-away dist from obs surface
+    double min_time_to_collide = 0.8;     // react to predicted impact (seconds)
+
+    // Historical holdovers, no longer used.
+    bool wrap_vs_avoid = false;   // always false
+    bool avoid_blend_mode = true; // obstacle avoid: blend vs hard switch
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 class Flock;
@@ -127,12 +137,15 @@ private:  // move to bottom of class later
     static inline int name_counter_ = 0;
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240318 move more values to FlockParameters.
+
     // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
     //               The first three of these easily belong in FlockParameters.
     //               What about the lists of boids and obtacles?
-    bool flock_wrap_vs_avoid = false;
-    double flock_min_time_to_collide = 0.8;  // react to predicted impact (seconds)
-    bool flock_avoid_blend_mode = true; // obstacle avoid: blend vs hard switch
+//    bool flock_wrap_vs_avoid = false;
+//    double flock_min_time_to_collide = 0.8;  // react to predicted impact (seconds)
+//    bool flock_avoid_blend_mode = true; // obstacle avoid: blend vs hard switch
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 public:
@@ -280,14 +293,18 @@ public:
     }
 
     // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
-    // (I will collide with obstacle within Flock.min_time_to_collide seconds)
+    // (I will collide with obstacle within min_time_to_collide seconds)
     // and "static" avoidance (I should fly away from this obstacle, for everted
     // containment obstacles).
     Vec3 steer_to_avoid()
     {
         Vec3 avoid;
         avoid_obstacle_annotation(0, Vec3::none(), 0);
-        if (not flock_wrap_vs_avoid)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240318 move more values to FlockParameters.
+//        if (not flock_wrap_vs_avoid)
+        if (not fp().wrap_vs_avoid)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             Vec3 predict_avoid = steer_for_predictive_avoidance();
             Vec3 static_avoid = fly_away_from_obstacles();
@@ -310,10 +327,18 @@ public:
             Vec3 normal = first_collision.normal_at_poi;
             Vec3 pure_steering = pure_lateral_steering(normal);
             avoidance = pure_steering.normalize();
-            double min_dist = speed() * flock_min_time_to_collide;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240318 move more values to FlockParameters.
+//            double min_dist = speed() * flock_min_time_to_collide;
+            double min_dist = speed() * fp().min_time_to_collide;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // Near enough to require avoidance steering?
             bool near = min_dist > first_collision.dist_to_collision;
-            if (flock_avoid_blend_mode)
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240318 move more values to FlockParameters.
+//            if (flock_avoid_blend_mode)
+            if (fp().avoid_blend_mode)
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             {
                 // Smooth weight transition from 80% to 120% of min dist.
                 double d = util::remap_interval(first_collision.dist_to_collision,
@@ -353,7 +378,11 @@ public:
         Vec3 avoidance;
         Vec3 p = position();
         Vec3 f = forward();
-        double max_distance = fp().body_radius * 20;  // TODO tuning parameter?
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240318 move more values to FlockParameters.
+//        double max_distance = fp().body_radius * 20;  // TODO tuning parameter?
+        double max_distance = fp().body_radius * fp().fly_away_max_dist_in_br;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for (Obstacle* obstacle : flock_obstacles())
         {
             Vec3 oa = obstacle->fly_away(p, f, max_distance, fp().body_radius);

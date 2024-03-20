@@ -58,8 +58,6 @@ public:
     
     static void unit_test();  // Defined at bottom of file.
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240309 WIP inside/outside-ness for Obstacles
     enum ExcludeFrom { inside, outside, neither };
     virtual void setExcludeFrom(ExcludeFrom ef) { exclude_from_ = ef; }
     virtual ExcludeFrom getExcludeFrom() const { return exclude_from_; }
@@ -72,48 +70,32 @@ public:
         return "unknown";
     }
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20240311 add Boid::detectObstacleViolations()
-//    void detectObstacleViolations()
-//    {
-//        for (Obstacle* obstacle : flock_obstacles())
-//        {
-//            //            double current_sdf = obstacle->signed_distance(position());
-//            
-//            obstacle->constraintViolation(position());
-//        }
-//    }
-    
-//        virtual bool constraintViolation(const Vec3& query_point) const
-//        {
-//    //        virtual double signed_distance(const Vec3& query_point) const { return 0; }
-//    //        auto ef = obstacle->getExcludeFrom();
-//
-//
-//    //        if (util::zero_crossing(current_sdf, previous_sdf) or
-//    //            ((current_sdf < 0) and (ef == Obstacle::inside)) or
-//    //            ((current_sdf > 0) and (ef == Obstacle::outside)))
-//
-//            ExcludeFrom ef = getExcludeFrom();
-//            double sdf = signed_distance(query_point);
-//            return (((sdf < 0) and (ef == inside)) or
-//                    ((sdf > 0) and (ef == outside)));
-//        }
-
-    // TODO 20240312 WIP: maybe make args "current_point" and "previous_point"
-    virtual bool constraintViolation(const Vec3& query_point) const
+    virtual bool constraintViolation(const Vec3& current_point,
+                                     const Vec3& previous_point) const
     {
+        bool violation = false;
         ExcludeFrom ef = getExcludeFrom();
-        double sdf = signed_distance(query_point);
-        return (((sdf < 0) and (ef == inside)) or
-                ((sdf > 0) and (ef == outside)));
+        double sdf = signed_distance(current_point);
+        // Static violation? EG: inside of an Obstacle with ExcludeFrom inside.
+        if (((sdf < 0) and (ef == inside)) or
+            ((sdf > 0) and (ef == outside)))
+        {
+            violation = true;
+        }
+        else
+        {
+            // Or dynamic: agent crossed the surface since previous step.
+            if ((not previous_point.is_none()) and
+                util::zero_crossing(sdf, signed_distance(previous_point)))
+            {
+                violation = true;
+            }
+        }
+        return violation;
     }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 private:
     ExcludeFrom exclude_from_ = neither;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 
@@ -123,16 +105,11 @@ public:
     EvertedSphereObstacle(double radius, const Vec3& center)
       : Obstacle(), radius_(radius), center_(center) {}
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240309 WIP inside/outside-ness for Obstacles
-    
     EvertedSphereObstacle(double radius, const Vec3& center, ExcludeFrom ef)
       : Obstacle(), radius_(radius), center_(center)
     {
         setExcludeFrom(ef);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 ray_intersection(const Vec3& origin,
@@ -215,6 +192,12 @@ public:
     
     PlaneObstacle(const Vec3& normal, const Vec3& center)
       : Obstacle(), normal_(normal), center_(center) {}
+    
+    PlaneObstacle(const Vec3& normal, const Vec3& center, ExcludeFrom ef)
+      : PlaneObstacle(normal, center)
+    {
+        setExcludeFrom(ef);
+    }
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 ray_intersection(const Vec3& origin,
@@ -307,9 +290,6 @@ public:
         std::tie(tangent_, length_) = offset.normalize_and_length();
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240309 WIP inside/outside-ness for Obstacles
-
     CylinderObstacle(double radius,
                      const Vec3& endpoint0,
                      const Vec3& endpoint1,
@@ -317,17 +297,7 @@ public:
       : CylinderObstacle(radius, endpoint0, endpoint1)
     {
         setExcludeFrom(ef);
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20240317 something like this should be in unit tests.
-        //               put this temp test here because no accessors for IVs.
-        assert(radius == radius_);
-        assert(endpoint0 == endpoint_);
-        assert(tangent_ == (endpoint1 - endpoint0).normalize());
-        assert(length_ == (endpoint1 - endpoint0).length());
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Nearest point on the infinite line containing cylinder's axis.
     Vec3 nearest_point_on_axis(const Vec3& query_point) const
@@ -475,6 +445,18 @@ inline void Obstacle::unit_test()
     double e = util::epsilon * 10;
     assert(Vec3::is_equal_within_epsilon(eso_ri, eso_ri_expected, e));
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    // Test ExcludeFrom testing with constraintViolation().
+    Vec3 poop(0, 0.1, 0);
+    Vec3 poip = -poop;
+    assert(po.constraintViolation(poip, poop));
+    assert(po.constraintViolation(poop, poip));
+    PlaneObstacle po_ef_inside(Vec3(0, 1, 0), Vec3(), ExcludeFrom::inside);
+    PlaneObstacle po_ef_outside(Vec3(0, 1, 0), Vec3(), ExcludeFrom::outside);
+    assert(po_ef_inside.constraintViolation(poip, Vec3::none()));
+    assert(not po_ef_outside.constraintViolation(poip, Vec3::none()));
+    assert(not po_ef_inside.constraintViolation(poop, Vec3::none()));
+    assert(po_ef_outside.constraintViolation(poop, Vec3::none()));
 }
 
 typedef std::vector<Obstacle*> ObstaclePtrList;

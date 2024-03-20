@@ -130,6 +130,9 @@ private:  // move to bottom of class later
     double neighbor_refresh_rate_ = 0.5;
     double time_since_last_neighbor_refresh_ = 0;
     
+    // Used to detect agent crossing Obstacle surface.
+    Vec3 previous_position_ = Vec3::none();
+    
     inline static RandomSequence rs_;
 
     // Used to generate unique string names for Boid instances
@@ -684,13 +687,11 @@ public:
         return collisions;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240311 add Boid::detectObstacleViolations()
     void detectObstacleViolations()
     {
         for (Obstacle* obstacle : flock_obstacles())
         {
-            if (obstacle->constraintViolation(position()))
+            if (obstacle->constraintViolation(position(), previous_position_))
             {
                 avoidance_failure_counter_ += 1;
                 
@@ -707,8 +708,8 @@ public:
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
+        previous_position_ = position();
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // For debugging: does this boid instance appear to be valid?
     // TODO 20230204 if needed again, should check other invariants.

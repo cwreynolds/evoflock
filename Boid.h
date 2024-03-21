@@ -687,13 +687,45 @@ public:
         return collisions;
     }
 
-    void detectObstacleViolations()
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240320 count steps where ANY boid violates obstacle
+
+//        void detectObstacleViolations()
+//        {
+//            for (Obstacle* obstacle : flock_obstacles())
+//            {
+//                if (obstacle->constraintViolation(position(), previous_position_))
+//                {
+//                    avoidance_failure_counter_ += 1;
+//
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // TODO 20240316 why avoiding sphere but collide with cylinder?
+//                    // TODO 20240311 temp:
+//    //                if (this == flock_boids().at(0))
+//    //                {
+//    //                    std::cout << obstacle->to_string() << " counter=";
+//    //                    std::cout << avoidance_failure_counter_ << " ";
+//    //                    std::cout << obstacle->getExcludeFromAsString();
+//    //                    std::cout << std::endl;
+//    //                }
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                }
+//            }
+//            previous_position_ = position();
+//        }
+
+
+//    void detectObstacleViolations()
+    bool detectObstacleViolations()
     {
+        bool violation = false;
         for (Obstacle* obstacle : flock_obstacles())
         {
             if (obstacle->constraintViolation(position(), previous_position_))
             {
                 avoidance_failure_counter_ += 1;
+                
+                violation = true;
                 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20240316 why avoiding sphere but collide with cylinder?
@@ -709,7 +741,10 @@ public:
             }
         }
         previous_position_ = position();
+        return violation;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // For debugging: does this boid instance appear to be valid?
     // TODO 20230204 if needed again, should check other invariants.

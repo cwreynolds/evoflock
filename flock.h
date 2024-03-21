@@ -401,6 +401,19 @@ public:
             bool speed_ok = util::between(b->speed(), 15, 25);
             if (not speed_ok) { count_speed_violations_whole_sim++; }
         }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240320 count steps where ANY boid violates obstacle
+        for (Boid* b : boids())
+        {
+            if (b->detectObstacleViolations())
+            {
+                any_obstacle_violation_per_step++;
+                break;
+            }
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -435,6 +448,11 @@ public:
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240320 count steps where ANY boid violates obstacle
+    int any_obstacle_violation_per_step = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     int log_stat_interval_ = 100;
     int getLogStatInterval() const { return log_stat_interval_; }
     void setLogStatInterval(int steps) { log_stat_interval_ = steps; }

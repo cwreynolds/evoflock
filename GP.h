@@ -111,9 +111,12 @@ inline FlockParameters init_flock_parameters(double max_force,
     fp.weight_cohere = weight_cohere;
     fp.weight_avoid = weight_avoid;
     fp.max_dist_separate = max_dist_separate_in_body_radii * fp.body_radius;
-    fp.exponent_separate = exponent_separate;
-    fp.exponent_align = exponent_align;
-    fp.exponent_cohere = exponent_cohere;
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20240320 turn off "exponents" they were 1 in the hand tuned set.
+//    fp.exponent_separate = exponent_separate;
+//    fp.exponent_align = exponent_align;
+//    fp.exponent_cohere = exponent_cohere;
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     fp.angle_separate = angle_separate;
     fp.angle_align = angle_align;
     fp.angle_cohere = angle_cohere;
@@ -323,10 +326,16 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
 //    //    double collide = (flock.total_avoid_fail_whole_sim / boid_count);
 //    //    double speed_err = (flock.count_speed_violations_whole_sim / boid_count);
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240320 count steps where ANY boid violates obstacle
+//    double nn_sep_err = flock.count_nn_sep_violations_whole_sim / norm;
+//    double collide    = flock.total_avoid_fail_whole_sim        / norm;
+//    double speed_err  = flock.count_speed_violations_whole_sim  / norm;
     double nn_sep_err = flock.count_nn_sep_violations_whole_sim / norm;
-    double collide    = flock.total_avoid_fail_whole_sim        / norm;
+    double collide    = flock.any_obstacle_violation_per_step / flock.max_simulation_steps();
     double speed_err  = flock.count_speed_violations_whole_sim  / norm;
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
 //    // TODO 20240313 oh! but maybe the "hyperbolic" 1/count is not needed since
 //    //               we now already scale it down to "bad behavior per boid per
@@ -392,7 +401,15 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
 //
 //    double fitness = (nn_sep_fitness * collide_fitness * speed_err_fitness);
     
-    double fitness = nonlin(nn_sep_fitness * collide_fitness * speed_err_fitness);
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20240320 what happens if we ignore all but avoidance fitness?
+//    speed_err = 0;
+//    nn_sep_err = 0;
+//    nn_sep_fitness = 1;
+//    speed_err_fitness = 1;
+
+//    double fitness = nonlin(nn_sep_fitness * collide_fitness * speed_err_fitness);
+    double fitness = nn_sep_fitness * collide_fitness * speed_err_fitness;
 
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     fitness_logger(nn_sep_fitness, nn_sep_err,
@@ -448,12 +465,13 @@ inline double run_flock_simulation(double max_force,
 {
     FlockParameters fp = init_flock_parameters(max_force,
                                                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                               // TODO 20240320 change back
                                                // TODO 20240316 why avoiding sphere
                                                // but collide with cylinder?
-//                                               max_speed,
-//                                               min_speed,
-                                               20,
-                                               20,
+                                               max_speed,
+                                               min_speed,
+//                                               20,
+//                                               20,
                                                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                                speed,
                                                

@@ -373,6 +373,12 @@ public:
         for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
         double ts = fp().min_speed - util::epsilon;
         for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240321 count steps where ANY boid violates speed or separation
+        bool speed_violation_this_step = false;
+        bool seperation_violation_this_step = false;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         total_avoid_fail_whole_sim = 0;
         for (Boid* b : boids())
         {
@@ -395,13 +401,37 @@ public:
             
 //            bool ok = util::between(dist, fp().body_radius * 3, fp().body_radius * 20);
 //            bool nn_sep_ok = util::between(dist / fp().body_radius, 3, 20);
-            bool nn_sep_ok = util::between(dist / fp().body_radius, 6, 12); // Mar 13 2pm
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240321 count steps where ANY boid violates speed or separation
+//            bool nn_sep_ok = util::between(dist / fp().body_radius, 6, 12); // Mar 13 2pm
+
+//            bool nn_sep_ok = dist > (6 * fp().body_radius); // Mar 21
+            bool nn_sep_ok = dist > (3 * fp().body_radius); // Mar 21
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             if (not nn_sep_ok) { count_nn_sep_violations_whole_sim++; }
 
             bool speed_ok = util::between(b->speed(), 15, 25);
             if (not speed_ok) { count_speed_violations_whole_sim++; }
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240321 count steps where ANY boid violates speed or separation
+            if (not nn_sep_ok) { seperation_violation_this_step = true; }
+            if (not speed_ok) { speed_violation_this_step = true; }
+            
+//            debugPrint(util::between(dist / fp().body_radius, 6, 12))
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         }
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240321 count steps where ANY boid violates speed or separation
+        if (seperation_violation_this_step) { any_seperation_violation_per_step++; }
+        if (speed_violation_this_step) { any_speed_violation_per_step++; }
+        
+//        debugPrint(seperation_violation_this_step)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240320 count steps where ANY boid violates obstacle
         for (Boid* b : boids())
@@ -451,6 +481,12 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240320 count steps where ANY boid violates obstacle
     int any_obstacle_violation_per_step = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240321 count steps where ANY boid violates speed or separation
+    int any_speed_violation_per_step = 0;
+    int any_seperation_violation_per_step = 0;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     int log_stat_interval_ = 100;

@@ -319,8 +319,8 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
     // Had been dividing by boid_count.
     // What about 1 / (boid count * step_count)?
     
-    // Normalize down to "count per boid per step".
-    double norm = flock.boid_count() * flock.max_simulation_steps();
+//    // Normalize down to "count per boid per step".
+//    double norm = flock.boid_count() * flock.max_simulation_steps();
     
 //    //    double nn_sep_err = (flock.count_nn_sep_violations_whole_sim / boid_count);
 //    //    double collide = (flock.total_avoid_fail_whole_sim / boid_count);
@@ -328,12 +328,31 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240320 count steps where ANY boid violates obstacle
+    
 //    double nn_sep_err = flock.count_nn_sep_violations_whole_sim / norm;
 //    double collide    = flock.total_avoid_fail_whole_sim        / norm;
 //    double speed_err  = flock.count_speed_violations_whole_sim  / norm;
-    double nn_sep_err = flock.count_nn_sep_violations_whole_sim / norm;
-    double collide    = flock.any_obstacle_violation_per_step / flock.max_simulation_steps();
-    double speed_err  = flock.count_speed_violations_whole_sim  / norm;
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20240321 count steps where ANY boid violates speed or separation
+
+//    double nn_sep_err = flock.count_nn_sep_violations_whole_sim / norm;
+//    double collide    = flock.any_obstacle_violation_per_step / flock.max_simulation_steps();
+//    double speed_err  = flock.count_speed_violations_whole_sim  / norm;
+    
+    double steps = flock.max_simulation_steps();
+    double nn_sep_err = flock.any_seperation_violation_per_step / steps;
+    double collide    = flock.any_obstacle_violation_per_step / steps;
+    double speed_err  = flock.any_speed_violation_per_step  / steps;
+    
+    debugPrint(flock.any_seperation_violation_per_step)
+    debugPrint(flock.any_obstacle_violation_per_step)
+    debugPrint(flock.any_speed_violation_per_step)
+    debugPrint(flock.any_seperation_violation_per_step / steps)
+    debugPrint(flock.any_obstacle_violation_per_step   / steps)
+    debugPrint(flock.any_speed_violation_per_step      / steps)
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
@@ -385,15 +404,45 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
 //    collide_fitness =   util::remap_interval_clip(collide_fitness,   0, 1, 0,    1);
 //    speed_err_fitness = util::remap_interval_clip(speed_err_fitness, 0, 1, 0.75, 1);
     
-    // TODO 20240315 more extreme emphasis on obstacle avoidance
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20240321 turning this off for now (forgot I had it on!)
 
-    nn_sep_fitness =    util::remap_interval_clip(nn_sep_fitness,    0, 1, 0.8, 1);
-    collide_fitness =   util::remap_interval_clip(collide_fitness,   0, 1, 0,   1);
-    speed_err_fitness = util::remap_interval_clip(speed_err_fitness, 0, 1, 0.9, 1);
+    // TODO 20240315 more extreme emphasis on obstacle avoidance
+//    nn_sep_fitness =    util::remap_interval_clip(nn_sep_fitness,    0, 1, 0.8, 1);
+//    collide_fitness =   util::remap_interval_clip(collide_fitness,   0, 1, 0,   1);
+//    speed_err_fitness = util::remap_interval_clip(speed_err_fitness, 0, 1, 0.9, 1);
     
-    // TODO 20240315 experimental non-linearity
-    // (Wolfram Alpha plot: https://tinyurl.com/bdew7a92)
-    auto nonlin = [](double x) { return (x + pow(x, 10)) / 2; };
+    // now back in:
+    
+//    nn_sep_fitness =    util::remap_interval_clip(nn_sep_fitness,    0, 1, 0.8, 1);
+//    collide_fitness =   util::remap_interval_clip(collide_fitness,   0, 1, 0,   1);
+//    speed_err_fitness = util::remap_interval_clip(speed_err_fitness, 0, 1, 0.9, 1);
+    
+    
+    // Adjust weight of one objective's fitness for "product of objective
+    // fitnesses". Each objective fitness is on [0, 1] and serves to modulate
+    // (decrease) other objective fitnesses. This reduces the range of decrease
+    // by mapping the input fitness from [0, 1] to [1-w, 1], that is,
+    // restricting it to the top of the range, hence limiting its contribution
+    // for smaller weights.
+    auto fitness_product_weight_01 = [](double fitness, double weight)
+    {
+        return util::remap_interval_clip(fitness, 0, 1, 1 - weight, 1);
+    };
+
+//    nn_sep_fitness =    fitness_product_weight_01(nn_sep_fitness,    0.2);
+//    collide_fitness =   fitness_product_weight_01(collide_fitness,   1.0);
+//    speed_err_fitness = fitness_product_weight_01(speed_err_fitness, 0.1);
+
+    nn_sep_fitness =    fitness_product_weight_01(nn_sep_fitness,    0.4);
+    collide_fitness =   fitness_product_weight_01(collide_fitness,   1.0);
+    speed_err_fitness = fitness_product_weight_01(speed_err_fitness, 0.2);
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+//    // TODO 20240315 experimental non-linearity
+//    // (Wolfram Alpha plot: https://tinyurl.com/bdew7a92)
+//    auto nonlin = [](double x) { return (x + pow(x, 10)) / 2; };
 
 //    nn_sep_fitness =    nonlin(nn_sep_fitness);
 //    collide_fitness =   nonlin(collide_fitness);
@@ -570,6 +619,10 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
         { "Real_0_100",  0.0, 100.0 },
         { "Real_0_200",  0.0, 200.0 },  // TODO keep?
         { "Real_m1_p1", -1.0,  +1.0 },
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240321 pre-ranging for speed values (is this "cheating"?)
+        { "Real_15_30",  15.0,  30.0 },  // for boid speed values
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     },
     {
         {
@@ -585,10 +638,16 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
             //     TODO should body_radius be held constant at 0.5?
             {
                 "Real_0_100",  // max_force
-                "Real_0_100",  // max_speed
-                "Real_0_100",  // min_speed
-                "Real_0_100",  // speed
-                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20240321 pre-ranging for speed values (is this "cheating"?)
+//                "Real_0_100",  // max_speed
+//                "Real_0_100",  // min_speed
+//                "Real_0_100",  // speed
+                "Real_15_30",  // max_speed
+                "Real_15_30",  // min_speed
+                "Real_15_30",  // speed
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                 "Real_0_100",  // weight_forward
                 "Real_0_100",  // weight_separate
                 "Real_0_100",  // weight_align

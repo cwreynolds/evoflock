@@ -311,58 +311,6 @@ public:
     //                    self.tracking_camera and
     //                    self.selected_boid().is_neighbor(boid))
     
-//        // Fly each boid in flock for one simulation step. Consists of two sequential
-//        // steps to avoid artifacts from order of boids. First a "sense/plan" phase
-//        // which computes the desired steering based on current state. Then an "act"
-//        // phase which actually moves the boids.
-//        void fly_flock(double time_step)
-//        {
-//            for (Boid* boid : boids()) { boid->plan_next_steer(time_step); }
-//            for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
-//            double ts = fp().min_speed - util::epsilon;
-//            for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20240307 working on fitness function
-//
-//
-//            // TOD code stolen from log_stats()
-//
-//    //        double max_nn_dist = 0;
-//    //        int total_avoid_fail = 0;
-//
-//            total_avoid_fail_whole_sim = 0;
-//            for (Boid* b : boids())
-//            {
-//                Boid* n = b->cached_nearest_neighbors().at(0);
-//                double  dist = (b->position() - n->position()).length();
-//    //            if (max_nn_dist < dist) { max_nn_dist = dist; }
-//                if (max_nn_dist_whole_sim < dist) { max_nn_dist_whole_sim = dist; }
-//    //            total_avoid_fail += b->avoidance_failure_counter();
-//
-//                if (min_sep_dist_whole_sim > dist) { min_sep_dist_whole_sim = dist;}
-//
-//                total_avoid_fail_whole_sim += b->avoidance_failure_counter();
-//
-//                sum_all_speed_whole_sim += b->speed();
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20240309 reconsider minsep
-//                double min_dist = fp().body_radius * 3;
-//                if (dist < min_dist) { count_minsep_violations_whole_sim++; }
-//
-//    //            if (dist < min_dist) { debugPrint(count_minsep_violations_whole_sim) }
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            }
-//
-//    //        std::cout << draw().frame_counter() << ": "
-//    //                  << total_avoid_fail_whole_sim << std::endl;
-//
-//
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        }
-
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
     // which computes the desired steering based on current state. Then an "act"
@@ -373,12 +321,9 @@ public:
         for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
         double ts = fp().min_speed - util::epsilon;
         for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240321 count steps where ANY boid violates speed or separation
         bool speed_violation_this_step = false;
         bool seperation_violation_this_step = false;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        bool obstacle_violation_this_step = false;
         total_avoid_fail_whole_sim = 0;
         for (Boid* b : boids())
         {
@@ -387,107 +332,32 @@ public:
             if (max_nn_dist_whole_sim < dist) { max_nn_dist_whole_sim = dist; }
             if (min_sep_dist_whole_sim > dist) { min_sep_dist_whole_sim = dist;}
             total_avoid_fail_whole_sim += b->avoidance_failure_counter();
-            
-//            sum_all_speed_whole_sim += b->speed();
-            
-//            double min_dist = fp().body_radius * 3;
-//            if (dist < min_dist) { count_minsep_violations_whole_sim++; }
-//            if (util::between(dist,
-//                              fp().body_radius * 3,
-//                              fp().body_radius * 20))
-//            {
-//                count_nn_sep_violations_whole_sim++;
-//            }
-            
-//            bool ok = util::between(dist, fp().body_radius * 3, fp().body_radius * 20);
-//            bool nn_sep_ok = util::between(dist / fp().body_radius, 3, 20);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240321 count steps where ANY boid violates speed or separation
-//            bool nn_sep_ok = util::between(dist / fp().body_radius, 6, 12); // Mar 13 2pm
-
-//            bool nn_sep_ok = dist > (6 * fp().body_radius); // Mar 21
             bool nn_sep_ok = dist > (3 * fp().body_radius); // Mar 21
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
             if (not nn_sep_ok) { count_nn_sep_violations_whole_sim++; }
-
             bool speed_ok = util::between(b->speed(), 15, 25);
             if (not speed_ok) { count_speed_violations_whole_sim++; }
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240321 count steps where ANY boid violates speed or separation
             if (not nn_sep_ok) { seperation_violation_this_step = true; }
             if (not speed_ok) { speed_violation_this_step = true; }
-            
-//            debugPrint(util::between(dist / fp().body_radius, 6, 12))
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+            if (b->detectObstacleViolations()){obstacle_violation_this_step=true;}
         }
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240321 count steps where ANY boid violates speed or separation
         if (seperation_violation_this_step) { any_seperation_violation_per_step++; }
         if (speed_violation_this_step) { any_speed_violation_per_step++; }
-        
-//        debugPrint(seperation_violation_this_step)
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240320 count steps where ANY boid violates obstacle
-        for (Boid* b : boids())
-        {
-            if (b->detectObstacleViolations())
-            {
-                any_obstacle_violation_per_step++;
-                break;
-            }
-        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+        if (obstacle_violation_this_step) { any_obstacle_violation_per_step++; }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240307 working on fitness function
-    
-    // do I want accessors for these?
-    
+    // TODO 20240307 do I want accessors for these?
     // The least separation over all boids on all simulation steps.
     double min_sep_dist_whole_sim = std::numeric_limits<double>::infinity();
-    
     // Largest separation over all boids on all simulation steps.
     double max_nn_dist_whole_sim = 0;
-
     // Count obstacle avoidance failures over all boids on all simulation steps.
     // (Computed anew each step by summing each boid's lifetime count.)
     int total_avoid_fail_whole_sim = 0;
-    
-//    // Average speed over all boids on all simulation steps.
-//    int sum_all_speed_whole_sim = 0;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240309 reconsider minsep
-    
-//    int count_minsep_violations_whole_sim = 0;
     int count_nn_sep_violations_whole_sim = 0;
-
-    
-    
     int count_speed_violations_whole_sim = 0;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240320 count steps where ANY boid violates obstacle
     int any_obstacle_violation_per_step = 0;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240321 count steps where ANY boid violates speed or separation
     int any_speed_violation_per_step = 0;
     int any_seperation_violation_per_step = 0;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     int log_stat_interval_ = 100;
     int getLogStatInterval() const { return log_stat_interval_; }
@@ -496,7 +366,6 @@ public:
     // Calculate and log various statistics for flock.
     void log_stats()
     {
-//        if ((not simulation_paused_) and (draw().frame_counter() % 100 == 0))
         if ((not simulation_paused_) and
             (draw().frame_counter() % getLogStatInterval() == 0))
         {
@@ -672,11 +541,6 @@ public:
         
     void pre_defined_obstacle_sets()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240309 WIP inside/outside-ness for Obstacles
-
-//        obstacles().push_back(new EvertedSphereObstacle(fp().sphere_radius,
-//                                                        fp().sphere_center));
         obstacles().push_back(new EvertedSphereObstacle(fp().sphere_radius,
                                                         fp().sphere_center,
                                                         Obstacle::outside));
@@ -685,15 +549,8 @@ public:
         double ecr = fp().sphere_radius;
         Vec3 ect = fp().sphere_center + Vec3(ecr * 0.6, ecr, 0);
         Vec3 ecb = fp().sphere_center + Vec3(ecr * 0.6, -ecr, 0);
-//        obstacles().push_back(new CylinderObstacle(ecr * 0.2, ect, ecb));
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240316 why avoiding sphere but collide with cylinder?
         obstacles().push_back(new CylinderObstacle(ecr * 0.2, ect, ecb,
                                                    Obstacle::inside));
-//        obstacles().push_back(new CylinderObstacle(ecr * 0.5, ect, ecb,
-//                                                   Obstacle::inside));
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

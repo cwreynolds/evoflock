@@ -28,18 +28,6 @@ inline float evoflock_fitness_function(LazyPredator::Individual* individual)
 }
 
 
-
-//    fitness_logger(nn_sep_fitness, nn_sep_err,
-//                   collide_fitness, collide,
-//                   ave_speed_fitness, ave_speed,
-//                   fitness);
-
-
-// TODO 20240309 temp?
-//void fitness_logger(double nn_sep_fitness, double nn_sep_err,
-//                    double collide_fitness, double collide,
-//                    double ave_speed_fitness, double ave_speed,
-//                    double fitness)
 void fitness_logger(double nn_sep_fitness, double nn_sep_err,
                     double collide_fitness, double collide,
                     double speed_err_fitness, double speed_err,
@@ -57,11 +45,8 @@ void fitness_logger(double nn_sep_fitness, double nn_sep_err,
         if (raw > -1) { std::cout << " (" << raw <<  ")"; }
         std::cout << std::endl;
     };
-//    print("    minsep    ", minsep_fitness,    minsep);
-//    print("    maxsep    ", maxsep_fitness,    maxsep);
     print("    nn_sep_err", nn_sep_fitness,    nn_sep_err);
     print("    collide   ", collide_fitness,   collide);
-//    print("    ave_speed ", ave_speed_fitness, ave_speed);
     print("    speed_err ", speed_err_fitness, speed_err);
     print("    fitness   ", fitness);
     std::cout << std::endl;
@@ -92,13 +77,10 @@ inline FlockParameters init_flock_parameters(double max_force,
                                              
                                              double angle_separate,
                                              double angle_align,
-                                             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                             // TODO 20240318 move more values to FlockParameters.
-//                                             double angle_cohere)
                                              double angle_cohere,
+                                             
                                              double fly_away_max_dist_in_br,
                                              double min_time_to_collide)
-                                             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     FlockParameters fp;
     fp.max_force = max_force;
@@ -111,20 +93,14 @@ inline FlockParameters init_flock_parameters(double max_force,
     fp.weight_cohere = weight_cohere;
     fp.weight_avoid = weight_avoid;
     fp.max_dist_separate = max_dist_separate_in_body_radii * fp.body_radius;
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20240320 turn off "exponents" they were 1 in the hand tuned set.
-//    fp.exponent_separate = exponent_separate;
-//    fp.exponent_align = exponent_align;
-//    fp.exponent_cohere = exponent_cohere;
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    //fp.exponent_separate = exponent_separate;  // stay at 1 like in hand-tuned
+    //fp.exponent_align = exponent_align;        // stay at 1 like in hand-tuned
+    //fp.exponent_cohere = exponent_cohere;      // stay at 1 like in hand-tuned
     fp.angle_separate = angle_separate;
     fp.angle_align = angle_align;
     fp.angle_cohere = angle_cohere;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240318 move more values to FlockParameters.
     fp.fly_away_max_dist_in_br = fly_away_max_dist_in_br;
     fp.min_time_to_collide = min_time_to_collide;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     return fp;
 }
 
@@ -135,211 +111,44 @@ inline void init_flock(Flock& flock)
     flock.set_boid_count(200);
     flock.set_fixed_fps(30);
     flock.set_fixed_time_step(true);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240316 why avoiding sphere but collide with cylinder?
-//    flock.set_max_simulation_steps(1000);
-//    flock.setLogStatInterval(1000);
-//    flock.set_max_simulation_steps(10);
-//    flock.set_max_simulation_steps(200);
     flock.set_max_simulation_steps(1000);
     flock.setLogStatInterval(flock.max_simulation_steps());
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     flock.setSaveBoidCenters(false);
     flock.log_prefix = "    ";
 }
 
 
-//    inline double measure_fitness_after_flock_simulation(const Flock& flock)
-//    {
-//        // Compute fitness and return it as value of GpTree.
-//        double tiny = 0.1;
-//
-//        double boid_count = flock.boid_count();
-//
-//    //    double minsep = (flock.count_minsep_violations_whole_sim / boid_count);
-//    //    double maxsep = flock.max_nn_dist_whole_sim;
-//
-//        double nn_sep_err = (flock.count_nn_sep_violations_whole_sim / boid_count);
-//
-//        double collide = (flock.total_avoid_fail_whole_sim / boid_count);
-//
-//        double speed_err = (flock.count_speed_violations_whole_sim / boid_count);
-//
-//
-//    //    double minsep_limit = flock.fp().body_radius * 6; // TODO ad hoc
-//    //    double maxsep_limit = flock.fp().body_radius * 30; // TODO ad hoc
-//
-//        // For plot of this see: https://bitly.ws/3fqEu
-//        auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
-//
-//    //    double minsep_fitness = util::remap_interval_clip(inv_count_01(minsep),
-//    //                                                      0, 1,
-//    //                                                      tiny, 1);
-//    //    double maxsep_fitness = util::remap_interval_clip(maxsep,
-//    //                                                      minsep_limit, maxsep_limit,
-//    //                                                      1, tiny);
-//    //    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//    //    // TODO 20240310 disable maxsep
-//    //    maxsep_fitness = 1;
-//    //    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//
-//        double nn_sep_fitness = util::remap_interval_clip(inv_count_01(nn_sep_err),
-//                                                          0, 1,
-//                                                          tiny, 1);
-//
-//
-//
-//        double collide_fitness = util::remap_interval_clip(inv_count_01(collide),
-//                                                           0, 1,
-//                                                           tiny, 1);
-//
-//    //    double ave_speed = (flock.sum_all_speed_whole_sim /
-//    //                        (flock.max_simulation_steps() * flock.boid_count()));
-//
-//
-//
-//
-//        // TODO 20 is roughly the target speed.
-//    //    double ave_speed_fitness = util::remap_interval_clip(ave_speed, 0, 20, tiny, 1);
-//        double speed_err_fitness = util::remap_interval_clip(inv_count_01(speed_err),
-//                                                             0, 1,
-//                                                             tiny, 1);
-//
-//
-//    //    double fitness = (minsep_fitness *
-//    //                      maxsep_fitness *
-//    //                      collide_fitness *
-//    //                      ave_speed_fitness);
-//    //    double fitness = (nn_sep_fitness *
-//    //                      collide_fitness *
-//    //                      ave_speed_fitness);
-//        double fitness = (nn_sep_fitness *
-//                          collide_fitness *
-//                          speed_err_fitness);
-//    //    fitness_logger(minsep_fitness, minsep,
-//    //                   maxsep_fitness, maxsep,
-//    //                   collide_fitness, collide,
-//    //                   ave_speed_fitness, ave_speed,
-//    //                   fitness);
-//    //    fitness_logger(nn_sep_fitness, nn_sep_err,
-//    //                   collide_fitness, collide,
-//    //                   ave_speed_fitness, ave_speed,
-//    //                   fitness);
-//        fitness_logger(nn_sep_fitness, nn_sep_err,
-//                       collide_fitness, collide,
-//                       speed_err_fitness, speed_err,
-//                       fitness);
-//
-//        return fitness;
-//
-//    }
-
-
-//    inline double measure_fitness_after_flock_simulation(const Flock& flock)
-//    {
-//        // Compute fitness and return it as value of GpTree.
-//        double tiny = 0.1;
-//    //    double boid_count = flock.boid_count();
-//
-//        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//        // TODO 20240313 these values seem to be so large that the fitness values
-//        // are all very close to 0. Trying to find some principled way to scale them
-//        // down.
-//        // Had been dividing by boid_count.
-//        // What about 1 / (boid count * step_count)?
-//
-//        // Normalize down to "count per boid per step".
-//        double norm = flock.boid_count() * flock.max_simulation_steps();
-//
-//    //    double nn_sep_err = (flock.count_nn_sep_violations_whole_sim / boid_count);
-//    //    double collide = (flock.total_avoid_fail_whole_sim / boid_count);
-//    //    double speed_err = (flock.count_speed_violations_whole_sim / boid_count);
-//
-//        double nn_sep_err = flock.count_nn_sep_violations_whole_sim / norm;
-//        double collide    = flock.total_avoid_fail_whole_sim        / norm;
-//        double speed_err  = flock.count_speed_violations_whole_sim  / norm;
-//
-//
-//        // TODO 20240313 oh! but maybe the "hyperbolic" 1/count is not needed since
-//        //               we now already scale it down to "bad behavior per boid per
-//        //               step" which is already on [0, 1]
-//        //
-//        //               For a multi-agent simulation we can count the good (or bad)
-//        //               outcomes each step for each agent. Then “normalize” that
-//        //               count by dividing it by agent count times step count. This
-//        //               is then a number on [0,1] averaging the good/bad events.
-//        //
-//        // Wait, I saw this go by (20240313):
-//        //     speed_err   0.550000 (1.000000)
-//        // Why isn't that 0.5?
-//        // Oh, its from the "tiny" isn't it?
-//        //
-//        // Move this to util, add unit tests
-//        // For plot of this see: https://bitly.ws/3fqEu
+//    // Move this to util, add unit tests
+//    // For plot of this see: https://bitly.ws/3fqEu
 //    //    auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
-//
-//        auto inv_count_01 = [](double count)
-//        {
-//            assert (count >= 0);
-//            return  1.0 / (count + 1);
-//        };
-//
-//        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//        double nn_sep_fitness = util::remap_interval_clip(inv_count_01(nn_sep_err),
-//                                                          0, 1,
-//                                                          tiny, 1);
-//        double collide_fitness = util::remap_interval_clip(inv_count_01(collide),
-//                                                           0, 1,
-//                                                           tiny, 1);
-//        double speed_err_fitness = util::remap_interval_clip(inv_count_01(speed_err),
-//                                                             0, 1,
-//                                                             tiny, 1);
-//        double fitness = (nn_sep_fitness *
-//                          collide_fitness *
-//                          speed_err_fitness);
-//        fitness_logger(nn_sep_fitness, nn_sep_err,
-//                       collide_fitness, collide,
-//                       speed_err_fitness, speed_err,
-//                       fitness);
-//        return fitness;
-//
-//    }
 
+
+//    // Experimental non-linearity
+//    // (Wolfram Alpha plot: https://tinyurl.com/bdew7a92)
+//    auto nonlin = [](double x) { return (x + pow(x, 10)) / 2; };
+
+
+// Flip the 0-to-1 range, but remap so [0,1] goes to [1,tiny]
+inline double flip_and_keep_above_zero(double fitness_01, double tiny = 0.1)
+{
+    return util::remap_interval_clip(fitness_01, 0, 1, 1, tiny);
+}
+
+
+// Adjust weight of one objective's fitness for "product of objective fitnesses".
+// Each objective fitness is on [0, 1] and serves to modulate (decrease) other
+// objective fitnesses. This reduces the range of decrease by mapping the input
+// fitness from [0, 1] to [1-w, 1], that is, restricting it to the top of the
+// range, hence limiting its contribution for smaller weights.
+double fitness_product_weight_01(double fitness, double weight)
+{
+    return util::remap_interval_clip(fitness, 0, 1, 1 - weight, 1);
+};
+
+
+// Compute fitness and return it as value of GpTree.
 inline double measure_fitness_after_flock_simulation(const Flock& flock)
 {
-    // Compute fitness and return it as value of GpTree.
-    double tiny = 0.1;
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20240313 these values seem to be so large that the fitness values
-    // are all very close to 0. Trying to find some principled way to scale them
-    // down.
-    // Had been dividing by boid_count.
-    // What about 1 / (boid count * step_count)?
-    
-//    // Normalize down to "count per boid per step".
-//    double norm = flock.boid_count() * flock.max_simulation_steps();
-    
-//    //    double nn_sep_err = (flock.count_nn_sep_violations_whole_sim / boid_count);
-//    //    double collide = (flock.total_avoid_fail_whole_sim / boid_count);
-//    //    double speed_err = (flock.count_speed_violations_whole_sim / boid_count);
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240320 count steps where ANY boid violates obstacle
-    
-//    double nn_sep_err = flock.count_nn_sep_violations_whole_sim / norm;
-//    double collide    = flock.total_avoid_fail_whole_sim        / norm;
-//    double speed_err  = flock.count_speed_violations_whole_sim  / norm;
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20240321 count steps where ANY boid violates speed or separation
-
-//    double nn_sep_err = flock.count_nn_sep_violations_whole_sim / norm;
-//    double collide    = flock.any_obstacle_violation_per_step / flock.max_simulation_steps();
-//    double speed_err  = flock.count_speed_violations_whole_sim  / norm;
-    
     double steps = flock.max_simulation_steps();
     double nn_sep_err = flock.any_seperation_violation_per_step / steps;
     double collide    = flock.any_obstacle_violation_per_step / steps;
@@ -352,115 +161,15 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
     debugPrint(flock.any_obstacle_violation_per_step   / steps)
     debugPrint(flock.any_speed_violation_per_step      / steps)
 
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-//    // TODO 20240313 oh! but maybe the "hyperbolic" 1/count is not needed since
-//    //               we now already scale it down to "bad behavior per boid per
-//    //               step" which is already on [0, 1]
-//    //
-//    //               For a multi-agent simulation we can count the good (or bad)
-//    //               outcomes each step for each agent. Then “normalize” that
-//    //               count by dividing it by agent count times step count. This
-//    //               is then a number on [0,1] averaging the good/bad events.
-//    //
-//    // Wait, I saw this go by (20240313):
-//    //     speed_err   0.550000 (1.000000)
-//    // Why isn't that 0.5?
-//    // Oh, its from the "tiny" isn't it?
-//    //
-//    // Move this to util, add unit tests
-//    // For plot of this see: https://bitly.ws/3fqEu
-//    //    auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
-//    
-//    auto inv_count_01 = [](double count)
-//    {
-//        assert (count >= 0);
-//        return  1.0 / (count + 1);
-//    };
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    
-//    double nn_sep_fitness = util::remap_interval_clip(inv_count_01(nn_sep_err),
-//                                                      0, 1,
-//                                                      tiny, 1);
-//    double collide_fitness = util::remap_interval_clip(inv_count_01(collide),
-//                                                       0, 1,
-//                                                       tiny, 1);
-//    double speed_err_fitness = util::remap_interval_clip(inv_count_01(speed_err),
-//                                                         0, 1,
-//                                                         tiny, 1);
-
-    double nn_sep_fitness = util::remap_interval_clip(nn_sep_err, 0, 1, 1, tiny);
-    double collide_fitness = util::remap_interval_clip(collide, 0, 1, 1, tiny);
-    double speed_err_fitness = util::remap_interval_clip(speed_err, 0, 1, 1, tiny);
-    
-    
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20240314 try per-fitness-factor weightings
-    
-//    nn_sep_fitness =    util::remap_interval_clip(nn_sep_fitness,    0, 1, 0.5,  1);
-//    collide_fitness =   util::remap_interval_clip(collide_fitness,   0, 1, 0,    1);
-//    speed_err_fitness = util::remap_interval_clip(speed_err_fitness, 0, 1, 0.75, 1);
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20240321 turning this off for now (forgot I had it on!)
-
-    // TODO 20240315 more extreme emphasis on obstacle avoidance
-//    nn_sep_fitness =    util::remap_interval_clip(nn_sep_fitness,    0, 1, 0.8, 1);
-//    collide_fitness =   util::remap_interval_clip(collide_fitness,   0, 1, 0,   1);
-//    speed_err_fitness = util::remap_interval_clip(speed_err_fitness, 0, 1, 0.9, 1);
-    
-    // now back in:
-    
-//    nn_sep_fitness =    util::remap_interval_clip(nn_sep_fitness,    0, 1, 0.8, 1);
-//    collide_fitness =   util::remap_interval_clip(collide_fitness,   0, 1, 0,   1);
-//    speed_err_fitness = util::remap_interval_clip(speed_err_fitness, 0, 1, 0.9, 1);
-    
-    
-    // Adjust weight of one objective's fitness for "product of objective
-    // fitnesses". Each objective fitness is on [0, 1] and serves to modulate
-    // (decrease) other objective fitnesses. This reduces the range of decrease
-    // by mapping the input fitness from [0, 1] to [1-w, 1], that is,
-    // restricting it to the top of the range, hence limiting its contribution
-    // for smaller weights.
-    auto fitness_product_weight_01 = [](double fitness, double weight)
-    {
-        return util::remap_interval_clip(fitness, 0, 1, 1 - weight, 1);
-    };
-
-//    nn_sep_fitness =    fitness_product_weight_01(nn_sep_fitness,    0.2);
-//    collide_fitness =   fitness_product_weight_01(collide_fitness,   1.0);
-//    speed_err_fitness = fitness_product_weight_01(speed_err_fitness, 0.1);
+    double nn_sep_fitness    = flip_and_keep_above_zero(nn_sep_err);
+    double collide_fitness   = flip_and_keep_above_zero(collide);
+    double speed_err_fitness = flip_and_keep_above_zero(speed_err);
 
     nn_sep_fitness =    fitness_product_weight_01(nn_sep_fitness,    0.4);
     collide_fitness =   fitness_product_weight_01(collide_fitness,   1.0);
     speed_err_fitness = fitness_product_weight_01(speed_err_fitness, 0.2);
 
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-//    // TODO 20240315 experimental non-linearity
-//    // (Wolfram Alpha plot: https://tinyurl.com/bdew7a92)
-//    auto nonlin = [](double x) { return (x + pow(x, 10)) / 2; };
-
-//    nn_sep_fitness =    nonlin(nn_sep_fitness);
-//    collide_fitness =   nonlin(collide_fitness);
-//    speed_err_fitness = nonlin(speed_err_fitness);
-//
-//    double fitness = (nn_sep_fitness * collide_fitness * speed_err_fitness);
-    
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20240320 what happens if we ignore all but avoidance fitness?
-//    speed_err = 0;
-//    nn_sep_err = 0;
-//    nn_sep_fitness = 1;
-//    speed_err_fitness = 1;
-
-//    double fitness = nonlin(nn_sep_fitness * collide_fitness * speed_err_fitness);
     double fitness = nn_sep_fitness * collide_fitness * speed_err_fitness;
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     fitness_logger(nn_sep_fitness, nn_sep_err,
                    collide_fitness, collide,
                    speed_err_fitness, speed_err,
@@ -504,36 +213,20 @@ inline double run_flock_simulation(double max_force,
                                    double angle_align,
                                    double angle_cohere,
 
-                                   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                   // TODO 20240318 move more values to FlockParameters.
                                    double fly_away_max_dist_in_br,
                                    double min_time_to_collide,
-                                   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
                                    bool write_flock_data_file = false)
 {
     FlockParameters fp = init_flock_parameters(max_force,
-                                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                               // TODO 20240320 change back
-                                               // TODO 20240316 why avoiding sphere
-                                               // but collide with cylinder?
                                                max_speed,
                                                min_speed,
-//                                               20,
-//                                               20,
-                                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                                speed,
                                                
                                                weight_forward,
                                                weight_separate,
                                                weight_align,
                                                weight_cohere,
-                                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                               // TODO 20240316 why avoiding sphere
-                                               // but collide with cylinder?
                                                weight_avoid,
-//                                               100,  // QQQQQQQQQQQQQQQQQQQQQQQQ
-                                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                                                max_dist_separate_in_body_radii,
                                                
@@ -543,14 +236,10 @@ inline double run_flock_simulation(double max_force,
                                                
                                                angle_separate,
                                                angle_align,
-                                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                               // TODO 20240318 move more values to FlockParameters.
-//                                               angle_cohere);
                                                angle_cohere,
+
                                                fly_away_max_dist_in_br,
                                                min_time_to_collide);
-                                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     return run_flock_simulation(fp, write_flock_data_file);
 }
 
@@ -582,18 +271,15 @@ inline float rerun_flock_simulation(const LazyPredator::Individual* individual)
                                 t.evalSubtree<double>(12),
                                 t.evalSubtree<double>(13),
                                 t.evalSubtree<double>(14),
-                                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                // TODO 20240318 move more values to FlockParameters.
                                 t.evalSubtree<double>(15),
                                 t.evalSubtree<double>(16),
                                 t.evalSubtree<double>(17),
-                                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                 true);  // write flock data file
 }
 
 
 
-// TODO 20240304 so for example, here is the first random tree from:
+// So for example, here is the first random tree from:
 //
 //     int max_tree_size = 20;
 //     std::string root_type = "Fitness_0_1";
@@ -619,10 +305,8 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
         { "Real_0_100",  0.0, 100.0 },
         { "Real_0_200",  0.0, 200.0 },  // TODO keep?
         { "Real_m1_p1", -1.0,  +1.0 },
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240321 pre-ranging for speed values (is this "cheating"?)
         { "Real_15_30",  15.0,  30.0 },  // for boid speed values
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     },
     {
         {
@@ -638,15 +322,9 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
             //     TODO should body_radius be held constant at 0.5?
             {
                 "Real_0_100",  // max_force
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240321 pre-ranging for speed values (is this "cheating"?)
-//                "Real_0_100",  // max_speed
-//                "Real_0_100",  // min_speed
-//                "Real_0_100",  // speed
                 "Real_15_30",  // max_speed
                 "Real_15_30",  // min_speed
                 "Real_15_30",  // speed
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 "Real_0_100",  // weight_forward
                 "Real_0_100",  // weight_separate
@@ -669,11 +347,8 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
                 "Real_m1_p1",  // angle_align
                 "Real_m1_p1",  // angle_cohere
                 
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240318 move more values to FlockParameters.
                 "Real_0_100", // fly_away_max_dist_in_br
                 "Real_0_10",  // min_time_to_collide
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             },
             
             // Evaluation function, which runs a flock simulation with the given
@@ -695,13 +370,9 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
                                                     t.evalSubtree<double>(12),
                                                     t.evalSubtree<double>(13),
                                                     t.evalSubtree<double>(14),
-                                                    //~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                                    // TODO 20240318 move more values to FlockParameters.
-//                                                    t.evalSubtree<double>(15));
                                                     t.evalSubtree<double>(15),
                                                     t.evalSubtree<double>(16),
                                                     t.evalSubtree<double>(17));
-                                                    //~~~~~~~~~~~~~~~~~~~~~~~~~~
                 return std::any(fitness);
             }
         }

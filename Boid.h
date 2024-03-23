@@ -84,15 +84,12 @@ public:
     double angle_separate = -0.707;  // 135°
     double angle_align    =  0.940;  // 20°
     double angle_cohere   =  0;      // 90°
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240318 move more values to FlockParameters.
     double fly_away_max_dist_in_br = 20;  // max fly-away dist from obs surface
     double min_time_to_collide = 0.8;     // react to predicted impact (seconds)
 
     // Historical holdovers, no longer used.
     bool wrap_vs_avoid = false;   // always false
     bool avoid_blend_mode = true; // obstacle avoid: blend vs hard switch
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 class Flock;
@@ -139,18 +136,6 @@ private:  // move to bottom of class later
     std::string name_;
     static inline int name_counter_ = 0;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240318 move more values to FlockParameters.
-
-    // TODO 20240131 temp work-around to avoid Flock/Boid definition cycle
-    //               The first three of these easily belong in FlockParameters.
-    //               What about the lists of boids and obtacles?
-//    bool flock_wrap_vs_avoid = false;
-//    double flock_min_time_to_collide = 0.8;  // react to predicted impact (seconds)
-//    bool flock_avoid_blend_mode = true; // obstacle avoid: blend vs hard switch
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 public:
     // Accessors
     BoidPtrList& flock_boids() { return *flock_boids_; }
@@ -217,15 +202,6 @@ public:
     // (an animation frame) for one boid in a flock.
     Vec3 steer_to_flock(double time_step)
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240316 why avoiding sphere but collide with cylinder?
-//        if (this == flock_boids().at(0))
-//        {
-//            std::cout << draw().frame_counter()
-//                      << " ----------------------------------------------------"
-//                      << std::endl;
-//        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         BoidPtrList neighbors = nearest_neighbors(time_step);
         Vec3 f = forward() * fp().weight_forward;
         Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
@@ -235,10 +211,6 @@ public:
         Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
         combined_steering = anti_stall_adjustment(combined_steering);
         annotation(s, a, c, o, combined_steering);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240311 add Boid::detectObstacleViolations()
-        detectObstacleViolations();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return combined_steering;
     }
     
@@ -303,11 +275,7 @@ public:
     {
         Vec3 avoid;
         avoid_obstacle_annotation(0, Vec3::none(), 0);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240318 move more values to FlockParameters.
-//        if (not flock_wrap_vs_avoid)
         if (not fp().wrap_vs_avoid)
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             Vec3 predict_avoid = steer_for_predictive_avoidance();
             Vec3 static_avoid = fly_away_from_obstacles();
@@ -330,18 +298,10 @@ public:
             Vec3 normal = first_collision.normal_at_poi;
             Vec3 pure_steering = pure_lateral_steering(normal);
             avoidance = pure_steering.normalize();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240318 move more values to FlockParameters.
-//            double min_dist = speed() * flock_min_time_to_collide;
             double min_dist = speed() * fp().min_time_to_collide;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // Near enough to require avoidance steering?
             bool near = min_dist > first_collision.dist_to_collision;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240318 move more values to FlockParameters.
-//            if (flock_avoid_blend_mode)
             if (fp().avoid_blend_mode)
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             {
                 // Smooth weight transition from 80% to 120% of min dist.
                 double d = util::remap_interval(first_collision.dist_to_collision,
@@ -354,22 +314,6 @@ public:
                 weight = near ? 1 : 0;
             }
             avoid_obstacle_annotation(1, poi, weight);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240316 why avoiding sphere but collide with cylinder?
-//            if (this == flock_boids().at(0))
-//            {
-//                std::cout << "avoiding "
-//                          << first_collision.obstacle->to_string()
-//                          << " (avoidance=" << avoidance
-//                          << " weight=" << weight << ")"
-//                
-//                          << " min_dist=" << min_dist
-//                          << " min_dist*0.8=" << min_dist * 0.8
-//                          << " min_dist*1.2=" << min_dist * 1.2
-//
-//                          << std::endl;
-//            }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         return avoidance * weight;
     }
@@ -381,11 +325,7 @@ public:
         Vec3 avoidance;
         Vec3 p = position();
         Vec3 f = forward();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240318 move more values to FlockParameters.
-//        double max_distance = fp().body_radius * 20;  // TODO tuning parameter?
         double max_distance = fp().body_radius * fp().fly_away_max_dist_in_br;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for (Obstacle* obstacle : flock_obstacles())
         {
             Vec3 oa = obstacle->fly_away(p, f, max_distance, fp().body_radius);
@@ -575,78 +515,6 @@ public:
         return up_memory_.value.normalize();
     }
 
-//        // Returns a list of future collisions sorted by time, with soonest first.
-//        // (Maintains avoidance_failure_counter_ and last_sdf_per_obstacle_ map.)
-//        CollisionList predict_future_collisions()
-//        {
-//            CollisionList collisions;
-//            for (Obstacle* obstacle : flock_obstacles())
-//            {
-//                Vec3 point_of_impact = obstacle->ray_intersection(position(),
-//                                                                  forward(),
-//                                                                  fp().body_radius);
-//                if (not point_of_impact.is_none())
-//                {
-//                    double dist_to_collision = (point_of_impact - position()).length();
-//                    double time_to_collision = dist_to_collision / speed();
-//                    Vec3 normal_at_poi = obstacle->normal_at_poi(point_of_impact,
-//                                                                 position());
-//                    collisions.push_back(Collision(*obstacle,
-//                                                   time_to_collision,
-//                                                   dist_to_collision,
-//                                                   point_of_impact,
-//                                                   normal_at_poi));
-//
-//
-//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                    // TODO 20240311 add Boid::detectObstacleViolations()
-//
-//    //                // If we encountered this obstacle before, check for collision.
-//    //                double current_sdf = obstacle->signed_distance(position());
-//    //                if (last_sdf_per_obstacle_.count(obstacle))
-//    //                {
-//    //                    double previous_sdf = last_sdf_per_obstacle_[obstacle];
-//    //                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //                    // TODO 20240309 WIP inside/outside-ness for Obstacles
-//    //
-//    //                    auto ef = obstacle->getExcludeFrom();
-//    //                    if (util::zero_crossing(current_sdf, previous_sdf) or
-//    //                        ((current_sdf < 0) and (ef == Obstacle::inside)) or
-//    //                        ((current_sdf > 0) and (ef == Obstacle::outside)))
-//    //                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //                    {
-//    //                        avoidance_failure_counter_ += 1;
-//    //                        //std::cout << "  " + (name() + ":       ").substr(0,11)
-//    //                        //    << avoidance_failure_counter_ << " ["
-//    //                        //    << std::to_string(previous_sdf).substr(0,5) << " "
-//    //                        //    << std::to_string(current_sdf).substr(0,5) << "] "
-//    //                        //    << obstacle->to_string() << std::endl;
-//    //
-//    //                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//    //                        // TODO 20240310 log failures
-//    //
-//    //                        if (this == flock_boids().at(0))
-//    //                        {
-//    //                            std::cout << draw().frame_counter() << ": ";
-//    //                            std::cout << obstacle->to_string() << " counter=";
-//    //                            std::cout << avoidance_failure_counter_ << " ";
-//    //                            std::cout << obstacle->getExcludeFromAsString();
-//    //                            std::cout << std::endl;
-//    //                        }
-//    //
-//    //                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//    //                    }
-//    //                }
-//    //                last_sdf_per_obstacle_[obstacle] = current_sdf;
-//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                }
-//            }
-//            auto sorted = [&](const Collision& a, const Collision& b)
-//                { return a.time_to_collision < b.time_to_collision; };
-//            std::sort(collisions.begin(), collisions.end(), sorted);
-//            return collisions;
-//        }
-
     // Returns a list of future collisions sorted by time, with soonest first.
     // (Maintains avoidance_failure_counter_ and last_sdf_per_obstacle_ map.)
     CollisionList predict_future_collisions()
@@ -668,17 +536,6 @@ public:
                                                dist_to_collision,
                                                point_of_impact,
                                                normal_at_poi));
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240316 why avoiding sphere but collide with cylinder?
-//                if (this == flock_boids().at(0))
-//                {
-//                    std::cout << obstacle->to_string();
-//                    std::cout << ", dist_to_collision=" << dist_to_collision;
-//                    std::cout << std::endl;
-//                }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
             }
         }
         auto sorted = [&](const Collision& a, const Collision& b)
@@ -687,35 +544,6 @@ public:
         return collisions;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240320 count steps where ANY boid violates obstacle
-
-//        void detectObstacleViolations()
-//        {
-//            for (Obstacle* obstacle : flock_obstacles())
-//            {
-//                if (obstacle->constraintViolation(position(), previous_position_))
-//                {
-//                    avoidance_failure_counter_ += 1;
-//
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    // TODO 20240316 why avoiding sphere but collide with cylinder?
-//                    // TODO 20240311 temp:
-//    //                if (this == flock_boids().at(0))
-//    //                {
-//    //                    std::cout << obstacle->to_string() << " counter=";
-//    //                    std::cout << avoidance_failure_counter_ << " ";
-//    //                    std::cout << obstacle->getExcludeFromAsString();
-//    //                    std::cout << std::endl;
-//    //                }
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                }
-//            }
-//            previous_position_ = position();
-//        }
-
-
-//    void detectObstacleViolations()
     bool detectObstacleViolations()
     {
         bool violation = false;
@@ -724,27 +552,12 @@ public:
             if (obstacle->constraintViolation(position(), previous_position_))
             {
                 avoidance_failure_counter_ += 1;
-                
                 violation = true;
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240316 why avoiding sphere but collide with cylinder?
-                // TODO 20240311 temp:
-//                if (this == flock_boids().at(0))
-//                {
-//                    std::cout << obstacle->to_string() << " counter=";
-//                    std::cout << avoidance_failure_counter_ << " ";
-//                    std::cout << obstacle->getExcludeFromAsString();
-//                    std::cout << std::endl;
-//                }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
         previous_position_ = position();
         return violation;
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // For debugging: does this boid instance appear to be valid?
     // TODO 20230204 if needed again, should check other invariants.

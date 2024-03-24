@@ -310,7 +310,24 @@ int main(int argc, const char * argv[])
     
     run_unit_tests();
 
+    
+    
     //--------------------------------------------------------------------------
+//    OccupancyMap om(Vec3(3, 3, 3), Vec3(3, 3, 3), Vec3());
+//    OccupancyMap om(Vec3(2, 3, 4), Vec3(1, 1, 1), Vec3());
+//    OccupancyMap om(Vec3(5, 3, 1), Vec3(1, 1, 1), Vec3());
+    shape::OccupancyMap om(Vec3(7, 5, 3), Vec3(1, 1, 1), Vec3());
+    om.add(Vec3());
+    om.print();
+    debugPrint(om.fractionOccupied())
+    om.add(Vec3(-0.5, -0.5, -0.5));
+    om.add(Vec3(0.49, 0.49, 0.49));
+    om.print();
+    debugPrint(om.fractionOccupied())
+    return EXIT_SUCCESS;
+    //--------------------------------------------------------------------------
+
+    
     
     int individuals = 500;
     int subpops = 25;

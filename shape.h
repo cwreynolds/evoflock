@@ -146,6 +146,83 @@ double distance_between_lines(const Vec3& origin1, const Vec3& tangent1,
     return distance;
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240323 prototype OccupancyMap
+
+// Defines a 3d (axis aligned) voxel map of given voxel count, overall box_size,
+// and center. Calling add() with a given location (say a boid center) marks
+// that voxel as occupied. In the context of EvoFlock that means "occupied by at
+// least one boid on at least one simulation step." Calling fractionOccupied()
+// returns the ratio of occupied voxels to all voxels
+//
+// I put this in shape.h for now, not sure this is the right place.
+//
+class OccupancyMap
+{
+public:
+    
+    OccupancyMap(Vec3 voxel_count_, Vec3 box_size_, Vec3 center_)
+    {
+        size_i = std::round(voxel_count_.x());
+        size_j = std::round(voxel_count_.y());
+        size_k = std::round(voxel_count_.z());
+        box_size = box_size_;
+        center = center_;
+        voxels.resize(size_i * size_j * size_k, 0);
+    }
+    
+    void add(Vec3 position) { voxels.at(positionToVoxelIndex(position))++; }
+    
+    double fractionOccupied()
+    {
+        double count = 0;
+        for (int v : voxels) { if (v > 0) { count++; }}
+        return count /  voxels.size();
+    }
+    
+    size_t positionToVoxelIndex(Vec3 position)
+    {
+        Vec3 offset = position + center + (box_size / 2);
+        return ijkToVoxelIndex((offset.x() / box_size.x()) * size_i,
+                               (offset.y() / box_size.y()) * size_j,
+                               (offset.z() / box_size.z()) * size_k);
+    }
+    
+    size_t ijkToVoxelIndex(int i, int j, int k)
+    {
+        int index = i + (j * size_i) + (k * size_i * size_k);
+        assert(util::between(index, 0, voxels.size()));
+        return i + (j * size_i) + (k * size_i * size_k);
+    }
+    
+    void print()
+    {
+        std::cout << std::endl;
+        for (int k = 0; k < size_k; k++)
+        {
+            for (int j = 0; j < size_j; j++)
+            {
+                for (int i = 0; i < size_i; i++)
+                {
+                    std::cout << voxels.at(ijkToVoxelIndex(i, j, k)) << " ";
+                }
+                std::cout << std::endl;
+            }
+            std::cout << std::endl;
+        }
+    }
+    
+private:
+    int size_i = 0;
+    int size_j = 0;
+    int size_k = 0;
+    Vec3 box_size;
+    Vec3 center;
+    std::vector<int> voxels;
+};
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 void unit_test()
 {
     Vec3 zzz = Vec3(0, 0, 0);

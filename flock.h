@@ -85,17 +85,27 @@ public:
     // Yes for now, lets just skip args to the constructor to avoid worrying
     // about which parameters are or aren't included there. New answer: none are.
 
-    Flock()
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240324 very WIP/ad hoc usage of OccupancyMap
+    shape::OccupancyMap occupancy_map;
+
+//    Flock()
+
+    // TODO 20240324 very ad hoc since these parameters depend on the enclosing
+    //               EvertedSphereObstacle. The OccupancyMap should probably be
+    //               constructed much later, perhaps in run()
+//    Flock() : occupancy_map(Vec3(50, 50, 50), Vec3(100, 100, 100), Vec3())
+    Flock() : occupancy_map(Vec3(25, 25, 25), Vec3(100, 100, 100), Vec3())
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
         pre_defined_obstacle_sets();
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240205 these were very early "just to get it running" hacks.
-    //               Replace using fp().
-    bool wrap_vs_avoid() { return false; }
-    double min_time_to_collide() { return 1; }
-    bool avoid_blend_mode() { return true; }
+    // bool wrap_vs_avoid() { return false; }
+    // double min_time_to_collide() { return 1; }
+    // bool avoid_blend_mode() { return true; }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Run boids simulation.
@@ -339,6 +349,27 @@ public:
             if (not nn_sep_ok) { seperation_violation_this_step = true; }
             if (not speed_ok) { speed_violation_this_step = true; }
             if (b->detectObstacleViolations()){obstacle_violation_this_step=true;}
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240324 very WIP/ad hoc usage of OccupancyMap
+            
+            // TODO 20240324 need to make OccupancyMap bullet proof to outliers
+            //               but for now
+
+//            debugPrint(b->position())
+//            debugPrint(b->position().length())
+
+//            occupancy_map.add(b->position());
+            
+//            if (b->position().length() < 50) {occupancy_map.add(b->position());}
+            
+//            void add(Vec3 position, IgnoreFunction ignore_function = nullptr)
+            
+//            auto ignore_function = [&](Vec3 p) { return p.length() > 50;};
+            auto ignore_function = [](Vec3 p) { return p.length() > 50;};
+            occupancy_map.add(b->position(), ignore_function);
+                              
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         if (seperation_violation_this_step) { any_seperation_violation_per_step++; }
         if (speed_violation_this_step) { any_speed_violation_per_step++; }

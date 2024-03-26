@@ -313,43 +313,70 @@ int main(int argc, const char * argv[])
     
     
     //--------------------------------------------------------------------------
-//    OccupancyMap om(Vec3(3, 3, 3), Vec3(3, 3, 3), Vec3());
-//    OccupancyMap om(Vec3(2, 3, 4), Vec3(1, 1, 1), Vec3());
-//    OccupancyMap om(Vec3(5, 3, 1), Vec3(1, 1, 1), Vec3());
-    shape::OccupancyMap om(Vec3(7, 5, 3), Vec3(1, 1, 1), Vec3());
-    om.add(Vec3());
-    om.print();
-    debugPrint(om.fractionOccupied())
-    om.add(Vec3(-0.5, -0.5, -0.5));
-    om.add(Vec3(0.49, 0.49, 0.49));
-    om.print();
-    debugPrint(om.fractionOccupied())
-    return EXIT_SUCCESS;
+//    shape::OccupancyMap om(Vec3(7, 5, 3), Vec3(1, 1, 1), Vec3());
+//    om.add(Vec3());
+//    om.print();
+//    debugPrint(om.fractionOccupied())
+//    om.add(Vec3(-0.5, -0.5, -0.5));
+//    om.add(Vec3(0.49, 0.49, 0.49));
+//    om.print();
+//    debugPrint(om.fractionOccupied())
+//    std::cout << std::endl;
+//    
+//    om.setVoxelIJK(4, 3, 2, 2);
+//    om.print();
+//    debugPrint(7 * 5 * 3)
+//    debugPrint(om.ijkToVoxelIndex(4, 3, 2))
+//    debugPrint(om.voxelIndexToIJK(om.ijkToVoxelIndex(4, 3, 2)))
+//    debugPrint(om.voxelIndexToIJK(om.ijkToVoxelIndex(6, 3, 0)))
+//    debugPrint(om.voxelIndexToIJK(om.ijkToVoxelIndex(6, 3, 1)))
+//    debugPrint(om.voxelIndexToIJK(om.ijkToVoxelIndex(1, 1, 1)))
+//    debugPrint(om.voxelIndexToIJK(om.ijkToVoxelIndex(0, 0, 0)))
+//
+//    std::cout << std::endl;
+//    shape::OccupancyMap o2(Vec3(10, 10, 10), Vec3(1, 1, 1), Vec3());
+//    debugPrint(o2.voxelIndexToPosition(o2.positionToVoxelIndex(Vec3(0.1, 0.1, 0.1))))
+//    debugPrint(o2.voxelIndexToPosition(o2.positionToVoxelIndex(Vec3(-0.1, -0.1, -0.1))))
+//    debugPrint(o2.voxelIndexToPosition(o2.positionToVoxelIndex(Vec3(0.15, 0.15, 0.15))))
+//
+//    return EXIT_SUCCESS;
     //--------------------------------------------------------------------------
 
     
     
     int individuals = 500;
     int subpops = 25;
-    int max_evolution_steps = 30000;
+//    int max_evolution_steps = 30000;
+//    int max_evolution_steps = 10;
+    int max_evolution_steps = 50000;
     int min_tree_size = 2;
     int max_tree_size = 20;
+    LazyPredator::Population* population = nullptr;
 
-    std::cout << "Create population." << std::endl;
-    util::Timer t("Create population.");
-    LazyPredator::Population population(individuals,
-                                        subpops,
-                                        max_tree_size,
-                                        min_tree_size,
-                                        max_tree_size,
-                                        evoflock_gp_function_set);
+    {
+        std::cout << "Create population." << std::endl;
+        util::Timer t("Create population.");
+//        LazyPredator::Population population(individuals,
+//                                            subpops,
+//                                            max_tree_size,
+//                                            min_tree_size,
+//                                            max_tree_size,
+//                                            evoflock_gp_function_set);
+        population = new LazyPredator::Population (individuals,
+                                                   subpops,
+                                                   max_tree_size,
+                                                   min_tree_size,
+                                                   max_tree_size,
+                                                   evoflock_gp_function_set);
 
+    }
+    
     {
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
         for (int i = 0; i < max_evolution_steps; i++)
         {
-            population.evolutionStep(evoflock_fitness_function);
+            population->evolutionStep(evoflock_fitness_function);
             std::cout << std::endl;
         }
     }
@@ -358,11 +385,27 @@ int main(int argc, const char * argv[])
     std::cout << std::endl;
     for (int i = 0; i < 10; i++)
     {
-        const LP::Individual* individual = population.nthBestFitness(i);
+        const LP::Individual* individual = population->nthBestFitness(i);
         std::cout << individual->tree().to_string() << std::endl;
         double fitness = rerun_flock_simulation(individual);
         debugPrint(fitness);
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240325 print OccupancyMap TEMP
+    
+    print_occupancy_map = true;
+
+    std::cout << std::endl;
+    std::cout << std::endl;
+    const LP::Individual* individual = population->nthBestFitness(0);
+    std::cout << individual->tree().to_string() << std::endl;
+    double fitness = rerun_flock_simulation(individual);
+    debugPrint(fitness);
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    delete population;
 
     //--------------------------------------------------------------------------
         

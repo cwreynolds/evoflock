@@ -171,16 +171,197 @@ public:
         voxels.resize(size_i * size_j * size_k, 0);
     }
     
-    void add(Vec3 position) { voxels.at(positionToVoxelIndex(position))++; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240324 very WIP/ad hoc usage of OccupancyMap
+
+//    void add(Vec3 position) { voxels.at(positionToVoxelIndex(position))++; }
     
-    double fractionOccupied()
+    typedef std::function<bool(Vec3 p)> IgnoreFunction;
+    
+//    static bool isOutsideOfMap(Vec3 position)
+//    {
+//        int index = positionToVoxelIndex(position);
+//        return not util::between(index, 0, voxels.size());
+//    }
+
+//    void add(Vec3 position, IgnoreFunction ignore_function =
+//             [this](Vec3 position)
+//             {
+//        int index = positionToVoxelIndex(position);
+//        return not util::between(index, 0, voxels.size());
+//    })
+//    {
+//        if (not ignore_function(position));
+//        {
+//            voxels.at(positionToVoxelIndex(position))++;
+//        }
+//    }
+
+    void add(Vec3 position, IgnoreFunction ignore_function = nullptr)
     {
-        double count = 0;
-        for (int v : voxels) { if (v > 0) { count++; }}
-        return count /  voxels.size();
+        if (not ignore_function)
+        {
+            ignore_function = [this](Vec3 position)
+            {
+                size_t index = positionToVoxelIndex(position);
+                return not util::between(index, 0, voxels.size());
+            };
+        }
+        
+        
+        if (not ignore_function(position))
+        {
+            voxels.at(positionToVoxelIndex(position))++;
+        }
+    }
+
+    
+
+//    double fractionOccupied() const
+//    {
+//        double count = 0;
+//        for (int v : voxels) { if (v > 0) { count++; }}
+//        return count /  voxels.size();
+//    }
+
+//    double fractionOccupied(IgnoreFunction ignore_function = nullptr) const
+//    {
+//        double occupied = 0;
+//        double visited = 0;
+//        if (not ignore_function)
+//        {
+//            for (int v : voxels) { visited++; if (v > 0) { occupied++; } }
+//        }
+//        else
+//        {
+//            for (int index = 0; index < voxels.size(); index++)
+//            {
+//                Vec3 voxel_center = voxelIndexToPosition(index);
+//                if (not ignore_function(voxel_center))
+//                {
+//                    visited++;
+//                    if (voxels.at(index) > 0) { occupied++; }
+//                }
+//            }
+//        }
+//        return occupied / visited;
+//    }
+
+//    double fractionOccupied(IgnoreFunction ignore_function = nullptr) const
+//    {
+//        double occupied = 0;
+//        double visited = 0;
+//        if (not ignore_function)
+//            { ignore_function = [](Vec3 position) { return false; }; }
+//        for (int index = 0; index < voxels.size(); index++)
+//        {
+//            Vec3 voxel_center = voxelIndexToPosition(index);
+//            if (not ignore_function(voxel_center))
+//            {
+//                visited++;
+//                if (voxels.at(index) > 0) { occupied++; }
+//            }
+//        }
+//        return occupied / visited;
+//    }
+
+    double fractionOccupied() const
+    {
+        return fractionOccupied([](Vec3 position) { return false; });
     }
     
-    size_t positionToVoxelIndex(Vec3 position)
+    double fractionOccupied(IgnoreFunction ignore_function) const
+    {
+        double occupied = 0;
+        double visited = 0;
+        for (int index = 0; index < voxels.size(); index++)
+        {
+            Vec3 voxel_center = voxelIndexToPosition(index);
+            if (not ignore_function(voxel_center))
+            {
+                visited++;
+                if (voxels.at(index) > 0) { occupied++; }
+            }
+        }
+        return occupied / visited;
+    }
+
+
+    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+    
+    
+    
+    
+//        // Back-converts a voxel index to 3d position of the voxel center.
+//        Vec3 voxelIndexToPosition(size_t index) const
+//        {
+//            Vec3 ijk = voxelIndexToIJK(index);
+//    //        int i = std::round(ijk.x());
+//    //        int j = std::round(ijk.y());
+//    //        int k = std::round(ijk.z());
+//
+//    //        double i = ijk.x();
+//    //        double j = ijk.y();
+//    //        double k = ijk.z();
+//
+//    //        Vec3 box_size;
+//    //        Vec3 center;
+//
+//    //        Vec3 scaled(ijk.x() * box_size.x() / size_i,
+//    //                    ijk.y() * box_size.y() / size_j,
+//    //                    ijk.z() * box_size.z() / size_k);
+//
+//            Vec3 scaled(box_size.x() * (ijk.x() / size_i),
+//                        box_size.y() * (ijk.y() / size_j),
+//                        box_size.z() * (ijk.z() / size_k));
+//
+//            return scaled + center;
+//        }
+
+    // Back-converts a voxel index to 3d position of the voxel center.
+    Vec3 voxelIndexToPosition(size_t index) const
+    {
+        Vec3 ijk = voxelIndexToIJK(index);
+        Vec3 scaled(box_size.x() * (ijk.x() / size_i),
+                    box_size.y() * (ijk.y() / size_j),
+                    box_size.z() * (ijk.z() / size_k));
+//        return scaled + center;
+        return scaled - center - (box_size / 2);
+    }
+
+
+//    size_t positionToVoxelIndex(Vec3 position) const
+//    {
+//        Vec3 offset = position + center + (box_size / 2);
+//        return ijkToVoxelIndex((offset.x() / box_size.x()) * size_i,
+//                               (offset.y() / box_size.y()) * size_j,
+//                               (offset.z() / box_size.z()) * size_k);
+//    }
+
+    
+    // Back-converts a voxel index to ijk voxel coordinates (as a Vec3).
+    Vec3 voxelIndexToIJK(size_t index) const
+    {
+        size_t k = index / (size_i * size_j);
+        size_t r = index % (size_i * size_j);
+        size_t j = r / size_i;
+        size_t i = r % size_i;
+        return Vec3(i, j, k);
+    }
+
+    
+    
+    // TODO 20240324 just for testing
+    void setVoxelIJK(int i, int j, int k, int count)
+    {
+        size_t index = ijkToVoxelIndex(i, j, k);
+        voxels.at(index) = count;
+    }
+
+    // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    size_t positionToVoxelIndex(Vec3 position) const
     {
         Vec3 offset = position + center + (box_size / 2);
         return ijkToVoxelIndex((offset.x() / box_size.x()) * size_i,
@@ -188,14 +369,36 @@ public:
                                (offset.z() / box_size.z()) * size_k);
     }
     
-    size_t ijkToVoxelIndex(int i, int j, int k)
-    {
-        int index = i + (j * size_i) + (k * size_i * size_k);
-        assert(util::between(index, 0, voxels.size()));
-        return i + (j * size_i) + (k * size_i * size_k);
-    }
     
-    void print()
+    size_t ijkToVoxelIndex(int i, int j, int k) const
+    {
+//        return i + (j * size_i) + (k * size_i * size_k);
+        return i + (j * size_i) + (k * size_i * size_j);
+    }
+
+//        void print(bool single_digit_only = false) const
+//        {
+//            std::cout << std::endl;
+//            for (int k = 0; k < size_k; k++)
+//            {
+//                for (int j = 0; j < size_j; j++)
+//                {
+//                    for (int i = 0; i < size_i; i++)
+//                    {
+//    //                    std::cout << voxels.at(ijkToVoxelIndex(i, j, k)) << " ";
+//                        int count = voxels.at(ijkToVoxelIndex(i, j, k));
+//                        if (single_digit_only and count > 9)
+//                            { std::cout << "MM"; }
+//                        else
+//                            { std::cout << count << " "; }
+//                    }
+//                    std::cout << std::endl;
+//                }
+//                std::cout << std::endl;
+//            }
+//        }
+    
+    void print(bool single_digit_only = false) const
     {
         std::cout << std::endl;
         for (int k = 0; k < size_k; k++)
@@ -204,14 +407,22 @@ public:
             {
                 for (int i = 0; i < size_i; i++)
                 {
-                    std::cout << voxels.at(ijkToVoxelIndex(i, j, k)) << " ";
+                    int count = voxels.at(ijkToVoxelIndex(i, j, k));
+                    if (single_digit_only)
+                    {
+                        if (count == 0) { std::cout << "• "; }
+                        else if (count > 9) { std::cout << "MM"; }
+                        else { std::cout << "MM"; }
+                    }
+                    else
+                        { std::cout << count << " "; }
                 }
                 std::cout << std::endl;
             }
             std::cout << std::endl;
         }
     }
-    
+
 private:
     int size_i = 0;
     int size_j = 0;

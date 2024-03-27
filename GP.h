@@ -13,10 +13,7 @@
 #pragma once
 
 #include "flock.h"
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240325 print OccupancyMap TEMP
 #include "shape.h"
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // TODO 20240226 For now, a modified copy of LazyPredator is in a subdirectory.
 #include "LazyPredator/LazyPredator.h"
@@ -149,11 +146,8 @@ double fitness_product_weight_01(double fitness, double weight)
     return util::remap_interval_clip(fitness, 0, 1, 1 - weight, 1);
 };
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240325 print OccupancyMap TEMP
-//inline const Flock* last_flock = nullptr;
-inline bool print_occupancy_map = false;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+inline bool print_occupancy_map = false;  // Just for debugging.
 
 
 // Compute fitness and return it as value of GpTree.
@@ -163,12 +157,8 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
     double nn_sep_err = flock.any_seperation_violation_per_step / steps;
     double collide    = flock.any_obstacle_violation_per_step / steps;
     double speed_err  = flock.any_speed_violation_per_step  / steps;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240324 very WIP/ad hoc usage of OccupancyMap
     auto ignore_function = [](Vec3 p) { return p.length() > 50;};
-
     double fraction_occupied = flock.occupancy_map.fractionOccupied(ignore_function);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     debugPrint(flock.any_seperation_violation_per_step)
     debugPrint(flock.any_obstacle_violation_per_step)
@@ -180,43 +170,26 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
     double nn_sep_fitness    = flip_and_keep_above_zero(nn_sep_err);
     double collide_fitness   = flip_and_keep_above_zero(collide);
     double speed_err_fitness = flip_and_keep_above_zero(speed_err);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240324 very WIP/ad hoc usage of OccupancyMap
     double occupied_fitness = util::remap_interval_clip(fraction_occupied, 0, 1, 0.1, 1);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//    nn_sep_fitness =    fitness_product_weight_01(nn_sep_fitness,    0.4);
-//    collide_fitness =   fitness_product_weight_01(collide_fitness,   1.0);
-//    speed_err_fitness = fitness_product_weight_01(speed_err_fitness, 0.2);
     nn_sep_fitness =    fitness_product_weight_01(nn_sep_fitness,    0.6);
     collide_fitness =   fitness_product_weight_01(collide_fitness,   1.0);
     speed_err_fitness = fitness_product_weight_01(speed_err_fitness, 0.2);
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240324 very WIP/ad hoc usage of OccupancyMap
-//    occupied_fitness  = fitness_product_weight_01(fraction_occupied, 0.5);
-//    occupied_fitness  = fitness_product_weight_01(fraction_occupied, 0.3);
-//    occupied_fitness  = fitness_product_weight_01(fraction_occupied, 0.7);
     occupied_fitness  = fitness_product_weight_01(fraction_occupied, 0.6);
 
     debugPrint(fraction_occupied)
     debugPrint(occupied_fitness)
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240324 very WIP/ad hoc usage of OccupancyMap
     double fitness = (nn_sep_fitness * collide_fitness *
                       speed_err_fitness * occupied_fitness);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     fitness_logger(nn_sep_fitness, nn_sep_err,
                    collide_fitness, collide,
                    speed_err_fitness, speed_err,
                    fitness);
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240325 print OccupancyMap TEMP
+    // Just for testing
     if (print_occupancy_map) { flock.occupancy_map.print(true); }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     return fitness;
 }
 

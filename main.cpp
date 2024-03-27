@@ -346,9 +346,10 @@ int main(int argc, const char * argv[])
     
     int individuals = 500;
     int subpops = 25;
-//    int max_evolution_steps = 30000;
+    int max_evolution_steps = 30000;
 //    int max_evolution_steps = 10;
-    int max_evolution_steps = 50000;
+//    int max_evolution_steps = 50000;
+//    int max_evolution_steps = 10;
     int min_tree_size = 2;
     int max_tree_size = 20;
     LazyPredator::Population* population = nullptr;
@@ -356,21 +357,13 @@ int main(int argc, const char * argv[])
     {
         std::cout << "Create population." << std::endl;
         util::Timer t("Create population.");
-//        LazyPredator::Population population(individuals,
-//                                            subpops,
-//                                            max_tree_size,
-//                                            min_tree_size,
-//                                            max_tree_size,
-//                                            evoflock_gp_function_set);
         population = new LazyPredator::Population (individuals,
                                                    subpops,
                                                    max_tree_size,
                                                    min_tree_size,
                                                    max_tree_size,
                                                    evoflock_gp_function_set);
-
     }
-    
     {
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
@@ -391,19 +384,13 @@ int main(int argc, const char * argv[])
         debugPrint(fitness);
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240325 print OccupancyMap TEMP
-    
     print_occupancy_map = true;
-
     std::cout << std::endl;
     std::cout << std::endl;
     const LP::Individual* individual = population->nthBestFitness(0);
     std::cout << individual->tree().to_string() << std::endl;
     double fitness = rerun_flock_simulation(individual);
     debugPrint(fitness);
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     delete population;
 

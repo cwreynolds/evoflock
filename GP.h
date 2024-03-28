@@ -21,12 +21,26 @@
 namespace LP = LazyPredator;
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240327 WIP for multi-objective fitness
+
 // Fitness function, simply returns Individual's tree's value (computing it and
 // caching it on first call).
 inline float evoflock_fitness_function(LazyPredator::Individual* individual)
 {
     return std::any_cast<double>(individual->tree().getRootValue());
 }
+
+//    // Fitness function, simply returns Individual's tree's value (computing it and
+//    // caching it on first call).
+//    inline std::vector<double> evoflock_fitness_function(LazyPredator::Individual* individual)
+//    {
+//        // TODO 20240327 MOCK!!
+//        std::vector<double> multi_objective_fitness = {0.0, 0.2, 0.4, 0.6, 0.8, 1.0};
+//        return multi_objective_fitness;
+//    }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 void fitness_logger(double nn_sep_fitness, double nn_sep_err,

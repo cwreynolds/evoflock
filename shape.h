@@ -251,10 +251,12 @@ public:
             {
                 for (int i = 0; i < size_i; i++)
                 {
-                    int count = voxels.at(ijkToVoxelIndex(i, j, k));
+                    size_t index = ijkToVoxelIndex(i, j, k);
+                    int count = voxels.at(index);
                     std::string str = std::to_string(count);
                     bool s = single_digit_only and not util::between(count,1,9);
-                    std::cout << (s ? ((count == 0) ? "•"s : "█"s) : str) << " ";
+                    bool in = voxelIndexToPosition(index).length() < 50;
+                    std::cout << (in?(s?((count==0)?"•"s:"█"s):str):" ") << " ";
                 }
                 std::cout << std::endl;
             }

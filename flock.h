@@ -308,9 +308,15 @@ public:
         for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
         double ts = fp().min_speed - util::epsilon;
         for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
-        bool speed_violation_this_step = false;
-        bool seperation_violation_this_step = false;
-        bool obstacle_violation_this_step = false;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240328 WIP for multi-objective fitness
+//        bool speed_violation_this_step = false;
+//        bool seperation_violation_this_step = false;
+//        bool obstacle_violation_this_step = false;
+        bool all_speed_good = true;
+        bool all_seperation_good = true;
+        bool all_avoidance_good = true;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         total_avoid_fail_whole_sim = 0;
         for (Boid* b : boids())
         {
@@ -323,15 +329,30 @@ public:
             if (not nn_sep_ok) { count_nn_sep_violations_whole_sim++; }
             bool speed_ok = util::between(b->speed(), 15, 25);
             if (not speed_ok) { count_speed_violations_whole_sim++; }
-            if (not nn_sep_ok) { seperation_violation_this_step = true; }
-            if (not speed_ok) { speed_violation_this_step = true; }
-            if (b->detectObstacleViolations()){obstacle_violation_this_step=true;}
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240328 WIP for multi-objective fitness
+//            if (not nn_sep_ok) { seperation_violation_this_step = true; }
+//            if (not speed_ok) { speed_violation_this_step = true; }
+//            if (b->detectObstacleViolations()){obstacle_violation_this_step=true;}
+            if (not nn_sep_ok) { all_seperation_good = false; }
+            if (not speed_ok) { all_speed_good = false; }
+            if (b->detectObstacleViolations()) { all_avoidance_good = false; }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // Add this boid's position to occupancy_map, ignore if outside ESO.
             occupancy_map.add(b->position(), [](Vec3 p){return p.length()>50;});
         }
-        if (seperation_violation_this_step) { any_seperation_violation_per_step++; }
-        if (speed_violation_this_step) { any_speed_violation_per_step++; }
-        if (obstacle_violation_this_step) { any_obstacle_violation_per_step++; }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240328 WIP for multi-objective fitness
+//        if (seperation_violation_this_step) { any_seperation_violation_per_step++; }
+//        if (!seperation_violation_this_step) { count_steps_good_separation++; }
+        if (all_seperation_good) { count_steps_good_separation++; }
+//        if (speed_violation_this_step) { any_speed_violation_per_step++; }
+//        if (!speed_violation_this_step) { count_steps_good_speed++; }
+        if (all_speed_good) { count_steps_good_speed++; }
+//        if (obstacle_violation_this_step) { any_obstacle_violation_per_step++; }
+//        if (!obstacle_violation_this_step) { count_steps_avoid_obstacle++; }
+        if (all_avoidance_good) { count_steps_avoid_obstacle++; }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // TODO 20240307 do I want accessors for these?
@@ -344,10 +365,20 @@ public:
     int total_avoid_fail_whole_sim = 0;
     int count_nn_sep_violations_whole_sim = 0;
     int count_speed_violations_whole_sim = 0;
-    int any_obstacle_violation_per_step = 0;
-    int any_speed_violation_per_step = 0;
-    int any_seperation_violation_per_step = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240328 WIP for multi-objective fitness
+
+//    int any_seperation_violation_per_step = 0;
+    int count_steps_good_separation = 0;
     
+//    int any_speed_violation_per_step = 0;
+    int count_steps_good_speed = 0;
+
+//    int any_obstacle_violation_per_step = 0;
+    int count_steps_avoid_obstacle = 0;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     int log_stat_interval_ = 100;
     int getLogStatInterval() const { return log_stat_interval_; }
     void setLogStatInterval(int steps) { log_stat_interval_ = steps; }

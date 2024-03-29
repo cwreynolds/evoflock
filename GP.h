@@ -60,10 +60,17 @@ void fitness_logger(double nn_sep_fitness, double nn_sep_err,
         if (raw > -1) { std::cout << " (" << raw <<  ")"; }
         std::cout << std::endl;
     };
-    print("    nn_sep_err", nn_sep_fitness,    nn_sep_err);
-    print("    collide   ", collide_fitness,   collide);
-    print("    speed_err ", speed_err_fitness, speed_err);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240328 WIP for multi-objective fitness
+//    print("    nn_sep_err", nn_sep_fitness,    nn_sep_err);
+//    print("    collide   ", collide_fitness,   collide);
+//    print("    speed_err ", speed_err_fitness, speed_err);
+//    print("    fitness   ", fitness);
+    print("    separation_fitness", nn_sep_fitness,    nn_sep_err);
+    print("    avoid_fitness     ", collide_fitness,   collide);
+    print("    speed_fitness     ", speed_err_fitness, speed_err);
     print("    fitness   ", fitness);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << std::endl;
     
     // restore output format flags and precision
@@ -143,6 +150,13 @@ inline void init_flock(Flock& flock)
 //    auto nonlin = [](double x) { return (x + pow(x, 10)) / 2; };
 
 
+// Remap so [0,1] goes to [1,tiny]
+inline double keep_above_zero(double fitness_01, double tiny = 0.1)
+{
+    return util::remap_interval_clip(fitness_01, 0, 1, tiny, 1);
+}
+
+
 // Flip the 0-to-1 range, but remap so [0,1] goes to [1,tiny]
 inline double flip_and_keep_above_zero(double fitness_01, double tiny = 0.1)
 {
@@ -164,43 +178,130 @@ double fitness_product_weight_01(double fitness, double weight)
 inline bool print_occupancy_map = false;  // Just for debugging.
 
 
+//    // Compute fitness and return it as value of GpTree.
+//    inline double measure_fitness_after_flock_simulation(const Flock& flock)
+//    {
+//        double steps = flock.max_simulation_steps();
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20240328 WIP for multi-objective fitness
+//    //    double nn_sep_err = flock.any_seperation_violation_per_step / steps;
+//    //    double nn_sep_err = flock.count_steps_good_separation / steps;
+//        double good_separation_fraction = flock.count_steps_good_separation / steps;
+//    //    double collide    = flock.any_obstacle_violation_per_step / steps;
+//    //    double collide    = flock.count_steps_avoid_obstacle / steps;
+//        double good_avoid_fraction    = flock.count_steps_avoid_obstacle / steps;
+//    //    double speed_err  = flock.any_speed_violation_per_step  / steps;
+//    //    double speed_err  = flock.count_steps_good_speed  / steps;
+//        double good_speed_fraction  = flock.count_steps_good_speed  / steps;
+//        auto ignore_function = [](Vec3 p) { return p.length() > 50;};
+//        double fraction_occupied = flock.occupancy_map.fractionOccupied(ignore_function);
+//
+//    //    debugPrint(flock.any_seperation_violation_per_step)
+//        debugPrint(flock.count_steps_good_separation)
+//    //    debugPrint(flock.any_obstacle_violation_per_step)
+//        debugPrint(flock.count_steps_avoid_obstacle)
+//    //    debugPrint(flock.any_speed_violation_per_step)
+//        debugPrint(flock.count_steps_good_speed)
+//    //    debugPrint(flock.any_seperation_violation_per_step / steps)
+//        debugPrint(flock.count_steps_good_separation / steps)
+//    //    debugPrint(flock.any_obstacle_violation_per_step   / steps)
+//        debugPrint(flock.count_steps_avoid_obstacle   / steps)
+//    //    debugPrint(flock.any_speed_violation_per_step      / steps)
+//        debugPrint(flock.count_steps_good_speed      / steps)
+//
+//    //    double nn_sep_fitness    = flip_and_keep_above_zero(nn_sep_err);
+//    //    double collide_fitness   = flip_and_keep_above_zero(collide);
+//    //    double speed_err_fitness = flip_and_keep_above_zero(speed_err);
+//    //    double occupied_fitness = util::remap_interval_clip(fraction_occupied, 0, 1, 0.1, 1);
+//
+//    //    double nn_sep_fitness    = keep_above_zero(nn_sep_err);
+//    //    double collide_fitness   = keep_above_zero(collide);
+//    //    double speed_err_fitness = keep_above_zero(speed_err);
+//    //    double occupied_fitness  = keep_above_zero(fraction_occupied);
+//
+//    //    double nn_sep_fitness    = keep_above_zero(good_separation_fraction);
+//    //    double collide_fitness   = keep_above_zero(good_avoid_fraction);
+//    //    double speed_err_fitness = keep_above_zero(good_speed_fraction);
+//        double separation_fitness    = keep_above_zero(good_separation_fraction);
+//        double avoid_fitness   = keep_above_zero(good_avoid_fraction);
+//        double speed_fitness = keep_above_zero(good_speed_fraction);
+//
+//        double occupied_fitness  = keep_above_zero(fraction_occupied);
+//
+//    //    nn_sep_fitness =    fitness_product_weight_01(nn_sep_fitness,    0.6);
+//    //    collide_fitness =   fitness_product_weight_01(collide_fitness,   1.0);
+//    //    speed_err_fitness = fitness_product_weight_01(speed_err_fitness, 0.2);
+//    //    occupied_fitness  = fitness_product_weight_01(fraction_occupied, 0.6);
+//
+//        separation_fitness =    fitness_product_weight_01(separation_fitness,    0.6);
+//        avoid_fitness =   fitness_product_weight_01(avoid_fitness,   1.0);
+//        speed_fitness = fitness_product_weight_01(speed_fitness, 0.2);
+//        occupied_fitness  = fitness_product_weight_01(fraction_occupied, 0.6);
+//
+//        debugPrint(fraction_occupied)
+//        debugPrint(occupied_fitness)
+//
+//    //    double fitness = (nn_sep_fitness * collide_fitness *
+//    //                      speed_err_fitness * occupied_fitness);
+//
+//        double fitness = (separation_fitness * avoid_fitness *
+//                          speed_fitness * occupied_fitness);
+//
+//    //    fitness_logger(nn_sep_fitness, nn_sep_err,
+//    //                   collide_fitness, collide,
+//    //                   speed_err_fitness, speed_err,
+//    //                   fitness);
+//        fitness_logger(separation_fitness, good_separation_fraction,
+//                       avoid_fitness, good_avoid_fraction,
+//                       speed_fitness, good_speed_fraction,
+//                       fitness);
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//        // Just for testing
+//        if (print_occupancy_map) { flock.occupancy_map.print(true); }
+//        return fitness;
+//    }
+
 // Compute fitness and return it as value of GpTree.
 inline double measure_fitness_after_flock_simulation(const Flock& flock)
 {
     double steps = flock.max_simulation_steps();
-    double nn_sep_err = flock.any_seperation_violation_per_step / steps;
-    double collide    = flock.any_obstacle_violation_per_step / steps;
-    double speed_err  = flock.any_speed_violation_per_step  / steps;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240328 WIP for multi-objective fitness
+    double good_separation_fraction = flock.count_steps_good_separation / steps;
+    double good_avoid_fraction    = flock.count_steps_avoid_obstacle / steps;
+    double good_speed_fraction  = flock.count_steps_good_speed  / steps;
     auto ignore_function = [](Vec3 p) { return p.length() > 50;};
     double fraction_occupied = flock.occupancy_map.fractionOccupied(ignore_function);
 
-    debugPrint(flock.any_seperation_violation_per_step)
-    debugPrint(flock.any_obstacle_violation_per_step)
-    debugPrint(flock.any_speed_violation_per_step)
-    debugPrint(flock.any_seperation_violation_per_step / steps)
-    debugPrint(flock.any_obstacle_violation_per_step   / steps)
-    debugPrint(flock.any_speed_violation_per_step      / steps)
+    debugPrint(flock.count_steps_good_separation)
+    debugPrint(flock.count_steps_avoid_obstacle)
+    debugPrint(flock.count_steps_good_speed)
+    debugPrint(flock.count_steps_good_separation / steps)
+    debugPrint(flock.count_steps_avoid_obstacle   / steps)
+    debugPrint(flock.count_steps_good_speed      / steps)
 
-    double nn_sep_fitness    = flip_and_keep_above_zero(nn_sep_err);
-    double collide_fitness   = flip_and_keep_above_zero(collide);
-    double speed_err_fitness = flip_and_keep_above_zero(speed_err);
-    double occupied_fitness = util::remap_interval_clip(fraction_occupied, 0, 1, 0.1, 1);
+    double separation_fitness = keep_above_zero(good_separation_fraction);
+    double avoid_fitness      = keep_above_zero(good_avoid_fraction);
+    double speed_fitness      = keep_above_zero(good_speed_fraction);
+    double occupied_fitness   = keep_above_zero(fraction_occupied);
 
-    nn_sep_fitness =    fitness_product_weight_01(nn_sep_fitness,    0.6);
-    collide_fitness =   fitness_product_weight_01(collide_fitness,   1.0);
-    speed_err_fitness = fitness_product_weight_01(speed_err_fitness, 0.2);
-    occupied_fitness  = fitness_product_weight_01(fraction_occupied, 0.6);
+    separation_fitness = fitness_product_weight_01(separation_fitness, 0.6);
+    avoid_fitness      = fitness_product_weight_01(avoid_fitness,      1.0);
+    speed_fitness      = fitness_product_weight_01(speed_fitness,      0.2);
+    occupied_fitness   = fitness_product_weight_01(fraction_occupied,  0.6);
 
     debugPrint(fraction_occupied)
     debugPrint(occupied_fitness)
 
-    double fitness = (nn_sep_fitness * collide_fitness *
-                      speed_err_fitness * occupied_fitness);
+    double fitness = (separation_fitness * avoid_fitness *
+                      speed_fitness * occupied_fitness);
 
-    fitness_logger(nn_sep_fitness, nn_sep_err,
-                   collide_fitness, collide,
-                   speed_err_fitness, speed_err,
+    fitness_logger(separation_fitness, good_separation_fraction,
+                   avoid_fitness,      good_avoid_fraction,
+                   speed_fitness,      good_speed_fraction,
                    fitness);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Just for testing
     if (print_occupancy_map) { flock.occupancy_map.print(true); }

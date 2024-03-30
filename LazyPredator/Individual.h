@@ -54,20 +54,21 @@ public:
     // Added to support "absolute fitness" in addition to "tournament fitness".
     bool hasFitness() const { return has_fitness_; }
     void setFitness(float f) { fitness_ = f; has_fitness_ = true; }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //        float getFitness() const { return (hasFitness() ?
-    //                                           fitness_ :
-    //                                           //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //    //                                       getTournamentsSurvived()); }
-    //                                           (getTournamentsSurvived() +
-    //                                            getStanding())); }
-    //                                           //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     float getFitness() const
     {
-        //        return (hasFitness() ?
-        //                fitness_ :
-        //                getTournamentsSurvived() + getStanding());
         return hasFitness() ? fitness_ : getTournamentsSurvived() + getStanding();
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240329 WIP for multi-objective fitness
+    bool hasMultiObjectiveFitness() const { return has_multi_objective_fitness_; }
+    void setMultiObjectiveFitness(std::vector<double> multi_objective_fitness)
+    {
+        multi_objective_fitness_ = multi_objective_fitness;
+        has_multi_objective_fitness_ = multi_objective_fitness_.size() > 0;
+    }
+    std::vector<double> getMultiObjectiveFitness() const
+    {
+        return multi_objective_fitness_;
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Compare counts of constructor/destructor calls. Must match at end of run.
@@ -84,7 +85,7 @@ public:
     {
         return constructor_count_ - destructor_count_;
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // TODO temporary for testing SimpleImageMatch
     float alt_fitness = -1;
     
@@ -136,6 +137,11 @@ private:
     // Added to support "absolute fitness" in addition to "tournament fitness".
     float fitness_ = 0;
     bool has_fitness_ = false;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240329 WIP for multi-objective fitness
+    std::vector<double> multi_objective_fitness_;
+    bool has_multi_objective_fitness_ = false;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Leak check. Count constructor/destructor calls. Must match at end of run.
     static inline int constructor_count_ = 0;
     static inline int destructor_count_ = 0;

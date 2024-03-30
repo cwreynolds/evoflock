@@ -298,83 +298,160 @@ public:
     //                    self.tracking_camera and
     //                    self.selected_boid().is_neighbor(boid))
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240329 WIP for multi-objective fitness
+
+//        // Fly each boid in flock for one simulation step. Consists of two sequential
+//        // steps to avoid artifacts from order of boids. First a "sense/plan" phase
+//        // which computes the desired steering based on current state. Then an "act"
+//        // phase which actually moves the boids.
+//        void fly_flock(double time_step)
+//        {
+//            for (Boid* boid : boids()) { boid->plan_next_steer(time_step); }
+//            for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
+//            double ts = fp().min_speed - util::epsilon;
+//            for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20240328 WIP for multi-objective fitness
+//    //        bool speed_violation_this_step = false;
+//    //        bool seperation_violation_this_step = false;
+//    //        bool obstacle_violation_this_step = false;
+//            bool all_speed_good = true;
+//            bool all_seperation_good = true;
+//            bool all_avoidance_good = true;
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //        total_÷avoid_fail_whole_sim = 0;
+//            for (Boid* b : boids())
+//            {
+//                Boid* n = b->cached_nearest_neighbors().at(0);
+//                double  dist = (b->position() - n->position()).length();
+//    //            if (max_nn_dist_whole_sim < dist) { max_nn_dist_whole_sim = dist; }
+//    //            if (min_sep_dist_whole_sim > dist) { min_sep_dist_whole_sim = dist;}
+//    //            total_avoid_fail_whole_sim += b->avoidance_failure_counter();
+//                bool nn_sep_ok = dist > (3 * fp().body_radius); // Mar 21
+//    //            if (not nn_sep_ok) { count_nn_sep_violations_whole_sim++; }
+//                bool speed_ok = util::between(b->speed(), 15, 25);
+//    //            if (not speed_ok) { count_speed_violations_whole_sim++; }
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20240328 WIP for multi-objective fitness
+//    //            if (not nn_sep_ok) { seperation_violation_this_step = true; }
+//    //            if (not speed_ok) { speed_violation_this_step = true; }
+//    //            if (b->detectObstacleViolations()){obstacle_violation_this_step=true;}
+//                if (not nn_sep_ok) { all_seperation_good = false; }
+//                if (not speed_ok) { all_speed_good = false; }
+//                if (b->detectObstacleViolations()) { all_avoidance_good = false; }
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // Add this boid's position to occupancy_map, ignore if outside ESO.
+//                occupancy_map.add(b->position(), [](Vec3 p){return p.length()>50;});
+//            }
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20240328 WIP for multi-objective fitness
+//    //        if (seperation_violation_this_step) { any_seperation_violation_per_step++; }
+//    //        if (!seperation_violation_this_step) { count_steps_good_separation++; }
+//            if (all_seperation_good) { count_steps_good_separation++; }
+//    //        if (speed_violation_this_step) { any_speed_violation_per_step++; }
+//    //        if (!speed_violation_this_step) { count_steps_good_speed++; }
+//            if (all_speed_good) { count_steps_good_speed++; }
+//    //        if (obstacle_violation_this_step) { any_obstacle_violation_per_step++; }
+//    //        if (!obstacle_violation_this_step) { count_steps_avoid_obstacle++; }
+//            if (all_avoidance_good) { count_steps_avoid_obstacle++; }
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        }
+//
+//    //    // TODO 20240307 do I want accessors for these?
+//    //    // The least separation over all boids on all simulation steps.
+//    //    double min_sep_dist_whole_sim = std::numeric_limits<double>::infinity();
+//    //    // Largest separation over all boids on all simulation steps.
+//    //    double max_nn_dist_whole_sim = 0;
+//    //    // Count obstacle avoidance failures over all boids on all simulation steps.
+//    //    // (Computed anew each step by summing each boid's lifetime count.)
+//    //    int total_avoid_fail_whole_sim = 0;
+//    //    int count_nn_sep_violations_whole_sim = 0;
+//    //    int count_speed_violations_whole_sim = 0;
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20240328 WIP for multi-objective fitness
+//
+//    //    int any_seperation_violation_per_step = 0;
+//        int count_steps_good_separation = 0;
+//
+//    //    int any_speed_violation_per_step = 0;
+//        int count_steps_good_speed = 0;
+//
+//    //    int any_obstacle_violation_per_step = 0;
+//        int count_steps_avoid_obstacle = 0;
+
+    
+    
+//        // Fly each boid in flock for one simulation step. Consists of two sequential
+//        // steps to avoid artifacts from order of boids. First a "sense/plan" phase
+//        // which computes the desired steering based on current state. Then an "act"
+//        // phase which actually moves the boids.
+//        void fly_flock(double time_step)
+//        {
+//            for (Boid* boid : boids()) { boid->plan_next_steer(time_step); }
+//            for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
+//    //        double ts = fp().min_speed - util::epsilon;
+//    //        for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
+//    //        bool all_speed_good = true;
+//    //        bool all_seperation_good = true;
+//    //        bool all_avoidance_good = true;
+//    //        for (Boid* b : boids())
+//    //        {
+//    //            Boid* n = b->cached_nearest_neighbors().at(0);
+//    //            double  dist = (b->position() - n->position()).length();
+//    //            bool nn_sep_ok = dist > (3 * fp().body_radius); // Mar 21
+//    //            bool speed_ok = util::between(b->speed(), 15, 25);
+//    //            if (not nn_sep_ok) { all_seperation_good = false; }
+//    //            if (not speed_ok) { all_speed_good = false; }
+//    //            if (b->detectObstacleViolations()) { all_avoidance_good = false; }
+//    //            // Add this boid's position to occupancy_map, ignore if outside ESO.
+//    //            occupancy_map.add(b->position(), [](Vec3 p){return p.length()>50;});
+//    //        }
+//    //        if (all_seperation_good) { count_steps_good_separation++; }
+//    //        if (all_speed_good) { count_steps_good_speed++; }
+//    //        if (all_avoidance_good) { count_steps_avoid_obstacle++; }
+//
+//            collect_flock_metrics();
+//        }
+
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
     // which computes the desired steering based on current state. Then an "act"
-    // phase which actually moves the boids.
+    // phase which actually moves the boids. Finally statistics are collected.
     void fly_flock(double time_step)
     {
         for (Boid* boid : boids()) { boid->plan_next_steer(time_step); }
         for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
+        collect_flock_metrics();
+    }
+
+    void collect_flock_metrics()
+    {
         double ts = fp().min_speed - util::epsilon;
         for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240328 WIP for multi-objective fitness
-//        bool speed_violation_this_step = false;
-//        bool seperation_violation_this_step = false;
-//        bool obstacle_violation_this_step = false;
         bool all_speed_good = true;
         bool all_seperation_good = true;
         bool all_avoidance_good = true;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        total_avoid_fail_whole_sim = 0;
         for (Boid* b : boids())
         {
             Boid* n = b->cached_nearest_neighbors().at(0);
             double  dist = (b->position() - n->position()).length();
-            if (max_nn_dist_whole_sim < dist) { max_nn_dist_whole_sim = dist; }
-            if (min_sep_dist_whole_sim > dist) { min_sep_dist_whole_sim = dist;}
-            total_avoid_fail_whole_sim += b->avoidance_failure_counter();
             bool nn_sep_ok = dist > (3 * fp().body_radius); // Mar 21
-            if (not nn_sep_ok) { count_nn_sep_violations_whole_sim++; }
             bool speed_ok = util::between(b->speed(), 15, 25);
-            if (not speed_ok) { count_speed_violations_whole_sim++; }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240328 WIP for multi-objective fitness
-//            if (not nn_sep_ok) { seperation_violation_this_step = true; }
-//            if (not speed_ok) { speed_violation_this_step = true; }
-//            if (b->detectObstacleViolations()){obstacle_violation_this_step=true;}
             if (not nn_sep_ok) { all_seperation_good = false; }
             if (not speed_ok) { all_speed_good = false; }
             if (b->detectObstacleViolations()) { all_avoidance_good = false; }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // Add this boid's position to occupancy_map, ignore if outside ESO.
             occupancy_map.add(b->position(), [](Vec3 p){return p.length()>50;});
         }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240328 WIP for multi-objective fitness
-//        if (seperation_violation_this_step) { any_seperation_violation_per_step++; }
-//        if (!seperation_violation_this_step) { count_steps_good_separation++; }
         if (all_seperation_good) { count_steps_good_separation++; }
-//        if (speed_violation_this_step) { any_speed_violation_per_step++; }
-//        if (!speed_violation_this_step) { count_steps_good_speed++; }
         if (all_speed_good) { count_steps_good_speed++; }
-//        if (obstacle_violation_this_step) { any_obstacle_violation_per_step++; }
-//        if (!obstacle_violation_this_step) { count_steps_avoid_obstacle++; }
         if (all_avoidance_good) { count_steps_avoid_obstacle++; }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
-
-    // TODO 20240307 do I want accessors for these?
-    // The least separation over all boids on all simulation steps.
-    double min_sep_dist_whole_sim = std::numeric_limits<double>::infinity();
-    // Largest separation over all boids on all simulation steps.
-    double max_nn_dist_whole_sim = 0;
-    // Count obstacle avoidance failures over all boids on all simulation steps.
-    // (Computed anew each step by summing each boid's lifetime count.)
-    int total_avoid_fail_whole_sim = 0;
-    int count_nn_sep_violations_whole_sim = 0;
-    int count_speed_violations_whole_sim = 0;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240328 WIP for multi-objective fitness
-
-//    int any_seperation_violation_per_step = 0;
-    int count_steps_good_separation = 0;
     
-//    int any_speed_violation_per_step = 0;
+    // TODO 20240329 Maybe these should be private with accessors
+    int count_steps_good_separation = 0;
     int count_steps_good_speed = 0;
-
-//    int any_obstacle_violation_per_step = 0;
     int count_steps_avoid_obstacle = 0;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -190,6 +190,106 @@ public:
         evolutionStep(tournament_function);
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240329 WIP for multi-objective fitness
+    // I want to make something like the version directly above:
+    //
+    //     void evolutionStep(FitnessFunction fitness_function) {...}
+    //
+    // except that its argument is a MultiObjectiveFitnessFunction which maps
+    // from an Individual* to a std::vector<double> of several independent
+    // objective/fitness values.
+    
+    
+    // Functions that measure "absolute" fitness of an Individual in isolation.
+    // (A shortcut for fitnesses that can be measured this way. Many cannot.)
+    // But this version (unlike FitnessFunction) is for the "multi objective"
+    // case where each fitness is a vector/tuple of fitness values for each of
+    // several independent objectives.
+    typedef std::function<std::vector<double>(Individual*)>
+            MultiObjectiveFitnessFunction;
+
+    // TODO rewrite this for"multi objective" case:
+    //
+    // Perform one step of the "steady state" evolutionary computation using
+    // "absolute fitness" (rather than "relative tournament-based fitness").
+    // Takes a FitnessFunction which maps a given Individual to a numeric
+    // "absolute fitness" value. Converts this into a TournamentFunction for
+    // use in the "relative fitness" version of evolutionStep() above.
+    //
+    // ...each evolution step this randomly choses one of the n objectives, and
+    // treats that as the fitness for this step, ignoring the others.
+
+    void evolutionStep(MultiObjectiveFitnessFunction mo_fitness_function)
+    {
+        
+        // TODO 20240329 I've copied in the body of the single objective case
+        // (above) which I will modify incrementally. It would be good to find
+        // ways to combine these so they share what code they can.
+        
+//        // Wrap given FitnessFunction to ensure Individual has cached fitness.
+//        auto augmented_fitness_function = [&](Individual* individual)
+//        {
+//            // In case Individual does not already have a cached fitness value.
+//            if (!(individual->hasFitness()))
+//            {
+//                // The existing sort index, if any, is now invalid.
+//                sort_cache_invalid_ = true;
+//                // Tree value should be previously cached, but just to be sure.
+//                individual->treeValue();
+//                // Cache fitness on Individual using given FitnessFunction.
+//                individual->setFitness(fitness_function(individual));
+//            }
+//            return individual->getFitness();
+//        };
+//        // Create a TournamentFunction based on the augmented FitnessFunction.
+//        auto tournament_function = [&](TournamentGroup group)
+//        {
+//            group.setAllMetrics(augmented_fitness_function);
+//            return group;
+//        };
+//        // Finally, do a tournament-based evolution step.
+//        evolutionStep(tournament_function);
+        
+        
+        // TODO 20240329 starting to prototype multi-objective case:
+
+        // TODO this is set to a random index into mo_fitness in tournament_function
+        int which_objective = -1;
+        int count_objective = -1;
+
+        // Wrap given FitnessFunction to ensure Individual has cached fitness.
+        auto augmented_fitness_function = [&](Individual* individual)
+        {
+            // In case Individual does not already have a cached fitness value.
+//            if (!(individual->hasFitness()))
+            if (!(individual->hasMultiObjectiveFitness())) // TODO ???
+            {
+                // The existing sort index, if any, is now invalid.
+                sort_cache_invalid_ = true;
+                // Tree value should be previously cached, but just to be sure.
+                individual->treeValue();
+                // Cache fitness on Individual using given FitnessFunction.
+//                individual->setFitness(fitness_function(individual));
+                individual->setMultiObjectiveFitness(mo_fitness_function(individual));
+            }
+            
+            // TODO needs to return the which_objective-th of mo_fitness
+            return individual->getFitness();
+        };
+        // Create a TournamentFunction based on the augmented FitnessFunction.
+        auto tournament_function = [&](TournamentGroup group)
+        {
+            group.setAllMetrics(augmented_fitness_function);
+            return group;
+        };
+        // Finally, do a tournament-based evolution step.
+        evolutionStep(tournament_function);
+         
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Delete Individual at index i, then overwrite pointer with replacement.
     void replaceIndividual(int i, Individual* new_individual, SubPop& subpop)
     {

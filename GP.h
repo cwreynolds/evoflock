@@ -20,26 +20,58 @@
 
 namespace LP = LazyPredator;
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240330 WIP for multi-objective fitness
+#ifdef MULTI_OBJECTIVE_FITNESS
+#else
+#endif
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240327 WIP for multi-objective fitness
+// TODO 20240330 WIP for multi-objective fitness
+#define MULTI_OBJECTIVE_FITNESS
 
+
+typedef std::vector<double> MultiObjectiveFitness;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    // TODO 20240327 WIP for multi-objective fitness
+//
+//    // Fitness function, simply returns Individual's tree's value (computing it and
+//    // caching it on first call).
+//    inline float evoflock_fitness_function(LazyPredator::Individual* individual)
+//    {
+//        return std::any_cast<double>(individual->tree().getRootValue());
+//    }
+//
+//    //    // Fitness function, simply returns Individual's tree's value (computing it and
+//    //    // caching it on first call).
+//    //    inline std::vector<double> evoflock_fitness_function(LazyPredator::Individual* individual)
+//    //    {
+//    //        // TODO 20240327 MOCK!!
+//    //        std::vector<double> multi_objective_fitness = {0.0, 0.2, 0.4, 0.6, 0.8, 1.0};
+//    //        return multi_objective_fitness;
+//    //    }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240330 WIP for multi-objective fitness
+#ifdef MULTI_OBJECTIVE_FITNESS
+// Fitness function, simply returns Individual's tree's value (computing it and
+// caching it on first call).
+inline MultiObjectiveFitness evoflock_fitness_function(LazyPredator::Individual* individual)
+{
+    return std::any_cast<MultiObjectiveFitness>(individual->tree().getRootValue());
+}
+#else
 // Fitness function, simply returns Individual's tree's value (computing it and
 // caching it on first call).
 inline float evoflock_fitness_function(LazyPredator::Individual* individual)
 {
     return std::any_cast<double>(individual->tree().getRootValue());
 }
-
-//    // Fitness function, simply returns Individual's tree's value (computing it and
-//    // caching it on first call).
-//    inline std::vector<double> evoflock_fitness_function(LazyPredator::Individual* individual)
-//    {
-//        // TODO 20240327 MOCK!!
-//        std::vector<double> multi_objective_fitness = {0.0, 0.2, 0.4, 0.6, 0.8, 1.0};
-//        return multi_objective_fitness;
-//    }
-
+#endif
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -66,24 +98,11 @@ void fitness_logger(double separation_fitness, double good_separation_fraction,
         if (raw > -1) { std::cout << " (" << raw <<  ")"; }
         std::cout << std::endl;
     };
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240328 WIP for multi-objective fitness
-//    print("    nn_sep_err", nn_sep_fitness,    nn_sep_err);
-//    print("    collide   ", collide_fitness,   collide);
-//    print("    speed_err ", speed_err_fitness, speed_err);
-//    print("    fitness   ", fitness);
-//    print("    separation_fitness", nn_sep_fitness,    nn_sep_err);
-//    print("    avoid_fitness     ", collide_fitness,   collide);
-//    print("    speed_fitness     ", speed_err_fitness, speed_err);
-//    print("    fitness   ", fitness);
-
     print("separation_fitness", separation_fitness, good_separation_fraction);
     print("avoid_fitness     ", avoid_fitness,      good_avoid_fraction);
     print("speed_fitness     ", speed_fitness,      good_speed_fraction);
     print("occupied_fitness  ", occupied_fitness,   occupied_fraction);
     print("fitness           ", fitness);
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << std::endl;
     
     // restore output format flags and precision
@@ -190,56 +209,12 @@ double fitness_product_weight_01(double fitness, double weight)
 
 inline bool print_occupancy_map = false;  // Just for debugging.
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240330 WIP for multi-objective fitness
+// split multiObjectiveFitnessOfFloc from measure_fitness_after_flock_simulation
 
-//    // Compute fitness and return it as value of GpTree.
-//    inline double measure_fitness_after_flock_simulation(const Flock& flock)
-//    {
-//        double steps = flock.max_simulation_steps();
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20240328 WIP for multi-objective fitness
-//        double good_separation_fraction = flock.count_steps_good_separation / steps;
-//        double good_avoid_fraction    = flock.count_steps_avoid_obstacle / steps;
-//        double good_speed_fraction  = flock.count_steps_good_speed  / steps;
-//        auto ignore_function = [](Vec3 p) { return p.length() > 50;};
-//        double occupied_fraction = flock.occupancy_map.fractionOccupied(ignore_function);
-//
-//    //    debugPrint(flock.count_steps_good_separation)
-//    //    debugPrint(flock.count_steps_avoid_obstacle)
-//    //    debugPrint(flock.count_steps_good_speed)
-//    //    debugPrint(flock.count_steps_good_separation / steps)
-//    //    debugPrint(flock.count_steps_avoid_obstacle   / steps)
-//    //    debugPrint(flock.count_steps_good_speed      / steps)
-//
-//        double separation_fitness = keep_above_zero(good_separation_fraction);
-//        double avoid_fitness      = keep_above_zero(good_avoid_fraction);
-//        double speed_fitness      = keep_above_zero(good_speed_fraction);
-//        double occupied_fitness   = keep_above_zero(occupied_fraction);
-//
-//        separation_fitness = fitness_product_weight_01(separation_fitness, 0.6);
-//        avoid_fitness      = fitness_product_weight_01(avoid_fitness,      1.0);
-//        speed_fitness      = fitness_product_weight_01(speed_fitness,      0.2);
-//        occupied_fitness   = fitness_product_weight_01(occupied_fitness,   0.6);
-//
-//    //    debugPrint(occupied_fraction)
-//    //    debugPrint(occupied_fitness)
-//
-//        double fitness = (separation_fitness * avoid_fitness *
-//                          speed_fitness * occupied_fitness);
-//
-//        fitness_logger(separation_fitness, good_separation_fraction,
-//                       avoid_fitness,      good_avoid_fraction,
-//                       speed_fitness,      good_speed_fraction,
-//                       occupied_fitness,   occupied_fraction,
-//                       fitness);
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//        // Just for testing
-//        if (print_occupancy_map) { flock.occupancy_map.print(true); }
-//        return fitness;
-//    }
-
-// Compute fitness from metrics maintained by flock during simulation.
-inline double measure_fitness_after_flock_simulation(const Flock& flock)
+//inline std::vector<double> multiObjectiveFitnessOfFlock(const Flock& flock)
+inline MultiObjectiveFitness multiObjectiveFitnessOfFlock(const Flock& flock)
 {
     double steps = flock.max_simulation_steps();
     double good_separation_fraction = flock.count_steps_good_separation / steps;
@@ -247,6 +222,27 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
     double good_speed_fraction  = flock.count_steps_good_speed  / steps;
     auto ignore_function = [](Vec3 p) { return p.length() > 50;};
     double occupied_fraction = flock.occupancy_map.fractionOccupied(ignore_function);
+    return {good_separation_fraction,
+            good_avoid_fraction,
+            good_speed_fraction,
+            occupied_fraction};
+}
+
+// Compute fitness from metrics maintained by flock during simulation.
+inline double measure_fitness_after_flock_simulation(const Flock& flock)
+{
+//    double steps = flock.max_simulation_steps();
+//    double good_separation_fraction = flock.count_steps_good_separation / steps;
+//    double good_avoid_fraction    = flock.count_steps_avoid_obstacle / steps;
+//    double good_speed_fraction  = flock.count_steps_good_speed  / steps;
+//    auto ignore_function = [](Vec3 p) { return p.length() > 50;};
+//    double occupied_fraction = flock.occupancy_map.fractionOccupied(ignore_function);
+
+    MultiObjectiveFitness mo_fitness = multiObjectiveFitnessOfFlock(flock);
+    double good_separation_fraction = mo_fitness.at(0);
+    double good_avoid_fraction      = mo_fitness.at(1);
+    double good_speed_fraction      = mo_fitness.at(2);
+    double occupied_fraction        = mo_fitness.at(3);
 
     double separation_fitness = keep_above_zero(good_separation_fraction);
     double avoid_fitness      = keep_above_zero(good_avoid_fraction);
@@ -269,23 +265,47 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
     if (print_occupancy_map) { flock.occupancy_map.print(true); }
     return fitness;
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240330 WIP for multi-objective fitness
+#ifdef MULTI_OBJECTIVE_FITNESS
+// Run flock simulation with given parameters, return a MultiObjectiveFitness.
+inline MultiObjectiveFitness run_flock_simulation(const FlockParameters& fp,
+                                                  bool write_flock_data_file = false)
+#else
 // Run flock simulation with given parameters, return a scalar fitness on [0,1].
 inline double run_flock_simulation(const FlockParameters& fp,
                                    bool write_flock_data_file = false)
+#endif
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     Flock flock;
     init_flock(flock);
     flock.setSaveBoidCenters(write_flock_data_file);
     flock.fp() = fp;
     flock.run();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240330 WIP for multi-objective fitness
+#ifdef MULTI_OBJECTIVE_FITNESS
+    return multiObjectiveFitnessOfFlock(flock);
+#else
     return measure_fitness_after_flock_simulation(flock);
+#endif
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240330 WIP for multi-objective fitness
+#ifdef MULTI_OBJECTIVE_FITNESS
+// Run flock simulation with given parameters, return a MultiObjectiveFitness.
+inline MultiObjectiveFitness run_flock_simulation(double max_force,
+#else
 // Run flock simulation with given parameters, return a scalar fitness on [0,1].
 inline double run_flock_simulation(double max_force,
+#endif
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                                    double max_speed,
                                    double min_speed,
                                    double speed,
@@ -337,16 +357,36 @@ inline double run_flock_simulation(double max_force,
 }
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240330 WIP for multi-objective fitness
+#ifdef MULTI_OBJECTIVE_FITNESS
+// Run flock simulation with given parameters, return a MultiObjectiveFitness.
+inline MultiObjectiveFitness run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
+{
+    return run_flock_simulation(FlockParameters(), write_flock_data_file);
+}
+#else
 // Run flock simulation with given parameters, return a scalar fitness on [0,1].
 inline double run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
 {
     return run_flock_simulation(FlockParameters(), write_flock_data_file);
 }
+#endif
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240330 WIP for multi-objective fitness
+#ifdef MULTI_OBJECTIVE_FITNESS
+// Wrote this to run at the end of evolution on the top-10 fitness individuals
+// of population in order to record flock data for playback
+inline MultiObjectiveFitness rerun_flock_simulation(const LazyPredator::Individual* individual)
+#else
 // Wrote this to run at the end of evolution on the top-10 fitness individuals
 // of population in order to record flock data for playback
 inline float rerun_flock_simulation(const LazyPredator::Individual* individual)
+#endif
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     LazyPredator::GpTree t = individual->tree(); // copy tree
     return run_flock_simulation(t.evalSubtree<double>(0),
@@ -392,7 +432,27 @@ inline float rerun_flock_simulation(const LazyPredator::Individual* individual)
 LazyPredator::FunctionSet evoflock_gp_function_set =
 {
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240330 WIP for multi-objective fitness
+#ifdef MULTI_OBJECTIVE_FITNESS
+        { "Multi_Objective_Fitness" },
+        
+        // TODO needs work, like Texture in TexSyn (see constructors for GpType):
+//        {
+//            "Texture",
+//            [](std::any a)
+//            {
+//                if (a.has_value())
+//                {
+//                    Texture* t = std::any_cast<Texture*>(a);
+//                    if (t && t->valid()) delete t;
+//                }
+//            }
+//        },
+#else
         { "Fitness_0_1", 0.0,   1.0 },
+#endif
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         { "Real_0_1",    0.0,   1.0 },
         { "Real_0_10",   0.0,  10.0 },
         { "Real_0_100",  0.0, 100.0 },
@@ -406,8 +466,16 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
             // GP function name:
             "Run_Flock",
             
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240330 WIP for multi-objective fitness
+#ifdef MULTI_OBJECTIVE_FITNESS
+            // Return type (in this case it returns a MultiObjectiveFitness):
+            "Multi_Objective_Fitness",
+#else
             // Return type (in this case it returns a fitness on [0,1]):
             "Fitness_0_1",
+#endif
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
             // Function parameter type list:
             //     TODO cf "FlockParameters" for details

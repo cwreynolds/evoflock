@@ -380,8 +380,16 @@ int main(int argc, const char * argv[])
     {
         const LP::Individual* individual = population->nthBestFitness(i);
         std::cout << individual->tree().to_string() << std::endl;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240330 WIP for multi-objective fitness
+#ifdef MULTI_OBJECTIVE_FITNESS
+        auto fitness = rerun_flock_simulation(individual);
+        debugPrint(LP::vec_to_string(fitness));
+#else
         double fitness = rerun_flock_simulation(individual);
         debugPrint(fitness);
+#endif
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     print_occupancy_map = true;
@@ -389,8 +397,16 @@ int main(int argc, const char * argv[])
     std::cout << std::endl;
     const LP::Individual* individual = population->nthBestFitness(0);
     std::cout << individual->tree().to_string() << std::endl;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240330 WIP for multi-objective fitness
+#ifdef MULTI_OBJECTIVE_FITNESS
+    auto fitness = rerun_flock_simulation(individual);
+    debugPrint(LP::vec_to_string(fitness));
+#else
     double fitness = rerun_flock_simulation(individual);
     debugPrint(fitness);
+#endif
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     delete population;
 

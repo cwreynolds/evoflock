@@ -254,10 +254,6 @@ public:
         
         // TODO 20240329 starting to prototype multi-objective case:
 
-        // TODO this is set to a random index into mo_fitness in tournament_function
-        int which_objective = -1;
-        int count_objective = -1;
-
         // Wrap given FitnessFunction to ensure Individual has cached fitness.
         auto augmented_fitness_function = [&](Individual* individual)
         {
@@ -280,6 +276,13 @@ public:
         // Create a TournamentFunction based on the augmented FitnessFunction.
         auto tournament_function = [&](TournamentGroup group)
         {
+            // TODO this is set to a random index into mo_fitness in tournament_function
+            int which_objective = -1;
+            int count_objective = -1;
+
+            
+            debugPrint(group.members().size())
+            
             group.setAllMetrics(augmented_fitness_function);
             return group;
         };

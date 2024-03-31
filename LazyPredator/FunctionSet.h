@@ -35,14 +35,33 @@
 namespace LazyPredator
 {
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240330 WIP for multi-objective fitness
+
+//    // Used only below in FunctionSet, then undef-ed at end of file.
+//    #define name_lookup_util(name, map)               \
+//    [&]()                                             \
+//    {                                                 \
+//    auto it = map.find(name);                     \
+//    assert("unknown type" && (it != map.end()));  \
+//    return &(it->second);                         \
+//    }()
+
 // Used only below in FunctionSet, then undef-ed at end of file.
-#define name_lookup_util(name, map)               \
-[&]()                                             \
-{                                                 \
-auto it = map.find(name);                     \
-assert("unknown type" && (it != map.end()));  \
-return &(it->second);                         \
+#define name_lookup_util(name, map, category)                         \
+[&]()                                                                 \
+{                                                                     \
+    auto it = map.find(name);                                         \
+    bool found = it != map.end();                                     \
+    if (not found)                                                    \
+    {                                                                 \
+        std::cout << category << " not found: " << name << std::endl; \
+    }                                                                 \
+    assert("unknown type" && found);                                  \
+    return &(it->second);                                             \
 }()
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Defines the function set used in a STGP run. Consists of a collection of
 // GpTypes and one of GpFunctions. Supports creation of random program drawn
@@ -288,9 +307,9 @@ public:
     // const (public, read only) and non-const (private, writable, for internal
     // use only during constructor). Use macro to remove code duplication.
     const GpType* lookupGpTypeByName(const std::string& name) const
-    { return name_lookup_util(name, nameToGpTypeMap()); }
+    { return name_lookup_util(name, nameToGpTypeMap(), "GpType"); }
     const GpFunction* lookupGpFunctionByName(const std::string& name) const
-    { return name_lookup_util(name, nameToGpFunctionMap()); }
+    { return name_lookup_util(name, nameToGpFunctionMap(), "GpFunction"); }
     
     // Add new GpType/GpFunction to FunctionSet, stored in a name-to-object map.
     void addGpType(GpType& type) { name_to_gp_type_[type.name()] = type; }
@@ -350,9 +369,9 @@ private:
     std::map<std::string, GpFunction> name_to_gp_function_;
     // Non-const versions for use only in constructor.
     GpType* lookupGpTypeByName(const std::string& name)
-    { return name_lookup_util(name, nameToGpTypeMap()); }
+    { return name_lookup_util(name, nameToGpTypeMap(), "GpType"); }
     GpFunction* lookupGpFunctionByName(const std::string& name)
-    { return name_lookup_util(name, nameToGpFunctionMap()); }
+    { return name_lookup_util(name, nameToGpFunctionMap(), "GpFunction"); }
     // The type returned from the root of trees built from this function set.
     GpType* root_type_ = nullptr;
     // The smallest size for a subtree (GpTree) to be exchanged between parent

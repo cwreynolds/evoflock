@@ -276,14 +276,81 @@ public:
         // Create a TournamentFunction based on the augmented FitnessFunction.
         auto tournament_function = [&](TournamentGroup group)
         {
-            // TODO this is set to a random index into mo_fitness in tournament_function
-            int which_objective = -1;
-            int count_objective = -1;
+            // This sets fitness for each group member, computing it if needed.
+            group.setAllMetrics(augmented_fitness_function);
 
             
-            debugPrint(group.members().size())
+            const auto& members = group.members();
+//            debugPrint(members.size())
             
-            group.setAllMetrics(augmented_fitness_function);
+//            auto mo_fitness = [](const TournamentGroupMember& m)
+//            {
+//                Individual* i = m.individual;
+//                return i->getMultiObjectiveFitness();
+//            };
+
+            auto mo_fitness = [&](int gmi)
+            {
+                const TournamentGroupMember& m = members.at(gmi);
+                Individual* i = m.individual;
+                return i->getMultiObjectiveFitness();
+            };
+
+            auto mo_size = [&](int gmi)
+            {
+                return mo_fitness(gmi).size();
+            };
+            
+            
+//            assert(mo_size(members.at(0)) == mo_size(members.at(1)));
+//            assert(mo_size(members.at(1)) == mo_size(members.at(2)));
+            
+            // TODO this assumes there are always 3 group members, which will be
+            // true, but better to check that "all" group members have same size.
+            assert(mo_size(0) == mo_size(1));
+            assert(mo_size(1) == mo_size(2));
+
+//            debugPrint(vec_to_string(mo_fitness(members[0])))
+            
+//            std::cout << "    {" << vec_to_string(mo_fitness(0)) << "}" << std::endl;
+//            std::cout << "    {" << vec_to_string(mo_fitness(1)) << "}" << std::endl;
+//            std::cout << "    {" << vec_to_string(mo_fitness(2)) << "}" << std::endl;
+            
+            
+            auto mo_fitness_as_string = [&](int gmi)
+            {
+                auto mof = mo_fitness(gmi);
+                std::stringstream s;
+                bool first = true;
+                s << "{";
+                for (auto& f : mof)
+                {
+                    if (first) { first = false; } else { s << ", "; }
+                    s << std::setprecision(4) << std::setw(6) << std::fixed;
+                    s << f;
+                }
+                s << "}";
+                return s.str();
+            };
+            
+            
+            std::cout << "    " << mo_fitness_as_string(0) << std::endl;
+            std::cout << "    " << mo_fitness_as_string(1) << std::endl;
+            std::cout << "    " << mo_fitness_as_string(2) << std::endl;
+
+
+//            assert(mo_count()
+//                   members.at(0).getMultiObjectiveFitness().size() ==
+//                   members.at(1).getMultiObjectiveFitness().size());
+//            assert(members.at(1).getMultiObjectiveFitness().size() == members.at(2).getMultiObjectiveFitness().size());
+
+//            // TODO this is set to a random index into mo_fitness in tournament_function
+//            int which_objective = -1;
+//            int count_objective = -1;
+//
+//            debugPrint(group.members().size())
+            
+//            group.setAllMetrics(augmented_fitness_function);
             return group;
         };
         // Finally, do a tournament-based evolution step.

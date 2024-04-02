@@ -357,6 +357,7 @@ int main(int argc, const char * argv[])
     {
         std::cout << "Create population." << std::endl;
         util::Timer t("Create population.");
+        evoflock_gp_function_set.setCrossoverFunction(evoflock_ga_crossover);
         population = new LazyPredator::Population (individuals,
                                                    subpops,
                                                    max_tree_size,

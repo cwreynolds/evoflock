@@ -340,9 +340,6 @@ public:
     // leaf values such as numeric constants. Values of 2 or more exclude those.
     int getCrossoverMinSize() const { return crossover_min_size_; }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240305 adding crossover_function_hook_ for custom crossover.
-    
     typedef std::function<void(const GpTree& parent0,
                                const GpTree& parent1,
                                GpTree& offspring,
@@ -359,8 +356,6 @@ public:
     {
         return crossover_function_hook_;
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 private:
     // These maps are used both to store the GpType and GpFunction objects,

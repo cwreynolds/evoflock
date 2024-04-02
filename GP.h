@@ -425,6 +425,28 @@ inline float rerun_flock_simulation(const LazyPredator::Individual* individual)
 //               0.534839, 0.0996812, 0.405398)                // angle
 
 
+// A custom “GA style” crossover for this degenerate GP function set.
+inline void evoflock_ga_crossover(const LP::GpTree& parent0,
+                                  const LP::GpTree& parent1,
+                                  LP::GpTree& offspring,
+                                  int min_size,
+                                  int max_size,
+                                  int fs_min_size)
+{
+    offspring = parent0;
+    for (int i = 0; i < parent0.subtrees().size(); i++)
+    {
+        if (LP::LPRS().randomBool())
+        {
+            offspring.getSubtree(i) = parent1.getSubtree(i);
+        }
+    }
+    //std::cout << "parent0:   " << parent0.to_string()   << std::endl;
+    //std::cout << "parent1:   " << parent1.to_string()   << std::endl;
+    //std::cout << "offspring: " << offspring.to_string() << std::endl;
+}
+
+
 // This is a degenerate GP function set, for what is essentially a GA problem:
 // selecting a set of real number parameters for a flock simulation, via an
 // absolute and fixed fitness metric. There is only one function, all GpTrees

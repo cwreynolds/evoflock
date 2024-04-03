@@ -11,6 +11,10 @@
 #include "FunctionSet.h"
 #include "TournamentGroup.h"
 #include <iomanip>
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240402 for std::reduce
+#include <numeric>
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 namespace LazyPredator
 {
@@ -208,6 +212,292 @@ public:
     // several independent objectives.
     typedef std::function<std::vector<double>(Individual*)>
             MultiObjectiveFitnessFunction;
+    
+    typedef std::vector<double> MultiObjectiveFitness;
+
+
+//        // TODO rewrite this for"multi objective" case:
+//        //
+//        // Perform one step of the "steady state" evolutionary computation using
+//        // "absolute fitness" (rather than "relative tournament-based fitness").
+//        // Takes a FitnessFunction which maps a given Individual to a numeric
+//        // "absolute fitness" value. Converts this into a TournamentFunction for
+//        // use in the "relative fitness" version of evolutionStep() above.
+//        //
+//        // ...each evolution step this randomly choses one of the n objectives, and
+//        // treats that as the fitness for this step, ignoring the others.
+//
+//        void evolutionStep(MultiObjectiveFitnessFunction mo_fitness_function)
+//        {
+//
+//            // TODO 20240329 I've copied in the body of the single objective case
+//            // (above) which I will modify incrementally. It would be good to find
+//            // ways to combine these so they share what code they can.
+//
+//    //        // Wrap given FitnessFunction to ensure Individual has cached fitness.
+//    //        auto augmented_fitness_function = [&](Individual* individual)
+//    //        {
+//    //            // In case Individual does not already have a cached fitness value.
+//    //            if (!(individual->hasFitness()))
+//    //            {
+//    //                // The existing sort index, if any, is now invalid.
+//    //                sort_cache_invalid_ = true;
+//    //                // Tree value should be previously cached, but just to be sure.
+//    //                individual->treeValue();
+//    //                // Cache fitness on Individual using given FitnessFunction.
+//    //                individual->setFitness(fitness_function(individual));
+//    //            }
+//    //            return individual->getFitness();
+//    //        };
+//    //        // Create a TournamentFunction based on the augmented FitnessFunction.
+//    //        auto tournament_function = [&](TournamentGroup group)
+//    //        {
+//    //            group.setAllMetrics(augmented_fitness_function);
+//    //            return group;
+//    //        };
+//    //        // Finally, do a tournament-based evolution step.
+//    //        evolutionStep(tournament_function);
+//
+//
+//            // TODO 20240329 starting to prototype multi-objective case:
+//
+//            // Wrap given FitnessFunction to ensure Individual has cached fitness.
+//            auto augmented_fitness_function = [&](Individual* individual)
+//            {
+//                // In case Individual does not already have a cached fitness value.
+//    //            if (!(individual->hasFitness()))
+//                if (!(individual->hasMultiObjectiveFitness())) // TODO ???
+//                {
+//                    // The existing sort index, if any, is now invalid.
+//                    sort_cache_invalid_ = true;
+//                    // Tree value should be previously cached, but just to be sure.
+//                    individual->treeValue();
+//                    // Cache fitness on Individual using given FitnessFunction.
+//    //                individual->setFitness(fitness_function(individual));
+//                    individual->setMultiObjectiveFitness(mo_fitness_function(individual));
+//                }
+//
+//                // TODO needs to return the which_objective-th of mo_fitness
+//                return individual->getFitness();
+//            };
+//            // Create a TournamentFunction based on the augmented FitnessFunction.
+//            auto tournament_function = [&](TournamentGroup group)
+//            {
+//                // This sets fitness for each group member, computing it if needed.
+//                group.setAllMetrics(augmented_fitness_function);
+//
+//
+//                const auto& members = group.members();
+//    //            debugPrint(members.size())
+//
+//    //            auto mo_fitness = [](const TournamentGroupMember& m)
+//    //            {
+//    //                Individual* i = m.individual;
+//    //                return i->getMultiObjectiveFitness();
+//    //            };
+//
+//                auto mo_fitness = [&](int gmi)
+//                {
+//                    const TournamentGroupMember& m = members.at(gmi);
+//                    Individual* i = m.individual;
+//                    return i->getMultiObjectiveFitness();
+//                };
+//
+//                auto mo_size = [&](int gmi)
+//                {
+//                    return mo_fitness(gmi).size();
+//                };
+//
+//
+//    //            assert(mo_size(members.at(0)) == mo_size(members.at(1)));
+//    //            assert(mo_size(members.at(1)) == mo_size(members.at(2)));
+//
+//                // TODO this assumes there are always 3 group members, which will be
+//                // true, but better to check that "all" group members have same size.
+//                assert(mo_size(0) == mo_size(1));
+//                assert(mo_size(1) == mo_size(2));
+//
+//    //            debugPrint(vec_to_string(mo_fitness(members[0])))
+//
+//    //            std::cout << "    {" << vec_to_string(mo_fitness(0)) << "}" << std::endl;
+//    //            std::cout << "    {" << vec_to_string(mo_fitness(1)) << "}" << std::endl;
+//    //            std::cout << "    {" << vec_to_string(mo_fitness(2)) << "}" << std::endl;
+//
+//
+//                auto mo_fitness_as_string = [&](int gmi)
+//                {
+//                    auto mof = mo_fitness(gmi);
+//                    std::stringstream s;
+//                    bool first = true;
+//                    s << "{";
+//                    for (auto& f : mof)
+//                    {
+//                        if (first) { first = false; } else { s << ", "; }
+//                        s << std::setprecision(4) << std::setw(6) << std::fixed;
+//                        s << f;
+//                    }
+//                    s << "}";
+//                    return s.str();
+//                };
+//
+//
+//                std::cout << "    " << mo_fitness_as_string(0) << std::endl;
+//                std::cout << "    " << mo_fitness_as_string(1) << std::endl;
+//                std::cout << "    " << mo_fitness_as_string(2) << std::endl;
+//
+//
+//    //            assert(mo_count()
+//    //                   members.at(0).getMultiObjectiveFitness().size() ==
+//    //                   members.at(1).getMultiObjectiveFitness().size());
+//    //            assert(members.at(1).getMultiObjectiveFitness().size() == members.at(2).getMultiObjectiveFitness().size());
+//
+//    //            // TODO this is set to a random index into mo_fitness in tournament_function
+//    //            int which_objective = -1;
+//    //            int count_objective = -1;
+//    //
+//    //            debugPrint(group.members().size())
+//
+//    //            group.setAllMetrics(augmented_fitness_function);
+//                return group;
+//            };
+//            // Finally, do a tournament-based evolution step.
+//            evolutionStep(tournament_function);
+//
+//        }
+
+//        // TODO rewrite this for"multi objective" case:
+//        //
+//        // Perform one step of the "steady state" evolutionary computation using
+//        // "absolute fitness" (rather than "relative tournament-based fitness").
+//        // Takes a FitnessFunction which maps a given Individual to a numeric
+//        // "absolute fitness" value. Converts this into a TournamentFunction for
+//        // use in the "relative fitness" version of evolutionStep() above.
+//        //
+//        // ...each evolution step this randomly choses one of the n objectives, and
+//        // treats that as the fitness for this step, ignoring the others.
+//
+//        void evolutionStep(MultiObjectiveFitnessFunction mo_fitness_function)
+//        {
+//            // Wrap given FitnessFunction to ensure Individual has cached fitness.
+//            auto augmented_fitness_function = [&](Individual* individual)
+//            {
+//                // In case Individual does not already have a cached fitness value.
+//                if (!(individual->hasMultiObjectiveFitness())) // TODO ???
+//                {
+//                    // The existing sort index, if any, is now invalid.
+//                    sort_cache_invalid_ = true;
+//                    // Tree value should be previously cached, but just to be sure.
+//                    individual->treeValue();
+//    //                // Cache fitness on Individual using given FitnessFunction.
+//    //                individual->setMultiObjectiveFitness(mo_fitness_function(individual));
+//    //
+//    //
+//    //                MultiObjectiveFitness mof = individual->getMultiObjectiveFitness();
+//    //                individual->setFitness(std::reduce(mof.begin(), mof.end(), 1.0,
+//    //                                                   std::multiplies()));
+//
+//                    // Cache fitness on Individual using given FitnessFunction.
+//                    MultiObjectiveFitness mof = mo_fitness_function(individual);
+//                    individual->setMultiObjectiveFitness(mof);
+//
+//                    // Set scalar fitness to product of objectives
+//                    // TODO 20240402 this needs to be customizable.
+//                    individual->setFitness(std::reduce(mof.begin(), mof.end(), 1.0,
+//                                                       std::multiplies()));
+//                }
+//
+//                // TODO needs to return the which_objective-th of mo_fitness
+//                // TODO no, actually this will be done in the TournamentFunction
+//                return individual->getFitness();
+//            };
+//
+//            // Create a TournamentFunction based on the augmented FitnessFunction.
+//            auto tournament_function = [&](TournamentGroup group)
+//            {
+//                // Set MO-fitness for each group member, computing it if needed.
+//                group.setAllMetrics(augmented_fitness_function);
+//
+//                // TODO just shorter name. Reconsider
+//    //            const auto& members = group.members();
+//                auto& members = group.members();
+//
+//                auto mo_fitness = [&](int gmi)
+//                {
+//                    const TournamentGroupMember& m = members.at(gmi);
+//                    Individual* i = m.individual;
+//                    return i->getMultiObjectiveFitness();
+//                };
+//
+//    //            auto mo_size = [&](int gmi)
+//    //            {
+//    //                return mo_fitness(gmi).size();
+//    //            };
+//
+//                auto tgm_fitness = [&](const TournamentGroupMember& m)
+//                {
+//                    Individual* i = m.individual;
+//                    return i->getMultiObjectiveFitness();
+//                };
+//                auto tgm_size = [&](const TournamentGroupMember& m)
+//                {
+//                    return tgm_fitness(m).size();
+//                };
+//
+//
+//                // Make sure mo_fitness of all group members is the same size.
+//                for (auto& m : members){assert(tgm_size(members[0]) == tgm_size(m));}
+//
+//                auto mo_fitness_as_string = [&](int gmi)
+//                {
+//                    auto mof = mo_fitness(gmi);
+//                    std::stringstream s;
+//                    bool first = true;
+//                    s << "{";
+//                    for (auto& f : mof)
+//                    {
+//                        if (first) { first = false; } else { s << ", "; }
+//                        s << std::setprecision(4) << std::setw(6) << std::fixed;
+//                        s << f;
+//                    }
+//                    s << "}";
+//                    return s.str();
+//                };
+//                std::cout << "    " << mo_fitness_as_string(0) << std::endl;
+//                std::cout << "    " << mo_fitness_as_string(1) << std::endl;
+//                std::cout << "    " << mo_fitness_as_string(2) << std::endl;
+//
+//                size_t random_index = LPRS().randomN(tgm_size(members[0]));
+//                std::cout << "    ";
+//                debugPrint(random_index)
+//                std::cout << "    selected objective metrics: ";
+//                for (auto& m : members)
+//                {
+//                    const MultiObjectiveFitness& mof = tgm_fitness(m);
+//                    auto selected_fitness = mof.at(random_index);
+//                    m.metric = selected_fitness;
+//                    std::cout << selected_fitness << " ";
+//                }
+//                std::cout << std::endl;
+//
+//
+//    //            assert(mo_count()
+//    //                   members.at(0).getMultiObjectiveFitness().size() ==
+//    //                   members.at(1).getMultiObjectiveFitness().size());
+//    //            assert(members.at(1).getMultiObjectiveFitness().size() == members.at(2).getMultiObjectiveFitness().size());
+//
+//    //            // TODO this is set to a random index into mo_fitness in tournament_function
+//    //            int which_objective = -1;
+//    //            int count_objective = -1;
+//    //
+//    //            debugPrint(group.members().size())
+//
+//    //            group.setAllMetrics(augmented_fitness_function);
+//                return group;
+//            };
+//            // Finally, do a tournament-based evolution step.
+//            evolutionStep(tournament_function);
+//
+//        }
 
     // TODO rewrite this for"multi objective" case:
     //
@@ -222,43 +512,10 @@ public:
 
     void evolutionStep(MultiObjectiveFitnessFunction mo_fitness_function)
     {
-        
-        // TODO 20240329 I've copied in the body of the single objective case
-        // (above) which I will modify incrementally. It would be good to find
-        // ways to combine these so they share what code they can.
-        
-//        // Wrap given FitnessFunction to ensure Individual has cached fitness.
-//        auto augmented_fitness_function = [&](Individual* individual)
-//        {
-//            // In case Individual does not already have a cached fitness value.
-//            if (!(individual->hasFitness()))
-//            {
-//                // The existing sort index, if any, is now invalid.
-//                sort_cache_invalid_ = true;
-//                // Tree value should be previously cached, but just to be sure.
-//                individual->treeValue();
-//                // Cache fitness on Individual using given FitnessFunction.
-//                individual->setFitness(fitness_function(individual));
-//            }
-//            return individual->getFitness();
-//        };
-//        // Create a TournamentFunction based on the augmented FitnessFunction.
-//        auto tournament_function = [&](TournamentGroup group)
-//        {
-//            group.setAllMetrics(augmented_fitness_function);
-//            return group;
-//        };
-//        // Finally, do a tournament-based evolution step.
-//        evolutionStep(tournament_function);
-        
-        
-        // TODO 20240329 starting to prototype multi-objective case:
-
         // Wrap given FitnessFunction to ensure Individual has cached fitness.
         auto augmented_fitness_function = [&](Individual* individual)
         {
             // In case Individual does not already have a cached fitness value.
-//            if (!(individual->hasFitness()))
             if (!(individual->hasMultiObjectiveFitness())) // TODO ???
             {
                 // The existing sort index, if any, is now invalid.
@@ -266,57 +523,43 @@ public:
                 // Tree value should be previously cached, but just to be sure.
                 individual->treeValue();
                 // Cache fitness on Individual using given FitnessFunction.
-//                individual->setFitness(fitness_function(individual));
-                individual->setMultiObjectiveFitness(mo_fitness_function(individual));
+                MultiObjectiveFitness mof = mo_fitness_function(individual);
+                individual->setMultiObjectiveFitness(mof);
+                // Set scalar fitness to product of objectives
+                // TODO 20240402 this needs to be customizable.
+                individual->setFitness(std::reduce(mof.begin(), mof.end(), 1.0,
+                                                   std::multiplies()));
             }
-            
-            // TODO needs to return the which_objective-th of mo_fitness
             return individual->getFitness();
         };
+        
         // Create a TournamentFunction based on the augmented FitnessFunction.
         auto tournament_function = [&](TournamentGroup group)
         {
-            // This sets fitness for each group member, computing it if needed.
+            // Set MO-fitness for each group member, computing it if needed.
             group.setAllMetrics(augmented_fitness_function);
-
             
-            const auto& members = group.members();
-//            debugPrint(members.size())
-            
-//            auto mo_fitness = [](const TournamentGroupMember& m)
-//            {
-//                Individual* i = m.individual;
-//                return i->getMultiObjectiveFitness();
-//            };
-
+            // TODO just shorter names. Reconsider
+            auto& members = group.members();
             auto mo_fitness = [&](int gmi)
             {
                 const TournamentGroupMember& m = members.at(gmi);
                 Individual* i = m.individual;
                 return i->getMultiObjectiveFitness();
             };
-
-            auto mo_size = [&](int gmi)
+            auto tgm_fitness = [&](const TournamentGroupMember& m)
             {
-                return mo_fitness(gmi).size();
+                Individual* i = m.individual;
+                return i->getMultiObjectiveFitness();
             };
-            
-            
-//            assert(mo_size(members.at(0)) == mo_size(members.at(1)));
-//            assert(mo_size(members.at(1)) == mo_size(members.at(2)));
-            
-            // TODO this assumes there are always 3 group members, which will be
-            // true, but better to check that "all" group members have same size.
-            assert(mo_size(0) == mo_size(1));
-            assert(mo_size(1) == mo_size(2));
+            auto tgm_size = [&](const TournamentGroupMember& m)
+            {
+                return tgm_fitness(m).size();
+            };
 
-//            debugPrint(vec_to_string(mo_fitness(members[0])))
-            
-//            std::cout << "    {" << vec_to_string(mo_fitness(0)) << "}" << std::endl;
-//            std::cout << "    {" << vec_to_string(mo_fitness(1)) << "}" << std::endl;
-//            std::cout << "    {" << vec_to_string(mo_fitness(2)) << "}" << std::endl;
-            
-            
+            // Make sure mo_fitness of all group members is the same size.
+            for (auto& m : members){assert(tgm_size(members[0])==tgm_size(m));}
+
             auto mo_fitness_as_string = [&](int gmi)
             {
                 auto mof = mo_fitness(gmi);
@@ -332,32 +575,60 @@ public:
                 s << "}";
                 return s.str();
             };
-            
-            
             std::cout << "    " << mo_fitness_as_string(0) << std::endl;
             std::cout << "    " << mo_fitness_as_string(1) << std::endl;
             std::cout << "    " << mo_fitness_as_string(2) << std::endl;
-
-
-//            assert(mo_count()
-//                   members.at(0).getMultiObjectiveFitness().size() ==
-//                   members.at(1).getMultiObjectiveFitness().size());
-//            assert(members.at(1).getMultiObjectiveFitness().size() == members.at(2).getMultiObjectiveFitness().size());
-
-//            // TODO this is set to a random index into mo_fitness in tournament_function
-//            int which_objective = -1;
-//            int count_objective = -1;
-//
-//            debugPrint(group.members().size())
             
-//            group.setAllMetrics(augmented_fitness_function);
+            // TODO 20240402 rather than pick one at random, test to find one
+            // index where all TournamentGroup values are not identical. Try one
+            // at random, then step around modulo the length of mo_fitness of
+            // all group members.
+            size_t random_index = LPRS().randomN(tgm_size(members[0]));
+            size_t mof_size = tgm_size(members[0]);
+            for (int i = 0; i < mof_size; i++)
+            {
+                bool first_m = true;
+                bool not_identical = false;
+                double metric = 0;
+//                auto mof = mo_fitness(int(random_index)); // ?????????????????
+                for (auto& m : members)
+                {
+                    auto mof = tgm_fitness(m);
+                    if (first_m)
+                    {
+                        metric = mof.at(random_index);
+                        first_m = false;
+                    }
+                    else
+                    {
+                        if (metric != tgm_fitness(m).at(random_index))
+                        {
+                            not_identical = true;
+                        }
+                    }
+                }
+                if (not_identical) break;
+                random_index = (random_index + 1) % mof_size;
+            }
+
+            
+            std::cout << "    ";
+            debugPrint(random_index)
+            std::cout << "    selected objective metrics: ";
+            for (auto& m : members)
+            {
+                const MultiObjectiveFitness& mof = tgm_fitness(m);
+                auto selected_fitness = mof.at(random_index);
+                m.metric = selected_fitness;
+                std::cout << selected_fitness << " ";
+            }
+            std::cout << std::endl;
             return group;
         };
         // Finally, do a tournament-based evolution step.
         evolutionStep(tournament_function);
-         
     }
-    
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Delete Individual at index i, then overwrite pointer with replacement.

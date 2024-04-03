@@ -285,14 +285,31 @@ inline double run_flock_simulation(const FlockParameters& fp,
     flock.setSaveBoidCenters(write_flock_data_file);
     flock.fp() = fp;
     flock.run();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    // TODO 20240330 WIP for multi-objective fitness
+//#ifdef MULTI_OBJECTIVE_FITNESS
+//    return multiObjectiveFitnessOfFlock(flock);
+//#else
+//    return measure_fitness_after_flock_simulation(flock);
+//#endif
+//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240330 WIP for multi-objective fitness
 #ifdef MULTI_OBJECTIVE_FITNESS
-    return multiObjectiveFitnessOfFlock(flock);
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20240402 add per-objective logging for MultiObjectiveFitness case.
+    // TODO          really ugly, needs polish.
+    auto mofof = multiObjectiveFitnessOfFlock(flock);
+    fitness_logger(mofof[0], -1, mofof[1], -1, mofof[2], -1, mofof[3], -1,
+                   (mofof[0] * mofof[1] * mofof[2] * mofof[3]));
+    return mofof;
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 #else
     return measure_fitness_after_flock_simulation(flock);
 #endif
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -342,7 +342,18 @@ int main(int argc, const char * argv[])
 //    return EXIT_SUCCESS;
     //--------------------------------------------------------------------------
 
+    //--------------------------------------------------------------------------
     
+    MultiObjectiveFitness ht_fitness = run_hand_tuned_flock_simulation(true);
+    debugPrint(LP::vec_to_string(ht_fitness));
+    return EXIT_SUCCESS;
+
+    //--------------------------------------------------------------------------
+
+    
+    MultiObjectiveFitness mfo = {0.1, 0.2, 0.3, 0.4, 0.5};
+    debugPrint(std::reduce(mfo.begin(), mfo.end(), 1.0, std::multiplies()));
+
     
     int individuals = 500;
     int subpops = 25;
@@ -411,12 +422,6 @@ int main(int argc, const char * argv[])
 
     delete population;
 
-    //--------------------------------------------------------------------------
-        
-//    double fitness = run_hand_tuned_flock_simulation(true);
-//    debugPrint(fitness);
-
-    //--------------------------------------------------------------------------
     
     return 0;
 }

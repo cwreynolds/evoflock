@@ -102,6 +102,7 @@ Vec3 ray_cylinder_intersection(const Vec3& ray_endpoint, const Vec3& ray_tangent
 //    double h = cyl_length;  // Scalar length along axis between endpoints.
     Vec3 o = ray_endpoint;  // The 3d origin/end/endpoint of ray.
     Vec3 n = ray_tangent;   // Unit 3d vector parallel to ray.
+    b = b - o;              // Offset b by the ray's origin/end/endpoint
     assert (a.is_unit_length());
     assert (n.is_unit_length());
     Vec3 na = n.cross(a);
@@ -365,6 +366,43 @@ void unit_test()
     // https://onlinemschool.com/math/assistance/cartesian_coordinate/p_line/
     assert (std::sqrt(2) / std::sqrt(3) ==
             distance_between_lines(zzz, ddd, ozo, Vec3(-1, 0, 1).normalize()));
+    
+    // This 20240403 test was added to find a bug in ray_cylinder_intersection's
+    // c++ rewrite. There is an "implied agent" at (x, 0, 0) where x sweeps from
+    // -1.5 to +1.5. The agent's forward is (0, 0, 1) pointing parallel to the
+    // +z axis. There is a vertical cylinder between (0, -1, 10) and (0, 1, 10).
+    // When x is between -1 and 1, the intersection is at (x, 0, z) where z is
+    // between 9 and 10.
+    {
+        Vec3 agent_forward(0, 0, 1);
+        Vec3 cyl_endpoint(0, -1, 10);
+        Vec3 cyl_tangent(0, 1, 0);
+        double cyl_radius = 1;
+        double cyl_length = 2;
+        for (int i = -15; i <= 15; i++)
+        {
+            Vec3 agent_position(i * 0.1, 0, 0);
+            Vec3 intersection = ray_cylinder_intersection(agent_position,
+                                                          agent_forward,
+                                                          cyl_endpoint,
+                                                          cyl_tangent,
+                                                          cyl_radius,
+                                                          cyl_length);
+            //std::cout << "agent_position = " << agent_position;
+            //std::cout << ", intersection = " << intersection << std::endl;
+            if (util::between(agent_position.x(), -1, 1 ))
+            {
+                assert(intersection.x() == agent_position.x());
+                assert(intersection.y() == agent_position.y());
+//                assert(intersection.z() >= 9);
+                assert(util::between(intersection.z(), 9, 10));
+            }
+            else
+            {
+                assert(intersection.is_none());
+            }
+        }
+    }
 }
 
 }  // end of namespace shape

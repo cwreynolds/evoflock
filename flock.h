@@ -18,6 +18,8 @@
 #include "Utilities.h"
 #include "Boid.h"
 #include "obstacle.h"
+#include "LazyPredator/LazyPredator.h"
+namespace LP = LazyPredator;
 #include <fstream>  // for logging simulation data to file.
 
 class Flock
@@ -133,30 +135,55 @@ public:
         }
     }
 
+//        // Populate this flock by creating "count" boids with uniformly distributed
+//        // random positions inside a sphere with the given "radius" and "center".
+//        // Each boid has a uniformly distributed random orientation.
+//        void make_boids(int count, double radius, Vec3 center)
+//        {
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20240403 does CylinderObstacle have a bug that breaks avoidance?
+//    //        RandomSequence rs; // TODO 20240202 temporary
+//            RandomSequence& rs = LP::LPRS();
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // Allocate default Boid instances.
+//            boid_instance_list().resize(boid_count());
+//            // Construct BoidPtrList.
+//            for (Boid& boid : boid_instance_list()) { boids().push_back(&boid); }
+//            // Set up each new Boid.
+//            for (Boid* boid : boids())
+//            {
+//    //            boid->set_fp(&fp());
+//    //            boid->set_draw(&draw());
+//    //            boid->set_flock_boids(&boids());
+//    //            boid->set_flock_obstacles(&obstacles());
+//    //            boid->set_ls(boid->ls().randomize_orientation());
+//    //            boid->setPosition(center + (rs.random_point_in_unit_radius_sphere() *
+//    //                                        radius * 0.95));
+//
+//                init_boid(boid, radius, center, rs);
+//
+//            }
+//            // Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
+//            for (Boid* boid : boids())
+//            {
+//                boid->recompute_nearest_neighbors();
+//                double t = rs.frandom01() * boid->neighbor_refresh_rate();
+//                boid->set_time_since_last_neighbor_refresh(t);
+//            }
+//        }
+
     // Populate this flock by creating "count" boids with uniformly distributed
     // random positions inside a sphere with the given "radius" and "center".
     // Each boid has a uniformly distributed random orientation.
     void make_boids(int count, double radius, Vec3 center)
     {
-        RandomSequence rs; // TODO 20240202 temporary
+        RandomSequence& rs = LP::LPRS();
         // Allocate default Boid instances.
         boid_instance_list().resize(boid_count());
         // Construct BoidPtrList.
         for (Boid& boid : boid_instance_list()) { boids().push_back(&boid); }
         // Set up each new Boid.
-        for (Boid* boid : boids())
-        {
-//            boid->set_fp(&fp());
-//            boid->set_draw(&draw());
-//            boid->set_flock_boids(&boids());
-//            boid->set_flock_obstacles(&obstacles());
-//            boid->set_ls(boid->ls().randomize_orientation());
-//            boid->setPosition(center + (rs.random_point_in_unit_radius_sphere() *
-//                                        radius * 0.95));
-            
-            init_boid(boid, radius, center, rs);
-
-        }
+        for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
         // Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
         for (Boid* boid : boids())
         {
@@ -165,23 +192,6 @@ public:
             boid->set_time_since_last_neighbor_refresh(t);
         }
     }
-    
-    //def init_boid(self, boid, radius, center):
-    //    boid.sphere_radius = radius
-    //    boid.sphere_center = center
-    //
-    //    # uniform over whole sphere enclosure
-    //    #    boid.ls = boid.ls.randomize_orientation()
-    //    #    boid.ls.p = (center + (radius * 0.95 *
-    //    #                           Vec3.random_point_in_unit_radius_sphere()))
-    //
-    //    mean_forward = Vec3(1, 0, 0)
-    //    noise_forward = Vec3.random_point_in_unit_radius_sphere() * 0.1
-    //    new_forward = (mean_forward + noise_forward).normalize()
-    //    boid.ls.rotate_to_new_forward(new_forward)
-    //    center_of_clump = center + Vec3(radius * -0.66, 0, 0)
-    //    offset_in_clump = radius * 0.33 * Vec3.random_point_in_unit_radius_sphere()
-    //    boid.ls.p = center_of_clump + offset_in_clump
 
     void init_boid(Boid* boid, double radius, Vec3 center, RandomSequence& rs)
     {

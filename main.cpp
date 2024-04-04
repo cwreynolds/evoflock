@@ -344,23 +344,24 @@ int main(int argc, const char * argv[])
 
     //--------------------------------------------------------------------------
     
-    MultiObjectiveFitness ht_fitness = run_hand_tuned_flock_simulation(true);
-    debugPrint(LP::vec_to_string(ht_fitness));
-    return EXIT_SUCCESS;
+//    for (int i = 0; i < 10; i++)
+//    {
+//        MultiObjectiveFitness ht_fitness = run_hand_tuned_flock_simulation(true);
+//        debugPrint(LP::vec_to_string(ht_fitness));
+//    }
+//    return EXIT_SUCCESS;
 
     //--------------------------------------------------------------------------
 
     
-    MultiObjectiveFitness mfo = {0.1, 0.2, 0.3, 0.4, 0.5};
-    debugPrint(std::reduce(mfo.begin(), mfo.end(), 1.0, std::multiplies()));
+//    MultiObjectiveFitness mfo = {0.1, 0.2, 0.3, 0.4, 0.5};
+//    debugPrint(std::reduce(mfo.begin(), mfo.end(), 1.0, std::multiplies()));
 
-    
+    //--------------------------------------------------------------------------
+
     int individuals = 500;
     int subpops = 25;
     int max_evolution_steps = 30000;
-//    int max_evolution_steps = 10;
-//    int max_evolution_steps = 50000;
-//    int max_evolution_steps = 10;
     int min_tree_size = 2;
     int max_tree_size = 20;
     LazyPredator::Population* population = nullptr;

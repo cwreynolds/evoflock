@@ -527,9 +527,42 @@ public:
                 individual->setMultiObjectiveFitness(mof);
                 // Set scalar fitness to product of objectives
                 // TODO 20240402 this needs to be customizable.
-                individual->setFitness(std::reduce(mof.begin(), mof.end(), 1.0,
-                                                   std::multiplies()));
+                // TODO 20240404 this is product of objectives
+//                individual->setFitness(std::reduce(mof.begin(), mof.end(), 1.0,
+//                                                   std::multiplies()));
+                
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20240405 try sum to scalarize fitness
+
+                debugPrint(vec_to_string(mof));
+                debugPrint(mof.size())
+                debugPrint(std::reduce(mof.begin(), mof.end(), 0.0, std::plus()))
+                debugPrint(std::reduce(mof.begin(), mof.end(), 0.0, std::plus()) / mof.size())
+
+                // TODO 20240404 this is average of objectives
+                individual->setFitness(std::reduce(mof.begin(),
+                                                   mof.end(), 0.0,
+                                                   std::plus()) / mof.size());
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20240404 more work on multi-objective fitness
+            //    void setFitness(float f) { fitness_ = f; has_fitness_ = true; }
+//            void setFitness(float f)
+//            {
+//                fitness_ = f;
+//                has_fitness_ = true;
+//                
+//                std::cout << "setFitness of Individual=" << this;
+//                std::cout << ", fitness=" << fitness_ << std::endl;
+//            }
+
+            std::cout << "fitness func  Individual=" << individual;
+            std::cout << ", fitness=" << individual->getFitness() << std::endl;
+            
+            std::cout << std::endl;
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             return individual->getFitness();
         };
         

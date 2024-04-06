@@ -53,7 +53,18 @@ public:
     void incrementTournamentsSurvived() { tournaments_survived_++; }
     // Added to support "absolute fitness" in addition to "tournament fitness".
     bool hasFitness() const { return has_fitness_; }
-    void setFitness(float f) { fitness_ = f; has_fitness_ = true; }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20240404 more work on multi-objective fitness
+//    void setFitness(float f) { fitness_ = f; has_fitness_ = true; }
+    void setFitness(float f)
+    {
+        fitness_ = f;
+        has_fitness_ = true;
+        
+        std::cout << "setFitness of Individual=" << this;
+        std::cout << ", fitness=" << fitness_ << std::endl;
+    }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     float getFitness() const
     {
         return hasFitness() ? fitness_ : getTournamentsSurvived() + getStanding();

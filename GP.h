@@ -301,8 +301,12 @@ inline double run_flock_simulation(const FlockParameters& fp,
     // TODO 20240402 add per-objective logging for MultiObjectiveFitness case.
     // TODO          really ugly, needs polish.
     auto mofof = multiObjectiveFitnessOfFlock(flock);
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20240405 try sum to scalarize fitness
     fitness_logger(mofof[0], -1, mofof[1], -1, mofof[2], -1, mofof[3], -1,
-                   (mofof[0] * mofof[1] * mofof[2] * mofof[3]));
+//                   (mofof[0] * mofof[1] * mofof[2] * mofof[3]));
+                   (mofof[0] + mofof[1] + mofof[2] + mofof[3]) / 4);
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     return mofof;
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 #else

@@ -356,6 +356,8 @@ int main(int argc, const char * argv[])
     
 //    MultiObjectiveFitness mfo = {0.1, 0.2, 0.3, 0.4, 0.5};
 //    debugPrint(std::reduce(mfo.begin(), mfo.end(), 1.0, std::multiplies()));
+//    debugPrint(std::reduce(mfo.begin(), mfo.end(), 1.0, std::plus()) / mfo.size());
+//    return EXIT_SUCCESS;
 
     //--------------------------------------------------------------------------
 

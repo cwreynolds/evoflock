@@ -361,9 +361,13 @@ int main(int argc, const char * argv[])
 
     //--------------------------------------------------------------------------
 
-    int individuals = 500;
-    int subpops = 25;
-    int max_evolution_steps = 30000;
+//    int individuals = 500;
+//    int subpops = 25;
+//    int max_evolution_steps = 30000;
+    int individuals = 1000;
+    int subpops = 50;
+    int max_evolution_steps = 60000;
+    
     int min_tree_size = 2;
     int max_tree_size = 20;
     LazyPredator::Population* population = nullptr;
@@ -379,12 +383,31 @@ int main(int argc, const char * argv[])
                                                    max_tree_size,
                                                    evoflock_gp_function_set);
     }
+    
+    // TODO very temp
+    debugPrint(scalarize_fitness({0, 0, 0, 0}))
+    debugPrint(scalarize_fitness({0.5, 0.5, 0.5, 0.5}))
+    debugPrint(scalarize_fitness({1, 1, 1, 1}))
+    
+    debugPrint(scalarize_fitness({1, 0, 0, 0}))
+    debugPrint(scalarize_fitness({1, 1, 0, 0}))
+    debugPrint(scalarize_fitness({1, 1, 1, 0}))
+
     {
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
         for (int i = 0; i < max_evolution_steps; i++)
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240406 formalize scalarize of MO fitness
+            
+            
+#ifdef MULTI_OBJECTIVE_FITNESS
+            population->evolutionStep(evoflock_fitness_function, scalarize_fitness);
+#else
             population->evolutionStep(evoflock_fitness_function);
+#endif
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             std::cout << std::endl;
         }
     }

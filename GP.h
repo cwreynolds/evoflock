@@ -267,6 +267,17 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+// Map a MultiObjectiveFitness to a scalar, here a normalized 4d magnitude.
+// Used as the FitnessScalarizeFunction for Population::evolutionStep().
+double scalarize_fitness(MultiObjectiveFitness mof)
+{
+    double sum_of_objectives_squared = 0;
+    for (auto objective : mof) { sum_of_objectives_squared += sq(objective); }
+    return std::sqrt(sum_of_objectives_squared) / std::sqrt(double(mof.size()));
+}
+
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240330 WIP for multi-objective fitness
 #ifdef MULTI_OBJECTIVE_FITNESS
@@ -301,11 +312,17 @@ inline double run_flock_simulation(const FlockParameters& fp,
     // TODO 20240402 add per-objective logging for MultiObjectiveFitness case.
     // TODO          really ugly, needs polish.
     auto mofof = multiObjectiveFitnessOfFlock(flock);
+//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//        // TODO 20240405 try sum to scalarize fitness
+//        fitness_logger(mofof[0], -1, mofof[1], -1, mofof[2], -1, mofof[3], -1,
+//    //                   (mofof[0] * mofof[1] * mofof[2] * mofof[3]));
+//                       (mofof[0] + mofof[1] + mofof[2] + mofof[3]) / 4);
+//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20240405 try sum to scalarize fitness
-    fitness_logger(mofof[0], -1, mofof[1], -1, mofof[2], -1, mofof[3], -1,
-//                   (mofof[0] * mofof[1] * mofof[2] * mofof[3]));
-                   (mofof[0] + mofof[1] + mofof[2] + mofof[3]) / 4);
+    fitness_logger(mofof[0], -1, mofof[1], -1,
+                   mofof[2], -1, mofof[3], -1,
+                   scalarize_fitness(mofof));
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     return mofof;
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
@@ -409,7 +426,9 @@ inline float rerun_flock_simulation(const LazyPredator::Individual* individual)
 #endif
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
-    LazyPredator::GpTree t = individual->tree(); // copy tree
+    // Is this tree copy needed to avoid using the previous cached tree root?
+    LazyPredator::GpTree t = individual->tree();
+    
     return run_flock_simulation(t.evalSubtree<double>(0),
                                 t.evalSubtree<double>(1),
                                 t.evalSubtree<double>(2),

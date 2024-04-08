@@ -103,6 +103,56 @@ public:
             sort();
         }
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240407 move support for MultiObjectiveFitness into TournamentGroup
+    
+    // Given a TournamentGroup with MultiObjectiveFitness, select a "useful"
+    // index into the MultiObjectiveFitness vector.
+    size_t pickMultiObjectiveFitnessIndex()
+    {
+        // First make sure TournamentGroup is set up for MultiObjectiveFitness.
+        assert((members().size() > 0) and "TournamentGroup must have members");
+        Individual* individual0 = members().at(0).individual;
+        size_t mof_size = individual0->getMultiObjectiveFitness().size();
+        assert((mof_size > 0) and "must have MultiObjectiveFitness data");
+        // Make sure mo_fitness of all group members is the same size.
+        for (auto& m : members())
+        {
+            assert((mof_size == m.individual->getMultiObjectiveFitness().size())
+                   and "all MultiObjectiveFitness vectors must be same size");
+        }
+
+        // Pick one at random, test to make sure all TournamentGroup values are
+        // not identical. If they are, step around modulo the length of MOF.
+        size_t random_index = LPRS().randomN(mof_size);
+        for (int i = 0; i < mof_size; i++)
+        {
+            bool first_m = true;
+            bool not_identical = false;
+            double metric = 0;
+            for (auto& m : members())
+            {
+                auto mof = m.individual->getMultiObjectiveFitness();
+                if (first_m)
+                {
+                    metric = mof.at(random_index);
+                    first_m = false;
+                }
+                else
+                {
+                    if (metric != mof.at(random_index))
+                    {
+                        not_identical = true;
+                    }
+                }
+            }
+            if (not_identical) break;
+            random_index = (random_index + 1) % mof_size;
+        }
+        return int(random_index);
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Is the given Individual a member of this TournamentGroup?
     bool isMember(Individual* individual) const
     {

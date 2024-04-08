@@ -275,13 +275,6 @@ public:
                 Individual* i = m.individual;
                 return i->getMultiObjectiveFitness();
             };
-            auto tgm_size = [&](const TournamentGroupMember& m)
-            {
-                return tgm_fitness(m).size();
-            };
-
-            // Make sure mo_fitness of all group members is the same size.
-            for (auto& m : members){assert(tgm_size(members[0])==tgm_size(m));}
 
             auto mo_fitness_as_string = [&](int gmi)
             {
@@ -298,51 +291,18 @@ public:
                 s << "}";
                 return s.str();
             };
+            size_t random_index = group.pickMultiObjectiveFitnessIndex();
+            
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             // TODO 20240404 more work on multi-objective fitness
             std::cout << "    " << mo_fitness_as_string(0) << std::endl;
             std::cout << "    " << mo_fitness_as_string(1) << std::endl;
             std::cout << "    " << mo_fitness_as_string(2) << std::endl;
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-            // TODO 20240402 rather than pick one at random, test to find one
-            // index where all TournamentGroup values are not identical. Try one
-            // at random, then step around modulo the length of mo_fitness of
-            // all group members.
-            size_t random_index = LPRS().randomN(tgm_size(members[0]));
-            size_t mof_size = tgm_size(members[0]);
-            for (int i = 0; i < mof_size; i++)
-            {
-                bool first_m = true;
-                bool not_identical = false;
-                double metric = 0;
-                for (auto& m : members)
-                {
-                    auto mof = tgm_fitness(m);
-                    if (first_m)
-                    {
-                        metric = mof.at(random_index);
-                        first_m = false;
-                    }
-                    else
-                    {
-                        if (metric != tgm_fitness(m).at(random_index))
-                        {
-                            not_identical = true;
-                        }
-                    }
-                }
-                if (not_identical) break;
-                random_index = (random_index + 1) % mof_size;
-            }
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20240404 more work on multi-objective fitness
             std::cout << "    ";
             debugPrint(random_index)
             std::cout << "    selected objective metrics: ";
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20240404 more work on multi-objective fitness
+            
             for (auto& m : members)
             {
                 const MultiObjectiveFitness& mof = tgm_fitness(m);

@@ -106,6 +106,54 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240407 move support for MultiObjectiveFitness into TournamentGroup
     
+//    // Given a TournamentGroup with MultiObjectiveFitness, select a "useful"
+//    // index into the MultiObjectiveFitness vector.
+//    size_t pickMultiObjectiveFitnessIndex()
+//    {
+//        // First make sure TournamentGroup is set up for MultiObjectiveFitness.
+//        assert((members().size() > 0) and "TournamentGroup must have members");
+//        Individual* individual0 = members().at(0).individual;
+//        size_t mof_size = individual0->getMultiObjectiveFitness().size();
+//        assert((mof_size > 0) and "must have MultiObjectiveFitness data");
+//        // Make sure mo_fitness of all group members is the same size.
+//        for (auto& m : members())
+//        {
+//            assert((mof_size == m.individual->getMultiObjectiveFitness().size())
+//                   and "all MultiObjectiveFitness vectors must be same size");
+//        }
+//
+//        // Pick one at random, test to make sure all TournamentGroup values are
+//        // not identical. If they are, step around modulo the length of MOF.
+//        size_t random_index = LPRS().randomN(mof_size);
+//        for (int i = 0; i < mof_size; i++)
+//        {
+//            bool first_m = true;
+//            bool not_identical = false;
+//            double metric = 0;
+//            for (auto& m : members())
+//            {
+//                auto mof = m.individual->getMultiObjectiveFitness();
+//                if (first_m)
+//                {
+//                    metric = mof.at(random_index);
+//                    first_m = false;
+//                }
+//                else
+//                {
+//                    if (metric != mof.at(random_index))
+//                    {
+//                        not_identical = true;
+//                    }
+//                }
+//            }
+//            if (not_identical) break;
+//            random_index = (random_index + 1) % mof_size;
+//        }
+//        return int(random_index);
+//    }
+    
+    // TODO 20240408 this version selects the index with the max range
+
     // Given a TournamentGroup with MultiObjectiveFitness, select a "useful"
     // index into the MultiObjectiveFitness vector.
     size_t pickMultiObjectiveFitnessIndex()
@@ -121,35 +169,127 @@ public:
             assert((mof_size == m.individual->getMultiObjectiveFitness().size())
                    and "all MultiObjectiveFitness vectors must be same size");
         }
+        
+//        // Pick one at random, test to make sure all TournamentGroup values are
+//        // not identical. If they are, step around modulo the length of MOF.
+//        size_t random_index = LPRS().randomN(mof_size);
+//        for (int i = 0; i < mof_size; i++)
+//        {
+//            bool first_m = true;
+//            bool not_identical = false;
+//            double metric = 0;
+//            for (auto& m : members())
+//            {
+//                auto mof = m.individual->getMultiObjectiveFitness();
+//                if (first_m)
+//                {
+//                    metric = mof.at(random_index);
+//                    first_m = false;
+//                }
+//                else
+//                {
+//                    if (metric != mof.at(random_index))
+//                    {
+//                        not_identical = true;
+//                    }
+//                }
+//            }
+//            if (not_identical) break;
+//            random_index = (random_index + 1) % mof_size;
+//        }
+//        return int(random_index);
 
-        // Pick one at random, test to make sure all TournamentGroup values are
-        // not identical. If they are, step around modulo the length of MOF.
-        size_t random_index = LPRS().randomN(mof_size);
+        
+//            // Loop over the mof index range. For each one find the range between
+//            // max and min fitness. Return the index corresponding to the largest
+//            // range.
+//
+//
+//    //        int best_index = 0;
+//    //        int biggest_range = 0;
+//            int best_index = -1;
+//            double biggest_range = -1;
+//
+//            for (int i = 0; i < mof_size; i++)
+//            {
+//                double min_fit = std::numeric_limits<double>::infinity();
+//                double max_fit = -min_fit;
+//
+//    //            debugPrint(i)
+//    //            debugPrint(min_fit)
+//    //            debugPrint(max_fit)
+//
+//                for (auto& m : members())
+//                {
+//                    double fit = m.individual->getMultiObjectiveFitness().at(i);
+//                    min_fit = std::min(fit, min_fit);
+//                    max_fit = std::max(fit, max_fit);
+//                }
+//                double range = max_fit - min_fit;
+//
+//    //            debugPrint(min_fit)
+//    //            debugPrint(max_fit)
+//    //            debugPrint(range)
+//    //            debugPrint(biggest_range)
+//    //            debugPrint(biggest_range < range)
+//
+//                if (biggest_range < range)
+//                {
+//                    biggest_range = range;
+//                    best_index = i;
+//
+//    //                debugPrint(biggest_range)
+//
+//                }
+//
+//    //            debugPrint(range)
+//    //            debugPrint(biggest_range)
+//    //            debugPrint(best_index)
+//    //            std::cout << std::endl;
+//            }
+//
+//
+//            return best_index;
+
+        
+        // Loop over the mof index range. For each one find the range between
+        // max and min fitness. Return the index corresponding to the lowest
+        // bottom of range, but only if range is not zero.
+        
+//        int best_index = 0;
+//        int biggest_range = 0;
+        int best_index = -1;
+//        double biggest_range = -1;
+        double least_bottom = std::numeric_limits<double>::infinity();
         for (int i = 0; i < mof_size; i++)
         {
-            bool first_m = true;
-            bool not_identical = false;
-            double metric = 0;
+            double min_fit = std::numeric_limits<double>::infinity();
+            double max_fit = -min_fit;
+//            debugPrint(i)
+//            debugPrint(min_fit)
+//            debugPrint(max_fit)
             for (auto& m : members())
             {
-                auto mof = m.individual->getMultiObjectiveFitness();
-                if (first_m)
-                {
-                    metric = mof.at(random_index);
-                    first_m = false;
-                }
-                else
-                {
-                    if (metric != mof.at(random_index))
-                    {
-                        not_identical = true;
-                    }
-                }
+                double fit = m.individual->getMultiObjectiveFitness().at(i);
+                min_fit = std::min(fit, min_fit);
+                max_fit = std::max(fit, max_fit);
             }
-            if (not_identical) break;
-            random_index = (random_index + 1) % mof_size;
+            double range = max_fit - min_fit;
+//            debugPrint(min_fit)
+//            debugPrint(max_fit)
+//            debugPrint(range)
+//            if (least_bottom > min_fit)
+//            if ((least_bottom > min_fit) and (range > 0))
+            if ((least_bottom >= min_fit) and (range > 0))
+            {
+                least_bottom = min_fit;
+                best_index = i;
+            }
+//            debugPrint(least_bottom)
+//            debugPrint(best_index)
+//            std::cout << std::endl;
         }
-        return int(random_index);
+        return best_index;
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

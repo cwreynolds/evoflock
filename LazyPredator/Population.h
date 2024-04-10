@@ -249,9 +249,9 @@ public:
             }
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             // TODO 20240404 more work on multi-objective fitness
-            std::cout << "fitness func  Individual=" << individual;
-            std::cout << ", fitness=" << individual->getFitness() << std::endl;
-            std::cout << std::endl;
+//            std::cout << "fitness func  Individual=" << individual;
+//            std::cout << ", fitness=" << individual->getFitness() << std::endl;
+//            std::cout << std::endl;
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             return individual->getFitness();
         };
@@ -291,22 +291,25 @@ public:
                 s << "}";
                 return s.str();
             };
-            size_t random_index = group.pickMultiObjectiveFitnessIndex();
-            
+//            size_t random_index = group.pickMultiObjectiveFitnessIndex();
+            size_t selected_mof_index = group.pickMultiObjectiveFitnessIndex();
+
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             // TODO 20240404 more work on multi-objective fitness
             std::cout << "    " << mo_fitness_as_string(0) << std::endl;
             std::cout << "    " << mo_fitness_as_string(1) << std::endl;
             std::cout << "    " << mo_fitness_as_string(2) << std::endl;
             std::cout << "    ";
-            debugPrint(random_index)
+//            debugPrint(random_index)
+            debugPrint(selected_mof_index)
             std::cout << "    selected objective metrics: ";
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             
             for (auto& m : members)
             {
                 const MultiObjectiveFitness& mof = tgm_fitness(m);
-                auto selected_fitness = mof.at(random_index);
+//                auto selected_fitness = mof.at(random_index);
+                auto selected_fitness = mof.at(selected_mof_index);
                 m.metric = selected_fitness;
                 std::cout << selected_fitness << " ";
             }

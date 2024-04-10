@@ -486,6 +486,8 @@ inline void evoflock_ga_crossover(const LP::GpTree& parent0,
     //std::cout << "offspring: " << offspring.to_string() << std::endl;
 }
 
+// The default (in GpType::defaultJiggleScale()) is 0.05
+double jiggle_scale = 0.1;
 
 // This is a degenerate GP function set, for what is essentially a GA problem:
 // selecting a set of real number parameters for a flock simulation, via an
@@ -515,13 +517,32 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
         { "Fitness_0_1", 0.0,   1.0 },
 #endif
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        { "Real_0_1",    0.0,   1.0 },
-        { "Real_0_10",   0.0,  10.0 },
-        { "Real_0_100",  0.0, 100.0 },
-        { "Real_0_200",  0.0, 200.0 },  // TODO keep?
-        { "Real_m1_p1", -1.0,  +1.0 },
+        
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20240409 trying increasing the jiggle scale (default is 0.05)
+
+//        { "Real_0_1",    0.0,   1.0 },
+//        { "Real_0_10",   0.0,  10.0 },
+//        { "Real_0_100",  0.0, 100.0 },
+//        { "Real_0_10_bigger_jiggle",   0.0,  10.0, 0.1 },
+//        { "Real_0_100_bigger_jiggle",  0.0, 100.0, 0.1 },
+//        { "Real_0_200",  0.0, 200.0 },  // TODO keep?
+//        { "Real_m1_p1", -1.0,  +1.0 },
+//        // TODO 20240321 pre-ranging for speed values (is this "cheating"?)
+//        { "Real_15_30",  15.0,  30.0 },  // for boid speed values
+        
+        { "Real_0_1",    0.0,   1.0, jiggle_scale },
+        { "Real_0_10",   0.0,  10.0, jiggle_scale },
+        { "Real_0_100",  0.0, 100.0, jiggle_scale },
+//        { "Real_0_10_bigger_jiggle",   0.0,  10.0, 0.1 },
+//        { "Real_0_100_bigger_jiggle",  0.0, 100.0, 0.1 },
+        { "Real_0_200",  0.0, 200.0, jiggle_scale },  // TODO keep?
+        { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
         // TODO 20240321 pre-ranging for speed values (is this "cheating"?)
-        { "Real_15_30",  15.0,  30.0 },  // for boid speed values
+        { "Real_15_30",  15.0,  30.0, jiggle_scale },  // for boid speed values
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     },
     {
         {
@@ -553,7 +574,11 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
                 "Real_0_100",  // weight_separate
                 "Real_0_100",  // weight_align
                 "Real_0_100",  // weight_cohere
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20240409 trying increasing the jiggle scale (default is 0.05)
                 "Real_0_100",  // weight_avoid
+//                "Real_0_100_bigger_jiggle",  // weight_avoid
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
                 "Real_0_200",  // max_dist_separate_in_body_radii
                 // TODO set to 100, essentially infinity, in the FlockParameters
@@ -571,7 +596,11 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
                 "Real_m1_p1",  // angle_cohere
                 
                 "Real_0_100", // fly_away_max_dist_in_br
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20240409 trying increasing the jiggle scale (default is 0.05)
                 "Real_0_10",  // min_time_to_collide
+//                "Real_0_10_bigger_jiggle",  // min_time_to_collide
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             },
             
             // Evaluation function, which runs a flock simulation with the given

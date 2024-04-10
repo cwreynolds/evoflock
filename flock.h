@@ -447,7 +447,8 @@ public:
             Boid* n = b->cached_nearest_neighbors().at(0);
             double  dist = (b->position() - n->position()).length();
             bool nn_sep_ok = dist > (3 * fp().body_radius); // Mar 21
-            bool speed_ok = util::between(b->speed(), 15, 25);
+//            bool speed_ok = util::between(b->speed(), 15, 25);
+            bool speed_ok = b->speed() > 15;
             if (not nn_sep_ok) { all_seperation_good = false; }
             if (not speed_ok) { all_speed_good = false; }
             if (b->detectObstacleViolations()) { all_avoidance_good = false; }

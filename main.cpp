@@ -360,20 +360,30 @@ int main(int argc, const char * argv[])
 //    return EXIT_SUCCESS;
 
     //--------------------------------------------------------------------------
+    
+//    int count = 0;
+//    double total = 1000000;
+//    for (int i = 0; i < total; i++) { if (lp::LPRS().randomBool()) { count++; } }
+//    debugPrint(count / total)
+//    return EXIT_SUCCESS;
+    
+    //--------------------------------------------------------------------------
 
 //    int individuals = 500;
 //    int subpops = 25;
 //    int max_evolution_steps = 30000;
     
-//    int individuals = 1000;
-//    int subpops = 50;
-//    int max_evolution_steps = 60000;
-
     int individuals = 1000;
     int subpops = 50;
-    int max_evolution_steps = 30000;
+    int max_evolution_steps = 60000;
+
+//    int individuals = 1000;
+//    int subpops = 50;
+//    int max_evolution_steps = 30000;
     
-    lp::LPRS().setSeed(20240408);
+//    lp::LPRS().setSeed(20240408);
+//    lp::LPRS().setSeed(20240409);
+    lp::LPRS().setSeed(202404091);
 
     int min_tree_size = 2;
     int max_tree_size = 20;

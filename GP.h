@@ -268,14 +268,26 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240410 try Matthews suggestion to use min of the fittnesses.
+
+//    // Map a MultiObjectiveFitness to a scalar, here a normalized 4d magnitude.
+//    // Used as the FitnessScalarizeFunction for Population::evolutionStep().
+//    double scalarize_fitness(MultiObjectiveFitness mof)
+//    {
+//        double sum_of_objectives_squared = 0;
+//        for (auto objective : mof) { sum_of_objectives_squared += sq(objective); }
+//        return std::sqrt(sum_of_objectives_squared) / std::sqrt(double(mof.size()));
+//    }
+
 // Map a MultiObjectiveFitness to a scalar, here a normalized 4d magnitude.
 // Used as the FitnessScalarizeFunction for Population::evolutionStep().
 double scalarize_fitness(MultiObjectiveFitness mof)
 {
-    double sum_of_objectives_squared = 0;
-    for (auto objective : mof) { sum_of_objectives_squared += sq(objective); }
-    return std::sqrt(sum_of_objectives_squared) / std::sqrt(double(mof.size()));
+    return *std::min_element(mof.begin(), mof.end());
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

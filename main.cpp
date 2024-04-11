@@ -369,13 +369,13 @@ int main(int argc, const char * argv[])
     
     //--------------------------------------------------------------------------
 
-//    int individuals = 500;
-//    int subpops = 25;
-//    int max_evolution_steps = 30000;
+    int individuals = 500;
+    int subpops = 25;
+    int max_evolution_steps = 30000;
     
-    int individuals = 1000;
-    int subpops = 50;
-    int max_evolution_steps = 60000;
+//    int individuals = 1000;
+//    int subpops = 50;
+//    int max_evolution_steps = 60000;
 
 //    int individuals = 1000;
 //    int subpops = 50;
@@ -383,7 +383,9 @@ int main(int argc, const char * argv[])
     
 //    lp::LPRS().setSeed(20240408);
 //    lp::LPRS().setSeed(20240409);
-    lp::LPRS().setSeed(202404091);
+//    lp::LPRS().setSeed(202404091);
+//    lp::LPRS().setSeed(20240410);
+    lp::LPRS().setSeed(2024041015);
 
     int min_tree_size = 2;
     int max_tree_size = 20;

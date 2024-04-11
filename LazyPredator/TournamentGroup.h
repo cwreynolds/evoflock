@@ -291,21 +291,59 @@ public:
 //            }
 //            return best_index;
 
+//            // Loop over the mof index range. For each one find the range between
+//            // max and min fitness. Return the index corresponding to the lowest
+//            // bottom of range, but only if range is not zero.
+//            //
+//            // TODO 20240409 added ~1/3 chance that any nonzero range index will be used.
+//
+//            int best_index = 0;
+//            double least_bottom = std::numeric_limits<double>::infinity();
+//            for (int i = 0; i < mof_size; i++)
+//            {
+//                double min_fit = std::numeric_limits<double>::infinity();
+//                double max_fit = -min_fit;
+//    //            debugPrint(i)
+//    //            debugPrint(min_fit)
+//    //            debugPrint(max_fit)
+//                for (auto& m : members())
+//                {
+//                    double fit = m.individual->getMultiObjectiveFitness().at(i);
+//                    min_fit = std::min(fit, min_fit);
+//                    max_fit = std::max(fit, max_fit);
+//                }
+//                double range = max_fit - min_fit;
+//    //            debugPrint(min_fit)
+//    //            debugPrint(max_fit)
+//    //            debugPrint(range)
+//    //            if (least_bottom > min_fit)
+//    //            if ((least_bottom > min_fit) and (range > 0))
+//
+//    //            if ((least_bottom >= min_fit) and (range > 0))
+//                if ((range > 0) and
+//                    ((least_bottom >= min_fit) or
+//    //                 lp::LPRS().randomBool(0.33 / mof_size)))
+//    //                 lp::LPRS().randomBool(0.5 / mof_size)))
+//                     lp::LPRS().randomBool(0.33)))
+//                {
+//                    least_bottom = min_fit;
+//                    best_index = i;
+//                }
+//    //            debugPrint(least_bottom)
+//    //            debugPrint(best_index)
+//    //            std::cout << std::endl;
+//            }
+//            return best_index;
+
         // Loop over the mof index range. For each one find the range between
-        // max and min fitness. Return the index corresponding to the lowest
-        // bottom of range, but only if range is not zero.
-        //
-        // TODO 20240409 added ~1/3 chance that any nonzero range index will be used.
+        // max and min fitness. Return the index corresponding to largest range.
         
         int best_index = 0;
-        double least_bottom = std::numeric_limits<double>::infinity();
+        double biggest_range = 0;
         for (int i = 0; i < mof_size; i++)
         {
             double min_fit = std::numeric_limits<double>::infinity();
             double max_fit = -min_fit;
-//            debugPrint(i)
-//            debugPrint(min_fit)
-//            debugPrint(max_fit)
             for (auto& m : members())
             {
                 double fit = m.individual->getMultiObjectiveFitness().at(i);
@@ -313,29 +351,13 @@ public:
                 max_fit = std::max(fit, max_fit);
             }
             double range = max_fit - min_fit;
-//            debugPrint(min_fit)
-//            debugPrint(max_fit)
-//            debugPrint(range)
-//            if (least_bottom > min_fit)
-//            if ((least_bottom > min_fit) and (range > 0))
-            
-//            if ((least_bottom >= min_fit) and (range > 0))
-            if ((range > 0) and
-                ((least_bottom >= min_fit) or
-//                 lp::LPRS().randomBool(0.33 / mof_size)))
-//                 lp::LPRS().randomBool(0.5 / mof_size)))
-                 lp::LPRS().randomBool(0.33)))
+            if (biggest_range < range)
             {
-                least_bottom = min_fit;
+                biggest_range = range;
                 best_index = i;
             }
-//            debugPrint(least_bottom)
-//            debugPrint(best_index)
-//            std::cout << std::endl;
         }
         return best_index;
-
-
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

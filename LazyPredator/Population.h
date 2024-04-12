@@ -314,6 +314,14 @@ public:
                 std::cout << selected_fitness << " ";
             }
             std::cout << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240411 are we forgetting to sort?!
+            std::cout << std::endl;
+            group.print();
+            group.sort();
+            group.print();
+            std::cout << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             return group;
         };
         // Finally, do a tournament-based evolution step.

@@ -378,7 +378,9 @@ public:
     // can set to false, canceling tournament, so leaving population unchanged.
     bool getValid() const { return valid_; }
     void setValid(bool new_validity) { valid_ = new_validity; }
-private:
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240411 are we forgetting to sort?!
+//private:
     // Sort the members of this group by their "metric" value.
     void sort()
     {
@@ -387,6 +389,8 @@ private:
                         { return a.metric < b.metric; };
         std::sort(members_.begin(), members_.end(), sorted);
     }
+private:
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::vector<TournamentGroupMember> members_;
     // Can set to false, canceling tournament, so leaving population unchanged.
     bool valid_ = true;

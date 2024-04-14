@@ -386,7 +386,8 @@ int main(int argc, const char * argv[])
 //    lp::LPRS().setSeed(202404091);
 //    lp::LPRS().setSeed(20240410);
 //    lp::LPRS().setSeed(2024041015);
-    lp::LPRS().setSeed(2024041114);
+//    lp::LPRS().setSeed(2024041114);
+    lp::LPRS().setSeed(2024041416);
 
     int min_tree_size = 2;
     int max_tree_size = 20;
@@ -404,14 +405,14 @@ int main(int argc, const char * argv[])
                                                    evoflock_gp_function_set);
     }
     
-    // TODO very temp
-    debugPrint(scalarize_fitness({0, 0, 0, 0}))
-    debugPrint(scalarize_fitness({0.5, 0.5, 0.5, 0.5}))
-    debugPrint(scalarize_fitness({1, 1, 1, 1}))
-    
-    debugPrint(scalarize_fitness({1, 0, 0, 0}))
-    debugPrint(scalarize_fitness({1, 1, 0, 0}))
-    debugPrint(scalarize_fitness({1, 1, 1, 0}))
+//    // TODO very temp
+//    debugPrint(scalarize_fitness({0, 0, 0, 0}))
+//    debugPrint(scalarize_fitness({0.5, 0.5, 0.5, 0.5}))
+//    debugPrint(scalarize_fitness({1, 1, 1, 1}))
+//    
+//    debugPrint(scalarize_fitness({1, 0, 0, 0}))
+//    debugPrint(scalarize_fitness({1, 1, 0, 0}))
+//    debugPrint(scalarize_fitness({1, 1, 1, 0}))
 
     {
         std::cout << "Run evolution." << std::endl;

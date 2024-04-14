@@ -193,17 +193,8 @@ public:
         // Finally, do a tournament-based evolution step.
         evolutionStep(tournament_function);
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240329 WIP for multi-objective fitness
-    // I want to make something like the version directly above:
-    //
-    //     void evolutionStep(FitnessFunction fitness_function) {...}
-    //
-    // except that its argument is a MultiObjectiveFitnessFunction which maps
-    // from an Individual* to a std::vector<double> of several independent
-    // objective/fitness values.
-    
+        
+    // Generic multi-objective fitness type: a vector of scalars.
     typedef std::vector<double> MultiObjectiveFitness;
 
     // Functions that measure "absolute" fitness of an Individual in isolation.
@@ -218,117 +209,51 @@ public:
     // 4d vector magnitude, normalized onto [0,1]
     typedef std::function<double(MultiObjectiveFitness)> FitnessScalarizeFunction;
 
-    // TODO rewrite this for"multi objective" case:
-    //
     // Perform one step of the "steady state" evolutionary computation using
-    // "absolute fitness" (rather than "relative tournament-based fitness").
-    // Takes a FitnessFunction which maps a given Individual to a numeric
-    // "absolute fitness" value. Converts this into a TournamentFunction for
-    // use in the "relative fitness" version of evolutionStep() above.
-    //
-    // ...each evolution step this randomly choses one of the n objectives, and
-    // treats that as the fitness for this step, ignoring the others.
-
+    // "multi objective fitness" -- basically a vector of scalar fitness values
+    // each for an independent, potentially conflicting measure of fitness. It
+    // is given a MultiObjectiveFitnessFunction (which maps an individual to a
+    // MultiObjectiveFitness) and a FitnessScalarizeFunction (which maps a
+    // MultiObjectiveFitness to a summary scalar, used to rank Individuals in
+    // the Population by quality). It creates a TournamentFunction from those,
+    // which is passed to a different version of evolutionStep(). Each evolution
+    // step this choses one of the N objectives (the one with most potential for
+    // improvement) and treats that as a scalar fitness for this step.
     void evolutionStep(MultiObjectiveFitnessFunction mo_fitness_function,
                        FitnessScalarizeFunction fitness_scalarize_function)
     {
-        // Wrap given FitnessFunction to ensure Individual has cached fitness.
-        auto augmented_fitness_function = [&](Individual* individual)
-        {
-            // In case Individual does not already have a cached fitness value.
-            if (!(individual->hasMultiObjectiveFitness())) // TODO ???
-            {
-                // The existing sort index, if any, is now invalid.
-                sort_cache_invalid_ = true;
-                // Tree value should be previously cached, but just to be sure.
-                individual->treeValue();
-                // Cache fitness on Individual using given FitnessFunction.
-                MultiObjectiveFitness mof = mo_fitness_function(individual);
-                individual->setMultiObjectiveFitness(mof);
-                individual->setFitness(fitness_scalarize_function(mof));
-            }
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20240404 more work on multi-objective fitness
-//            std::cout << "fitness func  Individual=" << individual;
-//            std::cout << ", fitness=" << individual->getFitness() << std::endl;
-//            std::cout << std::endl;
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            return individual->getFitness();
-        };
-        
-        // Create a TournamentFunction based on the augmented FitnessFunction.
+        // Create TournamentFunction from given fitness and scalarizer functions.
         auto tournament_function = [&](TournamentGroup group)
         {
-            // Set MO-fitness for each group member, computing it if needed.
-            group.setAllMetrics(augmented_fitness_function);
-            
-            // TODO just shorter names. Reconsider
-            auto& members = group.members();
-            auto mo_fitness = [&](int gmi)
+            // Make sure each group Individual has cached MultiObjectiveFitness.
+            for (auto& m : group.members())
             {
-                const TournamentGroupMember& m = members.at(gmi);
-                Individual* i = m.individual;
-                return i->getMultiObjectiveFitness();
-            };
-            auto tgm_fitness = [&](const TournamentGroupMember& m)
-            {
-                Individual* i = m.individual;
-                return i->getMultiObjectiveFitness();
-            };
-
-            auto mo_fitness_as_string = [&](int gmi)
-            {
-                auto mof = mo_fitness(gmi);
-                std::stringstream s;
-                bool first = true;
-                s << "{";
-                for (auto& f : mof)
+                if (not m.individual->hasMultiObjectiveFitness())
                 {
-                    if (first) { first = false; } else { s << ", "; }
-                    s << std::setprecision(4) << std::setw(6) << std::fixed;
-                    s << f;
+                    m.individual->treeValue();
+                    MultiObjectiveFitness mof = mo_fitness_function(m.individual);
+                    m.individual->setMultiObjectiveFitness(mof);
+                    m.individual->setFitness(fitness_scalarize_function(mof));
                 }
-                s << "}";
-                return s.str();
-            };
-//            size_t random_index = group.pickMultiObjectiveFitnessIndex();
-            size_t selected_mof_index = group.pickMultiObjectiveFitnessIndex();
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20240404 more work on multi-objective fitness
-            std::cout << "    " << mo_fitness_as_string(0) << std::endl;
-            std::cout << "    " << mo_fitness_as_string(1) << std::endl;
-            std::cout << "    " << mo_fitness_as_string(2) << std::endl;
-            std::cout << "    ";
-//            debugPrint(random_index)
-            debugPrint(selected_mof_index)
-            std::cout << "    selected objective metrics: ";
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            
-            for (auto& m : members)
-            {
-                const MultiObjectiveFitness& mof = tgm_fitness(m);
-//                auto selected_fitness = mof.at(random_index);
-                auto selected_fitness = mof.at(selected_mof_index);
-                m.metric = selected_fitness;
-                std::cout << selected_fitness << " ";
             }
-            std::cout << std::endl;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240411 are we forgetting to sort?!
-            std::cout << std::endl;
-            group.print();
+            // Select best of the multiple fitnesses to use for this step.
+            size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
+            // Set the "metric" of each TournamentGroup member to that
+            // "best_mof_index" of the member's MultiObjectiveFitness.
+            for (auto& m : group.members())
+            {
+                const auto& mof = m.individual->getMultiObjectiveFitness();
+                m.metric =  mof.at(best_mof_index);
+            }
+            // The existing sort index, if any, will be invalidated by this step.
+            sort_cache_invalid_ = true;
+            // Sort the TournamentGroup by metric, least first.
             group.sort();
-            group.print();
-            std::cout << std::endl;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             return group;
         };
         // Finally, do a tournament-based evolution step.
         evolutionStep(tournament_function);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Delete Individual at index i, then overwrite pointer with replacement.
     void replaceIndividual(int i, Individual* new_individual, SubPop& subpop)

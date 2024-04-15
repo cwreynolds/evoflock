@@ -11,10 +11,6 @@
 #include "FunctionSet.h"
 #include "TournamentGroup.h"
 #include <iomanip>
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240402 for std::reduce
-#include <numeric>
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 namespace LazyPredator
 {

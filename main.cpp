@@ -405,15 +405,6 @@ int main(int argc, const char * argv[])
                                                    evoflock_gp_function_set);
     }
     
-//    // TODO very temp
-//    debugPrint(scalarize_fitness({0, 0, 0, 0}))
-//    debugPrint(scalarize_fitness({0.5, 0.5, 0.5, 0.5}))
-//    debugPrint(scalarize_fitness({1, 1, 1, 1}))
-//    
-//    debugPrint(scalarize_fitness({1, 0, 0, 0}))
-//    debugPrint(scalarize_fitness({1, 1, 0, 0}))
-//    debugPrint(scalarize_fitness({1, 1, 1, 0}))
-
     {
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
@@ -439,16 +430,16 @@ int main(int argc, const char * argv[])
     {
         const LP::Individual* individual = population->nthBestFitness(i);
         std::cout << individual->tree().to_string() << std::endl;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240330 WIP for multi-objective fitness
-#ifdef MULTI_OBJECTIVE_FITNESS
-        auto fitness = rerun_flock_simulation(individual);
-        debugPrint(LP::vec_to_string(fitness));
-#else
-        double fitness = rerun_flock_simulation(individual);
-        debugPrint(fitness);
-#endif
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20240330 WIP for multi-objective fitness
+//#ifdef MULTI_OBJECTIVE_FITNESS
+//        auto fitness = rerun_flock_simulation(individual);
+//        debugPrint(LP::vec_to_string(fitness));
+//#else
+//        double fitness = rerun_flock_simulation(individual);
+//        debugPrint(fitness);
+//#endif
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     print_occupancy_map = true;

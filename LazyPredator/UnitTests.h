@@ -542,12 +542,7 @@ static void unit_test()
             ok = ok && st((count == 0) || (count == 1));
         }
         float p_to_q_ratio = float(total_P) / float(total_Q);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240409 these ad hoc bounds were a bit too tight so this test
-        // failed when I made a reasonable change to RandomSequence:randomBool().
-//        ok = ok && st(between(p_to_q_ratio, 0.8, 1.2));
         ok = ok && st(between(p_to_q_ratio, 0.75, 1.25));
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         FunctionSet::function_filter = nullptr;
         debugPrint(total_P)
         debugPrint(total_Q)
@@ -557,9 +552,10 @@ static void unit_test()
 
     // gp_tree_utility
     {
-        // Make several random GpTrees. Call GpTree::collectVectorOfSubtrees() and
-        // GpTree::collectSetOfTypes() on each. Then descend through tree verifying
-        // each node agrees with those collections. Also verifies GpTree::size().
+        // Make several random GpTrees. Call GpTree::collectVectorOfSubtrees()
+        // and GpTree::collectSetOfTypes() on each. Then descend through tree
+        // verifying each node agrees with those collections. Also verifies
+        // GpTree::size().
         bool ok = true;
         int retries = 50;
         LPRS().setSeed(62750858);

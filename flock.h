@@ -418,12 +418,46 @@ public:
         if (all_seperation_good) { count_steps_good_separation++; }
         if (all_speed_good) { count_steps_good_speed++; }
         if (all_avoidance_good) { count_steps_avoid_obstacle++; }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240416 refactor metrics
+//        std::cout << std::endl;
+//        debugPrint(draw().frame_counter())
+//        debugPrint(get_separation_score())
+//        debugPrint(get_speed_score())
+//        debugPrint(get_avoid_obstacle_score())
+//        debugPrint(get_occupied_score())
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // TODO 20240329 Maybe these should be private with accessors
     int count_steps_good_separation = 0;
     int count_steps_good_speed = 0;
     int count_steps_avoid_obstacle = 0;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240416 refactor metrics
+    
+    // These return a score on the range [0,1]
+    
+    double get_separation_score() const
+    {
+        return count_steps_good_separation / double(draw().frame_counter());
+    }
+    double get_speed_score() const
+    {
+        return count_steps_good_speed / double(draw().frame_counter());
+    }
+    double get_avoid_obstacle_score() const
+    {
+        return count_steps_avoid_obstacle / double(draw().frame_counter());
+    }
+    double get_occupied_score() const
+    {
+        auto ignore_function = [](Vec3 p) { return p.length() > 50;};
+        return occupancy_map.fractionOccupied(ignore_function);
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

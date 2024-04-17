@@ -449,10 +449,28 @@ public:
     {
         return count_steps_good_speed / double(draw().frame_counter());
     }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20240417 refactor metrics
+
+//    double get_avoid_obstacle_score() const
+//    {
+//        return count_steps_avoid_obstacle / double(draw().frame_counter());
+//    }
     double get_avoid_obstacle_score() const
     {
-        return count_steps_avoid_obstacle / double(draw().frame_counter());
+        // Total Count of obstacle avoidance failures: for all boids, all steps.
+        int count_avoid_fails = 0;
+        for (Boid* b : boids())
+        {
+            count_avoid_fails += b->avoidance_failure_counter();
+        }
+        double max_count = boids().size() * draw().frame_counter();
+//        return count_avoid_fails / max_count;
+        return 1 - (count_avoid_fails / max_count);
     }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     double get_occupied_score() const
     {
         auto ignore_function = [](Vec3 p) { return p.length() > 50;};

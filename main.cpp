@@ -387,7 +387,8 @@ int main(int argc, const char * argv[])
 //    lp::LPRS().setSeed(20240410);
 //    lp::LPRS().setSeed(2024041015);
 //    lp::LPRS().setSeed(2024041114);
-    lp::LPRS().setSeed(2024041416);
+//    lp::LPRS().setSeed(2024041416);
+    lp::LPRS().setSeed(2024041716);
 
     int min_tree_size = 2;
     int max_tree_size = 20;
@@ -430,16 +431,16 @@ int main(int argc, const char * argv[])
     {
         const LP::Individual* individual = population->nthBestFitness(i);
         std::cout << individual->tree().to_string() << std::endl;
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20240330 WIP for multi-objective fitness
-//#ifdef MULTI_OBJECTIVE_FITNESS
-//        auto fitness = rerun_flock_simulation(individual);
-//        debugPrint(LP::vec_to_string(fitness));
-//#else
-//        double fitness = rerun_flock_simulation(individual);
-//        debugPrint(fitness);
-//#endif
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240330 WIP for multi-objective fitness
+#ifdef MULTI_OBJECTIVE_FITNESS
+        auto fitness = rerun_flock_simulation(individual);
+        debugPrint(LP::vec_to_string(fitness));
+#else
+        double fitness = rerun_flock_simulation(individual);
+        debugPrint(fitness);
+#endif
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     print_occupancy_map = true;

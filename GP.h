@@ -214,11 +214,32 @@ inline bool print_occupancy_map = false;  // Just for debugging.
 // split multiObjectiveFitnessOfFloc from measure_fitness_after_flock_simulation
 
 //inline std::vector<double> multiObjectiveFitnessOfFlock(const Flock& flock)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240416 refactor metrics
+
+//inline MultiObjectiveFitness multiObjectiveFitnessOfFlock(const Flock& flock)
+//{
+//    double steps = flock.max_simulation_steps();
+//    double good_separation_fraction = flock.count_steps_good_separation / steps;
+//    double good_avoid_fraction    = flock.count_steps_avoid_obstacle / steps;
+//    double good_speed_fraction  = flock.count_steps_good_speed  / steps;
+//    auto ignore_function = [](Vec3 p) { return p.length() > 50;};
+//    double occupied_fraction = flock.occupancy_map.fractionOccupied(ignore_function);
+//    return {good_separation_fraction,
+//            good_avoid_fraction,
+//            good_speed_fraction,
+//            occupied_fraction};
+//}
+
 inline MultiObjectiveFitness multiObjectiveFitnessOfFlock(const Flock& flock)
 {
     double steps = flock.max_simulation_steps();
     double good_separation_fraction = flock.count_steps_good_separation / steps;
-    double good_avoid_fraction    = flock.count_steps_avoid_obstacle / steps;
+    
+//    double good_avoid_fraction    = flock.count_steps_avoid_obstacle / steps;
+    double good_avoid_fraction    = flock.get_avoid_obstacle_score();
+
     double good_speed_fraction  = flock.count_steps_good_speed  / steps;
     auto ignore_function = [](Vec3 p) { return p.length() > 50;};
     double occupied_fraction = flock.occupancy_map.fractionOccupied(ignore_function);
@@ -227,6 +248,8 @@ inline MultiObjectiveFitness multiObjectiveFitnessOfFlock(const Flock& flock)
             good_speed_fraction,
             occupied_fraction};
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Compute fitness from metrics maintained by flock during simulation.
 inline double measure_fitness_after_flock_simulation(const Flock& flock)

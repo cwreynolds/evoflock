@@ -418,7 +418,7 @@ public:
         if (all_seperation_good) { count_steps_good_separation++; }
         if (all_speed_good) { count_steps_good_speed++; }
         if (all_avoidance_good) { count_steps_avoid_obstacle++; }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240416 refactor metrics
 //        std::cout << std::endl;
 //        debugPrint(draw().frame_counter())
@@ -426,8 +426,36 @@ public:
 //        debugPrint(get_speed_score())
 //        debugPrint(get_avoid_obstacle_score())
 //        debugPrint(get_occupied_score())
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240418 try "chunking" for avoid_obstacle_score
+        
+        if (not (all_avoidance_good and all_boids_avoid_obs_for_whole_chunk_))
+        {
+            all_boids_avoid_obs_for_whole_chunk_ = false;
+        }
+
+        if (0 == (draw().frame_counter() % chunk_steps_))
+        {
+            if (all_boids_avoid_obs_for_whole_chunk_)
+            {
+                count_chunked_avoid_obstacle_++;
+            }
+            all_boids_avoid_obs_for_whole_chunk_ = true;
+//            debugPrint(count_chunked_avoid_obstacle_)
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240418 try "chunking" for avoid_obstacle_score
+    bool all_boids_avoid_obs_for_whole_chunk_ = true;
+    int count_chunked_avoid_obstacle_ = 0;
+    int chunk_steps_ = 10;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
     // TODO 20240329 Maybe these should be private with accessors
     int count_steps_good_separation = 0;
@@ -450,25 +478,40 @@ public:
         return count_steps_good_speed / double(draw().frame_counter());
     }
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20240417 refactor metrics
+//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//        // TODO 20240417 refactor metrics
+//
+//    //    double get_avoid_obstacle_score() const
+//    //    {
+//    //        return count_steps_avoid_obstacle / double(draw().frame_counter());
+//    //    }
+//        double get_avoid_obstacle_score() const
+//        {
+//            // Total Count of obstacle avoidance failures: for all boids, all steps.
+//            int count_avoid_fails = 0;
+//            for (Boid* b : boids())
+//            {
+//                count_avoid_fails += b->avoidance_failure_counter();
+//            }
+//            double max_count = boids().size() * draw().frame_counter();
+//    //        return count_avoid_fails / max_count;
+//            return 1 - (count_avoid_fails / max_count);
+//        }
+//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
-//    double get_avoid_obstacle_score() const
-//    {
-//        return count_steps_avoid_obstacle / double(draw().frame_counter());
-//    }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20240418 try "chunking" for avoid_obstacle_score
+
     double get_avoid_obstacle_score() const
     {
-        // Total Count of obstacle avoidance failures: for all boids, all steps.
-        int count_avoid_fails = 0;
-        for (Boid* b : boids())
-        {
-            count_avoid_fails += b->avoidance_failure_counter();
-        }
-        double max_count = boids().size() * draw().frame_counter();
-//        return count_avoid_fails / max_count;
-        return 1 - (count_avoid_fails / max_count);
+        double chunks = draw().frame_counter() / double(chunk_steps_);
+        return count_chunked_avoid_obstacle_ / chunks;
     }
+
+//    bool all_boids_avoid_obs_for_whole_chunk_ = true;
+//    int count_chunked_avoid_obstacle_ = 0;
+//    int chunk_steps_ = 10;
+    
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     double get_occupied_score() const

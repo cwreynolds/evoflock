@@ -436,7 +436,8 @@ public:
             all_boids_avoid_obs_for_whole_chunk_ = false;
         }
 
-        if (0 == (draw().frame_counter() % chunk_steps_))
+//        if (0 == (draw().frame_counter() % chunk_steps_))
+        if (start_new_chunk())
         {
             if (all_boids_avoid_obs_for_whole_chunk_)
             {
@@ -453,7 +454,15 @@ public:
     // TODO 20240418 try "chunking" for avoid_obstacle_score
     bool all_boids_avoid_obs_for_whole_chunk_ = true;
     int count_chunked_avoid_obstacle_ = 0;
-    int chunk_steps_ = 10;
+
+//    int chunk_steps_ = 10;
+    int chunk_count_ = 71;
+    
+    bool start_new_chunk() const
+    {
+        int chunk_steps = max_simulation_steps() / chunk_count_;
+        return 0 == (draw().frame_counter() % chunk_steps);
+    }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
@@ -502,16 +511,17 @@ public:
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20240418 try "chunking" for avoid_obstacle_score
 
+//    double get_avoid_obstacle_score() const
+//    {
+//        double chunks = draw().frame_counter() / double(chunk_steps_);
+//        return count_chunked_avoid_obstacle_ / chunks;
+//    }
+
     double get_avoid_obstacle_score() const
     {
-        double chunks = draw().frame_counter() / double(chunk_steps_);
-        return count_chunked_avoid_obstacle_ / chunks;
+        return count_chunked_avoid_obstacle_ / double(chunk_count_);
     }
 
-//    bool all_boids_avoid_obs_for_whole_chunk_ = true;
-//    int count_chunked_avoid_obstacle_ = 0;
-//    int chunk_steps_ = 10;
-    
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     double get_occupied_score() const

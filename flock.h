@@ -395,6 +395,65 @@ public:
         collect_flock_metrics();
     }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    // TODO 20240420 refactor "chunking" to be a free parameter
+    
+//        void collect_flock_metrics()
+//        {
+//            double ts = fp().min_speed - util::epsilon;
+//            for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
+//            bool all_speed_good = true;
+//            bool all_seperation_good = true;
+//            bool all_avoidance_good = true;
+//            for (Boid* b : boids())
+//            {
+//                Boid* n = b->cached_nearest_neighbors().at(0);
+//                double  dist = (b->position() - n->position()).length();
+//                bool nn_sep_ok = dist > (3 * fp().body_radius); // Mar 21
+//    //            bool speed_ok = util::between(b->speed(), 15, 25);
+//                bool speed_ok = b->speed() > 15;
+//                if (not nn_sep_ok) { all_seperation_good = false; }
+//                if (not speed_ok) { all_speed_good = false; }
+//                if (b->detectObstacleViolations()) { all_avoidance_good = false; }
+//                // Add this boid's position to occupancy_map, ignore if outside ESO.
+//                occupancy_map.add(b->position(), [](Vec3 p){return p.length()>50;});
+//            }
+//            if (all_seperation_good) { count_steps_good_separation++; }
+//            if (all_speed_good) { count_steps_good_speed++; }
+//            if (all_avoidance_good) { count_steps_avoid_obstacle++; }
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20240416 refactor metrics
+//    //        std::cout << std::endl;
+//    //        debugPrint(draw().frame_counter())
+//    //        debugPrint(get_separation_score())
+//    //        debugPrint(get_speed_score())
+//    //        debugPrint(get_avoid_obstacle_score())
+//    //        debugPrint(get_occupied_score())
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20240418 try "chunking" for avoid_obstacle_score
+//
+//            if (not (all_avoidance_good and all_boids_avoid_obs_for_whole_chunk_))
+//            {
+//                all_boids_avoid_obs_for_whole_chunk_ = false;
+//            }
+//
+//    //        if (0 == (draw().frame_counter() % chunk_steps_))
+//            if (start_new_chunk())
+//            {
+//                if (all_boids_avoid_obs_for_whole_chunk_)
+//                {
+//                    count_chunked_avoid_obstacle_++;
+//                }
+//                all_boids_avoid_obs_for_whole_chunk_ = true;
+//    //            debugPrint(count_chunked_avoid_obstacle_)
+//            }
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//        }
+
+
     void collect_flock_metrics()
     {
         double ts = fp().min_speed - util::epsilon;
@@ -402,54 +461,76 @@ public:
         bool all_speed_good = true;
         bool all_seperation_good = true;
         bool all_avoidance_good = true;
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20240418 try "chunking" for avoid_obstacle_score
+        int boid_index = 0;
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         for (Boid* b : boids())
         {
             Boid* n = b->cached_nearest_neighbors().at(0);
             double  dist = (b->position() - n->position()).length();
             bool nn_sep_ok = dist > (3 * fp().body_radius); // Mar 21
-//            bool speed_ok = util::between(b->speed(), 15, 25);
+            // bool speed_ok = util::between(b->speed(), 15, 25);
             bool speed_ok = b->speed() > 15;
             if (not nn_sep_ok) { all_seperation_good = false; }
             if (not speed_ok) { all_speed_good = false; }
             if (b->detectObstacleViolations()) { all_avoidance_good = false; }
             // Add this boid's position to occupancy_map, ignore if outside ESO.
             occupancy_map.add(b->position(), [](Vec3 p){return p.length()>50;});
+            
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20240418 try "chunking" for avoid_obstacle_score
+            
+            if (not (all_avoidance_good and all_boids_avoid_obs_for_whole_chunk_))
+            {
+                all_boids_avoid_obs_for_whole_chunk_ = false;
+            }
+            
+            if (start_new_chunk(boid_index))
+            {
+                if (all_boids_avoid_obs_for_whole_chunk_)
+                {
+                    count_chunked_avoid_obstacle_++;
+                }
+                all_boids_avoid_obs_for_whole_chunk_ = true;
+                
+                
+//                std::cout << "start_new_chunk ";
+//                std::cout << count_chunked_avoid_obstacle_ << " ";
+//                std::cout << count_chunked_avoid_obstacle_ / double(chunk_count_);
+//                std::cout << std::endl;
+            }
+            
+            boid_index++;
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
         }
         if (all_seperation_good) { count_steps_good_separation++; }
         if (all_speed_good) { count_steps_good_speed++; }
         if (all_avoidance_good) { count_steps_avoid_obstacle++; }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240416 refactor metrics
-//        std::cout << std::endl;
-//        debugPrint(draw().frame_counter())
-//        debugPrint(get_separation_score())
-//        debugPrint(get_speed_score())
-//        debugPrint(get_avoid_obstacle_score())
-//        debugPrint(get_occupied_score())
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240418 try "chunking" for avoid_obstacle_score
-        
-        if (not (all_avoidance_good and all_boids_avoid_obs_for_whole_chunk_))
-        {
-            all_boids_avoid_obs_for_whole_chunk_ = false;
-        }
-
-//        if (0 == (draw().frame_counter() % chunk_steps_))
-        if (start_new_chunk())
-        {
-            if (all_boids_avoid_obs_for_whole_chunk_)
-            {
-                count_chunked_avoid_obstacle_++;
-            }
-            all_boids_avoid_obs_for_whole_chunk_ = true;
-//            debugPrint(count_chunked_avoid_obstacle_)
-        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//        // TODO 20240418 try "chunking" for avoid_obstacle_score
+//        
+//        if (not (all_avoidance_good and all_boids_avoid_obs_for_whole_chunk_))
+//        {
+//            all_boids_avoid_obs_for_whole_chunk_ = false;
+//        }
+//
+//        if (start_new_chunk())
+//        {
+//            if (all_boids_avoid_obs_for_whole_chunk_)
+//            {
+//                count_chunked_avoid_obstacle_++;
+//            }
+//            all_boids_avoid_obs_for_whole_chunk_ = true;
+//        }
+//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     }
-    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240418 try "chunking" for avoid_obstacle_score
     bool all_boids_avoid_obs_for_whole_chunk_ = true;
@@ -458,10 +539,21 @@ public:
 //    int chunk_steps_ = 10;
     int chunk_count_ = 71;
     
-    bool start_new_chunk() const
+//    bool start_new_chunk() const
+//    {
+//        int chunk_steps = max_simulation_steps() / chunk_count_;
+//        return 0 == (draw().frame_counter() % chunk_steps);
+//    }
+
+    bool start_new_chunk(int boid_index) const
     {
-        int chunk_steps = max_simulation_steps() / chunk_count_;
-        return 0 == (draw().frame_counter() % chunk_steps);
+//        int chunk_steps = max_simulation_steps() / chunk_count_;
+        int boid_count = int(boids().size());
+        int total_boid_steps = max_simulation_steps() * boid_count;
+        int chunk_steps = total_boid_steps / chunk_count_;
+//        return 0 == (draw().frame_counter() % chunk_steps);
+        int previous_boid_steps = draw().frame_counter() * boid_count;
+        return 0 == (previous_boid_steps + boid_index) % chunk_steps;
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

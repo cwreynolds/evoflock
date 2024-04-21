@@ -461,10 +461,6 @@ public:
         bool all_speed_good = true;
         bool all_seperation_good = true;
         bool all_avoidance_good = true;
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20240418 try "chunking" for avoid_obstacle_score
-        int boid_index = 0;
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         for (Boid* b : boids())
         {
             Boid* n = b->cached_nearest_neighbors().at(0);
@@ -478,16 +474,15 @@ public:
             // Add this boid's position to occupancy_map, ignore if outside ESO.
             occupancy_map.add(b->position(), [](Vec3 p){return p.length()>50;});
             
-            
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             // TODO 20240418 try "chunking" for avoid_obstacle_score
             
-            if (not (all_avoidance_good and all_boids_avoid_obs_for_whole_chunk_))
+            if (not all_avoidance_good)
             {
                 all_boids_avoid_obs_for_whole_chunk_ = false;
             }
             
-            if (start_new_chunk(boid_index))
+            if (start_new_chunk())
             {
                 if (all_boids_avoid_obs_for_whole_chunk_)
                 {
@@ -501,33 +496,13 @@ public:
 //                std::cout << count_chunked_avoid_obstacle_ / double(chunk_count_);
 //                std::cout << std::endl;
             }
-            
-            boid_index++;
+            increment_boid_update_counter();
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         }
         if (all_seperation_good) { count_steps_good_separation++; }
         if (all_speed_good) { count_steps_good_speed++; }
         if (all_avoidance_good) { count_steps_avoid_obstacle++; }
-        
-//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//        // TODO 20240418 try "chunking" for avoid_obstacle_score
-//        
-//        if (not (all_avoidance_good and all_boids_avoid_obs_for_whole_chunk_))
-//        {
-//            all_boids_avoid_obs_for_whole_chunk_ = false;
-//        }
-//
-//        if (start_new_chunk())
-//        {
-//            if (all_boids_avoid_obs_for_whole_chunk_)
-//            {
-//                count_chunked_avoid_obstacle_++;
-//            }
-//            all_boids_avoid_obs_for_whole_chunk_ = true;
-//        }
-//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
     }
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
@@ -545,16 +520,95 @@ public:
 //        return 0 == (draw().frame_counter() % chunk_steps);
 //    }
 
-    bool start_new_chunk(int boid_index) const
+//        bool start_new_chunk(int boid_index) const
+//        {
+//    //        int chunk_steps = max_simulation_steps() / chunk_count_;
+//            int boid_count = int(boids().size());
+//            int total_boid_steps = max_simulation_steps() * boid_count;
+//            int chunk_steps = total_boid_steps / chunk_count_;
+//    //        return 0 == (draw().frame_counter() % chunk_steps);
+//            int previous_boid_steps = draw().frame_counter() * boid_count;
+//            return 0 == (previous_boid_steps + boid_index) % chunk_steps;
+//        }
+
+    
+//        int boid_eval_counter_ = 0;
+//
+//        bool start_new_chunk()
+//        {
+//    //        //        int chunk_steps = max_simulation_steps() / chunk_count_;
+//    //        int boid_count = int(boids().size());
+//    //        int total_boid_steps = max_simulation_steps() * boid_count;
+//    //        int chunk_steps = total_boid_steps / chunk_count_;
+//    //        //        return 0 == (draw().frame_counter() % chunk_steps);
+//    //        int previous_boid_steps = draw().frame_counter() * boid_count;
+//    //        return 0 == (previous_boid_steps + boid_index) % chunk_steps;
+//
+//            int boid_count = int(boids().size());
+//
+//            int boid_eval_max = max_simulation_steps() * boid_count;
+//
+//            int chunk_steps = boid_eval_max / chunk_count_;
+//
+//    //        bool result = (0 == (boid_eval_counter_ % chunk_steps));
+//    //        boid_eval_counter_++;
+//    //        return result;
+//
+//            return (0 == (boid_eval_counter_++ % chunk_steps));
+//        }
+
+    // Count each boid update for all simulation steps.
+    int boid_update_counter_ = 0;
+    
+    void increment_boid_update_counter() { boid_update_counter_++; }
+
+//        // For each boid update
+//        bool start_new_chunk()
+//        {
+//            if (boid_update_counter_ == 0) { debugPrint(boid_update_counter_); }
+//
+//            int boid_count = int(boids().size());
+//            int boid_update_max = max_simulation_steps() * boid_count;
+//            int chunk_steps = boid_update_max / chunk_count_;
+//    //        return (0 == (boid_update_counter_++ % chunk_steps));
+//            return (0 == (boid_update_counter_ % chunk_steps));
+//        }
+
+//        // For each boid update
+//        bool start_new_chunk()
+//        {
+//            int boid_count = int(boids().size());
+//            int boid_update_max = max_simulation_steps() * boid_count;
+//            int chunk_steps = boid_update_max / chunk_count_;
+//    //        return (0 == (boid_update_counter_ % chunk_steps));
+//            return ((boid_update_counter_ > 0) and
+//                    (0 == (boid_update_counter_ % chunk_steps)));
+//        }
+
+//    // For each boid update
+//    bool start_new_chunk()
+//    {
+//        int boid_count = int(boids().size());
+//        int boid_update_max = max_simulation_steps() * boid_count;
+//        int chunk_steps = boid_update_max / chunk_count_;
+//        return ((boid_update_counter_ == 0) ?
+//                false :
+//                (0 == (boid_update_counter_ % chunk_steps)));
+//    }
+
+    // For each boid update
+    bool start_new_chunk()
     {
-//        int chunk_steps = max_simulation_steps() / chunk_count_;
-        int boid_count = int(boids().size());
-        int total_boid_steps = max_simulation_steps() * boid_count;
-        int chunk_steps = total_boid_steps / chunk_count_;
-//        return 0 == (draw().frame_counter() % chunk_steps);
-        int previous_boid_steps = draw().frame_counter() * boid_count;
-        return 0 == (previous_boid_steps + boid_index) % chunk_steps;
+        bool result = false;
+        if (boid_update_counter_ > 0)
+        {
+            int boid_update_max = max_simulation_steps() * boids().size();
+            int chunk_steps = boid_update_max / chunk_count_;
+            result = (0 == (boid_update_counter_ % chunk_steps));
+        }
+        return result;
     }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
@@ -607,6 +661,19 @@ public:
 //    {
 //        double chunks = draw().frame_counter() / double(chunk_steps_);
 //        return count_chunked_avoid_obstacle_ / chunks;
+//    }
+
+//    double get_avoid_obstacle_score() const
+//    {
+//        return count_chunked_avoid_obstacle_ / double(chunk_count_);
+//    }
+
+//    double get_avoid_obstacle_score() const
+//    {
+//        debugPrint(count_chunked_avoid_obstacle_)
+//        debugPrint(double(chunk_count_))
+//        debugPrint(count_chunked_avoid_obstacle_ / double(chunk_count_))
+//        return count_chunked_avoid_obstacle_ / double(chunk_count_);
 //    }
 
     double get_avoid_obstacle_score() const

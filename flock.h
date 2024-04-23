@@ -297,7 +297,17 @@ public:
         {
             Boid* n = b->cached_nearest_neighbors().at(0);
             double  dist = (b->position() - n->position()).length();
-            bool nn_sep_ok = dist > (3 * fp().body_radius); // Mar 21
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240422 add a max acceptable separation
+//            bool nn_sep_ok = dist > (3 * fp().body_radius); // Mar 21
+            double br = fp().body_radius;
+//            bool nn_sep_ok = util::between(dist / br, 3, 12); // btw 3 and 12 br
+//            bool nn_sep_ok = util::between(dist / br, 3, 20); // btw 3 and 20 br
+//            bool nn_sep_ok = util::between(dist / br, 3, 30); // btw 3 and 30 br
+//            bool nn_sep_ok = util::between(dist / br, 3, 50); // btw 3 and 50 br
+//            bool nn_sep_ok = util::between(dist / br, 3, 20); // btw 3 and 20 br
+            bool nn_sep_ok = util::between(dist / br, 3, 12); // btw 3 and 12 br
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // bool speed_ok = util::between(b->speed(), 15, 25);
             bool speed_ok = b->speed() > 15;
             if (not nn_sep_ok) { all_seperation_good = false; }
@@ -311,6 +321,12 @@ public:
                 all_boids_avoid_obs_for_whole_chunk_ = false;
             }
             
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240422 change separation fitness to use chunking.
+            if (not nn_sep_ok) { all_separation_good_for_whole_chunk_ = false; }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            
             if (start_new_chunk())
             {
                 if (all_boids_avoid_obs_for_whole_chunk_)
@@ -318,6 +334,14 @@ public:
                     count_chunked_avoid_obstacle_++;
                 }
                 all_boids_avoid_obs_for_whole_chunk_ = true;
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20240422 change separation fitness to use chunking.
+                if (all_separation_good_for_whole_chunk_)
+                {
+                    count_chunked_separation_++;
+                }
+                all_separation_good_for_whole_chunk_ = true;
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
             increment_boid_update_counter();
         }
@@ -329,11 +353,21 @@ public:
     // Records if all obstacle avoidance is successful for whole chunk.
     // (Initialize to false so not to count chunk that ends on first update.)
     bool all_boids_avoid_obs_for_whole_chunk_ = false;
-
     int count_chunked_avoid_obstacle_ = 0;
 
-    int chunk_count_ = 71;
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240422 change separation fitness to use chunking.
+    bool all_separation_good_for_whole_chunk_ = false;
+    int count_chunked_separation_ = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240422 set to some non-goofy value.
+//    int chunk_count_ = 71;
+    int chunk_count_ = 200;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240422 change separation fitness to use chunking.
+
     // Count each boid update across all simulation steps.
     int boid_update_counter_ = 0;
     
@@ -354,10 +388,17 @@ public:
 
     // These return a score on the range [0,1]
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240422 change separation fitness to use chunking.
+//    double get_separation_score() const
+//    {
+//        return count_steps_good_separation / double(draw().frame_counter());
+//    }
     double get_separation_score() const
     {
-        return count_steps_good_separation / double(draw().frame_counter());
+        return count_steps_good_separation / double(chunk_count_);
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double get_speed_score() const
     {
         return count_steps_good_speed / double(draw().frame_counter());

@@ -124,11 +124,19 @@ public:
         // Loop over the mof index range. For each one find the range between
         // max and min fitness. Return the index corresponding to largest range.
         int best_index = 0;
-        double biggest_range = 0;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240422 change separation fitness to use chunking.
+//        double biggest_range = 0;
+        double infinity = std::numeric_limits<double>::infinity();
+//        double least_min = std::numeric_limits<double>::infinity();
+        double least_min = infinity;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for (int i = 0; i < mof_size; i++)
         {
-            double min_fit = std::numeric_limits<double>::infinity();
-            double max_fit = -min_fit;
+//            double min_fit = std::numeric_limits<double>::infinity();
+//            double max_fit = -min_fit;
+            double min_fit = infinity;
+            double max_fit = -infinity;
             for (auto& m : members())
             {
                 double fit = m.individual->getMultiObjectiveFitness().at(i);
@@ -136,11 +144,20 @@ public:
                 max_fit = std::max(fit, max_fit);
             }
             double range = max_fit - min_fit;
-            if (biggest_range < range)
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240422 change separation fitness to use chunking.
+//            if (biggest_range < range)
+//            {
+//                biggest_range = range;
+//                best_index = i;
+//            }
+//            if ((least_min > min_fit) and (range > 0))
+            if ((least_min >= min_fit) and (range > 0))
             {
-                biggest_range = range;
+                least_min = min_fit;
                 best_index = i;
             }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         return best_index;
     }

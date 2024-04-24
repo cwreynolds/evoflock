@@ -13,6 +13,54 @@
 namespace LazyPredator
 {
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240423 change MultiObjectiveFitness from typedef to class
+//               Probably should be moved somewhere else.
+
+// This class is just a slightly elaborated wrapper around a std::vector<double>
+class MultiObjectiveFitness
+{
+public:
+    MultiObjectiveFitness() {}
+    MultiObjectiveFitness(const std::vector<double>& multi_objective_fitness)
+    {
+        mof_ = multi_objective_fitness;
+    }
+    MultiObjectiveFitness(const std::vector<double>& multi_objective_fitness,
+                          const std::vector<std::string>& names)
+    {
+        mof_ = multi_objective_fitness;
+        names_ = names;
+    }
+    size_t size() const { return mof_.size(); }
+    double at(size_t i) const { return mof_.at(i); }
+    auto begin() {return mof_.begin(); }
+    auto end() {return mof_.end(); }
+    std::string to_string() const { return vec_to_string(mof_); }
+    const std::vector<double> as_vector() const { return mof_; }
+private:
+    std::vector<double> mof_;
+    
+    // TODO maybe instead of this in each instance, maybe just provide a
+    // utility function which takes this as an argument?
+    std::vector<std::string> names_;
+};
+
+}  // end of namespace LazyPredator
+
+std::ostream& operator<<(std::ostream& os,
+                         const LazyPredator::MultiObjectiveFitness& mfo)
+{
+    os << "{" << mfo.to_string() << "}";
+    return os;
+}
+
+
+namespace LazyPredator
+{
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 class Individual
 {
 public:
@@ -59,17 +107,30 @@ public:
         return hasFitness() ? fitness_ : getTournamentsSurvived() + getStanding();
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240423 change MultiObjectiveFitness from typedef to class
+//    bool hasMultiObjectiveFitness() const { return has_multi_objective_fitness_; }
+//    void setMultiObjectiveFitness(std::vector<double> multi_objective_fitness)
+//    {
+//        multi_objective_fitness_ = multi_objective_fitness;
+//        has_multi_objective_fitness_ = multi_objective_fitness_.size() > 0;
+//    }
+//    std::vector<double> getMultiObjectiveFitness() const
+//    {
+//        return multi_objective_fitness_;
+//    }
+    
     // TODO 20240329 WIP for multi-objective fitness
     bool hasMultiObjectiveFitness() const { return has_multi_objective_fitness_; }
-    void setMultiObjectiveFitness(std::vector<double> multi_objective_fitness)
+    void setMultiObjectiveFitness(MultiObjectiveFitness multi_objective_fitness)
     {
         multi_objective_fitness_ = multi_objective_fitness;
         has_multi_objective_fitness_ = multi_objective_fitness_.size() > 0;
     }
-    std::vector<double> getMultiObjectiveFitness() const
+    MultiObjectiveFitness getMultiObjectiveFitness() const
     {
         return multi_objective_fitness_;
     }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Compare counts of constructor/destructor calls. Must match at end of run.
     static void leakCheck()
@@ -139,7 +200,10 @@ private:
     bool has_fitness_ = false;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240329 WIP for multi-objective fitness
-    std::vector<double> multi_objective_fitness_;
+//    std::vector<double> multi_objective_fitness_;
+//    bool has_multi_objective_fitness_ = false;
+    // TODO 20240423 change MultiObjectiveFitness from typedef to class
+    MultiObjectiveFitness multi_objective_fitness_;
     bool has_multi_objective_fitness_ = false;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Leak check. Count constructor/destructor calls. Must match at end of run.

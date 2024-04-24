@@ -306,7 +306,8 @@ public:
 //            bool nn_sep_ok = util::between(dist / br, 3, 30); // btw 3 and 30 br
 //            bool nn_sep_ok = util::between(dist / br, 3, 50); // btw 3 and 50 br
 //            bool nn_sep_ok = util::between(dist / br, 3, 20); // btw 3 and 20 br
-            bool nn_sep_ok = util::between(dist / br, 3, 12); // btw 3 and 12 br
+//            bool nn_sep_ok = util::between(dist / br, 3, 12); // btw 3 and 12 br
+            bool nn_sep_ok = (dist / br) > 3; // greater than 3
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // bool speed_ok = util::between(b->speed(), 15, 25);
             bool speed_ok = b->speed() > 15;
@@ -345,7 +346,7 @@ public:
             }
             increment_boid_update_counter();
         }
-        if (all_seperation_good) { count_steps_good_separation++; }
+//        if (all_seperation_good) { count_steps_good_separation++; }
         if (all_speed_good) { count_steps_good_speed++; }
         // if (all_avoidance_good) { count_steps_avoid_obstacle++; }
     }
@@ -394,9 +395,13 @@ public:
 //    {
 //        return count_steps_good_separation / double(draw().frame_counter());
 //    }
+//    double get_separation_score() const
+//    {
+//        return count_steps_good_separation / double(chunk_count_);
+//    }
     double get_separation_score() const
     {
-        return count_steps_good_separation / double(chunk_count_);
+        return count_chunked_separation_ / double(chunk_count_);
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double get_speed_score() const

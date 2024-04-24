@@ -368,6 +368,14 @@ int main(int argc, const char * argv[])
 //    return EXIT_SUCCESS;
     
     //--------------------------------------------------------------------------
+    
+//    // TODO 20240423 change MultiObjectiveFitness from typedef to class
+//    LazyPredator::MultiObjectiveFitness mof({0.1, 0.2, 0.3, 0.4});
+//    std::cout << mof << std::endl;
+//    debugPrint(mof);
+//    return EXIT_SUCCESS;
+
+    //--------------------------------------------------------------------------
 
     int individuals = 500;
     int subpops = 25;
@@ -390,7 +398,7 @@ int main(int argc, const char * argv[])
 //    lp::LPRS().setSeed(2024041416);
 //    lp::LPRS().setSeed(2024041716);
 //    lp::LPRS().setSeed(2024041916);
-    lp::LPRS().setSeed(2024042221);
+    lp::LPRS().setSeed(20240424);
 
     int min_tree_size = 2;
     int max_tree_size = 20;
@@ -437,11 +445,13 @@ int main(int argc, const char * argv[])
         // TODO 20240330 WIP for multi-objective fitness
 #ifdef MULTI_OBJECTIVE_FITNESS
         auto fitness = rerun_flock_simulation(individual);
-        debugPrint(LP::vec_to_string(fitness));
+//        debugPrint(LP::vec_to_string(fitness));
+//        debugPrint(fitness);
 #else
         double fitness = rerun_flock_simulation(individual);
-        debugPrint(fitness);
+//        debugPrint(fitness);
 #endif
+        debugPrint(fitness);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
@@ -454,11 +464,12 @@ int main(int argc, const char * argv[])
     // TODO 20240330 WIP for multi-objective fitness
 #ifdef MULTI_OBJECTIVE_FITNESS
     auto fitness = rerun_flock_simulation(individual);
-    debugPrint(LP::vec_to_string(fitness));
+//    debugPrint(fitness);
 #else
     double fitness = rerun_flock_simulation(individual);
-    debugPrint(fitness);
+//    debugPrint(fitness);
 #endif
+    debugPrint(fitness);
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     delete population;

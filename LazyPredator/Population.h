@@ -189,9 +189,13 @@ public:
         // Finally, do a tournament-based evolution step.
         evolutionStep(tournament_function);
     }
-        
-    // Generic multi-objective fitness type: a vector of scalars.
-    typedef std::vector<double> MultiObjectiveFitness;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240423 change MultiObjectiveFitness from typedef to class
+
+//    // Generic multi-objective fitness type: a vector of scalars.
+//    typedef std::vector<double> MultiObjectiveFitness;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Functions that measure "absolute" fitness of an Individual in isolation.
     // (A shortcut for fitnesses that can be measured this way. Many cannot.)

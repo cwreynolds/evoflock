@@ -9,6 +9,7 @@
 #pragma once
 #include "Utilities.h"
 #include "FunctionSet.h"
+#include <numeric>  // for MultiObjectiveFitness
 
 namespace LazyPredator
 {
@@ -34,8 +35,13 @@ public:
     }
     size_t size() const { return mof_.size(); }
     double at(size_t i) const { return mof_.at(i); }
-    auto begin() {return mof_.begin(); }
-    auto end() {return mof_.end(); }
+    auto begin() const { return mof_.begin(); }
+    auto end() const { return mof_.end(); }
+    double min() const { return *std::min_element(begin(), end()); }
+    double sum() const { return std::reduce(begin(), end(), 0.0, std::plus()); }
+    double average() const { return sum() / size(); }
+    double product() const { return std::reduce(begin(), end(), 1.0,
+                                                std::multiplies()); }
     std::string to_string() const { return vec_to_string(mof_); }
     const std::vector<double> as_vector() const { return mof_; }
 private:

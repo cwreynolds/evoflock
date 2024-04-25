@@ -313,19 +313,27 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
 //    }
 
 // Map a MultiObjectiveFitness to a scalar, here a normalized 4d magnitude.
+
+
+//    // Map a MultiObjectiveFitness to a scalar, here the minimum value.
+//    // Used as the FitnessScalarizeFunction for Population::evolutionStep().
+//    double scalarize_fitness(LP::MultiObjectiveFitness mof)
+//    {
+//    //    return *std::min_element(mof.begin(), mof.end());
+//
+//        // TODO 20240423 change MultiObjectiveFitness from typedef to class
+//    //    auto as_vec = mof.as_vector();
+//    //    return *std::min_element(as_vec.begin(), as_vec.end());
+//
+//        // TODO Or maybe the MOF object should have its own min_element()?
+//    //    return *std::min_element(mof.begin(), mof.end());
+//
+//        return mof.min();
+//    }
+
+// Map a MultiObjectiveFitness to a scalar, here the minimum value.
 // Used as the FitnessScalarizeFunction for Population::evolutionStep().
-double scalarize_fitness(LP::MultiObjectiveFitness mof)
-{
-//    return *std::min_element(mof.begin(), mof.end());
-
-    // TODO 20240423 change MultiObjectiveFitness from typedef to class
-//    auto as_vec = mof.as_vector();
-//    return *std::min_element(as_vec.begin(), as_vec.end());
-    
-    // TODO Or maybe the MOF object should have its own min_element()?
-    return *std::min_element(mof.begin(), mof.end());
-
-}
+double scalarize_fitness(LP::MultiObjectiveFitness mof) { return mof.min(); }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

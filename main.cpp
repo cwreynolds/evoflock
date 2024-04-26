@@ -369,11 +369,8 @@ int main(int argc, const char * argv[])
     
     //--------------------------------------------------------------------------
     
-//    // TODO 20240423 change MultiObjectiveFitness from typedef to class
-//    LazyPredator::MultiObjectiveFitness mof({0.1, 0.2, 0.3, 0.4});
-//    std::cout << mof << std::endl;
-//    debugPrint(mof);
-//    return EXIT_SUCCESS;
+    LazyPredator::MultiObjectiveFitness mof({0.1, 0.2, 0.3, 0.4});
+    debugPrint(mof);
 
     //--------------------------------------------------------------------------
 
@@ -421,16 +418,7 @@ int main(int argc, const char * argv[])
         util::Timer t("Run evolution.");
         for (int i = 0; i < max_evolution_steps; i++)
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240406 formalize scalarize of MO fitness
-            
-            
-#ifdef MULTI_OBJECTIVE_FITNESS
             population->evolutionStep(evoflock_fitness_function, scalarize_fitness);
-#else
-            population->evolutionStep(evoflock_fitness_function);
-#endif
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             std::cout << std::endl;
         }
     }
@@ -441,18 +429,8 @@ int main(int argc, const char * argv[])
     {
         const LP::Individual* individual = population->nthBestFitness(i);
         std::cout << individual->tree().to_string() << std::endl;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240330 WIP for multi-objective fitness
-#ifdef MULTI_OBJECTIVE_FITNESS
         auto fitness = rerun_flock_simulation(individual);
-//        debugPrint(LP::vec_to_string(fitness));
-//        debugPrint(fitness);
-#else
-        double fitness = rerun_flock_simulation(individual);
-//        debugPrint(fitness);
-#endif
         debugPrint(fitness);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     print_occupancy_map = true;
@@ -460,17 +438,8 @@ int main(int argc, const char * argv[])
     std::cout << std::endl;
     const LP::Individual* individual = population->nthBestFitness(0);
     std::cout << individual->tree().to_string() << std::endl;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240330 WIP for multi-objective fitness
-#ifdef MULTI_OBJECTIVE_FITNESS
     auto fitness = rerun_flock_simulation(individual);
-//    debugPrint(fitness);
-#else
-    double fitness = rerun_flock_simulation(individual);
-//    debugPrint(fitness);
-#endif
     debugPrint(fitness);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     delete population;
 

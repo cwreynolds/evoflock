@@ -20,66 +20,14 @@
 
 namespace LP = LazyPredator;
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240330 WIP for multi-objective fitness
-#ifdef MULTI_OBJECTIVE_FITNESS
-#else
-#endif
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240330 WIP for multi-objective fitness
-#define MULTI_OBJECTIVE_FITNESS
-
-
-// TODO 20240423 change MultiObjectiveFitness from typedef to class
-// typedef std::vector<double> MultiObjectiveFitness;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    // TODO 20240327 WIP for multi-objective fitness
-//
-//    // Fitness function, simply returns Individual's tree's value (computing it and
-//    // caching it on first call).
-//    inline float evoflock_fitness_function(LazyPredator::Individual* individual)
-//    {
-//        return std::any_cast<double>(individual->tree().getRootValue());
-//    }
-//
-//    //    // Fitness function, simply returns Individual's tree's value (computing it and
-//    //    // caching it on first call).
-//    //    inline std::vector<double> evoflock_fitness_function(LazyPredator::Individual* individual)
-//    //    {
-//    //        // TODO 20240327 MOCK!!
-//    //        std::vector<double> multi_objective_fitness = {0.0, 0.2, 0.4, 0.6, 0.8, 1.0};
-//    //        return multi_objective_fitness;
-//    //    }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240330 WIP for multi-objective fitness
-#ifdef MULTI_OBJECTIVE_FITNESS
 // Fitness function, simply returns Individual's tree's value (computing it and
 // caching it on first call).
 inline LP::MultiObjectiveFitness evoflock_fitness_function(LazyPredator::Individual* individual)
 {
     return std::any_cast<LP::MultiObjectiveFitness>(individual->tree().getRootValue());
 }
-#else
-// Fitness function, simply returns Individual's tree's value (computing it and
-// caching it on first call).
-inline float evoflock_fitness_function(LazyPredator::Individual* individual)
-{
-    return std::any_cast<double>(individual->tree().getRootValue());
-}
-#endif
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-//void fitness_logger(double nn_sep_fitness, double nn_sep_err,
-//                    double collide_fitness, double collide,
-//                    double speed_err_fitness, double speed_err,
-//                    double fitness)
 void fitness_logger(double separation_fitness, double good_separation_fraction,
                     double avoid_fitness,      double good_avoid_fraction,
                     double speed_fitness,      double good_speed_fraction,
@@ -297,118 +245,32 @@ inline double measure_fitness_after_flock_simulation(const Flock& flock)
     if (print_occupancy_map) { flock.occupancy_map.print(true); }
     return fitness;
 }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240410 try Matthews suggestion to use min of the fittnesses.
-
-//    // Map a MultiObjectiveFitness to a scalar, here a normalized 4d magnitude.
-//    // Used as the FitnessScalarizeFunction for Population::evolutionStep().
-//    double scalarize_fitness(MultiObjectiveFitness mof)
-//    {
-//        double sum_of_objectives_squared = 0;
-//        for (auto objective : mof) { sum_of_objectives_squared += sq(objective); }
-//        return std::sqrt(sum_of_objectives_squared) / std::sqrt(double(mof.size()));
-//    }
-
-// Map a MultiObjectiveFitness to a scalar, here a normalized 4d magnitude.
-
-
-//    // Map a MultiObjectiveFitness to a scalar, here the minimum value.
-//    // Used as the FitnessScalarizeFunction for Population::evolutionStep().
-//    double scalarize_fitness(LP::MultiObjectiveFitness mof)
-//    {
-//    //    return *std::min_element(mof.begin(), mof.end());
-//
-//        // TODO 20240423 change MultiObjectiveFitness from typedef to class
-//    //    auto as_vec = mof.as_vector();
-//    //    return *std::min_element(as_vec.begin(), as_vec.end());
-//
-//        // TODO Or maybe the MOF object should have its own min_element()?
-//    //    return *std::min_element(mof.begin(), mof.end());
-//
-//        return mof.min();
-//    }
 
 // Map a MultiObjectiveFitness to a scalar, here the minimum value.
 // Used as the FitnessScalarizeFunction for Population::evolutionStep().
 double scalarize_fitness(LP::MultiObjectiveFitness mof) { return mof.min(); }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240330 WIP for multi-objective fitness
-#ifdef MULTI_OBJECTIVE_FITNESS
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
 inline LP::MultiObjectiveFitness run_flock_simulation(const FlockParameters& fp,
                                                       bool write_flock_data_file = false)
-#else
-// Run flock simulation with given parameters, return a scalar fitness on [0,1].
-inline double run_flock_simulation(const FlockParameters& fp,
-                                   bool write_flock_data_file = false)
-#endif
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     Flock flock;
     init_flock(flock);
     flock.setSaveBoidCenters(write_flock_data_file);
     flock.fp() = fp;
     flock.run();
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    // TODO 20240330 WIP for multi-objective fitness
-//#ifdef MULTI_OBJECTIVE_FITNESS
-//    return multiObjectiveFitnessOfFlock(flock);
-//#else
-//    return measure_fitness_after_flock_simulation(flock);
-//#endif
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240330 WIP for multi-objective fitness
-#ifdef MULTI_OBJECTIVE_FITNESS
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20240402 add per-objective logging for MultiObjectiveFitness case.
-    // TODO          really ugly, needs polish.
     auto mofof = multiObjectiveFitnessOfFlock(flock);
-//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//        // TODO 20240405 try sum to scalarize fitness
-//        fitness_logger(mofof[0], -1, mofof[1], -1, mofof[2], -1, mofof[3], -1,
-//    //                   (mofof[0] * mofof[1] * mofof[2] * mofof[3]));
-//                       (mofof[0] + mofof[1] + mofof[2] + mofof[3]) / 4);
-//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20240405 use scalarize fitness function
-//    fitness_logger(mofof[0], -1, mofof[1], -1,
-//                   mofof[2], -1, mofof[3], -1,
-//                   scalarize_fitness(mofof));
-    
-    // TODO 20240423 change MultiObjectiveFitness from typedef to class
     fitness_logger(mofof.at(0), -1, mofof.at(1), -1,
                    mofof.at(2), -1, mofof.at(3), -1,
                    scalarize_fitness(mofof));
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     return mofof;
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-#else
-    return measure_fitness_after_flock_simulation(flock);
-#endif
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240330 WIP for multi-objective fitness
-#ifdef MULTI_OBJECTIVE_FITNESS
+
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
 inline LP::MultiObjectiveFitness run_flock_simulation(double max_force,
-#else
-// Run flock simulation with given parameters, return a scalar fitness on [0,1].
-inline double run_flock_simulation(double max_force,
-#endif
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                                    double max_speed,
                                    double min_speed,
@@ -461,36 +323,16 @@ inline double run_flock_simulation(double max_force,
 }
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240330 WIP for multi-objective fitness
-#ifdef MULTI_OBJECTIVE_FITNESS
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
 inline LP::MultiObjectiveFitness run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
 {
     return run_flock_simulation(FlockParameters(), write_flock_data_file);
 }
-#else
-// Run flock simulation with given parameters, return a scalar fitness on [0,1].
-inline double run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
-{
-    return run_flock_simulation(FlockParameters(), write_flock_data_file);
-}
-#endif
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240330 WIP for multi-objective fitness
-#ifdef MULTI_OBJECTIVE_FITNESS
 // Wrote this to run at the end of evolution on the top-10 fitness individuals
 // of population in order to record flock data for playback
 inline LP::MultiObjectiveFitness rerun_flock_simulation(const LazyPredator::Individual* individual)
-#else
-// Wrote this to run at the end of evolution on the top-10 fitness individuals
-// of population in order to record flock data for playback
-inline float rerun_flock_simulation(const LazyPredator::Individual* individual)
-#endif
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     // Is this tree copy needed to avoid using the previous cached tree root?
     LazyPredator::GpTree t = individual->tree();
@@ -562,28 +404,7 @@ double jiggle_scale = 0.1;
 LazyPredator::FunctionSet evoflock_gp_function_set =
 {
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240330 WIP for multi-objective fitness
-#ifdef MULTI_OBJECTIVE_FITNESS
         { "Multi_Objective_Fitness" },
-        
-        // TODO needs work, like Texture in TexSyn (see constructors for GpType):
-//        {
-//            "Texture",
-//            [](std::any a)
-//            {
-//                if (a.has_value())
-//                {
-//                    Texture* t = std::any_cast<Texture*>(a);
-//                    if (t && t->valid()) delete t;
-//                }
-//            }
-//        },
-#else
-        { "Fitness_0_1", 0.0,   1.0 },
-#endif
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         // TODO 20240409 trying increasing the jiggle scale (default is 0.05)
@@ -615,16 +436,8 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
             // GP function name:
             "Run_Flock",
             
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240330 WIP for multi-objective fitness
-#ifdef MULTI_OBJECTIVE_FITNESS
             // Return type (in this case it returns a MultiObjectiveFitness):
             "Multi_Objective_Fitness",
-#else
-            // Return type (in this case it returns a fitness on [0,1]):
-            "Fitness_0_1",
-#endif
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
             // Function parameter type list:
             //     TODO cf "FlockParameters" for details

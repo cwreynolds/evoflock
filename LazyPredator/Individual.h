@@ -54,8 +54,9 @@ private:
 
 }  // end of namespace LazyPredator
 
-std::ostream& operator<<(std::ostream& os,
-                         const LazyPredator::MultiObjectiveFitness& mfo)
+namespace LP = LazyPredator;
+
+std::ostream& operator<<(std::ostream& os, const LP::MultiObjectiveFitness& mfo)
 {
     os << "{" << mfo.to_string() << "}";
     return os;

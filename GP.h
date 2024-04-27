@@ -20,40 +20,52 @@
 
 namespace LP = LazyPredator;
 
+typedef LazyPredator::MultiObjectiveFitness MOF;
+
 // Fitness function, simply returns Individual's tree's value (computing it and
 // caching it on first call).
-inline LP::MultiObjectiveFitness evoflock_fitness_function(LazyPredator::Individual* individual)
+inline MOF evoflock_fitness_function(LP::Individual* individual)
 {
-    return std::any_cast<LP::MultiObjectiveFitness>(individual->tree().getRootValue());
+    return std::any_cast<MOF>(individual->tree().getRootValue());
 }
 
 
-void fitness_logger(double separation_fitness, double good_separation_fraction,
-                    double avoid_fitness,      double good_avoid_fraction,
-                    double speed_fitness,      double good_speed_fraction,
-                    double occupied_fitness,   double occupied_fraction,
-                    double fitness)
+// Map a MultiObjectiveFitness to a scalar, here the minimum value.
+// Used as the FitnessScalarizeFunction for Population::evolutionStep().
+inline double scalarize_fitness(MOF mof) { return mof.min(); }
 
+
+inline const std::vector<std::string> mof_names =
+{
+    "separation",
+    "avoid",
+    "speed",
+    "occupied"
+};
+
+
+inline void fitness_logger(const MOF& mof)
 {
     // Save current settings for formatting float/double values
     std::ios::fmtflags old_settings = std::cout.flags();
     size_t old_precision = std::cout.precision();
-    
-    auto print = [](std::string label, double fitness, double raw = -1)
+    // Format labels.
+    size_t cw = 0;
+    std::vector<std::string> labels;
+    for (auto& s : mof_names)
+    { labels.push_back("    " + s + (s.empty() ? "" : "_") + "fitness"); }
+    for (auto& s : labels){ if (cw < s.size()) { cw = s.size(); } }
+    // Print one row of a table with a named mof fitness.
+    auto print = [&](double fitness, std::string name = "")
     {
-        std::cout << "    " << label;
+        if (name.empty()) { name = "    scalar fitness"; }
+        std::cout << (name + std::string(cw,' ')).substr(0, cw);
         std::cout << std::setprecision(6) << std::setw(10) << std::fixed;
-        std::cout << fitness;
-        if (raw > -1) { std::cout << " (" << raw <<  ")"; }
-        std::cout << std::endl;
+        std::cout << fitness << std::endl;
     };
-    print("separation_fitness", separation_fitness, good_separation_fraction);
-    print("avoid_fitness     ", avoid_fitness,      good_avoid_fraction);
-    print("speed_fitness     ", speed_fitness,      good_speed_fraction);
-    print("occupied_fitness  ", occupied_fitness,   occupied_fraction);
-    print("fitness           ", fitness);
+    for (int i = 0; i < mof.size(); i++) { print(mof.at(i), labels.at(i)); }
+    print(scalarize_fitness(mof));
     std::cout << std::endl;
-    
     // restore output format flags and precision
     std::cout.flags(old_settings);
     std::cout.precision(old_precision);
@@ -121,30 +133,6 @@ inline void init_flock(Flock& flock)
 }
 
 
-//    // Move this to util, add unit tests
-//    // For plot of this see: https://bitly.ws/3fqEu
-//    //    auto inv_count_01 = [](int count){ return  1.0 / (count + 1); };
-
-
-//    // Experimental non-linearity
-//    // (Wolfram Alpha plot: https://tinyurl.com/bdew7a92)
-//    auto nonlin = [](double x) { return (x + pow(x, 10)) / 2; };
-
-
-// Remap so [0,1] goes to [1,tiny]
-inline double keep_above_zero(double fitness_01, double tiny = 0.1)
-{
-    return util::remap_interval_clip(fitness_01, 0, 1, tiny, 1);
-}
-
-
-// Flip the 0-to-1 range, but remap so [0,1] goes to [1,tiny]
-inline double flip_and_keep_above_zero(double fitness_01, double tiny = 0.1)
-{
-    return util::remap_interval_clip(fitness_01, 0, 1, 1, tiny);
-}
-
-
 // Adjust weight of one objective's fitness for "product of objective fitnesses".
 // Each objective fitness is on [0, 1] and serves to modulate (decrease) other
 // objective fitnesses. This reduces the range of decrease by mapping the input
@@ -158,143 +146,66 @@ double fitness_product_weight_01(double fitness, double weight)
 
 inline bool print_occupancy_map = false;  // Just for debugging.
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240330 WIP for multi-objective fitness
-// split multiObjectiveFitnessOfFloc from measure_fitness_after_flock_simulation
 
-//inline std::vector<double> multiObjectiveFitnessOfFlock(const Flock& flock)
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240416 refactor metrics
-
-//inline MultiObjectiveFitness multiObjectiveFitnessOfFlock(const Flock& flock)
-//{
-//    double steps = flock.max_simulation_steps();
-//    double good_separation_fraction = flock.count_steps_good_separation / steps;
-//    double good_avoid_fraction    = flock.count_steps_avoid_obstacle / steps;
-//    double good_speed_fraction  = flock.count_steps_good_speed  / steps;
-//    auto ignore_function = [](Vec3 p) { return p.length() > 50;};
-//    double occupied_fraction = flock.occupancy_map.fractionOccupied(ignore_function);
-//    return {good_separation_fraction,
-//            good_avoid_fraction,
-//            good_speed_fraction,
-//            occupied_fraction};
-//}
-
-inline LP::MultiObjectiveFitness multiObjectiveFitnessOfFlock(const Flock& flock)
+inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 {
-    double steps = flock.max_simulation_steps();
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20240423 oops, use the new chunk era api
-//    double good_separation_fraction = flock.count_steps_good_separation / steps;
     double good_separation_fraction = flock.get_separation_score();
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    double good_avoid_fraction = flock.get_avoid_obstacle_score();
 
-//    double good_avoid_fraction    = flock.count_steps_avoid_obstacle / steps;
-    double good_avoid_fraction    = flock.get_avoid_obstacle_score();
+    double steps = flock.max_simulation_steps();
+    double good_speed_fraction = flock.count_steps_good_speed  / steps;
 
-    double good_speed_fraction  = flock.count_steps_good_speed  / steps;
     auto ignore_function = [](Vec3 p) { return p.length() > 50;};
     double occupied_fraction = flock.occupancy_map.fractionOccupied(ignore_function);
-//    return {good_separation_fraction,
-//            good_avoid_fraction,
-//            good_speed_fraction,
-//            occupied_fraction};
-    return LP::MultiObjectiveFitness({good_separation_fraction,
-                                      good_avoid_fraction,
-                                      good_speed_fraction,
-                                      occupied_fraction});
+
+    return {{good_separation_fraction,
+             good_avoid_fraction,
+             good_speed_fraction,
+             occupied_fraction}};
 }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-// Compute fitness from metrics maintained by flock during simulation.
-inline double measure_fitness_after_flock_simulation(const Flock& flock)
-{
-//    double steps = flock.max_simulation_steps();
-//    double good_separation_fraction = flock.count_steps_good_separation / steps;
-//    double good_avoid_fraction    = flock.count_steps_avoid_obstacle / steps;
-//    double good_speed_fraction  = flock.count_steps_good_speed  / steps;
-//    auto ignore_function = [](Vec3 p) { return p.length() > 50;};
-//    double occupied_fraction = flock.occupancy_map.fractionOccupied(ignore_function);
-
-    LP::MultiObjectiveFitness mo_fitness = multiObjectiveFitnessOfFlock(flock);
-    double good_separation_fraction = mo_fitness.at(0);
-    double good_avoid_fraction      = mo_fitness.at(1);
-    double good_speed_fraction      = mo_fitness.at(2);
-    double occupied_fraction        = mo_fitness.at(3);
-
-    double separation_fitness = keep_above_zero(good_separation_fraction);
-    double avoid_fitness      = keep_above_zero(good_avoid_fraction);
-    double speed_fitness      = keep_above_zero(good_speed_fraction);
-    double occupied_fitness   = keep_above_zero(occupied_fraction);
-
-    separation_fitness = fitness_product_weight_01(separation_fitness, 0.6);
-    avoid_fitness      = fitness_product_weight_01(avoid_fitness,      1.0);
-    speed_fitness      = fitness_product_weight_01(speed_fitness,      0.2);
-    occupied_fitness   = fitness_product_weight_01(occupied_fitness,   0.6);
-
-    double fitness = (separation_fitness * avoid_fitness *
-                      speed_fitness * occupied_fitness);
-    fitness_logger(separation_fitness, good_separation_fraction,
-                   avoid_fitness,      good_avoid_fraction,
-                   speed_fitness,      good_speed_fraction,
-                   occupied_fitness,   occupied_fraction,
-                   fitness);
-    // Just for testing
-    if (print_occupancy_map) { flock.occupancy_map.print(true); }
-    return fitness;
-}
-
-
-// Map a MultiObjectiveFitness to a scalar, here the minimum value.
-// Used as the FitnessScalarizeFunction for Population::evolutionStep().
-double scalarize_fitness(LP::MultiObjectiveFitness mof) { return mof.min(); }
 
 
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
-inline LP::MultiObjectiveFitness run_flock_simulation(const FlockParameters& fp,
-                                                      bool write_flock_data_file = false)
+inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
 {
     Flock flock;
     init_flock(flock);
-    flock.setSaveBoidCenters(write_flock_data_file);
+    flock.setSaveBoidCenters(write_file);
     flock.fp() = fp;
     flock.run();
-    auto mofof = multiObjectiveFitnessOfFlock(flock);
-    fitness_logger(mofof.at(0), -1, mofof.at(1), -1,
-                   mofof.at(2), -1, mofof.at(3), -1,
-                   scalarize_fitness(mofof));
-    return mofof;
+    MOF mof = multiObjectiveFitnessOfFlock(flock);
+    assert(mof.size() == mof_names.size());
+    fitness_logger(mof);
+    return mof;
 }
 
 
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
-inline LP::MultiObjectiveFitness run_flock_simulation(double max_force,
-
-                                   double max_speed,
-                                   double min_speed,
-                                   double speed,
-                                   
-                                   double weight_forward,
-                                   double weight_separate,
-                                   double weight_align,
-                                   double weight_cohere,
-                                   double weight_avoid,
-                                   
-                                   double max_dist_separate_in_body_radii,
-                                   
-                                   double exponent_separate,
-                                   double exponent_align,
-                                   double exponent_cohere,
-                                   
-                                   double angle_separate,
-                                   double angle_align,
-                                   double angle_cohere,
-
-                                   double fly_away_max_dist_in_br,
-                                   double min_time_to_collide,
-                                   bool write_flock_data_file = false)
+inline MOF run_flock_simulation(double max_force,
+                                
+                                double max_speed,
+                                double min_speed,
+                                double speed,
+                                
+                                double weight_forward,
+                                double weight_separate,
+                                double weight_align,
+                                double weight_cohere,
+                                double weight_avoid,
+                                
+                                double max_dist_separate_in_body_radii,
+                                
+                                double exponent_separate,
+                                double exponent_align,
+                                double exponent_cohere,
+                                
+                                double angle_separate,
+                                double angle_align,
+                                double angle_cohere,
+                                
+                                double fly_away_max_dist_in_br,
+                                double min_time_to_collide,
+                                bool write_flock_data_file = false)
 {
     FlockParameters fp = init_flock_parameters(max_force,
                                                max_speed,
@@ -324,7 +235,7 @@ inline LP::MultiObjectiveFitness run_flock_simulation(double max_force,
 
 
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
-inline LP::MultiObjectiveFitness run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
+inline MOF run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
 {
     return run_flock_simulation(FlockParameters(), write_flock_data_file);
 }
@@ -332,7 +243,7 @@ inline LP::MultiObjectiveFitness run_hand_tuned_flock_simulation(bool write_floc
 
 // Wrote this to run at the end of evolution on the top-10 fitness individuals
 // of population in order to record flock data for playback
-inline LP::MultiObjectiveFitness rerun_flock_simulation(const LazyPredator::Individual* individual)
+inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
 {
     // Is this tree copy needed to avoid using the previous cached tree root?
     LazyPredator::GpTree t = individual->tree();

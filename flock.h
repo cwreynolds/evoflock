@@ -293,6 +293,10 @@ public:
         bool all_speed_good = true;
         bool all_seperation_good = true;
         bool all_avoidance_good = true;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240427 remove speed fitness, add cohesion fitness.
+        double min_sep_allowed = 3;  // in units of body radius
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for (Boid* b : boids())
         {
             Boid* n = b->cached_nearest_neighbors().at(0);
@@ -307,8 +311,18 @@ public:
 //            bool nn_sep_ok = util::between(dist / br, 3, 50); // btw 3 and 50 br
 //            bool nn_sep_ok = util::between(dist / br, 3, 20); // btw 3 and 20 br
 //            bool nn_sep_ok = util::between(dist / br, 3, 12); // btw 3 and 12 br
-            bool nn_sep_ok = (dist / br) > 3; // greater than 3
+//            bool nn_sep_ok = (dist / br) > 3; // greater than 3
+            bool nn_sep_ok = (dist / br) > min_sep_allowed;
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240427 remove speed fitness, add cohesion fitness.
+//            double min_sep_allowed = 3;  // in units of body radius
+            double cs = util::remap_interval_clip(dist/br,min_sep_allowed,20,1,0);
+            sum_of_all_cohesion_scores_ += cs;
+//            assert(util::between(cs, 0, 1)); // TEMP TEMP TEMP TEMP TEMP TEMP TEMP
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
             // bool speed_ok = util::between(b->speed(), 15, 25);
             bool speed_ok = b->speed() > 15;
             if (not nn_sep_ok) { all_seperation_good = false; }
@@ -417,6 +431,16 @@ public:
         auto ignore_function = [](Vec3 p) { return p.length() > 50;};
         return occupancy_map.fractionOccupied(ignore_function);
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240427 remove speed fitness, add cohesion fitness.
+    double sum_of_all_cohesion_scores_ = 0;
+    double get_cohere_score() const
+    {
+        return sum_of_all_cohesion_scores_ / boid_update_counter_;
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     int log_stat_interval_ = 100;
     int getLogStatInterval() const { return log_stat_interval_; }

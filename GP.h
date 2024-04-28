@@ -14,12 +14,12 @@
 
 #include "flock.h"
 #include "shape.h"
-
 // TODO 20240226 For now, a modified copy of LazyPredator is in a subdirectory.
-#include "LazyPredator/LazyPredator.h"
 
+#include "LazyPredator/LazyPredator.h"
 namespace LP = LazyPredator;
 
+// Abbreviated name for this overly-long class name.
 typedef LazyPredator::MultiObjectiveFitness MOF;
 
 // Fitness function, simply returns Individual's tree's value (computing it and
@@ -37,11 +37,28 @@ inline double scalarize_fitness(MOF mof) { return mof.min(); }
 
 inline const std::vector<std::string> mof_names =
 {
-    "separation",
+    "separate",
     "avoid",
-    "speed",
+    "cohere",
     "occupied"
 };
+
+
+inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
+{
+    double separate = flock.get_separation_score();
+    double avoid = flock.get_avoid_obstacle_score();
+    double cohere = flock.get_cohere_score();
+    auto ignore_function = [](Vec3 p) { return p.length() > 50;};
+    double occupy = flock.occupancy_map.fractionOccupied(ignore_function);
+    return
+    {{
+        separate,
+        avoid,
+        cohere,
+        occupy
+    }};
+}
 
 
 inline void fitness_logger(const MOF& mof)
@@ -50,21 +67,20 @@ inline void fitness_logger(const MOF& mof)
     std::ios::fmtflags old_settings = std::cout.flags();
     size_t old_precision = std::cout.precision();
     // Format labels.
-    size_t cw = 0;
+    std::string sf = "scalar fitness";
+    size_t cw = sf.size();  // Column width.
     std::vector<std::string> labels;
-    for (auto& s : mof_names)
-    { labels.push_back("    " + s + (s.empty() ? "" : "_") + "fitness"); }
-    for (auto& s : labels){ if (cw < s.size()) { cw = s.size(); } }
+    for (auto& s : mof_names) { labels.push_back(s + " fitness"); }
+    for (auto& s : labels){ size_t ss = s.size(); if (cw < ss) { cw = ss; } }
     // Print one row of a table with a named mof fitness.
-    auto print = [&](double fitness, std::string name = "")
+    auto print = [&](double fitness, std::string name)
     {
-        if (name.empty()) { name = "    scalar fitness"; }
-        std::cout << (name + std::string(cw,' ')).substr(0, cw);
+        std::cout << "    " << (name + std::string(cw,' ')).substr(0, cw);
         std::cout << std::setprecision(6) << std::setw(10) << std::fixed;
         std::cout << fitness << std::endl;
     };
     for (int i = 0; i < mof.size(); i++) { print(mof.at(i), labels.at(i)); }
-    print(scalarize_fitness(mof));
+    print(scalarize_fitness(mof), sf);
     std::cout << std::endl;
     // restore output format flags and precision
     std::cout.flags(old_settings);
@@ -147,24 +163,6 @@ double fitness_product_weight_01(double fitness, double weight)
 inline bool print_occupancy_map = false;  // Just for debugging.
 
 
-inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
-{
-    double good_separation_fraction = flock.get_separation_score();
-    double good_avoid_fraction = flock.get_avoid_obstacle_score();
-
-    double steps = flock.max_simulation_steps();
-    double good_speed_fraction = flock.count_steps_good_speed  / steps;
-
-    auto ignore_function = [](Vec3 p) { return p.length() > 50;};
-    double occupied_fraction = flock.occupancy_map.fractionOccupied(ignore_function);
-
-    return {{good_separation_fraction,
-             good_avoid_fraction,
-             good_speed_fraction,
-             occupied_fraction}};
-}
-
-
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
 inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
 {
@@ -208,10 +206,12 @@ inline MOF run_flock_simulation(double max_force,
                                 bool write_flock_data_file = false)
 {
     FlockParameters fp = init_flock_parameters(max_force,
-                                               max_speed,
-                                               min_speed,
-                                               speed,
-                                               
+                                               // 20240427 Policy change: set
+                                               // rather than optimize speed.
+                                               20,  // max_speed,
+                                               20,  // min_speed,
+                                               20,  // speed,
+
                                                weight_forward,
                                                weight_separate,
                                                weight_align,

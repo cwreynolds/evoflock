@@ -105,10 +105,50 @@ public:
     }
     // Given a TournamentGroup with MultiObjectiveFitness, select a "best" index
     // into the MultiObjectiveFitness vector, based on largest range between min
-    // and max value for each index. NOTE that this implicitly assumes fitness
-    // (objective) values are normalized on the range [0,1], otherwise the range
-    // size would not be directly comparable.
+    // and max value for each index (later: OR the index with the lowest bottom
+    // of range). NOTE that this implicitly assumes fitness (objective) values
+    // are normalized on the range [0,1], otherwise the range size would not be
+    // directly comparable.
     size_t pickMultiObjectiveFitnessIndex()
+    {
+        size_t mof_size = checkValidForMultiObjectiveFitness();
+        double infinity = std::numeric_limits<double>::infinity();
+        // Loop over the mof index range. For each one find the range between
+        // max and min fitness. Return the index corresponding to largest range
+        // or the lowest bottom.
+        int best_index_big_range = 0;
+        int best_index_lowest_bottom = 0;
+        double biggest_range = 0;
+        double lowest_bottom = infinity;
+        for (int i = 0; i < mof_size; i++)
+        {
+            double min_fit = infinity;
+            double max_fit = -infinity;
+            for (auto& m : members())
+            {
+                double fit = m.individual->getMultiObjectiveFitness().at(i);
+                min_fit = std::min(fit, min_fit);
+                max_fit = std::max(fit, max_fit);
+            }
+            double range = max_fit - min_fit;
+            if (biggest_range < range)
+            {
+                biggest_range = range;
+                best_index_big_range = i;
+            }
+            if ((lowest_bottom >= min_fit) and (range > 0))
+            {
+                lowest_bottom = min_fit;
+                best_index_lowest_bottom = i;
+            }
+        }
+        return (LPRS().randomBool() ?
+                best_index_big_range :
+                best_index_lowest_bottom);
+    }
+    // First make sure TournamentGroup is set up for MultiObjectiveFitness.
+    // (Also returns the size of MultiObjectiveFitness vectors being used.)
+    size_t checkValidForMultiObjectiveFitness() const
     {
         // First make sure TournamentGroup is set up for MultiObjectiveFitness.
         assert((members().size() > 0) and "TournamentGroup must have members");
@@ -121,43 +161,7 @@ public:
             assert((mof_size == m.individual->getMultiObjectiveFitness().size())
                    and "all MultiObjectiveFitness vectors must be same size");
         }
-        // Loop over the mof index range. For each one find the range between
-        // max and min fitness. Return the index corresponding to largest range.
-        int best_index = 0;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240422 change separation fitness to use chunking.
-        double biggest_range = 0;
-        double infinity = std::numeric_limits<double>::infinity();
-        // double least_min = infinity;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        for (int i = 0; i < mof_size; i++)
-        {
-            double min_fit = infinity;
-            double max_fit = -infinity;
-            for (auto& m : members())
-            {
-                double fit = m.individual->getMultiObjectiveFitness().at(i);
-                min_fit = std::min(fit, min_fit);
-                max_fit = std::max(fit, max_fit);
-            }
-            double range = max_fit - min_fit;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240422 change separation fitness to use chunking.
-            // TODO 20240427 changed back from least_min to biggest_range
-            //               Possible choose between them randomly?
-            if (biggest_range < range)
-            {
-                biggest_range = range;
-                best_index = i;
-            }
-//            if ((least_min >= min_fit) and (range > 0))
-//            {
-//                least_min = min_fit;
-//                best_index = i;
-//            }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        }
-        return best_index;
+        return mof_size;
     }
     // Is the given Individual a member of this TournamentGroup?
     bool isMember(Individual* individual) const

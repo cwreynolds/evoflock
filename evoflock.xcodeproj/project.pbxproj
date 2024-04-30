@@ -36,6 +36,7 @@
 		847454BE2B6195F000214306 /* obstacle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = obstacle.h; sourceTree = "<group>"; };
 		847454BF2B65BE9C00214306 /* Boid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Boid.h; sourceTree = "<group>"; };
 		848BC33C2B69856700509CE5 /* flock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = flock.h; sourceTree = "<group>"; };
+		84A248392BE076450062EB95 /* dbscan.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dbscan.h; sourceTree = "<group>"; };
 		84A582972B5207000008CEE8 /* Agent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Agent.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -55,6 +56,7 @@
 			children = (
 				84A582972B5207000008CEE8 /* Agent.h */,
 				847454BF2B65BE9C00214306 /* Boid.h */,
+				84A248392BE076450062EB95 /* dbscan.h */,
 				848BC33C2B69856700509CE5 /* flock.h */,
 				8413ADFB2B89626F006693A1 /* GP.h */,
 				841F3D622B4A1C8100483276 /* LICENSE */,

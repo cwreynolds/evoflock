@@ -268,6 +268,7 @@ void open3d_test() {
 
 #include "Agent.h"
 #include "Boid.h"
+#include "dbscan.h"
 #include "flock.h"
 #include "GP.h"
 #include "LocalSpace.h"
@@ -287,10 +288,11 @@ void run_unit_tests()
     Agent::unit_test();
     Boid::unit_test();
     Flock::unit_test();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240224 very preliminary test
     LazyPredator::unit_test();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240430 prototype dbscan
+    dbscan(BoidPtrList({new Boid(), new Boid(), new Boid()})).unit_test();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << "All unit tests OK." << std::endl;
 }
 

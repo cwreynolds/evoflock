@@ -23,6 +23,8 @@
 #include <mutex>
 class Vec3;
 
+#include <sstream>
+
 namespace Utilities 
 {
 
@@ -251,6 +253,21 @@ void apply_to_pairwise_combinations(F pair_func, const std::vector<T>& collectio
         }
     }
 }
+
+// Convert an std::vector into an std::string as a "comma separated list".
+// TODO add a unit test. search for ", " to find places where this could be used
+template <typename T> std::string vec_to_string(const std::vector<T>& vector)
+{
+    std::stringstream s;
+    bool first = true;
+    for (auto& element : vector)
+    {
+        if (first) first = false; else s << ", ";
+        s << element;
+    }
+    return s.str();
+}
+
 
 static void unit_test()
 {

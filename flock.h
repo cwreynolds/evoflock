@@ -27,6 +27,11 @@
 namespace LP = LazyPredator;
 #include <fstream>  // for logging simulation data to file.
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240430 prototype dbscan
+#include "dbscan.h"
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 class Flock
 {
 private:
@@ -363,6 +368,17 @@ public:
 //        if (all_seperation_good) { count_steps_good_separation++; }
         if (all_speed_good) { count_steps_good_speed++; }
         // if (all_avoidance_good) { count_steps_avoid_obstacle++; }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240430 prototype dbscan
+//        auto df = [](Boid* a, Boid* b) { return (a->position() -
+//                                                 b->position()).length(); };
+//        dbscan d(boids(), df, 5, 3);
+//        if ((draw().frame_counter() % 100) == 0)
+//        {
+//            debugPrint(d.get_cluster_count())
+//        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // Records if all obstacle avoidance is successful for whole chunk.

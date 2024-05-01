@@ -278,6 +278,16 @@ void open3d_test() {
 #include "Vec3.h"
 #include <iostream>
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240430 prototype dbscan
+
+//double boid_dist(Boid* a, Boid* b)
+//{
+//    return (a->position() - b->position()).length();
+//}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 void run_unit_tests()
 {
     util::unit_test();
@@ -291,7 +301,11 @@ void run_unit_tests()
     LazyPredator::unit_test();
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240430 prototype dbscan
-    dbscan(BoidPtrList({new Boid(), new Boid(), new Boid()})).unit_test();
+//    BoidPtrList bpl ({new Boid(), new Boid(), new Boid()});
+//    auto df = [](Boid* a, Boid* b) { return (a->position() -
+//                                             b->position()).length(); };
+//    dbscan d(bpl, df, 1, 1);
+//    d.unit_test();
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << "All unit tests OK." << std::endl;
 }
@@ -371,8 +385,8 @@ int main(int argc, const char * argv[])
     
     //--------------------------------------------------------------------------
     
-    LazyPredator::MultiObjectiveFitness mof({0.1, 0.2, 0.3, 0.4});
-    debugPrint(mof);
+//    LazyPredator::MultiObjectiveFitness mof({0.1, 0.2, 0.3, 0.4});
+//    debugPrint(mof);
 
     //--------------------------------------------------------------------------
 

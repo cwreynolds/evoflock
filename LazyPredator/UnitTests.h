@@ -544,9 +544,9 @@ static void unit_test()
         float p_to_q_ratio = float(total_P) / float(total_Q);
         ok = ok && st(between(p_to_q_ratio, 0.75, 1.25));
         FunctionSet::function_filter = nullptr;
-        debugPrint(total_P)
-        debugPrint(total_Q)
-        debugPrint(p_to_q_ratio)
+        //debugPrint(total_P)
+        //debugPrint(total_Q)
+        //debugPrint(p_to_q_ratio)
         assert(ok && maybe_log("gp_tree_crossover"));
     }
 

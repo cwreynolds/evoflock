@@ -371,16 +371,45 @@ public:
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240430 prototype dbscan
+        
+        int dbscan_min_points = 3;
+//        double dbscan_epsilon = 5;
+        double dbscan_epsilon = 10;
+
 //        auto df = [](Boid* a, Boid* b) { return (a->position() -
 //                                                 b->position()).length(); };
-//        dbscan d(boids(), df, 5, 3);
+//        dbscan d(boids(), df, dbscan_epsilon, dbscan_min_points);
 //        if ((draw().frame_counter() % 100) == 0)
 //        {
 //            debugPrint(d.get_cluster_count())
 //        }
+        
+        
+        DBSCAN dbscan(dbscan_min_points, dbscan_epsilon, boids());
+        dbscan.run();
+        double cc = dbscan.get_cluster_count();
+        double cs = util::remap_interval_clip(cc, 0, 10, 0, 1);
+        total_cluster_scores_for_all_steps_ += cs;
+        if ((draw().frame_counter() % 100) == 0)
+        {
+            std::cout << "        ";
+            debugPrint(get_cluster_score())
+        }
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240501 prototype dbscan
+    
+    double total_cluster_scores_for_all_steps_ = 0;
+    
+    double get_cluster_score() const
+    {
+        return total_cluster_scores_for_all_steps_ / draw().frame_counter();
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Records if all obstacle avoidance is successful for whole chunk.
     // (Initialize to false so not to count chunk that ends on first update.)
     bool all_boids_avoid_obs_for_whole_chunk_ = false;

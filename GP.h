@@ -40,6 +40,10 @@ inline const std::vector<std::string> mof_names =
     "separate",
     "avoid",
     "cohere",
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240501 prototype dbscan
+    "cluster",
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     "occupied"
 };
 
@@ -49,6 +53,10 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
     double separate = flock.get_separation_score();
     double avoid = flock.get_avoid_obstacle_score();
     double cohere = flock.get_cohere_score();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240501 prototype dbscan
+    double cluster = flock.get_cluster_score();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     auto ignore_function = [](Vec3 p) { return p.length() > 50;};
     double occupy = flock.occupancy_map.fractionOccupied(ignore_function);
     return
@@ -56,6 +64,10 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
         separate,
         avoid,
         cohere,
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240501 prototype dbscan
+        cluster,
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         occupy
     }};
 }

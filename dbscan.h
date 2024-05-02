@@ -26,6 +26,214 @@
 
 #include "Boid.h"
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#define using_james_yoo_dbscan
+#ifdef using_james_yoo_dbscan
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+#ifndef DBSCAN_H
+#define DBSCAN_H
+
+#include <vector>
+#include <cmath>
+
+#define UNCLASSIFIED -1
+#define CORE_POINT 1
+#define BORDER_POINT 2
+#define NOISE -2
+#define SUCCESS 0
+#define FAILURE -3
+
+//using namespace std;
+
+typedef struct Point_
+{
+    float x, y, z;  // X, Y, Z position
+    int clusterID;  // clustered ID
+}Point;
+
+class DBSCAN {
+public:
+    //    DBSCAN(unsigned int minPts, float eps, vector<Point> points){
+    DBSCAN(unsigned int minPts, float eps, std::vector<Point> points){
+        m_minPoints = minPts;
+        m_epsilon = eps;
+        m_points = points;
+        //        m_pointSize = points.size();
+        m_pointSize = int(points.size());
+    }
+    
+    
+    // TODO 20240501 add temp interface to BoidPtrList
+    DBSCAN(unsigned int minPts, float eps, const BoidPtrList& boids)
+    {
+        m_minPoints = minPts;
+        m_epsilon = eps;
+        m_pointSize = int(boids.size());
+        for (Boid* b : boids)
+        {
+            Point_ point;
+            point.x = b->position().x();
+            point.y = b->position().y();
+            point.z = b->position().z();
+            point.clusterID = UNCLASSIFIED;
+            //            debugPrint(point.x)
+            //            debugPrint(point.y)
+            //            debugPrint(point.z)
+            m_points.push_back(point);
+        }
+    }
+    
+    
+    ~DBSCAN(){}
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    
+    //    int run();
+    //    vector<int> calculateCluster(Point point);
+    //    int expandCluster(Point point, int clusterID);
+    //    inline double calculateDistance(const Point& pointCore, const Point& pointTarget);
+    
+    
+    //    #include "dbscan.h"
+    
+    int run()
+    {
+        int clusterID = 1;
+        //        vector<Point>::iterator iter;
+        std::vector<Point>::iterator iter;
+        for(iter = m_points.begin(); iter != m_points.end(); ++iter)
+        {
+            if ( iter->clusterID == UNCLASSIFIED )
+            {
+                if ( expandCluster(*iter, clusterID) != FAILURE )
+                {
+                    clusterID += 1;
+                }
+            }
+        }
+        
+        // TODO 20240501 add public cluster count
+        m_cluster_count = clusterID;
+        
+        return 0;
+    }
+    
+    int expandCluster(Point point, int clusterID)
+    {
+        //        vector<int> clusterSeeds = calculateCluster(point);
+        std::vector<int> clusterSeeds = calculateCluster(point);
+        
+        if ( clusterSeeds.size() < m_minPoints )
+        {
+            point.clusterID = NOISE;
+            return FAILURE;
+        }
+        else
+        {
+            int index = 0, indexCorePoint = 0;
+            //            vector<int>::iterator iterSeeds;
+            std::vector<int>::iterator iterSeeds;
+            for( iterSeeds = clusterSeeds.begin(); iterSeeds != clusterSeeds.end(); ++iterSeeds)
+            {
+                m_points.at(*iterSeeds).clusterID = clusterID;
+                if (m_points.at(*iterSeeds).x == point.x && m_points.at(*iterSeeds).y == point.y && m_points.at(*iterSeeds).z == point.z )
+                {
+                    indexCorePoint = index;
+                }
+                ++index;
+            }
+            clusterSeeds.erase(clusterSeeds.begin()+indexCorePoint);
+            
+            //            for( vector<int>::size_type i = 0, n = clusterSeeds.size(); i < n; ++i )
+            for( std::vector<int>::size_type i = 0, n = clusterSeeds.size(); i < n; ++i )
+            {
+                //                vector<int> clusterNeighors = calculateCluster(m_points.at(clusterSeeds[i]));
+                std::vector<int> clusterNeighors = calculateCluster(m_points.at(clusterSeeds[i]));
+                
+                if ( clusterNeighors.size() >= m_minPoints )
+                {
+                    //                    vector<int>::iterator iterNeighors;
+                    std::vector<int>::iterator iterNeighors;
+                    for ( iterNeighors = clusterNeighors.begin(); iterNeighors != clusterNeighors.end(); ++iterNeighors )
+                    {
+                        if ( m_points.at(*iterNeighors).clusterID == UNCLASSIFIED || m_points.at(*iterNeighors).clusterID == NOISE )
+                        {
+                            if ( m_points.at(*iterNeighors).clusterID == UNCLASSIFIED )
+                            {
+                                clusterSeeds.push_back(*iterNeighors);
+                                n = clusterSeeds.size();
+                            }
+                            m_points.at(*iterNeighors).clusterID = clusterID;
+                        }
+                    }
+                }
+            }
+            
+            return SUCCESS;
+        }
+    }
+    
+    //    vector<int> calculateCluster(Point point)
+    //    {
+    //        int index = 0;
+    //        vector<Point>::iterator iter;
+    //        vector<int> clusterIndex;
+    std::vector<int> calculateCluster(Point point)
+    {
+        int index = 0;
+        std::vector<Point>::iterator iter;
+        std::vector<int> clusterIndex;
+        for( iter = m_points.begin(); iter != m_points.end(); ++iter)
+        {
+            if ( calculateDistance(point, *iter) <= m_epsilon )
+            {
+                clusterIndex.push_back(index);
+            }
+            index++;
+        }
+        return clusterIndex;
+    }
+    
+    inline double calculateDistance(const Point& pointCore, const Point& pointTarget )
+    {
+        return pow(pointCore.x - pointTarget.x,2)+pow(pointCore.y - pointTarget.y,2)+pow(pointCore.z - pointTarget.z,2);
+    }
+    
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    
+    int getTotalPointSize() {return m_pointSize;}
+    int getMinimumClusterSize() {return m_minPoints;}
+    int getEpsilonSize() {return m_epsilon;}
+    
+    // TODO 20240501 add accessible cluster count
+    int get_cluster_count() const { return m_cluster_count + 1; }
+
+    
+public:
+    //    vector<Point> m_points;
+    std::vector<Point> m_points;
+    
+    
+private:
+    unsigned int m_pointSize;
+    unsigned int m_minPoints;
+    float m_epsilon;
+    
+    // TODO 20240501 add accessible cluster count
+    int m_cluster_count = 0;
+};
+
+#endif // DBSCAN_H
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#else  // using_james_yoo_dbscan
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 class dbscan
 {
 public:
@@ -189,3 +397,7 @@ private:
     int cluster_count_ = 0;
 
 };
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#endif  // using_james_yoo_dbscan
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

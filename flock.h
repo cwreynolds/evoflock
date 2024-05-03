@@ -372,28 +372,20 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240430 prototype dbscan
         
-        int dbscan_min_points = 3;
-//        double dbscan_epsilon = 5;
-        double dbscan_epsilon = 10;
+//        int dbscan_min_points = 3;
+        int dbscan_min_points = 4;
+//        double dbscan_epsilon = 10;
+        double dbscan_epsilon = 5;
 
-//        auto df = [](Boid* a, Boid* b) { return (a->position() -
-//                                                 b->position()).length(); };
-//        dbscan d(boids(), df, dbscan_epsilon, dbscan_min_points);
-//        if ((draw().frame_counter() % 100) == 0)
-//        {
-//            debugPrint(d.get_cluster_count())
-//        }
-        
-        
-        DBSCAN dbscan(dbscan_min_points, dbscan_epsilon, boids());
-        dbscan.run();
-        double cc = dbscan.get_cluster_count();
-        double cs = util::remap_interval_clip(cc, 0, 10, 0, 1);
-        total_cluster_scores_for_all_steps_ += cs;
-        if ((draw().frame_counter() % 100) == 0)
+        if (0 == (draw().frame_counter() % cluster_score_stride_))
         {
-            std::cout << "        ";
-            debugPrint(get_cluster_score())
+            DBSCAN dbscan(dbscan_min_points, dbscan_epsilon, boids());
+            double cc = dbscan.get_cluster_count();
+            double cs = util::remap_interval_clip(cc, 1, 10, 0, 1);
+            cluster_score_sum_ += cs;
+            cluster_score_count_++;
+            
+//            debugPrint(cs)
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -401,12 +393,12 @@ public:
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240501 prototype dbscan
-    
-    double total_cluster_scores_for_all_steps_ = 0;
-    
+    double cluster_score_sum_ = 0;
+    int cluster_score_count_ = 0;
+    int cluster_score_stride_ = 10;
     double get_cluster_score() const
     {
-        return total_cluster_scores_for_all_steps_ / draw().frame_counter();
+        return cluster_score_sum_ / cluster_score_count_;
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

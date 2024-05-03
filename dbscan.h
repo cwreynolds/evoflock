@@ -45,23 +45,25 @@
 #define SUCCESS 0
 #define FAILURE -3
 
-//using namespace std;
-
 typedef struct Point_
 {
     float x, y, z;  // X, Y, Z position
     int clusterID;  // clustered ID
-}Point;
+} Point;
+
+
+// Note: I changed Yoo's implementation to call run() inside constructor.
 
 class DBSCAN {
 public:
-    //    DBSCAN(unsigned int minPts, float eps, vector<Point> points){
-    DBSCAN(unsigned int minPts, float eps, std::vector<Point> points){
+    DBSCAN(unsigned int minPts, float eps, std::vector<Point> points)
+    {
         m_minPoints = minPts;
         m_epsilon = eps;
+        m_epsilon_squared = eps * eps;
         m_points = points;
-        //        m_pointSize = points.size();
         m_pointSize = int(points.size());
+        run();
     }
     
     
@@ -70,38 +72,26 @@ public:
     {
         m_minPoints = minPts;
         m_epsilon = eps;
+        m_epsilon_squared = eps * eps;
         m_pointSize = int(boids.size());
-        for (Boid* b : boids)
+        m_points.resize(m_pointSize);
+        for (int i = 0; i < m_pointSize; i++)
         {
-            Point_ point;
-            point.x = b->position().x();
-            point.y = b->position().y();
-            point.z = b->position().z();
-            point.clusterID = UNCLASSIFIED;
-            //            debugPrint(point.x)
-            //            debugPrint(point.y)
-            //            debugPrint(point.z)
-            m_points.push_back(point);
+            m_points[i].x = boids[i]->position().x();
+            m_points[i].y = boids[i]->position().y();
+            m_points[i].z = boids[i]->position().z();
+            m_points[i].clusterID = UNCLASSIFIED;
         }
+        run();
     }
-    
     
     ~DBSCAN(){}
     
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    
-    //    int run();
-    //    vector<int> calculateCluster(Point point);
-    //    int expandCluster(Point point, int clusterID);
-    //    inline double calculateDistance(const Point& pointCore, const Point& pointTarget);
-    
-    
-    //    #include "dbscan.h"
-    
+        
     int run()
     {
         int clusterID = 1;
-        //        vector<Point>::iterator iter;
         std::vector<Point>::iterator iter;
         for(iter = m_points.begin(); iter != m_points.end(); ++iter)
         {
@@ -122,7 +112,6 @@ public:
     
     int expandCluster(Point point, int clusterID)
     {
-        //        vector<int> clusterSeeds = calculateCluster(point);
         std::vector<int> clusterSeeds = calculateCluster(point);
         
         if ( clusterSeeds.size() < m_minPoints )
@@ -133,7 +122,6 @@ public:
         else
         {
             int index = 0, indexCorePoint = 0;
-            //            vector<int>::iterator iterSeeds;
             std::vector<int>::iterator iterSeeds;
             for( iterSeeds = clusterSeeds.begin(); iterSeeds != clusterSeeds.end(); ++iterSeeds)
             {
@@ -146,15 +134,12 @@ public:
             }
             clusterSeeds.erase(clusterSeeds.begin()+indexCorePoint);
             
-            //            for( vector<int>::size_type i = 0, n = clusterSeeds.size(); i < n; ++i )
             for( std::vector<int>::size_type i = 0, n = clusterSeeds.size(); i < n; ++i )
             {
-                //                vector<int> clusterNeighors = calculateCluster(m_points.at(clusterSeeds[i]));
                 std::vector<int> clusterNeighors = calculateCluster(m_points.at(clusterSeeds[i]));
                 
                 if ( clusterNeighors.size() >= m_minPoints )
                 {
-                    //                    vector<int>::iterator iterNeighors;
                     std::vector<int>::iterator iterNeighors;
                     for ( iterNeighors = clusterNeighors.begin(); iterNeighors != clusterNeighors.end(); ++iterNeighors )
                     {
@@ -175,11 +160,6 @@ public:
         }
     }
     
-    //    vector<int> calculateCluster(Point point)
-    //    {
-    //        int index = 0;
-    //        vector<Point>::iterator iter;
-    //        vector<int> clusterIndex;
     std::vector<int> calculateCluster(Point point)
     {
         int index = 0;
@@ -187,7 +167,9 @@ public:
         std::vector<int> clusterIndex;
         for( iter = m_points.begin(); iter != m_points.end(); ++iter)
         {
-            if ( calculateDistance(point, *iter) <= m_epsilon )
+//            if ( calculateDistance(point, *iter) <= m_epsilon )
+            if ( calculateDistance(point, *iter) <= m_epsilon_squared )
+                
             {
                 clusterIndex.push_back(index);
             }
@@ -195,6 +177,11 @@ public:
         }
         return clusterIndex;
     }
+    
+    // TODO 20240502 OH! this computes distance squared! I think it should
+    // either take the square root, or better, square m_epsilon before the
+    // comparison, possibly up in the constructor.
+    // and this should be called distanceSquared() or something.
     
     inline double calculateDistance(const Point& pointCore, const Point& pointTarget )
     {
@@ -213,7 +200,6 @@ public:
 
     
 public:
-    //    vector<Point> m_points;
     std::vector<Point> m_points;
     
     
@@ -221,7 +207,8 @@ private:
     unsigned int m_pointSize;
     unsigned int m_minPoints;
     float m_epsilon;
-    
+    float m_epsilon_squared = 0;
+
     // TODO 20240501 add accessible cluster count
     int m_cluster_count = 0;
 };

@@ -371,25 +371,47 @@ public:
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240430 prototype dbscan
-        
-//        int dbscan_min_points = 3;
-        int dbscan_min_points = 4;
-//        double dbscan_epsilon = 10;
-        double dbscan_epsilon = 5;
-
         if (0 == (draw().frame_counter() % cluster_score_stride_))
         {
-            DBSCAN dbscan(dbscan_min_points, dbscan_epsilon, boids());
-            double cc = dbscan.get_cluster_count();
-            double cs = util::remap_interval_clip(cc, 1, 10, 0, 1);
+            double cs = util::remap_interval_clip(count_clusters(), 1, 10, 0, 1);
             cluster_score_sum_ += cs;
             cluster_score_count_++;
-            
-//            debugPrint(cs)
         }
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240504 Maybe instead of worrying about templating, I should just make
+    //               a Flock::count_clusters() to construct a std::vector<Point>,
+    //               make a DBSCAN from it, and return the count.
+    
+    int count_clusters() const
+    {
+        // Clustering parameters.
+//        int dbscan_min_points = 4;
+//        double dbscan_epsilon = 5;
+        int dbscan_min_points = 5;
+        double dbscan_epsilon = 8;
+        // Copy Boid positions into a vector of DBSCAN::Point.
+        size_t boid_count = boids().size();
+        std::vector<DBSCAN::Point> points(boid_count);
+        for (int i = 0; i < boid_count; i++)
+        {
+            const Vec3& bp = boids()[i]->position();
+            points[i].x = bp.x();
+            points[i].y = bp.y();
+            points[i].z = bp.z();
+        }
+        // Run DBSCAN clustering algorithm.
+        DBSCAN dbscan(dbscan_min_points, dbscan_epsilon, points);
+        // Return number of clusters found.
+        return dbscan.getClusterCount();
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240501 prototype dbscan

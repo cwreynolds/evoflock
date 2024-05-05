@@ -15,6 +15,8 @@
 //  (4) initialize Point.clusterID to UNCLASSIFIED.
 //  (5) rename calculateDistance() to distanceSquared(), compare to squared eps.
 //  (6) changed #define constants to be const static members of class.
+//  (7) modernize C++ usage: remove explicit iterators.
+//  (8) don't copy output vector from calculateCluster().
 //
 //  Created by Craig Reynolds on April 29, 2024.
 //  MIT License -- Copyright © 2024 Craig Reynolds
@@ -62,14 +64,15 @@ public:
                     clusterID += 1;
                 }
             }
+            m_cluster_count = std::max(m_cluster_count, iter->clusterID);
         }
-        m_cluster_count = clusterID;
         return 0;
     }
     
     int expandCluster(Point point, int clusterID)
     {
-        std::vector<int> clusterSeeds = calculateCluster(point);
+        std::vector<int> clusterSeeds;
+        calculateCluster(point, clusterSeeds);
         if (clusterSeeds.size() < m_minPoints)
         {
             point.clusterID = NOISE;
@@ -77,40 +80,30 @@ public:
         }
         else
         {
-            int index = 0, indexCorePoint = 0;
-            std::vector<int>::iterator iterSeeds;
-            for(iterSeeds = clusterSeeds.begin();
-                iterSeeds != clusterSeeds.end();
-                ++iterSeeds)
+            int indexCorePoint = 0;
+            for (int csi = 0; csi < clusterSeeds.size(); csi++)
             {
-                m_points.at(*iterSeeds).clusterID = clusterID;
-                if (m_points.at(*iterSeeds).x == point.x &&
-                    m_points.at(*iterSeeds).y == point.y &&
-                    m_points.at(*iterSeeds).z == point.z)
-                {
-                    indexCorePoint = index;
-                }
-                ++index;
+                Point& cp = m_points.at(clusterSeeds.at(csi));
+                cp.clusterID = clusterID;
+                if (coincident(cp, point)) { indexCorePoint = csi; }
             }
-            clusterSeeds.erase(clusterSeeds.begin()+indexCorePoint);
-            for(std::vector<int>::size_type i = 0, n = clusterSeeds.size(); i < n; ++i)
+            clusterSeeds.erase(clusterSeeds.begin() + indexCorePoint);
+            for (size_t i = 0; i < clusterSeeds.size(); ++i)
             {
-                std::vector<int> clusterNeighors = calculateCluster(m_points.at(clusterSeeds[i]));
+                std::vector<int> clusterNeighors;
+                calculateCluster(m_points.at(clusterSeeds[i]), clusterNeighors);
                 if (clusterNeighors.size() >= m_minPoints)
                 {
-                    std::vector<int>::iterator iterNeighors;
-                    for (iterNeighors = clusterNeighors.begin();
-                         iterNeighors != clusterNeighors.end();
-                         ++iterNeighors)
+                    for (int cn_index : clusterNeighors)
                     {
-                        if (m_points.at(*iterNeighors).clusterID == UNCLASSIFIED || m_points.at(*iterNeighors).clusterID == NOISE)
+                        int& cn_cid = m_points.at(cn_index).clusterID;
+                        if (cn_cid == UNCLASSIFIED || cn_cid == NOISE)
                         {
-                            if (m_points.at(*iterNeighors).clusterID == UNCLASSIFIED)
+                            if (cn_cid == UNCLASSIFIED)
                             {
-                                clusterSeeds.push_back(*iterNeighors);
-                                n = clusterSeeds.size();
+                                clusterSeeds.push_back(cn_index);
                             }
-                            m_points.at(*iterNeighors).clusterID = clusterID;
+                            cn_cid = clusterID;
                         }
                     }
                 }
@@ -119,29 +112,26 @@ public:
         }
     }
     
-    std::vector<int> calculateCluster(Point point)
+    void calculateCluster(const Point& point, std::vector<int>& output_points)
     {
-        int index = 0;
-        std::vector<Point>::iterator iter;
-        std::vector<int> clusterIndex;
-        for(iter = m_points.begin(); iter != m_points.end(); ++iter)
+        output_points.clear();
+        for (int i = 0; i < m_points.size(); i++)
         {
-            if (distanceSquared(point, *iter) <= m_epsilon_squared)
-            {
-                clusterIndex.push_back(index);
-            }
-            index++;
+            double d2 = distanceSquared(point, m_points.at(i));
+            if (d2 <= m_epsilon_squared) { output_points.push_back(i); }
         }
-        return clusterIndex;
-    }
-        
-    inline double distanceSquared(const Point& pointCore, const Point& pointTarget)
-    {
-        return (pow(pointCore.x - pointTarget.x, 2) +
-                pow(pointCore.y - pointTarget.y, 2) +
-                pow(pointCore.z - pointTarget.z, 2));
     }
 
+    static double distanceSquared(const Point& a, const Point& b)
+    {
+        return (pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
+    }
+
+    static bool coincident(const Point& a, const Point& b)
+    {
+        return (a.x == b.x) && (a.y == b.y) && (a.z == b.z);
+    }
+    
     int getTotalPointSize() {return m_pointSize;}
     int getMinimumClusterSize() {return m_minPoints;}
     int getEpsilonSize() {return m_epsilon;}
@@ -159,4 +149,88 @@ private:
     float m_epsilon;
     float m_epsilon_squared = 0;
     int m_cluster_count = 0;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240505 refactor old-fashioned c++
+
+public:
+    
+//#include <stdio.h>
+//#include <iostream>
+//#include "dbscan.h"
+    
+#define MINIMUM_POINTS 4     // minimum number of cluster
+//#define EPSILON (0.75*0.75)  // distance for clustering, metre^2
+#define EPSILON (0.75)  // distance for clustering, metre^2
+
+    static void readBenchmarkData(std::vector<Point>& points)
+    {
+        // load point cloud
+        FILE *stream;
+//        stream = fopen ("benchmark_hepta.dat","ra");
+        stream = fopen ("/Users/cwr/Desktop/benchmark_hepta.dat.txt","ra");
+
+        
+//        unsigned int minpts, num_points, cluster, i = 0;
+//        double epsilon;
+        unsigned int num_points;
+        unsigned int cluster;
+        unsigned int i = 0;
+
+        fscanf(stream, "%u\n", &num_points);
+        
+        Point *p = (Point *)calloc(num_points, sizeof(Point));
+        
+        while (i < num_points)
+        {
+            fscanf(stream, "%f,%f,%f,%d\n", &(p[i].x), &(p[i].y), &(p[i].z), &cluster);
+            p[i].clusterID = UNCLASSIFIED;
+            points.push_back(p[i]);
+            ++i;
+        }
+        
+        free(p);
+        fclose(stream);
+    }
+    
+    static void printResults(std::vector<Point>& points, int num_points)
+    {
+        int i = 0;
+        printf("Number of points: %u\n"
+               " x     y     z     cluster_id\n"
+               "-----------------------------\n"
+               , num_points);
+        while (i < num_points)
+        {
+            printf("%5.2lf %5.2lf %5.2lf: %d\n",
+                   points[i].x,
+                   points[i].y, points[i].z,
+                   points[i].clusterID);
+            ++i;
+        }
+    }
+    
+    static int test()
+    {
+        std::vector<Point> points;
+        
+        // read point data
+        readBenchmarkData(points);
+        
+        // constructor
+        DBSCAN ds(MINIMUM_POINTS, EPSILON, points);
+        
+        // main loop
+        ds.run();
+        
+        // result of DBSCAN algorithm
+        printResults(ds.m_points, ds.getTotalPointSize());
+        
+        
+        debugPrint(ds.getClusterCount())
+
+        
+        return 0;
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };

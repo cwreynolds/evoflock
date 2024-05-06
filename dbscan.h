@@ -54,21 +54,15 @@ public:
     int run()
     {
         int clusterID = 1;
-        std::vector<Point>::iterator iter;
-        for(iter = m_points.begin(); iter != m_points.end(); ++iter)
+        for (Point& point : m_points)
         {
-            if (iter->clusterID == UNCLASSIFIED)
-            {
-                if (expandCluster(*iter, clusterID) != FAILURE)
-                {
-                    clusterID += 1;
-                }
-            }
-            m_cluster_count = std::max(m_cluster_count, iter->clusterID);
+            if ((point.clusterID == UNCLASSIFIED) and
+                (expandCluster(point, clusterID) != FAILURE)) { clusterID++; }
+            m_cluster_count = std::max(m_cluster_count, point.clusterID);
         }
         return 0;
     }
-    
+
     int expandCluster(Point point, int clusterID)
     {
         std::vector<int> clusterSeeds;

@@ -128,16 +128,6 @@ public:
         parent1->incrementTournamentsSurvived();
         // Create new offspring tree by crossing-over these two parents.
         GpTree new_tree;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240305 adding crossover_function_hook_ for custom crossover.
-
-//        GpTree::crossover(parent0->tree(),
-//                          parent1->tree(),
-//                          new_tree,
-//                          getMinCrossoverTreeSize(),
-//                          getMaxCrossoverTreeSize(),
-//                          getFunctionSet()->getCrossoverMinSize());
-
         auto crossover = getFunctionSet()->getCrossoverFunction();
         crossover(parent0->tree(),
                   parent1->tree(),
@@ -145,13 +135,14 @@ public:
                   getMinCrossoverTreeSize(),
                   getMaxCrossoverTreeSize(),
                   getFunctionSet()->getCrossoverMinSize());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Mutate constants in new tree.
         new_tree.mutate();
         // Create new offspring Individual from new tree.
         Individual* offspring = new Individual(new_tree);
         // Construct and cache the result of evaluating new offspring's GpTree.
         offspring->treeValue();
+        // If group has custom_eval function run it on offspring (esp for MOF).
+        if (ranked_group.custom_eval) { ranked_group.custom_eval(offspring); }
         // Delete tournament loser from Population, replace with new offspring.
         replaceIndividual(loser_index, offspring, subpop);
         // Occasionally migrate Individuals between subpopulations.
@@ -171,8 +162,6 @@ public:
             // In case Individual does not already have a cached fitness value.
             if (!(individual->hasFitness()))
             {
-                // The existing sort index, if any, is now invalid.
-                sort_cache_invalid_ = true;
                 // Tree value should be previously cached, but just to be sure.
                 individual->treeValue();
                 // Cache fitness on Individual using given FitnessFunction.
@@ -189,13 +178,6 @@ public:
         // Finally, do a tournament-based evolution step.
         evolutionStep(tournament_function);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240423 change MultiObjectiveFitness from typedef to class
-
-//    // Generic multi-objective fitness type: a vector of scalars.
-//    typedef std::vector<double> MultiObjectiveFitness;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Functions that measure "absolute" fitness of an Individual in isolation.
     // (A shortcut for fitnesses that can be measured this way. Many cannot.)
@@ -217,25 +199,35 @@ public:
     // MultiObjectiveFitness to a summary scalar, used to rank Individuals in
     // the Population by quality). It creates a TournamentFunction from those,
     // which is passed to a different version of evolutionStep(). Each evolution
-    // step this choses one of the N objectives (the one with most potential for
-    // improvement) and treats that as a scalar fitness for this step.
+    // step this chooses one of the N objectives (the one with most potential
+    // for improvement) and treats that as a scalar fitness for this step.
     void evolutionStep(MultiObjectiveFitnessFunction mo_fitness_function,
                        FitnessScalarizeFunction fitness_scalarize_function)
     {
+        // State shared between lambdas below.
+        double prev_best_pop_fitness = bestFitness()->getFitness();
+        bool found_new_best = false;
+        // Customized function to perform MOF evaluation of individual.
+        auto mof_eval = [&](Individual* individual)
+        {
+            if (not individual->hasMultiObjectiveFitness())
+            {
+                individual->treeValue();
+                MultiObjectiveFitness mof = mo_fitness_function(individual);
+                individual->setMultiObjectiveFitness(mof);
+                double scalar = fitness_scalarize_function(mof);
+                individual->setFitness(scalar);
+                if (scalar > prev_best_pop_fitness) { found_new_best = true;}
+                sort_cache_invalid_ = true;
+            }
+        };
         // Create TournamentFunction from given fitness and scalarizer functions.
         auto tournament_function = [&](TournamentGroup group)
         {
             // Make sure each group Individual has cached MultiObjectiveFitness.
-            for (auto& m : group.members())
-            {
-                if (not m.individual->hasMultiObjectiveFitness())
-                {
-                    m.individual->treeValue();
-                    MultiObjectiveFitness mof = mo_fitness_function(m.individual);
-                    m.individual->setMultiObjectiveFitness(mof);
-                    m.individual->setFitness(fitness_scalarize_function(mof));
-                }
-            }
+            for (auto& m : group.members()) { mof_eval(m.individual); }
+            // Store customized evaluation function on TournamentGroup.
+            group.custom_eval = mof_eval;
             // Select best of the multiple fitnesses to use for this step.
             size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
             // Set the "metric" of each TournamentGroup member to that
@@ -245,10 +237,10 @@ public:
                 const auto& mof = m.individual->getMultiObjectiveFitness();
                 m.metric =  mof.at(best_mof_index);
             }
-            // The existing sort index, if any, will be invalidated by this step.
-            sort_cache_invalid_ = true;
             // Sort the TournamentGroup by metric, least first.
             group.sort();
+            // Preserve population best fitness regardless of MOF metrics.
+            if (found_new_best) { group.setValid(false); }
             return group;
         };
         // Finally, do a tournament-based evolution step.
@@ -268,8 +260,8 @@ public:
     {
         auto [i, j, k] = threeUniqueRandomIndices(subpop);
         return TournamentGroup({ {subpop.at(i), i},
-            {subpop.at(j), j},
-            {subpop.at(k), k} });
+                                 {subpop.at(j), j},
+                                 {subpop.at(k), k} });
     }
     
     // Select three unique random indices of a SubPop's Individuals.
@@ -341,12 +333,9 @@ public:
     }
     
     // Return pointer to Individual with best fitness.
-    Individual* bestFitness()
-    {
-        updateSortedCollectionOfIndividuals();
-        return nthBestFitness(0);
-    }
-    // Return pointer to Individual with nth best fitness (0 -> best).
+    Individual* bestFitness() { return nthBestFitness(0); }
+
+    // Return pointer to Individual with nth best fitness (n=0 is best fitness).
     Individual* nthBestFitness(int n)
     {
         updateSortedCollectionOfIndividuals();
@@ -410,6 +399,7 @@ public:
     // with setLoggerFunction().
     virtual void logger()
     {
+        updateSortedCollectionOfIndividuals();
         if (logger_function_) logger_function_(*this);
     }
     void setLoggerFunction(std::function<void(Population&)> logger_function)
@@ -480,8 +470,8 @@ public:
     
     // Get/set min/max crossover tree size.
     int getMinCrossoverTreeSize() const { return min_crossover_tree_size_; }
-    void setMinCrossoverTreeSize(int size) { min_crossover_tree_size_ = size; }
     int getMaxCrossoverTreeSize() const { return max_crossover_tree_size_; }
+    void setMinCrossoverTreeSize(int size) { min_crossover_tree_size_ = size; }
     void setMaxCrossoverTreeSize(int size) { max_crossover_tree_size_ = size; }
     
     // Duration of idle time during step that should be ignored for logging.

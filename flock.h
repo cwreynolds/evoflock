@@ -365,33 +365,18 @@ public:
             }
             increment_boid_update_counter();
         }
-//        if (all_seperation_good) { count_steps_good_separation++; }
         if (all_speed_good) { count_steps_good_speed++; }
-        // if (all_avoidance_good) { count_steps_avoid_obstacle++; }
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240430 prototype dbscan
         if (0 == (draw().frame_counter() % cluster_score_stride_))
         {
-            double cs = util::remap_interval_clip(count_clusters(), 1, 10, 0, 1);
+            double cs = util::remap_interval_clip(count_clusters(), 0, 5, 0, 1);
             cluster_score_sum_ += cs;
             cluster_score_count_++;
         }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240504 Maybe instead of worrying about templating, I should just make
-    //               a Flock::count_clusters() to construct a std::vector<Point>,
-    //               make a DBSCAN from it, and return the count.
     
     int count_clusters() const
     {
         // Clustering parameters.
-//        int dbscan_min_points = 4;
-//        double dbscan_epsilon = 5;
         int dbscan_min_points = 5;
         double dbscan_epsilon = 8;
         // Copy Boid positions into a vector of DBSCAN::Point.
@@ -410,11 +395,6 @@ public:
         return dbscan.getClusterCount();
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240501 prototype dbscan
     double cluster_score_sum_ = 0;
     int cluster_score_count_ = 0;
     int cluster_score_stride_ = 10;
@@ -422,7 +402,6 @@ public:
     {
         return cluster_score_sum_ / cluster_score_count_;
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Records if all obstacle avoidance is successful for whole chunk.
     // (Initialize to false so not to count chunk that ends on first update.)

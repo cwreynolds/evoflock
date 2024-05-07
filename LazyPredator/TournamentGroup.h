@@ -163,6 +163,9 @@ public:
         }
         return mof_size;
     }
+    // Used (initially for multiobjective fitness) to store a fitness evaluation
+    // function to be applied to the offspring created during this tournament.
+    std::function<void(Individual*)> custom_eval = nullptr;
     // Is the given Individual a member of this TournamentGroup?
     bool isMember(Individual* individual) const
     {

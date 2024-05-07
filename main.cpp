@@ -419,7 +419,8 @@ int main(int argc, const char * argv[])
 //    lp::LPRS().setSeed(20240424);
 //    lp::LPRS().setSeed(20240427);
 //    lp::LPRS().setSeed(20240504);
-    lp::LPRS().setSeed(20240505);
+//    lp::LPRS().setSeed(20240505);
+    lp::LPRS().setSeed(20240506);
 
     int min_tree_size = 2;
     int max_tree_size = 20;
@@ -466,7 +467,6 @@ int main(int argc, const char * argv[])
     debugPrint(fitness);
 
     delete population;
-
-    
+    LP::Individual::leakCheck();
     return 0;
 }

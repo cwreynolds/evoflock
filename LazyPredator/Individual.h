@@ -113,20 +113,6 @@ public:
     {
         return hasFitness() ? fitness_ : getTournamentsSurvived() + getStanding();
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240423 change MultiObjectiveFitness from typedef to class
-//    bool hasMultiObjectiveFitness() const { return has_multi_objective_fitness_; }
-//    void setMultiObjectiveFitness(std::vector<double> multi_objective_fitness)
-//    {
-//        multi_objective_fitness_ = multi_objective_fitness;
-//        has_multi_objective_fitness_ = multi_objective_fitness_.size() > 0;
-//    }
-//    std::vector<double> getMultiObjectiveFitness() const
-//    {
-//        return multi_objective_fitness_;
-//    }
-    
-    // TODO 20240329 WIP for multi-objective fitness
     bool hasMultiObjectiveFitness() const { return has_multi_objective_fitness_; }
     void setMultiObjectiveFitness(MultiObjectiveFitness multi_objective_fitness)
     {
@@ -137,8 +123,6 @@ public:
     {
         return multi_objective_fitness_;
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Compare counts of constructor/destructor calls. Must match at end of run.
     static void leakCheck()
     {

@@ -420,7 +420,8 @@ int main(int argc, const char * argv[])
 //    lp::LPRS().setSeed(20240427);
 //    lp::LPRS().setSeed(20240504);
 //    lp::LPRS().setSeed(20240505);
-    lp::LPRS().setSeed(20240506);
+//    lp::LPRS().setSeed(20240506);
+    lp::LPRS().setSeed(20240508);
 
     int min_tree_size = 2;
     int max_tree_size = 20;
@@ -457,7 +458,25 @@ int main(int argc, const char * argv[])
         auto fitness = rerun_flock_simulation(individual);
         debugPrint(fitness);
     }
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240507 experiment
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << "now with MOF scores multiplied together" << std::endl;
+    replace_scalar_fitness_with_product(*population);
+    population->logger();
+    std::cout << std::endl;
+    std::cout << std::endl;
+    for (int i = 0; i < 10; i++)
+    {
+        const LP::Individual* individual = population->nthBestFitness(i);
+        std::cout << individual->tree().to_string() << std::endl;
+        auto fitness = rerun_flock_simulation(individual);
+        debugPrint(fitness);
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     print_occupancy_map = true;
     std::cout << std::endl;
     std::cout << std::endl;

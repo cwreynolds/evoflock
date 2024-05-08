@@ -29,10 +29,31 @@ inline MOF evoflock_fitness_function(LP::Individual* individual)
     return std::any_cast<MOF>(individual->tree().getRootValue());
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240507 experiment
+
+//    // Map a MultiObjectiveFitness to a scalar, here the minimum value.
+//    // Used as the FitnessScalarizeFunction for Population::evolutionStep().
+//    inline double scalarize_fitness(MOF mof) { return mof.min(); }
+
+
+// Take the minimum element of a MultiObjectiveFitness ("Shangian scalarizer").
+inline double scalarize_fitness_min(MOF mof) { return mof.min(); }
+
+
+// Take the product of MultiObjectiveFitness elements.
+inline double scalarize_fitness_prod(MOF mof)
+{
+    return std::reduce(mof.begin(), mof.end(), 1.0, std::multiplies());
+}
+
 
 // Map a MultiObjectiveFitness to a scalar, here the minimum value.
 // Used as the FitnessScalarizeFunction for Population::evolutionStep().
-inline double scalarize_fitness(MOF mof) { return mof.min(); }
+inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 inline const std::vector<std::string> mof_names =
@@ -79,7 +100,8 @@ inline void fitness_logger(const MOF& mof)
     std::ios::fmtflags old_settings = std::cout.flags();
     size_t old_precision = std::cout.precision();
     // Format labels.
-    std::string sf = "scalar fitness";
+//    std::string sf = "scalar fitness";
+    std::string sf = "scalar composite";
     size_t cw = sf.size();  // Column width.
     std::vector<std::string> labels;
     for (auto& s : mof_names) { labels.push_back(s + " fitness"); }
@@ -316,6 +338,40 @@ inline void evoflock_ga_crossover(const LP::GpTree& parent0,
     //std::cout << "parent1:   " << parent1.to_string()   << std::endl;
     //std::cout << "offspring: " << offspring.to_string() << std::endl;
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240507 experiment
+
+//    void replace_scalar_fitness_with_product(LP::Population& population)
+//    {
+//        auto replace = [](LP::Individual* individual)
+//        {
+//            assert(individual->hasMultiObjectiveFitness());
+//            MOF mof = individual->getMultiObjectiveFitness();
+//    //        double f = std::reduce(mof.begin(), mof.end(), 1.0, std::multiplies());
+//    //        individual->setFitness(f);
+//            individual->setFitness(scalarize_fitness_prod(mof));
+//        };
+//        population.applyToAllIndividuals(replace);
+//    //    population.sort_cache_invalid_ = true;
+//        scalarize_fitness = scalarize_fitness_prod;
+//    }
+
+// An experiment to compare min and prod for MOF components.
+void replace_scalar_fitness_with_product(LP::Population& population)
+{
+    auto replace = [](LP::Individual* individual)
+    {
+//        assert(individual->hasMultiObjectiveFitness());
+        MOF mof = individual->getMultiObjectiveFitness();
+        individual->setFitness(scalarize_fitness_prod(mof));
+    };
+    population.applyToAllIndividuals(replace);
+    scalarize_fitness = scalarize_fitness_prod;
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // The default (in GpType::defaultJiggleScale()) is 0.05
 double jiggle_scale = 0.1;

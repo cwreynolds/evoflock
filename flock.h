@@ -23,14 +23,11 @@
 #include "Utilities.h"
 #include "Boid.h"
 #include "obstacle.h"
+#include "dbscan.h"
 #include "LazyPredator/LazyPredator.h"
 namespace LP = LazyPredator;
 #include <fstream>  // for logging simulation data to file.
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240430 prototype dbscan
-#include "dbscan.h"
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Flock
 {
@@ -298,55 +295,28 @@ public:
         bool all_speed_good = true;
         bool all_seperation_good = true;
         bool all_avoidance_good = true;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240427 remove speed fitness, add cohesion fitness.
         double min_sep_allowed = 3;  // in units of body radius
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for (Boid* b : boids())
         {
             Boid* n = b->cached_nearest_neighbors().at(0);
             double  dist = (b->position() - n->position()).length();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240422 add a max acceptable separation
-//            bool nn_sep_ok = dist > (3 * fp().body_radius); // Mar 21
             double br = fp().body_radius;
-//            bool nn_sep_ok = util::between(dist / br, 3, 12); // btw 3 and 12 br
-//            bool nn_sep_ok = util::between(dist / br, 3, 20); // btw 3 and 20 br
-//            bool nn_sep_ok = util::between(dist / br, 3, 30); // btw 3 and 30 br
-//            bool nn_sep_ok = util::between(dist / br, 3, 50); // btw 3 and 50 br
-//            bool nn_sep_ok = util::between(dist / br, 3, 20); // btw 3 and 20 br
-//            bool nn_sep_ok = util::between(dist / br, 3, 12); // btw 3 and 12 br
-//            bool nn_sep_ok = (dist / br) > 3; // greater than 3
             bool nn_sep_ok = (dist / br) > min_sep_allowed;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240427 remove speed fitness, add cohesion fitness.
-//            double min_sep_allowed = 3;  // in units of body radius
             double cs = util::remap_interval_clip(dist/br,min_sep_allowed,20,1,0);
             sum_of_all_cohesion_scores_ += cs;
-//            assert(util::between(cs, 0, 1)); // TEMP TEMP TEMP TEMP TEMP TEMP TEMP
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
-            // bool speed_ok = util::between(b->speed(), 15, 25);
             bool speed_ok = b->speed() > 15;
             if (not nn_sep_ok) { all_seperation_good = false; }
             if (not speed_ok) { all_speed_good = false; }
             if (b->detectObstacleViolations()) { all_avoidance_good = false; }
             // Add this boid's position to occupancy_map, ignore if outside ESO.
             occupancy_map.add(b->position(), [](Vec3 p){return p.length()>50;});
-            
             if (not all_avoidance_good)
             {
                 all_boids_avoid_obs_for_whole_chunk_ = false;
             }
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240422 change separation fitness to use chunking.
             if (not nn_sep_ok) { all_separation_good_for_whole_chunk_ = false; }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            
             if (start_new_chunk())
             {
                 if (all_boids_avoid_obs_for_whole_chunk_)
@@ -354,14 +324,11 @@ public:
                     count_chunked_avoid_obstacle_++;
                 }
                 all_boids_avoid_obs_for_whole_chunk_ = true;
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240422 change separation fitness to use chunking.
                 if (all_separation_good_for_whole_chunk_)
                 {
                     count_chunked_separation_++;
                 }
                 all_separation_good_for_whole_chunk_ = true;
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
             increment_boid_update_counter();
         }
@@ -408,18 +375,9 @@ public:
     bool all_boids_avoid_obs_for_whole_chunk_ = false;
     int count_chunked_avoid_obstacle_ = 0;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240422 change separation fitness to use chunking.
     bool all_separation_good_for_whole_chunk_ = false;
     int count_chunked_separation_ = 0;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240422 set to some non-goofy value.
-//    int chunk_count_ = 71;
     int chunk_count_ = 200;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240422 change separation fitness to use chunking.
 
     // Count each boid update across all simulation steps.
     int boid_update_counter_ = 0;
@@ -439,23 +397,10 @@ public:
     int count_steps_good_speed = 0;
     // int count_steps_avoid_obstacle = 0;
 
-    // These return a score on the range [0,1]
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240422 change separation fitness to use chunking.
-//    double get_separation_score() const
-//    {
-//        return count_steps_good_separation / double(draw().frame_counter());
-//    }
-//    double get_separation_score() const
-//    {
-//        return count_steps_good_separation / double(chunk_count_);
-//    }
     double get_separation_score() const
     {
         return count_chunked_separation_ / double(chunk_count_);
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double get_speed_score() const
     {
         return count_steps_good_speed / double(draw().frame_counter());
@@ -469,16 +414,12 @@ public:
         auto ignore_function = [](Vec3 p) { return p.length() > 50;};
         return occupancy_map.fractionOccupied(ignore_function);
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240427 remove speed fitness, add cohesion fitness.
+
     double sum_of_all_cohesion_scores_ = 0;
     double get_cohere_score() const
     {
         return sum_of_all_cohesion_scores_ / boid_update_counter_;
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
     int log_stat_interval_ = 100;
     int getLogStatInterval() const { return log_stat_interval_; }

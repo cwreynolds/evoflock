@@ -189,14 +189,8 @@ private:
     // Added to support "absolute fitness" in addition to "tournament fitness".
     float fitness_ = 0;
     bool has_fitness_ = false;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240329 WIP for multi-objective fitness
-//    std::vector<double> multi_objective_fitness_;
-//    bool has_multi_objective_fitness_ = false;
-    // TODO 20240423 change MultiObjectiveFitness from typedef to class
     MultiObjectiveFitness multi_objective_fitness_;
     bool has_multi_objective_fitness_ = false;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Leak check. Count constructor/destructor calls. Must match at end of run.
     static inline int constructor_count_ = 0;
     static inline int destructor_count_ = 0;

@@ -29,13 +29,6 @@ inline MOF evoflock_fitness_function(LP::Individual* individual)
     return std::any_cast<MOF>(individual->tree().getRootValue());
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240507 experiment
-
-//    // Map a MultiObjectiveFitness to a scalar, here the minimum value.
-//    // Used as the FitnessScalarizeFunction for Population::evolutionStep().
-//    inline double scalarize_fitness(MOF mof) { return mof.min(); }
-
 
 // Take the minimum element of a MultiObjectiveFitness ("Shangian scalarizer").
 inline double scalarize_fitness_min(MOF mof) { return mof.min(); }
@@ -53,18 +46,12 @@ inline double scalarize_fitness_prod(MOF mof)
 inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 inline const std::vector<std::string> mof_names =
 {
     "separate",
     "avoid",
     "cohere",
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240501 prototype dbscan
     "cluster",
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     "occupied"
 };
 
@@ -74,10 +61,7 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
     double separate = flock.get_separation_score();
     double avoid = flock.get_avoid_obstacle_score();
     double cohere = flock.get_cohere_score();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240501 prototype dbscan
     double cluster = flock.get_cluster_score();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     auto ignore_function = [](Vec3 p) { return p.length() > 50;};
     double occupy = flock.occupancy_map.fractionOccupied(ignore_function);
     return
@@ -85,10 +69,7 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
         separate,
         avoid,
         cohere,
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240501 prototype dbscan
         cluster,
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         occupy
     }};
 }
@@ -339,30 +320,11 @@ inline void evoflock_ga_crossover(const LP::GpTree& parent0,
     //std::cout << "offspring: " << offspring.to_string() << std::endl;
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240507 experiment
-
-//    void replace_scalar_fitness_with_product(LP::Population& population)
-//    {
-//        auto replace = [](LP::Individual* individual)
-//        {
-//            assert(individual->hasMultiObjectiveFitness());
-//            MOF mof = individual->getMultiObjectiveFitness();
-//    //        double f = std::reduce(mof.begin(), mof.end(), 1.0, std::multiplies());
-//    //        individual->setFitness(f);
-//            individual->setFitness(scalarize_fitness_prod(mof));
-//        };
-//        population.applyToAllIndividuals(replace);
-//    //    population.sort_cache_invalid_ = true;
-//        scalarize_fitness = scalarize_fitness_prod;
-//    }
-
 // An experiment to compare min and prod for MOF components.
 void replace_scalar_fitness_with_product(LP::Population& population)
 {
     auto replace = [](LP::Individual* individual)
     {
-//        assert(individual->hasMultiObjectiveFitness());
         MOF mof = individual->getMultiObjectiveFitness();
         individual->setFitness(scalarize_fitness_prod(mof));
     };
@@ -370,8 +332,6 @@ void replace_scalar_fitness_with_product(LP::Population& population)
     scalarize_fitness = scalarize_fitness_prod;
 }
 
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // The default (in GpType::defaultJiggleScale()) is 0.05
 double jiggle_scale = 0.1;
@@ -384,25 +344,9 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
 {
     {
         { "Multi_Objective_Fitness" },
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20240409 trying increasing the jiggle scale (default is 0.05)
-
-//        { "Real_0_1",    0.0,   1.0 },
-//        { "Real_0_10",   0.0,  10.0 },
-//        { "Real_0_100",  0.0, 100.0 },
-//        { "Real_0_10_bigger_jiggle",   0.0,  10.0, 0.1 },
-//        { "Real_0_100_bigger_jiggle",  0.0, 100.0, 0.1 },
-//        { "Real_0_200",  0.0, 200.0 },  // TODO keep?
-//        { "Real_m1_p1", -1.0,  +1.0 },
-//        // TODO 20240321 pre-ranging for speed values (is this "cheating"?)
-//        { "Real_15_30",  15.0,  30.0 },  // for boid speed values
-        
         { "Real_0_1",    0.0,   1.0, jiggle_scale },
         { "Real_0_10",   0.0,  10.0, jiggle_scale },
         { "Real_0_100",  0.0, 100.0, jiggle_scale },
-//        { "Real_0_10_bigger_jiggle",   0.0,  10.0, 0.1 },
-//        { "Real_0_100_bigger_jiggle",  0.0, 100.0, 0.1 },
         { "Real_0_200",  0.0, 200.0, jiggle_scale },  // TODO keep?
         { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
         // TODO 20240321 pre-ranging for speed values (is this "cheating"?)
@@ -432,11 +376,7 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
                 "Real_0_100",  // weight_separate
                 "Real_0_100",  // weight_align
                 "Real_0_100",  // weight_cohere
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                // TODO 20240409 trying increasing the jiggle scale (default is 0.05)
                 "Real_0_100",  // weight_avoid
-//                "Real_0_100_bigger_jiggle",  // weight_avoid
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
                 "Real_0_200",  // max_dist_separate_in_body_radii
                 // TODO set to 100, essentially infinity, in the FlockParameters
@@ -454,11 +394,7 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
                 "Real_m1_p1",  // angle_cohere
                 
                 "Real_0_100", // fly_away_max_dist_in_br
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                // TODO 20240409 trying increasing the jiggle scale (default is 0.05)
                 "Real_0_10",  // min_time_to_collide
-//                "Real_0_10_bigger_jiggle",  // min_time_to_collide
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             },
             
             // Evaluation function, which runs a flock simulation with the given

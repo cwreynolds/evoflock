@@ -399,10 +399,7 @@ public:
     // with setLoggerFunction().
     virtual void logger()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240507 experiment
         sort_cache_invalid_ = true;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         updateSortedCollectionOfIndividuals();
         if (logger_function_) logger_function_(*this);
     }

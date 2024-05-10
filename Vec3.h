@@ -141,16 +141,38 @@ public:
                                 Vec3::angle_between(from_vec, to_vec));
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240509 curvature infrastructure and fitness
+    
+//    // Check if two vectors are perpendicular.
+//    bool is_perpendicular(const Vec3& other) const
+//    {
+//        // TODO 20230430 Should it check for unit length, or normalize? For now,
+//        // assert that given vectors are unit length to see if it ever comes up.
+//        assert (is_unit_length());
+//        assert (other.is_unit_length());
+//        return util::within_epsilon(dot(other), 0);
+//    }
+
+
     // Check if two vectors are perpendicular.
     bool is_perpendicular(const Vec3& other) const
+    {
+        return is_perpendicular(other, util::epsilon);
+    }
+    // Check if two vectors are perpendicular.
+    bool is_perpendicular(const Vec3& other, double epsilon) const
     {
         // TODO 20230430 Should it check for unit length, or normalize? For now,
         // assert that given vectors are unit length to see if it ever comes up.
         assert (is_unit_length());
         assert (other.is_unit_length());
-        return util::within_epsilon(dot(other), 0);
+        return util::within_epsilon(dot(other), 0, epsilon);
     }
-    
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Check if two unit vectors are parallel (or anti-parallel).
     bool is_parallel(const Vec3& other) const
     {

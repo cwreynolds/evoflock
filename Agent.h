@@ -76,7 +76,7 @@ public:
     }
 
     // Very basic roll control: use global UP as reference up.
-    Vec3 up_reference(Vec3 acceleration) { return Vec3(0, 1, 0); }
+    virtual Vec3 up_reference(const Vec3& acceleration) { return Vec3(0, 1, 0); }
     
     // Given an arbitrary steering force, return the component purely lateral
     // (perpendicular) to our forward basis. This is the part that steers/turns

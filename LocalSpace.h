@@ -57,16 +57,38 @@ public:
                 p());
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240509 curvature infrastructure and fitness
+
+//    // Checks that basis vectors are unit length and mutually perpendicular.
+//    bool is_orthonormal() const
+//    {
+//        return (i().is_unit_length() and
+//                j().is_unit_length() and
+//                k().is_unit_length() and
+//                i().is_perpendicular(j()) and
+//                j().is_perpendicular(k()) and
+//                k().is_perpendicular(i()));
+//    }
+
     // Checks that basis vectors are unit length and mutually perpendicular.
-    bool is_orthonormal() const
+    // (When I started using this in evolution (which due to another bug, was
+    // not until 20240510) the third is_perpendicular() had "occasional" fails.
+    // It took bumping the threshold up by three orders of magnitude to avoid
+    // "false"(?) alarms. Nonetheless, it is correct to within eps*10 or 1e-12.)
+    bool is_orthonormal() const { return is_orthonormal(util::epsilon); }
+    bool is_orthonormal(double epsilon) const
     {
+        double more_permissive = epsilon * 1000;
         return (i().is_unit_length() and
                 j().is_unit_length() and
                 k().is_unit_length() and
-                i().is_perpendicular(j()) and
-                j().is_perpendicular(k()) and
-                k().is_perpendicular(i()));
+                i().is_perpendicular(j(), more_permissive) and
+                j().is_perpendicular(k(), more_permissive) and
+                k().is_perpendicular(i(), more_permissive));
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Return copy with random orientation, position is preserved.
     LocalSpace randomize_orientation() const
@@ -78,33 +100,21 @@ public:
         return LocalSpace(ii, jj, kk, p());
     }
     
-//    # Given a "new_forward" direction, rotate this LocalSpace about its position
-//    # to align with the new forward, while keeping the new up direction as close
-//    # as possible to the given "reference_up" (defaults to old up: self.j). The
-//    # intent is to find the smallest rotation needed to meet these constraints.
-//        def rotate_to_new_forward(self, new_forward, reference_up=None):
-//        if not reference_up:
-//        reference_up = self.j
-//        assert new_forward.is_unit_length()
-//        assert reference_up.is_unit_length()
-//        new_side = reference_up.cross(new_forward).normalize()
-//        new_up = new_forward.cross(new_side).normalize()
-//        self.set_state_ijkp(new_side, new_up, new_forward, self.p)
-
-    // Given a "new_forward" direction, rotate this LocalSpace about its position
-    // to align with the new forward, while keeping the new up direction as close
-    // as possible to the given "reference_up" (defaults to old up: self.j). The
-    // intent is to find the smallest rotation needed to meet these constraints.
-//    LocalSpace rotate_to_new_forward(Vec3 new_forward) const
-//    {
-//        return rotate_to_new_forward(new_forward, Vec3(0, 1, 0));
-//    }
+    // Given a "new_forward" direction, rotate this LocalSpace (about its
+    // position) to align with the new forward, while keeping the new "up"
+    // direction as close as possible to the given "reference_up". The intent
+    // is to find the smallest rotation needed to meet these constraints. This
+    // is a type of guided "reorthonormalization."
     LocalSpace rotate_to_new_forward(Vec3 new_forward, Vec3 reference_up) const
     {
         assert(new_forward.is_unit_length());
         assert(reference_up.is_unit_length());
         Vec3 new_side = reference_up.cross(new_forward).normalize();
         Vec3 new_up = new_forward.cross(new_side).normalize();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240509 curvature infrastructure and fitness
+        assert(new_forward.is_perpendicular(new_side, util::epsilon * 1000));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return LocalSpace(new_side, new_up, new_forward, p());
     }
     

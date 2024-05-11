@@ -57,38 +57,17 @@ public:
                 p());
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240509 curvature infrastructure and fitness
-
-//    // Checks that basis vectors are unit length and mutually perpendicular.
-//    bool is_orthonormal() const
-//    {
-//        return (i().is_unit_length() and
-//                j().is_unit_length() and
-//                k().is_unit_length() and
-//                i().is_perpendicular(j()) and
-//                j().is_perpendicular(k()) and
-//                k().is_perpendicular(i()));
-//    }
-
     // Checks that basis vectors are unit length and mutually perpendicular.
-    // (When I started using this in evolution (which due to another bug, was
-    // not until 20240510) the third is_perpendicular() had "occasional" fails.
-    // It took bumping the threshold up by three orders of magnitude to avoid
-    // "false"(?) alarms. Nonetheless, it is correct to within eps*10 or 1e-12.)
     bool is_orthonormal() const { return is_orthonormal(util::epsilon); }
     bool is_orthonormal(double epsilon) const
     {
-        double more_permissive = epsilon * 1000;
-        return (i().is_unit_length() and
-                j().is_unit_length() and
-                k().is_unit_length() and
-                i().is_perpendicular(j(), more_permissive) and
-                j().is_perpendicular(k(), more_permissive) and
-                k().is_perpendicular(i(), more_permissive));
+        return (i().is_unit_length(epsilon) and
+                j().is_unit_length(epsilon) and
+                k().is_unit_length(epsilon) and
+                i().is_perpendicular(j(), epsilon) and
+                j().is_perpendicular(k(), epsilon) and
+                k().is_perpendicular(i(), epsilon));
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Return copy with random orientation, position is preserved.
     LocalSpace randomize_orientation() const
@@ -111,10 +90,8 @@ public:
         assert(reference_up.is_unit_length());
         Vec3 new_side = reference_up.cross(new_forward).normalize();
         Vec3 new_up = new_forward.cross(new_side).normalize();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240509 curvature infrastructure and fitness
-        assert(new_forward.is_perpendicular(new_side, util::epsilon * 1000));
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Recalculate side for more precision with "more perpendicular" new_up.
+        new_side = new_up.cross(new_forward).normalize();
         return LocalSpace(new_side, new_up, new_forward, p());
     }
     

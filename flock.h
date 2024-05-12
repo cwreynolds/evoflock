@@ -330,6 +330,17 @@ public:
                 }
                 all_separation_good_for_whole_chunk_ = true;
             }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240511 support path curvature metric.
+            curvature_sum_for_all_boid_updates_ += b->getPathCurvature();
+            
+            if (temp_max_curvature_ < b->getPathCurvature())
+            {
+                temp_max_curvature_ = b->getPathCurvature();
+                std::cout << "    ---- ";
+                debugPrint(temp_max_curvature_)
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             increment_boid_update_counter();
         }
         if (all_speed_good) { count_steps_good_speed++; }
@@ -341,6 +352,19 @@ public:
         }
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240511 support path curvature metric.
+    double curvature_sum_for_all_boid_updates_ = 0;
+    double get_curvature_score() const
+    {
+        double ave = curvature_sum_for_all_boid_updates_ / boid_update_counter_;
+        double ad_hoc_max_curvature = 0.17;
+        double ad_hoc_high_curvature = ad_hoc_max_curvature / 2;
+        return util::clip01(ave / ad_hoc_high_curvature);
+    }
+    static inline double temp_max_curvature_ = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     int count_clusters() const
     {
         // Clustering parameters.

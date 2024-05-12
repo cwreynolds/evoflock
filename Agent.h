@@ -62,6 +62,7 @@ public:
         Vec3 new_velocity = velocity() + (acceleration * time_step);
         double new_speed = new_velocity.length();
         setSpeed(util::clip(new_speed, 0, max_speed()));
+        setPathCurvature(new_velocity);
         // Update geometric state when moving.
         if (speed() > 0)
         {
@@ -73,6 +74,15 @@ public:
             setPosition(position() + (new_forward * speed() * time_step));
             assert (ls().is_orthonormal());
         }
+    }
+    
+    // Get/set Agent's path curvature based on old and new velocity direction.
+    double getPathCurvature() const { return path_curvature_; }
+    void setPathCurvature(const Vec3& new_velocity)
+    {
+        Vec3 ovn = velocity().normalize_or_0();
+        Vec3 nvn = new_velocity.normalize_or_0();
+        path_curvature_ = (ovn - nvn).length();
     }
 
     // Very basic roll control: use global UP as reference up.
@@ -157,11 +167,12 @@ public:
 
 
 private:
-    LocalSpace ls_;           // Local coordinate space (pos, orient).
-    double mass_ = 1;         // Mass, normally ignored as 1.
-    double speed_ = 0;        // Current forward speed (m/s).
-    double max_speed_ = 1.0;  // Speed upper limit (m/s)
-    double max_force_ = 0.3;  // Acceleration upper limit (m/s²)
+    LocalSpace ls_;             // Local coordinate space (pos, orient).
+    double mass_ = 1;           // Mass, normally ignored as 1.
+    double speed_ = 0;          // Current forward speed (m/s).
+    double max_speed_ = 1.0;    // Speed upper limit (m/s)
+    double max_force_ = 0.3;    // Acceleration upper limit (m/s²)
+    double path_curvature_ = 0; // Computed in update_speed_and_local_space().
     std::string name_;
     inline static int serial_number_ = 0;
 };

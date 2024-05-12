@@ -52,6 +52,7 @@ inline const std::vector<std::string> mof_names =
     "avoid",
     "cohere",
     "cluster",
+    "curvature",
     "occupied"
 };
 
@@ -62,6 +63,7 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
     double avoid = flock.get_avoid_obstacle_score();
     double cohere = flock.get_cohere_score();
     double cluster = flock.get_cluster_score();
+    double curvature = flock.get_curvature_score();
     auto ignore_function = [](Vec3 p) { return p.length() > 50;};
     double occupy = flock.occupancy_map.fractionOccupied(ignore_function);
     return
@@ -70,6 +72,7 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
         avoid,
         cohere,
         cluster,
+        curvature,
         occupy
     }};
 }
@@ -81,9 +84,8 @@ inline void fitness_logger(const MOF& mof)
     std::ios::fmtflags old_settings = std::cout.flags();
     size_t old_precision = std::cout.precision();
     // Format labels.
-//    std::string sf = "scalar fitness";
-    std::string sf = "scalar composite";
-    size_t cw = sf.size();  // Column width.
+    std::string sc = "scalar composite";
+    size_t cw = sc.size();  // Column width.
     std::vector<std::string> labels;
     for (auto& s : mof_names) { labels.push_back(s + " fitness"); }
     for (auto& s : labels){ size_t ss = s.size(); if (cw < ss) { cw = ss; } }
@@ -95,7 +97,7 @@ inline void fitness_logger(const MOF& mof)
         std::cout << fitness << std::endl;
     };
     for (int i = 0; i < mof.size(); i++) { print(mof.at(i), labels.at(i)); }
-    print(scalarize_fitness(mof), sf);
+    print(scalarize_fitness(mof), sc);
     std::cout << std::endl;
     // restore output format flags and precision
     std::cout.flags(old_settings);

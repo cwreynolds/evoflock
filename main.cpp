@@ -422,7 +422,8 @@ int main(int argc, const char * argv[])
 //    lp::LPRS().setSeed(20240505);
 //    lp::LPRS().setSeed(20240506);
 //    lp::LPRS().setSeed(20240508);
-    lp::LPRS().setSeed(20240509);
+//    lp::LPRS().setSeed(20240509);
+    lp::LPRS().setSeed(20240512);
 
     int min_tree_size = 2;
     int max_tree_size = 20;

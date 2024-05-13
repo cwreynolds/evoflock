@@ -334,12 +334,12 @@ public:
             // TODO 20240511 support path curvature metric.
             curvature_sum_for_all_boid_updates_ += b->getPathCurvature();
             
-            if (temp_max_curvature_ < b->getPathCurvature())
-            {
-                temp_max_curvature_ = b->getPathCurvature();
-                std::cout << "    ---- ";
-                debugPrint(temp_max_curvature_)
-            }
+//            if (temp_max_curvature_ < b->getPathCurvature())
+//            {
+//                temp_max_curvature_ = b->getPathCurvature();
+//                std::cout << "    ---- ";
+//                debugPrint(temp_max_curvature_)
+//            }
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             increment_boid_update_counter();
         }
@@ -362,7 +362,7 @@ public:
         double ad_hoc_high_curvature = ad_hoc_max_curvature / 2;
         return util::clip01(ave / ad_hoc_high_curvature);
     }
-    static inline double temp_max_curvature_ = 0;
+//    static inline double temp_max_curvature_ = 0;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     int count_clusters() const

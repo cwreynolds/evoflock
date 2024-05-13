@@ -14,8 +14,8 @@
 
 #include "flock.h"
 #include "shape.h"
+#include <algorithm>  // For std::sort.
 // TODO 20240226 For now, a modified copy of LazyPredator is in a subdirectory.
-
 #include "LazyPredator/LazyPredator.h"
 namespace LP = LazyPredator;
 
@@ -78,33 +78,6 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 }
 
 
-inline void fitness_logger(const MOF& mof)
-{
-    // Save current settings for formatting float/double values
-    std::ios::fmtflags old_settings = std::cout.flags();
-    size_t old_precision = std::cout.precision();
-    // Format labels.
-    std::string sc = "scalar composite";
-    size_t cw = sc.size();  // Column width.
-    std::vector<std::string> labels;
-    for (auto& s : mof_names) { labels.push_back(s + " fitness"); }
-    for (auto& s : labels){ size_t ss = s.size(); if (cw < ss) { cw = ss; } }
-    // Print one row of a table with a named mof fitness.
-    auto print = [&](double fitness, std::string name)
-    {
-        std::cout << "    " << (name + std::string(cw,' ')).substr(0, cw);
-        std::cout << std::setprecision(6) << std::setw(10) << std::fixed;
-        std::cout << fitness << std::endl;
-    };
-    for (int i = 0; i < mof.size(); i++) { print(mof.at(i), labels.at(i)); }
-    print(scalarize_fitness(mof), sc);
-    std::cout << std::endl;
-    // restore output format flags and precision
-    std::cout.flags(old_settings);
-    std::cout.precision(old_precision);
-}
-
-
 // Return a FlockParameters object with all given parameter values
 inline FlockParameters init_flock_parameters(double max_force,
                                              double max_speed,
@@ -153,17 +126,38 @@ inline FlockParameters init_flock_parameters(double max_force,
 }
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240513 run two flock sims for half as long, keep lower fitness
+
+//    // Initialize basic run parameters of Flock object
+//    inline void init_flock(Flock& flock)
+//    {
+//        flock.set_boid_count(200);
+//        flock.set_fixed_fps(30);
+//        flock.set_fixed_time_step(true);
+//        flock.set_max_simulation_steps(1000);
+//        flock.setLogStatInterval(flock.max_simulation_steps());
+//        flock.setSaveBoidCenters(false);
+//        flock.log_prefix = "    ";
+//    }
+
 // Initialize basic run parameters of Flock object
 inline void init_flock(Flock& flock)
 {
     flock.set_boid_count(200);
     flock.set_fixed_fps(30);
     flock.set_fixed_time_step(true);
-    flock.set_max_simulation_steps(1000);
+    
+//    flock.set_max_simulation_steps(1000);
+    flock.set_max_simulation_steps(500);
+    
     flock.setLogStatInterval(flock.max_simulation_steps());
     flock.setSaveBoidCenters(false);
     flock.log_prefix = "    ";
 }
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 // Adjust weight of one objective's fitness for "product of objective fitnesses".
@@ -180,19 +174,82 @@ double fitness_product_weight_01(double fitness, double weight)
 inline bool print_occupancy_map = false;  // Just for debugging.
 
 
+inline void fitness_logger(const MOF& mof)
+{
+    // Save current settings for formatting float/double values
+    std::ios::fmtflags old_settings = std::cout.flags();
+    size_t old_precision = std::cout.precision();
+    // Format labels.
+    std::string sc = "scalar composite";
+    size_t cw = sc.size();  // Column width.
+    std::vector<std::string> labels;
+    for (auto& s : mof_names) { labels.push_back(s + " fitness"); }
+    for (auto& s : labels){ size_t ss = s.size(); if (cw < ss) { cw = ss; } }
+    // Print one row of a table with a named mof fitness.
+    auto print = [&](double fitness, std::string name)
+    {
+        std::cout << "    " << (name + std::string(cw,' ')).substr(0, cw);
+        std::cout << std::setprecision(6) << std::setw(10) << std::fixed;
+        std::cout << fitness << std::endl;
+    };
+    for (int i = 0; i < mof.size(); i++) { print(mof.at(i), labels.at(i)); }
+    print(scalarize_fitness(mof), sc);
+    std::cout << std::endl;
+    // restore output format flags and precision
+    std::cout.flags(old_settings);
+    std::cout.precision(old_precision);
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240513 run two flock sims for half as long, keep lower fitness
+
+//    // Run flock simulation with given parameters, return a MultiObjectiveFitness.
+//    inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
+//    {
+//        Flock flock;
+//        init_flock(flock);
+//        flock.setSaveBoidCenters(write_file);
+//        flock.fp() = fp;
+//        flock.run();
+//        MOF mof = multiObjectiveFitnessOfFlock(flock);
+//        assert(mof.size() == mof_names.size());
+//        fitness_logger(mof);
+//        return mof;
+//    }
+
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
 inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
 {
-    Flock flock;
-    init_flock(flock);
-    flock.setSaveBoidCenters(write_file);
-    flock.fp() = fp;
-    flock.run();
-    MOF mof = multiObjectiveFitnessOfFlock(flock);
-    assert(mof.size() == mof_names.size());
-    fitness_logger(mof);
-    return mof;
+    int runs = 2;
+    std::vector<MOF> mofs;
+    for (int r = 0; r < runs; r++)
+    {
+        Flock flock;
+        init_flock(flock);
+        flock.setSaveBoidCenters(write_file);
+        flock.fp() = fp;
+        flock.run();
+        MOF mof = multiObjectiveFitnessOfFlock(flock);
+        assert(mof.size() == mof_names.size());
+        fitness_logger(mof);
+        
+        mofs.push_back(mof);
+    }
+    
+    std::sort(mofs.begin(), mofs.end(),
+              [](const MOF& a, const MOF& b) { return (scalarize_fitness(a) <
+                                                       scalarize_fitness(b));});
+
+    MOF min_mof = mofs.at(0);
+//    std::cout << "    min composite " << scalarize_fitness(min_mof);
+//    std::cout << std::endl << std::endl;
+    double min_scalar = scalarize_fitness(min_mof);
+    std::cout << "    min composite " << min_scalar << std::endl << std::endl;
+    return min_mof;
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.

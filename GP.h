@@ -218,11 +218,133 @@ inline void fitness_logger(const MOF& mof)
 //        return mof;
 //    }
 
+//    // Run flock simulation with given parameters, return a MultiObjectiveFitness.
+//    // Makes given number of runs, returning the MOF with least scalar fitness.
+//    inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
+//    {
+//    //    int runs = 2;
+//        int runs = 4;
+//        std::vector<MOF> mofs;
+//        for (int r = 0; r < runs; r++)
+//        {
+//            Flock flock;
+//            init_flock(flock);
+//            flock.setSaveBoidCenters(write_file);
+//            flock.fp() = fp;
+//            flock.run();
+//            MOF mof = multiObjectiveFitnessOfFlock(flock);
+//            assert(mof.size() == mof_names.size());
+//            fitness_logger(mof);
+//
+//            mofs.push_back(mof);
+//        }
+//        std::sort(mofs.begin(), mofs.end(),
+//                  [](const MOF& a, const MOF& b){ return (scalarize_fitness(a) <
+//                                                          scalarize_fitness(b)); });
+//        MOF min_mof = mofs.at(0);
+//        double min_scalar = scalarize_fitness(min_mof);
+//        std::cout << "    min composite " << min_scalar << std::endl << std::endl;
+//        return min_mof;
+//    }
+
+
+//    // Run flock simulation with given parameters, return a MultiObjectiveFitness.
+//    // Makes given number of runs, returning the MOF with least scalar fitness.
+//    inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
+//    {
+//    //    int runs = 2;
+//        int runs = 4;
+//    //    std::vector<MOF> mofs;
+//        MOF least_mof;
+//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
+//        for (int r = 0; r < runs; r++)
+//        {
+//            Flock flock;
+//            init_flock(flock);
+//            flock.setSaveBoidCenters(write_file);
+//            flock.fp() = fp;
+//            flock.run();
+//            MOF mof = multiObjectiveFitnessOfFlock(flock);
+//            assert(mof.size() == mof_names.size());
+//            fitness_logger(mof);
+//
+//    //        mofs.push_back(mof);
+//
+//    //        double sf = scalarize_fitness(mof);
+//            if (least_scalar_fitness > scalarize_fitness(mof))
+//            {
+//                least_scalar_fitness = scalarize_fitness(mof);
+//                least_mof = mof;
+//            }
+//        }
+//    //    std::sort(mofs.begin(), mofs.end(),
+//    //              [](const MOF& a, const MOF& b){ return (scalarize_fitness(a) <
+//    //                                                      scalarize_fitness(b)); });
+//    //    MOF min_mof = mofs.at(0);
+//    //    double min_scalar = scalarize_fitness(min_mof);
+//    //    std::cout << "    min composite " << min_scalar << std::endl << std::endl;
+//    //    return min_mof;
+//        std::cout<<"    min composite "<<least_scalar_fitness<<std::endl<<std::endl;
+//        return least_mof;
+//    }
+
+//    // Run flock simulation with given parameters, return a MultiObjectiveFitness.
+//    // Makes given number of runs, returning the MOF with least scalar fitness.
+//    inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
+//    {
+//        int runs = 4;
+//        MOF least_mof;
+//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
+//        std::vector<double> scalar_fits;
+//        for (int r = 0; r < runs; r++)
+//        {
+//            Flock flock;
+//            init_flock(flock);
+//            flock.setSaveBoidCenters(write_file);
+//            flock.fp() = fp;
+//            flock.run();
+//            MOF mof = multiObjectiveFitnessOfFlock(flock);
+//            assert(mof.size() == mof_names.size());
+//
+//    //        fitness_logger(mof);
+//
+//    //        if (least_scalar_fitness > scalarize_fitness(mof))
+//    //        {
+//    //            least_scalar_fitness = scalarize_fitness(mof);
+//    //            least_mof = mof;
+//    //        }
+//
+//
+//            scalar_fits.push_back(scalarize_fitness(mof));
+//
+//            if (least_scalar_fitness > scalar_fits.back())
+//            {
+//                least_scalar_fitness = scalar_fits.back();
+//                least_mof = mof;
+//            }
+//
+//        }
+//
+//        fitness_logger(least_mof);
+//
+//    //    std::cout<<"    min composite "<<least_scalar_fitness<<std::endl<<std::endl;
+//
+//        std::cout << "    min composite "<< least_scalar_fitness;
+//        std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
+//        std::cout << std::endl << std::endl;
+//
+//        return least_mof;
+//    }
+
+
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
+// Makes given number of runs, returning the MOF with least scalar fitness.
 inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
 {
-    int runs = 2;
-    std::vector<MOF> mofs;
+    int runs = 4;
+    MOF least_mof;
+    double least_scalar_fitness = std::numeric_limits<double>::infinity();
+    std::vector<double> scalar_fits;
     for (int r = 0; r < runs; r++)
     {
         Flock flock;
@@ -232,21 +354,18 @@ inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = fal
         flock.run();
         MOF mof = multiObjectiveFitnessOfFlock(flock);
         assert(mof.size() == mof_names.size());
-        fitness_logger(mof);
-        
-        mofs.push_back(mof);
+        scalar_fits.push_back(scalarize_fitness(mof));
+        if (least_scalar_fitness > scalar_fits.back())
+        {
+            least_scalar_fitness = scalar_fits.back();
+            least_mof = mof;
+        }
     }
-    
-    std::sort(mofs.begin(), mofs.end(),
-              [](const MOF& a, const MOF& b) { return (scalarize_fitness(a) <
-                                                       scalarize_fitness(b));});
-
-    MOF min_mof = mofs.at(0);
-//    std::cout << "    min composite " << scalarize_fitness(min_mof);
-//    std::cout << std::endl << std::endl;
-    double min_scalar = scalarize_fitness(min_mof);
-    std::cout << "    min composite " << min_scalar << std::endl << std::endl;
-    return min_mof;
+    fitness_logger(least_mof);
+    std::cout << "    min composite "<< least_scalar_fitness;
+    std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
+    std::cout << std::endl << std::endl;
+    return least_mof;
 }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

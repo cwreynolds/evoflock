@@ -276,17 +276,74 @@ public:
     //                    self.tracking_camera and
     //                    self.selected_boid().is_neighbor(boid))
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240514 parallel execution for boid update?
+
+//    // Fly each boid in flock for one simulation step. Consists of two sequential
+//    // steps to avoid artifacts from order of boids. First a "sense/plan" phase
+//    // which computes the desired steering based on current state. Then an "act"
+//    // phase which actually moves the boids. Finally statistics are collected.
+//    // (TODO 20240514 why is "flock" in name? Maybe Flock::fly() or fly_boids()?)
+//    void fly_flock(double time_step)
+//    {
+//        for (Boid* boid : boids()) { boid->plan_next_steer(time_step); }
+//        for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
+//        collect_flock_metrics();
+//    }
 
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
     // which computes the desired steering based on current state. Then an "act"
     // phase which actually moves the boids. Finally statistics are collected.
+    // (TODO 20240514 why is "flock" in name? Maybe Flock::fly() or fly_boids()?)
     void fly_flock(double time_step)
     {
-        for (Boid* boid : boids()) { boid->plan_next_steer(time_step); }
-        for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
+//        for (Boid* boid : boids()) { boid->plan_next_steer(time_step); }
+//        for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
+        
+        // TODO 20240514 I tried this but did not seem to be supported yet.
+//        std::for_each(std::execution::par,
+//                      boids().begin(), boids().end(),
+//                      [&](Boid* b) { b->plan_next_steer(time_step); } );
+//        std::for_each(std::execution::par,
+//                      boids().begin(), boids().end(),
+//                      [&](Boid* b) { b->apply_next_steer(time_step); } );
+                
+        auto for_all_boids = [&](std::function<void(Boid* b)> boid_func)
+        {
+//            int thread_count = std::thread::hardware_concurrency() * 0.75;
+//            int thread_count = std::thread::hardware_concurrency();
+            int thread_count = std::thread::hardware_concurrency() * 0.5;
+//            int boids_per_thread = int(boids().size()) / thread_count;
+            int boids_per_thread = 1 + (int(boids().size()) / thread_count);
+            std::vector<std::thread> all_threads;
+            auto chunk_func = [&](int first, int last)
+            {
+                int end = std::min(last, int(boids().size()));
+                for (int i = first; i < end; i++)
+                {
+                    boid_func(boids().at(i));
+                }
+            };
+            int first = 0;
+            int last = boids_per_thread;
+            for (int t = 0; t < thread_count; t++)
+            {
+//                std::cout << "for_all_boids: " << first << ", " << last << std::endl;
+                
+                all_threads.push_back(std::thread(chunk_func, first, last));
+                first = last;
+                last += boids_per_thread;
+            }
+            // Wait for helper threads to finish, join them with this thread.
+            for (auto& t : all_threads) { t.join(); }
+        };
+        for_all_boids([&](Boid* b){ b->plan_next_steer(time_step);});
+        for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         collect_flock_metrics();
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void collect_flock_metrics()
     {

@@ -79,29 +79,29 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 
 
 // Return a FlockParameters object with all given parameter values
-inline FlockParameters init_flock_parameters(double max_force,
-                                             double max_speed,
-                                             double min_speed,
-                                             double speed,
-                                             
-                                             double weight_forward,
-                                             double weight_separate,
-                                             double weight_align,
-                                             double weight_cohere,
-                                             double weight_avoid,
-                                             
-                                             double max_dist_separate_in_body_radii,
-                                             
-                                             double exponent_separate,
-                                             double exponent_align,
-                                             double exponent_cohere,
-                                             
-                                             double angle_separate,
-                                             double angle_align,
-                                             double angle_cohere,
-                                             
-                                             double fly_away_max_dist_in_br,
-                                             double min_time_to_collide)
+inline FlockParameters init_fp(double max_force,
+                               double max_speed,
+                               double min_speed,
+                               double speed,
+                               
+                               double weight_forward,
+                               double weight_separate,
+                               double weight_align,
+                               double weight_cohere,
+                               double weight_avoid,
+                               
+                               double max_dist_separate_in_body_radii,
+                               
+                               double exponent_separate,
+                               double exponent_align,
+                               double exponent_cohere,
+                               
+                               double angle_separate,
+                               double angle_align,
+                               double angle_cohere,
+                               
+                               double fly_away_max_dist_in_br,
+                               double min_time_to_collide)
 {
     FlockParameters fp;
     fp.max_force = max_force;
@@ -339,6 +339,7 @@ inline void fitness_logger(const MOF& mof)
 
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
 // Makes given number of runs, returning the MOF with least scalar fitness.
+// TODO 20240515 maybe the name should be measure_fitness_of_fp() ?
 inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
 {
     int runs = 4;
@@ -372,62 +373,6 @@ inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = fal
 
 
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
-inline MOF run_flock_simulation(double max_force,
-                                
-                                double max_speed,
-                                double min_speed,
-                                double speed,
-                                
-                                double weight_forward,
-                                double weight_separate,
-                                double weight_align,
-                                double weight_cohere,
-                                double weight_avoid,
-                                
-                                double max_dist_separate_in_body_radii,
-                                
-                                double exponent_separate,
-                                double exponent_align,
-                                double exponent_cohere,
-                                
-                                double angle_separate,
-                                double angle_align,
-                                double angle_cohere,
-                                
-                                double fly_away_max_dist_in_br,
-                                double min_time_to_collide,
-                                bool write_flock_data_file = false)
-{
-    FlockParameters fp = init_flock_parameters(max_force,
-                                               // 20240427 Policy change: set
-                                               // rather than optimize speed.
-                                               20,  // max_speed,
-                                               20,  // min_speed,
-                                               20,  // speed,
-
-                                               weight_forward,
-                                               weight_separate,
-                                               weight_align,
-                                               weight_cohere,
-                                               weight_avoid,
-
-                                               max_dist_separate_in_body_radii,
-                                               
-                                               exponent_separate,
-                                               exponent_align,
-                                               exponent_cohere,
-                                               
-                                               angle_separate,
-                                               angle_align,
-                                               angle_cohere,
-
-                                               fly_away_max_dist_in_br,
-                                               min_time_to_collide);
-    return run_flock_simulation(fp, write_flock_data_file);
-}
-
-
-// Run flock simulation with given parameters, return a MultiObjectiveFitness.
 inline MOF run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
 {
     return run_flock_simulation(FlockParameters(), write_flock_data_file);
@@ -440,25 +385,24 @@ inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
 {
     // Is this tree copy needed to avoid using the previous cached tree root?
     LazyPredator::GpTree t = individual->tree();
-    
-    return run_flock_simulation(t.evalSubtree<double>(0),
-                                t.evalSubtree<double>(1),
-                                t.evalSubtree<double>(2),
-                                t.evalSubtree<double>(3),
-                                t.evalSubtree<double>(4),
-                                t.evalSubtree<double>(5),
-                                t.evalSubtree<double>(6),
-                                t.evalSubtree<double>(7),
-                                t.evalSubtree<double>(8),
-                                t.evalSubtree<double>(9),
-                                t.evalSubtree<double>(10),
-                                t.evalSubtree<double>(11),
-                                t.evalSubtree<double>(12),
-                                t.evalSubtree<double>(13),
-                                t.evalSubtree<double>(14),
-                                t.evalSubtree<double>(15),
-                                t.evalSubtree<double>(16),
-                                t.evalSubtree<double>(17),
+    return run_flock_simulation(init_fp(t.evalSubtree<double>(0),
+                                        t.evalSubtree<double>(1),
+                                        t.evalSubtree<double>(2),
+                                        t.evalSubtree<double>(3),
+                                        t.evalSubtree<double>(4),
+                                        t.evalSubtree<double>(5),
+                                        t.evalSubtree<double>(6),
+                                        t.evalSubtree<double>(7),
+                                        t.evalSubtree<double>(8),
+                                        t.evalSubtree<double>(9),
+                                        t.evalSubtree<double>(10),
+                                        t.evalSubtree<double>(11),
+                                        t.evalSubtree<double>(12),
+                                        t.evalSubtree<double>(13),
+                                        t.evalSubtree<double>(14),
+                                        t.evalSubtree<double>(15),
+                                        t.evalSubtree<double>(16),
+                                        t.evalSubtree<double>(17)),
                                 true);  // write flock data file
 }
 
@@ -527,10 +471,7 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
         { "Real_0_100",  0.0, 100.0, jiggle_scale },
         { "Real_0_200",  0.0, 200.0, jiggle_scale },  // TODO keep?
         { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
-        // TODO 20240321 pre-ranging for speed values (is this "cheating"?)
-        { "Real_15_30",  15.0,  30.0, jiggle_scale },  // for boid speed values
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        { "Real_20_20",  20.0,  20.0, 0 },            // for boid speed values
     },
     {
         {
@@ -546,9 +487,10 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
             //     TODO should body_radius be held constant at 0.5?
             {
                 "Real_0_100",  // max_force
-                "Real_15_30",  // max_speed
-                "Real_15_30",  // min_speed
-                "Real_15_30",  // speed
+                // 20240427 Policy change: specify rather than optimize speed:
+                "Real_20_20",  // max_speed
+                "Real_20_20",  // min_speed
+                "Real_20_20",  // speed
 
                 "Real_0_100",  // weight_forward
                 "Real_0_100",  // weight_separate
@@ -579,24 +521,25 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
             // parameters and returns the fitness.
             [](LazyPredator::GpTree& t)
             {
-                auto fitness = run_flock_simulation(t.evalSubtree<double>(0),
-                                                    t.evalSubtree<double>(1),
-                                                    t.evalSubtree<double>(2),
-                                                    t.evalSubtree<double>(3),
-                                                    t.evalSubtree<double>(4),
-                                                    t.evalSubtree<double>(5),
-                                                    t.evalSubtree<double>(6),
-                                                    t.evalSubtree<double>(7),
-                                                    t.evalSubtree<double>(8),
-                                                    t.evalSubtree<double>(9),
-                                                    t.evalSubtree<double>(10),
-                                                    t.evalSubtree<double>(11),
-                                                    t.evalSubtree<double>(12),
-                                                    t.evalSubtree<double>(13),
-                                                    t.evalSubtree<double>(14),
-                                                    t.evalSubtree<double>(15),
-                                                    t.evalSubtree<double>(16),
-                                                    t.evalSubtree<double>(17));
+                FlockParameters fp = init_fp(t.evalSubtree<double>(0),
+                                             t.evalSubtree<double>(1),
+                                             t.evalSubtree<double>(2),
+                                             t.evalSubtree<double>(3),
+                                             t.evalSubtree<double>(4),
+                                             t.evalSubtree<double>(5),
+                                             t.evalSubtree<double>(6),
+                                             t.evalSubtree<double>(7),
+                                             t.evalSubtree<double>(8),
+                                             t.evalSubtree<double>(9),
+                                             t.evalSubtree<double>(10),
+                                             t.evalSubtree<double>(11),
+                                             t.evalSubtree<double>(12),
+                                             t.evalSubtree<double>(13),
+                                             t.evalSubtree<double>(14),
+                                             t.evalSubtree<double>(15),
+                                             t.evalSubtree<double>(16),
+                                             t.evalSubtree<double>(17));
+                auto fitness = run_flock_simulation(fp);
                 return std::any(fitness);
             }
         }

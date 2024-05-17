@@ -83,6 +83,24 @@ public:
         Vec3 ovn = velocity().normalize_or_0();
         Vec3 nvn = new_velocity.normalize_or_0();
         path_curvature_ = (ovn - nvn).length();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240516 experiment with parallel simulations
+
+        if (std::isnan(path_curvature_))
+        {
+//            debugPrint(velocity())
+//            debugPrint(new_velocity)
+//            debugPrint(ovn)
+//            debugPrint(nvn)
+            
+            // super temp experiment
+//            path_curvature_ = 0;
+        
+        }
+        assert(!std::isnan(path_curvature_));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     }
 
     // Very basic roll control: use global UP as reference up.

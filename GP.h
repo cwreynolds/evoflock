@@ -337,8 +337,63 @@ inline void fitness_logger(const MOF& mof)
 //    }
 
 
+//    // Run flock simulation with given parameters, return a MultiObjectiveFitness.
+//    // Makes given number of runs, returning the MOF with least scalar fitness.
+//    // TODO 20240515 maybe the name should be measure_fitness_of_fp() ?
+//    inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
+//    {
+//        int runs = 4;
+//        MOF least_mof;
+//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
+//        std::vector<double> scalar_fits;
+//        for (int r = 0; r < runs; r++)
+//        {
+//            Flock flock;
+//            init_flock(flock);
+//            flock.setSaveBoidCenters(write_file);
+//            flock.fp() = fp;
+//            flock.run();
+//            MOF mof = multiObjectiveFitnessOfFlock(flock);
+//            assert(mof.size() == mof_names.size());
+//            scalar_fits.push_back(scalarize_fitness(mof));
+//            if (least_scalar_fitness > scalar_fits.back())
+//            {
+//                least_scalar_fitness = scalar_fits.back();
+//                least_mof = mof;
+//            }
+//        }
+//        fitness_logger(least_mof);
+//        std::cout << "    min composite "<< least_scalar_fitness;
+//        std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
+//        std::cout << std::endl << std::endl;
+//        return least_mof;
+//    }
+
+
+// TODO 20240516 experiment with parallel simulations
+
+//inline run_and_eval_one_flock_simulation ()
+//{
+//    Flock flock;
+//    init_flock(flock);
+//    flock.setSaveBoidCenters(write_file);
+//    flock.fp() = fp;
+//    flock.run();
+//    MOF mof = multiObjectiveFitnessOfFlock(flock);
+//    assert(mof.size() == mof_names.size());
+//    scalar_fits.push_back(scalarize_fitness(mof));
+//    if (least_scalar_fitness > scalar_fits.back())
+//    {
+//        least_scalar_fitness = scalar_fits.back();
+//        least_mof = mof;
+//    }
+//}
+
+
+// TODO 20240516 experiment with parallel simulations
+
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
-// Makes given number of runs, returning the MOF with least scalar fitness.
+// (Now does given number of runs, returning the MOF with least scalar fitness.)
 // TODO 20240515 maybe the name should be measure_fitness_of_fp() ?
 inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
 {
@@ -346,28 +401,72 @@ inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = fal
     MOF least_mof;
     double least_scalar_fitness = std::numeric_limits<double>::infinity();
     std::vector<double> scalar_fits;
-    for (int r = 0; r < runs; r++)
+
+//    std::recursive_mutex save_mof_mutex;
+    std::mutex save_mof_mutex;
+
+    auto do_1_run = [&]()
     {
+        // These steps can happen in parallel threads:
         Flock flock;
         init_flock(flock);
         flock.setSaveBoidCenters(write_file);
         flock.fp() = fp;
         flock.run();
         MOF mof = multiObjectiveFitnessOfFlock(flock);
-        assert(mof.size() == mof_names.size());
-        scalar_fits.push_back(scalarize_fitness(mof));
-        if (least_scalar_fitness > scalar_fits.back())
+        // These steps happen in single thread with lock on save_mof_mutex.
         {
-            least_scalar_fitness = scalar_fits.back();
-            least_mof = mof;
+//            std::lock_guard<std::recursive_mutex> smm(save_mof_mutex);
+            std::lock_guard<std::mutex> smm(save_mof_mutex);
+            assert(mof.size() == mof_names.size());
+            scalar_fits.push_back(scalarize_fitness(mof));
+            if (least_scalar_fitness > scalar_fits.back())
+            {
+                least_scalar_fitness = scalar_fits.back();
+                least_mof = mof;
+            }
         }
-    }
+    };
+    
+    
+//    for (int r = 0; r < runs; r++)
+//    {
+//        Flock flock;
+//        init_flock(flock);
+//        flock.setSaveBoidCenters(write_file);
+//        flock.fp() = fp;
+//        flock.run();
+//        MOF mof = multiObjectiveFitnessOfFlock(flock);
+//        assert(mof.size() == mof_names.size());
+//        scalar_fits.push_back(scalarize_fitness(mof));
+//        if (least_scalar_fitness > scalar_fits.back())
+//        {
+//            least_scalar_fitness = scalar_fits.back();
+//            least_mof = mof;
+//        }
+//    }
+
+    // Start thread for each simulation run.
+    std::vector<std::thread> threads;
+    
+#if 1
+    for (int r = 0; r < runs; r++) { do_1_run(); }
+#else
+    for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
+    // Wait for helper threads to finish, join them with this thread.
+    for (auto& t : threads) { t.join(); }
+#endif
+    
+    assert(scalar_fits.size() == runs);
+
     fitness_logger(least_mof);
     std::cout << "    min composite "<< least_scalar_fitness;
     std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
     std::cout << std::endl << std::endl;
     return least_mof;
 }
+
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

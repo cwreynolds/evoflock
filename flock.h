@@ -513,13 +513,37 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240511 support path curvature metric.
     double curvature_sum_for_all_boid_updates_ = 0;
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20240516 experiment with parallel simulations
+
+//    double get_curvature_score() const
+//    {
+//        double ave = curvature_sum_for_all_boid_updates_ / boid_update_counter_;
+//        double ad_hoc_max_curvature = 0.17;
+//        double ad_hoc_high_curvature = ad_hoc_max_curvature / 2;
+//        return util::clip01(ave / ad_hoc_high_curvature);
+//    }
+
     double get_curvature_score() const
     {
+        assert(boid_update_counter_ > 0);
+        
         double ave = curvature_sum_for_all_boid_updates_ / boid_update_counter_;
+        
+//        if (std::isnan(ave))
+//        {
+//            debugPrint(curvature_sum_for_all_boid_updates_)
+//            debugPrint(boid_update_counter_)
+//        }
+        assert(!std::isnan(ave));
+        
         double ad_hoc_max_curvature = 0.17;
         double ad_hoc_high_curvature = ad_hoc_max_curvature / 2;
         return util::clip01(ave / ad_hoc_high_curvature);
     }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 //    static inline double temp_max_curvature_ = 0;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

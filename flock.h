@@ -148,13 +148,29 @@ public:
     // Each boid has a uniformly distributed random orientation.
     void make_boids(int count, double radius, Vec3 center)
     {
-        RandomSequence& rs = LP::LPRS();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240516 experiment with parallel simulations
+        
+        // is this thread unsafe?!
+        // YES!! fixes NaN from having TWO boids in flock at same initial position!!
+        
+//        RandomSequence& rs = LP::LPRS();
+//        RandomSequence rs = LP::LPRS();
+        RandomSequence rs(LP::LPRS().nextInt());
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Allocate default Boid instances.
         boid_instance_list().resize(boid_count());
         // Construct BoidPtrList.
         for (Boid& boid : boid_instance_list()) { boids().push_back(&boid); }
         // Set up each new Boid.
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240516 experiment with parallel simulations
+//        std::cout << "    ----> " << boids().at(0)->position() << std::endl;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         // Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
         for (Boid* boid : boids())
         {
@@ -423,7 +439,11 @@ public:
     // Apply the given function to all Boids using parallel threads.
     void for_all_boids(std::function<void(Boid* b)> boid_func)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240516 experiment with parallel simulations
         int thread_count = 3; // TODO 20240515 min time on cwr's laptop.
+//        int thread_count = 2; // TODO 20240515 min time on cwr's laptop.
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         int boids_per_thread = 1 + (int(boids().size()) / thread_count);
         std::vector<std::thread> all_threads;
         // Apply "boid_func" to boids between indices "first" and "last"
@@ -436,9 +456,18 @@ public:
         int last = boids_per_thread;
         for (int t = 0; t < thread_count; t++)
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240516 experiment with parallel simulations
+            
+#if 1
+            chunk_func(first, last);
+#else
             all_threads.push_back(std::thread(chunk_func, first, last));
+#endif
             first = last;
             last += boids_per_thread;
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         // Wait for helper threads to finish, join them with this thread.
         for (auto& t : all_threads) { t.join(); }

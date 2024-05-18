@@ -48,6 +48,17 @@ public:
     // way to accomplish that, like say velocity dependent wind resistance?)
     void steer(Vec3 steering_force, double time_step)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240516 experiment with parallel simulations
+        
+        if (std::isnan(steering_force.x()))
+        {
+            debugPrint(steering_force)
+            debugPrint(time_step)
+        }
+        
+        assert(!std::isnan(steering_force.x()));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Limit steering force by max force (simulates power or thrust limit).
         Vec3 limit_steering_force = steering_force.truncate(max_force());
         // Adjust force by mass to get acceleration.
@@ -59,8 +70,29 @@ public:
     // Applies given acceleration to Agent's dynamic and geometric state.
     void update_speed_and_local_space(Vec3 acceleration, double time_step)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240516 experiment with parallel simulations
+        Vec3 old_velocity = velocity();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         Vec3 new_velocity = velocity() + (acceleration * time_step);
         double new_speed = new_velocity.length();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240516 experiment with parallel simulations
+        
+        if (std::isnan(new_speed))
+        {
+            debugPrint(acceleration)
+            debugPrint(time_step)
+            debugPrint(old_velocity)
+            debugPrint(new_velocity)
+            debugPrint(new_speed)
+        }
+        
+        assert(!std::isnan(new_speed));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         setSpeed(util::clip(new_speed, 0, max_speed()));
         setPathCurvature(new_velocity);
         // Update geometric state when moving.

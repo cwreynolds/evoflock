@@ -190,6 +190,16 @@ public:
     void plan_next_steer(double time_step)
     {
         next_steer_ = steer_to_flock(time_step);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240516 experiment with parallel simulations
+        
+        if (std::isnan(next_steer_.x()))
+        {
+            debugPrint(next_steer_)
+        }
+        
+        assert(!std::isnan(next_steer_.x()));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Apply desired steering for this simulation step
@@ -211,6 +221,24 @@ public:
         Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
         combined_steering = anti_stall_adjustment(combined_steering);
         annotation(s, a, c, o, combined_steering);
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240516 experiment with parallel simulations
+        
+        if (std::isnan(combined_steering.x()))
+        {
+            debugPrint(f)
+            debugPrint(s)
+            debugPrint(a)
+            debugPrint(c)
+            debugPrint(o)
+            debugPrint(util::vec_to_string(neighbors))
+            debugPrint(neighbors[0]->position())
+        }
+        
+        assert(!std::isnan(combined_steering.x()));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         return combined_steering;
     }
     
@@ -228,6 +256,20 @@ public:
             weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_separate);
             weight *= angle_weight(neighbor, fp().angle_separate);
             direction += offset * weight;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240516 experiment with parallel simulations
+            
+            if (std::isnan(direction.x()))
+            {
+//                debugPrint(int(this - neighbor))
+                debugPrint(this)
+                debugPrint(neighbor)
+                debugPrint(offset)
+                debugPrint(direction)
+            }
+            
+            assert(!std::isnan(direction.x()));
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         return direction.normalize_or_0();
     }
@@ -426,6 +468,51 @@ public:
         auto abb = all_boids.begin() + 1; // + 1 meaning to skip THIS boid.
         std::copy(abb, abb + n, cached_nearest_neighbors_.begin());
         time_since_last_neighbor_refresh_ = 0;
+
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240516 experiment with parallel simulations
+//        bool oops = false;
+//        for (int i = 0; i < cached_nearest_neighbors_.size(); i++)
+//        {
+//            if (cached_nearest_neighbors_.at(i) == this) { oops = true; }
+//        }
+//        if (oops)
+//        {
+//            for (int i = 0; i < cached_nearest_neighbors_.size(); i++)
+//            {
+//                std::cout << i << " " << this << " " <<
+//                cached_nearest_neighbors_.at(i) << std::endl;
+//            }
+//        }
+//        assert(not oops);
+        
+        if (cached_nearest_neighbors_.at(0) == this)
+        {
+            debugPrint(flock_boids().size())
+            debugPrint(all_boids.size())
+            debugPrint(cached_nearest_neighbors_.size())
+            debugPrint(this)
+            debugPrint(util::vec_to_string(cached_nearest_neighbors_))
+                        
+//            BoidPtrList temp(all_boids.begin(), all_boids.begin() + n + 1);
+//            debugPrint(util::vec_to_string(temp))
+            
+            BoidPtrList         first_eight_of_all_birds_;
+            std::vector<double> distance_squared_to_me;
+            for (int i = 0; i < 8; i++)
+            {
+                first_eight_of_all_birds_.push_back(all_boids.at(i));
+                distance_squared_to_me.push_back(distance_squared_from_me(all_boids.at(i)));
+            }
+            debugPrint(util::vec_to_string(first_eight_of_all_birds_))
+            debugPrint(util::vec_to_string(distance_squared_to_me))
+
+
+
+        }
+        assert(cached_nearest_neighbors_.at(0) != this);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // Ad hoc low-pass filtering of steering force. Blends this step's newly

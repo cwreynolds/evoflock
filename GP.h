@@ -449,7 +449,7 @@ inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = fal
     // Start thread for each simulation run.
     std::vector<std::thread> threads;
     
-#if 1
+#if 0
     for (int r = 0; r < runs; r++) { do_1_run(); }
 #else
     for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }

@@ -20,7 +20,6 @@
 #include "Agent.h"
 #include "obstacle.h"
 #include <algorithm>  // For sorting cached_nearest_neighbors_.
-#include <map>        // For last_sdf_per_obstacle_
 
 class Boid;
 typedef std::vector<Boid*> BoidPtrList;
@@ -110,9 +109,6 @@ private:  // move to bottom of class later
     Vec3 annote_avoid_poi_ = Vec3();  // This might be too elaborate: two vals
     double annote_avoid_weight_ = 0;  // per boid just for avoid annotation.
     
-    // Per boid map from Obstacle to previous signed_distance_function value.
-    // TODO 20240219 needs to be reset when obstacles change.
-    std::map<Obstacle*, double> last_sdf_per_obstacle_;
     // Cumulative count: how many avoidance failures (collisions) has it had?
     int avoidance_failure_counter_ = 0;
 
@@ -503,7 +499,6 @@ public:
     }
 
     // Returns a list of future collisions sorted by time, with soonest first.
-    // (Maintains avoidance_failure_counter_ and last_sdf_per_obstacle_ map.)
     CollisionList predict_future_collisions()
     {
         CollisionList collisions;

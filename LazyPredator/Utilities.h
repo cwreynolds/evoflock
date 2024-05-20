@@ -10,18 +10,19 @@
 //
 
 #pragma once
+#include <any>
 #include <cassert>
+#include <chrono>
 #include <cmath>
 #include <complex>
+#include <filesystem>
 #include <iostream>
 #include <iomanip>
 #include <limits>
-#include <vector>
-#include <chrono>
-#include <any>
+#include <map>
 #include <set>
 #include <thread>
-#include <filesystem>
+#include <vector>
 
 namespace LazyPredator
 {

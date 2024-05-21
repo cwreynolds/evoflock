@@ -436,43 +436,113 @@ public:
         collect_flock_metrics();
     }
 
-    // Apply the given function to all Boids using parallel threads.
+//        // Apply the given function to all Boids using parallel threads.
+//        void for_all_boids(std::function<void(Boid* b)> boid_func)
+//        {
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20240516 experiment with parallel simulations
+//            int thread_count = 3; // TODO 20240515 min time on cwr's laptop.
+//    //        int thread_count = 2; // TODO 20240515 min time on cwr's laptop.
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            int boids_per_thread = 1 + (int(boids().size()) / thread_count);
+//            std::vector<std::thread> all_threads;
+//            // Apply "boid_func" to boids between indices "first" and "last"
+//            auto chunk_func = [&](int first, int last)
+//            {
+//                int end = std::min(last, int(boids().size()));
+//                for (int i = first; i < end; i++) { boid_func(boids().at(i)); }
+//            };
+//            int first = 0;
+//            int last = boids_per_thread;
+//            for (int t = 0; t < thread_count; t++)
+//            {
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20240516 experiment with parallel simulations
+//
+//    #if 1
+//                chunk_func(first, last);
+//    #else
+//                all_threads.push_back(std::thread(chunk_func, first, last));
+//    #endif
+//                first = last;
+//                last += boids_per_thread;
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            }
+//            // Wait for helper threads to finish, join them with this thread.
+//            for (auto& t : all_threads) { t.join(); }
+//        };
+
+//        // TODO 20240520 temp experiment: this barely helped, whereas runing the
+//        //      4 sim runs per fitness test worked really well, linear speed up.
+//        //
+//        // Just one more experiment:
+//        //     make one new thread, split load between it and this main thread.
+//        //
+//        // Apply the given function to all Boids using parallel threads.
+//        void for_all_boids(std::function<void(Boid* b)> boid_func)
+//        {
+//    //        int thread_count = 3; // TODO 20240515 min time on cwr's laptop.
+//    //        int thread_count = 2; // TODO 20240515 min time on cwr's laptop.
+//    //        int boids_per_thread = 1 + (int(boids().size()) / thread_count);
+//            int boids_per_thread = 1 + (int(boids().size()) / 2);
+//    //        std::vector<std::thread> all_threads;
+//            // Apply "boid_func" to boids between indices "first" and "last"
+//            auto chunk_func = [&](int first, int last)
+//            {
+//                int end = std::min(last, int(boids().size()));
+//                for (int i = first; i < end; i++) { boid_func(boids().at(i)); }
+//            };
+//            int first = 0;
+//            int last = boids_per_thread;
+//    //        for (int t = 0; t < thread_count; t++)
+//    //        {
+//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //            // TODO 20240516 experiment with parallel simulations
+//    //
+//    //#if 1
+//    //            chunk_func(first, last);
+//    //#else
+//    //            all_threads.push_back(std::thread(chunk_func, first, last));
+//    //#endif
+//    //            first = last;
+//    //            last += boids_per_thread;
+//    //
+//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //        }
+//
+//            std::thread helper(chunk_func, first, last);
+//            first = last;
+//            last += boids_per_thread;
+//            chunk_func(first, last);
+//            helper.join();
+//
+//    //        // Wait for helper threads to finish, join them with this thread.
+//    //        for (auto& t : all_threads) { t.join(); }
+//        };
+
+    // Apply the given function to all Boids using two parallel threads.
+    //
+    // (At first this spun up N(=3) new threads to run in parallel. But that
+    //  provided almost no benefit. Probably the savings being canceled out by
+    //  thread launching overhead. Now creates ONE thread and splits the load
+    //  between it and this main thread.)
+    //
     void for_all_boids(std::function<void(Boid* b)> boid_func)
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240516 experiment with parallel simulations
-        int thread_count = 3; // TODO 20240515 min time on cwr's laptop.
-//        int thread_count = 2; // TODO 20240515 min time on cwr's laptop.
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        int boids_per_thread = 1 + (int(boids().size()) / thread_count);
-        std::vector<std::thread> all_threads;
         // Apply "boid_func" to boids between indices "first" and "last"
         auto chunk_func = [&](int first, int last)
         {
             int end = std::min(last, int(boids().size()));
             for (int i = first; i < end; i++) { boid_func(boids().at(i)); }
         };
-        int first = 0;
-        int last = boids_per_thread;
-        for (int t = 0; t < thread_count; t++)
-        {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240516 experiment with parallel simulations
-            
-#if 1
-            chunk_func(first, last);
-#else
-            all_threads.push_back(std::thread(chunk_func, first, last));
-#endif
-            first = last;
-            last += boids_per_thread;
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        }
-        // Wait for helper threads to finish, join them with this thread.
-        for (auto& t : all_threads) { t.join(); }
+        int boids_per_thread = 1 + (int(boids().size()) / 2);
+        std::thread helper(chunk_func, 0, boids_per_thread);
+        chunk_func(boids_per_thread, boids_per_thread * 2);
+        helper.join();
     };
 
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void collect_flock_metrics()

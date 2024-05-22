@@ -292,125 +292,6 @@ public:
     //                    self.tracking_camera and
     //                    self.selected_boid().is_neighbor(boid))
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240514 parallel execution for boid update?
-
-//    // Fly each boid in flock for one simulation step. Consists of two sequential
-//    // steps to avoid artifacts from order of boids. First a "sense/plan" phase
-//    // which computes the desired steering based on current state. Then an "act"
-//    // phase which actually moves the boids. Finally statistics are collected.
-//    // (TODO 20240514 why is "flock" in name? Maybe Flock::fly() or fly_boids()?)
-//    void fly_flock(double time_step)
-//    {
-//        for (Boid* boid : boids()) { boid->plan_next_steer(time_step); }
-//        for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
-//        collect_flock_metrics();
-//    }
-
-//        // Fly each boid in flock for one simulation step. Consists of two sequential
-//        // steps to avoid artifacts from order of boids. First a "sense/plan" phase
-//        // which computes the desired steering based on current state. Then an "act"
-//        // phase which actually moves the boids. Finally statistics are collected.
-//        // (TODO 20240514 why is "flock" in name? Maybe Flock::fly() or fly_boids()?)
-//        void fly_flock(double time_step)
-//        {
-//    //        for (Boid* boid : boids()) { boid->plan_next_steer(time_step); }
-//    //        for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
-//
-//            // TODO 20240514 I tried this but did not seem to be supported yet.
-//    //        std::for_each(std::execution::par,
-//    //                      boids().begin(), boids().end(),
-//    //                      [&](Boid* b) { b->plan_next_steer(time_step); } );
-//    //        std::for_each(std::execution::par,
-//    //                      boids().begin(), boids().end(),
-//    //                      [&](Boid* b) { b->apply_next_steer(time_step); } );
-//
-//            auto for_all_boids = [&](std::function<void(Boid* b)> boid_func)
-//            {
-//    //            int thread_count = std::thread::hardware_concurrency() * 0.75;
-//    //            int thread_count = std::thread::hardware_concurrency();
-//                int thread_count = std::thread::hardware_concurrency() * 0.5;
-//    //            int boids_per_thread = int(boids().size()) / thread_count;
-//                int boids_per_thread = 1 + (int(boids().size()) / thread_count);
-//                std::vector<std::thread> all_threads;
-//                auto chunk_func = [&](int first, int last)
-//                {
-//                    int end = std::min(last, int(boids().size()));
-//                    for (int i = first; i < end; i++)
-//                    {
-//                        boid_func(boids().at(i));
-//                    }
-//                };
-//                int first = 0;
-//                int last = boids_per_thread;
-//                for (int t = 0; t < thread_count; t++)
-//                {
-//    //                std::cout << "for_all_boids: " << first << ", " << last << std::endl;
-//
-//                    all_threads.push_back(std::thread(chunk_func, first, last));
-//                    first = last;
-//                    last += boids_per_thread;
-//                }
-//                // Wait for helper threads to finish, join them with this thread.
-//                for (auto& t : all_threads) { t.join(); }
-//            };
-//            for_all_boids([&](Boid* b){ b->plan_next_steer(time_step);});
-//            for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
-//            collect_flock_metrics();
-//        }
-    
-//        // Fly each boid in flock for one simulation step. Consists of two sequential
-//        // steps to avoid artifacts from order of boids. First a "sense/plan" phase
-//        // which computes the desired steering based on current state. Then an "act"
-//        // phase which actually moves the boids. Finally statistics are collected.
-//        // (TODO 20240514 why is "flock" in name? Maybe Flock::fly() or fly_boids()?)
-//        void fly_flock(double time_step)
-//        {
-//    //        for (Boid* boid : boids()) { boid->plan_next_steer(time_step); }
-//    //        for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
-//
-//            // TODO 20240514 I tried this but did not seem to be supported yet.
-//    //        std::for_each(std::execution::par,
-//    //                      boids().begin(), boids().end(),
-//    //                      [&](Boid* b) { b->plan_next_steer(time_step); } );
-//    //        std::for_each(std::execution::par,
-//    //                      boids().begin(), boids().end(),
-//    //                      [&](Boid* b) { b->apply_next_steer(time_step); } );
-//
-//    //            auto for_all_boids = [&](std::function<void(Boid* b)> boid_func)
-//    //            {
-//    //    //            int thread_count = std::thread::hardware_concurrency() * 0.75;
-//    //    //            int thread_count = std::thread::hardware_concurrency();
-//    //                int thread_count = std::thread::hardware_concurrency() * 0.5;
-//    //    //            int boids_per_thread = int(boids().size()) / thread_count;
-//    //                int boids_per_thread = 1 + (int(boids().size()) / thread_count);
-//    //                std::vector<std::thread> all_threads;
-//    //                auto chunk_func = [&](int first, int last)
-//    //                {
-//    //                    int end = std::min(last, int(boids().size()));
-//    //                    for (int i = first; i < end; i++)
-//    //                    {
-//    //                        boid_func(boids().at(i));
-//    //                    }
-//    //                };
-//    //                int first = 0;
-//    //                int last = boids_per_thread;
-//    //                for (int t = 0; t < thread_count; t++)
-//    //                {
-//    //    //                std::cout << "for_all_boids: " << first << ", " << last << std::endl;
-//    //
-//    //                    all_threads.push_back(std::thread(chunk_func, first, last));
-//    //                    first = last;
-//    //                    last += boids_per_thread;
-//    //                }
-//    //                // Wait for helper threads to finish, join them with this thread.
-//    //                for (auto& t : all_threads) { t.join(); }
-//    //            };
-//            for_all_boids([&](Boid* b){ b->plan_next_steer(time_step);});
-//            for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
-//            collect_flock_metrics();
-//        }
-
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
     // which computes the desired steering based on current state. Then an "act"
@@ -418,108 +299,10 @@ public:
     // (TODO 20240514 why is "flock" in name? Maybe Flock::fly() or fly_boids()?)
     void fly_flock(double time_step)
     {
-        // Original non-parallel version.
-        //for (Boid* boid : boids()) { boid->plan_next_steer(time_step); }
-        //for (Boid* boid : boids()) { boid->apply_next_steer(time_step); }
-        
-        // TODO 20240514 I tried this but did not seem to be supported yet.
-        //std::for_each(std::execution::par,
-        //              boids().begin(), boids().end(),
-        //              [&](Boid* b) { b->plan_next_steer(time_step); } );
-        //std::for_each(std::execution::par,
-        //              boids().begin(), boids().end(),
-        //              [&](Boid* b) { b->apply_next_steer(time_step); } );
-                
         for_all_boids([&](Boid* b){ b->plan_next_steer(time_step);});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
-        
         collect_flock_metrics();
     }
-
-//        // Apply the given function to all Boids using parallel threads.
-//        void for_all_boids(std::function<void(Boid* b)> boid_func)
-//        {
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20240516 experiment with parallel simulations
-//            int thread_count = 3; // TODO 20240515 min time on cwr's laptop.
-//    //        int thread_count = 2; // TODO 20240515 min time on cwr's laptop.
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            int boids_per_thread = 1 + (int(boids().size()) / thread_count);
-//            std::vector<std::thread> all_threads;
-//            // Apply "boid_func" to boids between indices "first" and "last"
-//            auto chunk_func = [&](int first, int last)
-//            {
-//                int end = std::min(last, int(boids().size()));
-//                for (int i = first; i < end; i++) { boid_func(boids().at(i)); }
-//            };
-//            int first = 0;
-//            int last = boids_per_thread;
-//            for (int t = 0; t < thread_count; t++)
-//            {
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20240516 experiment with parallel simulations
-//
-//    #if 1
-//                chunk_func(first, last);
-//    #else
-//                all_threads.push_back(std::thread(chunk_func, first, last));
-//    #endif
-//                first = last;
-//                last += boids_per_thread;
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            }
-//            // Wait for helper threads to finish, join them with this thread.
-//            for (auto& t : all_threads) { t.join(); }
-//        };
-
-//        // TODO 20240520 temp experiment: this barely helped, whereas runing the
-//        //      4 sim runs per fitness test worked really well, linear speed up.
-//        //
-//        // Just one more experiment:
-//        //     make one new thread, split load between it and this main thread.
-//        //
-//        // Apply the given function to all Boids using parallel threads.
-//        void for_all_boids(std::function<void(Boid* b)> boid_func)
-//        {
-//    //        int thread_count = 3; // TODO 20240515 min time on cwr's laptop.
-//    //        int thread_count = 2; // TODO 20240515 min time on cwr's laptop.
-//    //        int boids_per_thread = 1 + (int(boids().size()) / thread_count);
-//            int boids_per_thread = 1 + (int(boids().size()) / 2);
-//    //        std::vector<std::thread> all_threads;
-//            // Apply "boid_func" to boids between indices "first" and "last"
-//            auto chunk_func = [&](int first, int last)
-//            {
-//                int end = std::min(last, int(boids().size()));
-//                for (int i = first; i < end; i++) { boid_func(boids().at(i)); }
-//            };
-//            int first = 0;
-//            int last = boids_per_thread;
-//    //        for (int t = 0; t < thread_count; t++)
-//    //        {
-//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //            // TODO 20240516 experiment with parallel simulations
-//    //
-//    //#if 1
-//    //            chunk_func(first, last);
-//    //#else
-//    //            all_threads.push_back(std::thread(chunk_func, first, last));
-//    //#endif
-//    //            first = last;
-//    //            last += boids_per_thread;
-//    //
-//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //        }
-//
-//            std::thread helper(chunk_func, first, last);
-//            first = last;
-//            last += boids_per_thread;
-//            chunk_func(first, last);
-//            helper.join();
-//
-//    //        // Wait for helper threads to finish, join them with this thread.
-//    //        for (auto& t : all_threads) { t.join(); }
-//        };
 
     // Apply the given function to all Boids using two parallel threads.
     //
@@ -541,9 +324,6 @@ public:
         chunk_func(boids_per_thread, boids_per_thread * 2);
         helper.join();
     };
-
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void collect_flock_metrics()
     {

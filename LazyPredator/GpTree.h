@@ -329,9 +329,8 @@ public:
             {
                 // To bias for size, sort filtered subtree collection by size,
                 // select from upper or lower 1/3 of the sorted list.
-                std::sort(filtered_subtrees.begin(),
-                          filtered_subtrees.end(),
-                          [](GpTree* a,GpTree* b){return a->size()<b->size();});
+                auto s = [](GpTree* a,GpTree* b){return a->size() < b->size();};
+                std::ranges::sort(filtered_subtrees, s);
                 int end = int(filtered_subtrees.size()) - 1;
                 int from = (size_bias < 0) ? 0 : ((2 * end) / 3);  // 0 or 2/3
                 int to   = (size_bias < 0) ? (end / 3) : end;      // 1/3 or 1

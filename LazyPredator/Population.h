@@ -324,10 +324,9 @@ public:
                                   (Individual* i)
                                   { sorted_collection_.push_back(i); });
             // Sort with largest fitness Individuals at the front.
-            std::sort(sorted_collection_.begin(),
-                      sorted_collection_.end(),
-                      [](Individual* a, Individual* b)
-                      { return a->getFitness() > b->getFitness(); });
+            std::ranges::sort(sorted_collection_, 
+                              [](Individual* a, Individual* b)
+                              { return a->getFitness() > b->getFitness(); });
         }
         sort_cache_invalid_ = false;
     }

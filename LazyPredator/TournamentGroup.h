@@ -186,10 +186,9 @@ public:
     // Sort the members of this group by their "metric" value, least first.
     void sort()
     {
-        std::sort(members_.begin(),
-                  members_.end(),
-                  [](TournamentGroupMember& a, TournamentGroupMember& b)
-                  { return a.metric < b.metric; });
+        std::ranges::sort(members_,
+                          [](TournamentGroupMember& a, TournamentGroupMember& b)
+                          { return a.metric < b.metric; });
     }
 private:
     std::vector<TournamentGroupMember> members_;

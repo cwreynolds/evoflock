@@ -404,19 +404,18 @@ public:
     }
 
     // Recomputes a cached list of the N Boids nearest this one.
+    // TODO 20240129 look also at std::partial_sort() and std::stable_sort()
     void recompute_nearest_neighbors(int n=7)
     {
         auto distance_squared_from_me = [&](const Boid* boid){
             return (boid->position() - position()).length_squared(); };
         auto sorted = [&](const Boid* a, const Boid* b){
             return distance_squared_from_me(a) < distance_squared_from_me(b); };
-        // TODO 20240129 look also at std::partial_sort() and std::stable_sort()
         BoidPtrList all_boids = flock_boids();
-        
-        // TODO 20240215 experimental
+        // Maybe neighbor list size should be min(n,flock.size())? But for now:
         assert((all_boids.size() > n) && "neighborhood > flock size");
-
-        std::sort(all_boids.begin(), all_boids.end(), sorted);
+        // Sort all boids by nearest distance (squared) from me.
+        std::ranges::sort(all_boids, sorted);
         // Set "cached_nearest_neighbors_" to nearest "n" in "all_boids".
         cached_nearest_neighbors_.resize(n);
         auto abb = all_boids.begin() + 1; // + 1 meaning to skip THIS boid.
@@ -522,7 +521,7 @@ public:
         }
         auto sorted = [&](const Collision& a, const Collision& b)
             { return a.time_to_collision < b.time_to_collision; };
-        std::sort(collisions.begin(), collisions.end(), sorted);
+        std::ranges::sort(collisions, sorted);
         return collisions;
     }
 

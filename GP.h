@@ -14,7 +14,6 @@
 
 #include "flock.h"
 #include "shape.h"
-#include <algorithm>  // For std::sort.
 // TODO 20240226 For now, a modified copy of LazyPredator is in a subdirectory.
 #include "LazyPredator/LazyPredator.h"
 namespace LP = LazyPredator;

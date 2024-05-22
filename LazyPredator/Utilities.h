@@ -422,7 +422,7 @@ inline std::vector<std::string> directory_filenames(std::string directory_path)
             directory_contents.push_back(entry.path().filename().string());
         }
     }
-    std::sort(directory_contents.begin(), directory_contents.end());
+    std::ranges::sort(directory_contents);
     return directory_contents;
 }
 

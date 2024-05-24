@@ -399,14 +399,6 @@ int main(int argc, const char * argv[])
     int subpops = 25;
     int max_evolution_steps = 30000;
     
-//    int individuals = 1000;
-//    int subpops = 50;
-//    int max_evolution_steps = 60000;
-
-//    int individuals = 1000;
-//    int subpops = 50;
-//    int max_evolution_steps = 30000;
-    
 //    lp::LPRS().setSeed(20240408);
 //    lp::LPRS().setSeed(20240409);
 //    lp::LPRS().setSeed(202404091);

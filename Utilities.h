@@ -356,15 +356,9 @@ public:
     // int/double overloads of random2(), returns value between INCLUSIVE bounds.
     int random2(int i, int j) { assert(i<=j); return i + randomN(j - i + 1); }
     double random2(double i, double j) { return frandom2(i, j); }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Returns true or false with equal likelihood.
-//    bool randomBool() { return random2(0, 1); }
-    
     bool randomBool() { return randomBool(0.5); }
     bool randomBool(double likelihood)
     { assert(util::between(likelihood,0,1)); return frandom01() <= likelihood; }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Return random element of given std::vector.
     template<typename T> T randomSelectElement(const std::vector<T>& collection)
     { return collection.at(randomN(collection.size())); }

@@ -111,7 +111,11 @@ public:
     // directly comparable.
     size_t pickMultiObjectiveFitnessIndex()
     {
-        size_t mof_size = checkValidForMultiObjectiveFitness();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240523 WIP MOF priority ordering.
+//         size_t mof_size = checkValidForMultiObjectiveFitness();
+        size_t mof_size = adjustMofSizeForPriority();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         double infinity = std::numeric_limits<double>::infinity();
         // Loop over the mof index range. For each one find the range between
         // max and min fitness. Return the index corresponding to largest range
@@ -146,6 +150,19 @@ public:
                 best_index_big_range :
                 best_index_lowest_bottom);
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240523 WIP MOF priority ordering.
+    // TODO needs switch to disable
+    
+    size_t adjustMofSizeForPriority() const
+    {
+        size_t mof_size = checkValidForMultiObjectiveFitness();
+        // Half of the time leave unchanged, otherwise randomly use 1 to all.
+        if (LPRS().randomBool()) { mof_size = LPRS().randomN(mof_size - 1) + 1; }
+        return mof_size;
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // First make sure TournamentGroup is set up for MultiObjectiveFitness.
     // (Also returns the size of MultiObjectiveFitness vectors being used.)
     size_t checkValidForMultiObjectiveFitness() const

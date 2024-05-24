@@ -39,10 +39,18 @@ inline double scalarize_fitness_prod(MOF mof)
     return std::reduce(mof.begin(), mof.end(), 1.0, std::multiplies());
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240524 try run with scalarize_fitness_prod()
+
+//    // Map a MultiObjectiveFitness to a scalar, here the minimum value.
+//    // Used as the FitnessScalarizeFunction for Population::evolutionStep().
+//    inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 
 // Map a MultiObjectiveFitness to a scalar, here the minimum value.
 // Used as the FitnessScalarizeFunction for Population::evolutionStep().
-inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
+inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_prod;
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 inline const std::vector<std::string> mof_names =

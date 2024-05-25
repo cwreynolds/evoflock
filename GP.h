@@ -46,9 +46,87 @@ inline double scalarize_fitness_prod(MOF mof)
 //    // Used as the FitnessScalarizeFunction for Population::evolutionStep().
 //    inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 
+//    // Map a MultiObjectiveFitness to a scalar, here the minimum value.
+//    // Used as the FitnessScalarizeFunction for Population::evolutionStep().
+//    inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_prod;
+
+//    // Take the product of MultiObjectiveFitness elements.
+//    inline double scalarize_fitness_length(MOF mof)
+//    {
+//        // TODO 20240525 probably a way to "golf" this down to be more compact:
+//        double length_squared = 0;
+//        for (double component : mof) { length_squared += pow(component, 2); }
+//    //    return std::sqrt(length_squared);
+//
+//    //    double length1 = std::sqrt(length_squared);
+//
+//
+//        auto squared_sum = [](auto sum, auto val) { return sum + val * val; };
+//
+//    //    auto sum1 = std::accumulate(v.cbegin(), v.cend(), 0L, squared_sum);
+//    //    double length_squared_2 = std::accumulate(mof.begin(), mof.end(),
+//    //                                              0, squared_sum);
+//    //    double length_squared_2 = std::transform_reduce(mof.begin(), mof.end(), 0.0,
+//    //                                                    std::plus{},
+//    //                                                    [](auto val) { return val * val; });
+//
+//        double length_squared_2 = std::accumulate(mof.begin(), mof.end(),
+//                                                  0.0, squared_sum);
+//
+//
+//        debugPrint(length_squared)
+//        debugPrint(length_squared_2)
+//    //    assert(length_squared == length_squared_2);
+//        assert(util::within_epsilon(length_squared, length_squared_2));
+//
+//        return std::sqrt(length_squared);
+//    }
+
+
+//    // Take the product of MultiObjectiveFitness elements.
+//    inline double scalarize_fitness_length(MOF mof)
+//    {
+//    //    double length_squared = 0;
+//    //    for (double component : mof) { length_squared += pow(component, 2); }
+//    //    auto squared_sum = [](auto sum, auto val) { return sum + val * val; };
+//
+//    //    double length_squared_2 = std::accumulate(mof.begin(), mof.end(),
+//    //                                              0.0, squared_sum);
+//
+//
+//    //    debugPrint(length_squared)
+//    //    debugPrint(length_squared_2)
+//    //    //    assert(length_squared == length_squared_2);
+//    //    assert(util::within_epsilon(length_squared, length_squared_2));
+//
+//        return std::sqrt(std::accumulate(mof.begin(), mof.end(), 0.0,
+//                                         [](auto s, auto v) { return s + v * v; }));
+//    }
+
+//    // Take the product of MultiObjectiveFitness elements.
+//    inline double scalarize_fitness_length(MOF mof)
+//    {
+//        auto squared_sum = [](double sum, double val) { return sum + val * val; };
+//    //    double max_length_sq = std::sqrt(mof.size());
+//        double length_sq = std::accumulate(mof.begin(), mof.end(), 0.0, squared_sum);
+//    //    return std::sqrt(std::accumulate(mof.begin(), mof.end(), 0.0, squared_sum));
+//        return (std::sqrt(length_sq) / std::sqrt(mof.size()));
+//    }
+
+// Take the product of MultiObjectiveFitness elements.
+inline double scalarize_fitness_length(MOF mof)
+{
+    auto sum_of_sq = [](double sum, double val){ return sum + val * val; };
+    double length_sq = std::accumulate(mof.begin(), mof.end(), 0.0, sum_of_sq);
+    return (std::sqrt(length_sq) / std::sqrt(mof.size()));
+}
+
+
 // Map a MultiObjectiveFitness to a scalar, here the minimum value.
 // Used as the FitnessScalarizeFunction for Population::evolutionStep().
-inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_prod;
+inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_length;
+
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -548,17 +626,39 @@ inline void evoflock_ga_crossover(const LP::GpTree& parent0,
     //std::cout << "offspring: " << offspring.to_string() << std::endl;
 }
 
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//    // An experiment to compare min and prod for MOF components.
+//    void replace_scalar_fitness_with_product(LP::Population& population)
+//    {
+//        auto replace = [](LP::Individual* individual)
+//        {
+//            MOF mof = individual->getMultiObjectiveFitness();
+//            individual->setFitness(scalarize_fitness_prod(mof));
+//        };
+//        population.applyToAllIndividuals(replace);
+//        scalarize_fitness = scalarize_fitness_prod;
+//    }
+
+// inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_prod;
+
 // An experiment to compare min and prod for MOF components.
-void replace_scalar_fitness_with_product(LP::Population& population)
+void replace_scalar_fitness_metric(LP::Population& population,
+                                   std::function<double(MOF)> scalarizer_func)
 {
-    auto replace = [](LP::Individual* individual)
+    auto replace = [&](LP::Individual* individual)
     {
         MOF mof = individual->getMultiObjectiveFitness();
-        individual->setFitness(scalarize_fitness_prod(mof));
+//        individual->setFitness(scalarize_fitness_prod(mof));
+        individual->setFitness(scalarizer_func(mof));
     };
     population.applyToAllIndividuals(replace);
-    scalarize_fitness = scalarize_fitness_prod;
+//    scalarize_fitness = scalarize_fitness_prod;
+    scalarize_fitness = scalarizer_func;
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 // The default (in GpType::defaultJiggleScale()) is 0.05

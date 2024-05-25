@@ -457,8 +457,12 @@ int main(int argc, const char * argv[])
     // TODO 20240507 experiment
     std::cout << std::endl;
     std::cout << std::endl;
-    std::cout << "now with MOF scores multiplied together" << std::endl;
-    replace_scalar_fitness_with_product(*population);
+
+    //    std::cout << "now with MOF scores multiplied together" << std::endl;
+//    replace_scalar_fitness_with_product(*population);
+    std::cout << "now with MOF scalarized with scalarize_fitness_min()" << std::endl;
+    replace_scalar_fitness_metric(*population, scalarize_fitness_min);
+
     population->logger();
     std::cout << std::endl;
     std::cout << std::endl;

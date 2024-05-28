@@ -397,11 +397,7 @@ int main(int argc, const char * argv[])
 
     int individuals = 500;
     int subpops = 25;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240507 experiment
     int max_evolution_steps = 30000;
-//    int max_evolution_steps = 100;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //    lp::LPRS().setSeed(20240408);
 //    lp::LPRS().setSeed(20240409);
@@ -444,10 +440,6 @@ int main(int argc, const char * argv[])
         {
             population->evolutionStep(evoflock_fitness_function, scalarize_fitness);
             std::cout << std::endl;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240527 adjust split between main and helper thread
-            debugPrint(Flock::for_all_boids_total / Flock::for_all_boids_count)
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
     }
 

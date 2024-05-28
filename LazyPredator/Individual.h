@@ -39,6 +39,7 @@ public:
     auto end() const { return mof_.end(); }
     double min() const { return *std::min_element(begin(), end()); }
     double sum() const { return std::reduce(begin(), end(), 0.0, std::plus()); }
+    bool empty() const { return size() == 0; }
     double average() const { return sum() / size(); }
     double product() const { return std::reduce(begin(), end(), 1.0,
                                                 std::multiplies()); }

@@ -304,75 +304,34 @@ public:
         collect_flock_metrics();
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240527 adjust split between main and helper thread
-
-//    // Apply the given function to all Boids using two parallel threads.
-//    //
-//    // (At first this spun up N(=3) new threads to run in parallel. But that
-//    //  provided almost no benefit. Probably the savings being canceled out by
-//    //  thread launching overhead. Now creates ONE thread and splits the load
-//    //  between it and this main thread.)
-//    //
-//    void for_all_boids(std::function<void(Boid* b)> boid_func)
-//    {
-//        // Apply "boid_func" to boids between indices "first" and "last"
-//        auto chunk_func = [&](int first, int last)
-//        {
-//            int end = std::min(last, int(boids().size()));
-//            for (int i = first; i < end; i++) { boid_func(boids().at(i)); }
-//        };
-//        int boids_per_thread = 1 + (int(boids().size()) / 2);
-//        std::thread helper(chunk_func, 0, boids_per_thread);
-//        chunk_func(boids_per_thread, boids_per_thread * 2);
-//        helper.join();
-//    };
     
     // Apply the given function to all Boids using two parallel threads.
     //
     // (At first this spun up N(=3) new threads to run in parallel. But that
     //  provided almost no benefit. Probably the savings being canceled out by
     //  thread launching overhead. Now creates ONE thread and splits the load
-    //  between it and this main thread.)
+    //  between it and this main thread. On 20240527 I tried adjusting the load
+    //  ratio between the threads. (Used util::Timer and averaged over all calls
+    //  in an evelotion run.) I got maybe 1-2% improvement but didn't think it
+    //  was worth the extra code complexity. Verified that two threads are
+    //  better than one.)
     //
     void for_all_boids(std::function<void(Boid* b)> boid_func)
     {
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        util::Timer timer;
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
         // Apply "boid_func" to boids between indices "first" and "last"
         auto chunk_func = [&](int first, int last)
         {
             int end = std::min(last, int(boids().size()));
             for (int i = first; i < end; i++) { boid_func(boids().at(i)); }
         };
-        
         int boid_count = int(boids().size());
-//        int boids_per_thread = 1 + (int(boids().size()) / 2);
         int boids_per_thread = 1 + (boid_count * 0.5);
-//        int boids_per_thread = 1 + (boid_count * 0.6);
-//        int boids_per_thread = 1 + (boid_count * 0.4);
-
         std::thread helper(chunk_func, 0, boids_per_thread);
-
-//        chunk_func(boids_per_thread, boids_per_thread * 2);
         chunk_func(boids_per_thread, boid_count);
-
         helper.join();
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        for_all_boids_count += 1;
-        for_all_boids_total += timer.elapsedSeconds();
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     };
 
-    static inline double for_all_boids_count = 0;
-    static inline double for_all_boids_total = 0;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
     void collect_flock_metrics()
     {
         double ts = fp().min_speed - util::epsilon;

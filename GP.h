@@ -317,8 +317,11 @@ void replace_scalar_fitness_metric(LP::Population& population,
 {
     auto replace = [&](LP::Individual* individual)
     {
-        MOF mof = individual->getMultiObjectiveFitness();
-        if (not mof.empty()) { individual->setFitness(scalarizer_func(mof)); }
+        if (individual->hasMultiObjectiveFitness())
+        {
+            MOF mof = individual->getMultiObjectiveFitness();
+            individual->setFitness(scalarizer_func(mof));
+        }
     };
     population.applyToAllIndividuals(replace);
     scalarize_fitness = scalarizer_func;

@@ -512,11 +512,11 @@ public:
                 double time_to_collision = dist_to_collision / speed();
                 Vec3 normal_at_poi = obstacle->normal_at_poi(point_of_impact,
                                                              position());
-                collisions.push_back(Collision(*obstacle,
-                                               time_to_collision,
-                                               dist_to_collision,
-                                               point_of_impact,
-                                               normal_at_poi));
+                collisions.push_back({*obstacle,
+                                      time_to_collision,
+                                      dist_to_collision,
+                                      point_of_impact,
+                                      normal_at_poi});
             }
         }
         auto sorted = [&](const Collision& a, const Collision& b)

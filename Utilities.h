@@ -336,8 +336,20 @@ public:
     RandomSequence(uint64_t seed) : state_(uint32_t(seed)) {}
     // Next random number in sequence as a 31 bit positive int.
     uint32_t nextInt() { return bitMask() & nextUint32(); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240531 explicitly thread safe version of RandomSequence?
+    
+//    // Next random number in sequence as a 32 bit unsigned int.
+//    uint32_t nextUint32() { return state_ = util::rehash32bits(state_); }
+    
     // Next random number in sequence as a 32 bit unsigned int.
-    uint32_t nextUint32() { return state_ = util::rehash32bits(state_); }
+    uint32_t nextUint32()
+    {
+        std::lock_guard<std::mutex> grsm(global_rs_mutex_);
+        return state_ = util::rehash32bits(state_);
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // A 32 bit word with zero sign bit and all other 31 bits on, max pos int.
     uint32_t bitMask() { return 0x7fffffff; } // 31 bits
     // The largest (31 bit) positive integer that can be returned.
@@ -371,13 +383,30 @@ public:
     Vec3 random_point_in_unit_radius_sphere();
     Vec3 random_point_in_axis_aligned_box(Vec3 a, Vec3 b);
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240531 explicitly thread safe version of RandomSequence?
+    
+//    // Set seed (RS state) to given value, or defaultSeed() if none given.
+//    void setSeed() { state_ = defaultSeed(); }
+//    void setSeed(uint32_t seed) { state_ = seed; }
+
     // Set seed (RS state) to given value, or defaultSeed() if none given.
-    void setSeed() { state_ = defaultSeed(); }
-    void setSeed(uint32_t seed) { state_ = seed; }
+    void setSeed() { setSeed(defaultSeed()); }
+    void setSeed(uint32_t seed)
+    {
+        std::lock_guard<std::mutex> grsm(global_rs_mutex_);
+        state_ = seed;
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Get state.
     uint32_t getSeed() { return state_; }
 private:
     uint32_t state_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240531 explicitly thread safe version of RandomSequence?
+    static inline std::mutex global_rs_mutex_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 //------------------------------------------------------------------------------

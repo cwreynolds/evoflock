@@ -148,29 +148,13 @@ public:
     // Each boid has a uniformly distributed random orientation.
     void make_boids(int count, double radius, Vec3 center)
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240516 experiment with parallel simulations
-        
-        // is this thread unsafe?!
-        // YES!! fixes NaN from having TWO boids in flock at same initial position!!
-        
-//        RandomSequence& rs = LP::LPRS();
-//        RandomSequence rs = LP::LPRS();
-        RandomSequence rs(LP::LPRS().nextInt());
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Allocate default Boid instances.
         boid_instance_list().resize(boid_count());
         // Construct BoidPtrList.
         for (Boid& boid : boid_instance_list()) { boids().push_back(&boid); }
         // Set up each new Boid.
+        RandomSequence& rs = LP::LPRS();
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240516 experiment with parallel simulations
-//        std::cout << "    ----> " << boids().at(0)->position() << std::endl;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         // Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
         for (Boid* boid : boids())
         {
@@ -396,42 +380,17 @@ public:
         }
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240511 support path curvature metric.
+    // Score for average path curvature for all boids on all steps.
     double curvature_sum_for_all_boid_updates_ = 0;
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20240516 experiment with parallel simulations
-
-//    double get_curvature_score() const
-//    {
-//        double ave = curvature_sum_for_all_boid_updates_ / boid_update_counter_;
-//        double ad_hoc_max_curvature = 0.17;
-//        double ad_hoc_high_curvature = ad_hoc_max_curvature / 2;
-//        return util::clip01(ave / ad_hoc_high_curvature);
-//    }
-
     double get_curvature_score() const
     {
         assert(boid_update_counter_ > 0);
-        
         double ave = curvature_sum_for_all_boid_updates_ / boid_update_counter_;
-        
-//        if (std::isnan(ave))
-//        {
-//            debugPrint(curvature_sum_for_all_boid_updates_)
-//            debugPrint(boid_update_counter_)
-//        }
         assert(!std::isnan(ave));
-        
         double ad_hoc_max_curvature = 0.17;
         double ad_hoc_high_curvature = ad_hoc_max_curvature / 2;
         return util::clip01(ave / ad_hoc_high_curvature);
     }
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-//    static inline double temp_max_curvature_ = 0;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     int count_clusters() const
     {

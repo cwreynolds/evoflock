@@ -411,11 +411,16 @@ private:
 
 //------------------------------------------------------------------------------
 
+// Use global mutex to allow synchronizing console output from parallel threads.
+// (Written as a macro since the lock_guard is released at the end of a block.)
+// (..._evoflock suffix since collides with LP macro. Macro names are global.)
+#define grabPrintLock_evoflock() \
+std::lock_guard<std::recursive_mutex> pl_(util::DebugPrint::getPrintMutex());
+
 // For debugging: prints one line with a given C expression, an equals sign,
-// and the value of the expression.  For example "angle = 35.6"
-#define debugPrint(e)                                                          \
-{ std::lock_guard<std::recursive_mutex> pl_(util::DebugPrint::getPrintMutex());\
-  std::cout << #e" = " << (e) << std::endl << std::flush; }
+// and the value of the expression.  For example "std::sin(angle) = 35.6"
+#define debugPrint(e){ grabPrintLock_evoflock(); \
+                       std::cout << #e" = " << (e) << std::endl << std::flush; }
 
 // Square a double
 inline double sq(double f) { return f * f; }

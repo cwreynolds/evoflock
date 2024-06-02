@@ -422,5 +422,13 @@ std::lock_guard<std::recursive_mutex> pl_(util::DebugPrint::getPrintMutex());
 #define debugPrint(e){ grabPrintLock_evoflock(); \
                        std::cout << #e" = " << (e) << std::endl << std::flush; }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240601 fewer RandomSequence objects
+inline static RandomSequence efrs_default_;
+inline static RandomSequence* efrs_ = &efrs_default_;
+inline void setEFRS(RandomSequence& rs) { efrs_ = &rs; }
+inline RandomSequence& EFRS(){ return *efrs_; }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 // Square a double
 inline double sq(double f) { return f * f; }

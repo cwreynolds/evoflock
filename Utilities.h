@@ -424,10 +424,25 @@ std::lock_guard<std::recursive_mutex> pl_(util::DebugPrint::getPrintMutex());
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240601 fewer RandomSequence objects
-inline static RandomSequence efrs_default_;
-inline static RandomSequence* efrs_ = &efrs_default_;
-inline void setEFRS(RandomSequence& rs) { efrs_ = &rs; }
-inline RandomSequence& EFRS(){ return *efrs_; }
+
+//inline static RandomSequence efrs_default_;
+//inline static RandomSequence* efrs_ = &efrs_default_;
+//inline void setEFRS(RandomSequence& rs) { efrs_ = &rs; }
+//inline RandomSequence& EFRS(){ return *efrs_; }
+
+
+namespace EvoFlock
+{
+
+inline static RandomSequence rs_default_;
+inline static RandomSequence* rs_ = &rs_default_;
+inline void setRS(RandomSequence& rs) { rs_ = &rs; }
+inline RandomSequence& RS(){ return *rs_; }
+
+}  // end of namespace EvoFlock
+
+namespace EF = EvoFlock;
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Square a double

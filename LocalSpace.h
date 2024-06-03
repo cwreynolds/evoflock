@@ -72,8 +72,13 @@ public:
     // Return copy with random orientation, position is preserved.
     LocalSpace randomize_orientation() const
     {
-        Vec3 ii = rs_.random_unit_vector();
-        Vec3 jj = rs_.random_unit_vector();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240601 fewer RandomSequence objects
+//        Vec3 ii = rs_.random_unit_vector();
+//        Vec3 jj = rs_.random_unit_vector();
+        Vec3 ii = EF::RS().random_unit_vector();
+        Vec3 jj = EF::RS().random_unit_vector();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 kk = ii.cross(jj).normalize();
         jj = kk.cross(ii).normalize();
         return LocalSpace(ii, jj, kk, p());
@@ -103,8 +108,16 @@ public:
         Vec3 ls_p = Vec3(5, 6, 7);
         LocalSpace ls(ls_i, ls_j, ls_k, ls_p);
         LocalSpace r = LocalSpace(ls).randomize_orientation();
-        Vec3 a = rs_.random_point_in_unit_radius_sphere() * 10;
-        Vec3 b = rs_.random_point_in_unit_radius_sphere() * 100;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240601 fewer RandomSequence objects
+        //        Vec3 ii = rs_.random_unit_vector();
+        //        Vec3 jj = rs_.random_unit_vector();
+//        Vec3 ii = EF::RS().random_unit_vector();
+//        Vec3 jj = EF::RS().random_unit_vector();
+        
+        Vec3 a = EF::RS().random_point_in_unit_radius_sphere() * 10;
+        Vec3 b = EF::RS().random_point_in_unit_radius_sphere() * 100;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         assert (LocalSpace().is_orthonormal() && "initial value is orthonormal");
         assert (ls.is_orthonormal() && "handmade ls is orthonormal");
@@ -137,8 +150,11 @@ private:
     // Position of local center:
     Vec3 p_ = Vec3(0, 0, 0);
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240601 fewer RandomSequence objects
     // TODO 20230111 needs a better solution:
-    inline static RandomSequence rs_;
+//    inline static RandomSequence rs_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 // Serialize LocalSpace object to stream.

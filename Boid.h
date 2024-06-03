@@ -183,7 +183,8 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240601 fewer RandomSequence objects
 //        auto mrbc = [](){ return rs_.frandom2(0.5, 0.8); };
-        auto mrbc = [](){ return EFRS().frandom2(0.5, 0.8); };
+//        auto mrbc = [](){ return EFRS().frandom2(0.5, 0.8); };
+        auto mrbc = [](){ return EF::RS().frandom2(0.5, 0.8); };
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         color_ = Vec3(mrbc(), mrbc(), mrbc());
         name_ = "boid_" + std::to_string(name_counter_++);

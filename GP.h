@@ -300,7 +300,11 @@ inline void evoflock_ga_crossover(const LP::GpTree& parent0,
     offspring = parent0;
     for (int i = 0; i < parent0.subtrees().size(); i++)
     {
-        if (LP::LPRS().randomBool())
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240601 fewer RandomSequence objects
+//        if (LP::LPRS().randomBool())
+        if (EF::RS().randomBool())
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             offspring.getSubtree(i) = parent1.getSubtree(i);
         }

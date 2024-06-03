@@ -326,7 +326,8 @@ int main(int argc, const char * argv[])
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240601 fewer RandomSequence objects
-    setEFRS(LP::LPRS());
+//    setEFRS(LP::LPRS());
+    EF::setRS(LP::LPRS());
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     

@@ -336,20 +336,13 @@ public:
     RandomSequence(uint64_t seed) : state_(uint32_t(seed)) {}
     // Next random number in sequence as a 31 bit positive int.
     uint32_t nextInt() { return bitMask() & nextUint32(); }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240531 explicitly thread safe version of RandomSequence?
-    
-//    // Next random number in sequence as a 32 bit unsigned int.
-//    uint32_t nextUint32() { return state_ = util::rehash32bits(state_); }
-    
     // Next random number in sequence as a 32 bit unsigned int.
+    // explicitly thread safe version of RandomSequence
     uint32_t nextUint32()
     {
         std::lock_guard<std::mutex> grsm(global_rs_mutex_);
         return state_ = util::rehash32bits(state_);
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // A 32 bit word with zero sign bit and all other 31 bits on, max pos int.
     uint32_t bitMask() { return 0x7fffffff; } // 31 bits
     // The largest (31 bit) positive integer that can be returned.
@@ -383,13 +376,6 @@ public:
     Vec3 random_point_in_unit_radius_sphere();
     Vec3 random_point_in_axis_aligned_box(Vec3 a, Vec3 b);
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240531 explicitly thread safe version of RandomSequence?
-    
-//    // Set seed (RS state) to given value, or defaultSeed() if none given.
-//    void setSeed() { state_ = defaultSeed(); }
-//    void setSeed(uint32_t seed) { state_ = seed; }
-
     // Set seed (RS state) to given value, or defaultSeed() if none given.
     void setSeed() { setSeed(defaultSeed()); }
     void setSeed(uint32_t seed)
@@ -397,16 +383,11 @@ public:
         std::lock_guard<std::mutex> grsm(global_rs_mutex_);
         state_ = seed;
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Get state.
     uint32_t getSeed() { return state_; }
 private:
     uint32_t state_;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240531 explicitly thread safe version of RandomSequence?
     static inline std::mutex global_rs_mutex_;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 //------------------------------------------------------------------------------
@@ -422,28 +403,16 @@ std::lock_guard<std::recursive_mutex> pl_(util::DebugPrint::getPrintMutex());
 #define debugPrint(e){ grabPrintLock_evoflock(); \
                        std::cout << #e" = " << (e) << std::endl << std::flush; }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240601 fewer RandomSequence objects
-
-//inline static RandomSequence efrs_default_;
-//inline static RandomSequence* efrs_ = &efrs_default_;
-//inline void setEFRS(RandomSequence& rs) { efrs_ = &rs; }
-//inline RandomSequence& EFRS(){ return *efrs_; }
-
-
+// EF::RS() is the single, shared, thread-safe, settable, RandomSequence object.
 namespace EvoFlock
 {
-
 inline static RandomSequence rs_default_;
 inline static RandomSequence* rs_ = &rs_default_;
 inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
-
 }  // end of namespace EvoFlock
-
 namespace EF = EvoFlock;
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Square a double
 inline double sq(double f) { return f * f; }

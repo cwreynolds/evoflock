@@ -339,18 +339,17 @@ public:
         assert (Vec3::max({v123, v111, v236, v000}) == v236);
         
         // Run 20 trials on each of three random vector utilities.
-        RandomSequence rs;
         for (int i = 0; i < 20; i++)
         {
-            Vec3 r = rs.random_point_in_axis_aligned_box(v236, v123);
+            Vec3 r = EF::RS().random_point_in_axis_aligned_box(v236, v123);
             assert (util::between(r.x(), v123.x(), v236.x()));
             assert (util::between(r.y(), v123.y(), v236.y()));
             assert (util::between(r.z(), v123.z(), v236.z()));
             
-            r = rs.random_point_in_unit_radius_sphere();
+            r = EF::RS().random_point_in_unit_radius_sphere();
             assert (r.length() <= 1);
             
-            r = rs.random_unit_vector();
+            r = EF::RS().random_unit_vector();
             assert (util::within_epsilon(r.length(), 1));
         }
         

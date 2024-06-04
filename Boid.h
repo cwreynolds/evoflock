@@ -126,11 +126,6 @@ private:  // move to bottom of class later
     // Used to detect agent crossing Obstacle surface.
     Vec3 previous_position_ = Vec3::none();
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240601 fewer RandomSequence objects
-//    inline static RandomSequence rs_;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Used to generate unique string names for Boid instances
     std::string name_;
     static inline int name_counter_ = 0;
@@ -180,12 +175,7 @@ public:
     Boid() : Agent()
     {
         // Temp? Pick a random midrange boid color.
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240601 fewer RandomSequence objects
-//        auto mrbc = [](){ return rs_.frandom2(0.5, 0.8); };
-//        auto mrbc = [](){ return EFRS().frandom2(0.5, 0.8); };
         auto mrbc = [](){ return EF::RS().frandom2(0.5, 0.8); };
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         color_ = Vec3(mrbc(), mrbc(), mrbc());
         name_ = "boid_" + std::to_string(name_counter_++);
     }

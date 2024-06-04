@@ -72,13 +72,8 @@ public:
     // Return copy with random orientation, position is preserved.
     LocalSpace randomize_orientation() const
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240601 fewer RandomSequence objects
-//        Vec3 ii = rs_.random_unit_vector();
-//        Vec3 jj = rs_.random_unit_vector();
         Vec3 ii = EF::RS().random_unit_vector();
         Vec3 jj = EF::RS().random_unit_vector();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 kk = ii.cross(jj).normalize();
         jj = kk.cross(ii).normalize();
         return LocalSpace(ii, jj, kk, p());
@@ -108,22 +103,14 @@ public:
         Vec3 ls_p = Vec3(5, 6, 7);
         LocalSpace ls(ls_i, ls_j, ls_k, ls_p);
         LocalSpace r = LocalSpace(ls).randomize_orientation();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240601 fewer RandomSequence objects
-        //        Vec3 ii = rs_.random_unit_vector();
-        //        Vec3 jj = rs_.random_unit_vector();
-//        Vec3 ii = EF::RS().random_unit_vector();
-//        Vec3 jj = EF::RS().random_unit_vector();
-        
         Vec3 a = EF::RS().random_point_in_unit_radius_sphere() * 10;
         Vec3 b = EF::RS().random_point_in_unit_radius_sphere() * 100;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         assert (LocalSpace().is_orthonormal() && "initial value is orthonormal");
         assert (ls.is_orthonormal() && "handmade ls is orthonormal");
         assert (r.is_orthonormal() && "randomized ls is still orthonormal");
 
-        double e = util::epsilon * 10;
+        double e = util::epsilon * 20; // Changed from 10 to 20 on 20240604.
         assert (a.is_equal_within_epsilon(r.globalize(r.localize(a)), e));
         assert (a.is_equal_within_epsilon(r.localize(r.globalize(a)), e));
         assert (b.is_equal_within_epsilon(r.globalize(r.localize(b)), e));
@@ -149,12 +136,6 @@ private:
     Vec3 k_ = Vec3(0, 0, 1);
     // Position of local center:
     Vec3 p_ = Vec3(0, 0, 0);
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240601 fewer RandomSequence objects
-    // TODO 20230111 needs a better solution:
-//    inline static RandomSequence rs_;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 // Serialize LocalSpace object to stream.

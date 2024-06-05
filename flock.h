@@ -122,7 +122,7 @@ public:
             if (run_simulation_this_frame())
             {
                 // Draw.clear_scene()
-                fly_flock((fixed_time_step() or not draw().enable()) ?
+                fly_boids((fixed_time_step() or not draw().enable()) ?
                           1.0 / fixed_fps() :
                           draw().frame_duration());
                 save_centers_to_file_1_step();
@@ -280,14 +280,13 @@ public:
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
     // which computes the desired steering based on current state. Then an "act"
     // phase which actually moves the boids. Finally statistics are collected.
-    // (TODO 20240514 why is "flock" in name? Maybe Flock::fly() or fly_boids()?)
-    void fly_flock(double time_step)
+    // (20240605 renamed  Flock::fly_flock() to Flock::fly_boids())
+    void fly_boids(double time_step)
     {
         for_all_boids([&](Boid* b){ b->plan_next_steer(time_step);});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         collect_flock_metrics();
     }
-    
     
     // Apply the given function to all Boids using two parallel threads.
     //

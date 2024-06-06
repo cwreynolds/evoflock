@@ -18,6 +18,9 @@
 #include "LazyPredator/LazyPredator.h"
 namespace LP = LazyPredator;
 
+namespace GP
+{
+
 // Abbreviated name for this overly-long class name.
 typedef LazyPredator::MultiObjectiveFitness MOF;
 
@@ -364,23 +367,23 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
                 "Real_20_20",  // max_speed
                 "Real_20_20",  // min_speed
                 "Real_20_20",  // speed
-
+                
                 "Real_0_100",  // weight_forward
                 "Real_0_100",  // weight_separate
                 "Real_0_100",  // weight_align
                 "Real_0_100",  // weight_cohere
                 "Real_0_100",  // weight_avoid
-
+                
                 "Real_0_200",  // max_dist_separate_in_body_radii
                 // TODO set to 100, essentially infinity, in the FlockParameters
                 // class. Keep them that way for now but needs to be revisited.
                 //"Real_0_200",  // max_dist_align_in_body_radii
                 //"Real_0_200",  // max_dist_cohere_in_body_radii
-
+                
                 "Real_0_10",   // exponent_separate
                 "Real_0_10",   // exponent_align
                 "Real_0_10",   // exponent_cohere
-
+                
                 // Cosine of threshold angle (max angle from forward to be seen)
                 "Real_m1_p1",  // angle_separate
                 "Real_m1_p1",  // angle_align
@@ -418,3 +421,5 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
         }
     }
 };
+
+}  // end of namespace GP

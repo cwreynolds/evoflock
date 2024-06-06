@@ -415,7 +415,8 @@ int main(int argc, const char * argv[])
 //    lp::LPRS().setSeed(20240506);
 //    lp::LPRS().setSeed(20240508);
 //    lp::LPRS().setSeed(20240509);
-    lp::LPRS().setSeed(20240512);
+//    lp::LPRS().setSeed(20240512);
+    lp::LPRS().setSeed(20240606);
 
     int min_tree_size = 2;
     int max_tree_size = 20;
@@ -424,13 +425,13 @@ int main(int argc, const char * argv[])
     {
         std::cout << "Create population." << std::endl;
         util::Timer t("Create population.");
-        evoflock_gp_function_set.setCrossoverFunction(evoflock_ga_crossover);
+        GP::evoflock_gp_function_set.setCrossoverFunction(GP::evoflock_ga_crossover);
         population = new LazyPredator::Population (individuals,
                                                    subpops,
                                                    max_tree_size,
                                                    min_tree_size,
                                                    max_tree_size,
-                                                   evoflock_gp_function_set);
+                                                   GP::evoflock_gp_function_set);
     }
     
     {
@@ -438,47 +439,38 @@ int main(int argc, const char * argv[])
         util::Timer t("Run evolution.");
         for (int i = 0; i < max_evolution_steps; i++)
         {
-            population->evolutionStep(evoflock_fitness_function, scalarize_fitness);
+            population->evolutionStep(GP::evoflock_fitness_function,
+                                      GP::scalarize_fitness);
             std::cout << std::endl;
         }
     }
-
-    std::cout << std::endl;
-    std::cout << std::endl;
-    for (int i = 0; i < 10; i++)
+    
+    // Save end of run data.
+    auto record_top_10 = [&]()
     {
-        const LP::Individual* individual = population->nthBestFitness(i);
-        std::cout << individual->tree().to_string() << std::endl;
-        auto fitness = rerun_flock_simulation(individual);
-        debugPrint(fitness);
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240507 experiment
+        std::cout << std::endl;
+        std::cout << std::endl;
+        for (int i = 0; i < 10; i++)
+        {
+            const LP::Individual* individual = population->nthBestFitness(i);
+            std::cout << individual->tree().to_string() << std::endl;
+            auto fitness = GP::rerun_flock_simulation(individual);
+            debugPrint(fitness);
+        }
+    };
+    record_top_10();
     std::cout << std::endl;
     std::cout << std::endl;
-
     std::cout << "now with MOF scalarized with scalarize_fitness_min()" << std::endl;
-    replace_scalar_fitness_metric(*population, scalarize_fitness_min);
+    GP::replace_scalar_fitness_metric(*population, GP::scalarize_fitness_min);
+    record_top_10();
 
-    population->logger();
-    std::cout << std::endl;
-    std::cout << std::endl;
-    for (int i = 0; i < 10; i++)
-    {
-        const LP::Individual* individual = population->nthBestFitness(i);
-        std::cout << individual->tree().to_string() << std::endl;
-        auto fitness = rerun_flock_simulation(individual);
-        debugPrint(fitness);
-    }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    print_occupancy_map = true;
+    GP::print_occupancy_map = true;
     std::cout << std::endl;
     std::cout << std::endl;
     const LP::Individual* individual = population->nthBestFitness(0);
     std::cout << individual->tree().to_string() << std::endl;
-    auto fitness = rerun_flock_simulation(individual);
+    auto fitness = GP::rerun_flock_simulation(individual);
     debugPrint(fitness);
 
     delete population;

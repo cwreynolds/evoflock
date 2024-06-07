@@ -338,7 +338,11 @@ double jiggle_scale = 0.1;
 // selecting a set of real number parameters for a flock simulation, via an
 // absolute and fixed fitness metric. There is only one function, all GpTrees
 // are exactly one function deep, differing only in their parameter values.
-LazyPredator::FunctionSet evoflock_gp_function_set =
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240606 starting to prototype GP from-scratch-no-black-box
+//LazyPredator::FunctionSet evoflock_gp_function_set =
+LazyPredator::FunctionSet evoflock_ga_function_set =
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     {
         { "Multi_Objective_Fitness" },
@@ -421,5 +425,97 @@ LazyPredator::FunctionSet evoflock_gp_function_set =
         }
     }
 };
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240606 starting to prototype GP from-scratch-no-black-box
+
+//LazyPredator::FunctionSet evoflock_gp_function_set =
+
+LP::FunctionSet evoflock_gp_function_set()
+{
+    return 
+    {
+        // GpTypes
+        {
+            { "Vec3" },
+            { "Scalar_1",     -1.0,   1.0 },
+            { "Scalar_100", -100.0, 100.0 },
+        },
+        
+        // GpFunctions
+        {
+            // Scalar functions: add, multiply
+            {
+                "Add_scalar", "Vec3", {"Scalar_100", "Scalar_100"},
+                [](LP::GpTree& tree)
+                {
+                    return std::any(tree.evalSubtree<float>(0) +
+                                    tree.evalSubtree<float>(1));
+                }
+            },
+            {
+                "Multiply_scalar", "Vec3", {"Scalar_100", "Scalar_100"},
+                [](LP::GpTree& tree)
+                {
+                    return std::any(tree.evalSubtree<float>(0) *
+                                    tree.evalSubtree<float>(1));
+                }
+            },
+            {
+                "Adjust_scalar", "Vec3", {"Scalar_100", "Scalar_1"},
+                [](LP::GpTree& tree)
+                {
+                    return std::any(tree.evalSubtree<float>(0) *
+                                    tree.evalSubtree<float>(1));
+                }
+            },
+            
+            // Vector functions: construct, add
+            {
+                "Vec3", "Vec3", {"Real_mp100", "Real_mp100", "Real_mp100"},
+                [](LP::GpTree& tree)
+                {
+                    return std::any(Vec3(tree.evalSubtree<float>(0),
+                                         tree.evalSubtree<float>(1),
+                                         tree.evalSubtree<float>(2)));
+                }
+            },
+            {
+                "Add_v3", "Vec3", {"Vec3", "Vec3"},
+                [](LP::GpTree& tree)
+                {
+                    return std::any(tree.evalSubtree<float>(0) +
+                                    tree.evalSubtree<float>(1));
+                }
+            },
+            
+            // Boid API:
+            {
+                "Distance_To_First_obstacle", "Real_mp100", {},
+                [](LP::GpTree& t)
+                {
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // QQQ TODO purely for prototyping:
+                    Boid boid;
+                    // QQQ TODO prototype, needs caching.
+                    CollisionList collisions = boid.predict_future_collisions();
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    
+                    double distance = std::numeric_limits<double>::infinity();
+                    if (not collisions.empty())
+                    {
+                        const Collision& first_collision = collisions.front();
+                        Vec3 poi = first_collision.point_of_impact;
+                        distance = (poi - boid.position()).length();
+                    }
+                    return std::any(distance);
+                }
+            },
+        }
+    };
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 }  // end of namespace GP

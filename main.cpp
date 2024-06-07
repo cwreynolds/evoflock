@@ -395,6 +395,14 @@ int main(int argc, const char * argv[])
     
     //--------------------------------------------------------------------------
 
+    // TODO 20240606 starting to prototype GP from-scratch-no-black-box
+
+    LP::FunctionSet fs =  GP::evoflock_gp_function_set();
+    fs.print();
+    return EXIT_SUCCESS;
+    
+    //--------------------------------------------------------------------------
+
     int individuals = 500;
     int subpops = 25;
     int max_evolution_steps = 30000;
@@ -425,13 +433,19 @@ int main(int argc, const char * argv[])
     {
         std::cout << "Create population." << std::endl;
         util::Timer t("Create population.");
-        GP::evoflock_gp_function_set.setCrossoverFunction(GP::evoflock_ga_crossover);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240606 starting to prototype GP from-scratch-no-black-box
+        LazyPredator::FunctionSet& fs = GP::evoflock_ga_function_set;
+//        GP::evoflock_gp_function_set.setCrossoverFunction(GP::evoflock_ga_crossover);
+        fs.setCrossoverFunction(GP::evoflock_ga_crossover);
         population = new LazyPredator::Population (individuals,
                                                    subpops,
                                                    max_tree_size,
                                                    min_tree_size,
                                                    max_tree_size,
-                                                   GP::evoflock_gp_function_set);
+//                                                   GP::evoflock_gp_function_set);
+                                                   fs);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     {

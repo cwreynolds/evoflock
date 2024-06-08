@@ -429,8 +429,43 @@ LazyPredator::FunctionSet evoflock_ga_function_set =
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240606 starting to prototype GP from-scratch-no-black-box
 
-//LazyPredator::FunctionSet evoflock_gp_function_set =
 
+// TODO starting to see signs of life:
+//
+//        Scale_v3(Neighbor_1_Position(),
+//                 -2.12243)
+//        Forward()
+//        Neighbor_1_Position()
+//        Vec3(Add_scalar(Distance_To_First_obstacle(),
+//                        Distance_To_First_obstacle()),
+//             Multiply_scalar(Distance_To_First_obstacle(),
+//                             Distance_To_First_obstacle()),
+//             Add_scalar(Distance_To_First_obstacle(),
+//                        Distance_To_First_obstacle()))
+//        Forward()
+//        Neighbor_1_Position()
+//        Forward()
+//        Vec3(Adjust_scalar(Distance_To_First_obstacle(),
+//                           0.534153),
+//             Multiply_scalar(Distance_To_First_obstacle(),
+//                             Distance_To_First_obstacle()),
+//             Add_scalar(Distance_To_First_obstacle(),
+//                        Distance_To_First_obstacle()))
+//        Neighbor_1_Position()
+//        Add_v3(Scale_v3(Neighbor_1_Position(),
+//                        0.917505),
+//               Scale_v3(Neighbor_1_Position(),
+//                        -4.65))
+
+
+// In the GP (vs GA) version, the evolved code is a per-frame steering function
+// for each Boid. This API supplied a "per thread global" which points to the
+// current Boid.
+thread_local Boid* current_gp_boid_per_thread_ = nullptr;
+Boid* getCurrentGpBoidPerThread() { return current_gp_boid_per_thread_; }
+void setCurrentGpBoidPerThread(Boid* boid) { current_gp_boid_per_thread_ = boid; }
+
+// FuntionSet for the GP version of EvoFlock.
 LP::FunctionSet evoflock_gp_function_set()
 {
     return 
@@ -439,69 +474,128 @@ LP::FunctionSet evoflock_gp_function_set()
         {
             { "Vec3" },
             { "Scalar_1",     -1.0,   1.0 },
+            { "Scalar_5",     -5.0,   5.0 },
             { "Scalar_100", -100.0, 100.0 },
         },
         
         // GpFunctions
         {
-            // Scalar functions: add, multiply
+            // Scalar functions: add, multiply,
             {
-                "Add_scalar", "Vec3", {"Scalar_100", "Scalar_100"},
+                "Add_scalar", "Scalar_100", {"Scalar_100", "Scalar_100"},
                 [](LP::GpTree& tree)
                 {
-                    return std::any(tree.evalSubtree<float>(0) +
-                                    tree.evalSubtree<float>(1));
+                    return std::any(tree.evalSubtree<double>(0) +
+                                    tree.evalSubtree<double>(1));
                 }
             },
             {
-                "Multiply_scalar", "Vec3", {"Scalar_100", "Scalar_100"},
+                "Multiply_scalar", "Scalar_100", {"Scalar_100", "Scalar_100"},
                 [](LP::GpTree& tree)
                 {
-                    return std::any(tree.evalSubtree<float>(0) *
-                                    tree.evalSubtree<float>(1));
+                    return std::any(tree.evalSubtree<double>(0) *
+                                    tree.evalSubtree<double>(1));
                 }
             },
             {
-                "Adjust_scalar", "Vec3", {"Scalar_100", "Scalar_1"},
+                "Adjust_scalar", "Scalar_100", {"Scalar_100", "Scalar_1"},
                 [](LP::GpTree& tree)
                 {
-                    return std::any(tree.evalSubtree<float>(0) *
-                                    tree.evalSubtree<float>(1));
+                    return std::any(tree.evalSubtree<double>(0) *
+                                    tree.evalSubtree<double>(1));
                 }
             },
             
-            // Vector functions: construct, add
+            // Vector functions: construct, add, scale,
             {
-                "Vec3", "Vec3", {"Real_mp100", "Real_mp100", "Real_mp100"},
+                "Vec3", "Vec3", {"Scalar_100", "Scalar_100", "Scalar_100"},
                 [](LP::GpTree& tree)
                 {
-                    return std::any(Vec3(tree.evalSubtree<float>(0),
-                                         tree.evalSubtree<float>(1),
-                                         tree.evalSubtree<float>(2)));
+                    return std::any(Vec3(tree.evalSubtree<double>(0),
+                                         tree.evalSubtree<double>(1),
+                                         tree.evalSubtree<double>(2)));
                 }
             },
             {
                 "Add_v3", "Vec3", {"Vec3", "Vec3"},
                 [](LP::GpTree& tree)
                 {
-                    return std::any(tree.evalSubtree<float>(0) +
-                                    tree.evalSubtree<float>(1));
+                    return std::any(tree.evalSubtree<Vec3>(0) +
+                                    tree.evalSubtree<Vec3>(1));
                 }
             },
-            
+            {
+                "Scale_v3", "Vec3", {"Vec3", "Scalar_5"},
+                [](LP::GpTree& tree)
+                {
+                    return std::any(tree.evalSubtree<Vec3>(0) *
+                                    tree.evalSubtree<double>(1));
+                }
+            },
+
             // Boid API:
             {
-                "Distance_To_First_obstacle", "Real_mp100", {},
+                "Forward", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // QQQ TODO purely for prototyping:
-                    Boid boid;
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // QQQ TODO purely for prototyping:
+//                    Boid boid;
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    return std::any(boid.forward());
+//                    return std::any(current_gp_boid->forward());
+                    return std::any(getCurrentGpBoidPerThread()->forward());
+                }
+            },
+            {
+//                "Neighbor_1_Position", "Vec3", {},
+                "Neighbor_1_Pos", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                        // QQQ TODO purely for prototyping:
+//    //                    Boid boid;
+//                        Boid* boid = current_gp_boid;
+//                        double time_step = 1.0 / 30.0;
+//    //                    BoidPtrList neighbors = boid.nearest_neighbors(time_step);
+//                        BoidPtrList neighbors = boid->nearest_neighbors(time_step);
+//                        Boid* neighbor_1 = neighbors.at(0);
+//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                        return std::any(neighbor_1->position());
+
+//                    Boid* boid = current_gp_boid;
+                    Boid* boid = getCurrentGpBoidPerThread();
+                    double time_step = 1.0 / 30.0;
+                    BoidPtrList neighbors = boid->nearest_neighbors(time_step);
+                    return std::any(neighbors.at(0)->position());
+                }
+            },
+            {
+//                "Distance_To_First_obstacle", "Scalar_100", {},
+                "First_Obs_Dist", "Scalar_100", {},
+                [](LP::GpTree& t)
+                {
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // QQQ TODO purely for prototyping:
+//                    Boid boid;
+//                    // QQQ TODO prototype, needs caching.
+//                    CollisionList collisions = boid.predict_future_collisions();
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    
+//                    double distance = std::numeric_limits<double>::infinity();
+//                    if (not collisions.empty())
+//                    {
+//                        const Collision& first_collision = collisions.front();
+//                        Vec3 poi = first_collision.point_of_impact;
+//                        distance = (poi - boid.position()).length();
+//                    }
+//                    return std::any(distance);
+
+                    assert(getCurrentGpBoidPerThread());
+                    Boid& boid = *getCurrentGpBoidPerThread();
+                    double distance = std::numeric_limits<double>::infinity();
                     // QQQ TODO prototype, needs caching.
                     CollisionList collisions = boid.predict_future_collisions();
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    
-                    double distance = std::numeric_limits<double>::infinity();
                     if (not collisions.empty())
                     {
                         const Collision& first_collision = collisions.front();
@@ -509,6 +603,26 @@ LP::FunctionSet evoflock_gp_function_set()
                         distance = (poi - boid.position()).length();
                     }
                     return std::any(distance);
+                }
+            },
+            {
+                "First_Obs_Normal", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+                    assert(getCurrentGpBoidPerThread());
+                    Boid& boid = *getCurrentGpBoidPerThread();
+//                    double distance = std::numeric_limits<double>::infinity();
+                    Vec3 normal;
+                    // QQQ TODO prototype, needs caching.
+                    CollisionList collisions = boid.predict_future_collisions();
+                    if (not collisions.empty())
+                    {
+                        const Collision& first_collision = collisions.front();
+//                        Vec3 poi = first_collision.point_of_impact;
+//                        distance = (poi - boid.position()).length();
+                        normal = first_collision.normal_at_poi;
+                    }
+                    return std::any(normal);
                 }
             },
         }

@@ -399,6 +399,25 @@ int main(int argc, const char * argv[])
 
     LP::FunctionSet fs =  GP::evoflock_gp_function_set();
     fs.print();
+    
+    Boid boid;
+    EvertedSphereObstacle eso(10, Vec3());
+    ObstaclePtrList opl = {&eso};
+    boid.set_flock_obstacles(&opl);
+    FlockParameters fp;
+    boid.set_fp(&fp);
+    GP::setCurrentGpBoidPerThread(&boid);
+
+    for (int i = 0; i < 10; i++)
+    {
+        LP::GpTree gp_tree;
+        fs.makeRandomTree(30, gp_tree);
+        std::cout << gp_tree.to_string(true) << std::endl;
+        Vec3 v = std::any_cast<Vec3>(gp_tree.eval());
+        debugPrint(v);
+        std::cout << std::endl;
+    }
+
     return EXIT_SUCCESS;
     
     //--------------------------------------------------------------------------
@@ -433,19 +452,14 @@ int main(int argc, const char * argv[])
     {
         std::cout << "Create population." << std::endl;
         util::Timer t("Create population.");
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240606 starting to prototype GP from-scratch-no-black-box
         LazyPredator::FunctionSet& fs = GP::evoflock_ga_function_set;
-//        GP::evoflock_gp_function_set.setCrossoverFunction(GP::evoflock_ga_crossover);
         fs.setCrossoverFunction(GP::evoflock_ga_crossover);
         population = new LazyPredator::Population (individuals,
                                                    subpops,
                                                    max_tree_size,
                                                    min_tree_size,
                                                    max_tree_size,
-//                                                   GP::evoflock_gp_function_set);
                                                    fs);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     {

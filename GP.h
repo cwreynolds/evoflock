@@ -462,8 +462,12 @@ LazyPredator::FunctionSet evoflock_ga_function_set =
 // for each Boid. This API supplied a "per thread global" which points to the
 // current Boid.
 thread_local Boid* current_gp_boid_per_thread_ = nullptr;
-Boid* getCurrentGpBoidPerThread() { return current_gp_boid_per_thread_; }
 void setCurrentGpBoidPerThread(Boid* boid) { current_gp_boid_per_thread_ = boid; }
+Boid* getCurrentGpBoidPerThread()
+{
+    assert(current_gp_boid_per_thread_ && "invalid current_gp_boid_per_thread_");
+    return current_gp_boid_per_thread_;
+}
 
 // FuntionSet for the GP version of EvoFlock.
 LP::FunctionSet evoflock_gp_function_set()
@@ -538,65 +542,52 @@ LP::FunctionSet evoflock_gp_function_set()
                 "Forward", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    // QQQ TODO purely for prototyping:
-//                    Boid boid;
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    return std::any(boid.forward());
-//                    return std::any(current_gp_boid->forward());
                     return std::any(getCurrentGpBoidPerThread()->forward());
                 }
             },
             {
-//                "Neighbor_1_Position", "Vec3", {},
-                "Neighbor_1_Pos", "Vec3", {},
+                "Neighbor_1_Forward", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                        // QQQ TODO purely for prototyping:
-//    //                    Boid boid;
-//                        Boid* boid = current_gp_boid;
-//                        double time_step = 1.0 / 30.0;
-//    //                    BoidPtrList neighbors = boid.nearest_neighbors(time_step);
-//                        BoidPtrList neighbors = boid->nearest_neighbors(time_step);
-//                        Boid* neighbor_1 = neighbors.at(0);
-//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                        return std::any(neighbor_1->position());
-
-//                    Boid* boid = current_gp_boid;
                     Boid* boid = getCurrentGpBoidPerThread();
                     double time_step = 1.0 / 30.0;
                     BoidPtrList neighbors = boid->nearest_neighbors(time_step);
+                    assert(neighbors.size() > 0);
+                    return std::any(neighbors.at(0)->forward());
+                }
+            },
+            {
+                "Neighbor_1_Pos", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+                    Boid* boid = getCurrentGpBoidPerThread();
+                    double time_step = 1.0 / 30.0;
+                    BoidPtrList neighbors = boid->nearest_neighbors(time_step);
+                    assert(neighbors.size() > 0);
                     return std::any(neighbors.at(0)->position());
                 }
             },
             {
-//                "Distance_To_First_obstacle", "Scalar_100", {},
+                "Neighbor_1_Offset", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+                    Boid* boid = getCurrentGpBoidPerThread();
+                    double time_step = 1.0 / 30.0;
+                    BoidPtrList neighbors = boid->nearest_neighbors(time_step);
+                    assert(neighbors.size() > 0);
+                    return std::any(neighbors.at(0)->position() -
+                                    boid->position());
+                }
+            },
+            {
                 "First_Obs_Dist", "Scalar_100", {},
                 [](LP::GpTree& t)
                 {
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    // QQQ TODO purely for prototyping:
-//                    Boid boid;
-//                    // QQQ TODO prototype, needs caching.
-//                    CollisionList collisions = boid.predict_future_collisions();
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    
-//                    double distance = std::numeric_limits<double>::infinity();
-//                    if (not collisions.empty())
-//                    {
-//                        const Collision& first_collision = collisions.front();
-//                        Vec3 poi = first_collision.point_of_impact;
-//                        distance = (poi - boid.position()).length();
-//                    }
-//                    return std::any(distance);
-
-                    assert(getCurrentGpBoidPerThread());
                     Boid& boid = *getCurrentGpBoidPerThread();
                     double distance = std::numeric_limits<double>::infinity();
                     // QQQ TODO prototype, needs caching.
                     CollisionList collisions = boid.predict_future_collisions();
-                    if (not collisions.empty())
+                    if (collisions.size() > 0)
                     {
                         const Collision& first_collision = collisions.front();
                         Vec3 poi = first_collision.point_of_impact;
@@ -609,17 +600,13 @@ LP::FunctionSet evoflock_gp_function_set()
                 "First_Obs_Normal", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    assert(getCurrentGpBoidPerThread());
                     Boid& boid = *getCurrentGpBoidPerThread();
-//                    double distance = std::numeric_limits<double>::infinity();
                     Vec3 normal;
                     // QQQ TODO prototype, needs caching.
                     CollisionList collisions = boid.predict_future_collisions();
-                    if (not collisions.empty())
+                    if (collisions.size() > 0)
                     {
                         const Collision& first_collision = collisions.front();
-//                        Vec3 poi = first_collision.point_of_impact;
-//                        distance = (poi - boid.position()).length();
                         normal = first_collision.normal_at_poi;
                     }
                     return std::any(normal);

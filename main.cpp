@@ -401,11 +401,19 @@ int main(int argc, const char * argv[])
     fs.print();
     
     Boid boid;
+    Boid neighbor1;
+    Boid neighbor2;
+    neighbor1.setPosition(Vec3(1, 0, 0));
+    neighbor1.setPosition(Vec3(0, 1, 0));
+    BoidPtrList neighbors = {&neighbor1, &neighbor2};
+    boid.set_flock_boids(&neighbors);
+    boid.recompute_nearest_neighbors(1);
     EvertedSphereObstacle eso(10, Vec3());
     ObstaclePtrList opl = {&eso};
     boid.set_flock_obstacles(&opl);
     FlockParameters fp;
     boid.set_fp(&fp);
+
     GP::setCurrentGpBoidPerThread(&boid);
 
     for (int i = 0; i < 10; i++)
@@ -413,9 +421,9 @@ int main(int argc, const char * argv[])
         LP::GpTree gp_tree;
         fs.makeRandomTree(30, gp_tree);
         std::cout << gp_tree.to_string(true) << std::endl;
-        Vec3 v = std::any_cast<Vec3>(gp_tree.eval());
-        debugPrint(v);
-        std::cout << std::endl;
+        Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
+        debugPrint(steering);
+        std::cout << std::endl << std::endl;
     }
 
     return EXIT_SUCCESS;

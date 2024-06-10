@@ -268,6 +268,19 @@ template <typename T> std::string vec_to_string(const std::vector<T>& vector)
     return s.str();
 }
 
+// Do one pass of a Shell (interchange) sort. Not currently used. Experiment for
+// doing incremental sort of neighbors in Boid::recompute_nearest_neighbors().
+template <typename C, typename F>
+void incremental_sort(C collection, F less_than)
+{
+    for (int i = int(collection.size()) - 1; i > 0; i--)
+    {
+        if (not less_than(collection[i - 1], collection[i]))
+        {
+            std::swap(collection[i - 1], collection[i]);
+        }
+    }
+}
 
 static void unit_test()
 {

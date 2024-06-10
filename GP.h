@@ -462,11 +462,18 @@ LazyPredator::FunctionSet evoflock_ga_function_set =
 // for each Boid. This API supplied a "per thread global" which points to the
 // current Boid.
 thread_local Boid* current_gp_boid_per_thread_ = nullptr;
-void setCurrentGpBoidPerThread(Boid* boid) { current_gp_boid_per_thread_ = boid; }
-Boid* getCurrentGpBoidPerThread()
+void setGpBoidPerThread(Boid* boid) { current_gp_boid_per_thread_ = boid; }
+Boid* getGpBoidPerThread()
 {
     assert(current_gp_boid_per_thread_ && "invalid current_gp_boid_per_thread_");
     return current_gp_boid_per_thread_;
+}
+
+Boid* getGpBoidNeighbor(int n)
+{
+    BoidPtrList neighbors = getGpBoidPerThread()->cached_nearest_neighbors();
+    assert(neighbors.size() >= n);
+    return neighbors.at(n - 1);
 }
 
 // FuntionSet for the GP version of EvoFlock.
@@ -509,7 +516,18 @@ LP::FunctionSet evoflock_gp_function_set()
                                     tree.evalSubtree<double>(1));
                 }
             },
-            
+            {
+                "Power", "Scalar_100", {"Scalar_100", "Scalar_100"},
+                [](LP::GpTree& tree)
+                {
+                    double base = tree.evalSubtree<double>(0);
+                    double expt = tree.evalSubtree<double>(1);
+                    // TODO ad hoc, revisit.
+                    return std::any(std::pow(util::clip(base, 0.01, 100),
+                                             util::clip(expt, 0.01, 10)));
+                }
+            },
+
             // Vector functions: construct, add, scale,
             {
                 "Vec3", "Vec3", {"Scalar_100", "Scalar_100", "Scalar_100"},
@@ -536,54 +554,78 @@ LP::FunctionSet evoflock_gp_function_set()
                                     tree.evalSubtree<double>(1));
                 }
             },
+            {
+                "Length", "Scalar_100", {"Vec3"},
+                [](LP::GpTree& tree)
+                {
+                    return std::any(tree.evalSubtree<Vec3>(0).length());
+                }
+            },
+            {
+                "Normalize", "Vec3", {"Vec3"},
+                [](LP::GpTree& tree)
+                {
+                    Vec3 v = tree.evalSubtree<Vec3>(0);
+                    Vec3 n = v.normalize_or_0();
+                    return std::any(n.is_valid() ? n : Vec3());
+                }
+            },
 
             // Boid API:
+            {
+                "Speed", "Scalar_100", {},
+                [](LP::GpTree& t)
+                {
+                    return std::any(getGpBoidPerThread()->speed());
+                }
+            },
             {
                 "Forward", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    return std::any(getCurrentGpBoidPerThread()->forward());
+                    return std::any(getGpBoidPerThread()->forward());
                 }
             },
             {
                 "Neighbor_1_Forward", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    Boid* boid = getCurrentGpBoidPerThread();
-                    double time_step = 1.0 / 30.0;
-                    BoidPtrList neighbors = boid->nearest_neighbors(time_step);
-                    assert(neighbors.size() > 0);
-                    return std::any(neighbors.at(0)->forward());
-                }
-            },
-            {
-                "Neighbor_1_Pos", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    Boid* boid = getCurrentGpBoidPerThread();
-                    double time_step = 1.0 / 30.0;
-                    BoidPtrList neighbors = boid->nearest_neighbors(time_step);
-                    assert(neighbors.size() > 0);
-                    return std::any(neighbors.at(0)->position());
+                    return std::any(getGpBoidNeighbor(1)->forward());
+
                 }
             },
             {
                 "Neighbor_1_Offset", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    Boid* boid = getCurrentGpBoidPerThread();
-                    double time_step = 1.0 / 30.0;
-                    BoidPtrList neighbors = boid->nearest_neighbors(time_step);
-                    assert(neighbors.size() > 0);
-                    return std::any(neighbors.at(0)->position() -
-                                    boid->position());
+                    return std::any(getGpBoidNeighbor(1)->position() -
+                                    getGpBoidPerThread()->position());
                 }
             },
+
+            {
+                "Neighbor_2_Forward", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+                    return std::any(getGpBoidNeighbor(2)->forward());
+                    
+                }
+            },
+            {
+                "Neighbor_2_Offset", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+                    return std::any(getGpBoidNeighbor(2)->position() -
+                                    getGpBoidPerThread()->position());
+                }
+            },
+
+
             {
                 "First_Obs_Dist", "Scalar_100", {},
                 [](LP::GpTree& t)
                 {
-                    Boid& boid = *getCurrentGpBoidPerThread();
+                    Boid& boid = *getGpBoidPerThread();
                     double distance = std::numeric_limits<double>::infinity();
                     // QQQ TODO prototype, needs caching.
                     CollisionList collisions = boid.predict_future_collisions();
@@ -600,7 +642,7 @@ LP::FunctionSet evoflock_gp_function_set()
                 "First_Obs_Normal", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    Boid& boid = *getCurrentGpBoidPerThread();
+                    Boid& boid = *getGpBoidPerThread();
                     Vec3 normal;
                     // QQQ TODO prototype, needs caching.
                     CollisionList collisions = boid.predict_future_collisions();

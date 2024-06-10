@@ -51,7 +51,7 @@ public:
     // Vector operations dot product, length (norm), normalize.
     double dot(const Vec3& v) const
         { return x() * v.x() + y() * v.y() + z() * v.z(); }
-    double length() const { return std::sqrt(sq(x()) + sq(y()) + sq(z())); }
+    double length() const { return std::sqrt(length_squared()); }
     double length_squared() const { return sq(x()) + sq(y()) + sq(z()); }
     Vec3 normalize() const { return *this / length(); }
     

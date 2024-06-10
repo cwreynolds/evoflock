@@ -400,29 +400,33 @@ int main(int argc, const char * argv[])
     LP::FunctionSet fs =  GP::evoflock_gp_function_set();
     fs.print();
     
-    Boid boid;
-    Boid neighbor1;
-    Boid neighbor2;
-    neighbor1.setPosition(Vec3(1, 0, 0));
-    neighbor1.setPosition(Vec3(0, 1, 0));
-    BoidPtrList neighbors = {&neighbor1, &neighbor2};
+    std::vector<Boid> boids(10);
+    for (int i = 0; i < 10; i++)
+    {
+        boids[i].setPosition(EF::RS().random_unit_vector() * 10);
+        boids[i].setForward(EF::RS().random_unit_vector());
+    }
+    Boid& boid = boids[0];
+    BoidPtrList neighbors;
+    for (Boid& b : boids) { neighbors.push_back(&b); }
     boid.set_flock_boids(&neighbors);
-    boid.recompute_nearest_neighbors(1);
-    EvertedSphereObstacle eso(10, Vec3());
+    boid.recompute_nearest_neighbors();
+    EvertedSphereObstacle eso(100, Vec3());
     ObstaclePtrList opl = {&eso};
     boid.set_flock_obstacles(&opl);
     FlockParameters fp;
     boid.set_fp(&fp);
 
-    GP::setCurrentGpBoidPerThread(&boid);
+    GP::setGpBoidPerThread(&boid);
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 100; i++)
     {
         LP::GpTree gp_tree;
-        fs.makeRandomTree(30, gp_tree);
+        fs.makeRandomTree(50, gp_tree);
         std::cout << gp_tree.to_string(true) << std::endl;
         Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
         debugPrint(steering);
+        if (not steering.is_valid()) { std::cout << "bad steer!" << std::endl;}
         std::cout << std::endl << std::endl;
     }
 

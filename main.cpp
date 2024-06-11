@@ -421,12 +421,13 @@ int main(int argc, const char * argv[])
 
     for (int i = 0; i < 100; i++)
     {
+        std::cout << i << ":" << std::endl;
         LP::GpTree gp_tree;
         fs.makeRandomTree(50, gp_tree);
         std::cout << gp_tree.to_string(true) << std::endl;
         Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
         debugPrint(steering);
-        if (not steering.is_valid()) { std::cout << "bad steer!" << std::endl;}
+        assert (steering.is_valid());
         std::cout << std::endl << std::endl;
     }
 

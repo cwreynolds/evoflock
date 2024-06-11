@@ -48,13 +48,28 @@ public:
     Vec3 operator*=(double s) { return *this = *this * s; }
     Vec3 operator/=(double s) { return *this = *this / s; }
 
-    // Vector operations dot product, length (norm), normalize.
-    double dot(const Vec3& v) const
-        { return x() * v.x() + y() * v.y() + z() * v.z(); }
     double length() const { return std::sqrt(length_squared()); }
     double length_squared() const { return sq(x()) + sq(y()) + sq(z()); }
     Vec3 normalize() const { return *this / length(); }
     
+    // Dot product (infix method, self is first arg)
+    double dot(const Vec3& v) const { return Vec3::dot(*this, v); }
+    // Dot product (static 2 arg version)
+    static double dot(const Vec3& a, const Vec3& b)
+    {
+        return (a.x() * b.x() + a.y() * b.y() + a.z() * b.z());
+    }
+    // Cross product (infix method, self is first arg)
+    Vec3 cross(const Vec3& v) const { return Vec3::cross(*this, v); }
+    // Cross product (static 2 arg version)
+    static Vec3 cross(const Vec3& a, const Vec3& b)
+    {
+        // (From https://en.wikipedia.org/wiki/Cross_product#Matrix_notation)
+        return Vec3(a.y() * b.z() - a.z() * b.y(),
+                    a.z() * b.x() - a.x() * b.z(),
+                    a.x() * b.y() - a.y() * b.x());
+    }
+
     // Normalize except if input is zero length, then return that.
     Vec3 normalize_or_0() const
         { return is_zero_length() ? *this : *this / length(); }
@@ -96,18 +111,6 @@ public:
     Vec3 perpendicular_component(const Vec3& unit_basis) const
     {
         return *this - parallel_component(unit_basis);
-    }
-
-    // Cross product (infix method, self is first arg)
-    Vec3 cross(const Vec3& v) const { return Vec3::cross(*this, v); }
-
-    // Cross product (static 2 arg version)
-    static Vec3 cross(const Vec3& a, const Vec3& b)
-    {
-        // (From https://en.wikipedia.org/wiki/Cross_product#Matrix_notation)
-        return Vec3(a.y() * b.z() - a.z() * b.y(),
-                    a.z() * b.x() - a.x() * b.z(),
-                    a.x() * b.y() - a.y() * b.x());
     }
 
     // Get angle between two arbitrary direction vectors. (Visualize two vectors

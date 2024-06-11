@@ -501,7 +501,7 @@ LP::FunctionSet evoflock_gp_function_set()
                 }
             },
             {
-                "Multiply_scalar", "Scalar_100", {"Scalar_100", "Scalar_100"},
+                "Mul_scalar", "Scalar_100", {"Scalar_100", "Scalar_100"},
                 [](LP::GpTree& tree)
                 {
                     return std::any(tree.evalSubtree<double>(0) *
@@ -509,7 +509,7 @@ LP::FunctionSet evoflock_gp_function_set()
                 }
             },
             {
-                "Adjust_scalar", "Scalar_100", {"Scalar_100", "Scalar_1"},
+                "Adj_scalar", "Scalar_100", {"Scalar_100", "Scalar_1"},
                 [](LP::GpTree& tree)
                 {
                     return std::any(tree.evalSubtree<double>(0) *
@@ -523,19 +523,25 @@ LP::FunctionSet evoflock_gp_function_set()
                     double base = tree.evalSubtree<double>(0);
                     double expt = tree.evalSubtree<double>(1);
                     // TODO ad hoc, revisit.
-                    return std::any(std::pow(util::clip(base, 0.01, 100),
-                                             util::clip(expt, 0.01, 10)));
+                    double p = std::pow(util::clip(base, 0.01, 100),
+                                        util::clip(expt, 0.01, 10));
+                    if (not std::isnormal(p)) { p = 0; };
+                    return std::any(p);
                 }
             },
 
-            // Vector functions: construct, add, scale,
+            // Vector functions:
             {
                 "Vec3", "Vec3", {"Scalar_100", "Scalar_100", "Scalar_100"},
                 [](LP::GpTree& tree)
                 {
-                    return std::any(Vec3(tree.evalSubtree<double>(0),
-                                         tree.evalSubtree<double>(1),
-                                         tree.evalSubtree<double>(2)));
+                    double x = tree.evalSubtree<double>(0);
+                    double y = tree.evalSubtree<double>(1);
+                    double z = tree.evalSubtree<double>(2);
+                    if (not std::isnormal(x)) { x = 0; }
+                    if (not std::isnormal(y)) { y = 0; }
+                    if (not std::isnormal(z)) { z = 0; }
+                    return std::any(Vec3(x, y, z));
                 }
             },
             {
@@ -543,6 +549,14 @@ LP::FunctionSet evoflock_gp_function_set()
                 [](LP::GpTree& tree)
                 {
                     return std::any(tree.evalSubtree<Vec3>(0) +
+                                    tree.evalSubtree<Vec3>(1));
+                }
+            },
+            {
+                "Sub_v3", "Vec3", {"Vec3", "Vec3"},
+                [](LP::GpTree& tree)
+                {
+                    return std::any(tree.evalSubtree<Vec3>(0) -
                                     tree.evalSubtree<Vec3>(1));
                 }
             },
@@ -570,6 +584,42 @@ LP::FunctionSet evoflock_gp_function_set()
                     return std::any(n.is_valid() ? n : Vec3());
                 }
             },
+            {
+                "Cross", "Vec3", {"Vec3", "Vec3"},
+                [](LP::GpTree& tree)
+                {
+                    return std::any(Vec3::cross(tree.evalSubtree<Vec3>(0),
+                                                tree.evalSubtree<Vec3>(1)));
+                }
+            },
+            {
+                "Dot", "Scalar_100", {"Vec3", "Vec3"},
+                [](LP::GpTree& tree)
+                {
+                    return std::any(Vec3::dot(tree.evalSubtree<Vec3>(0),
+                                              tree.evalSubtree<Vec3>(1)));
+                }
+            },
+            {
+                "Parallel_Component", "Vec3", {"Vec3", "Vec3"},
+                [](LP::GpTree& tree)
+                {
+                    Vec3 value = tree.evalSubtree<Vec3>(0);
+                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
+                    if (basis.is_zero_length()) { basis = Vec3(1, 0, 0); }
+                    return std::any(value.parallel_component(basis));
+                }
+            },
+            {
+                "Perpendicular_Component", "Vec3", {"Vec3", "Vec3"},
+                [](LP::GpTree& tree)
+                {
+                    Vec3 value = tree.evalSubtree<Vec3>(0);
+                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
+                    if (basis.is_zero_length()) { basis = Vec3(1, 0, 0); }
+                    return std::any(value.perpendicular_component(basis));
+                }
+            },
 
             // Boid API:
             {
@@ -584,6 +634,13 @@ LP::FunctionSet evoflock_gp_function_set()
                 [](LP::GpTree& t)
                 {
                     return std::any(getGpBoidPerThread()->forward());
+                }
+            },
+            {
+                "Acceleration", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+                    return std::any(getGpBoidPerThread()->getAcceleration());
                 }
             },
             {
@@ -627,8 +684,7 @@ LP::FunctionSet evoflock_gp_function_set()
                 {
                     Boid& boid = *getGpBoidPerThread();
                     double distance = std::numeric_limits<double>::infinity();
-                    // QQQ TODO prototype, needs caching.
-                    CollisionList collisions = boid.predict_future_collisions();
+                    auto collisions = boid.get_predicted_obstacle_collisions();
                     if (collisions.size() > 0)
                     {
                         const Collision& first_collision = collisions.front();
@@ -644,8 +700,7 @@ LP::FunctionSet evoflock_gp_function_set()
                 {
                     Boid& boid = *getGpBoidPerThread();
                     Vec3 normal;
-                    // QQQ TODO prototype, needs caching.
-                    CollisionList collisions = boid.predict_future_collisions();
+                    auto collisions = boid.get_predicted_obstacle_collisions();
                     if (collisions.size() > 0)
                     {
                         const Collision& first_collision = collisions.front();
@@ -657,8 +712,5 @@ LP::FunctionSet evoflock_gp_function_set()
         }
     };
 }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 }  // end of namespace GP

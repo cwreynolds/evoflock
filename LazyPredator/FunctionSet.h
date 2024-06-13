@@ -171,9 +171,17 @@ public:
                                      gp_functions) const
     {
         GpFunction* result = nullptr;
+        // Workaround June 12, 2024: weightedRandomSelect() would (very) rarely
+        // return null when gp_functions was non-empty. I first noticed this
+        // when I generated one million random trees to verify a FunctionSet. At
+        // tree 617985 the error occurred. It might be "random < next" versus
+        // "random <= next" but since I was unsure I used a bigger hammer with
+        // this fallback initialization trick.
+        if (not gp_functions.empty()) { result = gp_functions.at(0); }
+
         float total_weight = 0;
         for (auto f : gp_functions) { total_weight += f->selectionWeight(); }
-        float random = LPRS().random2(0.0f, total_weight); // TODO which RS?
+        float random = LPRS().random2(0.0f, total_weight);
         float previous = 0;
         for (auto gp_function : gp_functions)
         {

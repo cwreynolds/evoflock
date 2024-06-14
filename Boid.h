@@ -120,7 +120,11 @@ private:  // move to bottom of class later
     // Cache of nearest neighbors, updating "occasionally".
     BoidPtrList cached_nearest_neighbors_;
     // Seconds between neighbor refresh (Set to zero to turn off caching.)
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240614 save data for fitness plots.
     double neighbor_refresh_rate_ = 0.25;
+//    double neighbor_refresh_rate_ = 0.5;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double time_since_last_neighbor_refresh_ = 0;
     
     // Used to detect agent crossing Obstacle surface.

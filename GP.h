@@ -426,6 +426,34 @@ LazyPredator::FunctionSet evoflock_ga_function_set =
     }
 };
 
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240614 save data for fitness plots.
+
+
+void save_fitness_time_series(LP::Population& population)
+{
+    int step_frequency = 300;
+    static std::string pathname;
+    if (0 == population.getStepCount() % step_frequency)
+    {
+        if (pathname.empty())
+        {
+            pathname = "/Users/cwr/Desktop/flock_data/fitness_data.csv";
+            std::ofstream stream(pathname);
+            stream << "step,average,best" << std::endl;
+            stream.close();
+        }
+        std::ofstream stream(pathname, std::ios_base::app);
+        stream << population.getStepCount() << ",";
+        stream << population.averageFitness() << ",";
+        stream << population.bestFitness()->getFitness() << std::endl;
+        stream.close();
+    }
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240606 starting to prototype GP from-scratch-no-black-box
 

@@ -397,41 +397,41 @@ int main(int argc, const char * argv[])
 
     // TODO 20240606 starting to prototype GP from-scratch-no-black-box
 
-    LP::FunctionSet fs =  GP::evoflock_gp_function_set();
-    fs.print();
-    
-    std::vector<Boid> boids(10);
-    for (int i = 0; i < 10; i++)
-    {
-        boids[i].setPosition(EF::RS().random_unit_vector() * 10);
-        boids[i].setForward(EF::RS().random_unit_vector());
-    }
-    Boid& boid = boids[0];
-    BoidPtrList neighbors;
-    for (Boid& b : boids) { neighbors.push_back(&b); }
-    boid.set_flock_boids(&neighbors);
-    boid.recompute_nearest_neighbors();
-    EvertedSphereObstacle eso(100, Vec3());
-    ObstaclePtrList opl = {&eso};
-    boid.set_flock_obstacles(&opl);
-    FlockParameters fp;
-    boid.set_fp(&fp);
-
-    GP::setGpBoidPerThread(&boid);
-
-    for (int i = 0; i < 100; i++)
-    {
-        std::cout << i << ":" << std::endl;
-        LP::GpTree gp_tree;
-        fs.makeRandomTree(50, gp_tree);
-        std::cout << gp_tree.to_string(true) << std::endl;
-        Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
-        debugPrint(steering);
-        assert (steering.is_valid());
-        std::cout << std::endl << std::endl;
-    }
-
-    return EXIT_SUCCESS;
+//    LP::FunctionSet fs =  GP::evoflock_gp_function_set();
+//    fs.print();
+//    
+//    std::vector<Boid> boids(10);
+//    for (int i = 0; i < 10; i++)
+//    {
+//        boids[i].setPosition(EF::RS().random_unit_vector() * 10);
+//        boids[i].setForward(EF::RS().random_unit_vector());
+//    }
+//    Boid& boid = boids[0];
+//    BoidPtrList neighbors;
+//    for (Boid& b : boids) { neighbors.push_back(&b); }
+//    boid.set_flock_boids(&neighbors);
+//    boid.recompute_nearest_neighbors();
+//    EvertedSphereObstacle eso(100, Vec3());
+//    ObstaclePtrList opl = {&eso};
+//    boid.set_flock_obstacles(&opl);
+//    FlockParameters fp;
+//    boid.set_fp(&fp);
+//
+//    GP::setGpBoidPerThread(&boid);
+//
+//    for (int i = 0; i < 100; i++)
+//    {
+//        std::cout << i << ":" << std::endl;
+//        LP::GpTree gp_tree;
+//        fs.makeRandomTree(50, gp_tree);
+//        std::cout << gp_tree.to_string(true) << std::endl;
+//        Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
+//        debugPrint(steering);
+//        assert (steering.is_valid());
+//        std::cout << std::endl << std::endl;
+//    }
+//
+//    return EXIT_SUCCESS;
     
     //--------------------------------------------------------------------------
 
@@ -480,6 +480,10 @@ int main(int argc, const char * argv[])
         util::Timer t("Run evolution.");
         for (int i = 0; i < max_evolution_steps; i++)
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240614 save data for fitness plots.
+            GP::save_fitness_time_series(*population);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             population->evolutionStep(GP::evoflock_fitness_function,
                                       GP::scalarize_fitness);
             std::cout << std::endl;

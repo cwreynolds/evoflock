@@ -121,9 +121,10 @@ private:  // move to bottom of class later
     BoidPtrList cached_nearest_neighbors_;
     // Seconds between neighbor refresh (Set to zero to turn off caching.)
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240615 why did sim slow down recently?
     // TODO 20240614 save data for fitness plots.
-    double neighbor_refresh_rate_ = 0.25;
-//    double neighbor_refresh_rate_ = 0.5;
+//    double neighbor_refresh_rate_ = 0.25;
+    double neighbor_refresh_rate_ = 0.5;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double time_since_last_neighbor_refresh_ = 0;
     
@@ -187,12 +188,26 @@ public:
         name_ = "boid_" + std::to_string(name_counter_++);
     }
 
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240615 why did sim slow down recently?
+
+
+//    // Determine and store desired steering for this simulation step
+//    void plan_next_steer(double time_step)
+//    {
+//        cache_predicted_obstacle_collisions();
+//        next_steer_ = steer_to_flock(time_step);
+//    }
+
     // Determine and store desired steering for this simulation step
     void plan_next_steer(double time_step)
     {
         cache_predicted_obstacle_collisions();
         next_steer_ = steer_to_flock(time_step);
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Apply desired steering for this simulation step
     void apply_next_steer(double time_step)
@@ -292,6 +307,12 @@ public:
     {
         double weight = 0;
         Vec3 avoidance;
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240615 why did sim slow down recently?
+//        cache_predicted_obstacle_collisions();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         CollisionList collisions = get_predicted_obstacle_collisions();
         if (not collisions.empty())
         {
@@ -406,6 +427,18 @@ public:
         {
             recompute_nearest_neighbors(n);
         }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240615 why did sim slow down recently?
+        
+//        if (is_first_boid())
+//        {
+//            grabPrintLock_evoflock();
+//            std::cout << draw().frame_counter();
+//            std::cout << " " << name() << " use neighbors";
+//            std::cout << std::endl;
+//        }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return cached_nearest_neighbors_;
     }
 
@@ -413,6 +446,18 @@ public:
     // TODO 20240129 look also at std::partial_sort() and std::stable_sort()
     void recompute_nearest_neighbors(int n=7)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240615 why did sim slow down recently?
+        
+//        if (is_first_boid())
+//        {
+//            grabPrintLock_evoflock();
+//            std::cout << draw().frame_counter();
+//            std::cout << " " << name() << " compute neighbors";
+//            std::cout << std::endl;
+//        }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         auto distance_squared_from_me = [&](const Boid* boid){
             return (boid->position() - position()).length_squared(); };
         auto sorted = [&](const Boid* a, const Boid* b){
@@ -505,12 +550,36 @@ public:
 
     CollisionList get_predicted_obstacle_collisions() const
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240615 why did sim slow down recently?
+        
+//        if (is_first_boid())
+//        {
+//            grabPrintLock_evoflock();
+//            std::cout << draw().frame_counter();
+//            std::cout << " " << name() << " use";
+//            std::cout << std::endl;
+//        }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return predicted_collisions_;
     }
 
     // Build a list of future collisions sorted by time, with soonest first.
     void cache_predicted_obstacle_collisions()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240615 why did sim slow down recently?
+        
+//        if (is_first_boid())
+//        {
+//            grabPrintLock_evoflock();
+//            std::cout << draw().frame_counter();
+//            std::cout << " " << name() << " cache";
+//            std::cout << std::endl;
+//        }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for (Obstacle* obstacle : flock_obstacles())
         {
             Vec3 point_of_impact = obstacle->ray_intersection(position(),
@@ -548,6 +617,13 @@ public:
         previous_position_ = position();
         return violation;
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240615 why did sim slow down recently?
+    
+    bool is_first_boid() const { return this == flock_boids().at(0); }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // For debugging: does this boid instance appear to be valid?
     // TODO 20230204 if needed again, should check other invariants.

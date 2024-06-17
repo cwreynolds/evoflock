@@ -480,10 +480,7 @@ int main(int argc, const char * argv[])
         util::Timer t("Run evolution.");
         for (int i = 0; i < max_evolution_steps; i++)
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240614 save data for fitness plots.
             GP::save_fitness_time_series(*population);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             population->evolutionStep(GP::evoflock_fitness_function,
                                       GP::scalarize_fitness);
             std::cout << std::endl;

@@ -338,11 +338,7 @@ double jiggle_scale = 0.1;
 // selecting a set of real number parameters for a flock simulation, via an
 // absolute and fixed fitness metric. There is only one function, all GpTrees
 // are exactly one function deep, differing only in their parameter values.
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240606 starting to prototype GP from-scratch-no-black-box
-//LazyPredator::FunctionSet evoflock_gp_function_set =
 LazyPredator::FunctionSet evoflock_ga_function_set =
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     {
         { "Multi_Objective_Fitness" },
@@ -427,10 +423,7 @@ LazyPredator::FunctionSet evoflock_ga_function_set =
 };
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240614 save data for fitness plots.
-
-
+// Called each step to handle writing log file with fitness over time data.
 void save_fitness_time_series(LP::Population& population)
 {
     int step_frequency = 300;
@@ -451,43 +444,10 @@ void save_fitness_time_series(LP::Population& population)
         stream.close();
     }
 }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240606 starting to prototype GP from-scratch-no-black-box
-
-
-// TODO starting to see signs of life:
-//
-//        Scale_v3(Neighbor_1_Position(),
-//                 -2.12243)
-//        Forward()
-//        Neighbor_1_Position()
-//        Vec3(Add_scalar(Distance_To_First_obstacle(),
-//                        Distance_To_First_obstacle()),
-//             Multiply_scalar(Distance_To_First_obstacle(),
-//                             Distance_To_First_obstacle()),
-//             Add_scalar(Distance_To_First_obstacle(),
-//                        Distance_To_First_obstacle()))
-//        Forward()
-//        Neighbor_1_Position()
-//        Forward()
-//        Vec3(Adjust_scalar(Distance_To_First_obstacle(),
-//                           0.534153),
-//             Multiply_scalar(Distance_To_First_obstacle(),
-//                             Distance_To_First_obstacle()),
-//             Add_scalar(Distance_To_First_obstacle(),
-//                        Distance_To_First_obstacle()))
-//        Neighbor_1_Position()
-//        Add_v3(Scale_v3(Neighbor_1_Position(),
-//                        0.917505),
-//               Scale_v3(Neighbor_1_Position(),
-//                        -4.65))
 
 
 // In the GP (vs GA) version, the evolved code is a per-frame steering function
-// for each Boid. This API supplied a "per thread global" which points to the
+// for each Boid. This API supplies a "per thread global" which points to the
 // current Boid.
 thread_local Boid* current_gp_boid_per_thread_ = nullptr;
 void setGpBoidPerThread(Boid* boid) { current_gp_boid_per_thread_ = boid; }

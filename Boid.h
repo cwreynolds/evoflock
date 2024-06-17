@@ -131,9 +131,10 @@ private:  // move to bottom of class later
     // Used to detect agent crossing Obstacle surface.
     Vec3 previous_position_ = Vec3::none();
     
-    // Per step cache of obstacle collision predictions.
-    CollisionList predicted_collisions_;
-    
+    // Per step cache of predicted obstacle collisions.
+    CollisionList predicted_obstacle_collisions_;
+    bool predicted_obstacle_collisions_cached_this_step_ = false;
+
     // Used to generate unique string names for Boid instances
     std::string name_;
     static inline int name_counter_ = 0;
@@ -188,11 +189,9 @@ public:
         name_ = "boid_" + std::to_string(name_counter_++);
     }
 
-
     // Determine and store desired steering for this simulation step
     void plan_next_steer(double time_step)
     {
-        cache_predicted_obstacle_collisions();
         next_steer_ = steer_to_flock(time_step);
     }
 
@@ -207,6 +206,7 @@ public:
     Vec3 steer_to_flock(double time_step)
     {
         BoidPtrList neighbors = nearest_neighbors(time_step);
+        flush_cache_of_predicted_obstacle_collisions();
         Vec3 f = forward() * fp().weight_forward;
         Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
         Vec3 a = steer_to_align(neighbors) * fp().weight_align;
@@ -505,35 +505,48 @@ public:
         return up_memory_.value.normalize();
     }
 
-    CollisionList get_predicted_obstacle_collisions() const
+    void flush_cache_of_predicted_obstacle_collisions()
     {
-        return predicted_collisions_;
+        predicted_obstacle_collisions_cached_this_step_ = false;
+    }
+
+    CollisionList get_predicted_obstacle_collisions()
+    {
+        if (not predicted_obstacle_collisions_cached_this_step_)
+        {
+            cache_predicted_obstacle_collisions();
+            predicted_obstacle_collisions_cached_this_step_ = true;
+        }
+        return predicted_obstacle_collisions_;
     }
 
     // Build a list of future collisions sorted by time, with soonest first.
     void cache_predicted_obstacle_collisions()
     {
+        predicted_obstacle_collisions_.clear();
         for (Obstacle* obstacle : flock_obstacles())
         {
-            Vec3 point_of_impact = obstacle->ray_intersection(position(),
-                                                              forward(),
-                                                              fp().body_radius);
-            if (not point_of_impact.is_none())
+            // Compute predicted point of impact, if any.
+            Vec3 poi = obstacle->ray_intersection(position(),
+                                                  forward(),
+                                                  fp().body_radius);
+            if (not poi.is_none())
             {
-                double dist_to_collision = (point_of_impact - position()).length();
+                double dist_to_collision = (poi - position()).length();
                 double time_to_collision = dist_to_collision / speed();
-                Vec3 normal_at_poi = obstacle->normal_at_poi(point_of_impact,
-                                                             position());
-                predicted_collisions_.push_back({*obstacle,
-                                                 time_to_collision,
-                                                 dist_to_collision,
-                                                 point_of_impact,
-                                                 normal_at_poi});
+                Vec3 normal_at_poi = obstacle->normal_at_poi(poi, position());
+                predicted_obstacle_collisions_.push_back({*obstacle,
+                                                          time_to_collision,
+                                                          dist_to_collision,
+                                                          poi,
+                                                          normal_at_poi});
             }
         }
         auto sorted = [&](const Collision& a, const Collision& b)
-            { return a.time_to_collision < b.time_to_collision; };
-        std::ranges::sort(predicted_collisions_, sorted);
+        { 
+            return a.time_to_collision < b.time_to_collision;
+        };
+        std::ranges::sort(predicted_obstacle_collisions_, sorted);
     }
 
     bool detectObstacleViolations()

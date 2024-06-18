@@ -100,7 +100,11 @@ private:  // move to bottom of class later
     Draw* draw_ = nullptr;
     FlockParameters* fp_ = nullptr;
     ObstaclePtrList* flock_obstacles_;  // Flock's current list of obstacles.
-    BoidPtrList* flock_boids_;  // List of boids in flock.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240617 revisit incremental_sort()
+//    BoidPtrList* flock_boids_;  // List of boids in flock.
+    BoidPtrList flock_boids_;  // List of boids in flock.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Set during sense/plan phase, saved for steer phase.
     Vec3 next_steer_;
@@ -123,8 +127,8 @@ private:  // move to bottom of class later
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240615 why did sim slow down recently?
     // TODO 20240614 save data for fitness plots.
-//    double neighbor_refresh_rate_ = 0.25;
-    double neighbor_refresh_rate_ = 0.5;
+    double neighbor_refresh_rate_ = 0.25;
+//    double neighbor_refresh_rate_ = 0.5;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double time_since_last_neighbor_refresh_ = 0;
     
@@ -141,10 +145,22 @@ private:  // move to bottom of class later
     
 public:
     // Accessors
-    BoidPtrList& flock_boids() { return *flock_boids_; }
-    const BoidPtrList& flock_boids() const { return *flock_boids_; }
-    void set_flock_boids(BoidPtrList* bpl) { flock_boids_ = bpl; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240617 revisit incremental_sort()
     
+//    BoidPtrList& flock_boids() { return *flock_boids_; }
+//    const BoidPtrList& flock_boids() const { return *flock_boids_; }
+//    void set_flock_boids(BoidPtrList* bpl) { flock_boids_ = bpl; }
+    
+    
+    // TODO each boid keeps its own "approximjately sorted" list of flockmates.
+    
+    BoidPtrList& flock_boids() { return flock_boids_; }
+    const BoidPtrList& flock_boids() const { return flock_boids_; }
+    void set_flock_boids(BoidPtrList* bpl) { flock_boids_ = *bpl; }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     ObstaclePtrList& flock_obstacles() { return *flock_obstacles_; }
     const ObstaclePtrList& flock_obstacles() const { return *flock_obstacles_; }
     void set_flock_obstacles(ObstaclePtrList* opl) { flock_obstacles_ = opl; }
@@ -399,17 +415,35 @@ public:
         return (projection_onto_forward > cos_angle_threshold) ? 1 : 0;
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240617 revisit incremental_sort()
+    
+//    // Returns a list of the N Boids nearest this one.
+//    // (n=3 increased frame rate from ~30 to ~50 fps. No other obvious changes.)
+//    BoidPtrList nearest_neighbors(double time_step, int n = 7)
+//    {
+//        time_since_last_neighbor_refresh_ += time_step;
+//        if (time_since_last_neighbor_refresh_ > neighbor_refresh_rate_)
+//        {
+//            recompute_nearest_neighbors(n);
+//        }
+//        return cached_nearest_neighbors_;
+//    }
+
+
     // Returns a list of the N Boids nearest this one.
     // (n=3 increased frame rate from ~30 to ~50 fps. No other obvious changes.)
     BoidPtrList nearest_neighbors(double time_step, int n = 7)
     {
         time_since_last_neighbor_refresh_ += time_step;
-        if (time_since_last_neighbor_refresh_ > neighbor_refresh_rate_)
+//        if (time_since_last_neighbor_refresh_ > neighbor_refresh_rate_)
         {
             recompute_nearest_neighbors(n);
         }
         return cached_nearest_neighbors_;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Recomputes a cached list of the N Boids nearest this one.
     // TODO 20240129 look also at std::partial_sort() and std::stable_sort()
@@ -419,15 +453,72 @@ public:
             return (boid->position() - position()).length_squared(); };
         auto sorted = [&](const Boid* a, const Boid* b){
             return distance_squared_from_me(a) < distance_squared_from_me(b); };
-        BoidPtrList all_boids = flock_boids();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240617 revisit incremental_sort()
+
+//        BoidPtrList all_boids = flock_boids();
+        
         // Maybe neighbor list size should be min(n,flock.size())? But for now:
-        assert((all_boids.size() > n) && "neighborhood > flock size");
+//        assert((all_boids.size() > n) && "neighborhood > flock size");
+        assert((flock_boids().size() > n) && "neighborhood > flock size");
+
+//        grabPrintLock_evoflock()
+//        std::cout << std::endl;
+//        debugPrint(position())
+//        
+//        for (int i = 0; i < 7; i++)
+//        {
+//            std::cout << i << ": distance_squared_from_me = " << distance_squared_from_me(all_boids[i]) << std::endl;
+//        }
+        
+        
+        
         // Sort all boids by nearest distance (squared) from me.
-        std::ranges::sort(all_boids, sorted);
+//        std::ranges::sort(all_boids, sorted);
+//        util::incremental_sort(all_boids, sorted);
+        
+//        for (int i = int(all_boids.size()) - 1; i > 0; i--)
+//        {
+//            if (not sorted(all_boids[i - 1], all_boids[i]))
+//            {
+//                std::swap(all_boids[i - 1], all_boids[i]);
+//            }
+//        }
+
+//            int stride = EF::RS().random2(1, 10);
+//    //        for (int i = int(all_boids.size()) - 1; i > 0; i--)
+//            for (int i = int(all_boids.size()) - 1; i > 0; i = i - stride)
+//            {
+//                if (not sorted(all_boids[i - 1], all_boids[i]))
+//                {
+//                    std::swap(all_boids[i - 1], all_boids[i]);
+//                }
+//            }
+
+        for (int i = int(flock_boids_.size()) - 1; i > 0; i--)
+        {
+            if (not sorted(flock_boids_[i - 1], flock_boids_[i]))
+            {
+                std::swap(flock_boids_[i - 1], flock_boids_[i]);
+            }
+        }
+
+        
+//        for (int i = 0; i < 7; i++)
+//        {
+//            std::cout << i << ": distance_squared_from_me = " << distance_squared_from_me(all_boids[i]) << std::endl;
+//        }
+//
+//        std::cout << std::endl;
+
         // Set "cached_nearest_neighbors_" to nearest "n" in "all_boids".
         cached_nearest_neighbors_.resize(n);
-        auto abb = all_boids.begin() + 1; // + 1 meaning to skip THIS boid.
-        std::copy(abb, abb + n, cached_nearest_neighbors_.begin());
+//        auto abb = all_boids.begin() + 1; // + 1 meaning to skip THIS boid.
+//        std::copy(abb, abb + n, cached_nearest_neighbors_.begin());
+        auto fbb = flock_boids_.begin() + 1; // + 1 meaning to skip THIS boid.
+        std::copy(fbb, fbb + n, cached_nearest_neighbors_.begin());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Verify neighbor distances.
         assert(distance_squared_from_me(cached_nearest_neighbors_[0]) > 0);
         time_since_last_neighbor_refresh_ = 0;
@@ -542,6 +633,8 @@ public:
                                                           normal_at_poi});
             }
         }
+        // This would have caught the bug I spent days tracking down (20240617):
+        assert(predicted_obstacle_collisions_.size()<=flock_obstacles().size());
         auto sorted = [&](const Collision& a, const Collision& b)
         { 
             return a.time_to_collision < b.time_to_collision;

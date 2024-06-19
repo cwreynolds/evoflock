@@ -155,13 +155,6 @@ public:
         // Set up each new Boid.
         RandomSequence& rs = EF::RS();
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
-        // Initialize per-Boid cached_nearest_neighbors. Randomize time stamp.
-        for (Boid* boid : boids())
-        {
-            boid->recompute_nearest_neighbors();
-            double t = rs.frandom01() * boid->neighbor_refresh_rate();
-            boid->set_time_since_last_neighbor_refresh(t);
-        }
     }
 
     void init_boid(Boid* boid, double radius, Vec3 center, RandomSequence& rs)

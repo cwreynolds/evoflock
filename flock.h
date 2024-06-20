@@ -157,6 +157,11 @@ public:
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240619 WIP first GP_not_GA run
+    std::function<Vec3()> override_steer_function = nullptr;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     void init_boid(Boid* boid, double radius, Vec3 center, RandomSequence& rs)
     {
         // uniform over whole sphere enclosure
@@ -171,6 +176,10 @@ public:
         boid->set_draw(&draw());
         boid->set_flock_boids(&boids());
         boid->set_flock_obstacles(&obstacles());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240619 WIP first GP_not_GA run
+        boid->override_steer_function = override_steer_function;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Vec3 mean_forward(1, 0, 0);
         Vec3 noise_forward = rs.random_point_in_unit_radius_sphere() * 0.1;

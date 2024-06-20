@@ -203,24 +203,64 @@ public:
     {
         steer(next_steer_, time_step);
     }
-
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240619 WIP first GP_not_GA run
+    //               VERY PROTOTYPE!!
+    
+//    // Basic flocking behavior. Computes steering force for one simulation step
+//    // (an animation frame) for one boid in a flock.
+//    Vec3 steer_to_flock(double time_step)
+//    {
+//        BoidPtrList neighbors = nearest_neighbors();
+//        flush_cache_of_predicted_obstacle_collisions();
+//        Vec3 f = forward() * fp().weight_forward;
+//        Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
+//        Vec3 a = steer_to_align(neighbors) * fp().weight_align;
+//        Vec3 c = steer_to_cohere(neighbors) * fp().weight_cohere;
+//        Vec3 o = steer_to_avoid() * fp().weight_avoid;
+//        Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
+//        combined_steering = anti_stall_adjustment(combined_steering);
+//        annotation(s, a, c, o, combined_steering);
+//        return combined_steering;
+//    }
+  
+    static inline bool GP_not_GA = false;
+    
+    
+    std::function<Vec3()> override_steer_function = nullptr;
+    
+    
     // Basic flocking behavior. Computes steering force for one simulation step
     // (an animation frame) for one boid in a flock.
     Vec3 steer_to_flock(double time_step)
     {
+//        debugPrint(GP_not_GA)
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
-        Vec3 f = forward() * fp().weight_forward;
-        Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
-        Vec3 a = steer_to_align(neighbors) * fp().weight_align;
-        Vec3 c = steer_to_cohere(neighbors) * fp().weight_cohere;
-        Vec3 o = steer_to_avoid() * fp().weight_avoid;
-        Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
-        combined_steering = anti_stall_adjustment(combined_steering);
-        annotation(s, a, c, o, combined_steering);
-        return combined_steering;
+
+        if (GP_not_GA)
+        {
+            return override_steer_function();
+        }
+        else
+        {
+//            BoidPtrList neighbors = nearest_neighbors();
+//            flush_cache_of_predicted_obstacle_collisions();
+            Vec3 f = forward() * fp().weight_forward;
+            Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
+            Vec3 a = steer_to_align(neighbors) * fp().weight_align;
+            Vec3 c = steer_to_cohere(neighbors) * fp().weight_cohere;
+            Vec3 o = steer_to_avoid() * fp().weight_avoid;
+            Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
+            combined_steering = anti_stall_adjustment(combined_steering);
+            annotation(s, a, c, o, combined_steering);
+            return combined_steering;
+        }
     }
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Steering force component to move away from neighbors.
     Vec3 steer_to_separate(const BoidPtrList& neighbors)
     {

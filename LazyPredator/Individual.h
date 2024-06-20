@@ -72,6 +72,14 @@ namespace LazyPredator
 class Individual
 {
 public:
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240619 WIP first GP_not_GA run
+    // VERY TEMP
+    std::string tree_to_string() const
+    {
+        return tree_.to_string(true);
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Individual()
     {
         constructor_count_++;

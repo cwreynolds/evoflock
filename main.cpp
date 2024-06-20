@@ -458,21 +458,57 @@ int main(int argc, const char * argv[])
 //    lp::LPRS().setSeed(20240512);
     lp::LPRS().setSeed(20240606);
 
-    int min_tree_size = 2;
-    int max_tree_size = 20;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240619 WIP first GP_not_GA run
+    
+    bool GP_not_GA = false;
+//    bool GP_not_GA = true;
+    
+
+    //    int min_tree_size = 2;
+//    int max_tree_size = 20;
+    int min_tree_size = GP_not_GA ? 10  :  2;
+    int max_tree_size = GP_not_GA ? 100 : 20;
+    
+    auto fitness_function = (GP_not_GA ?
+                             GP::evoflock_gp_fitness_function :
+                             GP::evoflock_ga_fitness_function);
+
+    Boid::GP_not_GA = GP_not_GA;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     LazyPredator::Population* population = nullptr;
 
     {
         std::cout << "Create population." << std::endl;
         util::Timer t("Create population.");
-        LazyPredator::FunctionSet& fs = GP::evoflock_ga_function_set;
-        fs.setCrossoverFunction(GP::evoflock_ga_crossover);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240619 WIP first GP_not_GA run
+        
+//        LazyPredator::FunctionSet& fs = GP::evoflock_ga_function_set;
+//        fs.setCrossoverFunction(GP::evoflock_ga_crossover);
+
+        LazyPredator::FunctionSet fs = (GP_not_GA ?
+                                        GP::evoflock_gp_function_set() :
+                                        GP::evoflock_ga_function_set);
+        if (not GP_not_GA)
+        {
+            fs.setCrossoverFunction(GP::evoflock_ga_crossover);
+        }
+        
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         population = new LazyPredator::Population (individuals,
                                                    subpops,
                                                    max_tree_size,
                                                    min_tree_size,
                                                    max_tree_size,
                                                    fs);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240619 WIP first GP_not_GA run
+        std::cout << "example tree:" << std::endl;
+        std::cout << population->bestFitness()->tree_to_string() << std::endl;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     {
@@ -481,8 +517,20 @@ int main(int argc, const char * argv[])
         for (int i = 0; i < max_evolution_steps; i++)
         {
             GP::save_fitness_time_series(*population);
-            population->evolutionStep(GP::evoflock_fitness_function,
-                                      GP::scalarize_fitness);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240619 WIP first GP_not_GA run
+            
+//            population->evolutionStep(GP::evoflock_fitness_function,
+//                                      GP::scalarize_fitness);
+
+//            population->evolutionStep((GP_not_GA ?
+//                                       GP::evoflock_gp_fitness_function :
+//                                       GP::evoflock_ga_fitness_function),
+//                                      GP::scalarize_fitness);
+
+            population->evolutionStep(fitness_function, GP::scalarize_fitness);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             std::cout << std::endl;
         }
     }

@@ -212,7 +212,10 @@ public:
         {
             if (not individual->hasMultiObjectiveFitness())
             {
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20240619 WIP first GP_not_GA run
                 individual->treeValue();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 MultiObjectiveFitness mof = mo_fitness_function(individual);
                 individual->setMultiObjectiveFitness(mof);
                 double scalar = fitness_scalarize_function(mof);

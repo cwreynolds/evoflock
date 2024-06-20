@@ -25,12 +25,43 @@ namespace GP
 typedef LazyPredator::MultiObjectiveFitness MOF;
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240619 WIP first GP_not_GA run
+
+//    // Fitness function, simply returns Individual's tree's value (computing it and
+//    // caching it on first call).
+//    inline MOF evoflock_fitness_function(LP::Individual* individual)
+//    {
+//        return std::any_cast<MOF>(individual->tree().getRootValue());
+//    }
+
 // Fitness function, simply returns Individual's tree's value (computing it and
 // caching it on first call).
-inline MOF evoflock_fitness_function(LP::Individual* individual)
+inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
 {
     return std::any_cast<MOF>(individual->tree().getRootValue());
 }
+
+
+
+inline MOF run_gp_flock_simulation(LP::Individual* individual,
+                                   bool write_file);
+
+inline MOF run_gp_flock_simulation(LP::Individual* individual)
+{
+    return run_gp_flock_simulation(individual, false);
+}
+
+
+
+// Fitness function, runs a flock simulation using evolved tree for steering
+inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
+{
+    std::cout << "in evoflock_gp_fitness_function()" << std::endl;
+    return run_gp_flock_simulation(individual);
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 // Take the minimum element of a MultiObjectiveFitness ("Shangian scalarizer").
@@ -241,6 +272,116 @@ inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = fal
     std::cout << std::endl << std::endl;
     return least_mof;
 }
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240619 WIP first GP_not_GA run
+
+
+//    // Fitness function, runs a flock simulation using evolved tree for steering
+//    inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
+//    {
+//        //    return std::any_cast<MOF>(individual->tree().getRootValue());
+//
+//
+//        // This needs to make a lambda which executes the tree to get a steering vector.
+//
+//        // That lambda needs to be plugged in to Boid (or probably Flock) so it is
+//        // invoked each step for each boid to steer it.
+//
+//        // The lambda need to somehow de-cache its previous "root value" each time.
+//
+//
+//
+//        //    auto fitness = run_gp_flock_simulation(individual);
+//        //    return std::any(fitness);
+//
+//        return run_gp_flock_simulation(individual);
+//
+//    }
+
+
+inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
+{
+    
+    int runs = 4;
+    MOF least_mof;
+    double least_scalar_fitness = std::numeric_limits<double>::infinity();
+    std::vector<double> scalar_fits;
+    std::mutex save_mof_mutex;
+    // Perform one simulation run, and record results.
+    auto do_1_run = [&]()
+    {
+        // These steps can happen in parallel threads:
+        Flock flock;
+        init_flock(flock);
+        flock.setSaveBoidCenters(write_file);
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+        //        flock.fp() = fp;
+
+        grabPrintLock_evoflock();
+        std::cout << "in do_1_run()" << std::endl;
+
+        individual->treeValue();
+
+        LP::GpTree gp_tree;
+        gp_tree = individual->tree();
+        
+        
+
+        std::cout << "tree from individual:" << std::endl;
+        std::cout << individual->tree().to_string() << std::endl;
+        std::cout << "tree copy:" << std::endl;
+        std::cout << gp_tree.to_string() << std::endl;
+        std::cout << "Individual::tree_to_string():" << std::endl;
+        std::cout << individual->tree_to_string() << std::endl;
+
+        
+        flock.override_steer_function = [&]()
+        {
+            debugPrint(std::any_cast<Vec3>(gp_tree.eval()))
+            return std::any_cast<Vec3>(gp_tree.eval());
+        };
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+
+        flock.run();
+        MOF mof = multiObjectiveFitnessOfFlock(flock);
+        // These steps happen in the single thread with lock on save_mof_mutex.
+        {
+            std::lock_guard<std::mutex> smm(save_mof_mutex);
+            assert(mof.size() == mof_names.size());
+            scalar_fits.push_back(scalarize_fitness(mof));
+            if (least_scalar_fitness > scalar_fits.back())
+            {
+                least_scalar_fitness = scalar_fits.back();
+                least_mof = mof;
+            }
+        }
+    };
+#if 0
+    // Do simulation runs sequentially.
+    for (int r = 0; r < runs; r++) { do_1_run(); }
+#else
+    // Do each simulation run in a parallel thread.
+    std::vector<std::thread> threads;
+    for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
+    // Wait for helper threads to finish, join them with this thread.
+    for (auto& t : threads) { t.join(); }
+#endif
+    assert(scalar_fits.size() == runs);
+    fitness_logger(least_mof);
+    std::cout << "    min composite "<< least_scalar_fitness;
+    std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
+    std::cout << std::endl << std::endl;
+    return least_mof;
+    
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.

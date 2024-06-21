@@ -324,7 +324,16 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
         grabPrintLock_evoflock();
         std::cout << "in do_1_run()" << std::endl;
 
-        individual->treeValue();
+//        individual->treeValue();
+
+        debugPrint(&individual)
+        debugPrint(&(individual->tree()))
+        debugPrint(individual->tree().subtrees().size());
+        debugPrint(std::any_cast<Vec3>(individual->tree().getRootValue()));
+        debugPrint(individual->tree().getRootType()->name())
+        debugPrint(individual->tree().getRootFunction().name())
+
+        std::cout << "-------------------------------" << std::endl;
 
         LP::GpTree gp_tree;
         gp_tree = individual->tree();
@@ -362,7 +371,8 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
             }
         }
     };
-#if 0
+//#if 0
+#if 1
     // Do simulation runs sequentially.
     for (int r = 0; r < runs; r++) { do_1_run(); }
 #else
@@ -586,21 +596,26 @@ void save_fitness_time_series(LP::Population& population)
     }
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240621 GP error at start
 
-// In the GP (vs GA) version, the evolved code is a per-frame steering function
-// for each Boid. This API supplies a "per thread global" which points to the
-// current Boid.
-thread_local Boid* current_gp_boid_per_thread_ = nullptr;
-void setGpBoidPerThread(Boid* boid) { current_gp_boid_per_thread_ = boid; }
-Boid* getGpBoidPerThread()
-{
-    assert(current_gp_boid_per_thread_ && "invalid current_gp_boid_per_thread_");
-    return current_gp_boid_per_thread_;
-}
+//    // In the GP (vs GA) version, the evolved code is a per-frame steering function
+//    // for each Boid. This API supplies a "per thread global" which points to the
+//    // current Boid.
+//    thread_local Boid* current_gp_boid_per_thread_ = nullptr;
+//    void setGpBoidPerThread(Boid* boid) { current_gp_boid_per_thread_ = boid; }
+//    Boid* getGpBoidPerThread()
+//    {
+//        assert(current_gp_boid_per_thread_ && "invalid current_gp_boid_per_thread_");
+//        return current_gp_boid_per_thread_;
+//    }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Boid* getGpBoidNeighbor(int n)
 {
-    BoidPtrList neighbors = getGpBoidPerThread()->cached_nearest_neighbors();
+//    BoidPtrList neighbors = getGpBoidPerThread()->cached_nearest_neighbors();
+    BoidPtrList neighbors = Boid::getGpPerThread()->cached_nearest_neighbors();
     assert(neighbors.size() >= n);
     return neighbors.at(n - 1);
 }
@@ -626,7 +641,7 @@ LP::FunctionSet evoflock_gp_function_set()
         // GpTypes
         {
             { "Vec3" },
-            { "Scalar_1",     -1.0,   1.0 },
+//            { "Scalar_1",     -1.0,   1.0 },
             { "Scalar_5",     -5.0,   5.0 },
             { "Scalar_100", -100.0, 100.0 },
         },
@@ -780,14 +795,16 @@ LP::FunctionSet evoflock_gp_function_set()
                 "Velocity", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    return std::any(getGpBoidPerThread()->velocity());
+//                    return std::any(getGpBoidPerThread()->velocity());
+                    return std::any(Boid::getGpPerThread()->velocity());
                 }
             },
             {
                 "Acceleration", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    return std::any(getGpBoidPerThread()->getAcceleration());
+//                    return std::any(getGpBoidPerThread()->getAcceleration());
+                    return std::any(Boid::getGpPerThread()->getAcceleration());
                 }
             },
             {
@@ -803,7 +820,8 @@ LP::FunctionSet evoflock_gp_function_set()
                 [](LP::GpTree& t)
                 {
                     return std::any(getGpBoidNeighbor(1)->position() -
-                                    getGpBoidPerThread()->position());
+//                                    getGpBoidPerThread()->position());
+                                    Boid::getGpPerThread()->position());
                 }
             },
             {
@@ -819,7 +837,8 @@ LP::FunctionSet evoflock_gp_function_set()
                 [](LP::GpTree& t)
                 {
                     return std::any(getGpBoidNeighbor(2)->position() -
-                                    getGpBoidPerThread()->position());
+//                                    getGpBoidPerThread()->position());
+                                    Boid::getGpPerThread()->position());
                 }
             },
             {
@@ -835,14 +854,16 @@ LP::FunctionSet evoflock_gp_function_set()
                 [](LP::GpTree& t)
                 {
                     return std::any(getGpBoidNeighbor(3)->position() -
-                                    getGpBoidPerThread()->position());
+//                                    getGpBoidPerThread()->position());
+                                    Boid::getGpPerThread()->position());
                 }
             },
             {
                 "First_Obs_Dist", "Scalar_100", {},
                 [](LP::GpTree& t)
                 {
-                    Boid& boid = *getGpBoidPerThread();
+//                    Boid& boid = *getGpBoidPerThread();
+                    Boid& boid = *Boid::getGpPerThread();
                     double distance = std::numeric_limits<double>::infinity();
                     auto collisions = boid.get_predicted_obstacle_collisions();
                     if (collisions.size() > 0)
@@ -858,7 +879,8 @@ LP::FunctionSet evoflock_gp_function_set()
                 "First_Obs_Normal", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    Boid& boid = *getGpBoidPerThread();
+//                    Boid& boid = *getGpBoidPerThread();
+                    Boid& boid = *Boid::getGpPerThread();
                     Vec3 normal;
                     auto collisions = boid.get_predicted_obstacle_collisions();
                     if (collisions.size() > 0)

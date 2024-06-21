@@ -21,7 +21,7 @@ namespace LazyPredator
 class GpTree
 {
 public:
-    // Default costructor.
+    // Default constructor.
     GpTree(){}
     // Reference to vector of subtrees, const or not.
     std::vector<GpTree>& subtrees() { return subtrees_; }
@@ -74,6 +74,13 @@ public:
     {
         if (!isLeaf())
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240621 GP error at start
+//            debugPrint("inGpTree::eval()")
+//            debugPrint(this)
+//            getRootFunction().print();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             setRootValue(getRootFunction().eval(*this),
                          *getRootFunction().returnType());
         }

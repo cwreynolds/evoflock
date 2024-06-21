@@ -506,8 +506,56 @@ int main(int argc, const char * argv[])
                                                    fs);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240619 WIP first GP_not_GA run
-        std::cout << "example tree:" << std::endl;
-        std::cout << population->bestFitness()->tree_to_string() << std::endl;
+        
+//        std::cout << "example tree:" << std::endl;
+//        std::cout << population->bestFitness()->tree_to_string() << std::endl;
+        
+//            Flock flock;
+//            GP::init_flock(flock);
+//    //        flock.make_boids(200, 100, Vec3());
+//            flock.run();
+//            Boid* boid = flock.boids().at(0);
+//        Boid::setGpPerThread(boid);
+
+
+        if (GP_not_GA)
+        {
+            std::vector<Boid> boids(10);
+            for (int i = 0; i < 10; i++)
+            {
+                boids[i].setPosition(EF::RS().random_unit_vector() * 10);
+                boids[i].setForward(EF::RS().random_unit_vector());
+            }
+            Boid& boid = boids[0];
+            BoidPtrList neighbors;
+            for (Boid& b : boids) { neighbors.push_back(&b); }
+            boid.set_flock_boids(&neighbors);
+            boid.recompute_nearest_neighbors();
+            EvertedSphereObstacle eso(100, Vec3());
+            ObstaclePtrList opl = {&eso};
+            boid.set_flock_obstacles(&opl);
+            FlockParameters fp;
+            boid.set_fp(&fp);
+            
+            Boid::setGpPerThread(&boid);
+            
+            int count = 1;
+            auto print_individuals_tree = [&](LP::Individual* i)
+            {
+                std::cout << std::endl << count++ << std::endl;
+                std::string tree_string = i->tree_to_string();
+                std::cout << tree_string << std::endl;
+                LP::GpTree gp_tree = i->tree();
+                std::string copied_tree_string = gp_tree.to_string(true);
+                std::cout << "tree copy matches original" << std::endl;
+                assert(tree_string == copied_tree_string);
+//                std::cout << "copied tree:" << std::endl;
+//                std::cout << gp_tree.to_string(true) << std::endl;
+                std::cout << "treeValue():" << std::endl;
+                std::cout << std::any_cast<Vec3>(i->treeValue()) << std::endl;
+            };
+            population->applyToAllIndividuals(print_individuals_tree);
+        }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     

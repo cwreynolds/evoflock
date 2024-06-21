@@ -227,10 +227,19 @@ public:
   
     static inline bool GP_not_GA = false;
     
-    
     std::function<Vec3()> override_steer_function = nullptr;
     
-    
+    // In the GP (vs GA) version, the evolved code is a per-frame steering function
+    // for each Boid. This API supplies a "per thread global" which points to the
+    // current Boid.
+    static inline thread_local Boid* gp_boid_per_thread_ = nullptr;
+    static void setGpPerThread(Boid* boid) { gp_boid_per_thread_ = boid; }
+    static Boid* getGpPerThread()
+    {
+        assert(gp_boid_per_thread_ && "invalid Boid::gp_boid_per_thread_");
+        return gp_boid_per_thread_;
+    }
+
     // Basic flocking behavior. Computes steering force for one simulation step
     // (an animation frame) for one boid in a flock.
     Vec3 steer_to_flock(double time_step)
@@ -239,8 +248,15 @@ public:
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
 
-        if (GP_not_GA)
+//            if (GP_not_GA)
+//            {
+//    //            GP::setGpBoidPerThread();
+//                setGpPerThread(this);
+//                return override_steer_function();
+//            }
+        if (GP_not_GA and override_steer_function)
         {
+            setGpPerThread(this);
             return override_steer_function();
         }
         else

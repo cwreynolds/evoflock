@@ -57,6 +57,7 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual)
 // Fitness function, runs a flock simulation using evolved tree for steering
 inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
 {
+    std::cout << "#################################" << std::endl;
     std::cout << "in evoflock_gp_fitness_function()" << std::endl;
     return run_gp_flock_simulation(individual);
 }
@@ -301,9 +302,19 @@ inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = fal
 //    }
 
 
+// TODO 20240622 just temporary for debugging
+std::map<LP::Individual*, Vec3> values_of_individuals;
+std::map<LP::Individual*, LP::GpTree> trees_of_individuals;
+
+
 inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
 {
-    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    debugPrint(Boid::getGpPerThread())
+    debugPrint(values_of_individuals[individual])
+    debugPrint(trees_of_individuals[individual].to_string(true))
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     int runs = 4;
     MOF least_mof;
     double least_scalar_fitness = std::numeric_limits<double>::infinity();
@@ -323,6 +334,12 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
 
         grabPrintLock_evoflock();
         std::cout << "in do_1_run()" << std::endl;
+        
+        
+        // TODO 20240622 new, preset to dummy:
+//        debugPrint(flock.boids().size())
+//        Boid::setGpPerThread(flock.boids().at(0));
+        
 
 //        individual->treeValue();
 
@@ -596,25 +613,9 @@ void save_fitness_time_series(LP::Population& population)
     }
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240621 GP error at start
-
-//    // In the GP (vs GA) version, the evolved code is a per-frame steering function
-//    // for each Boid. This API supplies a "per thread global" which points to the
-//    // current Boid.
-//    thread_local Boid* current_gp_boid_per_thread_ = nullptr;
-//    void setGpBoidPerThread(Boid* boid) { current_gp_boid_per_thread_ = boid; }
-//    Boid* getGpBoidPerThread()
-//    {
-//        assert(current_gp_boid_per_thread_ && "invalid current_gp_boid_per_thread_");
-//        return current_gp_boid_per_thread_;
-//    }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Boid* getGpBoidNeighbor(int n)
 {
-//    BoidPtrList neighbors = getGpBoidPerThread()->cached_nearest_neighbors();
     BoidPtrList neighbors = Boid::getGpPerThread()->cached_nearest_neighbors();
     assert(neighbors.size() >= n);
     return neighbors.at(n - 1);
@@ -636,12 +637,11 @@ Vec3 clean_vec3(Vec3 v)
 // FuntionSet for the GP version of EvoFlock.
 LP::FunctionSet evoflock_gp_function_set()
 {
-    return 
+    return
     {
         // GpTypes
         {
             { "Vec3" },
-//            { "Scalar_1",     -1.0,   1.0 },
             { "Scalar_5",     -5.0,   5.0 },
             { "Scalar_100", -100.0, 100.0 },
         },
@@ -795,7 +795,6 @@ LP::FunctionSet evoflock_gp_function_set()
                 "Velocity", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-//                    return std::any(getGpBoidPerThread()->velocity());
                     return std::any(Boid::getGpPerThread()->velocity());
                 }
             },
@@ -803,7 +802,6 @@ LP::FunctionSet evoflock_gp_function_set()
                 "Acceleration", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-//                    return std::any(getGpBoidPerThread()->getAcceleration());
                     return std::any(Boid::getGpPerThread()->getAcceleration());
                 }
             },
@@ -820,7 +818,6 @@ LP::FunctionSet evoflock_gp_function_set()
                 [](LP::GpTree& t)
                 {
                     return std::any(getGpBoidNeighbor(1)->position() -
-//                                    getGpBoidPerThread()->position());
                                     Boid::getGpPerThread()->position());
                 }
             },
@@ -837,7 +834,6 @@ LP::FunctionSet evoflock_gp_function_set()
                 [](LP::GpTree& t)
                 {
                     return std::any(getGpBoidNeighbor(2)->position() -
-//                                    getGpBoidPerThread()->position());
                                     Boid::getGpPerThread()->position());
                 }
             },
@@ -854,7 +850,6 @@ LP::FunctionSet evoflock_gp_function_set()
                 [](LP::GpTree& t)
                 {
                     return std::any(getGpBoidNeighbor(3)->position() -
-//                                    getGpBoidPerThread()->position());
                                     Boid::getGpPerThread()->position());
                 }
             },
@@ -862,7 +857,6 @@ LP::FunctionSet evoflock_gp_function_set()
                 "First_Obs_Dist", "Scalar_100", {},
                 [](LP::GpTree& t)
                 {
-//                    Boid& boid = *getGpBoidPerThread();
                     Boid& boid = *Boid::getGpPerThread();
                     double distance = std::numeric_limits<double>::infinity();
                     auto collisions = boid.get_predicted_obstacle_collisions();
@@ -879,7 +873,6 @@ LP::FunctionSet evoflock_gp_function_set()
                 "First_Obs_Normal", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-//                    Boid& boid = *getGpBoidPerThread();
                     Boid& boid = *Boid::getGpPerThread();
                     Vec3 normal;
                     auto collisions = boid.get_predicted_obstacle_collisions();

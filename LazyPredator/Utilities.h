@@ -550,5 +550,3 @@ inline RandomSequence& LPRS() { return LP::randomSequence(); }
 
 
 }  // end of namespace LazyPredator
-
-namespace lp = LazyPredator;

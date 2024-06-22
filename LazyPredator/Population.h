@@ -210,12 +210,16 @@ public:
         // Customized function to perform MOF evaluation of individual.
         auto mof_eval = [&](Individual* individual)
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240622 still debugging error GP_not_GA run
+            std::cout << "in mof_eval() inside Population::evolutionStep()" << std::endl;
+            debugPrint(individual)
+            debugPrint(individual->tree_to_string())
+            std::cout << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (not individual->hasMultiObjectiveFitness())
             {
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240619 WIP first GP_not_GA run
                 individual->treeValue();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 MultiObjectiveFitness mof = mo_fitness_function(individual);
                 individual->setMultiObjectiveFitness(mof);
                 double scalar = fitness_scalarize_function(mof);

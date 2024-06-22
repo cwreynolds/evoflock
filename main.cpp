@@ -456,7 +456,7 @@ int main(int argc, const char * argv[])
 //    lp::LPRS().setSeed(20240508);
 //    lp::LPRS().setSeed(20240509);
 //    lp::LPRS().setSeed(20240512);
-    lp::LPRS().setSeed(20240606);
+    LP::LPRS().setSeed(20240606);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run
@@ -542,17 +542,36 @@ int main(int argc, const char * argv[])
             int count = 1;
             auto print_individuals_tree = [&](LP::Individual* i)
             {
-                std::cout << std::endl << count++ << std::endl;
-                std::string tree_string = i->tree_to_string();
-                std::cout << tree_string << std::endl;
-                LP::GpTree gp_tree = i->tree();
-                std::string copied_tree_string = gp_tree.to_string(true);
-                std::cout << "tree copy matches original" << std::endl;
-                assert(tree_string == copied_tree_string);
-//                std::cout << "copied tree:" << std::endl;
-//                std::cout << gp_tree.to_string(true) << std::endl;
-                std::cout << "treeValue():" << std::endl;
-                std::cout << std::any_cast<Vec3>(i->treeValue()) << std::endl;
+//                std::cout << std::endl << count++ << std::endl;
+//                std::string tree_string = i->tree_to_string();
+//                std::cout << tree_string << std::endl;
+//                LP::GpTree gp_tree = i->tree();
+//                std::string copied_tree_string = gp_tree.to_string(true);
+//                std::cout << "tree copy matches original" << std::endl;
+//                assert(tree_string == copied_tree_string);
+//                std::cout << "treeValue():" << std::endl;
+//                std::cout << std::any_cast<Vec3>(i->treeValue()) << std::endl;
+
+                i->treeValue();
+                count++;
+                
+                // TODO 20240622 just temporary for debugging
+                GP::values_of_individuals[i] = std::any_cast<Vec3>(i->treeValue());
+                GP::trees_of_individuals[i] = i->tree();
+                
+                Vec3 trap(-0.273772, -0.526079, 0.805164);
+                if (Vec3::is_equal_within_epsilon(trap,
+                                                  std::any_cast<Vec3>(i->treeValue()),
+                                                  0.0001))
+                {
+//                    std::string tree_string = i->tree_to_string();
+//                    std::cout << tree_string << std::endl;
+                    
+                    debugPrint(GP::trees_of_individuals[i].to_string(true))
+
+                }
+
+
             };
             population->applyToAllIndividuals(print_individuals_tree);
         }

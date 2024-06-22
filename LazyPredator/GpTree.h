@@ -250,6 +250,16 @@ public:
         offspring = exchange ? parent1 : parent0;
         // Perform actual crossover.
         crossoverDonorRecipient(donor, offspring, min_size, max_size, fs_min_size);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240621 GP error at start
+                
+//        std::cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
+//        std::cout << parent0.to_string(true) << std::endl;
+//        std::cout << parent1.to_string(true) << std::endl;
+//        std::cout << offspring.to_string(true) << std::endl;
+//        std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     static void crossoverDonorRecipient(GpTree& donor,

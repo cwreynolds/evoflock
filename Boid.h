@@ -239,30 +239,29 @@ public:
         assert(gp_boid_per_thread_ && "invalid Boid::gp_boid_per_thread_");
         return gp_boid_per_thread_;
     }
+    
+    static inline int qqq_counter = 0;
 
     // Basic flocking behavior. Computes steering force for one simulation step
     // (an animation frame) for one boid in a flock.
     Vec3 steer_to_flock(double time_step)
     {
-//        debugPrint(GP_not_GA)
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
 
-//            if (GP_not_GA)
-//            {
-//    //            GP::setGpBoidPerThread();
-//                setGpPerThread(this);
-//                return override_steer_function();
-//            }
         if (GP_not_GA and override_steer_function)
         {
+            qqq_counter++;
+            debugPrint(qqq_counter)
+            
+            assert(override_steer_function);
             setGpPerThread(this);
-            return override_steer_function();
+            Vec3 steering_from_evolved_function = override_steer_function();
+            setGpPerThread(nullptr);
+            return steering_from_evolved_function;
         }
         else
         {
-//            BoidPtrList neighbors = nearest_neighbors();
-//            flush_cache_of_predicted_obstacle_collisions();
             Vec3 f = forward() * fp().weight_forward;
             Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
             Vec3 a = steer_to_align(neighbors) * fp().weight_align;

@@ -358,6 +358,16 @@ public:
         return *result;
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    void print() const
+    {
+        std::cout << "GpTree:" << std::endl;
+        std::cout << "    root type:     " << getRootType()->name() << std::endl;
+        std::cout << "    root function: " << getRootFunction().name() << std::endl;
+        std::cout << "    subtree count: " << subtrees().size() << std::endl;
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
 private:
     // NOTE: if any more data members are added, compare them in equals().
     // Add (allocate) one subtree. addSubtrees() is external API.

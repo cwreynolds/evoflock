@@ -460,21 +460,19 @@ int main(int argc, const char * argv[])
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run
-    
-    bool GP_not_GA = false;
-//    bool GP_not_GA = true;
-    
+        
+    Boid::GP_not_GA = false;
+//    Boid::GP_not_GA = true;
 
-    //    int min_tree_size = 2;
+//    int min_tree_size = 2;
 //    int max_tree_size = 20;
-    int min_tree_size = GP_not_GA ? 10  :  2;
-    int max_tree_size = GP_not_GA ? 100 : 20;
+    int min_tree_size = Boid::GP_not_GA ? 10  :  2;
+    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
     
-    auto fitness_function = (GP_not_GA ?
+    auto fitness_function = (Boid::GP_not_GA ?
                              GP::evoflock_gp_fitness_function :
                              GP::evoflock_ga_fitness_function);
 
-    Boid::GP_not_GA = GP_not_GA;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     LazyPredator::Population* population = nullptr;
@@ -488,10 +486,10 @@ int main(int argc, const char * argv[])
 //        LazyPredator::FunctionSet& fs = GP::evoflock_ga_function_set;
 //        fs.setCrossoverFunction(GP::evoflock_ga_crossover);
 
-        LazyPredator::FunctionSet fs = (GP_not_GA ?
+        LazyPredator::FunctionSet fs = (Boid::GP_not_GA ?
                                         GP::evoflock_gp_function_set() :
                                         GP::evoflock_ga_function_set);
-        if (not GP_not_GA)
+        if (not Boid::GP_not_GA)
         {
             fs.setCrossoverFunction(GP::evoflock_ga_crossover);
         }
@@ -506,19 +504,8 @@ int main(int argc, const char * argv[])
                                                    fs);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240619 WIP first GP_not_GA run
-        
-//        std::cout << "example tree:" << std::endl;
-//        std::cout << population->bestFitness()->tree_to_string() << std::endl;
-        
-//            Flock flock;
-//            GP::init_flock(flock);
-//    //        flock.make_boids(200, 100, Vec3());
-//            flock.run();
-//            Boid* boid = flock.boids().at(0);
-//        Boid::setGpPerThread(boid);
 
-
-        if (GP_not_GA)
+        if (Boid::GP_not_GA)
         {
             std::vector<Boid> boids(10);
             for (int i = 0; i < 10; i++)
@@ -542,18 +529,24 @@ int main(int argc, const char * argv[])
             int count = 1;
             auto print_individuals_tree = [&](LP::Individual* i)
             {
-//                std::cout << std::endl << count++ << std::endl;
-//                std::string tree_string = i->tree_to_string();
-//                std::cout << tree_string << std::endl;
-//                LP::GpTree gp_tree = i->tree();
-//                std::string copied_tree_string = gp_tree.to_string(true);
-//                std::cout << "tree copy matches original" << std::endl;
-//                assert(tree_string == copied_tree_string);
-//                std::cout << "treeValue():" << std::endl;
-//                std::cout << std::any_cast<Vec3>(i->treeValue()) << std::endl;
+                std::cout << std::endl << count++ << std::endl;
+                debugPrint(i)
+                std::string tree_string = i->tree_to_string();
+                std::cout << tree_string << std::endl;
+                LP::GpTree gp_tree = i->tree();
+                std::string copied_tree_string = gp_tree.to_string(true);
+                std::cout << "tree copy matches original" << std::endl;
+                assert(tree_string == copied_tree_string);
+                std::cout << "treeValue():" << std::endl;
+                std::cout << std::any_cast<Vec3>(i->treeValue()) << std::endl;
+                
+                std::cout << "GpTree::print():" << std::endl;
+                gp_tree.print();
 
                 i->treeValue();
-                count++;
+                i->qqq_count = count;
+                i->duplicate_tree = i->tree();
+                debugPrint(i->duplicate_tree.to_string())
                 
                 // TODO 20240622 just temporary for debugging
                 GP::values_of_individuals[i] = std::any_cast<Vec3>(i->treeValue());
@@ -564,14 +557,8 @@ int main(int argc, const char * argv[])
                                                   std::any_cast<Vec3>(i->treeValue()),
                                                   0.0001))
                 {
-//                    std::string tree_string = i->tree_to_string();
-//                    std::cout << tree_string << std::endl;
-                    
                     debugPrint(GP::trees_of_individuals[i].to_string(true))
-
                 }
-
-
             };
             population->applyToAllIndividuals(print_individuals_tree);
         }
@@ -595,6 +582,8 @@ int main(int argc, const char * argv[])
 //                                       GP::evoflock_ga_fitness_function),
 //                                      GP::scalarize_fitness);
 
+            std::cout << "evolution step: " << i << std::endl;
+            
             population->evolutionStep(fitness_function, GP::scalarize_fitness);
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

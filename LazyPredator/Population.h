@@ -214,6 +214,7 @@ public:
             // TODO 20240622 still debugging error GP_not_GA run
             std::cout << "in mof_eval() inside Population::evolutionStep()" << std::endl;
             debugPrint(individual)
+            individual->tree().print();
             debugPrint(individual->tree_to_string())
             std::cout << std::endl;
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

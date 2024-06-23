@@ -310,9 +310,28 @@ std::map<LP::Individual*, LP::GpTree> trees_of_individuals;
 inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
 {
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    std::cout << "in run_gp_flock_simulation()" << std::endl;
+
     debugPrint(Boid::getGpPerThread())
+    debugPrint(individual->qqq_count)
     debugPrint(values_of_individuals[individual])
     debugPrint(trees_of_individuals[individual].to_string(true))
+    individual->tree().print();
+    individual->duplicate_tree.print();
+
+    // TODO first encountered Individual:
+    //
+    //    14
+    //    Neighbor_1_Velocity()
+    //    tree copy matches original
+    //    treeValue():
+    //    Vec3(-0, 0, -0)
+    //    GpTree::print():
+    //    GpTree:
+    //        root type:     Vec3
+    //        root function: Neighbor_1_Velocity
+    //        subtree count: 0
+    //    i->duplicate_tree.to_string() = Neighbor_1_Velocity()
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     int runs = 4;

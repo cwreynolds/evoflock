@@ -252,7 +252,7 @@ public:
         if (GP_not_GA and override_steer_function)
         {
             qqq_counter++;
-            debugPrint(qqq_counter)
+            debugPrint(Boid::qqq_counter)
             
             assert(override_steer_function);
             setGpPerThread(this);

@@ -311,9 +311,13 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
 {
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     std::cout << "in run_gp_flock_simulation()" << std::endl;
+    
+    assert(Boid::GP_not_GA);
 
+    debugPrint(individual)
+    debugPrint(individual->pop_position)
     debugPrint(Boid::getGpPerThread())
-    debugPrint(individual->qqq_count)
+//    debugPrint(individual->qqq_count)
     debugPrint(values_of_individuals[individual])
     debugPrint(trees_of_individuals[individual].to_string(true))
     individual->tree().print();
@@ -362,7 +366,9 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
 
 //        individual->treeValue();
 
-        debugPrint(&individual)
+//        debugPrint(&individual)
+        debugPrint(individual)
+        debugPrint(individual->pop_position)
         debugPrint(&(individual->tree()))
         debugPrint(individual->tree().subtrees().size());
         debugPrint(std::any_cast<Vec3>(individual->tree().getRootValue()));
@@ -407,17 +413,34 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
             }
         }
     };
-//#if 0
-#if 1
-    // Do simulation runs sequentially.
-    for (int r = 0; r < runs; r++) { do_1_run(); }
-#else
-    // Do each simulation run in a parallel thread.
-    std::vector<std::thread> threads;
-    for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
-    // Wait for helper threads to finish, join them with this thread.
-    for (auto& t : threads) { t.join(); }
-#endif
+    
+//    //#if 0
+//    #if 1
+//        // Do simulation runs sequentially.
+//        for (int r = 0; r < runs; r++) { do_1_run(); }
+//    #else
+//        // Do each simulation run in a parallel thread.
+//        std::vector<std::thread> threads;
+//        for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
+//        // Wait for helper threads to finish, join them with this thread.
+//        for (auto& t : threads) { t.join(); }
+//    #endif
+    
+    bool multi_threaded = not Boid::GP_not_GA;
+    if (multi_threaded)
+    {
+        // Do each simulation run in a parallel thread.
+        std::vector<std::thread> threads;
+        for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
+        // Wait for helper threads to finish, join them with this thread.
+        for (auto& t : threads) { t.join(); }
+    }
+    else
+    {
+        // Do simulation runs sequentially.
+        for (int r = 0; r < runs; r++) { do_1_run(); }
+    }
+
     assert(scalar_fits.size() == runs);
     fitness_logger(least_mof);
     std::cout << "    min composite "<< least_scalar_fitness;

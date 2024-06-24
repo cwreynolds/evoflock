@@ -266,6 +266,30 @@ void open3d_test() {
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240624 still debugging GP_not_GA error
+
+
+#define check_Individual_13(individual)                              \
+{                                                                    \
+    std::cout << "In check_Individual_13()" << std::endl;            \
+    static bool first = true;                                        \
+    static void* i13 = nullptr;                                      \
+    if (first) { i13 = individual; first = false; }                  \
+    assert(individual == i13);                                       \
+    assert(individual->pop_position == 13);                          \
+    auto gp_tree = individual->tree();                               \
+    assert(gp_tree.subtrees().size() == 0);                          \
+    assert(gp_tree.to_string() == "First_Obs_Normal()");             \
+    assert(gp_tree.getRootFunction().name() == "First_Obs_Normal");  \
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #include "Agent.h"
 #include "Boid.h"
 #include "dbscan.h"
@@ -461,8 +485,8 @@ int main(int argc, const char * argv[])
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run
         
-    Boid::GP_not_GA = false;
-//    Boid::GP_not_GA = true;
+//    Boid::GP_not_GA = false;
+    Boid::GP_not_GA = true;
 
 //    int min_tree_size = 2;
 //    int max_tree_size = 20;
@@ -473,7 +497,8 @@ int main(int argc, const char * argv[])
                              GP::evoflock_gp_fitness_function :
                              GP::evoflock_ga_fitness_function);
 
-
+    LP::Individual* save_i13 = nullptr;
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     LazyPredator::Population* population = nullptr;
 
@@ -529,42 +554,82 @@ int main(int argc, const char * argv[])
             int count = 1;
             auto print_individuals_tree = [&](LP::Individual* i)
             {
-                std::cout << std::endl << count++ << std::endl;
-                debugPrint(i)
-                std::string tree_string = i->tree_to_string();
-                std::cout << tree_string << std::endl;
-                LP::GpTree gp_tree = i->tree();
-                std::string copied_tree_string = gp_tree.to_string(true);
-                std::cout << "tree copy matches original" << std::endl;
-                assert(tree_string == copied_tree_string);
-                std::cout << "treeValue():" << std::endl;
-                std::cout << std::any_cast<Vec3>(i->treeValue()) << std::endl;
+                i->pop_position = count;
                 
-                std::cout << "GpTree::print():" << std::endl;
-                gp_tree.print();
-
+                
+//                std::cout << std::endl << count << std::endl;
+//                debugPrint(i)
+//                std::string tree_string = i->tree_to_string();
+//                std::cout << tree_string << std::endl;
+//                LP::GpTree gp_tree = i->tree();
+//                std::string copied_tree_string = gp_tree.to_string(true);
+//                std::cout << "tree copy matches original" << std::endl;
+//                assert(tree_string == copied_tree_string);
+//                std::cout << "treeValue():" << std::endl;
+//                std::cout << std::any_cast<Vec3>(i->treeValue()) << std::endl;
+//                
+//                std::cout << "GpTree::print():" << std::endl;
+//                gp_tree.print();
+//
+//                i->treeValue();
+//                i->qqq_count = count;
+//                i->duplicate_tree = i->tree();
+//                debugPrint(i->duplicate_tree.to_string())
+                
+                
                 i->treeValue();
-                i->qqq_count = count;
                 i->duplicate_tree = i->tree();
-                debugPrint(i->duplicate_tree.to_string())
-                
+
                 // TODO 20240622 just temporary for debugging
                 GP::values_of_individuals[i] = std::any_cast<Vec3>(i->treeValue());
                 GP::trees_of_individuals[i] = i->tree();
                 
-                Vec3 trap(-0.273772, -0.526079, 0.805164);
-                if (Vec3::is_equal_within_epsilon(trap,
-                                                  std::any_cast<Vec3>(i->treeValue()),
-                                                  0.0001))
+//                Vec3 trap(-0.273772, -0.526079, 0.805164);
+//                if (Vec3::is_equal_within_epsilon(trap,
+//                                                  std::any_cast<Vec3>(i->treeValue()),
+//                                                  0.0001))
+//                {
+//                    debugPrint(GP::trees_of_individuals[i].to_string(true))
+//                }
+                
+                
+//                std::string tree_string = GP::trees_of_individuals[i].to_string();
+//                tree_string = tree_string.substr(0, 150);
+//                std::cout << count << ": " << i << " ";
+//                std::cout << tree_string << std::endl;
+                
+                if (count == 13)
                 {
+                    check_Individual_13(i);
+                    save_i13 = i;
+
+                    
+                    std::cout << "in main()" << std::endl;
+                    debugPrint(i)
+                    debugPrint(i->pop_position)
+                    debugPrint(Boid::getGpPerThread())
+                    debugPrint(GP::values_of_individuals[i])
                     debugPrint(GP::trees_of_individuals[i].to_string(true))
+                    i->tree().print();
+                    i->duplicate_tree.print();
                 }
+                if (count > 13) { check_Individual_13(save_i13); }
+
+                count++;
             };
             population->applyToAllIndividuals(print_individuals_tree);
+            
+            
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240624 still debugging GP_not_GA error
+    check_Individual_13(save_i13);                              \
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     {
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");

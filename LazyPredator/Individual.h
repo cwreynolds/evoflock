@@ -79,7 +79,13 @@ public:
     {
         return tree_.to_string(true);
     }
+    
+    int pop_position = 0;  // temp, for debugging, to track one instance
+
+//    int qqq_count = 0;
+    GpTree duplicate_tree;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     Individual()
     {
         constructor_count_++;
@@ -180,12 +186,6 @@ public:
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240623 keep track of first processed Individual
-    int qqq_count = 0;
-    GpTree duplicate_tree;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 private:
     GpTree tree_;
     // Resettable cache for result of tree evaluation.

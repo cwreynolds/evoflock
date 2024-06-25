@@ -252,12 +252,13 @@ public:
         if (GP_not_GA and override_steer_function)
         {
             qqq_counter++;
-            debugPrint(Boid::qqq_counter)
+//            debugPrint(Boid::qqq_counter)
             
             assert(override_steer_function);
             setGpPerThread(this);
             Vec3 steering_from_evolved_function = override_steer_function();
             setGpPerThread(nullptr);
+//            assert(steering_from_evolved_function.length_squared() > 0);
             return steering_from_evolved_function;
         }
         else
@@ -554,6 +555,39 @@ public:
     //    def is_neighbor(self, other_boid):
     //        return other_boid in self.flock.selected_boid().cached_nearest_neighbors
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240625 in evoflock GP mode seeing too much accel==0
+    //               Make really sure this always returns a unit length vector.
+
+//    // Bird-like roll control: blends vector toward path curvature center with
+//    // global up. Overrides method in base class Agent
+//    Vec3 up_reference(const Vec3& acceleration) override
+//    {
+//        Vec3 global_up_scaled = Vec3(0, acceleration.length(), 0);
+//        Vec3 new_up = acceleration + global_up_scaled;
+//        up_memory_.blend(new_up, 0.95);
+//        return up_memory_.value.normalize();
+//    }
+    
+//        // Bird-like roll control: blends vector toward path curvature center with
+//        // global up. Overrides method in base class Agent
+//        Vec3 up_reference(const Vec3& acceleration) override
+//        {
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20240625 in evoflock GP mode seeing too much accel==0
+//
+//    //        Vec3 global_up_scaled = Vec3(0, acceleration.length(), 0);
+//
+//            double accel_mag = acceleration.length();
+//            Vec3 global_up_scaled = Vec3(0, (accel_mag > 0 ? accel_mag : 1), 0);
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            Vec3 new_up = acceleration + global_up_scaled;
+//            up_memory_.blend(new_up, 0.95);
+//            return up_memory_.value.normalize();
+//        }
+
     // Bird-like roll control: blends vector toward path curvature center with
     // global up. Overrides method in base class Agent
     Vec3 up_reference(const Vec3& acceleration) override
@@ -561,8 +595,16 @@ public:
         Vec3 global_up_scaled = Vec3(0, acceleration.length(), 0);
         Vec3 new_up = acceleration + global_up_scaled;
         up_memory_.blend(new_up, 0.95);
-        return up_memory_.value.normalize();
+        
+//        return up_memory_.value.normalize();
+
+        Vec3 up_ref = up_memory_.value.normalize();
+        // Make REALLY sure this always returns a unit length vector.
+        return (up_ref.is_unit_length() ? up_ref : Vec3(0, 1, 0));
+
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void flush_cache_of_predicted_obstacle_collisions()
     {

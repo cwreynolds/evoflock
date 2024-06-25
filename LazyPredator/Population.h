@@ -139,10 +139,23 @@ public:
         new_tree.mutate();
         // Create new offspring Individual from new tree.
         Individual* offspring = new Individual(new_tree);
-        // Construct and cache the result of evaluating new offspring's GpTree.
-        offspring->treeValue();
-        // If group has custom_eval function run it on offspring (esp for MOF).
-        if (ranked_group.custom_eval) { ranked_group.custom_eval(offspring); }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240625 hmm is really necessary, or more a "maybe a good idea"?
+        //               invalid "invalid Boid::gp_boid_per_thread_" in evoflock
+        //               GP mode causes an
+        //
+        //               generally It seems like evaluating fitness should not
+        //               be done as a side effect of creating a new tree, so I
+        //               prefer to make it “lazy” if possible
+        
+//        // Construct and cache the result of evaluating new offspring's GpTree.
+//        offspring->treeValue();
+//        // If group has custom_eval function run it on offspring (esp for MOF).
+//        if (ranked_group.custom_eval) { ranked_group.custom_eval(offspring); }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         // Delete tournament loser from Population, replace with new offspring.
         replaceIndividual(loser_index, offspring, subpop);
         // Occasionally migrate Individuals between subpopulations.
@@ -212,17 +225,21 @@ public:
         {
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20240622 still debugging error GP_not_GA run
-            std::cout << "in mof_eval() inside Population::evolutionStep()" << std::endl;
-            check_Individual_13(individual)
-            debugPrint(individual)
-            debugPrint(individual->pop_position)
-            individual->tree().print();
-            debugPrint(individual->tree_to_string())
-            std::cout << std::endl;
+//            std::cout << "in mof_eval() inside Population::evolutionStep()" << std::endl;
+//            check_Individual_13(individual)
+//            debugPrint(individual)
+//            debugPrint(individual->pop_position)
+//            individual->tree().print();
+//            debugPrint(individual->tree_to_string())
+//            std::cout << std::endl;
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (not individual->hasMultiObjectiveFitness())
             {
-                individual->treeValue();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20240625 will it work without this? its before the
+                //       mo_fitness_function which is where it is value to eval.
+//                individual->treeValue();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 MultiObjectiveFitness mof = mo_fitness_function(individual);
                 individual->setMultiObjectiveFitness(mof);
                 double scalar = fitness_scalarize_function(mof);

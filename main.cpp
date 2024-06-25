@@ -273,19 +273,21 @@ void open3d_test() {
 // TODO 20240624 still debugging GP_not_GA error
 
 
-#define check_Individual_13(individual)                              \
-{                                                                    \
-    std::cout << "In check_Individual_13()" << std::endl;            \
-    static bool first = true;                                        \
-    static void* i13 = nullptr;                                      \
-    if (first) { i13 = individual; first = false; }                  \
-    assert(individual == i13);                                       \
-    assert(individual->pop_position == 13);                          \
-    auto gp_tree = individual->tree();                               \
-    assert(gp_tree.subtrees().size() == 0);                          \
-    assert(gp_tree.to_string() == "First_Obs_Normal()");             \
-    assert(gp_tree.getRootFunction().name() == "First_Obs_Normal");  \
-}
+//    #define check_Individual_13(individual)                              \
+//    {                                                                    \
+//        std::cout << "In check_Individual_13()" << std::endl;            \
+//        static bool first = true;                                        \
+//        static void* i13 = nullptr;                                      \
+//        if (first) { i13 = individual; first = false; }                  \
+//        assert(individual == i13);                                       \
+//        assert(individual->pop_position == 13);                          \
+//        auto gp_tree = individual->tree();                               \
+//        assert(gp_tree.subtrees().size() == 0);                          \
+//        assert(gp_tree.to_string() == "First_Obs_Normal()");             \
+//        assert(gp_tree.getRootFunction().name() == "First_Obs_Normal");  \
+//    }
+
+#define check_Individual_13(individual) {}
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -497,10 +499,14 @@ int main(int argc, const char * argv[])
                              GP::evoflock_gp_fitness_function :
                              GP::evoflock_ga_fitness_function);
 
-    LP::Individual* save_i13 = nullptr;
+//    LP::Individual* save_i13 = nullptr;
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    LazyPredator::Population* population = nullptr;
+    LP::Population* population = nullptr;
+
+    LP::FunctionSet fs = (Boid::GP_not_GA ?
+                          GP::evoflock_gp_function_set() :
+                          GP::evoflock_ga_function_set);
 
     {
         std::cout << "Create population." << std::endl;
@@ -511,9 +517,9 @@ int main(int argc, const char * argv[])
 //        LazyPredator::FunctionSet& fs = GP::evoflock_ga_function_set;
 //        fs.setCrossoverFunction(GP::evoflock_ga_crossover);
 
-        LazyPredator::FunctionSet fs = (Boid::GP_not_GA ?
-                                        GP::evoflock_gp_function_set() :
-                                        GP::evoflock_ga_function_set);
+//        LazyPredator::FunctionSet fs = (Boid::GP_not_GA ?
+//                                        GP::evoflock_gp_function_set() :
+//                                        GP::evoflock_ga_function_set);
         if (not Boid::GP_not_GA)
         {
             fs.setCrossoverFunction(GP::evoflock_ga_crossover);
@@ -532,6 +538,12 @@ int main(int argc, const char * argv[])
 
         if (Boid::GP_not_GA)
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240624 still debugging GP_not_GA error
+//            population->trap_on_destructor = true;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            
             std::vector<Boid> boids(10);
             for (int i = 0; i < 10; i++)
             {
@@ -598,22 +610,22 @@ int main(int argc, const char * argv[])
 //                std::cout << count << ": " << i << " ";
 //                std::cout << tree_string << std::endl;
                 
-                if (count == 13)
-                {
-                    check_Individual_13(i);
-                    save_i13 = i;
-
-                    
-                    std::cout << "in main()" << std::endl;
-                    debugPrint(i)
-                    debugPrint(i->pop_position)
-                    debugPrint(Boid::getGpPerThread())
-                    debugPrint(GP::values_of_individuals[i])
-                    debugPrint(GP::trees_of_individuals[i].to_string(true))
-                    i->tree().print();
-                    i->duplicate_tree.print();
-                }
-                if (count > 13) { check_Individual_13(save_i13); }
+//                if (count == 13)
+//                {
+//                    check_Individual_13(i);
+//                    save_i13 = i;
+//
+//                    
+//                    std::cout << "in main()" << std::endl;
+//                    debugPrint(i)
+//                    debugPrint(i->pop_position)
+//                    debugPrint(Boid::getGpPerThread())
+//                    debugPrint(GP::values_of_individuals[i])
+//                    debugPrint(GP::trees_of_individuals[i].to_string(true))
+//                    i->tree().print();
+//                    i->duplicate_tree.print();
+//                }
+//                if (count > 13) { check_Individual_13(save_i13); }
 
                 count++;
             };
@@ -627,7 +639,7 @@ int main(int argc, const char * argv[])
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240624 still debugging GP_not_GA error
-    check_Individual_13(save_i13);                              \
+//    check_Individual_13(save_i13);                              \
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     {

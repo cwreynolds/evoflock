@@ -57,8 +57,8 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual)
 // Fitness function, runs a flock simulation using evolved tree for steering
 inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
 {
-    std::cout << "#################################" << std::endl;
-    std::cout << "in evoflock_gp_fitness_function()" << std::endl;
+//    std::cout << "#################################" << std::endl;
+//    std::cout << "in evoflock_gp_fitness_function()" << std::endl;
     return run_gp_flock_simulation(individual);
 }
 
@@ -310,18 +310,18 @@ std::map<LP::Individual*, LP::GpTree> trees_of_individuals;
 inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
 {
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    std::cout << "in run_gp_flock_simulation()" << std::endl;
+//    std::cout << "in run_gp_flock_simulation()" << std::endl;
     
     assert(Boid::GP_not_GA);
 
-    debugPrint(individual)
-    debugPrint(individual->pop_position)
-    debugPrint(Boid::getGpPerThread())
-//    debugPrint(individual->qqq_count)
-    debugPrint(values_of_individuals[individual])
-    debugPrint(trees_of_individuals[individual].to_string(true))
-    individual->tree().print();
-    individual->duplicate_tree.print();
+//        debugPrint(individual)
+//        debugPrint(individual->pop_position)
+//    //    debugPrint(Boid::getGpPerThread())
+//    //    debugPrint(individual->qqq_count)
+//        debugPrint(values_of_individuals[individual])
+//        debugPrint(trees_of_individuals[individual].to_string(true))
+//        individual->tree().print();
+//        individual->duplicate_tree.print();
 
     // TODO first encountered Individual:
     //
@@ -356,46 +356,59 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
         //        flock.fp() = fp;
 
         grabPrintLock_evoflock();
-        std::cout << "in do_1_run()" << std::endl;
-        
-        
-        // TODO 20240622 new, preset to dummy:
-//        debugPrint(flock.boids().size())
-//        Boid::setGpPerThread(flock.boids().at(0));
-        
-
-//        individual->treeValue();
-
-//        debugPrint(&individual)
-        debugPrint(individual)
-        debugPrint(individual->pop_position)
-        debugPrint(&(individual->tree()))
-        debugPrint(individual->tree().subtrees().size());
-        debugPrint(std::any_cast<Vec3>(individual->tree().getRootValue()));
-        debugPrint(individual->tree().getRootType()->name())
-        debugPrint(individual->tree().getRootFunction().name())
-
-        std::cout << "-------------------------------" << std::endl;
+//            std::cout << "in do_1_run()" << std::endl;
+//
+//
+//            // TODO 20240622 new, preset to dummy:
+//    //        debugPrint(flock.boids().size())
+//    //        Boid::setGpPerThread(flock.boids().at(0));
+//
+//
+//    //        individual->treeValue();
+//
+//    //        debugPrint(&individual)
+//            debugPrint(individual)
+//            debugPrint(individual->pop_position)
+//            debugPrint(&(individual->tree()))
+//            debugPrint(individual->tree().subtrees().size());
+//            debugPrint(std::any_cast<Vec3>(individual->tree().getRootValue()));
+//            debugPrint(individual->tree().getRootType()->name())
+//            debugPrint(individual->tree().getRootFunction().name())
+//
+//            std::cout << "-------------------------------" << std::endl;
 
         LP::GpTree gp_tree;
         gp_tree = individual->tree();
         
         
 
-        std::cout << "tree from individual:" << std::endl;
-        std::cout << individual->tree().to_string() << std::endl;
-        std::cout << "tree copy:" << std::endl;
-        std::cout << gp_tree.to_string() << std::endl;
-        std::cout << "Individual::tree_to_string():" << std::endl;
-        std::cout << individual->tree_to_string() << std::endl;
+//        std::cout << "tree from individual:" << std::endl;
+//        std::cout << individual->tree().to_string() << std::endl;
+//        std::cout << "tree copy:" << std::endl;
+//        std::cout << gp_tree.to_string() << std::endl;
+//        std::cout << "Individual::tree_to_string():" << std::endl;
+//        std::cout << individual->tree_to_string() << std::endl;
 
         
+//        flock.override_steer_function = [&]()
+//        {
+////            debugPrint(std::any_cast<Vec3>(gp_tree.eval()))
+//            return std::any_cast<Vec3>(gp_tree.eval());
+//        };
+
         flock.override_steer_function = [&]()
         {
-            debugPrint(std::any_cast<Vec3>(gp_tree.eval()))
-            return std::any_cast<Vec3>(gp_tree.eval());
+            Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
+            
+            // TODO 20240625 not sure this is the right solution, but I quickly
+            // hit an assert violation in LocalSpace::rotate_to_new_forward()
+            // because reference_up was zero rather than unit length. Maybe
+            // because acceleration was also zero early in sim?
+            if (not (steering.length_squared() > 0)) { steering = Vec3(0,0,1); }
+            
+            return steering;
         };
-        
+
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 
@@ -426,7 +439,9 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
 //        for (auto& t : threads) { t.join(); }
 //    #endif
     
-    bool multi_threaded = not Boid::GP_not_GA;
+//    bool multi_threaded = true;
+    bool multi_threaded = false;
+
     if (multi_threaded)
     {
         // Do each simulation run in a parallel thread.
@@ -658,6 +673,23 @@ void save_fitness_time_series(LP::Population& population)
 
 Boid* getGpBoidNeighbor(int n)
 {
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240625 chasing down:
+    // "terminating due to uncaught exception of type std::length_error: vector"
+    
+//    debugPrint(Boid::getGpPerThread())
+//    debugPrint(Boid::getGpPerThread()->cached_nearest_neighbors().size())
+
+    assert(Boid::getGpPerThread());
+//    assert(Boid::getGpPerThread()->cached_nearest_neighbors().size() == 7);
+
+    size_t s = Boid::getGpPerThread()->cached_nearest_neighbors().size();
+    if (s != 7)
+    {
+        debugPrint(Boid::getGpPerThread()->cached_nearest_neighbors().size())
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     BoidPtrList neighbors = Boid::getGpPerThread()->cached_nearest_neighbors();
     assert(neighbors.size() >= n);
     return neighbors.at(n - 1);
@@ -674,6 +706,11 @@ double clean_num(double x)
 Vec3 clean_vec3(Vec3 v)
 {
     return { clean_num(v.x()), clean_num(v.y()), clean_num(v.z()) };
+}
+
+Vec3 ensure_unit_length(Vec3 v)
+{
+    return (v.is_unit_length() ? v : Vec3(1, 0, 0));
 }
 
 // FuntionSet for the GP version of EvoFlock.
@@ -806,8 +843,10 @@ LP::FunctionSet evoflock_gp_function_set()
                 {
                     Vec3 value = tree.evalSubtree<Vec3>(0);
                     Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
-                    if (basis.is_zero_length()) { basis = Vec3(1, 0, 0); }
-                    return std::any(value.parallel_component(basis));
+//                    if (basis.is_zero_length()) { basis = Vec3(1, 0, 0); }
+//                    return std::any(value.parallel_component(basis));
+                    Vec3 unit_basis = ensure_unit_length(basis);
+                    return std::any(value.parallel_component(unit_basis));
                 }
             },
             {
@@ -816,8 +855,10 @@ LP::FunctionSet evoflock_gp_function_set()
                 {
                     Vec3 value = tree.evalSubtree<Vec3>(0);
                     Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
-                    if (basis.is_zero_length()) { basis = Vec3(1, 0, 0); }
-                    return std::any(value.perpendicular_component(basis));
+//                    if (basis.is_zero_length()) { basis = Vec3(1, 0, 0); }
+//                    return std::any(value.perpendicular_component(basis));
+                    Vec3 unit_basis = ensure_unit_length(basis);
+                    return std::any(value.perpendicular_component(unit_basis));
                 }
             },
 

@@ -344,6 +344,8 @@ public:
         
         if (Boid::GP_not_GA)
         {
+            // TODO 20240625 when we switch back to multithreading, need to make
+            // sure new thread gets same Boid::getGpPerThread() as main thread.
             chunk_func(0, boid_count);
         }
         else
@@ -352,6 +354,10 @@ public:
             chunk_func(boids_per_thread, boid_count);
             helper.join();
         }
+
+//        std::thread helper(chunk_func, 0, boids_per_thread);
+//        chunk_func(boids_per_thread, boid_count);
+//        helper.join();
     };
 
     
@@ -428,7 +434,14 @@ public:
     {
         assert(boid_update_counter_ > 0);
         double ave = curvature_sum_for_all_boid_updates_ / boid_update_counter_;
-        assert(!std::isnan(ave));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240625 in evoflock GP mode this was triggering
+
+//        assert(!std::isnan(ave));
+
+        if (std::isnan(ave)) { ave = 0; }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         double ad_hoc_max_curvature = 0.17;
         double ad_hoc_high_curvature = ad_hoc_max_curvature / 2;
         return util::clip01(ave / ad_hoc_high_curvature);

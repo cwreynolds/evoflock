@@ -325,11 +325,11 @@ public:
 //            print_first_10_flock_boids();
 
             
-            if (is_first_boid())
-            {
-                debugPrint(draw().frame_counter())
-                debugPrint(steering_from_evolved_function)
-            }
+//            if (is_first_boid())
+//            {
+//                debugPrint(draw().frame_counter())
+//                debugPrint(steering_from_evolved_function)
+//            }
 
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -546,6 +546,8 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240626 Oh, this is why is_first_boid() stopped working...
 //        BoidPtrList& fb = flock_boids();
+//        BoidPtrList fb = flock_boids();
+        // Copy list of pointers to flock-mates, to sorted in-place.
         BoidPtrList fb = flock_boids();
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // How far is given boid from "this" boid? Returns infinity for itself.

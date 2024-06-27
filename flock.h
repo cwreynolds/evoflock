@@ -342,22 +342,41 @@ public:
         int boid_count = int(boids().size());
         int boids_per_thread = 1 + (boid_count * 0.5);
         
-        if (Boid::GP_not_GA)
-        {
-            // TODO 20240625 when we switch back to multithreading, need to make
-            // sure new thread gets same Boid::getGpPerThread() as main thread.
-            chunk_func(0, boid_count);
-        }
-        else
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240627 trying to reenable multi threading
+
+//        if (Boid::GP_not_GA)
+//        {
+//            // TODO 20240625 when we switch back to multithreading, need to make
+//            // sure new thread gets same Boid::getGpPerThread() as main thread.
+//            chunk_func(0, boid_count);
+//        }
+//        else
+//        {
+//            std::thread helper(chunk_func, 0, boids_per_thread);
+//            chunk_func(boids_per_thread, boid_count);
+//            helper.join();
+//        }
+
+//        std::thread helper(chunk_func, 0, boids_per_thread);
+//        chunk_func(boids_per_thread, boid_count);
+//        helper.join();
+
+//        bool multithreading = not Boid::GP_not_GA;
+        bool multithreading = true;
+        if (multithreading)
         {
             std::thread helper(chunk_func, 0, boids_per_thread);
             chunk_func(boids_per_thread, boid_count);
             helper.join();
         }
-
-//        std::thread helper(chunk_func, 0, boids_per_thread);
-//        chunk_func(boids_per_thread, boid_count);
-//        helper.join();
+        else
+        {
+            // TODO 20240625 when we switch back to multithreading, need to make
+            // sure new thread gets same Boid::getGpPerThread() as main thread.
+            chunk_func(0, boid_count);
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     };
 
     

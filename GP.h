@@ -309,34 +309,7 @@ std::map<LP::Individual*, LP::GpTree> trees_of_individuals;
 
 inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
 {
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//    std::cout << "in run_gp_flock_simulation()" << std::endl;
-    
     assert(Boid::GP_not_GA);
-
-//        debugPrint(individual)
-//        debugPrint(individual->pop_position)
-//    //    debugPrint(Boid::getGpPerThread())
-//    //    debugPrint(individual->qqq_count)
-//        debugPrint(values_of_individuals[individual])
-//        debugPrint(trees_of_individuals[individual].to_string(true))
-//        individual->tree().print();
-//        individual->duplicate_tree.print();
-
-    // TODO first encountered Individual:
-    //
-    //    14
-    //    Neighbor_1_Velocity()
-    //    tree copy matches original
-    //    treeValue():
-    //    Vec3(-0, 0, -0)
-    //    GpTree::print():
-    //    GpTree:
-    //        root type:     Vec3
-    //        root function: Neighbor_1_Velocity
-    //        subtree count: 0
-    //    i->duplicate_tree.to_string() = Neighbor_1_Velocity()
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     int runs = 4;
     MOF least_mof;
@@ -351,53 +324,16 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
         init_flock(flock);
         flock.setSaveBoidCenters(write_file);
 
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        //        flock.fp() = fp;
-
-        grabPrintLock_evoflock();
-//            std::cout << "in do_1_run()" << std::endl;
-//
-//
-//            // TODO 20240622 new, preset to dummy:
-//    //        debugPrint(flock.boids().size())
-//    //        Boid::setGpPerThread(flock.boids().at(0));
-//
-//
-//    //        individual->treeValue();
-//
-//    //        debugPrint(&individual)
-//            debugPrint(individual)
-//            debugPrint(individual->pop_position)
-//            debugPrint(&(individual->tree()))
-//            debugPrint(individual->tree().subtrees().size());
-//            debugPrint(std::any_cast<Vec3>(individual->tree().getRootValue()));
-//            debugPrint(individual->tree().getRootType()->name())
-//            debugPrint(individual->tree().getRootFunction().name())
-//
-//            std::cout << "-------------------------------" << std::endl;
-
-        LP::GpTree gp_tree;
-        gp_tree = individual->tree();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240627 trying to reenable multi threading
         
-        
-
-//        std::cout << "tree from individual:" << std::endl;
-//        std::cout << individual->tree().to_string() << std::endl;
-//        std::cout << "tree copy:" << std::endl;
-//        std::cout << gp_tree.to_string() << std::endl;
-//        std::cout << "Individual::tree_to_string():" << std::endl;
-//        std::cout << individual->tree_to_string() << std::endl;
-
-        
-//        flock.override_steer_function = [&]()
-//        {
-////            debugPrint(std::any_cast<Vec3>(gp_tree.eval()))
-//            return std::any_cast<Vec3>(gp_tree.eval());
-//        };
+//        LP::GpTree gp_tree;
+//        gp_tree = individual->tree();
 
         flock.override_steer_function = [&]()
         {
+            LP::GpTree gp_tree = individual->tree();
+
             Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
             
             // TODO 20240625 not sure this is the right solution, but I quickly
@@ -409,8 +345,7 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
             return steering;
         };
 
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         flock.run();
         MOF mof = multiObjectiveFitnessOfFlock(flock);
@@ -427,20 +362,13 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
         }
     };
     
-//    //#if 0
-//    #if 1
-//        // Do simulation runs sequentially.
-//        for (int r = 0; r < runs; r++) { do_1_run(); }
-//    #else
-//        // Do each simulation run in a parallel thread.
-//        std::vector<std::thread> threads;
-//        for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
-//        // Wait for helper threads to finish, join them with this thread.
-//        for (auto& t : threads) { t.join(); }
-//    #endif
-    
-//    bool multi_threaded = true;
-    bool multi_threaded = false;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240627 trying to reenable multi threading
+
+    bool multi_threaded = true;
+//    bool multi_threaded = false;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     if (multi_threaded)
     {

@@ -546,9 +546,16 @@ LazyPredator::FunctionSet evoflock_ga_function_set =
                 "Real_0_10",  // min_time_to_collide
             },
             
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240628 can we do an eval of a const tree?
+
             // Evaluation function, which runs a flock simulation with the given
             // parameters and returns the fitness.
+#ifdef eval_const_20240628
+            [](const LazyPredator::GpTree& t)
+#else  // eval_const_20240628
             [](LazyPredator::GpTree& t)
+#endif // eval_const_20240628
             {
                 FlockParameters fp = init_fp(t.evalSubtree<double>(0),
                                              t.evalSubtree<double>(1),
@@ -571,6 +578,7 @@ LazyPredator::FunctionSet evoflock_ga_function_set =
                 auto fitness = run_flock_simulation(fp);
                 return std::any(fitness);
             }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
     }
 };
@@ -642,6 +650,11 @@ Vec3 ensure_unit_length(Vec3 v)
 }
 
 // FuntionSet for the GP version of EvoFlock.
+
+#ifdef eval_const_20240628
+LP::FunctionSet evoflock_gp_function_set() { return evoflock_ga_function_set;}
+#else  // eval_const_20240628
+
 LP::FunctionSet evoflock_gp_function_set()
 {
     return
@@ -898,5 +911,7 @@ LP::FunctionSet evoflock_gp_function_set()
         }
     };
 }
+
+#endif // eval_const_20240628
 
 }  // end of namespace GP

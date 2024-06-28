@@ -74,18 +74,24 @@ public:
     {
         if (!isLeaf())
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240621 GP error at start
-//            debugPrint("inGpTree::eval()")
-//            debugPrint(this)
-//            getRootFunction().print();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
             setRootValue(getRootFunction().eval(*this),
                          *getRootFunction().returnType());
         }
         return getRootValue();
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240628 can we do an eval of a const tree?
+    
+#ifdef eval_const_20240628
+    std::any eval_const() const
+    {
+        return getRootFunction().eval(*this);
+    }
+#else  // eval_const_20240628
+#endif // eval_const_20240628
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Evaluate i-th subtree, corresponds to i-th parameter of root function,
     // then cast the resulting std::any to the given concrete type T.
     template <typename T> T evalSubtree(int i)

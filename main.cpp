@@ -292,6 +292,17 @@ void open3d_test() {
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240628 can we do an eval of a const tree?
+
+//#define eval_const_20240628
+
+#ifdef eval_const_20240628
+#else  // eval_const_20240628
+#endif // eval_const_20240628
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #include "Agent.h"
 #include "Boid.h"
 #include "dbscan.h"
@@ -487,8 +498,11 @@ int main(int argc, const char * argv[])
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run
         
-//    Boid::GP_not_GA = false;
-    Boid::GP_not_GA = true;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240628 can we do an eval of a const tree?
+    Boid::GP_not_GA = false;
+//    Boid::GP_not_GA = true;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //    int min_tree_size = 2;
 //    int max_tree_size = 20;

@@ -23,13 +23,31 @@ public:
     GpFunction(const std::string& name,
                const std::string& return_type_name,
                const std::vector<std::string>& parameter_type_names,
+               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+               // TODO 20240628 can we do an eval of a const tree?
+               
+#ifdef eval_const_20240628
+               std::function<std::any(const GpTree& t)> eval)
+#else  // eval_const_20240628
                std::function<std::any(GpTree& t)> eval)
+#endif // eval_const_20240628
+
+               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       : GpFunction(name, return_type_name, parameter_type_names, eval, 1) {}
     
     GpFunction(const std::string& name,
                const std::string& return_type_name,
                const std::vector<std::string>& parameter_type_names,
+               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+               // TODO 20240628 can we do an eval of a const tree?
+               
+#ifdef eval_const_20240628
+               std::function<std::any(const GpTree& t)> eval,
+#else  // eval_const_20240628
                std::function<std::any(GpTree& t)> eval,
+#endif // eval_const_20240628
+
+               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                float selection_weight)
       : name_(name),
         return_type_name_(return_type_name),
@@ -62,9 +80,20 @@ public:
     // Minimum "size" required to terminate subtree with this function at root.
     int minSizeToTerminate() const { return min_size_to_terminate_; }
     void setMinSizeToTerminate(int s) { min_size_to_terminate_ = s; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240628 can we do an eval of a const tree?
+
+#ifdef eval_const_20240628
+    // Evaluate (execute) a GpTree with this function at root
+    // TODO probably should assert they match (this and tree root GpFunction)
+    std::any eval(const GpTree& tree) const { return eval_(tree);  }
+#else  // eval_const_20240628
     // Evaluate (execute) a GpTree with this function at root
     // TODO probably should assert they match (this and tree root GpFunction)
     std::any eval(GpTree& tree) const { return eval_(tree);  }
+#endif // eval_const_20240628
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Called by FunctionSet init while linking types and functions.
     void linkToReturnType()
     {
@@ -92,7 +121,16 @@ private:
     std::vector<std::string> parameter_type_names_;
     std::vector<GpType*> parameter_types_;
     int min_size_to_terminate_ = std::numeric_limits<int>::max();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240628 can we do an eval of a const tree?
+    
+#ifdef eval_const_20240628
+    std::function<std::any(const GpTree& t)> eval_ = nullptr;
+#else  // eval_const_20240628
     std::function<std::any(GpTree& t)> eval_ = nullptr;
+#endif // eval_const_20240628
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     float selection_weight_ = 1;
 };
 

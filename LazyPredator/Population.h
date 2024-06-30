@@ -238,7 +238,17 @@ public:
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20240625 will it work without this? its before the
                 //       mo_fitness_function which is where it is value to eval.
-//                individual->treeValue();
+                
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20240630 OH!! taking this out made Boid::GP_not_GA=true
+                // work, but BROKE "Boid::GP_not_GA=false" (and all previous FS)
+                // Apparently I want to make this optional, default ON but have
+                // a way to set it to OFF for the Boid::GP_not_GA=true case
+                                
+                individual->treeValue();
+
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 MultiObjectiveFitness mof = mo_fitness_function(individual);
                 individual->setMultiObjectiveFitness(mof);

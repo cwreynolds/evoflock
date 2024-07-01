@@ -204,6 +204,11 @@ public:
     // 4d vector magnitude, normalized onto [0,1]
     typedef std::function<double(MultiObjectiveFitness)> FitnessScalarizeFunction;
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240701 external switch -- temporary?
+    bool explicit_treeValue_in_evolutionStep = true;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Perform one step of the "steady state" evolutionary computation using
     // "multi objective fitness" -- basically a vector of scalar fitness values
     // each for an independent, potentially conflicting measure of fitness. It
@@ -244,8 +249,17 @@ public:
                 // work, but BROKE "Boid::GP_not_GA=false" (and all previous FS)
                 // Apparently I want to make this optional, default ON but have
                 // a way to set it to OFF for the Boid::GP_not_GA=true case
-                                
-                individual->treeValue();
+
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                // TODO 20240701 external switch -- temporary?
+                
+//                individual->treeValue();
+
+                if (explicit_treeValue_in_evolutionStep)
+                {
+                    individual->treeValue();
+                }
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

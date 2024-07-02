@@ -474,7 +474,10 @@ int main(int argc, const char * argv[])
 
     int individuals = 500;
     int subpops = 25;
-    int max_evolution_steps = 30000;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    int max_evolution_steps = 30000;
+    int max_evolution_steps = 100;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //    lp::LPRS().setSeed(20240408);
 //    lp::LPRS().setSeed(20240409);
@@ -500,8 +503,8 @@ int main(int argc, const char * argv[])
         
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240628 can we do an eval of a const tree?
-    Boid::GP_not_GA = false;
-//    Boid::GP_not_GA = true;
+//    Boid::GP_not_GA = false;
+    Boid::GP_not_GA = true;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //    int min_tree_size = 2;
@@ -534,11 +537,17 @@ int main(int argc, const char * argv[])
 //        LazyPredator::FunctionSet fs = (Boid::GP_not_GA ?
 //                                        GP::evoflock_gp_function_set() :
 //                                        GP::evoflock_ga_function_set);
-        if (not Boid::GP_not_GA)
-        {
-            fs.setCrossoverFunction(GP::evoflock_ga_crossover);
-        }
         
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20240702 try using that new switch
+
+//        if (not Boid::GP_not_GA)
+//        {
+//            fs.setCrossoverFunction(GP::evoflock_ga_crossover);
+//        }
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         population = new LazyPredator::Population (individuals,
@@ -547,6 +556,22 @@ int main(int argc, const char * argv[])
                                                    min_tree_size,
                                                    max_tree_size,
                                                    fs);
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20240702 try using that new switch
+                
+        if (Boid::GP_not_GA)
+        {
+            population->explicit_treeValue_in_evolutionStep = false;
+        }
+        else
+        {
+            fs.setCrossoverFunction(GP::evoflock_ga_crossover);
+        }
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240619 WIP first GP_not_GA run
 
@@ -690,7 +715,8 @@ int main(int argc, const char * argv[])
         for (int i = 0; i < 10; i++)
         {
             const LP::Individual* individual = population->nthBestFitness(i);
-            std::cout << individual->tree().to_string() << std::endl;
+//            std::cout << individual->tree().to_string() << std::endl;
+            std::cout << individual->tree().to_string(true) << std::endl;
             auto fitness = GP::rerun_flock_simulation(individual);
             debugPrint(fitness);
         }

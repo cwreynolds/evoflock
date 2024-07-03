@@ -714,27 +714,44 @@ int main(int argc, const char * argv[])
         std::cout << std::endl;
         for (int i = 0; i < 10; i++)
         {
-            const LP::Individual* individual = population->nthBestFitness(i);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240703 fix end of run logging for GP
+//            const LP::Individual* individual = population->nthBestFitness(i);
+            LP::Individual* individual = population->nthBestFitness(i);
 //            std::cout << individual->tree().to_string() << std::endl;
             std::cout << individual->tree().to_string(true) << std::endl;
-            auto fitness = GP::rerun_flock_simulation(individual);
+//            auto fitness = GP::rerun_flock_simulation(individual);
+            LazyPredator::MultiObjectiveFitness fitness;
+            if (Boid::GP_not_GA)
+            {
+                fitness = GP::evoflock_gp_fitness_function(individual);
+            }
+            else
+            {
+                fitness = GP::rerun_flock_simulation(individual);
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             debugPrint(fitness);
         }
     };
     record_top_10();
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << "now with MOF scalarized with scalarize_fitness_min()" << std::endl;
-    GP::replace_scalar_fitness_metric(*population, GP::scalarize_fitness_min);
-    record_top_10();
 
-    GP::print_occupancy_map = true;
-    std::cout << std::endl;
-    std::cout << std::endl;
-    const LP::Individual* individual = population->nthBestFitness(0);
-    std::cout << individual->tree().to_string() << std::endl;
-    auto fitness = GP::rerun_flock_simulation(individual);
-    debugPrint(fitness);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240703 fix end of run logging for GP
+//    std::cout << std::endl;
+//    std::cout << std::endl;
+//    std::cout << "now with MOF scalarized with scalarize_fitness_min()" << std::endl;
+//    GP::replace_scalar_fitness_metric(*population, GP::scalarize_fitness_min);
+//    record_top_10();
+//
+//    GP::print_occupancy_map = true;
+//    std::cout << std::endl;
+//    std::cout << std::endl;
+//    const LP::Individual* individual = population->nthBestFitness(0);
+//    std::cout << individual->tree().to_string() << std::endl;
+//    auto fitness = GP::rerun_flock_simulation(individual);
+//    debugPrint(fitness);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     delete population;
     LP::Individual::leakCheck();

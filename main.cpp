@@ -724,6 +724,11 @@ int main(int argc, const char * argv[])
             LazyPredator::MultiObjectiveFitness fitness;
             if (Boid::GP_not_GA)
             {
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO for simplicity, change get/setSaveBoidCenters() to be static
+                Flock::setSaveBoidCenters(true);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                 fitness = GP::evoflock_gp_fitness_function(individual);
             }
             else

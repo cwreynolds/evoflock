@@ -204,11 +204,21 @@ public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO for simplicity, change get/setSaveBoidCenters() to be static
+
     // TODO just WIP for prototyping
+//    std::ofstream* boid_center_data_stream_;
+//    bool save_boid_centers_ = true;
+//    void setSaveBoidCenters(bool save) { save_boid_centers_ = save; }
+//    bool getSaveBoidCenters() const { return save_boid_centers_; }
+
     std::ofstream* boid_center_data_stream_;
-    bool save_boid_centers_ = true;
-    void setSaveBoidCenters(bool save) { save_boid_centers_ = save; }
-    bool getSaveBoidCenters() const { return save_boid_centers_; }
+    static inline bool save_boid_centers_ = false;
+    void static setSaveBoidCenters(bool save) { save_boid_centers_ = save; }
+    bool static getSaveBoidCenters() { return save_boid_centers_; }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //    void save_centers_to_file_start()
 //    {

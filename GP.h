@@ -178,7 +178,10 @@ inline void init_flock(Flock& flock)
     flock.set_fixed_time_step(true);
     flock.set_max_simulation_steps(500);  // 20240513: was 1000 before.
     flock.setLogStatInterval(flock.max_simulation_steps());
-    flock.setSaveBoidCenters(false);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO for simplicity, change get/setSaveBoidCenters() to be static
+//    flock.setSaveBoidCenters(false);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     flock.log_prefix = "    ";
 }
 
@@ -322,7 +325,10 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
         // These steps can happen in parallel threads:
         Flock flock;
         init_flock(flock);
-        flock.setSaveBoidCenters(write_file);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO for simplicity, change get/setSaveBoidCenters() to be static
+//        flock.setSaveBoidCenters(write_file);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240627 trying to reenable multi threading

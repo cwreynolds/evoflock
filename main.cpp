@@ -471,13 +471,20 @@ int main(int argc, const char * argv[])
 //    return EXIT_SUCCESS;
     
     //--------------------------------------------------------------------------
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240619 WIP first GP_not_GA run
+    
+//    Boid::GP_not_GA = false;
+    Boid::GP_not_GA = true;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     int individuals = 500;
     int subpops = 25;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //    int max_evolution_steps = 30000;
-    int max_evolution_steps = 100;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    int max_evolution_steps = Boid::GP_not_GA ? 15000 : 30000;
 
 //    lp::LPRS().setSeed(20240408);
 //    lp::LPRS().setSeed(20240409);
@@ -501,17 +508,21 @@ int main(int argc, const char * argv[])
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run
         
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240628 can we do an eval of a const tree?
-//    Boid::GP_not_GA = false;
-    Boid::GP_not_GA = true;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20240628 can we do an eval of a const tree?
+//    //    Boid::GP_not_GA = false;
+//        Boid::GP_not_GA = true;
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //    int min_tree_size = 2;
 //    int max_tree_size = 20;
-    int min_tree_size = Boid::GP_not_GA ? 10  :  2;
-    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
     
+//    int min_tree_size = Boid::GP_not_GA ? 10  :  2;
+//    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
+
+    int min_tree_size = Boid::GP_not_GA ? 20 :  2;
+    int max_tree_size = Boid::GP_not_GA ? 50 : 20;
+
     auto fitness_function = (Boid::GP_not_GA ?
                              GP::evoflock_gp_fitness_function :
                              GP::evoflock_ga_fitness_function);

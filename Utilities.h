@@ -112,6 +112,17 @@ bool zero_crossing(double a, double b)
     return ((a >= 0) and (b <= 0)) or ((a <= 0) and (b >= 0));
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240706 make global variable GP::mof_names into a function.
+
+// Maps from 0 to 1 into a sinusoid ramp ("slow in, slow out") from 0 to 1.
+inline double sinusoid (double x)
+{
+    return (1 - std::cos(x * M_PI)) / 2;
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 // Note: "class Pairings" was here in the Python version. Still needed?
 
 // Utility for blending per-step values into accumulators for low pass filtering.

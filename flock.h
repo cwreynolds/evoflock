@@ -446,6 +446,14 @@ public:
 //                debugPrint(temp_max_curvature_)
 //            }
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240706 make global variable GP::mof_names into a function.
+            speed_score_sum_for_all_boid_updates_ += boid_speed_score(b);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            
             increment_boid_update_counter();
         }
         if (all_speed_good) { count_steps_good_speed++; }
@@ -475,6 +483,43 @@ public:
         double ad_hoc_high_curvature = ad_hoc_max_curvature / 2;
         return util::clip01(ave / ad_hoc_high_curvature);
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240706 make global variable GP::mof_names into a function.
+    double speed_score_sum_for_all_boid_updates_ = 0;
+    double speed_target = 20; // m/s
+    double speed_support_width = 10;
+    double boid_speed_score(Boid* boid)
+    {
+        double score = 0;
+        double speed = boid->speed();
+        double low  = speed_target - (speed_support_width / 2);
+        double high = speed_target + (speed_support_width / 2);
+        // Per boid score is zero outside a "speed_support_width" interval
+        // centered on "speed_target". There the score is 1 and it falls
+        // off to 0 (at "low" and "high") with a cosine kernel shape.
+        if (util::between(speed, low, speed_target))
+        {
+            score = util::sinusoid(util::remap_interval(speed,
+                                                        low, speed_target,
+                                                        0, 1));
+        }
+        if (util::between(speed, speed_target, high))
+        {
+            
+            score = util::sinusoid(util::remap_interval(speed,
+                                                        speed_target, high,
+                                                        1, 0));
+        }
+        return score;
+    }
+    double get_gp_speed_score() const
+    {
+        return speed_score_sum_for_all_boid_updates_ / boid_update_counter_;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     int count_clusters() const
     {

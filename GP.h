@@ -89,17 +89,77 @@ inline double scalarize_fitness_length(MOF mof)
 // scalarize_fitness_prod(), or scalarize_fitness_length();
 inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240706 make global variable GP::mof_names into a function.
 
-inline const std::vector<std::string> mof_names =
+//    inline const std::vector<std::string> mof_names =
+//    {
+//        "separate",
+//        "avoid",
+//        "cohere",
+//        "cluster",
+//        "curvature",
+//        "occupied"
+//    };
+
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return
+//        {
+//            "separate",
+//            "avoid",
+//            "cohere",
+//            "cluster",
+//            "curvature",
+//            "occupied"
+//        };
+//
+//    }
+
+inline std::vector<std::string> mof_names()
 {
-    "separate",
-    "avoid",
-    "cohere",
-    "cluster",
-    "curvature",
-    "occupied"
-};
+    return (Boid::GP_not_GA ?
+            std::vector<std::string>(
+                                     {
+                                         "separate",
+                                         "avoid",
+                                         "cohere",
+//                                         "cluster",
+//                                         "curvature",
+                                         "speed",
+                                         "occupied"
+                                     }) :
+            std::vector<std::string>(
+                                     {
+                                         "separate",
+                                         "avoid",
+                                         "cohere",
+                                         "cluster",
+                                         "curvature",
+                                         "occupied"
+                                     }));
+}
 
+
+//    inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
+//    {
+//        double separate = flock.get_separation_score();
+//        double avoid = flock.get_avoid_obstacle_score();
+//        double cohere = flock.get_cohere_score();
+//        double cluster = flock.get_cluster_score();
+//        double curvature = flock.get_curvature_score();
+//        auto ignore_function = [](Vec3 p) { return p.length() > 50;};
+//        double occupy = flock.occupancy_map.fractionOccupied(ignore_function);
+//        return
+//        {{
+//            separate,
+//            avoid,
+//            cohere,
+//            cluster,
+//            curvature,
+//            occupy
+//        }};
+//    }
 
 inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 {
@@ -108,18 +168,46 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
     double cohere = flock.get_cohere_score();
     double cluster = flock.get_cluster_score();
     double curvature = flock.get_curvature_score();
+    double speed = flock.get_gp_speed_score();
     auto ignore_function = [](Vec3 p) { return p.length() > 50;};
     double occupy = flock.occupancy_map.fractionOccupied(ignore_function);
-    return
-    {{
-        separate,
-        avoid,
-        cohere,
-        cluster,
-        curvature,
-        occupy
-    }};
+    //    return
+    //    {{
+    //        separate,
+    //        avoid,
+    //        cohere,
+    //        cluster,
+    //        curvature,
+    //        occupy
+    //    }};
+    
+//    Boid::GP_not_GA
+    
+    return (Boid::GP_not_GA ?
+            MOF(
+                {
+                    separate,
+                    avoid,
+                    cohere,
+//                    cluster,
+//                    curvature,
+                    speed,
+                    occupy
+                }) :
+            MOF(
+                {
+                    separate,
+                    avoid,
+                    cohere,
+                    cluster,
+                    curvature,
+                    occupy
+                })
+            );
 }
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 // Return a FlockParameters object with all given parameter values
@@ -209,7 +297,11 @@ inline void fitness_logger(const MOF& mof)
     std::string sc = "scalar composite";
     size_t cw = sc.size();  // Column width.
     std::vector<std::string> labels;
-    for (auto& s : mof_names) { labels.push_back(s + " fitness"); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240706 make global variable GP::mof_names into a function.
+//    for (auto& s : mof_names) { labels.push_back(s + " fitness"); }
+    for (auto& s : mof_names()) { labels.push_back(s + " fitness"); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     for (auto& s : labels){ size_t ss = s.size(); if (cw < ss) { cw = ss; } }
     // Print one row of a table with a named mof fitness.
     auto print = [&](double fitness, std::string name)
@@ -250,7 +342,11 @@ inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = fal
         // These steps happen in the single thread with lock on save_mof_mutex.
         {
             std::lock_guard<std::mutex> smm(save_mof_mutex);
-            assert(mof.size() == mof_names.size());
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240706 make global variable GP::mof_names into a function.
+//            assert(mof.size() == mof_names.size());
+            assert(mof.size() == mof_names().size());
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             scalar_fits.push_back(scalarize_fitness(mof));
             if (least_scalar_fitness > scalar_fits.back())
             {
@@ -358,7 +454,11 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
         // These steps happen in the single thread with lock on save_mof_mutex.
         {
             std::lock_guard<std::mutex> smm(save_mof_mutex);
-            assert(mof.size() == mof_names.size());
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240706 make global variable GP::mof_names into a function.
+//            assert(mof.size() == mof_names.size());
+            assert(mof.size() == mof_names().size());
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             scalar_fits.push_back(scalarize_fitness(mof));
             if (least_scalar_fitness > scalar_fits.back())
             {

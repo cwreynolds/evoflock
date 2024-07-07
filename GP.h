@@ -442,7 +442,14 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
             // hit an assert violation in LocalSpace::rotate_to_new_forward()
             // because reference_up was zero rather than unit length. Maybe
             // because acceleration was also zero early in sim?
-            if (not (steering.length_squared() > 0)) { steering = Vec3(0,0,1); }
+//            if (not (steering.length_squared() > 0)) { steering = Vec3(0,0,1); }
+ 
+            // TODO 20240707 "Assertion failed: (new_forward.is_unit_length()),
+            // function rotate_to_new_forward..." so a little more bullet proofing:
+            if (not (steering.length_squared() > 0) or not steering.is_valid())
+            {
+                steering = Vec3(0, 0, 1);
+            }
             
             return steering;
         };

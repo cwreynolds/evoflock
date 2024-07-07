@@ -520,8 +520,11 @@ int main(int argc, const char * argv[])
 //    int min_tree_size = Boid::GP_not_GA ? 10  :  2;
 //    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
 
-    int min_tree_size = Boid::GP_not_GA ? 20 :  2;
-    int max_tree_size = Boid::GP_not_GA ? 50 : 20;
+//    int min_tree_size = Boid::GP_not_GA ? 20 :  2;
+//    int max_tree_size = Boid::GP_not_GA ? 50 : 20;
+
+    int min_tree_size = Boid::GP_not_GA ? 20  :  2;
+    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
 
     auto fitness_function = (Boid::GP_not_GA ?
                              GP::evoflock_gp_fitness_function :

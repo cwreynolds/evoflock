@@ -331,6 +331,12 @@ public:
 //                debugPrint(steering_from_evolved_function)
 //            }
 
+//            if (is_first_boid() && (draw().frame_counter() < 10))
+//            {
+//                debugPrint(draw().frame_counter())
+//                debugPrint(steering_from_evolved_function)
+//            }
+
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
             return steering_from_evolved_function;

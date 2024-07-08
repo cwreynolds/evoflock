@@ -372,9 +372,15 @@ public:
 //        chunk_func(boids_per_thread, boid_count);
 //        helper.join();
 
-//        bool multithreading = not Boid::GP_not_GA;
-        bool multithreading = true;
-        if (multithreading)
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20240707 global switch to enable threads EF::enable_multithreading
+
+//    //        bool multithreading = not Boid::GP_not_GA;
+//            bool multithreading = true;
+//            if (multithreading)
+
+        if (EF::enable_multithreading)
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         {
             std::thread helper(chunk_func, 0, boids_per_thread);
             chunk_func(boids_per_thread, boid_count);

@@ -572,7 +572,7 @@ static void unit_test()
             gp_tree.collectVectorOfSubtrees(vector_of_subtrees);
             for (GpTree* t : vector_of_subtrees) { set_of_subtrees.insert(t); }
             gp_tree.collectSetOfTypes(set_of_types);
-            // Verify that set_of_subtrees.size() is equal ro gp_tree.size().
+            // Verify that set_of_subtrees.size() is equal to gp_tree.size().
             ok = ok && st(gp_tree.size() == set_of_subtrees.size());
             // Traverse a GpTree, testing each node for membership in both sets.
             std::function<void(GpTree*)> check = [&](GpTree* t)

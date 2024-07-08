@@ -472,6 +472,32 @@ int main(int argc, const char * argv[])
     
     //--------------------------------------------------------------------------
     
+        
+    std::vector<Boid> boids(10);
+    for (int i = 0; i < 10; i++)
+    {
+        boids[i].setPosition(EF::RS().random_unit_vector() * 10);
+        boids[i].setForward(EF::RS().random_unit_vector());
+    }
+    Boid& boid = boids[0];
+    BoidPtrList neighbors;
+    for (Boid& b : boids) { neighbors.push_back(&b); }
+    boid.set_flock_boids(&neighbors);
+    boid.recompute_nearest_neighbors();
+    EvertedSphereObstacle eso(100, Vec3());
+    ObstaclePtrList opl = {&eso};
+    boid.set_flock_obstacles(&opl);
+    FlockParameters fp;
+    boid.set_fp(&fp);
+    Boid::setGpPerThread(&boid);
+
+    GP::test_First_Obs_GpFuncs();
+    
+//    exit(EXIT_SUCCESS);
+//    EF::enable_multithreading = false;
+    
+    //--------------------------------------------------------------------------
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run
     
@@ -480,10 +506,8 @@ int main(int argc, const char * argv[])
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
     int individuals = 500;
     int subpops = 25;
-//    int max_evolution_steps = 30000;
     int max_evolution_steps = Boid::GP_not_GA ? 15000 : 30000;
 
 //    lp::LPRS().setSeed(20240408);

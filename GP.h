@@ -355,16 +355,32 @@ inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = fal
             }
         }
     };
-#if 0
-    // Do simulation runs sequentially.
-    for (int r = 0; r < runs; r++) { do_1_run(); }
-#else
-    // Do each simulation run in a parallel thread.
-    std::vector<std::thread> threads;
-    for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
-    // Wait for helper threads to finish, join them with this thread.
-    for (auto& t : threads) { t.join(); }
-#endif
+    
+//    #if 0
+//        // Do simulation runs sequentially.
+//        for (int r = 0; r < runs; r++) { do_1_run(); }
+//    #else
+//        // Do each simulation run in a parallel thread.
+//        std::vector<std::thread> threads;
+//        for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
+//        // Wait for helper threads to finish, join them with this thread.
+//        for (auto& t : threads) { t.join(); }
+//    #endif
+    
+    if (EF::enable_multithreading)
+    {
+        // Do each simulation run in a parallel thread.
+        std::vector<std::thread> threads;
+        for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
+        // Wait for helper threads to finish, join them with this thread.
+        for (auto& t : threads) { t.join(); }
+    }
+    else
+    {
+        // Do simulation runs sequentially.
+        for (int r = 0; r < runs; r++) { do_1_run(); }
+    }
+
     assert(scalar_fits.size() == runs);
     fitness_logger(least_mof);
     std::cout << "    min composite "<< least_scalar_fitness;
@@ -475,15 +491,21 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
         }
     };
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240627 trying to reenable multi threading
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20240707 global switch to enable threads EF::enable_multithreading
 
-    bool multi_threaded = true;
-//    bool multi_threaded = false;
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20240627 trying to reenable multi threading
+//
+//        bool multi_threaded = true;
+//    //    bool multi_threaded = false;
+//
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//        if (multi_threaded)
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    if (multi_threaded)
+    if (EF::enable_multithreading)
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     {
         // Do each simulation run in a parallel thread.
         std::vector<std::thread> threads;
@@ -1026,5 +1048,27 @@ LP::FunctionSet evoflock_gp_function_set()
 }
 
 #endif // eval_const_20240628
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240707 WIP on a prototype unit test for this GP module
+
+void test_First_Obs_GpFuncs()
+{
+    const LP::FunctionSet fs = evoflock_gp_function_set();
+    const LP::GpFunction* fod = fs.lookupGpFunctionByName("First_Obs_Dist");
+    const LP::GpFunction* fon = fs.lookupGpFunctionByName("First_Obs_Normal");
+
+    LP::GpTree gp_tree_fod;
+    gp_tree_fod.setRootFunction(*fod);
+    double distance = std::any_cast<double>(gp_tree_fod.eval());
+    debugPrint(distance)
+    
+    LP::GpTree gp_tree_fon;
+    gp_tree_fon.setRootFunction(*fon);
+    Vec3 normal = std::any_cast<Vec3>(gp_tree_fon.eval());
+    debugPrint(normal)
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 }  // end of namespace GP

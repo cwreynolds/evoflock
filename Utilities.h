@@ -420,6 +420,10 @@ inline static RandomSequence rs_default_;
 inline static RandomSequence* rs_ = &rs_default_;
 inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240707 global switch to enable threads EF::enable_multithreading
+inline static bool enable_multithreading = true;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }  // end of namespace EvoFlock
 namespace EF = EvoFlock;
 

@@ -845,6 +845,14 @@ LP::FunctionSet evoflock_gp_function_set()
                     return std::any(clean_num(std::pow(base, expt)));
                 }
             },
+            {
+                "Abs", "Scalar_100", {"Scalar_100"},
+                [](LP::GpTree& tree)
+                {
+                    double x = tree.evalSubtree<double>(0);
+                    return std::any(clean_num(std::abs(x)));
+                }
+            },
 
             // Vector functions:
             {

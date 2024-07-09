@@ -209,6 +209,38 @@ public:
     bool explicit_treeValue_in_evolutionStep = true;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240708 WIP for MOF elitism
+    
+private:
+    MultiObjectiveFitness elite_mof_;
+public:
+    
+    void updateEliteMOF(const MultiObjectiveFitness& mof)
+    {
+        if (elite_mof_.empty()) { elite_mof_ = mof; }  // First update.
+        assert(mof.size() == elite_mof_.size());
+        for (int i = 0; i < mof.size(); i++)
+        {
+            elite_mof_.at(i) = std::max(mof.at(i), elite_mof_.at(i));
+        }
+    }
+
+    bool isEliteMOF(const MultiObjectiveFitness& mof)
+    {
+        bool elite = false;
+        assert(mof.size() == elite_mof_.size());
+        for (int i = 0; i < mof.size(); i++)
+        {
+            double mo = mof.at(i);
+            double eo = elite_mof_.at(i);
+            if (util::between(mo, 0.05, 0.95) and (mo >= eo)) { elite = true; }
+        }
+        return elite;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     // Perform one step of the "steady state" evolutionary computation using
     // "multi objective fitness" -- basically a vector of scalar fitness values
     // each for an independent, potentially conflicting measure of fitness. It
@@ -266,6 +298,10 @@ public:
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 MultiObjectiveFitness mof = mo_fitness_function(individual);
                 individual->setMultiObjectiveFitness(mof);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20240708 WIP for MOF elitism
+                updateEliteMOF(mof);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 double scalar = fitness_scalarize_function(mof);
                 individual->setFitness(scalar);
                 if (scalar > prev_best_pop_fitness) { found_new_best = true;}
@@ -292,6 +328,24 @@ public:
             group.sort();
             // Preserve population best fitness regardless of MOF metrics.
             if (found_new_best) { group.setValid(false); }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240708 WIP for MOF elitism
+            MultiObjectiveFitness mof =
+                            group.worstIndividual()->getMultiObjectiveFitness();
+            if (isEliteMOF(mof))
+            {
+                std::cout << std::endl <<
+                "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                << std::endl;
+                debugPrint(elite_mof_)
+                std::cout << "       ";
+                debugPrint(mof)
+                std::cout << std::endl;
+                group.setValid(false);
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             return group;
         };
         // Finally, do a tournament-based evolution step.

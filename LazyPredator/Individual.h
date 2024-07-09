@@ -34,7 +34,15 @@ public:
         names_ = names;
     }
     size_t size() const { return mof_.size(); }
-    double at(size_t i) const { return mof_.at(i); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240708 make MultiObjectiveFitness.at() work for read AND write.
+    
+//    double at(size_t i) const { return mof_.at(i); }
+    
+    double& at(size_t i) { return mof_.at(i); }
+    const double& at(size_t i) const { return mof_.at(i); }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     auto begin() const { return mof_.begin(); }
     auto end() const { return mof_.end(); }
     double min() const { return *std::min_element(begin(), end()); }

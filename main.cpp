@@ -472,39 +472,56 @@ int main(int argc, const char * argv[])
     
     //--------------------------------------------------------------------------
     
-        
-    std::vector<Boid> boids(10);
-    for (int i = 0; i < 10; i++)
-    {
-        boids[i].setPosition(EF::RS().random_unit_vector() * 10);
-        boids[i].setForward(EF::RS().random_unit_vector());
-    }
-    Boid& boid = boids[0];
-    BoidPtrList neighbors;
-    for (Boid& b : boids) { neighbors.push_back(&b); }
-    boid.set_flock_boids(&neighbors);
-    boid.recompute_nearest_neighbors();
-    EvertedSphereObstacle eso(100, Vec3());
-    ObstaclePtrList opl = {&eso};
-    boid.set_flock_obstacles(&opl);
-    FlockParameters fp;
-    boid.set_fp(&fp);
-    Boid::setGpPerThread(&boid);
-
-    GP::test_First_Obs_GpFuncs();
-    
+//    std::vector<Boid> boids(10);
+//    for (int i = 0; i < 10; i++)
+//    {
+//        boids[i].setPosition(EF::RS().random_unit_vector() * 10);
+//        boids[i].setForward(EF::RS().random_unit_vector());
+//    }
+//    Boid& boid = boids[0];
+//    BoidPtrList neighbors;
+//    for (Boid& b : boids) { neighbors.push_back(&b); }
+//    boid.set_flock_boids(&neighbors);
+//    boid.recompute_nearest_neighbors();
+//    EvertedSphereObstacle eso(100, Vec3());
+//    ObstaclePtrList opl = {&eso};
+//    boid.set_flock_obstacles(&opl);
+//    FlockParameters fp;
+//    boid.set_fp(&fp);
+//    Boid::setGpPerThread(&boid);
+//
+//    GP::test_First_Obs_GpFuncs();
+//    
 //    exit(EXIT_SUCCESS);
 //    EF::enable_multithreading = false;
+
+    //--------------------------------------------------------------------------
+    // TODO 20240709 why so few (none?) Scalar_100 ephemeral constants?
+
     
+//    // Debugging why there are so few (none?) of Scalar_100 ephemeral constants.
+//    // Working hypothesis: in TexSyn the GpFunc were in non overlapping sets:
+//    // Textures which had no ephemeral constants, and scalars which DID have ECs
+//    // but were returned by no functions.
+//    
+//    LP::LPRS().setSeed(20240709);
+//    LP::FunctionSet gp_fs =  GP::evoflock_gp_function_set();
+//    gp_fs.print();
+//    for (int i = 0; i < 100; i++)
+//    {
+//        std::cout << i << ":" << std::endl;
+//        LP::GpTree gp_tree;
+//        gp_fs.makeRandomTree(50, gp_tree);
+//        std::cout << gp_tree.to_string(true) << std::endl;
+//        std::cout << std::endl << std::endl;
+//    }
+//    return EXIT_SUCCESS;
+
     //--------------------------------------------------------------------------
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240619 WIP first GP_not_GA run
     
 //    Boid::GP_not_GA = false;
     Boid::GP_not_GA = true;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     int individuals = 500;
     int subpops = 25;
@@ -527,7 +544,8 @@ int main(int argc, const char * argv[])
 //    lp::LPRS().setSeed(20240508);
 //    lp::LPRS().setSeed(20240509);
 //    lp::LPRS().setSeed(20240512);
-    LP::LPRS().setSeed(20240606);
+//    LP::LPRS().setSeed(20240606);
+    LP::LPRS().setSeed(20240708);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run
@@ -547,7 +565,10 @@ int main(int argc, const char * argv[])
 //    int min_tree_size = Boid::GP_not_GA ? 20 :  2;
 //    int max_tree_size = Boid::GP_not_GA ? 50 : 20;
 
-    int min_tree_size = Boid::GP_not_GA ? 20  :  2;
+//    int min_tree_size = Boid::GP_not_GA ? 20  :  2;
+//    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
+
+    int min_tree_size = Boid::GP_not_GA ? 30  :  2;
     int max_tree_size = Boid::GP_not_GA ? 100 : 20;
 
     auto fitness_function = (Boid::GP_not_GA ?

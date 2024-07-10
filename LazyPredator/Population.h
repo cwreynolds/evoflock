@@ -260,16 +260,6 @@ public:
         // Customized function to perform MOF evaluation of individual.
         auto mof_eval = [&](Individual* individual)
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240622 still debugging error GP_not_GA run
-//            std::cout << "in mof_eval() inside Population::evolutionStep()" << std::endl;
-//            check_Individual_13(individual)
-//            debugPrint(individual)
-//            debugPrint(individual->pop_position)
-//            individual->tree().print();
-//            debugPrint(individual->tree_to_string())
-//            std::cout << std::endl;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (not individual->hasMultiObjectiveFitness())
             {
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -326,31 +316,63 @@ public:
             }
             // Sort the TournamentGroup by metric, least first.
             group.sort();
-            // Preserve population best fitness regardless of MOF metrics.
-            if (found_new_best) { group.setValid(false); }
+            
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240708 WIP for MOF elitism
-            MultiObjectiveFitness mof =
-                            group.worstIndividual()->getMultiObjectiveFitness();
+            // TODO 20240710 WIP for MOF elitism
+
+//            // Preserve population best fitness regardless of MOF metrics.
+//            if (found_new_best) { group.setValid(false); }
+            
+            protectEliteMOF(group);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            return group;
+        };
+        // Finally, do a tournament-based evolution step.
+        evolutionStep(tournament_function);
+    }
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240710 WIP for MOF elitism
+    
+    // rethink name
+    
+    // Inspect Individuals in TournamentGroup. Determine if any are "elite": by
+    // dominating any one of the MOF objectives, or by having best of population
+    // scalar fitness. If elites are found, then set the TournamentGroup to be
+    // invalid, so to prevent "death".
+    void protectEliteMOF(TournamentGroup group)
+    {
+        for (auto& m : group.members())
+        {
+            Individual* individual = m.individual;
+            MultiObjectiveFitness mof = individual->getMultiObjectiveFitness();
+            double prev_best_pop_fitness = bestFitness()->getFitness();
+            double fitness = individual->getFitness();
+            if (fitness >= prev_best_pop_fitness)
+            {
+                std::cout << "QQQQ protect best scalarized fitness" << std::endl;
+                group.setValid(false);
+            }
             if (isEliteMOF(mof))
             {
                 std::cout << std::endl <<
-                "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                << std::endl;
+                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+                    << std::endl;
                 debugPrint(elite_mof_)
                 std::cout << "       ";
                 debugPrint(mof)
                 std::cout << std::endl;
                 group.setValid(false);
             }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            return group;
-        };
-        // Finally, do a tournament-based evolution step.
-        evolutionStep(tournament_function);
+        }
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     // Delete Individual at index i, then overwrite pointer with replacement.
     void replaceIndividual(int i, Individual* new_individual, SubPop& subpop)

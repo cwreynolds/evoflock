@@ -416,8 +416,16 @@ public:
             
             double cs = util::remap_interval_clip(dist/br,min_sep_allowed,20,1,0);
             sum_of_all_cohesion_scores_ += cs;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240710 change speed fitness back to speed-ok frame count.
             
-            bool speed_ok = b->speed() > 15;
+//            bool speed_ok = b->speed() > 15;
+            
+            bool speed_ok = util::between(b->speed(),
+                                          speed_target - speed_support_width / 2,
+                                          speed_target + speed_support_width / 2);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (not nn_sep_ok) { all_seperation_good = false; }
             if (not speed_ok) { all_speed_good = false; }
             if (b->detectObstacleViolations()) { all_avoidance_good = false; }
@@ -459,7 +467,6 @@ public:
             speed_score_sum_for_all_boid_updates_ += boid_speed_score(b);
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-            
             increment_boid_update_counter();
         }
         if (all_speed_good) { count_steps_good_speed++; }
@@ -494,7 +501,11 @@ public:
     // TODO 20240706 make global variable GP::mof_names into a function.
     double speed_score_sum_for_all_boid_updates_ = 0;
     double speed_target = 20; // m/s
-    double speed_support_width = 10;
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20240710 change speed fitness back to speed-ok frame count.
+//    double speed_support_width = 10;
+    double speed_support_width = 6;  // That is +/- 3m/s is good enough.
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     double boid_speed_score(Boid* boid)
     {
         double score = 0;

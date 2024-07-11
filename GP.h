@@ -116,16 +116,39 @@ inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 //
 //    }
 
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (Boid::GP_not_GA ?
+//                std::vector<std::string>(
+//                                         {
+//                                             "separate",
+//                                             "avoid",
+//                                             "cohere",
+//    //                                         "cluster",
+//    //                                         "curvature",
+//                                             "speed",
+//                                             "occupied"
+//                                         }) :
+//                std::vector<std::string>(
+//                                         {
+//                                             "separate",
+//                                             "avoid",
+//                                             "cohere",
+//                                             "cluster",
+//                                             "curvature",
+//                                             "occupied"
+//                                         }));
+//    }
+
 inline std::vector<std::string> mof_names()
 {
     return (Boid::GP_not_GA ?
             std::vector<std::string>(
                                      {
-                                         "separate",
                                          "avoid",
+                                         "separate",
+//                                         "avoid",
                                          "cohere",
-//                                         "cluster",
-//                                         "curvature",
                                          "speed",
                                          "occupied"
                                      }) :
@@ -168,7 +191,11 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
     double cohere = flock.get_cohere_score();
     double cluster = flock.get_cluster_score();
     double curvature = flock.get_curvature_score();
-    double speed = flock.get_gp_speed_score();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240710 change speed fitness back to speed-ok frame count.
+//    double speed = flock.get_gp_speed_score();
+    double speed = flock.get_speed_score();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     auto ignore_function = [](Vec3 p) { return p.length() > 50;};
     double occupy = flock.occupancy_map.fractionOccupied(ignore_function);
     //    return
@@ -183,14 +210,36 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
     
 //    Boid::GP_not_GA
     
+//        return (Boid::GP_not_GA ?
+//                MOF(
+//                    {
+//                        separate,
+//                        avoid,
+//                        cohere,
+//    //                    cluster,
+//    //                    curvature,
+//                        speed,
+//                        occupy
+//                    }) :
+//                MOF(
+//                    {
+//                        separate,
+//                        avoid,
+//                        cohere,
+//                        cluster,
+//                        curvature,
+//                        occupy
+//                    })
+//                );
+//    }
+
     return (Boid::GP_not_GA ?
             MOF(
                 {
-                    separate,
                     avoid,
+                    separate,
+//                    avoid,
                     cohere,
-//                    cluster,
-//                    curvature,
                     speed,
                     occupy
                 }) :

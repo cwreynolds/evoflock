@@ -102,8 +102,34 @@ public:
         TournamentGroup random_group = randomTournamentGroup(subpop);
         // Run tournament among the three, return ranked group.
         TournamentGroup ranked_group = tournament_function(random_group);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240710 WTF despite my best efforts, fitness falls during run.
+        
+        double prev_best_fitness = bestFitness()->getFitness();
+
         // Complete the step based on this ranked group, if it is valid.
         if (ranked_group.getValid()) { evolutionStep(ranked_group, subpop); }
+        
+//        if (not random_group.getValid())
+//        {
+//            std::cout << "MMMM (not random_group.getValid())" << std::endl;
+//        }
+//        if (not ranked_group.getValid())
+//        {
+//            std::cout << "MMMM (not ranked_group.getValid())" << std::endl;
+//        }
+
+        double new_best_fitness = bestFitness()->getFitness();
+//        bool WOT = new_best_fitness < prev_best_fitness;
+//        if (WOT)
+//        {
+//            debugPrint(ranked_group.getValid())
+//            debugPrint(prev_best_fitness)
+//            debugPrint(new_best_fitness)
+//        }
+        assert(new_best_fitness >= prev_best_fitness);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Increment step count (before logger() call for 1 based step numbers).
         incrementStepCount();
         logger();
@@ -226,7 +252,7 @@ public:
         }
     }
 
-    bool isEliteMOF(const MultiObjectiveFitness& mof)
+    bool isEliteMOF(const MultiObjectiveFitness& mof) const
     {
         bool elite = false;
         assert(mof.size() == elite_mof_.size());
@@ -342,7 +368,8 @@ public:
     // dominating any one of the MOF objectives, or by having best of population
     // scalar fitness. If elites are found, then set the TournamentGroup to be
     // invalid, so to prevent "death".
-    void protectEliteMOF(TournamentGroup group)
+//    void protectEliteMOF(TournamentGroup group)
+    void protectEliteMOF(TournamentGroup& group)
     {
         for (auto& m : group.members())
         {
@@ -352,20 +379,20 @@ public:
             double fitness = individual->getFitness();
             if (fitness >= prev_best_pop_fitness)
             {
-                std::cout << "QQQQ protect best scalarized fitness" << std::endl;
+//                std::cout << "QQQQ protect best scalarized fitness" << std::endl;
                 group.setValid(false);
             }
             if (isEliteMOF(mof))
             {
-                std::cout << std::endl <<
-                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-                    << std::endl;
-                debugPrint(elite_mof_)
-                std::cout << "       ";
-                debugPrint(mof)
-                std::cout << std::endl;
+//                std::cout << std::endl <<
+//                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+//                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+//                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+//                    << std::endl;
+//                debugPrint(elite_mof_)
+//                std::cout << "       ";
+//                debugPrint(mof)
+//                std::cout << std::endl;
                 group.setValid(false);
             }
         }

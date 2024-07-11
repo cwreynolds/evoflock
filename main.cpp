@@ -525,7 +525,11 @@ int main(int argc, const char * argv[])
 
     int individuals = 500;
     int subpops = 25;
-    int max_evolution_steps = Boid::GP_not_GA ? 15000 : 30000;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240710 fiddling with hyperparameters
+//    int max_evolution_steps = Boid::GP_not_GA ? 15000 : 30000;
+    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //    lp::LPRS().setSeed(20240408);
 //    lp::LPRS().setSeed(20240409);
@@ -545,7 +549,8 @@ int main(int argc, const char * argv[])
 //    lp::LPRS().setSeed(20240509);
 //    lp::LPRS().setSeed(20240512);
 //    LP::LPRS().setSeed(20240606);
-    LP::LPRS().setSeed(20240708);
+//    LP::LPRS().setSeed(20240708);
+    LP::LPRS().setSeed(20240710);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run
@@ -568,8 +573,28 @@ int main(int argc, const char * argv[])
 //    int min_tree_size = Boid::GP_not_GA ? 20  :  2;
 //    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
 
-    int min_tree_size = Boid::GP_not_GA ? 30  :  2;
-    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240710 fiddling with hyperparameters
+
+//    int min_tree_size = Boid::GP_not_GA ? 30  :  2;
+//    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
+
+    int min_crossover_tree_size = Boid::GP_not_GA ? 20 :  2;
+    int max_crossover_tree_size = Boid::GP_not_GA ? 60 : 20;
+//    int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
+    int max_initial_tree_size   = Boid::GP_not_GA ? 60 : 20;
+//    int max_initial_tree_size   = Boid::GP_not_GA ? 1000 : 20;
+
+    
+//    Population(int individual_count,
+//               int subpopulation_count,
+//               int max_init_tree_size,
+//               int min_crossover_tree_size,
+//               int max_crossover_tree_size,
+//               const FunctionSet& fs)
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     auto fitness_function = (Boid::GP_not_GA ?
                              GP::evoflock_gp_fitness_function :
@@ -609,12 +634,27 @@ int main(int argc, const char * argv[])
 
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        population = new LazyPredator::Population (individuals,
-                                                   subpops,
-                                                   max_tree_size,
-                                                   min_tree_size,
-                                                   max_tree_size,
-                                                   fs);
+        
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240710 fiddling with hyperparameters
+
+//        population = new LazyPredator::Population (individuals,
+//                                                   subpops,
+//                                                   max_tree_size,
+//                                                   min_tree_size,
+//                                                   max_tree_size,
+//                                                   fs);
+
+        population = new LazyPredator::Population(individuals,
+                                                  subpops,
+                                                  max_initial_tree_size,
+                                                  min_crossover_tree_size,
+                                                  max_crossover_tree_size,
+                                                  fs);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        
         
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         // TODO 20240702 try using that new switch

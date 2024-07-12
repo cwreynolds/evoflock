@@ -111,17 +111,18 @@ public:
     // directly comparable.
     size_t pickMultiObjectiveFitnessIndex()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240523 WIP MOF priority ordering.
-//         size_t mof_size = checkValidForMultiObjectiveFitness();
         size_t mof_size = adjustMofSizeForPriority();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         double infinity = std::numeric_limits<double>::infinity();
         // Loop over the mof index range. For each one find the range between
         // max and min fitness. Return the index corresponding to largest range
         // or the lowest bottom.
-        int best_index_big_range = 0;
-        int best_index_lowest_bottom = 0;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240712 reconsider these "better index" strategies.
+//        int best_index_big_range = 0;
+//        int best_index_lowest_bottom = 0;
+        int best_index_big_range = LPRS().randomN(mof_size);
+        int best_index_lowest_bottom = LPRS().randomN(mof_size);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         double biggest_range = 0;
         double lowest_bottom = infinity;
         for (int i = 0; i < mof_size; i++)
@@ -146,23 +147,71 @@ public:
                 best_index_lowest_bottom = i;
             }
         }
-        return (LPRS().randomBool() ?
-                best_index_big_range :
-                best_index_lowest_bottom);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240712 reconsider these "better index" strategies.
+//        return (LPRS().randomBool() ?
+//                best_index_big_range :
+//                best_index_lowest_bottom);
+        return best_index_lowest_bottom;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240523 WIP MOF priority ordering.
-    // TODO needs switch to disable
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240711 some problem for MOF with just one element
+    
+//    size_t adjustMofSizeForPriority() const
+//    {
+//        size_t mof_size = checkValidForMultiObjectiveFitness();
+//        // Half of the time leave unchanged, otherwise randomly use 1 to all.
+//        if (LPRS().randomBool()) { mof_size = LPRS().randomN(mof_size - 1) + 1; }
+//        return mof_size;
+//    }
+
+    
+//        size_t adjustMofSizeForPriority() const
+//        {
+//            size_t mof_size = checkValidForMultiObjectiveFitness();
+//
+//    //        debugPrint(mof_size)
+//            std::cout << "top adjustMofSizeForPriority(), mof_size=" << mof_size << std::endl;
+//
+//            // Half of the time leave unchanged, otherwise randomly use 1 to all.
+//            if (LPRS().randomBool()) { mof_size = LPRS().randomN(mof_size - 1) + 1; }
+//
+//            //        debugPrint(mof_size)
+//            std::cout << "bot adjustMofSizeForPriority(), mof_size=" << mof_size << std::endl;
+//
+//            return mof_size;
+//        }
+
+//    size_t adjustMofSizeForPriority() const
+//    {
+//        size_t mof_size = checkValidForMultiObjectiveFitness();
+//        // Half of the time leave unchanged, otherwise randomly use 1 to all.
+//        if ((mof_size > 1) and LPRS().randomBool())
+//        {
+//            mof_size = LPRS().randomN(mof_size - 1) + 1;
+//        }
+//        return mof_size;
+//    }
+    
+    // "Occasionally" ignore some of the fitness objectives listed later in MOF.
+    // This serves to give priority to those listed earlier, allowing the
+    // application to specify which objectives are more important.
     size_t adjustMofSizeForPriority() const
     {
         size_t mof_size = checkValidForMultiObjectiveFitness();
-        // Half of the time leave unchanged, otherwise randomly use 1 to all.
-        if (LPRS().randomBool()) { mof_size = LPRS().randomN(mof_size - 1) + 1; }
+        // Half of the time leave MOF size unchanged.
+        if (LPRS().randomBool())
+        {
+            // Otherwise drop some random number of fitness objectives off end.
+            if (mof_size > 1) { mof_size = LPRS().randomN(mof_size - 1) + 1; }
+        }
         return mof_size;
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // First make sure TournamentGroup is set up for MultiObjectiveFitness.
     // (Also returns the size of MultiObjectiveFitness vectors being used.)
     size_t checkValidForMultiObjectiveFitness() const

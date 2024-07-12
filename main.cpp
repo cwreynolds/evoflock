@@ -518,6 +518,23 @@ int main(int argc, const char * argv[])
 //    return EXIT_SUCCESS;
 
     //--------------------------------------------------------------------------
+    
+//    LP::LPRS().setSeed(20240711);
+//    for (int i = 0; i < 20; i++)
+//    {
+//        debugPrint(EF::RS().randomN(5))
+//    }
+//    LP::LPRS().setSeed(20240711);
+//    for (int i = 0; i < 20; i++)
+//    {
+//        debugPrint(EF::RS().randomN(5 - 1) + 1)
+//    }
+//
+//    debugPrint(EF::RS().randomN(0))
+//
+//    return EXIT_SUCCESS;
+    
+    //--------------------------------------------------------------------------
 
     
 //    Boid::GP_not_GA = false;

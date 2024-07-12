@@ -365,9 +365,14 @@ public:
     double frandom01() { return double(nextInt()) / double(maxIntValue()); }
     // Returns a double randomly distributed between lowerBound and upperBound
     double frandom2(double a, double b) { return util::interpolate(frandom01(), a, b); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240711 some problem for MOF with just one element
     // Returns an int randomly distributed between 0 and n-1.
-    int randomN(int n) { return nextInt() % n; }
-    int randomN(size_t n) { return nextInt() % n; }
+//    int randomN(int n) { return nextInt() % n; }
+//    int randomN(size_t n) { return nextInt() % n; }
+    int randomN(int n) { assert(n > 0); return nextInt() % n; }
+    int randomN(size_t n) { assert(n > 0); return nextInt() % n; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // int/double overloads of random2(), returns value between INCLUSIVE bounds.
     int random2(int i, int j) { assert(i<=j); return i + randomN(j - i + 1); }
     double random2(double i, double j) { return frandom2(i, j); }

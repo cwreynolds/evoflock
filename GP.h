@@ -140,6 +140,51 @@ inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 //                                         }));
 //    }
 
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (Boid::GP_not_GA ?
+//                std::vector<std::string>(
+//                                         {
+//                                             "avoid",
+//                                             "separate",
+//    //                                         "avoid",
+//                                             "cohere",
+//                                             "speed",
+//                                             "occupied"
+//                                         }) :
+//                std::vector<std::string>(
+//                                         {
+//                                             "separate",
+//                                             "avoid",
+//                                             "cohere",
+//                                             "cluster",
+//                                             "curvature",
+//                                             "occupied"
+//                                         }));
+//    }
+
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (Boid::GP_not_GA ?
+//                std::vector<std::string>(
+//                                         {
+//                                             "avoid",
+//    //                                         "separate",
+//    //                                         "cohere",
+//                                             "speed",
+//    //                                         "occupied"
+//                                         }) :
+//                std::vector<std::string>(
+//                                         {
+//                                             "separate",
+//                                             "avoid",
+//                                             "cohere",
+//                                             "cluster",
+//                                             "curvature",
+//                                             "occupied"
+//                                         }));
+//    }
+
 inline std::vector<std::string> mof_names()
 {
     return (Boid::GP_not_GA ?
@@ -147,10 +192,7 @@ inline std::vector<std::string> mof_names()
                                      {
                                          "avoid",
                                          "separate",
-//                                         "avoid",
-                                         "cohere",
                                          "speed",
-                                         "occupied"
                                      }) :
             std::vector<std::string>(
                                      {
@@ -233,15 +275,55 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 //                );
 //    }
 
+//        return (Boid::GP_not_GA ?
+//                MOF(
+//                    {
+//                        avoid,
+//                        separate,
+//    //                    avoid,
+//                        cohere,
+//                        speed,
+//                        occupy
+//                    }) :
+//                MOF(
+//                    {
+//                        separate,
+//                        avoid,
+//                        cohere,
+//                        cluster,
+//                        curvature,
+//                        occupy
+//                    })
+//                );
+    
+    
+    
+//        return (Boid::GP_not_GA ?
+//                MOF(
+//                    {
+//                        avoid,
+//    //                    separate,
+//    //                    cohere,
+//                        speed,
+//    //                    occupy
+//                    }) :
+//                MOF(
+//                    {
+//                        separate,
+//                        avoid,
+//                        cohere,
+//                        cluster,
+//                        curvature,
+//                        occupy
+//                    })
+//                );
+
     return (Boid::GP_not_GA ?
             MOF(
                 {
                     avoid,
                     separate,
-//                    avoid,
-                    cohere,
                     speed,
-                    occupy
                 }) :
             MOF(
                 {
@@ -253,6 +335,7 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
                     occupy
                 })
             );
+
 }
 
 

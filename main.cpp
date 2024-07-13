@@ -616,8 +616,6 @@ int main(int argc, const char * argv[])
     auto fitness_function = (Boid::GP_not_GA ?
                              GP::evoflock_gp_fitness_function :
                              GP::evoflock_ga_fitness_function);
-
-//    LP::Individual* save_i13 = nullptr;
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     LP::Population* population = nullptr;
@@ -629,29 +627,6 @@ int main(int argc, const char * argv[])
     {
         std::cout << "Create population." << std::endl;
         util::Timer t("Create population.");
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240619 WIP first GP_not_GA run
-        
-//        LazyPredator::FunctionSet& fs = GP::evoflock_ga_function_set;
-//        fs.setCrossoverFunction(GP::evoflock_ga_crossover);
-
-//        LazyPredator::FunctionSet fs = (Boid::GP_not_GA ?
-//                                        GP::evoflock_gp_function_set() :
-//                                        GP::evoflock_ga_function_set);
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20240702 try using that new switch
-
-//        if (not Boid::GP_not_GA)
-//        {
-//            fs.setCrossoverFunction(GP::evoflock_ga_crossover);
-//        }
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240710 fiddling with hyperparameters
@@ -663,6 +638,8 @@ int main(int argc, const char * argv[])
 //                                                   max_tree_size,
 //                                                   fs);
 
+//        LP::Individual::increasing_initial_tree_size = true;
+        
         population = new LazyPredator::Population(individuals,
                                                   subpops,
                                                   max_initial_tree_size,
@@ -686,117 +663,8 @@ int main(int argc, const char * argv[])
         }
         
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240619 WIP first GP_not_GA run
-
-        if (Boid::GP_not_GA)
-        {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240624 still debugging GP_not_GA error
-//            population->trap_on_destructor = true;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            
-            std::vector<Boid> boids(10);
-            for (int i = 0; i < 10; i++)
-            {
-                boids[i].setPosition(EF::RS().random_unit_vector() * 10);
-                boids[i].setForward(EF::RS().random_unit_vector());
-            }
-            Boid& boid = boids[0];
-            BoidPtrList neighbors;
-            for (Boid& b : boids) { neighbors.push_back(&b); }
-            boid.set_flock_boids(&neighbors);
-            boid.recompute_nearest_neighbors();
-            EvertedSphereObstacle eso(100, Vec3());
-            ObstaclePtrList opl = {&eso};
-            boid.set_flock_obstacles(&opl);
-            FlockParameters fp;
-            boid.set_fp(&fp);
-            
-            Boid::setGpPerThread(&boid);
-            
-            int count = 1;
-            auto print_individuals_tree = [&](LP::Individual* i)
-            {
-                i->pop_position = count;
-                
-                
-//                std::cout << std::endl << count << std::endl;
-//                debugPrint(i)
-//                std::string tree_string = i->tree_to_string();
-//                std::cout << tree_string << std::endl;
-//                LP::GpTree gp_tree = i->tree();
-//                std::string copied_tree_string = gp_tree.to_string(true);
-//                std::cout << "tree copy matches original" << std::endl;
-//                assert(tree_string == copied_tree_string);
-//                std::cout << "treeValue():" << std::endl;
-//                std::cout << std::any_cast<Vec3>(i->treeValue()) << std::endl;
-//                
-//                std::cout << "GpTree::print():" << std::endl;
-//                gp_tree.print();
-//
-//                i->treeValue();
-//                i->qqq_count = count;
-//                i->duplicate_tree = i->tree();
-//                debugPrint(i->duplicate_tree.to_string())
-                
-                
-                i->treeValue();
-                i->duplicate_tree = i->tree();
-
-                // TODO 20240622 just temporary for debugging
-                GP::values_of_individuals[i] = std::any_cast<Vec3>(i->treeValue());
-                GP::trees_of_individuals[i] = i->tree();
-                
-//                Vec3 trap(-0.273772, -0.526079, 0.805164);
-//                if (Vec3::is_equal_within_epsilon(trap,
-//                                                  std::any_cast<Vec3>(i->treeValue()),
-//                                                  0.0001))
-//                {
-//                    debugPrint(GP::trees_of_individuals[i].to_string(true))
-//                }
-                
-                
-//                std::string tree_string = GP::trees_of_individuals[i].to_string();
-//                tree_string = tree_string.substr(0, 150);
-//                std::cout << count << ": " << i << " ";
-//                std::cout << tree_string << std::endl;
-                
-//                if (count == 13)
-//                {
-//                    check_Individual_13(i);
-//                    save_i13 = i;
-//
-//                    
-//                    std::cout << "in main()" << std::endl;
-//                    debugPrint(i)
-//                    debugPrint(i->pop_position)
-//                    debugPrint(Boid::getGpPerThread())
-//                    debugPrint(GP::values_of_individuals[i])
-//                    debugPrint(GP::trees_of_individuals[i].to_string(true))
-//                    i->tree().print();
-//                    i->duplicate_tree.print();
-//                }
-//                if (count > 13) { check_Individual_13(save_i13); }
-
-                count++;
-            };
-            population->applyToAllIndividuals(print_individuals_tree);
-            
-            
-        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240624 still debugging GP_not_GA error
-//    check_Individual_13(save_i13);                              \
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     {
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
@@ -814,9 +682,16 @@ int main(int argc, const char * argv[])
 //                                       GP::evoflock_ga_fitness_function),
 //                                      GP::scalarize_fitness);
 
-            std::cout << "evolution step: " << i << std::endl;
+//            std::cout << "evolution step: " << i << std::endl;
             
             population->evolutionStep(fitness_function, GP::scalarize_fitness);
+            
+            
+            if ((population->getStepCount() % 100) == 0)
+            {
+                LP::Individual* individual = population->bestFitness();
+                std::cout << individual->tree().to_string(true) << std::endl;
+            }
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             std::cout << std::endl;
@@ -856,24 +731,6 @@ int main(int argc, const char * argv[])
         }
     };
     record_top_10();
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240703 fix end of run logging for GP
-//    std::cout << std::endl;
-//    std::cout << std::endl;
-//    std::cout << "now with MOF scalarized with scalarize_fitness_min()" << std::endl;
-//    GP::replace_scalar_fitness_metric(*population, GP::scalarize_fitness_min);
-//    record_top_10();
-//
-//    GP::print_occupancy_map = true;
-//    std::cout << std::endl;
-//    std::cout << std::endl;
-//    const LP::Individual* individual = population->nthBestFitness(0);
-//    std::cout << individual->tree().to_string() << std::endl;
-//    auto fitness = GP::rerun_flock_simulation(individual);
-//    debugPrint(fitness);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     delete population;
     LP::Individual::leakCheck();
     return 0;

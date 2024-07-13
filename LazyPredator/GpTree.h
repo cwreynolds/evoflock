@@ -45,6 +45,10 @@ public:
         assert("call addSubtrees() only once" && subtrees().size() == 0);
         for (int i = 0; i < count; i++) addSubtree();
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240712 experiment with increasing initial tree size.
+    void clear() { subtrees().clear(); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Count tokens in tree (functions or leaves/constants).
     int size() const
     {

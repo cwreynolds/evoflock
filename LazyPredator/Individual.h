@@ -98,10 +98,102 @@ public:
     {
         constructor_count_++;
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240712 experiment with increasing initial tree size.
+    
+//    Individual(int max_tree_size, const FunctionSet& fs) : Individual()
+//    {
+//        fs.makeRandomTree(max_tree_size, tree_);
+//    }
+    
+//        static inline bool increasing_initial_tree_size = false;
+//
+//        Individual(int max_tree_size, const FunctionSet& fs) : Individual()
+//        {
+//            if (not increasing_initial_tree_size)
+//            {
+//                fs.makeRandomTree(max_tree_size, tree_);
+//            }
+//            else
+//            {
+//                GpTree temp_tree;
+//                for (int i = 0; i < 5; i++)
+//                {
+//                    temp_tree.clear();
+//                    fs.makeRandomTree(max_tree_size, temp_tree);
+//                    if ((temp_tree.size() > tree_.size()) and
+//                        (temp_tree.size() < max_tree_size))
+//                    {
+//                        tree_.clear();
+//                        tree_ = temp_tree;
+//                    }
+//    //                debugPrint(temp_tree.size())
+//    //                debugPrint(tree_.size())
+//                }
+//    //            std::cout << tree().to_string(true) << std::endl;
+//    //            std::cout << std::endl;
+//
+//            }
+//        }
+
+//    Individual(int max_tree_size, const FunctionSet& fs) : Individual()
+//    {
+//        GpTree temp_tree;
+//        for (int i = 0; i < 5; i++)
+//        {
+//            temp_tree.clear();
+//            fs.makeRandomTree(max_tree_size, temp_tree);
+//            if (temp_tree.size() > tree_.size())
+//            {
+//                tree_.clear();
+//                tree_ = temp_tree;
+//            }
+//            debugPrint(temp_tree.size())
+//            debugPrint(tree_.size())
+//        }
+//        std::cout << tree().to_string(true) << std::endl;
+//        std::cout << std::endl;
+//    }
+    
+    static inline bool increasing_initial_tree_size = false;
+    static inline int iits_counter = 0;
+    
     Individual(int max_tree_size, const FunctionSet& fs) : Individual()
     {
-        fs.makeRandomTree(max_tree_size, tree_);
+        if (not increasing_initial_tree_size)
+        {
+            fs.makeRandomTree(max_tree_size, tree_);
+        }
+        else
+        {
+            debugPrint(iits_counter);
+            iits_counter++;
+//            GpTree temp_tree;
+            GpTree new_tree;
+            GpTree big_tree;
+            for (int i = 0; i < 5; i++)
+            {
+                new_tree.clear();
+                fs.makeRandomTree(max_tree_size, new_tree);
+//                if ((new_tree.size() > big_tree.size()) and
+//                    (new_tree.size() < max_tree_size))
+                if ((new_tree.size() > big_tree.size()) and
+                    (new_tree.size() < max_tree_size) and
+                    (new_tree.size() > 1))
+                {
+                    big_tree.clear();
+                    big_tree = new_tree;
+                }
+                debugPrint(new_tree.size())
+                debugPrint(big_tree.size())
+            }
+            tree_ = big_tree;
+            std::cout << tree().to_string(true) << std::endl;
+            std::cout << std::endl;
+        }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Individual(const GpTree& gp_tree) : Individual() { tree_ = gp_tree; }
     
     virtual ~Individual()

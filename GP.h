@@ -922,6 +922,10 @@ Vec3 ensure_unit_length(Vec3 v)
 LP::FunctionSet evoflock_gp_function_set() { return evoflock_ga_function_set;}
 #else  // eval_const_20240628
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240712 experiment: get rid of GpType "Scalar_5" (replace with
+//               "Scalar_100") to promote more "mixability" in the DSL.
+
 LP::FunctionSet evoflock_gp_function_set()
 {
     return
@@ -929,7 +933,13 @@ LP::FunctionSet evoflock_gp_function_set()
         // GpTypes
         {
             { "Vec3" },
-            { "Scalar_5",     -5.0,   5.0 },
+//            {
+//                "Vec3",
+//                nullptr,
+//                [](std::any a){ return std::any_cast<Vec3>(a).to_string(); },
+//                nullptr
+//            },
+//            { "Scalar_5",     -5.0,   5.0 },
             { "Scalar_100", -100.0, 100.0 },
         },
         
@@ -961,7 +971,8 @@ LP::FunctionSet evoflock_gp_function_set()
                 }
             },
             {
-                "Adjust", "Scalar_100", {"Scalar_100", "Scalar_5"},
+//                "Adjust", "Scalar_100", {"Scalar_100", "Scalar_5"},
+                "Adjust", "Scalar_100", {"Scalar_100", "Scalar_100"},
                 [](LP::GpTree& tree)
                 {
                     return std::any(clean_num(tree.evalSubtree<double>(0) *
@@ -1014,7 +1025,8 @@ LP::FunctionSet evoflock_gp_function_set()
                 }
             },
             {
-                "Scale_v3", "Vec3", {"Vec3", "Scalar_5"},
+//                "Scale_v3", "Vec3", {"Vec3", "Scalar_5"},
+                "Scale_v3", "Vec3", {"Vec3", "Scalar_100"},
                 [](LP::GpTree& tree)
                 {
                     return std::any(tree.evalSubtree<Vec3>(0) *
@@ -1086,6 +1098,17 @@ LP::FunctionSet evoflock_gp_function_set()
                     Vec3 a = tree.evalSubtree<Vec3>(1);
                     Vec3 b = tree.evalSubtree<Vec3>(2);
                     return std::any(util::interpolate(util::clip01(i), a, b));
+                }
+            },
+            {
+                "Ifle", "Vec3", {"Scalar_100", "Scalar_100", "Vec3", "Vec3"},
+                [](LP::GpTree& tree)
+                {
+                    double i = tree.evalSubtree<double>(0);
+                    double j = tree.evalSubtree<double>(1);
+                    Vec3 a = tree.evalSubtree<Vec3>(2);
+                    Vec3 b = tree.evalSubtree<Vec3>(3);
+                    return std::any(i <= j ? a : b);
                 }
             },
 
@@ -1186,6 +1209,7 @@ LP::FunctionSet evoflock_gp_function_set()
         }
     };
 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #endif // eval_const_20240628
 

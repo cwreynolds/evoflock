@@ -79,6 +79,30 @@ public:
         return LocalSpace(ii, jj, kk, p());
     }
     
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240713 I occasionally get a failure of the first assert during
+    //               GP runs. Thinking about optionally making it less strict.
+
+//    // Given a "new_forward" direction, rotate this LocalSpace (about its
+//    // position) to align with the new forward, while keeping the new "up"
+//    // direction as close as possible to the given "reference_up". The intent
+//    // is to find the smallest rotation needed to meet these constraints. This
+//    // is a type of guided "reorthonormalization."
+//    LocalSpace rotate_to_new_forward(Vec3 new_forward, Vec3 reference_up) const
+//    {
+//        assert(new_forward.is_unit_length());
+//        assert(reference_up.is_unit_length());
+//        Vec3 new_side = reference_up.cross(new_forward).normalize();
+//        Vec3 new_up = new_forward.cross(new_side).normalize();
+//        // Recalculate side for more precision with "more perpendicular" new_up.
+//        new_side = new_up.cross(new_forward).normalize();
+//        return LocalSpace(new_side, new_up, new_forward, p());
+//    }
+    
+//    static inline double epsilon_for_rotate_to_new_forward = util::epsilon;
+    static inline double epsilon_for_gp = util::epsilon;
+
     // Given a "new_forward" direction, rotate this LocalSpace (about its
     // position) to align with the new forward, while keeping the new "up"
     // direction as close as possible to the given "reference_up". The intent
@@ -86,15 +110,33 @@ public:
     // is a type of guided "reorthonormalization."
     LocalSpace rotate_to_new_forward(Vec3 new_forward, Vec3 reference_up) const
     {
-        assert(new_forward.is_unit_length());
-        assert(reference_up.is_unit_length());
+        {
+            grabPrintLock_evoflock();
+            
+            if (not new_forward.is_unit_length(epsilon_for_gp))
+            {
+                std::cout << "new_forward.length() = ";
+                std::cout << std::setprecision(20)  << std::fixed;
+                std::cout << new_forward.length() << std::endl;
+            }
+        }
+        
+//        assert(new_forward.is_unit_length());
+//        assert(reference_up.is_unit_length());
+
+        
+        assert(new_forward.is_unit_length(epsilon_for_gp));
+        assert(reference_up.is_unit_length(epsilon_for_gp));
+        
         Vec3 new_side = reference_up.cross(new_forward).normalize();
         Vec3 new_up = new_forward.cross(new_side).normalize();
         // Recalculate side for more precision with "more perpendicular" new_up.
         new_side = new_up.cross(new_forward).normalize();
         return LocalSpace(new_side, new_up, new_forward, p());
     }
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     static void unit_test()
     {
         Vec3 ls_i = Vec3(1, 2, 3).normalize();

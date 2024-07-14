@@ -586,18 +586,60 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
 
             Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
             
-            // TODO 20240625 not sure this is the right solution, but I quickly
-            // hit an assert violation in LocalSpace::rotate_to_new_forward()
-            // because reference_up was zero rather than unit length. Maybe
-            // because acceleration was also zero early in sim?
+//            // TODO 20240625 not sure this is the right solution, but I quickly
+//            // hit an assert violation in LocalSpace::rotate_to_new_forward()
+//            // because reference_up was zero rather than unit length. Maybe
+//            // because acceleration was also zero early in sim?
 //            if (not (steering.length_squared() > 0)) { steering = Vec3(0,0,1); }
  
-            // TODO 20240707 "Assertion failed: (new_forward.is_unit_length()),
-            // function rotate_to_new_forward..." so a little more bullet proofing:
-            if (not (steering.length_squared() > 0) or not steering.is_valid())
-            {
-                steering = Vec3(0, 0, 1);
-            }
+//            // TODO 20240707 "Assertion failed: (new_forward.is_unit_length()),
+//            // function rotate_to_new_forward..." so a little more bullet proofing:
+//            if (not (steering.length_squared() > 0) or not steering.is_valid())
+//            {
+//                steering = Vec3(0, 0, 1);
+//            }
+            
+            // TODO 20240713 I just made a test, zero steering should be fine:
+
+//            if (not steering.is_valid()) { steering = Vec3(0, 0, 1); }
+//            if (not steering.is_valid())
+//            {
+//                steering = Boid::getGpPerThread()->forward();
+//            }
+            if (not steering.is_valid()) { steering = Vec3(); }
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240713 maybe the problem is steering too big?
+            
+//            double max_steering_length = 10;
+//            if (steering.length() > max_steering_length)
+//            {
+//                grabPrintLock_evoflock();
+//                std::cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ";
+//                debugPrint(steering.length())
+//                
+//                steering = steering.truncate(max_steering_length);
+//                debugPrint(steering.length())
+//            }
+            
+            
+//            // TODO 20240713 OH! and/or steering too small?
+//            if (steering.length() > 0 and steering.length() < 0.0001)
+//            {
+//                grabPrintLock_evoflock();
+//                std::cout << "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ";
+//                debugPrint(steering.length())
+//            }
+
+            
+            double max_steering_length = 10;
+            steering = steering.truncate(max_steering_length);
+            
+            double min_steering_length = 0.00001;
+
+            if (steering.length() < min_steering_length) { steering = Vec3(); }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             
             return steering;
         };

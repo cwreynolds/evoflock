@@ -92,13 +92,28 @@ public:
         return util::within_epsilon(length_squared(), 0, epsilon);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240713 maybe the problem is steering too big?
+
+//    // Returns vector parallel to "this" but no longer than "max_length"
+//    Vec3 truncate(double max_length) const
+//    {
+//        double len = length();
+//        return len <= max_length ? *this : *this * (max_length / len);
+//    }
+
     // Returns vector parallel to "this" but no longer than "max_length"
     Vec3 truncate(double max_length) const
     {
-        double len = length();
-        return len <= max_length ? *this : *this * (max_length / len);
+        Vec3 t = *this;
+        double length_sq = length_squared();
+        double max_sq = std::pow(max_length, 2);
+        if (length_sq > max_sq) { t *= max_length / std::sqrt(length_sq); }
+        return t;
     }
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // return component of vector parallel to a unit basis vector
     Vec3 parallel_component(const Vec3& unit_basis) const
     {
@@ -163,15 +178,22 @@ public:
     {
         return is_perpendicular(other, util::epsilon);
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240713 I occasionally get a failure of the first assert during
+    //               GP runs. Thinking about optionally making it less strict.
+
     // Check if two vectors are perpendicular.
     bool is_perpendicular(const Vec3& other, double epsilon) const
     {
-        // TODO 20230430 Should it check for unit length, or normalize? For now,
-        // assert that given vectors are unit length to see if it ever comes up.
-        assert (is_unit_length());
-        assert (other.is_unit_length());
+//        // TODO 20230430 Should it check for unit length, or normalize? For now,
+//        // assert that given vectors are unit length to see if it ever comes up.
+//        assert (is_unit_length());
+//        assert (other.is_unit_length());
+        assert (is_unit_length(epsilon));
+        assert (other.is_unit_length(epsilon));
         return util::within_epsilon(dot(other), 0, epsilon);
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

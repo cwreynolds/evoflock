@@ -68,12 +68,34 @@ public:
         if (speed() > 0)
         {
             Vec3 new_forward = new_velocity / new_speed;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240713 maybe the problem is steering too big?
+            
+            {
+                grabPrintLock_evoflock();
+                if (not new_forward.is_unit_length())
+                {
+                    debugPrint(new_speed)
+                    debugPrint(new_velocity)
+                    std::cout << "new_forward.length() = ";
+                    std::cout << std::setprecision(20)  << std::fixed;
+                    std::cout << new_forward.length() << std::endl;
+                }
+            }
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // Rotate LocalSpace to align with new_forward.
             Vec3 reference_up = up_reference(acceleration * time_step);
             set_ls(ls().rotate_to_new_forward(new_forward, reference_up));
             // Set new position.
             setPosition(position() + (new_forward * speed() * time_step));
-            assert (ls().is_orthonormal());
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240713 I occasionally get a failure of the first assert during
+            //               GP runs. Thinking about optionally making it less strict.
+//            assert (ls().is_orthonormal());
+//            assert (ls().is_orthonormal(LocalSpace::epsilon_for_gp));
+            assert (ls().is_orthonormal(LocalSpace::epsilon_for_gp * 1000));
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
     }
     

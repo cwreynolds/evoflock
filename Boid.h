@@ -299,46 +299,6 @@ public:
             setGpPerThread(this);
             Vec3 steering_from_evolved_function = override_steer_function();
             setGpPerThread(nullptr);
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20240626 make sure not getting the same steering each sim
-            //               step because of caching.
-            
-//    //            if (is_first_boid())
-//                {
-//                    debugPrint(this)
-//
-//                    int pos = -1;
-//    //                for (auto bp : flock_boids())
-//                    for (int i = 0; i < flock_boids().size(); i++)
-//                    {
-//                        if (this == flock_boids().at(i)) { pos = i; }
-//                    }
-//
-//                    debugPrint(pos)
-//                    debugPrint(is_first_boid())
-//                    debugPrint(flock_boids().size())
-//                    debugPrint(steering_from_evolved_function)
-//                }
-            
-//            debugPrint(this)
-//            print_first_10_flock_boids();
-
-            
-//            if (is_first_boid())
-//            {
-//                debugPrint(draw().frame_counter())
-//                debugPrint(steering_from_evolved_function)
-//            }
-
-//            if (is_first_boid() && (draw().frame_counter() < 10))
-//            {
-//                debugPrint(draw().frame_counter())
-//                debugPrint(steering_from_evolved_function)
-//            }
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
             return steering_from_evolved_function;
         }
         else

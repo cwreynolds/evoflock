@@ -47,7 +47,16 @@ public:
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240712 experiment with increasing initial tree size.
-    void clear() { subtrees().clear(); }
+    
+//    void clear() { subtrees().clear(); }
+    
+    void clear()
+    {
+        subtrees().clear();
+        root_type_ = nullptr;
+        root_function_ = nullptr;
+    }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Count tokens in tree (functions or leaves/constants).
     int size() const

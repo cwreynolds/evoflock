@@ -543,25 +543,25 @@ int main(int argc, const char * argv[])
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20240713 experiment with increasing initial tree size.
     //               LP::Individual::increasing_initial_tree_size = true;
+    
 //    int individuals = 500;
 //    int subpops = 25;
-    int individuals = 2000;
-    int subpops = 50;
+//    int max_evolution_steps = Boid::GP_not_GA ? 15000 : 30000;
     
-    
-//  LocalSpace::epsilon_for_gp = 0.0000000001;
-//  LocalSpace::epsilon_for_gp = 0.000000001;
-//  LocalSpace::epsilon_for_gp = 0.00000001;
-//  LocalSpace::epsilon_for_gp = 0.0000001;
 
+//    int individuals = 2000;
+//    int subpops = 50;
+//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
+
+//    int individuals = 300;
+//    int subpops = 17;
+//    int max_evolution_steps = Boid::GP_not_GA ? 50000 : 30000;
+
+    int individuals = 600;
+    int subpops = 25;
+    int max_evolution_steps = Boid::GP_not_GA ? 50000 : 30000;
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240710 fiddling with hyperparameters
-//    int max_evolution_steps = Boid::GP_not_GA ? 15000 : 30000;
-    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //    lp::LPRS().setSeed(20240408);
 //    lp::LPRS().setSeed(20240409);
@@ -583,7 +583,8 @@ int main(int argc, const char * argv[])
 //    LP::LPRS().setSeed(20240606);
 //    LP::LPRS().setSeed(20240708);
 //    LP::LPRS().setSeed(20240710);
-    LP::LPRS().setSeed(20240713);
+//    LP::LPRS().setSeed(20240713);
+    LP::LPRS().setSeed(20240714);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run

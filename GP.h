@@ -960,15 +960,15 @@ LP::FunctionSet evoflock_gp_function_set()
                                               tree.evalSubtree<double>(1)));
                 }
             },
-            {
-//                "Adjust", "Scalar_100", {"Scalar_100", "Scalar_5"},
-                "Adjust", "Scalar_100", {"Scalar_100", "Scalar_100"},
-                [](LP::GpTree& tree)
-                {
-                    return std::any(clean_num(tree.evalSubtree<double>(0) *
-                                              tree.evalSubtree<double>(1)));
-                }
-            },
+//                {
+//    //                "Adjust", "Scalar_100", {"Scalar_100", "Scalar_5"},
+//                    "Adjust", "Scalar_100", {"Scalar_100", "Scalar_100"},
+//                    [](LP::GpTree& tree)
+//                    {
+//                        return std::any(clean_num(tree.evalSubtree<double>(0) *
+//                                                  tree.evalSubtree<double>(1)));
+//                    }
+//                },
             {
                 "Power", "Scalar_100", {"Scalar_100", "Scalar_100"},
                 [](LP::GpTree& tree)

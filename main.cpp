@@ -270,29 +270,6 @@ void open3d_test() {
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240624 still debugging GP_not_GA error
-
-
-//    #define check_Individual_13(individual)                              \
-//    {                                                                    \
-//        std::cout << "In check_Individual_13()" << std::endl;            \
-//        static bool first = true;                                        \
-//        static void* i13 = nullptr;                                      \
-//        if (first) { i13 = individual; first = false; }                  \
-//        assert(individual == i13);                                       \
-//        assert(individual->pop_position == 13);                          \
-//        auto gp_tree = individual->tree();                               \
-//        assert(gp_tree.subtrees().size() == 0);                          \
-//        assert(gp_tree.to_string() == "First_Obs_Normal()");             \
-//        assert(gp_tree.getRootFunction().name() == "First_Obs_Normal");  \
-//    }
-
-#define check_Individual_13(individual) {}
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240628 can we do an eval of a const tree?
 
 //#define eval_const_20240628
@@ -535,8 +512,26 @@ int main(int argc, const char * argv[])
 //    return EXIT_SUCCESS;
     
     //--------------------------------------------------------------------------
-
     
+    // TODO 20240715 WIP new approach to tree generation.
+
+    {
+        LP::FunctionSet fs =  GP::evoflock_gp_function_set();
+        fs.print();
+        
+        for (int i = 0; i < 10000; i++)
+        {
+            std::cout << i << ":" << std::endl;
+            LP::GpTree gp_tree = fs.newMakeRandomTree(5, 50);
+            debugPrint(gp_tree.size());
+            std::cout << gp_tree.to_string(true) << std::endl;
+            std::cout << std::endl << std::endl;
+        }
+    }
+    return EXIT_SUCCESS;
+
+    //--------------------------------------------------------------------------
+
 //    Boid::GP_not_GA = false;
     Boid::GP_not_GA = true;
 

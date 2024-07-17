@@ -325,7 +325,7 @@ public:
                             int& output_actual_size,
                             GpTree& gp_tree) const
     {
-        output_actual_size++;  // for "function_name" (or epheneral) itself
+        output_actual_size++;  // for "function_name" (or ephemeral) itself
         int size_used = 0;
         int count = int(root_function.parameterTypes().size());
         // Set root function in given GpTree object
@@ -358,12 +358,32 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240715 WIP new approach to tree generation.
     
-    // WIP
-    // Reimplement the original LP random tree maker. It only allowed a max_size
-    // parameter and often made trees much smaller than that. This take min and
-    // max size parameters and aims to make trees that fall into that interval.
-    // WIP
-    GpTree newMakeRandomTree(int min_tree_size, int max_tree_size) const
+    // Reimplement the original December 2020 LP random tree maker. It allowed
+    // only a max_size parameter and frequently made trees MUCH smaller than
+    // that. (Especially with the evoflock function set.) This version takes
+    // both min and max size parameters and aims to make trees that fall into
+    // that interval. It does this by simply repeatedly generating trees until
+    // it finds one in the desired size range. It is not guaranteed to find one.
+    //
+    // TODO 20240716 Tested with evoflock GP function set: successfully made
+    // 1000000 trees on size range [5,50] using the default retries=100, and on
+    // size range [80,100] using retries=5000. Note that for tighter bounds,
+    // such as [90,100], it failed to find suitable trees. I will leave this
+    // problem for another day.
+    //
+    // Supports min and max tree size. Now I think I want one target size, not a
+    // range, which the tree generator should “take seriously.” Probably the
+    // 2020 version was orignally intended to do that, but I settled for a
+    // result size somewhere between 1 and max_tree_size.
+    //
+    GpTree newMakeRandomTree(int min_tree_size,
+                             int max_tree_size) const
+    {
+        return newMakeRandomTree(min_tree_size, max_tree_size, 100);
+    }
+    GpTree newMakeRandomTree(int min_tree_size,
+                             int max_tree_size,
+                             int retries) const
     {
         GpTree new_tree;
         // Is this GpTree in the the correct size range?
@@ -371,40 +391,28 @@ public:
         {
             return util::between(tree.size(), min_tree_size, max_tree_size);
         };
-        int retries = 10;
+        // Make up to "retries" attempts to find a tree of the correct size.
         for (int i = 0; i < retries; i++)
         {
             GpTree temp_tree;
             makeRandomTree(max_tree_size, temp_tree);
-            if (size_ok(temp_tree))
+            // Save temp_tree if size is OK, or this is the last retry.
+            if (size_ok(temp_tree) or (i == retries - 1))
             {
-//                new_tree.clear();
                 new_tree = temp_tree;
                 break;
             }
         }
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//        // where does this bug come from?
-//        // Tree has size one but null getRootType() and getRootFunction()
-//        // Does this have something to do with "more ECs" fix?
-//        if (not new_tree.getRootType())
-//        {
-//            debugPrint(new_tree.size())
-//            debugPrint(new_tree.getRootType())
-//            debugPrint(&new_tree.getRootFunction())
-//            debugPrint(new_tree.getRootValue().has_value())
-//            std::cout << new_tree.to_string(true) << std::endl;
-//        }
-//        assert(new_tree.getRootType());
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        // If somehow failed, trying one more tree generation.
-        if (not (size_ok(new_tree) and new_tree.getRootType()))
+        if (not size_ok(new_tree))
         {
-            new_tree.clear();
-            makeRandomTree(max_tree_size, new_tree);
+            debugPrint(new_tree.size());
+            std::cout << new_tree.to_string(true) << std::endl;
+            std::cout << "consider using a wider range between min_tree_size"
+                      << " and max_tree_size, or increasing the value of"
+                      << " 'retries'." << std::endl;
         }
+        assert(new_tree.is_valid());
+        assert(size_ok(new_tree));
         return new_tree;
     }
 

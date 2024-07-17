@@ -31,6 +31,11 @@ public:
     const GpTree& getSubtree(int i) const { return subtrees().at(i); }
     // Get/set reference to GpFunction object at root of this tree.
     const GpFunction& getRootFunction() const { return *root_function_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240716 add validity check
+    // Maybe getRootFunction() should always return a pointer, like getRootType()?
+    const GpFunction* getRootFunctionP() const { return root_function_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     void setRootFunction(const GpFunction& function)
     {
         root_function_ = &function;
@@ -387,6 +392,33 @@ public:
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240716 add validity check
+    
+    
+    // For debugging: does this instance appear to be valid?
+    bool is_valid() const
+    {
+        bool valid = true;
+        assert(checkClassID());
+        if (size() == 0)  // Is leaf node, or function of no arguments.
+        {
+            valid = (getRootType() and
+                     (getRootFunctionP() or
+                      getRootValue().has_value()));
+        }
+        else
+        {
+            for (auto& subtree : subtrees())
+            {
+                if (not subtree.is_valid()) { valid = false;}
+            }
+        }
+        return valid;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 private:
     // NOTE: if any more data members are added, compare them in equals().
     // Add (allocate) one subtree. addSubtrees() is external API.
@@ -397,6 +429,13 @@ private:
     std::any leaf_value_;
     std::vector<GpTree> subtrees_;
     std::string id_;                            // TODO for debugging only.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240716 add validity check
+    // Make sure GpTree* points to valid instance.
+    const static inline int class_id_ = 14014074;
+    int instance_id_ = class_id_;
+    bool checkClassID() const { return class_id_ == instance_id_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 }  // end of namespace LazyPredator

@@ -513,22 +513,26 @@ int main(int argc, const char * argv[])
     
     //--------------------------------------------------------------------------
     
-    // TODO 20240715 WIP new approach to tree generation.
-
-    {
-        LP::FunctionSet fs =  GP::evoflock_gp_function_set();
-        fs.print();
-        
-        for (int i = 0; i < 10000; i++)
-        {
-            std::cout << i << ":" << std::endl;
-            LP::GpTree gp_tree = fs.newMakeRandomTree(5, 50);
-            debugPrint(gp_tree.size());
-            std::cout << gp_tree.to_string(true) << std::endl;
-            std::cout << std::endl << std::endl;
-        }
-    }
-    return EXIT_SUCCESS;
+//        // TODO 20240715 WIP new approach to tree generation.
+//
+//        {
+//            LP::FunctionSet fs =  GP::evoflock_gp_function_set();
+//            fs.print();
+//            
+//    //        for (int i = 0; i < 10000; i++)
+//            for (int i = 0; i < 1000000; i++)
+//            {
+//                std::cout << i << ":" << std::endl;
+//    //            LP::GpTree gp_tree = fs.newMakeRandomTree(5, 50);
+//    //            LP::GpTree gp_tree = fs.newMakeRandomTree(90, 100);
+//    //            LP::GpTree gp_tree = fs.newMakeRandomTree(80, 100);
+//                LP::GpTree gp_tree = fs.newMakeRandomTree(20, 60);
+//                debugPrint(gp_tree.size());
+//                std::cout << gp_tree.to_string(true) << std::endl;
+//                std::cout << std::endl << std::endl;
+//            }
+//        }
+//        return EXIT_SUCCESS;
 
     //--------------------------------------------------------------------------
 

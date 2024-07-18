@@ -185,6 +185,63 @@ inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 //                                         }));
 //    }
 
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (Boid::GP_not_GA ?
+//                std::vector<std::string>(
+//                                         {
+//                                             "avoid",
+//                                             "separate",
+//                                             "speed",
+//                                         }) :
+//                std::vector<std::string>(
+//                                         {
+//                                             "separate",
+//                                             "avoid",
+//                                             "cohere",
+//                                             "cluster",
+//                                             "curvature",
+//                                             "occupied"
+//                                         }));
+//    }
+
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (Boid::GP_not_GA ?
+//                std::vector<std::string>(
+//                                         {
+//                                             "unitary",
+//                                         }) :
+//                std::vector<std::string>(
+//                                         {
+//                                             "separate",
+//                                             "avoid",
+//                                             "cohere",
+//                                             "cluster",
+//                                             "curvature",
+//                                             "occupied"
+//                                         }));
+//    }
+
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (Boid::GP_not_GA ?
+//                std::vector<std::string>(
+//                                         {
+//                                             "avoid+speed",
+//                                             "separate+speed",
+//                                         }) :
+//                std::vector<std::string>(
+//                                         {
+//                                             "separate",
+//                                             "avoid",
+//                                             "cohere",
+//                                             "cluster",
+//                                             "curvature",
+//                                             "occupied"
+//                                         }));
+//    }
+
 inline std::vector<std::string> mof_names()
 {
     return (Boid::GP_not_GA ?
@@ -233,11 +290,20 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
     double cohere = flock.get_cohere_score();
     double cluster = flock.get_cluster_score();
     double curvature = flock.get_curvature_score();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240710 change speed fitness back to speed-ok frame count.
 //    double speed = flock.get_gp_speed_score();
     double speed = flock.get_speed_score();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240717 experiment with weighted combination to avoid MOF cost.
+    
+//    double unitary = avoid * separate * speed;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
     auto ignore_function = [](Vec3 p) { return p.length() > 50;};
     double occupy = flock.occupancy_map.fractionOccupied(ignore_function);
     //    return
@@ -317,6 +383,91 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 //                        occupy
 //                    })
 //                );
+
+//    return (Boid::GP_not_GA ?
+//            MOF(
+//                {
+//                    avoid,
+//                    separate,
+//                    speed,
+//                }) :
+//            MOF(
+//                {
+//                    separate,
+//                    avoid,
+//                    cohere,
+//                    cluster,
+//                    curvature,
+//                    occupy
+//                })
+//            );
+
+//    return (Boid::GP_not_GA ?
+//            MOF(
+//                {
+//                    unitary,
+//                }) :
+//            MOF(
+//                {
+//                    separate,
+//                    avoid,
+//                    cohere,
+//                    cluster,
+//                    curvature,
+//                    occupy
+//                })
+//            );
+
+//    return (Boid::GP_not_GA ?
+//            MOF(
+//                {
+//                    avoid    * util::remap_interval(speed, 0.0, 1.0, 0.9, 1.0),
+//                    separate * util::remap_interval(speed, 0.0, 1.0, 0.9, 1.0),
+//                }) :
+//            MOF(
+//                {
+//                    separate,
+//                    avoid,
+//                    cohere,
+//                    cluster,
+//                    curvature,
+//                    occupy
+//                })
+//            );
+
+//    return (Boid::GP_not_GA ?
+//            MOF(
+//                {
+//                    avoid    * util::remap_interval(speed, 0.0, 1.0, 0.8, 1.0),
+//                    separate * util::remap_interval(speed, 0.0, 1.0, 0.8, 1.0),
+//                }) :
+//            MOF(
+//                {
+//                    separate,
+//                    avoid,
+//                    cohere,
+//                    cluster,
+//                    curvature,
+//                    occupy
+//                })
+//            );
+
+//    return (Boid::GP_not_GA ?
+//            MOF(
+//                {
+//                    avoid    * util::remap_interval(speed, 0.0, 1.0, 0.6, 1.0),
+//                    separate * util::remap_interval(speed, 0.0, 1.0, 0.6, 1.0),
+//                }) :
+//            MOF(
+//                {
+//                    separate,
+//                    avoid,
+//                    cohere,
+//                    cluster,
+//                    curvature,
+//                    occupy
+//                })
+//            );
 
     return (Boid::GP_not_GA ?
             MOF(

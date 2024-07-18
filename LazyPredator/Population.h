@@ -127,7 +127,14 @@ public:
 //            debugPrint(prev_best_fitness)
 //            debugPrint(new_best_fitness)
 //        }
-        assert(new_best_fitness >= prev_best_fitness);
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20240717 add global switch: protect_elite_mof
+
+//        assert(new_best_fitness >= prev_best_fitness);
+        if (protect_elite_mof) { assert(new_best_fitness >= prev_best_fitness); }
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Increment step count (before logger() call for 1 based step numbers).
@@ -362,6 +369,13 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240710 WIP for MOF elitism
     
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20240717 add global switch: protect_elite_mof
+//    static inline bool protect_elite_mof = true;
+    static inline bool protect_elite_mof = false;
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+    
     // rethink name
     
     // Inspect Individuals in TournamentGroup. Determine if any are "elite": by
@@ -382,7 +396,14 @@ public:
 //                std::cout << "QQQQ protect best scalarized fitness" << std::endl;
                 group.setValid(false);
             }
-            if (isEliteMOF(mof))
+            
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20240717 add global switch: protect_elite_mof
+
+//            if (isEliteMOF(mof))
+            if (isEliteMOF(mof) and protect_elite_mof)
+
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
             {
 //                std::cout << std::endl <<
 //                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"

@@ -560,8 +560,19 @@ int main(int argc, const char * argv[])
 //    int subpops = 25;
 //    int max_evolution_steps = Boid::GP_not_GA ? 50000 : 30000;
 
-    int individuals = 500;
-    int subpops = 22;
+//    // 20240718
+//    int individuals = 500;
+//    int subpops = 22;
+//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
+
+//    // 20240718
+//    int individuals = 1000;
+//    int subpops = 32;
+//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
+
+    // 20240719
+    int individuals = 250;
+    int subpops = 16;
     int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -587,7 +598,8 @@ int main(int argc, const char * argv[])
 //    LP::LPRS().setSeed(20240708);
 //    LP::LPRS().setSeed(20240710);
 //    LP::LPRS().setSeed(20240713);
-    LP::LPRS().setSeed(20240714);
+//    LP::LPRS().setSeed(20240714);
+    LP::LPRS().setSeed(20240718);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run

@@ -53,6 +53,18 @@ public:
                                                 std::multiplies()); }
     std::string to_string() const { return vec_to_string(mof_); }
     const std::vector<double> as_vector() const { return mof_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240718 experiment using "hypervolume" as metric for TG
+    //               try to refactor like product()
+    double hyperVolume() const
+    {
+        double volume = 1;
+        double min = 0.01;
+        for (auto& o : mof_) { assert(util::between(o, 0.0, 1.0)); }
+        for (auto& o : mof_) { volume *= std::max(o, min); }
+        return volume;
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 private:
     std::vector<double> mof_;
     

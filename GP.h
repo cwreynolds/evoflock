@@ -83,11 +83,23 @@ inline double scalarize_fitness_length(MOF mof)
     return (std::sqrt(length_sq) / std::sqrt(mof.size()));
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240718 experiment using "hypervolume" as metric for TG
+
+// Take the hypervolume of MultiObjectiveFitness elements (basically product).
+inline double scalarize_fitness_hyperVolume(MOF mof)
+{
+    return mof.hyperVolume();
+}
 
 // Map a MultiObjectiveFitness to a scalar. Used as the FitnessScalarizeFunction
 // for Population::evolutionStep(). Usually one of scalarize_fitness_min(),
 // scalarize_fitness_prod(), or scalarize_fitness_length();
-inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
+//inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
+
+inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240706 make global variable GP::mof_names into a function.

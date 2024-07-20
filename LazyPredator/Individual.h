@@ -46,6 +46,7 @@ public:
     auto begin() const { return mof_.begin(); }
     auto end() const { return mof_.end(); }
     double min() const { return *std::min_element(begin(), end()); }
+    double max() const { return *std::max_element(begin(), end()); }
     double sum() const { return std::reduce(begin(), end(), 0.0, std::plus()); }
     bool empty() const { return size() == 0; }
     double average() const { return sum() / size(); }
@@ -64,6 +65,29 @@ public:
         for (auto& o : mof_) { volume *= std::max(o, min); }
         return volume;
     }
+    
+
+//    // TODO 20240719 experimental variation of hyperVolume()
+//    // This did not seem to fix the run of failed sims, so probably not worth keeping
+//    
+//    // Like hyperVolume() (floored product) but occasionally sets the max MOF
+//    // element to zero.
+//    double hyperVolumeDropout() const
+//    {
+//        double volume = hyperVolume();
+//        if (LPRS().randomBool(0.25))
+//        {
+//            MultiObjectiveFitness mof = *this;
+//            for (int i = 0; i < mof.size(); i++)
+//            {
+//                if(mof.at(i) == mof.max()){ mof.at(i) = 0; }
+//            }
+//            volume = mof.hyperVolume();
+//        }
+//        return volume;
+//    }
+//
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 private:
     std::vector<double> mof_;

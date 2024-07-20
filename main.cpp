@@ -570,9 +570,14 @@ int main(int argc, const char * argv[])
 //    int subpops = 32;
 //    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
 
+//    // 20240719
+//    int individuals = 250;
+//    int subpops = 16;
+//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
+
     // 20240719
-    int individuals = 250;
-    int subpops = 16;
+    int individuals = 500;
+    int subpops = 22;
     int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -622,26 +627,13 @@ int main(int argc, const char * argv[])
 //    int min_tree_size = Boid::GP_not_GA ? 20  :  2;
 //    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240710 fiddling with hyperparameters
-
-//    int min_tree_size = Boid::GP_not_GA ? 30  :  2;
-//    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
-
     int min_crossover_tree_size = Boid::GP_not_GA ? 20 :  2;
     int max_crossover_tree_size = Boid::GP_not_GA ? 60 : 20;
-//    int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
-    int max_initial_tree_size   = Boid::GP_not_GA ? 60 : 20;
-//    int max_initial_tree_size   = Boid::GP_not_GA ? 1000 : 20;
-
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240720 did I make this too large?
     
-//    Population(int individual_count,
-//               int subpopulation_count,
-//               int max_init_tree_size,
-//               int min_crossover_tree_size,
-//               int max_crossover_tree_size,
-//               const FunctionSet& fs)
-
+//    int max_initial_tree_size   = Boid::GP_not_GA ? 60 : 20;
+    int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

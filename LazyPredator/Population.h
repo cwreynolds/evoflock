@@ -425,9 +425,13 @@ public:
             {
                 const auto& mof = m.individual->getMultiObjectiveFitness();
                 m.metric =  mof.hyperVolume();
-                
                 std::cout << "    #### hyperVolume = " << mof.hyperVolume();
                 std::cout << ", mof = " << mof << std::endl;
+
+//                const auto& mof = m.individual->getMultiObjectiveFitness();
+//                m.metric =  mof.hyperVolumeDropout();
+//                std::cout << "    #### hyperVolume = " << m.metric;
+//                std::cout << ", mof = " << mof << std::endl;
             }
             std::cout << std::endl;
 

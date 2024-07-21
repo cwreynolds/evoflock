@@ -95,9 +95,10 @@ inline double scalarize_fitness_hyperVolume(MOF mof)
 // Map a MultiObjectiveFitness to a scalar. Used as the FitnessScalarizeFunction
 // for Population::evolutionStep(). Usually one of scalarize_fitness_min(),
 // scalarize_fitness_prod(), or scalarize_fitness_length();
-//inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 
-inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
+inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
+
+//inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

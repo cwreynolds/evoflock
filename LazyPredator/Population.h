@@ -367,6 +367,85 @@ public:
 //            evolutionStep(tournament_function);
 //        }
 
+//        // Perform one step of the "steady state" evolutionary computation using
+//        // "multi objective fitness" -- basically a vector of scalar fitness values
+//        // each for an independent, potentially conflicting measure of fitness. It
+//        // is given a MultiObjectiveFitnessFunction (which maps an individual to a
+//        // MultiObjectiveFitness) and a FitnessScalarizeFunction (which maps a
+//        // MultiObjectiveFitness to a summary scalar, used to rank Individuals in
+//        // the Population by quality). It creates a TournamentFunction from those,
+//        // which is passed to a different version of evolutionStep(). Each evolution
+//        // step this chooses one of the N objectives (the one with most potential
+//        // for improvement) and treats that as a scalar fitness for this step.
+//        void evolutionStep(MultiObjectiveFitnessFunction mo_fitness_function,
+//                           FitnessScalarizeFunction fitness_scalarize_function)
+//        {
+//            // State shared between lambdas below.
+//            double prev_best_pop_fitness = bestFitness()->getFitness();
+//            bool found_new_best = false;
+//            // Customized function to perform MOF evaluation of individual.
+//            auto mof_eval = [&](Individual* individual)
+//            {
+//                if (not individual->hasMultiObjectiveFitness())
+//                {
+//                    if (explicit_treeValue_in_evolutionStep)
+//                    {
+//                        individual->treeValue();
+//                    }
+//                    MultiObjectiveFitness mof = mo_fitness_function(individual);
+//                    individual->setMultiObjectiveFitness(mof);
+//                    updateEliteMOF(mof);
+//                    double scalar = fitness_scalarize_function(mof);
+//                    individual->setFitness(scalar);
+//                    if (scalar > prev_best_pop_fitness) { found_new_best = true;}
+//                    sort_cache_invalid_ = true;
+//                }
+//            };
+//            // Create TournamentFunction from given fitness and scalarizer functions.
+//            auto tournament_function = [&](TournamentGroup group)
+//            {
+//                // Make sure each group Individual has cached MultiObjectiveFitness.
+//                for (auto& m : group.members()) { mof_eval(m.individual); }
+//
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//                // TODO 20240718 experiment using "hypervolume" as metric for TG
+//
+//                // Select best of the multiple fitnesses to use for this step.
+//                size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
+//                // Set the "metric" of each TournamentGroup member to that
+//                // "best_mof_index" of the member's MultiObjectiveFitness.
+//                for (auto& m : group.members())
+//                {
+//                    const auto& mof = m.individual->getMultiObjectiveFitness();
+//                    m.metric =  mof.at(best_mof_index);
+//                }
+//
+//    //                // Set each TournamentGroup member's "metric" to its MOF hypervolume.
+//    //                for (auto& m : group.members())
+//    //                {
+//    //                    const auto& mof = m.individual->getMultiObjectiveFitness();
+//    //                    m.metric =  mof.hyperVolume();
+//    //                    std::cout << "    #### hyperVolume = " << mof.hyperVolume();
+//    //                    std::cout << ", mof = " << mof << std::endl;
+//    //
+//    //    //                const auto& mof = m.individual->getMultiObjectiveFitness();
+//    //    //                m.metric =  mof.hyperVolumeDropout();
+//    //    //                std::cout << "    #### hyperVolume = " << m.metric;
+//    //    //                std::cout << ", mof = " << mof << std::endl;
+//    //                }
+//    //                std::cout << std::endl;
+//
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//                // Sort the TournamentGroup by metric, least first.
+//                group.sort();
+//                protectEliteMOF(group);
+//                return group;
+//            };
+//            // Finally, do a tournament-based evolution step.
+//            evolutionStep(tournament_function);
+//        }
+
     // Perform one step of the "steady state" evolutionary computation using
     // "multi objective fitness" -- basically a vector of scalar fitness values
     // each for an independent, potentially conflicting measure of fitness. It
@@ -408,7 +487,7 @@ public:
             for (auto& m : group.members()) { mof_eval(m.individual); }
             
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20240718 experiment using "hypervolume" as metric for TG
+            // TODO 20240720 experiment using "dominate per MOF dimension" count
 
 //            // Select best of the multiple fitnesses to use for this step.
 //            size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
@@ -420,20 +499,68 @@ public:
 //                m.metric =  mof.at(best_mof_index);
 //            }
 
-            // Set each TournamentGroup member's "metric" to its MOF hypervolume.
+            // Set the "metric" of each TournamentGroup member to count of MOF
+            // dimensions its Individual dominates.
+//                for (int i = 0; i < group.members().size(); i++)
+//                {
+//                    auto& gm = group.members().at(i);
+//                    const auto& mof = gm.individual->getMultiObjectiveFitness();
+//                    int dominate_count = 0;
+//                    for (int j = 0; j < mof.size(); j++)
+//                    {
+//    //                    bool dominate = false;
+//                        double my_j_value = mof.at(j);
+//                        double max_j_value = -1; // QQQQ use -inf?
+//                        for (int k = 0; k < group.members().size(); k++)
+//                        {
+//                            const auto& gm2 = group.members().at(k);
+//                            const auto& mof2 = gm2.individual->getMultiObjectiveFitness();
+//    //                        if (my_j_value > mof2.at(j)) { dominate = true; }
+//                            if (max_j_value < mof2.at(j)) { max_j_value = mof2.at(j); }
+//                        }
+//    //                    if (my_j_value == max_j_value) { dominate = true; }
+//    //                    if (dominate) { dominate_count++; }
+//                        if (my_j_value == max_j_value) { dominate_count++; }
+//                    }
+//                    gm.metric = dominate_count;
+//                }
+            for (int i = 0; i < group.members().size(); i++)
+            {
+                auto& gm = group.members().at(i);
+                const auto& mof = gm.individual->getMultiObjectiveFitness();
+                int dominate_count = 0;
+                for (int j = 0; j < mof.size(); j++)
+                {
+//                    double my_j_value = mof.at(j);
+                    double max_j_value = -1; // QQQQ use -inf?
+                    for (int k = 0; k < group.members().size(); k++)
+                    {
+                        const auto& gm2 = group.members().at(k);
+                        const auto& mof2 = gm2.individual->getMultiObjectiveFitness();
+//                        if (max_j_value < mof2.at(j)) { max_j_value = mof2.at(j); }
+
+                        if (i != k)
+                        {
+                            if (max_j_value < mof2.at(j))
+                            {
+                                max_j_value = mof2.at(j);
+                            }
+                        }
+                    }
+                    if (mof.at(j) > max_j_value) { dominate_count++; }
+                }
+                gm.metric = dominate_count;
+            }
+
+            std::cout << std::endl << "**************************" << std::endl;
+//            group.print();
             for (auto& m : group.members())
             {
-                const auto& mof = m.individual->getMultiObjectiveFitness();
-                m.metric =  mof.hyperVolume();
-                std::cout << "    #### hyperVolume = " << mof.hyperVolume();
-                std::cout << ", mof = " << mof << std::endl;
-
-//                const auto& mof = m.individual->getMultiObjectiveFitness();
-//                m.metric =  mof.hyperVolumeDropout();
-//                std::cout << "    #### hyperVolume = " << m.metric;
-//                std::cout << ", mof = " << mof << std::endl;
+                std::cout << "metric = " << m.metric << ", mof = ";
+                std::cout << m.individual->getMultiObjectiveFitness().to_string();
+                std::cout << std::endl;
             }
-            std::cout << std::endl;
+            std::cout << "**************************" << std::endl << std::endl;
 
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 

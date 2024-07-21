@@ -635,6 +635,8 @@ int main(int argc, const char * argv[])
 //    int max_initial_tree_size   = Boid::GP_not_GA ? 60 : 20;
     int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
 
+    // TODO git trouble
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     auto fitness_function = (Boid::GP_not_GA ?

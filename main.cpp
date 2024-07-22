@@ -575,12 +575,46 @@ int main(int argc, const char * argv[])
 //    int subpops = 16;
 //    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
 
-    // 20240719
-    int individuals = 500;
-    int subpops = 22;
-    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
+//    // 20240719
+//    int individuals = 500;
+//    int subpops = 22;
+//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
+
+    // 20240721
+    int individuals = 2000;
+    int subpops = 100;
+    int max_evolution_steps = Boid::GP_not_GA ? 120000 : 30000;
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        
+    //    int min_tree_size = 2;
+    //    int max_tree_size = 20;
+    
+    //    int min_tree_size = Boid::GP_not_GA ? 10  :  2;
+    //    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
+    
+    //    int min_tree_size = Boid::GP_not_GA ? 20 :  2;
+    //    int max_tree_size = Boid::GP_not_GA ? 50 : 20;
+    
+    //    int min_tree_size = Boid::GP_not_GA ? 20  :  2;
+    //    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
+    
+    int min_crossover_tree_size = Boid::GP_not_GA ? 20 :  2;
+    int max_crossover_tree_size = Boid::GP_not_GA ? 60 : 20;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240720 did I make this too large?
+    
+//    int max_initial_tree_size   = Boid::GP_not_GA ? 60 : 20;
+    
+    // 20240720
+//    int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
+    
+    // 20240721
+    int max_initial_tree_size   = Boid::GP_not_GA ? 15 : 20;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 
 //    lp::LPRS().setSeed(20240408);
 //    lp::LPRS().setSeed(20240409);
@@ -604,40 +638,12 @@ int main(int argc, const char * argv[])
 //    LP::LPRS().setSeed(20240710);
 //    LP::LPRS().setSeed(20240713);
 //    LP::LPRS().setSeed(20240714);
-    LP::LPRS().setSeed(20240718);
+//    LP::LPRS().setSeed(20240718);
+    LP::LPRS().setSeed(20240721);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run
         
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20240628 can we do an eval of a const tree?
-//    //    Boid::GP_not_GA = false;
-//        Boid::GP_not_GA = true;
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//    int min_tree_size = 2;
-//    int max_tree_size = 20;
-    
-//    int min_tree_size = Boid::GP_not_GA ? 10  :  2;
-//    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
-
-//    int min_tree_size = Boid::GP_not_GA ? 20 :  2;
-//    int max_tree_size = Boid::GP_not_GA ? 50 : 20;
-
-//    int min_tree_size = Boid::GP_not_GA ? 20  :  2;
-//    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
-
-    int min_crossover_tree_size = Boid::GP_not_GA ? 20 :  2;
-    int max_crossover_tree_size = Boid::GP_not_GA ? 60 : 20;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240720 did I make this too large?
-    
-//    int max_initial_tree_size   = Boid::GP_not_GA ? 60 : 20;
-    int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
-
-    // TODO git trouble
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     auto fitness_function = (Boid::GP_not_GA ?
                              GP::evoflock_gp_fitness_function :

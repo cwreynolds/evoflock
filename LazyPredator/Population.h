@@ -102,41 +102,11 @@ public:
         TournamentGroup random_group = randomTournamentGroup(subpop);
         // Run tournament among the three, return ranked group.
         TournamentGroup ranked_group = tournament_function(random_group);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240710 WTF despite my best efforts, fitness falls during run.
-        
         double prev_best_fitness = bestFitness()->getFitness();
-
         // Complete the step based on this ranked group, if it is valid.
         if (ranked_group.getValid()) { evolutionStep(ranked_group, subpop); }
-        
-//        if (not random_group.getValid())
-//        {
-//            std::cout << "MMMM (not random_group.getValid())" << std::endl;
-//        }
-//        if (not ranked_group.getValid())
-//        {
-//            std::cout << "MMMM (not ranked_group.getValid())" << std::endl;
-//        }
-
         double new_best_fitness = bestFitness()->getFitness();
-//        bool WOT = new_best_fitness < prev_best_fitness;
-//        if (WOT)
-//        {
-//            debugPrint(ranked_group.getValid())
-//            debugPrint(prev_best_fitness)
-//            debugPrint(new_best_fitness)
-//        }
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20240717 add global switch: protect_elite_mof
-
-//        assert(new_best_fitness >= prev_best_fitness);
         if (protect_elite_mof) { assert(new_best_fitness >= prev_best_fitness); }
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Increment step count (before logger() call for 1 based step numbers).
         incrementStepCount();
         logger();
@@ -524,43 +494,73 @@ public:
 //                    }
 //                    gm.metric = dominate_count;
 //                }
-            for (int i = 0; i < group.members().size(); i++)
+            
+            //~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~
+            
+//                for (int i = 0; i < group.members().size(); i++)
+//                {
+//                    auto& gm = group.members().at(i);
+//                    const auto& mof = gm.individual->getMultiObjectiveFitness();
+//                    int dominate_count = 0;
+//                    for (int j = 0; j < mof.size(); j++)
+//                    {
+//    //                    double my_j_value = mof.at(j);
+//                        double max_j_value = -1; // QQQQ use -inf?
+//                        for (int k = 0; k < group.members().size(); k++)
+//                        {
+//                            const auto& gm2 = group.members().at(k);
+//                            const auto& mof2 = gm2.individual->getMultiObjectiveFitness();
+//    //                        if (max_j_value < mof2.at(j)) { max_j_value = mof2.at(j); }
+//
+//                            if (i != k)
+//                            {
+//                                if (max_j_value < mof2.at(j))
+//                                {
+//                                    max_j_value = mof2.at(j);
+//                                }
+//                            }
+//                        }
+//                        if (mof.at(j) > max_j_value) { dominate_count++; }
+//                    }
+//                    gm.metric = dominate_count;
+//                }
+//
+//                std::cout << std::endl << "**************************" << std::endl;
+//    //            group.print();
+//                for (auto& m : group.members())
+//                {
+//                    std::cout << "metric = " << m.metric << ", mof = ";
+//                    std::cout << m.individual->getMultiObjectiveFitness().to_string();
+//                    std::cout << std::endl;
+//                }
+//                std::cout << "**************************" << std::endl << std::endl;
+            
+            //~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~
+
+            
+//            count_objectives_dominated(group);
+            
+            //~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~
+            
+            
+            // Randomly combine COD with the two versions of best_mof_index.
+            if (LPRS().randomBool(0.33))
             {
-                auto& gm = group.members().at(i);
-                const auto& mof = gm.individual->getMultiObjectiveFitness();
-                int dominate_count = 0;
-                for (int j = 0; j < mof.size(); j++)
+                countObjectivesDominated(group);
+            }
+            else
+            {
+                // Select best of the multiple fitnesses to use for this step.
+                size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
+                // Set the "metric" of each TournamentGroup member to that
+                // "best_mof_index" of the member's MultiObjectiveFitness.
+                for (auto& m : group.members())
                 {
-//                    double my_j_value = mof.at(j);
-                    double max_j_value = -1; // QQQQ use -inf?
-                    for (int k = 0; k < group.members().size(); k++)
-                    {
-                        const auto& gm2 = group.members().at(k);
-                        const auto& mof2 = gm2.individual->getMultiObjectiveFitness();
-//                        if (max_j_value < mof2.at(j)) { max_j_value = mof2.at(j); }
-
-                        if (i != k)
-                        {
-                            if (max_j_value < mof2.at(j))
-                            {
-                                max_j_value = mof2.at(j);
-                            }
-                        }
-                    }
-                    if (mof.at(j) > max_j_value) { dominate_count++; }
+                    const auto& mof = m.individual->getMultiObjectiveFitness();
+                    m.metric =  mof.at(best_mof_index);
                 }
-                gm.metric = dominate_count;
             }
 
-            std::cout << std::endl << "**************************" << std::endl;
-//            group.print();
-            for (auto& m : group.members())
-            {
-                std::cout << "metric = " << m.metric << ", mof = ";
-                std::cout << m.individual->getMultiObjectiveFitness().to_string();
-                std::cout << std::endl;
-            }
-            std::cout << "**************************" << std::endl << std::endl;
 
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
@@ -573,10 +573,59 @@ public:
         evolutionStep(tournament_function);
     }
 
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240721 break off countObjectivesDominated() into its own function
+    //     had been inline in evolutionStep(MultiObjectiveFitnessFunction...)
+    
+    // Wrote new experimental code to count how many objectives (dimensions of a
+    // MOF) are dominated by a given Individual.
+    // Use this to set TournamentGroupMembers::metric
+    
+    
+    void countObjectivesDominated(TournamentGroup& group)
+    {
+        for (int i = 0; i < group.members().size(); i++)
+        {
+            auto& gm = group.members().at(i);
+            const auto& mof = gm.individual->getMultiObjectiveFitness();
+            int dominate_count = 0;
+            for (int j = 0; j < mof.size(); j++)
+            {
+                double max_j_value = -1; // QQQQ use -inf?
+                for (int k = 0; k < group.members().size(); k++)
+                {
+                    const auto& gm2 = group.members().at(k);
+                    const auto& mof2 = gm2.individual->getMultiObjectiveFitness();
+                    if (i != k)
+                    {
+                        double mof2_j = mof2.at(j);
+                        if (max_j_value < mof2_j) { max_j_value = mof2_j; }
+                    }
+                }
+                if (mof.at(j) > max_j_value) { dominate_count++; }
+            }
+            gm.metric = dominate_count;
+        }
+        
+        std::cout << std::endl;
+        std::cout << "**************************" << std::endl;
+        for (auto& m : group.members())
+        {
+            std::cout << "metric = " << m.metric << ", mof = ";
+            std::cout << m.individual->getMultiObjectiveFitness().to_string();
+            std::cout << std::endl;
+        }
+        std::cout << "**************************" << std::endl;
+        std::cout << std::endl;
+    }
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240710 WIP for MOF elitism
     

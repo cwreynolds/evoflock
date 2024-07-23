@@ -16,6 +16,7 @@
 
 #pragma once
 #include <iostream>
+#include <iomanip>
 #include <cstdlib>
 #include <chrono>
 #include <thread>
@@ -265,18 +266,25 @@ void apply_to_pairwise_combinations(F pair_func, const std::vector<T>& collectio
     }
 }
 
-// Convert an std::vector into an std::string as a "comma separated list".
-// TODO add a unit test. search for ", " to find places where this could be used
-template <typename T> std::string vec_to_string(const std::vector<T>& vector)
+// Convert a std::vector to a string, with comma-space between printed elements.
+// If not 0, fixed_precision allows printing columns each row is an std::vector.
+template <typename T> std::string vec_to_string(const std::vector<T>& vector,
+                                                int fixed_precision)
 {
     std::stringstream s;
     bool first = true;
+    if (fixed_precision > 0) { s << std::setprecision(4) << std::fixed; }
     for (auto& element : vector)
     {
         if (first) first = false; else s << ", ";
         s << element;
     }
     return s.str();
+}
+
+template <typename T> std::string vec_to_string(const std::vector<T>& vector)
+{
+    return vec_to_string(vector, 0);
 }
 
 static void unit_test()
@@ -325,6 +333,9 @@ static void unit_test()
     apply_to_pairwise_combinations([&](int p, int q){assert(p == pairs[pi++]);
                                                      assert(q == pairs[pi++]);},
                                    std::vector<int>({0, 1, 2, 3, 4}));
+
+    std::vector<double> vd({0.1, 2.3, 4.5, 5.6});
+    assert (vec_to_string(vd, 4) == "0.1000, 2.3000, 4.5000, 5.6000");
 
     // TODO 20230409 test random-number utilities, later RandomSequence.
 }

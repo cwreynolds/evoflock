@@ -322,17 +322,24 @@ template<typename T> std::string any_to_string(std::any a)
 inline bool is_normal(float x) { return !(std::isnan(x) || std::isinf(x)); }
 
 // Convert an std::vector into an std::string as a "comma separated list".
-// TODO add a unit test. search for ", " to find places where this could be used
-template <typename T> std::string vec_to_string(const std::vector<T>& vector)
+// If not 0, fixed_precision allows printing columns each row is an std::vector.
+template <typename T> std::string vec_to_string(const std::vector<T>& vector,
+                                                int fixed_precision)
 {
     std::stringstream s;
     bool first = true;
+    if (fixed_precision > 0) { s << std::setprecision(4) << std::fixed; }
     for (auto& element : vector)
     {
         if (first) first = false; else s << ", ";
         s << element;
     }
     return s.str();
+}
+
+template <typename T> std::string vec_to_string(const std::vector<T>& vector)
+{
+    return vec_to_string(vector, 0);
 }
 
 // Format float to a string, as percentage with "digits" fractional digits after

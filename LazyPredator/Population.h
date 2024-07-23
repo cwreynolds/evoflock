@@ -610,15 +610,16 @@ public:
             gm.metric = dominate_count;
         }
         
+        std::string sep = "****************************************************";
         std::cout << std::endl;
-        std::cout << "**************************" << std::endl;
+        std::cout << sep << std::endl;
         for (auto& m : group.members())
         {
-            std::cout << "metric = " << m.metric << ", mof = ";
-            std::cout << m.individual->getMultiObjectiveFitness().to_string();
-            std::cout << std::endl;
+            auto mof = m.individual->getMultiObjectiveFitness();
+            std::cout << "metric = " << m.metric << ", mof = {";
+            std::cout << vec_to_string(mof.as_vector(), 4) << "}" << std::endl;
         }
-        std::cout << "**************************" << std::endl;
+        std::cout << sep << std::endl;
         std::cout << std::endl;
     }
     

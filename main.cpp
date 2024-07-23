@@ -580,10 +580,15 @@ int main(int argc, const char * argv[])
 //    int subpops = 22;
 //    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
 
+//    // 20240721
+//    int individuals = 2000;
+//    int subpops = 100;
+//    int max_evolution_steps = Boid::GP_not_GA ? 120000 : 30000;
+
     // 20240721
-    int individuals = 2000;
-    int subpops = 100;
-    int max_evolution_steps = Boid::GP_not_GA ? 120000 : 30000;
+    int individuals = 500;
+    int subpops = 22;
+    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         
@@ -606,12 +611,15 @@ int main(int argc, const char * argv[])
     
 //    int max_initial_tree_size   = Boid::GP_not_GA ? 60 : 20;
     
-    // 20240720
+//    // 20240720
 //    int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
     
-    // 20240721
-    int max_initial_tree_size   = Boid::GP_not_GA ? 15 : 20;
-    
+//    // 20240721
+//    int max_initial_tree_size   = Boid::GP_not_GA ? 15 : 20;
+  
+    // 20240722
+    int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -639,7 +647,8 @@ int main(int argc, const char * argv[])
 //    LP::LPRS().setSeed(20240713);
 //    LP::LPRS().setSeed(20240714);
 //    LP::LPRS().setSeed(20240718);
-    LP::LPRS().setSeed(20240721);
+//    LP::LPRS().setSeed(20240721);
+    LP::LPRS().setSeed(20240722);
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run

@@ -594,6 +594,11 @@ int main(int argc, const char * argv[])
     int subpops = 22;
     int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
 
+//    // 20240724
+//    int individuals = 1000;
+//    int subpops = 32;
+//    int max_evolution_steps = Boid::GP_not_GA ? 60000 : 30000;
+
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         
     //    int min_tree_size = 2;

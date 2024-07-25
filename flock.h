@@ -428,7 +428,27 @@ public:
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (not nn_sep_ok) { all_seperation_good = false; }
             if (not speed_ok) { all_speed_good = false; }
-            if (b->detectObstacleViolations()) { all_avoidance_good = false; }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240724 try GP using "per-boid avoid count"
+            
+//            if (b->detectObstacleViolations()) { all_avoidance_good = false; }
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20240724 try ignoring fitness of boid after it hits obstacle.
+            
+            if (b->detectObstacleViolations() or b->dead)
+            {
+                all_avoidance_good = false;
+                b->dead = true;
+            }
+            else
+            {
+                per_boid_avoid_count++;
+            }
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // Add this boid's position to occupancy_map, ignore if outside ESO.
             occupancy_map.add(b->position(), [](Vec3 p){return p.length()>50;});
             if (not all_avoidance_good)
@@ -611,6 +631,15 @@ public:
         auto ignore_function = [](Vec3 p) { return p.length() > 50;};
         return occupancy_map.fractionOccupied(ignore_function);
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240724 try GP using "per-boid avoid count"
+    double per_boid_avoid_count = 0;
+    double get_per_boid_avoid_score() const
+    {
+        return per_boid_avoid_count / boid_update_counter_;
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     double sum_of_all_cohesion_scores_ = 0;
     double get_cohere_score() const

@@ -233,6 +233,11 @@ public:
     
     std::function<Vec3()> override_steer_function = nullptr;
     
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20240724 try ignoring fitness of boid after it hits obstacle.
+    bool dead = false;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    
     // In the GP (vs GA) version, the evolved code is a per-frame steering function
     // for each Boid. This API supplies a "per thread global" which points to the
     // current Boid.

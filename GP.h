@@ -305,25 +305,43 @@ inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 //                                         }));
 //    }
 
-// 20240723
+//    // 20240723
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (Boid::GP_not_GA ?
+//                std::vector<std::string>(
+//                                         {
+//    //                                         "speed",
+//                                             "avoid",
+//                                             "separate",
+//                                             "cohere",
+//                                         }) :
+//                std::vector<std::string>(
+//                                         {
+//                                             "separate",
+//                                             "avoid",
+//                                             "cohere",
+//    //                                         "cluster",
+//    //                                         "curvature",
+//    //                                         "occupied"
+//                                         }));
+//    }
+
+// 20240724
 inline std::vector<std::string> mof_names()
 {
     return (Boid::GP_not_GA ?
             std::vector<std::string>(
                                      {
-//                                         "speed",
                                          "avoid",
-                                         "separate",
-                                         "cohere",
+//                                         "separate",
+//                                         "cohere",
                                      }) :
             std::vector<std::string>(
                                      {
                                          "separate",
                                          "avoid",
                                          "cohere",
-//                                         "cluster",
-//                                         "curvature",
-//                                         "occupied"
                                      }));
 }
 
@@ -582,30 +600,54 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 //                );
 
     
+//        return (Boid::GP_not_GA ?
+//                MOF(
+//                    {
+//    //                    // 20240722
+//    //                    speed,
+//    //                    avoid,
+//    //                    separate,
+//    //                    cohere,
+//
+//                        // 20240723
+//                        // speed,
+//                        avoid,
+//                        separate,
+//                        cohere,
+//                    }) :
+//                MOF(
+//                    {
+//    //                    separate,
+//    //                    avoid,
+//    //                    cohere,
+//    //                    cluster,
+//    //                    curvature,
+//    //                    occupy,
+//
+//                        // 20240723
+//                        separate,
+//                        avoid,
+//                        cohere,
+//                        // cluster,
+//                        // curvature,
+//                        // occupy,
+//                    })
+//                );
+
     return (Boid::GP_not_GA ?
             MOF(
                 {
-//                    // 20240722
-//                    speed,
+                    // 20240724
 //                    avoid,
 //                    separate,
 //                    cohere,
+                    
+//                    avoid,
 
-                    // 20240723
-                    // speed,
-                    avoid,
-                    separate,
-                    cohere,
+                    flock.get_per_boid_avoid_score(),
                 }) :
             MOF(
                 {
-//                    separate,
-//                    avoid,
-//                    cohere,
-//                    cluster,
-//                    curvature,
-//                    occupy,
-
                     // 20240723
                     separate,
                     avoid,
@@ -615,8 +657,6 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
                     // occupy,
                 })
             );
-
-
 }
 
 

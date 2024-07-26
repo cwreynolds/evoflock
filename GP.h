@@ -1244,13 +1244,6 @@ LP::FunctionSet evoflock_gp_function_set()
         // GpTypes
         {
             { "Vec3" },
-//            {
-//                "Vec3",
-//                nullptr,
-//                [](std::any a){ return std::any_cast<Vec3>(a).to_string(); },
-//                nullptr
-//            },
-//            { "Scalar_5",     -5.0,   5.0 },
             { "Scalar_100", -100.0, 100.0 },
         },
         
@@ -1281,15 +1274,6 @@ LP::FunctionSet evoflock_gp_function_set()
                                               tree.evalSubtree<double>(1)));
                 }
             },
-//                {
-//    //                "Adjust", "Scalar_100", {"Scalar_100", "Scalar_5"},
-//                    "Adjust", "Scalar_100", {"Scalar_100", "Scalar_100"},
-//                    [](LP::GpTree& tree)
-//                    {
-//                        return std::any(clean_num(tree.evalSubtree<double>(0) *
-//                                                  tree.evalSubtree<double>(1)));
-//                    }
-//                },
             {
                 "Power", "Scalar_100", {"Scalar_100", "Scalar_100"},
                 [](LP::GpTree& tree)
@@ -1299,14 +1283,14 @@ LP::FunctionSet evoflock_gp_function_set()
                     return std::any(clean_num(std::pow(base, expt)));
                 }
             },
-            {
-                "Abs", "Scalar_100", {"Scalar_100"},
-                [](LP::GpTree& tree)
-                {
-                    double x = tree.evalSubtree<double>(0);
-                    return std::any(clean_num(std::abs(x)));
-                }
-            },
+//            {
+//                "Abs", "Scalar_100", {"Scalar_100"},
+//                [](LP::GpTree& tree)
+//                {
+//                    double x = tree.evalSubtree<double>(0);
+//                    return std::any(clean_num(std::abs(x)));
+//                }
+//            },
 
             // Vector functions:
             {
@@ -1336,7 +1320,6 @@ LP::FunctionSet evoflock_gp_function_set()
                 }
             },
             {
-//                "Scale_v3", "Vec3", {"Vec3", "Scalar_5"},
                 "Scale_v3", "Vec3", {"Vec3", "Scalar_100"},
                 [](LP::GpTree& tree)
                 {
@@ -1376,26 +1359,22 @@ LP::FunctionSet evoflock_gp_function_set()
                                               tree.evalSubtree<Vec3>(1)));
                 }
             },
-            {
-                "Parallel_Component", "Vec3", {"Vec3", "Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    Vec3 value = tree.evalSubtree<Vec3>(0);
-                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
-//                    if (basis.is_zero_length()) { basis = Vec3(1, 0, 0); }
-//                    return std::any(value.parallel_component(basis));
-                    Vec3 unit_basis = ensure_unit_length(basis);
-                    return std::any(value.parallel_component(unit_basis));
-                }
-            },
+//            {
+//                "Parallel_Component", "Vec3", {"Vec3", "Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    Vec3 value = tree.evalSubtree<Vec3>(0);
+//                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
+//                    Vec3 unit_basis = ensure_unit_length(basis);
+//                    return std::any(value.parallel_component(unit_basis));
+//                }
+//            },
             {
                 "Perpendicular_Component", "Vec3", {"Vec3", "Vec3"},
                 [](LP::GpTree& tree)
                 {
                     Vec3 value = tree.evalSubtree<Vec3>(0);
                     Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
-//                    if (basis.is_zero_length()) { basis = Vec3(1, 0, 0); }
-//                    return std::any(value.perpendicular_component(basis));
                     Vec3 unit_basis = ensure_unit_length(basis);
                     return std::any(value.perpendicular_component(unit_basis));
                 }
@@ -1408,7 +1387,8 @@ LP::FunctionSet evoflock_gp_function_set()
                     double i = tree.evalSubtree<double>(0);
                     Vec3 a = tree.evalSubtree<Vec3>(1);
                     Vec3 b = tree.evalSubtree<Vec3>(2);
-                    return std::any(util::interpolate(util::clip01(i), a, b));
+//                    return std::any(util::interpolate(util::clip01(i), a, b));
+                    return std::any(util::interpolate(i, a, b));
                 }
             },
             {
@@ -1454,38 +1434,38 @@ LP::FunctionSet evoflock_gp_function_set()
                                     Boid::getGpPerThread()->position());
                 }
             },
-            {
-                "Neighbor_2_Velocity", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    return std::any(getGpBoidNeighbor(2)->velocity());
-                    
-                }
-            },
-            {
-                "Neighbor_2_Offset", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    return std::any(getGpBoidNeighbor(2)->position() -
-                                    Boid::getGpPerThread()->position());
-                }
-            },
-            {
-                "Neighbor_3_Velocity", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    return std::any(getGpBoidNeighbor(3)->velocity());
-                    
-                }
-            },
-            {
-                "Neighbor_3_Offset", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    return std::any(getGpBoidNeighbor(3)->position() -
-                                    Boid::getGpPerThread()->position());
-                }
-            },
+//            {
+//                "Neighbor_2_Velocity", "Vec3", {},
+//                [](LP::GpTree& t)
+//                {
+//                    return std::any(getGpBoidNeighbor(2)->velocity());
+//                    
+//                }
+//            },
+//            {
+//                "Neighbor_2_Offset", "Vec3", {},
+//                [](LP::GpTree& t)
+//                {
+//                    return std::any(getGpBoidNeighbor(2)->position() -
+//                                    Boid::getGpPerThread()->position());
+//                }
+//            },
+//            {
+//                "Neighbor_3_Velocity", "Vec3", {},
+//                [](LP::GpTree& t)
+//                {
+//                    return std::any(getGpBoidNeighbor(3)->velocity());
+//                    
+//                }
+//            },
+//            {
+//                "Neighbor_3_Offset", "Vec3", {},
+//                [](LP::GpTree& t)
+//                {
+//                    return std::any(getGpBoidNeighbor(3)->position() -
+//                                    Boid::getGpPerThread()->position());
+//                }
+//            },
             {
                 "First_Obs_Dist", "Scalar_100", {},
                 [](LP::GpTree& t)

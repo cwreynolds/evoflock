@@ -686,6 +686,7 @@ public:
                 total_avoid_fail += b->avoidance_failure_counter();
             }
             
+            grabPrintLock_evoflock();
             std::cout << log_prefix;
             std::cout << draw().frame_counter();
             // std::cout << " fps=" << 0; // round(self.fps.value));

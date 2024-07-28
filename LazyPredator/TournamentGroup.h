@@ -147,9 +147,24 @@ public:
                 best_index_lowest_bottom = i;
             }
         }
-        return (LPRS().randomBool(0.3) ?
-                best_index_big_range :
-                best_index_lowest_bottom);
+        //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+        // TODO 20240726_for_GA_compare_3_TG_metrics
+        
+//        return (LPRS().randomBool(0.3) ?
+//                best_index_big_range :
+//                best_index_lowest_bottom);
+        
+//        return best_index_big_range;
+        
+//        return best_index_lowest_bottom;
+        
+//        return (LPRS().randomBool(0.8) ?
+//                best_index_lowest_bottom :
+//                best_index_big_range);
+
+        return best_index_lowest_bottom;
+        
+        //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
     }
         
     // "Occasionally" ignore some of the fitness objectives listed later in MOF.

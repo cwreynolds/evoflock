@@ -543,12 +543,15 @@ public:
             //~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~
             
             
+            //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+            // TODO 20240726_for_GA_compare_3_TG_metrics
+            
             // Randomly combine COD with the two versions of best_mof_index.
-            if (LPRS().randomBool(0.33))
-            {
-                countObjectivesDominated(group);
-            }
-            else
+//            if (LPRS().randomBool(0.33))
+//            {
+//                countObjectivesDominated(group);
+//            }
+//            else
             {
                 // Select best of the multiple fitnesses to use for this step.
                 size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
@@ -560,6 +563,8 @@ public:
                     m.metric =  mof.at(best_mof_index);
                 }
             }
+            
+            //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
 
 
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~

@@ -539,7 +539,8 @@ int main(int argc, const char * argv[])
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20240723 going back to GA to make sure that still works.
 //    Boid::GP_not_GA = false;
-    Boid::GP_not_GA = true;
+//    Boid::GP_not_GA = true;
+    Boid::GP_not_GA = false;
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     
 

@@ -436,10 +436,21 @@ public:
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             // TODO 20240724 try ignoring fitness of boid after it hits obstacle.
             
-            if (b->detectObstacleViolations() or b->dead)
+//            if (b->detectObstacleViolations() or b->dead)
+//            {
+//                all_avoidance_good = false;
+//                b->dead = true;
+//            }
+//            else
+//            {
+//                per_boid_avoid_count++;
+//            }
+
+            // TODO 20240728 retracted.
+            
+            if (b->detectObstacleViolations())
             {
                 all_avoidance_good = false;
-                b->dead = true;
             }
             else
             {

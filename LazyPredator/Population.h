@@ -546,7 +546,43 @@ public:
             //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
             // TODO 20240726_for_GA_compare_3_TG_metrics
             
-            // Randomly combine COD with the two versions of best_mof_index.
+//                // Randomly combine COD with the two versions of best_mof_index.
+//    //            if (LPRS().randomBool(0.33))
+//    //            {
+//    //                countObjectivesDominated(group);
+//    //            }
+//    //            else
+//                {
+//                    // Select best of the multiple fitnesses to use for this step.
+//                    size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
+//                    // Set the "metric" of each TournamentGroup member to that
+//                    // "best_mof_index" of the member's MultiObjectiveFitness.
+//                    for (auto& m : group.members())
+//                    {
+//                        const auto& mof = m.individual->getMultiObjectiveFitness();
+//                        m.metric =  mof.at(best_mof_index);
+//                    }
+//                }
+
+//    //            // Randomly combine COD with the two versions of best_mof_index.
+//    //            if (LPRS().randomBool(0.33))
+//    //            {
+//                    countObjectivesDominated(group);
+//    //            }
+//    //            else
+//    //            {
+//    //                // Select best of the multiple fitnesses to use for this step.
+//    //                size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
+//    //                // Set the "metric" of each TournamentGroup member to that
+//    //                // "best_mof_index" of the member's MultiObjectiveFitness.
+//    //                for (auto& m : group.members())
+//    //                {
+//    //                    const auto& mof = m.individual->getMultiObjectiveFitness();
+//    //                    m.metric =  mof.at(best_mof_index);
+//    //                }
+//    //            }
+
+//            // Randomly combine COD with the two versions of best_mof_index.
 //            if (LPRS().randomBool(0.33))
 //            {
 //                countObjectivesDominated(group);
@@ -563,7 +599,7 @@ public:
                     m.metric =  mof.at(best_mof_index);
                 }
             }
-            
+
             //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
 
 

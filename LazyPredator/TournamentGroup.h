@@ -162,8 +162,18 @@ public:
 //                best_index_lowest_bottom :
 //                best_index_big_range);
 
-        return best_index_lowest_bottom;
+//        return best_index_lowest_bottom;
         
+//        return best_index_big_range;
+        
+//        return (LPRS().randomBool(0.8) ?
+//                best_index_lowest_bottom :
+//                best_index_big_range);
+
+//        return best_index_big_range;
+        
+        return best_index_lowest_bottom;
+
         //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
     }
         

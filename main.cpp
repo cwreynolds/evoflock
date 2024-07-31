@@ -540,7 +540,8 @@ int main(int argc, const char * argv[])
     // TODO 20240723 going back to GA to make sure that still works.
 //    Boid::GP_not_GA = false;
 //    Boid::GP_not_GA = true;
-    Boid::GP_not_GA = false;
+//    Boid::GP_not_GA = false;
+    Boid::GP_not_GA = true;
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     
 
@@ -590,15 +591,25 @@ int main(int argc, const char * argv[])
 //    int subpops = 100;
 //    int max_evolution_steps = Boid::GP_not_GA ? 120000 : 30000;
 
-    // 20240721
-    int individuals = 500;
-    int subpops = 22;
-    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
+//    // 20240721
+//    int individuals = 500;
+//    int subpops = 22;
+//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
 
 //    // 20240724
 //    int individuals = 1000;
 //    int subpops = 32;
 //    int max_evolution_steps = Boid::GP_not_GA ? 60000 : 30000;
+
+//    // 20240729 4X
+//    int individuals = 2000;
+//    int subpops = 45;
+//    int max_evolution_steps = Boid::GP_not_GA ? 120000 : 30000;
+
+    // 20240730
+    int individuals = 500;
+    int subpops = 22;
+    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         

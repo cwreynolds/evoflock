@@ -644,7 +644,11 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
                     
 //                    avoid,
 
-                    flock.get_per_boid_avoid_score(),
+//                    flock.get_per_boid_avoid_score(),
+                    
+                    // 20240729
+                    avoid,
+
                 }) :
             MOF(
                 {

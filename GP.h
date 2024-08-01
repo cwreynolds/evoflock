@@ -646,8 +646,11 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 
 //                    flock.get_per_boid_avoid_score(),
                     
-                    // 20240729
-                    avoid,
+//                    // 20240729
+//                    avoid,
+                    
+                    // 20240731
+                    flock.get_per_boid_avoid_score(),
 
                 }) :
             MOF(
@@ -1422,22 +1425,25 @@ LP::FunctionSet evoflock_gp_function_set()
                     return std::any(Boid::getGpPerThread()->getAcceleration());
                 }
             },
-            {
-                "Neighbor_1_Velocity", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    return std::any(getGpBoidNeighbor(1)->velocity());
-                    
-                }
-            },
-            {
-                "Neighbor_1_Offset", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    return std::any(getGpBoidNeighbor(1)->position() -
-                                    Boid::getGpPerThread()->position());
-                }
-            },
+            
+            // 20240731 TEMP
+//            {
+//                "Neighbor_1_Velocity", "Vec3", {},
+//                [](LP::GpTree& t)
+//                {
+//                    return std::any(getGpBoidNeighbor(1)->velocity());
+//                    
+//                }
+//            },
+//            {
+//                "Neighbor_1_Offset", "Vec3", {},
+//                [](LP::GpTree& t)
+//                {
+//                    return std::any(getGpBoidNeighbor(1)->position() -
+//                                    Boid::getGpPerThread()->position());
+//                }
+//            },
+
 //            {
 //                "Neighbor_2_Velocity", "Vec3", {},
 //                [](LP::GpTree& t)

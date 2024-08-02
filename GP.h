@@ -1426,23 +1426,22 @@ LP::FunctionSet evoflock_gp_function_set()
                 }
             },
             
-            // 20240731 TEMP
-//            {
-//                "Neighbor_1_Velocity", "Vec3", {},
-//                [](LP::GpTree& t)
-//                {
-//                    return std::any(getGpBoidNeighbor(1)->velocity());
-//                    
-//                }
-//            },
-//            {
-//                "Neighbor_1_Offset", "Vec3", {},
-//                [](LP::GpTree& t)
-//                {
-//                    return std::any(getGpBoidNeighbor(1)->position() -
-//                                    Boid::getGpPerThread()->position());
-//                }
-//            },
+            {
+                "Neighbor_1_Velocity", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+                    return std::any(getGpBoidNeighbor(1)->velocity());
+                    
+                }
+            },
+            {
+                "Neighbor_1_Offset", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+                    return std::any(getGpBoidNeighbor(1)->position() -
+                                    Boid::getGpPerThread()->position());
+                }
+            },
 
 //            {
 //                "Neighbor_2_Velocity", "Vec3", {},
@@ -1507,6 +1506,37 @@ LP::FunctionSet evoflock_gp_function_set()
                     return std::any(normal);
                 }
             },
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20240801 very experimental, add high level "hint" to
+            // simulate "seeding" population with handwritten steering program.
+            
+            
+            {
+                "Avoid_Obstacle", "Vec3", {"Scalar_100"},
+                [](LP::GpTree& tree)
+                {
+                    double min_dist = tree.evalSubtree<double>(0);
+                    Boid& boid = *Boid::getGpPerThread();
+                    Vec3 avoidance;
+                    auto collisions = boid.get_predicted_obstacle_collisions();
+                    if (collisions.size() > 0)
+                    {
+                        const Collision& first_collision = collisions.front();
+                        Vec3 poi = first_collision.point_of_impact;
+                        double distance = (poi - boid.position()).length();
+                        if (distance > min_dist)
+                        {
+                            Vec3 normal = first_collision.normal_at_poi;
+                            avoidance = normal.parallel_component(boid.forward());
+                        }
+                    }
+                    return std::any(avoidance);
+                }
+            },
+
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }
     };
 }

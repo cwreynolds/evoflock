@@ -1513,10 +1513,12 @@ LP::FunctionSet evoflock_gp_function_set()
             
             
             {
-                "Avoid_Obstacle", "Vec3", {"Scalar_100"},
+//                "Avoid_Obstacle", "Vec3", {"Scalar_100"},
+                "Avoid_Obstacle", "Vec3", {},
                 [](LP::GpTree& tree)
                 {
-                    double min_dist = tree.evalSubtree<double>(0);
+//                    double min_dist = tree.evalSubtree<double>(0);
+                    double min_dist = 25;
                     Boid& boid = *Boid::getGpPerThread();
                     Vec3 avoidance;
                     auto collisions = boid.get_predicted_obstacle_collisions();
@@ -1532,6 +1534,30 @@ LP::FunctionSet evoflock_gp_function_set()
                         }
                     }
                     return std::any(avoidance);
+                }
+            },
+
+//            {
+//                "Neighbor_1_Offset", "Vec3", {},
+//                [](LP::GpTree& t)
+//                {
+//                    return std::any(getGpBoidNeighbor(1)->position() -
+//                                    Boid::getGpPerThread()->position());
+//                }
+//            },
+
+            {
+                "Adjust_Neighbor_Dist", "Vec3", {},
+                [](LP::GpTree& tree)
+                {
+                    Vec3 steering;
+                    Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
+                                            Boid::getGpPerThread()->position());
+                    double neighbor_dist = neighbor_offset.length();
+                    Vec3 neighbor_direction = neighbor_offset / neighbor_dist;
+                    if (neighbor_dist < 2) { steering = neighbor_direction; }
+                    if (neighbor_dist > 9) { steering = -neighbor_direction; }
+                    return std::any(steering * 10);
                 }
             },
 

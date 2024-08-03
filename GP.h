@@ -327,7 +327,25 @@ inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 //                                         }));
 //    }
 
-// 20240724
+//    // 20240724
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (Boid::GP_not_GA ?
+//                std::vector<std::string>(
+//                                         {
+//                                             "avoid",
+//    //                                         "separate",
+//    //                                         "cohere",
+//                                         }) :
+//                std::vector<std::string>(
+//                                         {
+//                                             "separate",
+//                                             "avoid",
+//                                             "cohere",
+//                                         }));
+//    }
+
+// 20240802
 inline std::vector<std::string> mof_names()
 {
     return (Boid::GP_not_GA ?
@@ -336,6 +354,12 @@ inline std::vector<std::string> mof_names()
                                          "avoid",
 //                                         "separate",
 //                                         "cohere",
+                                         "separate",
+                                         "cohere",
+                                         
+                                         "cluster",
+                                         "occupied"
+
                                      }) :
             std::vector<std::string>(
                                      {
@@ -374,8 +398,8 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
     double cluster = flock.get_cluster_score();
     double curvature = flock.get_curvature_score();
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240710 change speed fitness back to speed-ok frame count.
-//    double speed = flock.get_gp_speed_score();
+    // TODO 20240710 change speed fitness back to fraction of speed-ok chunks.
+    //    double speed = flock.get_gp_speed_score();
     double speed = flock.get_speed_score();
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -634,23 +658,47 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 //                    })
 //                );
 
+//        return (Boid::GP_not_GA ?
+//                MOF(
+//                    {
+//                        // 20240724
+//    //                    avoid,
+//    //                    separate,
+//    //                    cohere,
+//
+//    //                    avoid,
+//
+//    //                    flock.get_per_boid_avoid_score(),
+//
+//    //                    // 20240729
+//    //                    avoid,
+//
+//                        // 20240731
+//                        flock.get_per_boid_avoid_score(),
+//
+//                    }) :
+//                MOF(
+//                    {
+//                        // 20240723
+//                        separate,
+//                        avoid,
+//                        cohere,
+//                        // cluster,
+//                        // curvature,
+//                        // occupy,
+//                    })
+//                );
+
+    
     return (Boid::GP_not_GA ?
             MOF(
                 {
-                    // 20240724
-//                    avoid,
-//                    separate,
-//                    cohere,
-                    
-//                    avoid,
-
-//                    flock.get_per_boid_avoid_score(),
-                    
-//                    // 20240729
-//                    avoid,
-                    
-                    // 20240731
-                    flock.get_per_boid_avoid_score(),
+                    // 20240802
+                    avoid,
+                    separate,
+                    cohere,
+                    cluster,
+                    occupy,
 
                 }) :
             MOF(

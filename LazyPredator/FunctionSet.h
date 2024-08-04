@@ -232,6 +232,70 @@ public:
 //        }
 //    }
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    // TODO 202400804 prototype customized makeRandomTree()
+
+
+//        // Creates a random program (nested expression) using the "language" defined
+//        // in this FunctionSet. Parameter "max_size" is upper bound on the number of
+//        // nodes (function calls or constants) in the resulting program. The program
+//        // returns a value of "return_type" from its root.
+//        void makeRandomTree(int max_size,
+//                            const GpType& return_type,
+//                            int& output_actual_size,
+//                            GpTree& gp_tree) const
+//        {
+//            // Find all function whose value is return_type, for which a subtree can
+//            // be constructed in max_size or fewer nodes, and select on randomly.
+//            GpFunction* rf = randomFunctionOfTypeInSize(max_size, return_type);
+//
+//            // Does return_type have an ephemeral constant generator?
+//            bool has_eg = return_type.hasEphemeralGenerator();
+//    //        bool prefer_constant = has_eg and LPRS().randomBool(0.1);
+//    //        bool prefer_constant = has_eg and LPRS().randomBool(0.2);
+//            bool prefer_constant = has_eg and LPRS().randomBool(0.5);
+//    //        bool prefer_constant = has_eg;
+//
+//    //        if (rf)
+//            if (rf and not prefer_constant)
+//
+//            {
+//                // If found, recurse on a subtree with that function at the root.
+//                makeRandomTreeRoot(max_size, return_type, *rf,
+//                                   output_actual_size, gp_tree);
+//            }
+//
+//    //        else if (return_type.hasEphemeralGenerator())
+//            else if (has_eg)
+//
+//            {
+//                // If no function found, but this type has an ephemeral generator,
+//                // use it to generate a leaf constant, ending recursion.
+//                output_actual_size++;
+//                // TODO should pass rs() into the generator for repeatability.
+//                std::any leaf_value = return_type.generateEphemeralConstant();
+//                gp_tree.setRootValue(leaf_value, return_type);
+//            }
+//            else
+//            {
+//                // TODO better way to signal this FunctionSet specification error?
+//                std::cout << "No function or ephemeral constant found for GpType ";
+//                std::cout << return_type.name() << " remaining size: " << max_size;
+//                std::cout << std::endl;
+//                exit(EXIT_FAILURE);
+//            }
+//        }
+
+    
+    // TODO 202400804 prototype customized makeRandomTree()
+    typedef std::function<Vec3(int max_size,
+                               const GpType& return_type,
+                               int& output_actual_size,
+                               GpTree& gp_tree)> OverrideTreeMaker;
+
+    OverrideTreeMaker override_tree_maker = nullptr;
+
+    
     // Creates a random program (nested expression) using the "language" defined
     // in this FunctionSet. Parameter "max_size" is upper bound on the number of
     // nodes (function calls or constants) in the resulting program. The program
@@ -241,18 +305,25 @@ public:
                         int& output_actual_size,
                         GpTree& gp_tree) const
     {
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+        // TODO 202400804 prototype customized makeRandomTree()
+        
+        if (override_tree_maker)
+        {
+            override_tree_maker(max_size,
+                                return_type,
+                                output_actual_size,
+                                gp_tree);
+            return;
+        }
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
         // Find all function whose value is return_type, for which a subtree can
         // be constructed in max_size or fewer nodes, and select on randomly.
         GpFunction* rf = randomFunctionOfTypeInSize(max_size, return_type);
-
         // Does return_type have an ephemeral constant generator?
         bool has_eg = return_type.hasEphemeralGenerator();
-//        bool prefer_constant = has_eg and LPRS().randomBool(0.1);
-//        bool prefer_constant = has_eg and LPRS().randomBool(0.2);
         bool prefer_constant = has_eg and LPRS().randomBool(0.5);
-//        bool prefer_constant = has_eg;
-
-//        if (rf)
         if (rf and not prefer_constant)
 
         {
@@ -260,10 +331,7 @@ public:
             makeRandomTreeRoot(max_size, return_type, *rf,
                                output_actual_size, gp_tree);
         }
-        
-//        else if (return_type.hasEphemeralGenerator())
         else if (has_eg)
-
         {
             // If no function found, but this type has an ephemeral generator,
             // use it to generate a leaf constant, ending recursion.
@@ -275,13 +343,14 @@ public:
         else
         {
             // TODO better way to signal this FunctionSet specification error?
-            std::cout << "No function or epheneral constant found for GpType ";
+            std::cout << "No function or ephemeral constant found for GpType ";
             std::cout << return_type.name() << " remaining size: " << max_size;
             std::cout << std::endl;
             exit(EXIT_FAILURE);
         }
     }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     

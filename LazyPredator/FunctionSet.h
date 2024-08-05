@@ -474,6 +474,9 @@ public:
         }
         if (not size_ok(new_tree))
         {
+            debugPrint(min_tree_size)
+            debugPrint(max_tree_size)
+
             debugPrint(new_tree.size());
             std::cout << new_tree.to_string(true) << std::endl;
             std::cout << "consider using a wider range between min_tree_size"

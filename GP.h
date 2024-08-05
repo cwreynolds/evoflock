@@ -1609,6 +1609,71 @@ LP::FunctionSet evoflock_gp_function_set()
                 }
             },
 
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        }
+    };
+}
+
+
+
+LP::FunctionSet test_gp_boid_function_set()
+{
+    return
+    {
+        // GpTypes
+        {
+            { "Vec3" },
+            { "Scalar_100", -100.0, 100.0 },
+        },
+        // GpFunctions
+        {
+            
+            // TODO just laying out a hand-tuned boid behavior
+            {
+                "Be_The_Boid", "Vec3", {},
+                [](LP::GpTree& tree)
+                {
+                    Vec3 avoidance;
+                    //                    Vec3 neighbor_dist_adjust;
+                    Boid& boid = *Boid::getGpPerThread();
+                    
+                    
+                    double min_dist = 25;
+                    auto collisions = boid.get_predicted_obstacle_collisions();
+                    if (collisions.size() > 0)
+                    {
+                        const Collision& first_collision = collisions.front();
+                        Vec3 poi = first_collision.point_of_impact;
+                        double distance = (poi - boid.position()).length();
+                        if (distance > min_dist)
+                        {
+                            Vec3 normal = first_collision.normal_at_poi;
+                            avoidance = normal.parallel_component(boid.forward());
+                        }
+                    }
+                    
+                    Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
+                                            Boid::getGpPerThread()->position());
+                    double neighbor_dist = neighbor_offset.length();
+                    Vec3 neighbor_direction = neighbor_offset / neighbor_dist;
+                    
+//                    Vec3 neighbor_dist_adjust = (neighbor_direction *
+//                                                 ((neighbor_dist < 2) ?
+//                                                  1 : ((neighbor_dist > 9) ?
+//                                                       -1 : 0)));
+                    Vec3 neighbor_dist_adjust = (neighbor_direction *
+                                                 ((neighbor_dist < 2) ?
+                                                  -1 :
+//                                                  ((neighbor_dist > 9) ?
+                                                  ((neighbor_dist > 5) ?
+                                                   1 :
+                                                   0)));
+
+                    // TODO later try hard selection
+                    return std::any((avoidance + neighbor_dist_adjust) * 10);
+                    
+                }
+            },
             
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }

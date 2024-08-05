@@ -638,8 +638,12 @@ int main(int argc, const char * argv[])
 //    // 20240721
 //    int max_initial_tree_size   = Boid::GP_not_GA ? 15 : 20;
   
-    // 20240722
-    int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
+//    // 20240722
+//    int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
+    
+    // TODO 20240805 testing with Be_The_Boid
+    int max_initial_tree_size   = Boid::GP_not_GA ? 2 : 20;
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -683,7 +687,10 @@ int main(int argc, const char * argv[])
     LP::Population* population = nullptr;
 
     LP::FunctionSet fs = (Boid::GP_not_GA ?
-                          GP::evoflock_gp_function_set() :
+                          //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                          GP::evoflock_gp_function_set() :
+                          GP::test_gp_boid_function_set() :
+                          //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                           GP::evoflock_ga_function_set);
 
     {

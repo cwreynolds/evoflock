@@ -24,25 +24,12 @@ namespace GP
 // Abbreviated name for this overly-long class name.
 typedef LazyPredator::MultiObjectiveFitness MOF;
 
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240619 WIP first GP_not_GA run
-
-//    // Fitness function, simply returns Individual's tree's value (computing it and
-//    // caching it on first call).
-//    inline MOF evoflock_fitness_function(LP::Individual* individual)
-//    {
-//        return std::any_cast<MOF>(individual->tree().getRootValue());
-//    }
-
 // Fitness function, simply returns Individual's tree's value (computing it and
 // caching it on first call).
 inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
 {
     return std::any_cast<MOF>(individual->tree().getRootValue());
 }
-
-
 
 inline MOF run_gp_flock_simulation(LP::Individual* individual,
                                    bool write_file);
@@ -51,8 +38,6 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual)
 {
     return run_gp_flock_simulation(individual, false);
 }
-
-
 
 // Fitness function, runs a flock simulation using evolved tree for steering
 inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
@@ -83,9 +68,6 @@ inline double scalarize_fitness_length(MOF mof)
     return (std::sqrt(length_sq) / std::sqrt(mof.size()));
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240718 experiment using "hypervolume" as metric for TG
-
 // Take the hypervolume of MultiObjectiveFitness elements (basically product).
 inline double scalarize_fitness_hyperVolume(MOF mof)
 {
@@ -100,251 +82,6 @@ inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 
 //inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240706 make global variable GP::mof_names into a function.
-
-//    inline const std::vector<std::string> mof_names =
-//    {
-//        "separate",
-//        "avoid",
-//        "cohere",
-//        "cluster",
-//        "curvature",
-//        "occupied"
-//    };
-
-//    inline std::vector<std::string> mof_names()
-//    {
-//        return
-//        {
-//            "separate",
-//            "avoid",
-//            "cohere",
-//            "cluster",
-//            "curvature",
-//            "occupied"
-//        };
-//
-//    }
-
-//    inline std::vector<std::string> mof_names()
-//    {
-//        return (Boid::GP_not_GA ?
-//                std::vector<std::string>(
-//                                         {
-//                                             "separate",
-//                                             "avoid",
-//                                             "cohere",
-//    //                                         "cluster",
-//    //                                         "curvature",
-//                                             "speed",
-//                                             "occupied"
-//                                         }) :
-//                std::vector<std::string>(
-//                                         {
-//                                             "separate",
-//                                             "avoid",
-//                                             "cohere",
-//                                             "cluster",
-//                                             "curvature",
-//                                             "occupied"
-//                                         }));
-//    }
-
-//    inline std::vector<std::string> mof_names()
-//    {
-//        return (Boid::GP_not_GA ?
-//                std::vector<std::string>(
-//                                         {
-//                                             "avoid",
-//                                             "separate",
-//    //                                         "avoid",
-//                                             "cohere",
-//                                             "speed",
-//                                             "occupied"
-//                                         }) :
-//                std::vector<std::string>(
-//                                         {
-//                                             "separate",
-//                                             "avoid",
-//                                             "cohere",
-//                                             "cluster",
-//                                             "curvature",
-//                                             "occupied"
-//                                         }));
-//    }
-
-//    inline std::vector<std::string> mof_names()
-//    {
-//        return (Boid::GP_not_GA ?
-//                std::vector<std::string>(
-//                                         {
-//                                             "avoid",
-//    //                                         "separate",
-//    //                                         "cohere",
-//                                             "speed",
-//    //                                         "occupied"
-//                                         }) :
-//                std::vector<std::string>(
-//                                         {
-//                                             "separate",
-//                                             "avoid",
-//                                             "cohere",
-//                                             "cluster",
-//                                             "curvature",
-//                                             "occupied"
-//                                         }));
-//    }
-
-//    inline std::vector<std::string> mof_names()
-//    {
-//        return (Boid::GP_not_GA ?
-//                std::vector<std::string>(
-//                                         {
-//                                             "avoid",
-//                                             "separate",
-//                                             "speed",
-//                                         }) :
-//                std::vector<std::string>(
-//                                         {
-//                                             "separate",
-//                                             "avoid",
-//                                             "cohere",
-//                                             "cluster",
-//                                             "curvature",
-//                                             "occupied"
-//                                         }));
-//    }
-
-//    inline std::vector<std::string> mof_names()
-//    {
-//        return (Boid::GP_not_GA ?
-//                std::vector<std::string>(
-//                                         {
-//                                             "unitary",
-//                                         }) :
-//                std::vector<std::string>(
-//                                         {
-//                                             "separate",
-//                                             "avoid",
-//                                             "cohere",
-//                                             "cluster",
-//                                             "curvature",
-//                                             "occupied"
-//                                         }));
-//    }
-
-//    inline std::vector<std::string> mof_names()
-//    {
-//        return (Boid::GP_not_GA ?
-//                std::vector<std::string>(
-//                                         {
-//                                             "avoid+speed",
-//                                             "separate+speed",
-//                                         }) :
-//                std::vector<std::string>(
-//                                         {
-//                                             "separate",
-//                                             "avoid",
-//                                             "cohere",
-//                                             "cluster",
-//                                             "curvature",
-//                                             "occupied"
-//                                         }));
-//    }
-
-//    inline std::vector<std::string> mof_names()
-//    {
-//        return (Boid::GP_not_GA ?
-//                std::vector<std::string>(
-//                                         {
-//                                             "avoid",
-//                                             "separate",
-//                                             "speed",
-//                                         }) :
-//                std::vector<std::string>(
-//                                         {
-//                                             "separate",
-//                                             "avoid",
-//                                             "cohere",
-//                                             "cluster",
-//                                             "curvature",
-//                                             "occupied"
-//                                         }));
-//    }
-
-//    // 20240722
-//    inline std::vector<std::string> mof_names()
-//    {
-//        return (Boid::GP_not_GA ?
-//                std::vector<std::string>(
-//                                         {
-//    //                                         "avoid",
-//    //                                         "separate",
-//    //                                         "speed",
-//
-//    //                                         "speed",
-//    //                                         "avoid",
-//    //                                         "separate",
-//    //                                         "cohere",
-//
-//                                             // just a hack test
-//                                             "avoid or separate",
-//                                             "speed or cohere",
-//                                         }) :
-//                std::vector<std::string>(
-//                                         {
-//                                             "separate",
-//                                             "avoid",
-//                                             "cohere",
-//                                             "cluster",
-//                                             "curvature",
-//                                             "occupied"
-//                                         }));
-//    }
-
-//    // 20240723
-//    inline std::vector<std::string> mof_names()
-//    {
-//        return (Boid::GP_not_GA ?
-//                std::vector<std::string>(
-//                                         {
-//    //                                         "speed",
-//                                             "avoid",
-//                                             "separate",
-//                                             "cohere",
-//                                         }) :
-//                std::vector<std::string>(
-//                                         {
-//                                             "separate",
-//                                             "avoid",
-//                                             "cohere",
-//    //                                         "cluster",
-//    //                                         "curvature",
-//    //                                         "occupied"
-//                                         }));
-//    }
-
-//    // 20240724
-//    inline std::vector<std::string> mof_names()
-//    {
-//        return (Boid::GP_not_GA ?
-//                std::vector<std::string>(
-//                                         {
-//                                             "avoid",
-//    //                                         "separate",
-//    //                                         "cohere",
-//                                         }) :
-//                std::vector<std::string>(
-//                                         {
-//                                             "separate",
-//                                             "avoid",
-//                                             "cohere",
-//                                         }));
-//    }
-
 // 20240802
 inline std::vector<std::string> mof_names()
 {
@@ -352,11 +89,8 @@ inline std::vector<std::string> mof_names()
             std::vector<std::string>(
                                      {
                                          "avoid",
-//                                         "separate",
-//                                         "cohere",
                                          "separate",
                                          "cohere",
-                                         
                                          "cluster",
                                          "occupied"
 
@@ -369,327 +103,21 @@ inline std::vector<std::string> mof_names()
                                      }));
 }
 
-
-//    inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
-//    {
-//        double separate = flock.get_separation_score();
-//        double avoid = flock.get_avoid_obstacle_score();
-//        double cohere = flock.get_cohere_score();
-//        double cluster = flock.get_cluster_score();
-//        double curvature = flock.get_curvature_score();
-//        auto ignore_function = [](Vec3 p) { return p.length() > 50;};
-//        double occupy = flock.occupancy_map.fractionOccupied(ignore_function);
-//        return
-//        {{
-//            separate,
-//            avoid,
-//            cohere,
-//            cluster,
-//            curvature,
-//            occupy
-//        }};
-//    }
-
 inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 {
     double separate = flock.get_separation_score();
     double avoid = flock.get_avoid_obstacle_score();
     double cohere = flock.get_cohere_score();
     double cluster = flock.get_cluster_score();
-    double curvature = flock.get_curvature_score();
+    // double curvature = flock.get_curvature_score();
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240710 change speed fitness back to fraction of speed-ok chunks.
-    //    double speed = flock.get_gp_speed_score();
-    double speed = flock.get_speed_score();
+    // double speed = flock.get_gp_speed_score();
+    // double speed = flock.get_speed_score();
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240717 experiment with weighted combination to avoid MOF cost.
-    
-//    double unitary = avoid * separate * speed;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
     auto ignore_function = [](Vec3 p) { return p.length() > 50;};
     double occupy = flock.occupancy_map.fractionOccupied(ignore_function);
-    //    return
-    //    {{
-    //        separate,
-    //        avoid,
-    //        cohere,
-    //        cluster,
-    //        curvature,
-    //        occupy
-    //    }};
-    
-//    Boid::GP_not_GA
-    
-//        return (Boid::GP_not_GA ?
-//                MOF(
-//                    {
-//                        separate,
-//                        avoid,
-//                        cohere,
-//    //                    cluster,
-//    //                    curvature,
-//                        speed,
-//                        occupy
-//                    }) :
-//                MOF(
-//                    {
-//                        separate,
-//                        avoid,
-//                        cohere,
-//                        cluster,
-//                        curvature,
-//                        occupy
-//                    })
-//                );
-//    }
 
-//        return (Boid::GP_not_GA ?
-//                MOF(
-//                    {
-//                        avoid,
-//                        separate,
-//    //                    avoid,
-//                        cohere,
-//                        speed,
-//                        occupy
-//                    }) :
-//                MOF(
-//                    {
-//                        separate,
-//                        avoid,
-//                        cohere,
-//                        cluster,
-//                        curvature,
-//                        occupy
-//                    })
-//                );
-    
-    
-    
-//        return (Boid::GP_not_GA ?
-//                MOF(
-//                    {
-//                        avoid,
-//    //                    separate,
-//    //                    cohere,
-//                        speed,
-//    //                    occupy
-//                    }) :
-//                MOF(
-//                    {
-//                        separate,
-//                        avoid,
-//                        cohere,
-//                        cluster,
-//                        curvature,
-//                        occupy
-//                    })
-//                );
-
-//    return (Boid::GP_not_GA ?
-//            MOF(
-//                {
-//                    avoid,
-//                    separate,
-//                    speed,
-//                }) :
-//            MOF(
-//                {
-//                    separate,
-//                    avoid,
-//                    cohere,
-//                    cluster,
-//                    curvature,
-//                    occupy
-//                })
-//            );
-
-//    return (Boid::GP_not_GA ?
-//            MOF(
-//                {
-//                    unitary,
-//                }) :
-//            MOF(
-//                {
-//                    separate,
-//                    avoid,
-//                    cohere,
-//                    cluster,
-//                    curvature,
-//                    occupy
-//                })
-//            );
-
-//    return (Boid::GP_not_GA ?
-//            MOF(
-//                {
-//                    avoid    * util::remap_interval(speed, 0.0, 1.0, 0.9, 1.0),
-//                    separate * util::remap_interval(speed, 0.0, 1.0, 0.9, 1.0),
-//                }) :
-//            MOF(
-//                {
-//                    separate,
-//                    avoid,
-//                    cohere,
-//                    cluster,
-//                    curvature,
-//                    occupy
-//                })
-//            );
-
-//    return (Boid::GP_not_GA ?
-//            MOF(
-//                {
-//                    avoid    * util::remap_interval(speed, 0.0, 1.0, 0.8, 1.0),
-//                    separate * util::remap_interval(speed, 0.0, 1.0, 0.8, 1.0),
-//                }) :
-//            MOF(
-//                {
-//                    separate,
-//                    avoid,
-//                    cohere,
-//                    cluster,
-//                    curvature,
-//                    occupy
-//                })
-//            );
-
-//    return (Boid::GP_not_GA ?
-//            MOF(
-//                {
-//                    avoid    * util::remap_interval(speed, 0.0, 1.0, 0.6, 1.0),
-//                    separate * util::remap_interval(speed, 0.0, 1.0, 0.6, 1.0),
-//                }) :
-//            MOF(
-//                {
-//                    separate,
-//                    avoid,
-//                    cohere,
-//                    cluster,
-//                    curvature,
-//                    occupy
-//                })
-//            );
-
-//    return (Boid::GP_not_GA ?
-//            MOF(
-//                {
-//                    avoid,
-//                    separate,
-//                    speed,
-//                }) :
-//            MOF(
-//                {
-//                    separate,
-//                    avoid,
-//                    cohere,
-//                    cluster,
-//                    curvature,
-//                    occupy
-//                })
-//            );
-
-
-//        return (Boid::GP_not_GA ?
-//                MOF(
-//                    {
-//                        // 20240722
-//    //                    avoid,
-//    //                    separate,
-//    //                    speed,
-//
-//                        speed,
-//                        avoid,
-//                        separate,
-//                        cohere,
-//
-//    //                    EF::RS().randomBool() ? avoid : separate,
-//    //                    EF::RS().randomBool() ? speed : cohere,
-//
-//                    }) :
-//                MOF(
-//                    {
-//                        separate,
-//                        avoid,
-//                        cohere,
-//                        cluster,
-//                        curvature,
-//                        occupy
-//                    })
-//                );
-
-    
-//        return (Boid::GP_not_GA ?
-//                MOF(
-//                    {
-//    //                    // 20240722
-//    //                    speed,
-//    //                    avoid,
-//    //                    separate,
-//    //                    cohere,
-//
-//                        // 20240723
-//                        // speed,
-//                        avoid,
-//                        separate,
-//                        cohere,
-//                    }) :
-//                MOF(
-//                    {
-//    //                    separate,
-//    //                    avoid,
-//    //                    cohere,
-//    //                    cluster,
-//    //                    curvature,
-//    //                    occupy,
-//
-//                        // 20240723
-//                        separate,
-//                        avoid,
-//                        cohere,
-//                        // cluster,
-//                        // curvature,
-//                        // occupy,
-//                    })
-//                );
-
-//        return (Boid::GP_not_GA ?
-//                MOF(
-//                    {
-//                        // 20240724
-//    //                    avoid,
-//    //                    separate,
-//    //                    cohere,
-//
-//    //                    avoid,
-//
-//    //                    flock.get_per_boid_avoid_score(),
-//
-//    //                    // 20240729
-//    //                    avoid,
-//
-//                        // 20240731
-//                        flock.get_per_boid_avoid_score(),
-//
-//                    }) :
-//                MOF(
-//                    {
-//                        // 20240723
-//                        separate,
-//                        avoid,
-//                        cohere,
-//                        // cluster,
-//                        // curvature,
-//                        // occupy,
-//                    })
-//                );
-
-    
     return (Boid::GP_not_GA ?
             MOF(
                 {
@@ -774,10 +202,6 @@ inline void init_flock(Flock& flock)
     flock.set_fixed_time_step(true);
     flock.set_max_simulation_steps(500);  // 20240513: was 1000 before.
     flock.setLogStatInterval(flock.max_simulation_steps());
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO for simplicity, change get/setSaveBoidCenters() to be static
-//    flock.setSaveBoidCenters(false);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     flock.log_prefix = "    ";
 }
 
@@ -805,11 +229,7 @@ inline void fitness_logger(const MOF& mof)
     std::string sc = "scalar composite";
     size_t cw = sc.size();  // Column width.
     std::vector<std::string> labels;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240706 make global variable GP::mof_names into a function.
-//    for (auto& s : mof_names) { labels.push_back(s + " fitness"); }
     for (auto& s : mof_names()) { labels.push_back(s + " fitness"); }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     for (auto& s : labels){ size_t ss = s.size(); if (cw < ss) { cw = ss; } }
     // Print one row of a table with a named mof fitness.
     auto print = [&](double fitness, std::string name)
@@ -850,11 +270,7 @@ inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = fal
         // These steps happen in the single thread with lock on save_mof_mutex.
         {
             std::lock_guard<std::mutex> smm(save_mof_mutex);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240706 make global variable GP::mof_names into a function.
-//            assert(mof.size() == mof_names.size());
             assert(mof.size() == mof_names().size());
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             scalar_fits.push_back(scalarize_fitness(mof));
             if (least_scalar_fitness > scalar_fits.back())
             {
@@ -863,18 +279,7 @@ inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = fal
             }
         }
     };
-    
-//    #if 0
-//        // Do simulation runs sequentially.
-//        for (int r = 0; r < runs; r++) { do_1_run(); }
-//    #else
-//        // Do each simulation run in a parallel thread.
-//        std::vector<std::thread> threads;
-//        for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
-//        // Wait for helper threads to finish, join them with this thread.
-//        for (auto& t : threads) { t.join(); }
-//    #endif
-    
+        
     if (EF::enable_multithreading)
     {
         // Do each simulation run in a parallel thread.
@@ -897,38 +302,9 @@ inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = fal
     return least_mof;
 }
 
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240619 WIP first GP_not_GA run
-
-
-//    // Fitness function, runs a flock simulation using evolved tree for steering
-//    inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
-//    {
-//        //    return std::any_cast<MOF>(individual->tree().getRootValue());
-//
-//
-//        // This needs to make a lambda which executes the tree to get a steering vector.
-//
-//        // That lambda needs to be plugged in to Boid (or probably Flock) so it is
-//        // invoked each step for each boid to steer it.
-//
-//        // The lambda need to somehow de-cache its previous "root value" each time.
-//
-//
-//
-//        //    auto fitness = run_gp_flock_simulation(individual);
-//        //    return std::any(fitness);
-//
-//        return run_gp_flock_simulation(individual);
-//
-//    }
-
-
 // TODO 20240622 just temporary for debugging
 std::map<LP::Individual*, Vec3> values_of_individuals;
 std::map<LP::Individual*, LP::GpTree> trees_of_individuals;
-
 
 inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
 {
@@ -945,16 +321,12 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
         // These steps can happen in parallel threads:
         Flock flock;
         init_flock(flock);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO for simplicity, change get/setSaveBoidCenters() to be static
-//        flock.setSaveBoidCenters(write_file);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240627 trying to reenable multi threading
-        
-//        LP::GpTree gp_tree;
-//        gp_tree = individual->tree();
+        // TODO 20240627 it would be nice to not have to duplicate tree for each
+        //               boid on every simulation step.
+        //
+        // LP::GpTree gp_tree;
+        // gp_tree = individual->tree();
 
         flock.override_steer_function = [&]()
         {
@@ -967,19 +339,13 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
             if (steering.length() < min_steering_length) { steering = Vec3(); }
             return steering;
         };
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         flock.run();
         MOF mof = multiObjectiveFitnessOfFlock(flock);
         // These steps happen in the single thread with lock on save_mof_mutex.
         {
             std::lock_guard<std::mutex> smm(save_mof_mutex);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240706 make global variable GP::mof_names into a function.
-//            assert(mof.size() == mof_names.size());
             assert(mof.size() == mof_names().size());
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             scalar_fits.push_back(scalarize_fitness(mof));
             if (least_scalar_fitness > scalar_fits.back())
             {
@@ -989,21 +355,7 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
         }
     };
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20240707 global switch to enable threads EF::enable_multithreading
-
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20240627 trying to reenable multi threading
-//
-//        bool multi_threaded = true;
-//    //    bool multi_threaded = false;
-//
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//        if (multi_threaded)
-
     if (EF::enable_multithreading)
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     {
         // Do each simulation run in a parallel thread.
         std::vector<std::thread> threads;
@@ -1025,9 +377,6 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
     return least_mof;
     
 }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
 inline MOF run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
@@ -1242,23 +591,8 @@ void save_fitness_time_series(LP::Population& population)
 
 Boid* getGpBoidNeighbor(int n)
 {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240625 chasing down:
-    // "terminating due to uncaught exception of type std::length_error: vector"
-    
-//    debugPrint(Boid::getGpPerThread())
-//    debugPrint(Boid::getGpPerThread()->cached_nearest_neighbors().size())
-
     assert(Boid::getGpPerThread());
-//    assert(Boid::getGpPerThread()->cached_nearest_neighbors().size() == 7);
-
-    size_t s = Boid::getGpPerThread()->cached_nearest_neighbors().size();
-    if (s != 7)
-    {
-        debugPrint(Boid::getGpPerThread()->cached_nearest_neighbors().size())
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    assert(Boid::getGpPerThread()->cached_nearest_neighbors().size() == 7);
     BoidPtrList neighbors = Boid::getGpPerThread()->cached_nearest_neighbors();
     assert(neighbors.size() >= n);
     return neighbors.at(n - 1);
@@ -1561,11 +895,9 @@ LP::FunctionSet evoflock_gp_function_set()
             
             
             {
-//                "Avoid_Obstacle", "Vec3", {"Scalar_100"},
                 "Avoid_Obstacle", "Vec3", {},
                 [](LP::GpTree& tree)
                 {
-//                    double min_dist = tree.evalSubtree<double>(0);
                     double min_dist = 25;
                     Boid& boid = *Boid::getGpPerThread();
                     Vec3 avoidance;
@@ -1584,16 +916,6 @@ LP::FunctionSet evoflock_gp_function_set()
                     return std::any(avoidance);
                 }
             },
-
-//            {
-//                "Neighbor_1_Offset", "Vec3", {},
-//                [](LP::GpTree& t)
-//                {
-//                    return std::any(getGpBoidNeighbor(1)->position() -
-//                                    Boid::getGpPerThread()->position());
-//                }
-//            },
-
             {
                 "Adjust_Neighbor_Dist", "Vec3", {},
                 [](LP::GpTree& tree)

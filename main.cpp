@@ -535,6 +535,11 @@ int main(int argc, const char * argv[])
 //        return EXIT_SUCCESS;
 
     //--------------------------------------------------------------------------
+    
+//    GP::evoflock_gp_function_set().print_typical_trees(10, 30, 50);
+//    return EXIT_SUCCESS;
+    
+    //--------------------------------------------------------------------------
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20240723 going back to GA to make sure that still works.
@@ -544,6 +549,11 @@ int main(int argc, const char * argv[])
     Boid::GP_not_GA = true;
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 202400807 why are obstacles ignored?
+    EF::enable_multithreading = false;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20240713 experiment with increasing initial tree size.

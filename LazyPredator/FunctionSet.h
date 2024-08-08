@@ -556,6 +556,23 @@ public:
         return crossover_function_hook_;
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240808 utility to print "typical" trees from this FS.
+    
+    // Utility to print "typical" trees from this FS, to help inspect/debug.
+    void print_typical_trees() { print_typical_trees(5, 10, 20); }
+    void print_typical_trees(int n, int min_size, int max_size)
+    {
+        for (int i = 0; i < n; i++)
+        {
+            GpTree gp_tree = newMakeRandomTree(min_size, max_size);
+            debugPrint(gp_tree.size());
+            std::cout << gp_tree.to_string(true) << std::endl << std::endl;
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 private:
     // These maps are used both to store the GpType and GpFunction objects,
     // plus to look up those objects from their character string names.

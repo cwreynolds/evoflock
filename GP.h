@@ -47,8 +47,6 @@ inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
     return run_gp_flock_simulation(individual);
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 // Take the minimum element of a MultiObjectiveFitness ("Shangian scalarizer").
 inline double scalarize_fitness_min(MOF mof) { return mof.min(); }
@@ -672,14 +670,14 @@ LP::FunctionSet evoflock_gp_function_set()
                     return std::any(clean_num(std::pow(base, expt)));
                 }
             },
-//            {
-//                "Abs", "Scalar_100", {"Scalar_100"},
-//                [](LP::GpTree& tree)
-//                {
-//                    double x = tree.evalSubtree<double>(0);
-//                    return std::any(clean_num(std::abs(x)));
-//                }
-//            },
+            {
+                "Abs", "Scalar_100", {"Scalar_100"},
+                [](LP::GpTree& tree)
+                {
+                    double x = tree.evalSubtree<double>(0);
+                    return std::any(clean_num(std::abs(x)));
+                }
+            },
 
             // Vector functions:
             {
@@ -748,16 +746,16 @@ LP::FunctionSet evoflock_gp_function_set()
                                               tree.evalSubtree<Vec3>(1)));
                 }
             },
-//            {
-//                "Parallel_Component", "Vec3", {"Vec3", "Vec3"},
-//                [](LP::GpTree& tree)
-//                {
-//                    Vec3 value = tree.evalSubtree<Vec3>(0);
-//                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
-//                    Vec3 unit_basis = ensure_unit_length(basis);
-//                    return std::any(value.parallel_component(unit_basis));
-//                }
-//            },
+            {
+                "Parallel_Component", "Vec3", {"Vec3", "Vec3"},
+                [](LP::GpTree& tree)
+                {
+                    Vec3 value = tree.evalSubtree<Vec3>(0);
+                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
+                    Vec3 unit_basis = ensure_unit_length(basis);
+                    return std::any(value.parallel_component(unit_basis));
+                }
+            },
             {
                 "Perpendicular_Component", "Vec3", {"Vec3", "Vec3"},
                 [](LP::GpTree& tree)
@@ -825,38 +823,38 @@ LP::FunctionSet evoflock_gp_function_set()
                 }
             },
 
-//            {
-//                "Neighbor_2_Velocity", "Vec3", {},
-//                [](LP::GpTree& t)
-//                {
-//                    return std::any(getGpBoidNeighbor(2)->velocity());
-//                    
-//                }
-//            },
-//            {
-//                "Neighbor_2_Offset", "Vec3", {},
-//                [](LP::GpTree& t)
-//                {
-//                    return std::any(getGpBoidNeighbor(2)->position() -
-//                                    Boid::getGpPerThread()->position());
-//                }
-//            },
-//            {
-//                "Neighbor_3_Velocity", "Vec3", {},
-//                [](LP::GpTree& t)
-//                {
-//                    return std::any(getGpBoidNeighbor(3)->velocity());
-//                    
-//                }
-//            },
-//            {
-//                "Neighbor_3_Offset", "Vec3", {},
-//                [](LP::GpTree& t)
-//                {
-//                    return std::any(getGpBoidNeighbor(3)->position() -
-//                                    Boid::getGpPerThread()->position());
-//                }
-//            },
+            {
+                "Neighbor_2_Velocity", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+                    return std::any(getGpBoidNeighbor(2)->velocity());
+                    
+                }
+            },
+            {
+                "Neighbor_2_Offset", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+                    return std::any(getGpBoidNeighbor(2)->position() -
+                                    Boid::getGpPerThread()->position());
+                }
+            },
+            {
+                "Neighbor_3_Velocity", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+                    return std::any(getGpBoidNeighbor(3)->velocity());
+                    
+                }
+            },
+            {
+                "Neighbor_3_Offset", "Vec3", {},
+                [](LP::GpTree& t)
+                {
+                    return std::any(getGpBoidNeighbor(3)->position() -
+                                    Boid::getGpPerThread()->position());
+                }
+            },
             {
                 "First_Obs_Dist", "Scalar_100", {},
                 [](LP::GpTree& t)
@@ -894,42 +892,42 @@ LP::FunctionSet evoflock_gp_function_set()
             // simulate "seeding" population with handwritten steering program.
             
             
-            {
-                "Avoid_Obstacle", "Vec3", {},
-                [](LP::GpTree& tree)
-                {
-                    double min_dist = 25;
-                    Boid& boid = *Boid::getGpPerThread();
-                    Vec3 avoidance;
-                    auto collisions = boid.get_predicted_obstacle_collisions();
-                    if (collisions.size() > 0)
-                    {
-                        const Collision& first_collision = collisions.front();
-                        Vec3 poi = first_collision.point_of_impact;
-                        double distance = (poi - boid.position()).length();
-                        if (distance > min_dist)
-                        {
-                            Vec3 normal = first_collision.normal_at_poi;
-                            avoidance = normal.parallel_component(boid.forward());
-                        }
-                    }
-                    return std::any(avoidance);
-                }
-            },
-            {
-                "Adjust_Neighbor_Dist", "Vec3", {},
-                [](LP::GpTree& tree)
-                {
-                    Vec3 steering;
-                    Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
-                                            Boid::getGpPerThread()->position());
-                    double neighbor_dist = neighbor_offset.length();
-                    Vec3 neighbor_direction = neighbor_offset / neighbor_dist;
-                    if (neighbor_dist < 2) { steering = neighbor_direction; }
-                    if (neighbor_dist > 9) { steering = -neighbor_direction; }
-                    return std::any(steering * 10);
-                }
-            },
+//            {
+//                "Avoid_Obstacle", "Vec3", {},
+//                [](LP::GpTree& tree)
+//                {
+//                    double min_dist = 25;
+//                    Boid& boid = *Boid::getGpPerThread();
+//                    Vec3 avoidance;
+//                    auto collisions = boid.get_predicted_obstacle_collisions();
+//                    if (collisions.size() > 0)
+//                    {
+//                        const Collision& first_collision = collisions.front();
+//                        Vec3 poi = first_collision.point_of_impact;
+//                        double distance = (poi - boid.position()).length();
+//                        if (distance > min_dist)
+//                        {
+//                            Vec3 normal = first_collision.normal_at_poi;
+//                            avoidance = normal.parallel_component(boid.forward());
+//                        }
+//                    }
+//                    return std::any(avoidance);
+//                }
+//            },
+//            {
+//                "Adjust_Neighbor_Dist", "Vec3", {},
+//                [](LP::GpTree& tree)
+//                {
+//                    Vec3 steering;
+//                    Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
+//                                            Boid::getGpPerThread()->position());
+//                    double neighbor_dist = neighbor_offset.length();
+//                    Vec3 neighbor_direction = neighbor_offset / neighbor_dist;
+//                    if (neighbor_dist < 2) { steering = neighbor_direction; }
+//                    if (neighbor_dist > 9) { steering = -neighbor_direction; }
+//                    return std::any(steering * 10);
+//                }
+//            },
 
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }

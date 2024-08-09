@@ -862,9 +862,21 @@ LP::FunctionSet evoflock_gp_function_set()
                     Boid& boid = *Boid::getGpPerThread();
                     double distance = std::numeric_limits<double>::infinity();
                     auto collisions = boid.get_predicted_obstacle_collisions();
+                    
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TOODO 20240809 why is obstacle avoidance broken?
+                    assert(not collisions.empty());
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    
                     if (collisions.size() > 0)
                     {
                         const Collision& first_collision = collisions.front();
+                        
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        // TOODO 20240809 why is obstacle avoidance broken?
+                        debugPrint(first_collision)
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        
                         Vec3 poi = first_collision.point_of_impact;
                         distance = (poi - boid.position()).length();
                     }
@@ -878,11 +890,23 @@ LP::FunctionSet evoflock_gp_function_set()
                     Boid& boid = *Boid::getGpPerThread();
                     Vec3 normal;
                     auto collisions = boid.get_predicted_obstacle_collisions();
+                    
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TOODO 20240809 why is obstacle avoidance broken?
+                    assert(not collisions.empty());
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    
                     if (collisions.size() > 0)
                     {
                         const Collision& first_collision = collisions.front();
+                        
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        // TOODO 20240809 why is obstacle avoidance broken?
+                        debugPrint(first_collision)
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        
                         normal = first_collision.normal_at_poi;
-                    }
+                }
                     return std::any(normal);
                 }
             },
@@ -1082,12 +1106,22 @@ LP::FunctionSet test_gp_boid_function_set()
                 [](LP::GpTree& tree)
                 {
                     Vec3 avoidance;
-                    Boid& boid = *Boid::getGpPerThread();
                     double min_dist = 25;
+                    Boid& boid = *Boid::getGpPerThread();
                     auto collisions = boid.get_predicted_obstacle_collisions();
                     if (collisions.size() > 0)
                     {
                         const Collision& first_collision = collisions.front();
+                        
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        // TOODO 20240809 why is obstacle avoidance broken?
+//                        debugPrint(first_collision)
+                        if (boid.is_first_boid())
+                        {
+                            std::cout << first_collision << std::endl;
+                        }
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        
                         Vec3 poi = first_collision.point_of_impact;
                         double distance = (poi - boid.position()).length();
                         if (distance > min_dist)

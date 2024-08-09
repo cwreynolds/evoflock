@@ -413,8 +413,32 @@ public:
     double dist_to_collision;
     Vec3 point_of_impact;
     Vec3 normal_at_poi;
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TOODO 20240809 why is obstacle avoidance broken?
+    std::string to_string() const
+    {
+        std::stringstream ss;
+        ss << "Collision(" << "obs=" << obstacle->to_string();
+        ss << ", time=" << time_to_collision;
+        ss << ", dist=" << dist_to_collision;
+        ss << ", poi=" << point_of_impact;
+        ss << ", norm=" << normal_at_poi << ")";
+        return ss.str();
+    }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 };
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TOODO 20240809 why is obstacle avoidance broken?
+
+// Serialize Collision object to stream.
+inline std::ostream& operator<<(std::ostream& os, const Collision& c)
+{
+    os << c.to_string();
+    return os;
+}
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 inline void Obstacle::unit_test()
 {

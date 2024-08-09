@@ -296,6 +296,35 @@ public:
 //        std::cout << std::endl;
 //    }
 
+//    // Basic flocking behavior. Computes steering force for one simulation step
+//    // (an animation frame) for one boid in a flock.
+//    Vec3 steer_to_flock(double time_step)
+//    {
+//        BoidPtrList neighbors = nearest_neighbors();
+//        flush_cache_of_predicted_obstacle_collisions();
+//
+//        if (GP_not_GA and override_steer_function)
+//        {
+//            assert(override_steer_function);
+//            setGpPerThread(this);
+//            Vec3 steering_from_evolved_function = override_steer_function();
+//            setGpPerThread(nullptr);
+//            return steering_from_evolved_function;
+//        }
+//        else
+//        {
+//            Vec3 f = forward() * fp().weight_forward;
+//            Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
+//            Vec3 a = steer_to_align(neighbors) * fp().weight_align;
+//            Vec3 c = steer_to_cohere(neighbors) * fp().weight_cohere;
+//            Vec3 o = steer_to_avoid() * fp().weight_avoid;
+//            Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
+//            combined_steering = anti_stall_adjustment(combined_steering);
+//            annotation(s, a, c, o, combined_steering);
+//            return combined_steering;
+//        }
+//    }
+
     // Basic flocking behavior. Computes steering force for one simulation step
     // (an animation frame) for one boid in a flock.
     Vec3 steer_to_flock(double time_step)
@@ -305,7 +334,9 @@ public:
 
         if (GP_not_GA and override_steer_function)
         {
+            // TODO seems redundant, both here and in the IF
             assert(override_steer_function);
+            
             setGpPerThread(this);
             Vec3 steering_from_evolved_function = override_steer_function();
             setGpPerThread(nullptr);

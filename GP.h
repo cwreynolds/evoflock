@@ -902,7 +902,12 @@ LP::FunctionSet evoflock_gp_function_set()
                         
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                         // TOODO 20240809 why is obstacle avoidance broken?
-                        debugPrint(first_collision)
+//                        debugPrint(first_collision)
+                        
+                        debugPrint(Draw().frame_counter())
+                        bool log = (boid.is_first_boid() and
+                                    ((Draw().frame_counter() % 100) == 0));
+                        if (log) { debugPrint(first_collision) }
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                         
                         normal = first_collision.normal_at_poi;
@@ -1116,10 +1121,20 @@ LP::FunctionSet test_gp_boid_function_set()
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                         // TOODO 20240809 why is obstacle avoidance broken?
 //                        debugPrint(first_collision)
-                        if (boid.is_first_boid())
+//                        if (boid.is_first_boid())
+//                        {
+//                            std::cout << first_collision << std::endl;
+//                        }
+                        
+                        
+//                        debugPrint(Draw().frame_counter())
+                        if (boid.is_first_boid() and
+                            ((Draw().frame_counter() % 100) == 0))
                         {
-                            std::cout << first_collision << std::endl;
+                            debugPrint(Draw().frame_counter())
+                            debugPrint(first_collision)
                         }
+
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                         
                         Vec3 poi = first_collision.point_of_impact;

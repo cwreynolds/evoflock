@@ -616,10 +616,16 @@ int main(int argc, const char * argv[])
 //    int subpops = 45;
 //    int max_evolution_steps = Boid::GP_not_GA ? 120000 : 30000;
 
-    // 20240730
+//    // 20240730
+//    int individuals = 500;
+//    int subpops = 22;
+//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
+
+    // 20240810
     int individuals = 500;
     int subpops = 22;
-    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
+//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
+    int max_evolution_steps = Boid::GP_not_GA ? 20 : 30000;
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         

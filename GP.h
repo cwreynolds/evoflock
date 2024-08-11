@@ -1095,15 +1095,122 @@ LP::FunctionSet evoflock_gp_function_set()
 //    }
 
 
+//    // TODO just laying out a hand-tuned boid behavior
+//    LP::FunctionSet test_gp_boid_function_set()
+//    {
+//        return
+//        {
+//            // GpTypes
+//            {
+//                { "Vec3" },
+//            },
+//            // GpFunctions
+//            {
+//                {
+//                    "Be_The_Boid", "Vec3", {},
+//                    [](LP::GpTree& tree)
+//                    {
+//                        Vec3 avoidance;
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                        // TOODO 20240809 why is obstacle avoidance broken?
+//
+//    //                    double min_dist = 25;
+//    //                    Boid& boid = *Boid::getGpPerThread();
+//                        Boid& boid = *Boid::getGpPerThread();
+//
+//                        double min_dist = boid.speed() * boid.fp().min_time_to_collide;
+//
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                        auto collisions = boid.get_predicted_obstacle_collisions();
+//                        if (collisions.size() > 0)
+//                        {
+//                            const Collision& first_collision = collisions.front();
+//                            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                            // TOODO 20240809 why is obstacle avoidance broken?
+//    //                        Vec3 poi = first_collision.point_of_impact;
+//    //                        double distance = (poi - boid.position()).length();
+//    //                        if (distance > min_dist)
+//                            if (first_collision.dist_to_collision > min_dist)
+//                            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                            {
+//                                avoidance = first_collision.normal_at_poi;
+//                            }
+//                            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                            // TOODO 20240809 why is obstacle avoidance broken?
+//
+//                            //-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+//                            // TODO 20240810 weird time issue in GP mode?
+//                            if (boid.is_first_boid() and
+//                                ((boid.draw().frame_counter() % 20) == 0))
+//                            {
+//                                Vec3 f = boid.forward();
+//                                Vec3 lat_avoid = avoidance.perpendicular_component(f);
+//
+//
+//    //                            if (not (lat_avoid.is_zero_length() or
+//    //                                     lat_avoid.is_perpendicular(f)))
+//    //                            {
+//    //                                debugPrint(f)
+//    //                                debugPrint(lat_avoid)
+//    //                            }
+//                                debugPrint(f)
+//    //                            debugPrint(f.length())
+//                                debugPrint(lat_avoid)
+//    //                            debugPrint(lat_avoid.length())
+//
+//                                assert(lat_avoid.is_zero_length() or
+//                                       lat_avoid.normalize().is_perpendicular(f, 0.0001));
+//
+//    //                            Vec3 local_lat_avoid = boid.ls().localize(lat_avoid);
+//                                debugPrint(first_collision)
+//                                std::cout << boid.draw().frame_counter() << ": ";
+//    //                            std::cout << local_lat_avoid.normalize_or_0();
+//    //                            std::cout << std::endl;
+//    //                            debugPrint(local_lat_avoid.normalize_or_0())
+//
+//                                Vec3 local_lat_avoid = boid.ls().localize(lat_avoid + boid.position());
+//                                debugPrint(local_lat_avoid)
+//                            }
+//                            //-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+//
+//                            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                        }
+//                        Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
+//                                                Boid::getGpPerThread()->position());
+//                        double neighbor_dist = neighbor_offset.length();
+//                        Vec3 neighbor_direction = neighbor_offset / neighbor_dist;
+//
+//                        double weight = 0;
+//                        if (neighbor_dist < 2) { weight = -1; }
+//                        if (neighbor_dist > 5) { weight = +1; }
+//                        Vec3 neighbor_dist_adjust = neighbor_direction * weight;
+//
+//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                        // TODO 20240811 use had selection when avoidance needed
+//
+//    //                    // TODO later try hard selection
+//    //                    Vec3 steer = avoidance + neighbor_dist_adjust;
+//
+//                        Vec3 steer = (avoidance.is_zero_length() ?
+//                                      neighbor_dist_adjust :
+//                                      avoidance);
+//
+//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                        Vec3 lateral = steer.perpendicular_component(boid.forward());
+//                        return std::any(lateral * 10);
+//                    }
+//                },
+//            }
+//        };
+//    }
+
 // TODO just laying out a hand-tuned boid behavior
 LP::FunctionSet test_gp_boid_function_set()
 {
     return
     {
         // GpTypes
-        {
-            { "Vec3" },
-        },
+        { { "Vec3" }, },
         // GpFunctions
         {
             {
@@ -1111,52 +1218,52 @@ LP::FunctionSet test_gp_boid_function_set()
                 [](LP::GpTree& tree)
                 {
                     Vec3 avoidance;
-                    double min_dist = 25;
                     Boid& boid = *Boid::getGpPerThread();
+                    
+                    // Steer to avoid obstacles.
+                    double min_dist = boid.speed() * boid.fp().min_time_to_collide;
                     auto collisions = boid.get_predicted_obstacle_collisions();
                     if (collisions.size() > 0)
                     {
                         const Collision& first_collision = collisions.front();
-                        
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        // TOODO 20240809 why is obstacle avoidance broken?
-//                        debugPrint(first_collision)
-//                        if (boid.is_first_boid())
-//                        {
-//                            std::cout << first_collision << std::endl;
-//                        }
-                        
-                        
-//                        debugPrint(Draw().frame_counter())
-                        if (boid.is_first_boid() and
-                            ((Draw().frame_counter() % 100) == 0))
-                        {
-                            debugPrint(Draw().frame_counter())
-                            debugPrint(first_collision)
-                        }
-
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        
-                        Vec3 poi = first_collision.point_of_impact;
-                        double distance = (poi - boid.position()).length();
-                        if (distance > min_dist)
+                        if (first_collision.dist_to_collision < min_dist)
                         {
                             avoidance = first_collision.normal_at_poi;
                         }
                     }
+                    
+                    // Steer to adjust neighbor offset.
                     Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
                                             Boid::getGpPerThread()->position());
                     double neighbor_dist = neighbor_offset.length();
                     Vec3 neighbor_direction = neighbor_offset / neighbor_dist;
-                    
                     double weight = 0;
                     if (neighbor_dist < 2) { weight = -1; }
                     if (neighbor_dist > 5) { weight = +1; }
                     Vec3 neighbor_dist_adjust = neighbor_direction * weight;
-                                                 
-                    // TODO later try hard selection
-                    Vec3 steer = avoidance + neighbor_dist_adjust;
+
+                    Vec3 steer = (avoidance.is_zero_length() ?
+                                  neighbor_dist_adjust :
+                                  avoidance);
+
+                    Vec3 f = boid.forward();
                     Vec3 lateral = steer.perpendicular_component(boid.forward());
+                    lateral = lateral.normalize_or_0();
+
+                    // temp:
+                    double e = 0.0001;
+                    if (not lateral.is_zero_length())
+                    {
+                        assert(lateral.is_perpendicular(f, e));
+                    }
+                    // temp:
+                    if (boid.is_first_boid() and
+                        ((boid.draw().frame_counter() % 20) == 0))
+                    {
+                        std::cout << boid.draw().frame_counter() << ": ";
+                        debugPrint(lateral)
+                    }
+
                     return std::any(lateral * 10);
                 }
             },

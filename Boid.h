@@ -413,8 +413,8 @@ public:
 
     // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
     // (I will collide with obstacle within min_time_to_collide seconds)
-    // and "static" avoidance (I should fly away from this obstacle, for everted
-    // containment obstacles).
+    // and "static" avoidance (I should fly away from this obstacle to add
+    // clearance, to avoid scraping along everted containment obstacles).
     Vec3 steer_to_avoid()
     {
         Vec3 avoid;

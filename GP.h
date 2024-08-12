@@ -1226,11 +1226,16 @@ LP::FunctionSet test_gp_boid_function_set()
                     if (collisions.size() > 0)
                     {
                         const Collision& first_collision = collisions.front();
-                        if (first_collision.dist_to_collision < min_dist)
+                        if (min_dist > first_collision.dist_to_collision)
                         {
                             avoidance = first_collision.normal_at_poi;
                         }
                     }
+                                        
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // VERY temp experiment
+//                    avoidance = boid.steer_to_avoid();
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     
                     // Steer to adjust neighbor offset.
                     Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
@@ -1260,11 +1265,17 @@ LP::FunctionSet test_gp_boid_function_set()
                     if (boid.is_first_boid() and
                         ((boid.draw().frame_counter() % 20) == 0))
                     {
+                        if (collisions.size() > 0)
+                        {
+                            std::cout << boid.draw().frame_counter() << ": ";
+                            debugPrint(collisions.front())
+                        }
                         std::cout << boid.draw().frame_counter() << ": ";
                         debugPrint(lateral)
                     }
 
-                    return std::any(lateral * 10);
+//                    return std::any(lateral * 10);
+                    return std::any(lateral * 100);
                 }
             },
         }

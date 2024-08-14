@@ -546,13 +546,17 @@ int main(int argc, const char * argv[])
 //    Boid::GP_not_GA = false;
 //    Boid::GP_not_GA = true;
 //    Boid::GP_not_GA = false;
-    Boid::GP_not_GA = true;
+//    Boid::GP_not_GA = true;
+    // 20240813
+    Boid::GP_not_GA = false;
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     
     
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 202400807 why are obstacles ignored?
-    EF::enable_multithreading = false;
+//    EF::enable_multithreading = false;
+    // 20240813
+    EF::enable_multithreading = true;
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~

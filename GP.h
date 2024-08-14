@@ -90,14 +90,20 @@ inline std::vector<std::string> mof_names()
                                          "separate",
                                          "cohere",
                                          "cluster",
-                                         "occupied"
+                                         "occupied",
 
                                      }) :
             std::vector<std::string>(
                                      {
-                                         "separate",
+                                         // 20240813:
+//                                         "separate",
+//                                         "avoid",
+//                                         "cohere",
                                          "avoid",
+                                         "separate",
                                          "cohere",
+                                         "cluster",
+                                         "occupied",
                                      }));
 }
 
@@ -129,13 +135,19 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
                 }) :
             MOF(
                 {
-                    // 20240723
-                    separate,
+//                    // 20240723
+//                    separate,
+//                    avoid,
+//                    cohere,
+//                    // cluster,
+//                    // curvature,
+//                    // occupy,
+                    // 20240813:
                     avoid,
+                    separate,
                     cohere,
-                    // cluster,
-                    // curvature,
-                    // occupy,
+                    cluster,
+                    occupy,
                 })
             );
 }

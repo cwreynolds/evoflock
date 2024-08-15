@@ -204,7 +204,7 @@ public:
         steer(next_steer_, time_step);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240723 try forcing speed to be 20 m/s.
-        if (GP_not_GA) { setSpeed(20); }  // TODO very ad hoc!
+//        if (GP_not_GA) { setSpeed(20); }  // TODO very ad hoc!
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     

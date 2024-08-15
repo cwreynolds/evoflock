@@ -1253,15 +1253,37 @@ LP::FunctionSet test_gp_boid_function_set()
                     Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
                                             Boid::getGpPerThread()->position());
                     double neighbor_dist = neighbor_offset.length();
-                    Vec3 neighbor_direction = neighbor_offset / neighbor_dist;
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // VERY temp experiment
+//                    Vec3 neighbor_direction = neighbor_offset / neighbor_dist;
+                    Vec3 neighbor_direction;
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     double weight = 0;
                     if (neighbor_dist < 2) { weight = -1; }
                     if (neighbor_dist > 5) { weight = +1; }
                     Vec3 neighbor_dist_adjust = neighbor_direction * weight;
+                    
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20240814 adjust speed
+                    Vec3 speed_adjust;
+                    Vec3 forward_weighted = boid.forward() * 0.5;
+//                    if (boid.speed() < 18) { speed_adjust = forward_weighted; }
+//                    if (boid.speed() > 22) { speed_adjust = -forward_weighted; }
+                    if (boid.speed() < 16) { speed_adjust = forward_weighted; }
+                    if (boid.speed() > 24) { speed_adjust = -forward_weighted; }
+
+
+//                    Vec3 steer = (avoidance.is_zero_length() ?
+//                                  neighbor_dist_adjust :
+//                                  avoidance);
+                    
+//                    steer += speed_adjust;
 
                     Vec3 steer = (avoidance.is_zero_length() ?
-                                  neighbor_dist_adjust :
+                                  (neighbor_dist_adjust + speed_adjust) :
                                   avoidance);
+
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
                     Vec3 f = boid.forward();
                     Vec3 lateral = steer.perpendicular_component(boid.forward());
@@ -1283,11 +1305,13 @@ LP::FunctionSet test_gp_boid_function_set()
                             debugPrint(collisions.front())
                         }
                         std::cout << boid.draw().frame_counter() << ": ";
-                        debugPrint(lateral)
+//                        debugPrint(lateral)
+                        debugPrint(steer)
                     }
 
 //                    return std::any(lateral * 10);
-                    return std::any(lateral * 100);
+//                    return std::any(lateral * 100);
+                    return std::any(steer * 100);
                 }
             },
         }

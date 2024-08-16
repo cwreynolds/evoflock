@@ -1311,7 +1311,13 @@ LP::FunctionSet test_gp_boid_function_set()
 
 //                    return std::any(lateral * 10);
 //                    return std::any(lateral * 100);
-                    return std::any(steer * 100);
+//                    return std::any(steer * 100);
+                    
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20240816 VERY temp experiment
+                    return std::any(boid.pre_GP_steer_to_flock());
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                 }
             },
         }

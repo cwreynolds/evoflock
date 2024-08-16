@@ -356,6 +356,29 @@ public:
         }
     }
 
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20240816 VERY temp experiment
+    
+    
+    Vec3 pre_GP_steer_to_flock()
+    {
+        BoidPtrList neighbors = nearest_neighbors();
+        flush_cache_of_predicted_obstacle_collisions();
+
+        Vec3 f = forward() * fp().weight_forward;
+        Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
+        Vec3 a = steer_to_align(neighbors) * fp().weight_align;
+        Vec3 c = steer_to_cohere(neighbors) * fp().weight_cohere;
+        Vec3 o = steer_to_avoid() * fp().weight_avoid;
+        Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
+        combined_steering = anti_stall_adjustment(combined_steering);
+        annotation(s, a, c, o, combined_steering);
+        return combined_steering;
+    }
+
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Steering force component to move away from neighbors.

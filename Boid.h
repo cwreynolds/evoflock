@@ -193,19 +193,15 @@ public:
     }
 
     // Determine and store desired steering for this simulation step
-    void plan_next_steer(double time_step)
+    void plan_next_steer()
     {
-        next_steer_ = steer_to_flock(time_step);
+        next_steer_ = steer_to_flock();
     }
 
     // Apply desired steering for this simulation step
     void apply_next_steer(double time_step)
     {
         steer(next_steer_, time_step);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240723 try forcing speed to be 20 m/s.
-//        if (GP_not_GA) { setSpeed(20); }  // TODO very ad hoc!
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -327,7 +323,7 @@ public:
 
     // Basic flocking behavior. Computes steering force for one simulation step
     // (an animation frame) for one boid in a flock.
-    Vec3 steer_to_flock(double time_step)
+    Vec3 steer_to_flock()
     {
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();

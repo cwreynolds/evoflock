@@ -295,7 +295,7 @@ public:
     // (20240605 renamed  Flock::fly_flock() to Flock::fly_boids())
     void fly_boids(double time_step)
     {
-        for_all_boids([&](Boid* b){ b->plan_next_steer(time_step);});
+        for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         collect_flock_metrics();
     }

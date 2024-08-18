@@ -645,15 +645,15 @@ static void unit_test()
         {
             int individual_count = 100;
             Population p(individual_count, 2, 20, fs);
-            float sum1 = 0;
-            float sum2 = 0;
+            int sum1 = 0;
+            int sum2 = 0;
             p.applyToAllIndividuals([&](Individual* i){sum1+=(i->tree().size());});
             for (int i = 0; i < p.getSubpopulationCount(); i++)
             {
                 for (auto& j : p.subpopulation(i)) { sum2 += j->tree().size(); }
             }
-            float average_tree_size_1 = sum1 / p.getIndividualCount();
-            float average_tree_size_2 = sum2 / p.getIndividualCount();
+            int average_tree_size_1 = sum1 / p.getIndividualCount();
+            int average_tree_size_2 = sum2 / p.getIndividualCount();
             ok = ok && st(p.averageTreeSize() == average_tree_size_1);
             ok = ok && st(p.averageTreeSize() == average_tree_size_2);
         }
@@ -683,10 +683,7 @@ static void unit_test()
         }
         // Make sure all of the Individuals have been properly cleaned up.
         ok = ok && st(Individual::getLeakCount() == 0);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240709 why so few (none?) Scalar_100 ephemeral constants?
-//        assert(ok && maybe_log("subpopulation_and_stats"));
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        assert(ok && maybe_log("subpopulation_and_stats"));
     }
     
     // subpopulation_migration

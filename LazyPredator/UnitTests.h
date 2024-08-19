@@ -504,8 +504,8 @@ static void unit_test()
             }
             return count;
         };
-        // Used during random tree creation: filter list of candidate functions to
-        // use only those whose initial letter matching "filter_string";
+        // Used during random tree creation: filter list of candidate functions
+        // to use only those whose initial letter matching "filter_string";
         std::string filter_string;
         FunctionSet::function_filter = [&](std::vector<GpFunction*>& funcs)
         {
@@ -547,10 +547,7 @@ static void unit_test()
         //debugPrint(total_P)
         //debugPrint(total_Q)
         //debugPrint(p_to_q_ratio)
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240709 why so few (none?) Scalar_100 ephemeral constants?
-//        assert(ok && maybe_log("gp_tree_crossover"));
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        assert(ok && maybe_log("gp_tree_crossover"));
     }
 
     // gp_tree_utility

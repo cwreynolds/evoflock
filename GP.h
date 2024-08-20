@@ -581,7 +581,8 @@ void save_fitness_time_series(LP::Population& population)
 {
     int step_frequency = 300;
     static std::string pathname;
-    if (0 == population.getStepCount() % step_frequency)
+    int count = population.getStepCount();
+    if ((0 == count) or (0 == (count + 1) % step_frequency))
     {
         if (pathname.empty())
         {
@@ -591,7 +592,7 @@ void save_fitness_time_series(LP::Population& population)
             stream.close();
         }
         std::ofstream stream(pathname, std::ios_base::app);
-        stream << population.getStepCount() << ",";
+        stream << (count == 0 ? 0 : count + 1) << ",";
         stream << population.averageFitness() << ",";
         stream << population.bestFitness()->getFitness() << std::endl;
         stream.close();
@@ -1295,19 +1296,19 @@ LP::FunctionSet test_gp_boid_function_set()
                     {
                         assert(lateral.is_perpendicular(f, e));
                     }
-                    // temp:
-                    if (boid.is_first_boid() and
-                        ((boid.draw().frame_counter() % 20) == 0))
-                    {
-                        if (collisions.size() > 0)
-                        {
-                            std::cout << boid.draw().frame_counter() << ": ";
-                            debugPrint(collisions.front())
-                        }
-                        std::cout << boid.draw().frame_counter() << ": ";
-//                        debugPrint(lateral)
-                        debugPrint(steer)
-                    }
+//                        // temp:
+//                        if (boid.is_first_boid() and
+//                            ((boid.draw().frame_counter() % 20) == 0))
+//                        {
+//                            if (collisions.size() > 0)
+//                            {
+//                                std::cout << boid.draw().frame_counter() << ": ";
+//                                debugPrint(collisions.front())
+//                            }
+//                            std::cout << boid.draw().frame_counter() << ": ";
+//    //                        debugPrint(lateral)
+//                            debugPrint(steer)
+//                        }
 
 //                    return std::any(lateral * 10);
 //                    return std::any(lateral * 100);

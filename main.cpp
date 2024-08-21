@@ -10,9 +10,17 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240318 trying linking to Open3D 0.18.0
 
-// #define test_open3d
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20240318 trying linking to Open3D 0.18.0
+
+//#define test_open3d
+
 #ifdef test_open3d
 
+#define FMT_HEADER_ONLY
+#include <cstdlib>
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 #include "open3d/Open3D.h"
 
 using namespace open3d;

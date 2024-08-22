@@ -47,6 +47,7 @@
 		847454BE2B6195F000214306 /* obstacle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = obstacle.h; sourceTree = "<group>"; };
 		847454BF2B65BE9C00214306 /* Boid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Boid.h; sourceTree = "<group>"; };
 		848101F62C7666CA00433168 /* libOpen3D.0.18.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpen3D.0.18.0.dylib; path = "../open3d-devel-darwin-arm64-0.18.0+c219d82/lib/libOpen3D.0.18.0.dylib"; sourceTree = "<group>"; };
+		848101FB2C77B53E00433168 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		848BC33C2B69856700509CE5 /* flock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = flock.h; sourceTree = "<group>"; };
 		84A248392BE076450062EB95 /* dbscan.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dbscan.h; sourceTree = "<group>"; };
 		84A582972B5207000008CEE8 /* Agent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Agent.h; sourceTree = "<group>"; };
@@ -80,6 +81,7 @@
 				840B67B62B5C28D1008AE661 /* shape.h */,
 				841F3D642B4C73A500483276 /* Utilities.h */,
 				841F3D612B49EE6C00483276 /* Vec3.h */,
+				848101FB2C77B53E00433168 /* CMakeLists.txt */,
 				8413ADFC2B8AB10C006693A1 /* LazyPredator */,
 				841F3D562B49E90000483276 /* Products */,
 				848101F52C7666CA00433168 /* Frameworks */,

@@ -14,13 +14,14 @@
 // TODO 20240318 trying linking to Open3D 0.18.0
 
 //#define test_open3d
-
 #ifdef test_open3d
-
 #define FMT_HEADER_ONLY
-#include <cstdlib>
+
+// Test code: https://github.com/isl-org/Open3D/blob/main/examples/cpp/Draw.cpp
 
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+#include <cstdlib>
+
 #include "open3d/Open3D.h"
 
 using namespace open3d;
@@ -570,8 +571,12 @@ int main(int argc, const char * argv[])
 //    // 20240813
 //    EF::enable_multithreading = true;
 
-    // 20240814
-    EF::enable_multithreading = false;
+//    // 20240814
+//    EF::enable_multithreading = false;
+
+    // 20240822
+    EF::enable_multithreading = true;
+
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~

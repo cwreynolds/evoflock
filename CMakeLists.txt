@@ -1,0 +1,39 @@
+################################################################################
+#
+# evoflock cmake file
+# August 22, 2024
+# cwr
+#
+# See "cmake build of flock" in Notes app
+# See CMake Tutorial: https://cmake.org/cmake/help/latest/guide/tutorial/
+#
+################################################################################
+
+cmake_minimum_required(VERSION 3.10)
+
+# Project name and version.
+project(evoflock VERSION 0.0)
+
+# Specify which C++ standard
+#     Had been using 17 (for std::any), now 20 (for std::ranges).
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Specify compiler optimization level
+#     In Xcode I have been using the default: "-Os" meaning "Fastest, Smallest".
+add_compile_options(-O3)
+
+# Add source files to the executable
+add_executable(evoflock main.cpp)
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# For future use, toward linking with Open3D:
+#
+# # Find the external GLEW and GLFW packages.
+# find_package(GLFW3 REQUIRED)
+# find_package(GLEW REQUIRED)
+# 
+# # In target_link_libraries(): important to use "glfw" instead of "GLFW::glfw"
+# # as suggested by https://stackoverflow.com/q/68871506/1991373
+# target_link_libraries(flock glfw GLEW::glew)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

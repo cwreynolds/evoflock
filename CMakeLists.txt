@@ -1,6 +1,7 @@
 ################################################################################
 #
 # evoflock cmake file
+# CMakeLists.txt
 # August 22, 2024
 # cwr
 #
@@ -23,8 +24,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 #     In Xcode I have been using the default: "-Os" meaning "Fastest, Smallest".
 add_compile_options(-O3)
 
-# Add source files to the executable
-add_executable(evoflock main.cpp)
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # For future use, toward linking with Open3D:
@@ -37,3 +36,18 @@ add_executable(evoflock main.cpp)
 # # as suggested by https://stackoverflow.com/q/68871506/1991373
 # target_link_libraries(flock glfw GLEW::glew)
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Very ad hoc link to pre-release version from "main-devel"
+# (via https://github.com/isl-org/Open3D/releases/tag/main-devel)
+#
+# find_package(Open3D REQUIRED)
+find_package(Open3D REQUIRED PATHS
+             /Users/cwr/Documents/code/open3d-devel-darwin-arm64-0.18.0+c219d82)
+             
+# add_executable(Draw)
+# target_sources(Draw PRIVATE Draw.cpp)
+# target_link_libraries(Draw PRIVATE Open3D::Open3D)
+
+# Add source files to the executable
+add_executable(evoflock main.cpp)
+target_link_libraries(evoflock PRIVATE Open3D::Open3D)

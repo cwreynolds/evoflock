@@ -13,9 +13,12 @@
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 // TODO 20240318 trying linking to Open3D 0.18.0
 
-//#define test_open3d
+#define test_open3d
 #ifdef test_open3d
+
+#ifndef FMT_HEADER_ONLY
 #define FMT_HEADER_ONLY
+#endif
 
 // Test code: https://github.com/isl-org/Open3D/blob/main/examples/cpp/Draw.cpp
 

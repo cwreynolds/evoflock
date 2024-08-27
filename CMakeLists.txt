@@ -24,33 +24,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 #     In Xcode I have been using the default: "-Os" meaning "Fastest, Smallest".
 add_compile_options(-O3)
 
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# For future use, toward linking with Open3D:
-#
-# # Find the external GLEW and GLFW packages.
-# find_package(GLFW3 REQUIRED)
-# find_package(GLEW REQUIRED)
-# 
-# # In target_link_libraries(): important to use "glfw" instead of "GLFW::glfw"
-# # as suggested by https://stackoverflow.com/q/68871506/1991373
-# target_link_libraries(flock glfw GLEW::glew)
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-# Very ad hoc link to pre-release version from "main-devel"
-# (via https://github.com/isl-org/Open3D/releases/tag/main-devel)
-#
-# find_package(Open3D REQUIRED PATHS
-#              /Users/cwr/Documents/code/open3d-devel-darwin-arm64-0.18.0+c219d82)
-
 # Link to my own local build-from-source of Open3D
 find_package(Open3D REQUIRED)
-
-
-# add_executable(Draw)
-# target_sources(Draw PRIVATE Draw.cpp)
-# target_link_libraries(Draw PRIVATE Open3D::Open3D)
 
 # Add source files to the executable
 add_executable(evoflock main.cpp)

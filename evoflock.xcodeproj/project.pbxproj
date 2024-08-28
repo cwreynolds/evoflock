@@ -8,7 +8,70 @@
 
 /* Begin PBXBuildFile section */
 		841F3D602B49E9FE00483276 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 841F3D5F2B49E9FE00483276 /* main.cpp */; };
-		848101F72C7666CA00433168 /* libOpen3D.0.18.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 848101F62C7666CA00433168 /* libOpen3D.0.18.0.dylib */; settings = {ATTRIBUTES = (Required, ); }; };
+		849C91512C7E9DFC007DFBDE /* libOpen3D.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91502C7E9DFC007DFBDE /* libOpen3D.a */; };
+		849C91892C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filament.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91522C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_filament.a */; };
+		849C918A2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91532C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a */; };
+		849C918B2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersModeling-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91542C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersModeling-9.1.a */; };
+		849C918C2C7E9F7B007DFBDE /* libOpen3D_3rdparty_qhull_r.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91552C7E9F7A007DFBDE /* libOpen3D_3rdparty_qhull_r.a */; };
+		849C918D2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersSources-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91562C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersSources-9.1.a */; };
+		849C918E2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersCore-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91572C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersCore-9.1.a */; };
+		849C918F2C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_lexers.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91582C7E9F7A007DFBDE /* libOpen3D_3rdparty_embree_lexers.a */; };
+		849C91902C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersGeneral-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91592C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersGeneral-9.1.a */; };
+		849C91912C7E9F7B007DFBDE /* libOpen3D_3rdparty_glew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C915A2C7E9F7A007DFBDE /* libOpen3D_3rdparty_glew.a */; };
+		849C91922C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_vkshaders.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C915B2C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_vkshaders.a */; };
+		849C91932C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_embree4.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C915C2C7E9F7A007DFBDE /* libOpen3D_3rdparty_embree_embree4.a */; };
+		849C91942C7E9F7B007DFBDE /* libOpen3D_3rdparty_qhullcpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C915D2C7E9F7A007DFBDE /* libOpen3D_3rdparty_qhullcpp.a */; };
+		849C91952C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filaflat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C915E2C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_filaflat.a */; };
+		849C91962C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_meshoptimizer.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C915F2C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_meshoptimizer.a */; };
+		849C91972C7E9F7B007DFBDE /* libOpen3D_3rdparty_glfw.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91602C7E9F7A007DFBDE /* libOpen3D_3rdparty_glfw.a */; };
+		849C91982C7E9F7B007DFBDE /* libOpen3D_3rdparty_imgui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91612C7E9F7A007DFBDE /* libOpen3D_3rdparty_imgui.a */; };
+		849C91992C7E9F7B007DFBDE /* libOpen3D_3rdparty_openssl_ssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91622C7E9F7A007DFBDE /* libOpen3D_3rdparty_openssl_ssl.a */; };
+		849C919A2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_bluegl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91632C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_bluegl.a */; };
+		849C919B2C7E9F7B007DFBDE /* libOpen3D_3rdparty_curl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91642C7E9F7A007DFBDE /* libOpen3D_3rdparty_curl.a */; };
+		849C919C2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filameshio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91652C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_filameshio.a */; };
+		849C919D2C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_tasking.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91662C7E9F7A007DFBDE /* libOpen3D_3rdparty_embree_tasking.a */; };
+		849C919E2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_ibl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91672C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_ibl.a */; };
+		849C919F2C7E9F7B007DFBDE /* libOpen3D_3rdparty_liblzf.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91682C7E9F7A007DFBDE /* libOpen3D_3rdparty_liblzf.a */; };
+		849C91A02C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_sys.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91692C7E9F7A007DFBDE /* libOpen3D_3rdparty_embree_sys.a */; };
+		849C91A12C7E9F7B007DFBDE /* libOpen3D_3rdparty_zlib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C916A2C7E9F7A007DFBDE /* libOpen3D_3rdparty_zlib.a */; };
+		849C91A22C7E9F7B007DFBDE /* libOpen3D_3rdparty_uvatlas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C916B2C7E9F7B007DFBDE /* libOpen3D_3rdparty_uvatlas.a */; };
+		849C91A32C7E9F7B007DFBDE /* libOpen3D_3rdparty_jsoncpp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C916C2C7E9F7B007DFBDE /* libOpen3D_3rdparty_jsoncpp.a */; };
+		849C91A42C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonMath-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C916D2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonMath-9.1.a */; };
+		849C91A52C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_image.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C916E2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_image.a */; };
+		849C91A62C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonCore-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C916F2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonCore-9.1.a */; };
+		849C91A72C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_simd.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91702C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_simd.a */; };
+		849C91A82C7E9F7B007DFBDE /* libOpen3D_3rdparty_tinyfiledialogs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91712C7E9F7B007DFBDE /* libOpen3D_3rdparty_tinyfiledialogs.a */; };
+		849C91A92C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonDataModel-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91722C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonDataModel-9.1.a */; };
+		849C91AA2C7E9F7B007DFBDE /* libOpen3D_3rdparty_png.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91732C7E9F7B007DFBDE /* libOpen3D_3rdparty_png.a */; };
+		849C91AB2C7E9F7B007DFBDE /* libOpen3D_3rdparty_assimp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91742C7E9F7B007DFBDE /* libOpen3D_3rdparty_assimp.a */; };
+		849C91AC2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtksys-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91752C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtksys-9.1.a */; };
+		849C91AD2C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_embree_avx2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91762C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_embree_avx2.a */; };
+		849C91AE2C7E9F7B007DFBDE /* libOpen3D_3rdparty_rply.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91772C7E9F7B007DFBDE /* libOpen3D_3rdparty_rply.a */; };
+		849C91AF2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonExecutionModel-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91782C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonExecutionModel-9.1.a */; };
+		849C91B02C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_geometry.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91792C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_geometry.a */; };
+		849C91B12C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkkissfft-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C917A2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkkissfft-9.1.a */; };
+		849C91B22C7E9F7B007DFBDE /* libOpen3D_3rdparty_zeromq.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C917B2C7E9F7B007DFBDE /* libOpen3D_3rdparty_zeromq.a */; };
+		849C91B32C7E9F7B007DFBDE /* libOpen3D_3rdparty_fmt.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C917C2C7E9F7B007DFBDE /* libOpen3D_3rdparty_fmt.a */; };
+		849C91B42C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filabridge.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C917D2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filabridge.a */; };
+		849C91B52C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonTransforms-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C917E2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonTransforms-9.1.a */; };
+		849C91B62C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_backend.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C917F2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_backend.a */; };
+		849C91B72C7E9F7B007DFBDE /* libOpen3D_3rdparty_jpeg.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91802C7E9F7B007DFBDE /* libOpen3D_3rdparty_jpeg.a */; };
+		849C91B82C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonMisc-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91812C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonMisc-9.1.a */; };
+		849C91B92C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filamat_lite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91822C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filamat_lite.a */; };
+		849C91BA2C7E9F7B007DFBDE /* libOpen3D_3rdparty_blas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91832C7E9F7B007DFBDE /* libOpen3D_3rdparty_blas.a */; };
+		849C91BB2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_utils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91842C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_utils.a */; };
+		849C91BC2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_smol-v.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91852C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_smol-v.a */; };
+		849C91BD2C7E9F7B007DFBDE /* libOpen3D_3rdparty_openssl_crypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91862C7E9F7B007DFBDE /* libOpen3D_3rdparty_openssl_crypto.a */; };
+		849C91BE2C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_math.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91872C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_math.a */; };
+		849C91BF2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonSystem-9.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91882C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonSystem-9.1.a */; };
+		849C91C12C7EA0B3007DFBDE /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91C02C7EA0B3007DFBDE /* CoreFoundation.framework */; };
+		849C91C32C7EA0FE007DFBDE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91C22C7EA0FE007DFBDE /* Foundation.framework */; };
+		849C91C52C7EA18F007DFBDE /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91C42C7EA18F007DFBDE /* CoreGraphics.framework */; };
+		849C91C72C7EA1CE007DFBDE /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91C62C7EA1CE007DFBDE /* CoreVideo.framework */; };
+		849C91C92C7EA212007DFBDE /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91C82C7EA212007DFBDE /* IOKit.framework */; };
+		849C91CB2C7EA259007DFBDE /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91CA2C7EA259007DFBDE /* Metal.framework */; };
+		849C91CD2C7EA28A007DFBDE /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91CC2C7EA28A007DFBDE /* AppKit.framework */; };
+		849C91CF2C7EA2CE007DFBDE /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 849C91CE2C7EA2CE007DFBDE /* SystemConfiguration.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -49,6 +112,70 @@
 		848101F62C7666CA00433168 /* libOpen3D.0.18.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpen3D.0.18.0.dylib; path = "../open3d-devel-darwin-arm64-0.18.0+c219d82/lib/libOpen3D.0.18.0.dylib"; sourceTree = "<group>"; };
 		848101FB2C77B53E00433168 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		848BC33C2B69856700509CE5 /* flock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = flock.h; sourceTree = "<group>"; };
+		849C91502C7E9DFC007DFBDE /* libOpen3D.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D.a; path = ../../../../../usr/local/lib/libOpen3D.a; sourceTree = "<group>"; };
+		849C91522C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_filament.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_filament.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_filament.a; sourceTree = "<group>"; };
+		849C91532C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a"; sourceTree = "<group>"; };
+		849C91542C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersModeling-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkFiltersModeling-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkFiltersModeling-9.1.a"; sourceTree = "<group>"; };
+		849C91552C7E9F7A007DFBDE /* libOpen3D_3rdparty_qhull_r.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_qhull_r.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_qhull_r.a; sourceTree = "<group>"; };
+		849C91562C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersSources-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkFiltersSources-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkFiltersSources-9.1.a"; sourceTree = "<group>"; };
+		849C91572C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersCore-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkFiltersCore-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkFiltersCore-9.1.a"; sourceTree = "<group>"; };
+		849C91582C7E9F7A007DFBDE /* libOpen3D_3rdparty_embree_lexers.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_embree_lexers.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_embree_lexers.a; sourceTree = "<group>"; };
+		849C91592C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersGeneral-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkFiltersGeneral-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkFiltersGeneral-9.1.a"; sourceTree = "<group>"; };
+		849C915A2C7E9F7A007DFBDE /* libOpen3D_3rdparty_glew.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_glew.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_glew.a; sourceTree = "<group>"; };
+		849C915B2C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_vkshaders.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_vkshaders.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_vkshaders.a; sourceTree = "<group>"; };
+		849C915C2C7E9F7A007DFBDE /* libOpen3D_3rdparty_embree_embree4.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_embree_embree4.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_embree_embree4.a; sourceTree = "<group>"; };
+		849C915D2C7E9F7A007DFBDE /* libOpen3D_3rdparty_qhullcpp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_qhullcpp.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_qhullcpp.a; sourceTree = "<group>"; };
+		849C915E2C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_filaflat.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_filaflat.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_filaflat.a; sourceTree = "<group>"; };
+		849C915F2C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_meshoptimizer.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_meshoptimizer.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_meshoptimizer.a; sourceTree = "<group>"; };
+		849C91602C7E9F7A007DFBDE /* libOpen3D_3rdparty_glfw.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_glfw.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_glfw.a; sourceTree = "<group>"; };
+		849C91612C7E9F7A007DFBDE /* libOpen3D_3rdparty_imgui.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_imgui.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_imgui.a; sourceTree = "<group>"; };
+		849C91622C7E9F7A007DFBDE /* libOpen3D_3rdparty_openssl_ssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_openssl_ssl.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_openssl_ssl.a; sourceTree = "<group>"; };
+		849C91632C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_bluegl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_bluegl.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_bluegl.a; sourceTree = "<group>"; };
+		849C91642C7E9F7A007DFBDE /* libOpen3D_3rdparty_curl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_curl.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_curl.a; sourceTree = "<group>"; };
+		849C91652C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_filameshio.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_filameshio.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_filameshio.a; sourceTree = "<group>"; };
+		849C91662C7E9F7A007DFBDE /* libOpen3D_3rdparty_embree_tasking.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_embree_tasking.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_embree_tasking.a; sourceTree = "<group>"; };
+		849C91672C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_ibl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_ibl.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_ibl.a; sourceTree = "<group>"; };
+		849C91682C7E9F7A007DFBDE /* libOpen3D_3rdparty_liblzf.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_liblzf.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_liblzf.a; sourceTree = "<group>"; };
+		849C91692C7E9F7A007DFBDE /* libOpen3D_3rdparty_embree_sys.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_embree_sys.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_embree_sys.a; sourceTree = "<group>"; };
+		849C916A2C7E9F7A007DFBDE /* libOpen3D_3rdparty_zlib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_zlib.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_zlib.a; sourceTree = "<group>"; };
+		849C916B2C7E9F7B007DFBDE /* libOpen3D_3rdparty_uvatlas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_uvatlas.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_uvatlas.a; sourceTree = "<group>"; };
+		849C916C2C7E9F7B007DFBDE /* libOpen3D_3rdparty_jsoncpp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_jsoncpp.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_jsoncpp.a; sourceTree = "<group>"; };
+		849C916D2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonMath-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkCommonMath-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkCommonMath-9.1.a"; sourceTree = "<group>"; };
+		849C916E2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_image.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_image.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_image.a; sourceTree = "<group>"; };
+		849C916F2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonCore-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkCommonCore-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkCommonCore-9.1.a"; sourceTree = "<group>"; };
+		849C91702C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_simd.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_embree_simd.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_embree_simd.a; sourceTree = "<group>"; };
+		849C91712C7E9F7B007DFBDE /* libOpen3D_3rdparty_tinyfiledialogs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_tinyfiledialogs.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_tinyfiledialogs.a; sourceTree = "<group>"; };
+		849C91722C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonDataModel-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkCommonDataModel-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkCommonDataModel-9.1.a"; sourceTree = "<group>"; };
+		849C91732C7E9F7B007DFBDE /* libOpen3D_3rdparty_png.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_png.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_png.a; sourceTree = "<group>"; };
+		849C91742C7E9F7B007DFBDE /* libOpen3D_3rdparty_assimp.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_assimp.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_assimp.a; sourceTree = "<group>"; };
+		849C91752C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtksys-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtksys-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtksys-9.1.a"; sourceTree = "<group>"; };
+		849C91762C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_embree_avx2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_embree_embree_avx2.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_embree_embree_avx2.a; sourceTree = "<group>"; };
+		849C91772C7E9F7B007DFBDE /* libOpen3D_3rdparty_rply.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_rply.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_rply.a; sourceTree = "<group>"; };
+		849C91782C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonExecutionModel-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkCommonExecutionModel-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkCommonExecutionModel-9.1.a"; sourceTree = "<group>"; };
+		849C91792C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_geometry.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_geometry.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_geometry.a; sourceTree = "<group>"; };
+		849C917A2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkkissfft-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkkissfft-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkkissfft-9.1.a"; sourceTree = "<group>"; };
+		849C917B2C7E9F7B007DFBDE /* libOpen3D_3rdparty_zeromq.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_zeromq.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_zeromq.a; sourceTree = "<group>"; };
+		849C917C2C7E9F7B007DFBDE /* libOpen3D_3rdparty_fmt.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_fmt.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_fmt.a; sourceTree = "<group>"; };
+		849C917D2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filabridge.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_filabridge.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_filabridge.a; sourceTree = "<group>"; };
+		849C917E2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonTransforms-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkCommonTransforms-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkCommonTransforms-9.1.a"; sourceTree = "<group>"; };
+		849C917F2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_backend.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_backend.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_backend.a; sourceTree = "<group>"; };
+		849C91802C7E9F7B007DFBDE /* libOpen3D_3rdparty_jpeg.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_jpeg.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_jpeg.a; sourceTree = "<group>"; };
+		849C91812C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonMisc-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkCommonMisc-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkCommonMisc-9.1.a"; sourceTree = "<group>"; };
+		849C91822C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filamat_lite.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_filamat_lite.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_filamat_lite.a; sourceTree = "<group>"; };
+		849C91832C7E9F7B007DFBDE /* libOpen3D_3rdparty_blas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_blas.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_blas.a; sourceTree = "<group>"; };
+		849C91842C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_utils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_utils.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_utils.a; sourceTree = "<group>"; };
+		849C91852C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_smol-v.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_filament_smol-v.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_filament_smol-v.a"; sourceTree = "<group>"; };
+		849C91862C7E9F7B007DFBDE /* libOpen3D_3rdparty_openssl_crypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_openssl_crypto.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_openssl_crypto.a; sourceTree = "<group>"; };
+		849C91872C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_math.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_embree_math.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_embree_math.a; sourceTree = "<group>"; };
+		849C91882C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonSystem-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkCommonSystem-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkCommonSystem-9.1.a"; sourceTree = "<group>"; };
+		849C91C02C7EA0B3007DFBDE /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		849C91C22C7EA0FE007DFBDE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		849C91C42C7EA18F007DFBDE /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		849C91C62C7EA1CE007DFBDE /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		849C91C82C7EA212007DFBDE /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		849C91CA2C7EA259007DFBDE /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		849C91CC2C7EA28A007DFBDE /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		849C91CE2C7EA2CE007DFBDE /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		84A248392BE076450062EB95 /* dbscan.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dbscan.h; sourceTree = "<group>"; };
 		84A582972B5207000008CEE8 /* Agent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Agent.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,7 +185,70 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				848101F72C7666CA00433168 /* libOpen3D.0.18.0.dylib in Frameworks */,
+				849C91CF2C7EA2CE007DFBDE /* SystemConfiguration.framework in Frameworks */,
+				849C91CD2C7EA28A007DFBDE /* AppKit.framework in Frameworks */,
+				849C91CB2C7EA259007DFBDE /* Metal.framework in Frameworks */,
+				849C91C92C7EA212007DFBDE /* IOKit.framework in Frameworks */,
+				849C91C72C7EA1CE007DFBDE /* CoreVideo.framework in Frameworks */,
+				849C91C52C7EA18F007DFBDE /* CoreGraphics.framework in Frameworks */,
+				849C91C32C7EA0FE007DFBDE /* Foundation.framework in Frameworks */,
+				849C91C12C7EA0B3007DFBDE /* CoreFoundation.framework in Frameworks */,
+				849C91512C7E9DFC007DFBDE /* libOpen3D.a in Frameworks */,
+				849C91892C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filament.a in Frameworks */,
+				849C918A2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a in Frameworks */,
+				849C918B2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersModeling-9.1.a in Frameworks */,
+				849C918C2C7E9F7B007DFBDE /* libOpen3D_3rdparty_qhull_r.a in Frameworks */,
+				849C918D2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersSources-9.1.a in Frameworks */,
+				849C918E2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersCore-9.1.a in Frameworks */,
+				849C918F2C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_lexers.a in Frameworks */,
+				849C91902C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersGeneral-9.1.a in Frameworks */,
+				849C91912C7E9F7B007DFBDE /* libOpen3D_3rdparty_glew.a in Frameworks */,
+				849C91922C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_vkshaders.a in Frameworks */,
+				849C91932C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_embree4.a in Frameworks */,
+				849C91942C7E9F7B007DFBDE /* libOpen3D_3rdparty_qhullcpp.a in Frameworks */,
+				849C91952C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filaflat.a in Frameworks */,
+				849C91962C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_meshoptimizer.a in Frameworks */,
+				849C91972C7E9F7B007DFBDE /* libOpen3D_3rdparty_glfw.a in Frameworks */,
+				849C91982C7E9F7B007DFBDE /* libOpen3D_3rdparty_imgui.a in Frameworks */,
+				849C91992C7E9F7B007DFBDE /* libOpen3D_3rdparty_openssl_ssl.a in Frameworks */,
+				849C919A2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_bluegl.a in Frameworks */,
+				849C919B2C7E9F7B007DFBDE /* libOpen3D_3rdparty_curl.a in Frameworks */,
+				849C919C2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filameshio.a in Frameworks */,
+				849C919D2C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_tasking.a in Frameworks */,
+				849C919E2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_ibl.a in Frameworks */,
+				849C919F2C7E9F7B007DFBDE /* libOpen3D_3rdparty_liblzf.a in Frameworks */,
+				849C91A02C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_sys.a in Frameworks */,
+				849C91A12C7E9F7B007DFBDE /* libOpen3D_3rdparty_zlib.a in Frameworks */,
+				849C91A22C7E9F7B007DFBDE /* libOpen3D_3rdparty_uvatlas.a in Frameworks */,
+				849C91A32C7E9F7B007DFBDE /* libOpen3D_3rdparty_jsoncpp.a in Frameworks */,
+				849C91A42C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonMath-9.1.a in Frameworks */,
+				849C91A52C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_image.a in Frameworks */,
+				849C91A62C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonCore-9.1.a in Frameworks */,
+				849C91A72C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_simd.a in Frameworks */,
+				849C91A82C7E9F7B007DFBDE /* libOpen3D_3rdparty_tinyfiledialogs.a in Frameworks */,
+				849C91A92C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonDataModel-9.1.a in Frameworks */,
+				849C91AA2C7E9F7B007DFBDE /* libOpen3D_3rdparty_png.a in Frameworks */,
+				849C91AB2C7E9F7B007DFBDE /* libOpen3D_3rdparty_assimp.a in Frameworks */,
+				849C91AC2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtksys-9.1.a in Frameworks */,
+				849C91AD2C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_embree_avx2.a in Frameworks */,
+				849C91AE2C7E9F7B007DFBDE /* libOpen3D_3rdparty_rply.a in Frameworks */,
+				849C91AF2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonExecutionModel-9.1.a in Frameworks */,
+				849C91B02C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_geometry.a in Frameworks */,
+				849C91B12C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkkissfft-9.1.a in Frameworks */,
+				849C91B22C7E9F7B007DFBDE /* libOpen3D_3rdparty_zeromq.a in Frameworks */,
+				849C91B32C7E9F7B007DFBDE /* libOpen3D_3rdparty_fmt.a in Frameworks */,
+				849C91B42C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filabridge.a in Frameworks */,
+				849C91B52C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonTransforms-9.1.a in Frameworks */,
+				849C91B62C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_backend.a in Frameworks */,
+				849C91B72C7E9F7B007DFBDE /* libOpen3D_3rdparty_jpeg.a in Frameworks */,
+				849C91B82C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonMisc-9.1.a in Frameworks */,
+				849C91B92C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filamat_lite.a in Frameworks */,
+				849C91BA2C7E9F7B007DFBDE /* libOpen3D_3rdparty_blas.a in Frameworks */,
+				849C91BB2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_utils.a in Frameworks */,
+				849C91BC2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_smol-v.a in Frameworks */,
+				849C91BD2C7E9F7B007DFBDE /* libOpen3D_3rdparty_openssl_crypto.a in Frameworks */,
+				849C91BE2C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_math.a in Frameworks */,
+				849C91BF2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonSystem-9.1.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -99,6 +289,70 @@
 		848101F52C7666CA00433168 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				849C91CE2C7EA2CE007DFBDE /* SystemConfiguration.framework */,
+				849C91CC2C7EA28A007DFBDE /* AppKit.framework */,
+				849C91CA2C7EA259007DFBDE /* Metal.framework */,
+				849C91C82C7EA212007DFBDE /* IOKit.framework */,
+				849C91C62C7EA1CE007DFBDE /* CoreVideo.framework */,
+				849C91C42C7EA18F007DFBDE /* CoreGraphics.framework */,
+				849C91C22C7EA0FE007DFBDE /* Foundation.framework */,
+				849C91C02C7EA0B3007DFBDE /* CoreFoundation.framework */,
+				849C91742C7E9F7B007DFBDE /* libOpen3D_3rdparty_assimp.a */,
+				849C91832C7E9F7B007DFBDE /* libOpen3D_3rdparty_blas.a */,
+				849C91642C7E9F7A007DFBDE /* libOpen3D_3rdparty_curl.a */,
+				849C91762C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_embree_avx2.a */,
+				849C915C2C7E9F7A007DFBDE /* libOpen3D_3rdparty_embree_embree4.a */,
+				849C91582C7E9F7A007DFBDE /* libOpen3D_3rdparty_embree_lexers.a */,
+				849C91872C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_math.a */,
+				849C91702C7E9F7B007DFBDE /* libOpen3D_3rdparty_embree_simd.a */,
+				849C91692C7E9F7A007DFBDE /* libOpen3D_3rdparty_embree_sys.a */,
+				849C91662C7E9F7A007DFBDE /* libOpen3D_3rdparty_embree_tasking.a */,
+				849C917F2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_backend.a */,
+				849C91632C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_bluegl.a */,
+				849C917D2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filabridge.a */,
+				849C915E2C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_filaflat.a */,
+				849C91822C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_filamat_lite.a */,
+				849C91522C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_filament.a */,
+				849C91652C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_filameshio.a */,
+				849C91792C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_geometry.a */,
+				849C91672C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_ibl.a */,
+				849C916E2C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_image.a */,
+				849C915F2C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_meshoptimizer.a */,
+				849C91852C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_smol-v.a */,
+				849C91842C7E9F7B007DFBDE /* libOpen3D_3rdparty_filament_utils.a */,
+				849C915B2C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_vkshaders.a */,
+				849C917C2C7E9F7B007DFBDE /* libOpen3D_3rdparty_fmt.a */,
+				849C915A2C7E9F7A007DFBDE /* libOpen3D_3rdparty_glew.a */,
+				849C91602C7E9F7A007DFBDE /* libOpen3D_3rdparty_glfw.a */,
+				849C91612C7E9F7A007DFBDE /* libOpen3D_3rdparty_imgui.a */,
+				849C91802C7E9F7B007DFBDE /* libOpen3D_3rdparty_jpeg.a */,
+				849C916C2C7E9F7B007DFBDE /* libOpen3D_3rdparty_jsoncpp.a */,
+				849C91682C7E9F7A007DFBDE /* libOpen3D_3rdparty_liblzf.a */,
+				849C91862C7E9F7B007DFBDE /* libOpen3D_3rdparty_openssl_crypto.a */,
+				849C91622C7E9F7A007DFBDE /* libOpen3D_3rdparty_openssl_ssl.a */,
+				849C91732C7E9F7B007DFBDE /* libOpen3D_3rdparty_png.a */,
+				849C91552C7E9F7A007DFBDE /* libOpen3D_3rdparty_qhull_r.a */,
+				849C915D2C7E9F7A007DFBDE /* libOpen3D_3rdparty_qhullcpp.a */,
+				849C91772C7E9F7B007DFBDE /* libOpen3D_3rdparty_rply.a */,
+				849C91712C7E9F7B007DFBDE /* libOpen3D_3rdparty_tinyfiledialogs.a */,
+				849C916B2C7E9F7B007DFBDE /* libOpen3D_3rdparty_uvatlas.a */,
+				849C916F2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonCore-9.1.a */,
+				849C91722C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonDataModel-9.1.a */,
+				849C91782C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonExecutionModel-9.1.a */,
+				849C916D2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonMath-9.1.a */,
+				849C91812C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonMisc-9.1.a */,
+				849C91882C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonSystem-9.1.a */,
+				849C917E2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkCommonTransforms-9.1.a */,
+				849C91572C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersCore-9.1.a */,
+				849C91592C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersGeneral-9.1.a */,
+				849C91542C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersModeling-9.1.a */,
+				849C91562C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkFiltersSources-9.1.a */,
+				849C917A2C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtkkissfft-9.1.a */,
+				849C91532C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a */,
+				849C91752C7E9F7B007DFBDE /* libOpen3D_3rdparty_vtk_vtksys-9.1.a */,
+				849C917B2C7E9F7B007DFBDE /* libOpen3D_3rdparty_zeromq.a */,
+				849C916A2C7E9F7A007DFBDE /* libOpen3D_3rdparty_zlib.a */,
+				849C91502C7E9DFC007DFBDE /* libOpen3D.a */,
 				848101F62C7666CA00433168 /* libOpen3D.0.18.0.dylib */,
 			);
 			name = Frameworks;
@@ -307,7 +561,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib/;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/open3d,
+					/usr/local/include/open3d/3rdparty,
+					"/usr/local/include/eigen-3.4.0",
+				);
 			};
 			name = Debug;
 		};
@@ -317,7 +578,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib/;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					/usr/local/include,
+					/usr/local/include/open3d,
+					/usr/local/include/open3d/3rdparty,
+					"/usr/local/include/eigen-3.4.0",
+				);
 			};
 			name = Release;
 		};

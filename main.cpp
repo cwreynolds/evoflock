@@ -11,9 +11,10 @@
 // TODO 20240318 trying linking to Open3D 0.18.0
 
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20240318 trying linking to Open3D 0.18.0
+// TODO 20240821 try linking to Open3D 0.18.0
 
-#define test_open3d
+//#define test_open3d
+
 #ifdef test_open3d
 
 #ifndef FMT_HEADER_ONLY

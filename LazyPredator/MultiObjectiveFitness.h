@@ -25,16 +25,15 @@ namespace LazyPredator
 class MultiObjectiveFitness
 {
 public:
-    MultiObjectiveFitness() {}
+    MultiObjectiveFitness() : MultiObjectiveFitness({}, {}) {}
     MultiObjectiveFitness(const std::vector<double>& multi_objective_fitness)
-    {
-        mof_ = multi_objective_fitness;
-    }
+      : MultiObjectiveFitness(multi_objective_fitness, {}) {}
     MultiObjectiveFitness(const std::vector<double>& multi_objective_fitness,
                           const std::vector<std::string>& names)
     {
         mof_ = multi_objective_fitness;
         names_ = names;
+        assertNormalized();
     }
     size_t size() const { return mof_.size(); }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -92,6 +91,41 @@ public:
 //
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    // Are all scalar fitness components on the range [0,1]?
+    bool allComponentsAreNormalized() const
+    {
+        // TODO 20240901 there is probably a higher level way to express this
+        // (reduce? transform_reduce?) but for now just an old fashioned loop.
+        bool all_normalized = true;
+        for (auto& component : mof_)
+        {
+            if (not util::between(component, 0, 1)) { all_normalized = false; }
+        }
+        return all_normalized;
+    }
+    
+    static inline bool assert_normalized = true;
+    
+    void assertNormalized() const
+    {
+        if (assert_normalized)
+        {
+            bool all_normalized = allComponentsAreNormalized();
+            if (not all_normalized)
+            {
+                std::cout <<
+                "MultiObjectiveFitness has so far (Sept 1, 2024) only been used "
+                "in a regime where all scalar fitness components are normalized "
+                "on [0,1]. There may be bugs based on this assumption. If you "
+                "understand that and want to use “unnormalized” fitness values, "
+                "set LazyPredator::MultiObjectiveFitness::assert_normalized to "
+                " false." << std::endl;
+            }
+            assert(all_normalized);
+        }
+    }
+
 private:
     std::vector<double> mof_;
     
@@ -102,11 +136,11 @@ private:
 
 }  // end of namespace LazyPredator
 
-namespace LP = LazyPredator;
 
-std::ostream& operator<<(std::ostream& os, const LP::MultiObjectiveFitness& mfo)
+// Serialize MultiObjectiveFitness object to stream.
+std::ostream& operator<<(std::ostream& os,
+                         const LazyPredator::MultiObjectiveFitness& mfo)
 {
     os << "{" << mfo.to_string() << "}";
     return os;
 }
-

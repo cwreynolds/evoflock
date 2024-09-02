@@ -9,17 +9,11 @@
 //  MIT License -- Copyright © 2024 Craig Reynolds
 //-------------------------------------------------------------------------------
 
-
-
-
+#pragma once
 #include <numeric>  // for MultiObjectiveFitness
 
 namespace LazyPredator
 {
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240423 change MultiObjectiveFitness from typedef to class
-//               Probably should be moved somewhere else.
 
 // This class is just a slightly elaborated wrapper around a std::vector<double>
 class MultiObjectiveFitness
@@ -36,15 +30,8 @@ public:
         assertNormalized();
     }
     size_t size() const { return mof_.size(); }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240708 make MultiObjectiveFitness.at() work for read AND write.
-    
-//    double at(size_t i) const { return mof_.at(i); }
-    
     double& at(size_t i) { return mof_.at(i); }
     const double& at(size_t i) const { return mof_.at(i); }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     auto begin() const { return mof_.begin(); }
     auto end() const { return mof_.end(); }
     double min() const { return *std::min_element(begin(), end()); }
@@ -126,6 +113,56 @@ public:
         }
     }
 
+    static void unit_test()
+    {
+//        // TEMP
+//        std::cout << "In LP::MultiObjectiveFitness::unit_test()." << std::endl;
+        
+        // Test constructors empty(), and size().
+        {
+            assert(MultiObjectiveFitness().empty());
+            assert(MultiObjectiveFitness().size() == 0);
+            assert(MultiObjectiveFitness({0.1}).size() == 1);
+            assert(MultiObjectiveFitness({0.1, 0.2}, {"a", "b"}).size() == 2);
+        }
+        // Test at() for read and write.
+        {
+            MultiObjectiveFitness mof({0.0, 0.2, 0.4});
+            assert(mof.at(1) == 0.2);
+            mof.at(1) = 0.5;
+            assert(mof.at(1) == 0.5);
+        }
+        // Test min(), max(), sum(), average(), and product()
+        {
+            MultiObjectiveFitness mof({0.2, 0.4, 0.6});
+            assert(mof.min() == 0.2);
+            assert(mof.max() == 0.6);
+            assert(util::within_epsilon(mof.sum(), 1.2));
+            assert(util::within_epsilon(mof.average(), 0.4));
+            assert(util::within_epsilon(mof.product(), 0.048));
+        }
+        // Test as_vector() and to_string().
+        {
+            std::vector<double> std_vector{0.1, 0.2, 0.3};
+            MultiObjectiveFitness mof(std_vector);
+            assert(mof.as_vector() == std_vector);
+            assert(mof.to_string() == "0.1, 0.2, 0.3");
+        }
+        
+        // TODO should hyperVolume() be kept? Add unit test if so.
+        // TODO test name retrival
+        
+        // Test predicate for "all scalar fitnesses are normalized".
+        {
+            assert_normalized = false;  // Turn default check off.
+            MultiObjectiveFitness norm0({0, 2, 4, 6, 8, 10});
+            MultiObjectiveFitness norm1({0.0, 0.2, 0.4, 0.6, 0.8, 1.0});
+            assert(not norm0.allComponentsAreNormalized() and
+                   norm1.allComponentsAreNormalized());
+            assert_normalized = true;   // Turn default check back on.
+        }
+    }
+    
 private:
     std::vector<double> mof_;
     

@@ -315,6 +315,10 @@ void open3d_test() {
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+// TODO 20240902 Instead of calling each module's unit test from main.cpp, why
+//               not refactor this into something like EF::unit_test() in
+//               evoflock's (currently non-existent) header which does that?
+
 void run_unit_tests()
 {
     util::unit_test();
@@ -325,15 +329,14 @@ void run_unit_tests()
     Agent::unit_test();
     Boid::unit_test();
     Flock::unit_test();
+    
+    // TODO 20240902 eventually these should be combined (using the first name).
+    //               It would be nice, but not strictly necessary, to recast
+    //               LazyPredator/UnitTests.h to the New Way, with a unit_test()
+    //               method on each class, as a series of asserts.
     LazyPredator::unit_test();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240430 prototype dbscan
-//    BoidPtrList bpl ({new Boid(), new Boid(), new Boid()});
-//    auto df = [](Boid* a, Boid* b) { return (a->position() -
-//                                             b->position()).length(); };
-//    dbscan d(bpl, df, 1, 1);
-//    d.unit_test();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    LazyPredator::MultiObjectiveFitness::unit_test();
+
     std::cout << "All unit tests OK." << std::endl;
 }
 

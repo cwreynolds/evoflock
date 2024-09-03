@@ -8,23 +8,11 @@
 //  Copyright © 2020 Craig Reynolds. All rights reserved.
 //
 
-//#pragma once
-//
-//namespace UnitTests
-//{
-//    bool allTestsOK();
-//}
-
 #pragma once
-//#include "FunctionSet.h"
 #include "Population.h"
 
 namespace LazyPredator
 {
-
-//  TestFS.h
-//  Sample FunctionSets for testing and as examples.
-
 
 class TestFS
 {
@@ -276,7 +264,14 @@ private:
     return _e_ok;                                          \
 }()
 
-static void unit_test()
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240903 tiny step toward refactoring LP's unit tests. ("it would be
+// nice, but not necessary, to recast LazyPredator/UnitTests.h to the New Way,
+// with a unit_test() method on each class, as a series of asserts.") This is
+// to allow using LP::unit_test() as the name for the New Way unit tests.
+//static void unit_test()
+static void legacy_unit_test()
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     bool verbose = false;
     auto maybe_log= [&](std::string s)

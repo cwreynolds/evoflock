@@ -17,18 +17,22 @@
 //
 
 #pragma once
-
 #include "Population.h"
 #include "UnitTests.h"
 
-// TODO 20240224 very temp for testing
 namespace LazyPredator
 {
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240903 tiny step toward refactoring LP's unit tests. ("it would be
+// nice, but not necessary, to recast LazyPredator/UnitTests.h to the New Way,
+// with a unit_test() method on each class, as a series of asserts.") This is
+// to allow using LP::unit_test() as the name for the approach going forward
+// using New Way unit tests.
 
-//    static void unit_test()
-//    {
-//        // Just testing that I can instantiate a functional LazyPredator class.
-//        assert(Population().getMigrationLikelihood());
-//    }
-
+static void unit_test()
+{
+    MultiObjectiveFitness::unit_test();  // Modern class with New Way unit tests
+    legacy_unit_test();
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

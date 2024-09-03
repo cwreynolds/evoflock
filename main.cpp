@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------
 //
-// main.cpp -- new flock experiments
+//  main.cpp -- new flock experiments
 //
 //  Created by Craig Reynolds on January 6, 2024.
 //  MIT License -- Copyright © 2024 Craig Reynolds
@@ -284,61 +284,14 @@ void open3d_test() {
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240628 can we do an eval of a const tree?
-
 //#define eval_const_20240628
-
 #ifdef eval_const_20240628
 #else  // eval_const_20240628
 #endif // eval_const_20240628
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#include "Agent.h"
-#include "Boid.h"
-#include "dbscan.h"
-#include "flock.h"
-#include "GP.h"
-#include "LocalSpace.h"
-#include "obstacle.h"
-#include "shape.h"
-#include "Utilities.h"
-#include "Vec3.h"
-#include <iostream>
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240430 prototype dbscan
-
-//double boid_dist(Boid* a, Boid* b)
-//{
-//    return (a->position() - b->position()).length();
-//}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-// TODO 20240902 Instead of calling each module's unit test from main.cpp, why
-//               not refactor this into something like EF::unit_test() in
-//               evoflock's (currently non-existent) header which does that?
-
-void run_unit_tests()
-{
-    util::unit_test();
-    Vec3::unit_test();
-    LocalSpace::unit_test();
-    shape::unit_test();
-    Obstacle::unit_test();
-    Agent::unit_test();
-    Boid::unit_test();
-    Flock::unit_test();
-    
-    // TODO 20240902 eventually these should be combined (using the first name).
-    //               It would be nice, but not strictly necessary, to recast
-    //               LazyPredator/UnitTests.h to the New Way, with a unit_test()
-    //               method on each class, as a series of asserts.
-    LazyPredator::unit_test();
-    LazyPredator::MultiObjectiveFitness::unit_test();
-
-    std::cout << "All unit tests OK." << std::endl;
-}
+#include "evoflock.h"
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -356,7 +309,7 @@ int main(int argc, const char * argv[])
     
     EF::setRS(LP::LPRS());
     
-    run_unit_tests();
+    EF::unit_test();
 
     //--------------------------------------------------------------------------
 //    shape::OccupancyMap om(Vec3(7, 5, 3), Vec3(1, 1, 1), Vec3());

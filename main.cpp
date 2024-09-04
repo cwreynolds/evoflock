@@ -13,7 +13,7 @@
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 // TODO 20240821 try linking to Open3D 0.18.0
 
-//#define test_open3d
+#define test_open3d
 
 #ifdef test_open3d
 
@@ -24,6 +24,44 @@
 // Test code: https://github.com/isl-org/Open3D/blob/main/examples/cpp/Draw.cpp
 
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20240904 try linking to Open3D "main" branch, simple green ball test
+// https://github.com/isl-org/Open3D/blob/main/examples/cmake/open3d-cmake-find-package/Draw.cpp
+
+
+// ----------------------------------------------------------------------------
+// -                        Open3D: www.open3d.org                            -
+// ----------------------------------------------------------------------------
+// Copyright (c) 2018-2023 www.open3d.org
+// SPDX-License-Identifier: MIT
+// ----------------------------------------------------------------------------
+
+#include <string>
+
+#include "open3d/Open3D.h"
+
+//int main(int argc, char *argv[]) {
+int main_for_green_ball(int argc, const char *argv[]) {
+    if (argc == 2) {
+        std::string option(argv[1]);
+        if (option == "--skip-for-unit-test") {
+            open3d::utility::LogInfo("Skiped for unit test.");
+            return 0;
+        }
+    }
+
+    auto sphere = open3d::geometry::TriangleMesh::CreateSphere(1.0);
+    sphere->ComputeVertexNormals();
+    sphere->PaintUniformColor({0.0, 1.0, 0.0});
+    open3d::visualization::DrawGeometries({sphere});
+    return 0;
+}
+
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 #include <cstdlib>
 
 #include "open3d/Open3D.h"
@@ -301,7 +339,13 @@ void open3d_test() {
 int main(int argc, const char * argv[])
 {
 #ifdef test_open3d
-    open3d_test();
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20240904 try linking to Open3D "main" branch, simple green ball test
+//    open3d_test();
+    main_for_green_ball(argc, argv);
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     return EXIT_SUCCESS;
 #endif  // test_open3d
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

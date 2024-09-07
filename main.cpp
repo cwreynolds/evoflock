@@ -63,6 +63,58 @@ int main_for_green_ball(int argc, const char *argv[]) {
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240906 start to mock up a visualizer for evoflock fitness test.
+
+double sphere_diameter = 100;
+
+void visualizeEvoflockFitnessTest()
+{
+    auto sphere = open3d::geometry::TriangleMesh::CreateSphere(sphere_diameter);
+    sphere->ComputeVertexNormals();
+    sphere->PaintUniformColor({0.5, 0.5, 0.5});
+    
+    
+//    auto lines = open3d::geometry::LineSet(<#const std::vector<Eigen::Vector3d> &points#>,
+//                                           <#const std::vector<Eigen::Vector2i> &lines#>)
+
+    auto line_endpoints = std::vector<Eigen::Vector3d> {{0, 100, 0}, {0, -100, 0}};
+    auto line_segments = std::vector<Eigen::Vector2i> {{0, 1}};
+    auto lines = open3d::geometry::LineSet(line_endpoints, line_segments);
+    
+//    debugPrint(lines.GetCenter());
+    
+    std::cout << "lines.GetCenter() = " << lines.GetCenter() << std::endl;
+
+    
+//    open3d::visualization::DrawGeometries({sphere});
+    open3d::visualization::DrawGeometries({sphere},
+//    open3d::visualization::DrawGeometries({sphere, std::shared_ptr<open3d::geometry::Geometry>(lines) },
+                                          "Open3D",
+                                          640,
+                                          480,
+                                          50,
+                                          50,
+                                          false,
+                                          false,
+                                          true  // false,
+//                                          Eigen::Vector3d *     lookat = nullptr,
+//                                          Eigen::Vector3d *     up = nullptr,
+//                                          Eigen::Vector3d *     front = nullptr,
+//                                          double *     zoom = nullptr
+                                          );
+    
+    
+    return;
+}
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
 // TODO 20240904 OK while the "green ball test" (above) works, the more
 //               comprehensive sample below does not. It gets:
 //
@@ -359,8 +411,13 @@ int main(int argc, const char * argv[])
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20240904 try linking to Open3D "main" branch, simple green ball test
 //    open3d_test();
-    main_for_green_ball(argc, argv);
+//    main_for_green_ball(argc, argv);
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240906 start to mock up a visualizer for evoflock fitness test.
+    visualizeEvoflockFitnessTest();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     return EXIT_SUCCESS;
 #endif  // test_open3d

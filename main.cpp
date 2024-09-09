@@ -7,6 +7,8 @@
 //
 //------------------------------------------------------------------------------
 
+#include "evoflock.h"
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240318 trying linking to Open3D 0.18.0
 
@@ -68,44 +70,97 @@ int main_for_green_ball(int argc, const char *argv[]) {
 // TODO 20240906 start to mock up a visualizer for evoflock fitness test.
 
 double sphere_diameter = 100;
+double sphere_radius = sphere_diameter / 2;
+
+void LineWidthPointSizeTest()
+{
+    open3d::PrintOpen3DVersion();
+    auto lineset = std::make_shared<open3d::geometry::LineSet>();
+    lineset->points_ = {{5, 0, 0}, {-5, 0, 0}, {0, 5, 0}, {0, -5, 0}, {0, 0, 5}, {0, 0, -5}};
+    lineset->lines_ = {{0, 1}, {2, 3}, {4, 5}};
+    lineset->colors_ = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+    
+    auto vis = open3d::visualization::Visualizer();
+    vis.CreateVisualizerWindow();
+    vis.AddGeometry(lineset);
+    vis.GetRenderOption().line_width_ = 10.0;
+    vis.GetRenderOption().point_size_ = 20.0;
+    vis.Run();
+}
+
+
+std::vector<Vec3> scene_line_endpoints_;
+std::vector<std::size_t> scene_line_segments_;
+std::vector<Vec3> scene_line_colors_;
+
+void clearLineSegmentsFromScene()
+{
+    scene_line_endpoints_.clear();
+    scene_line_segments_.clear();
+    scene_line_colors_.clear();
+}
+
+void addLineSegmentToScene(const Vec3& endpoint0,
+                           const Vec3& endpoint1,
+                           const Vec3& color)
+{
+    scene_line_endpoints_.push_back(endpoint0);
+    scene_line_segments_.push_back(scene_line_endpoints_.size());
+    scene_line_endpoints_.push_back(endpoint1);
+    scene_line_segments_.push_back(scene_line_endpoints_.size());
+    scene_line_colors_.push_back(color);
+}
+
+std::shared_ptr<open3d::geometry::LineSet> makeLineSetForScene()
+{
+    auto ls = std::make_shared<open3d::geometry::LineSet>();
+    for (auto& e : scene_line_endpoints_)
+    {
+        ls->points_.push_back({e.x(), e.y(), e.z()});
+    }
+    for (int s = 0; s < scene_line_segments_.size(); s += 2)
+    {
+        ls->lines_.push_back({s, s + 1});
+    }
+    for (auto& c : scene_line_colors_)
+    {
+        ls->colors_.push_back({c.x(), c.y(), c.z()});
+    }
+    return ls;
+}
 
 void visualizeEvoflockFitnessTest()
 {
-    auto sphere = open3d::geometry::TriangleMesh::CreateSphere(sphere_diameter);
+//    LineWidthPointSizeTest();
+//    return;
+    
+    auto sphere = open3d::geometry::TriangleMesh::CreateSphere(sphere_radius);
     sphere->ComputeVertexNormals();
     sphere->PaintUniformColor({0.5, 0.5, 0.5});
     
+    addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
+    addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
     
-//    auto lines = open3d::geometry::LineSet(<#const std::vector<Eigen::Vector3d> &points#>,
-//                                           <#const std::vector<Eigen::Vector2i> &lines#>)
+    auto rs = EF::RS();
+    Vec3 a;
+    Vec3 b;
+    for (int i = 0; i < 1000; i++)
+    {
+        a = b;
+        b = b + rs.random_unit_vector() * 0.5;
+        auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
+        addLineSegmentToScene(a, b, c);
+    }
 
-    auto line_endpoints = std::vector<Eigen::Vector3d> {{0, 100, 0}, {0, -100, 0}};
-    auto line_segments = std::vector<Eigen::Vector2i> {{0, 1}};
-    auto lines = open3d::geometry::LineSet(line_endpoints, line_segments);
-    
-//    debugPrint(lines.GetCenter());
-    
-    std::cout << "lines.GetCenter() = " << lines.GetCenter() << std::endl;
-
-    
-//    open3d::visualization::DrawGeometries({sphere});
-    open3d::visualization::DrawGeometries({sphere},
-//    open3d::visualization::DrawGeometries({sphere, std::shared_ptr<open3d::geometry::Geometry>(lines) },
-                                          "Open3D",
-                                          640,
-                                          480,
-                                          50,
-                                          50,
-                                          false,
-                                          false,
-                                          true  // false,
-//                                          Eigen::Vector3d *     lookat = nullptr,
-//                                          Eigen::Vector3d *     up = nullptr,
-//                                          Eigen::Vector3d *     front = nullptr,
-//                                          double *     zoom = nullptr
-                                          );
-    
-    
+    auto vis = open3d::visualization::Visualizer();
+    int window_size = 2000;
+    vis.CreateVisualizerWindow("evoflock", window_size, window_size, 0, 0);
+    vis.AddGeometry(sphere);
+    vis.AddGeometry(makeLineSetForScene());
+    vis.GetRenderOption().line_width_ = 10.0;
+    vis.GetRenderOption().point_size_ = 20.0;
+    vis.GetRenderOption().mesh_show_back_face_ = true;
+    vis.Run();
     return;
 }
 
@@ -397,7 +452,7 @@ void visualizeEvoflockFitnessTest()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-#include "evoflock.h"
+//#include "evoflock.h"
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

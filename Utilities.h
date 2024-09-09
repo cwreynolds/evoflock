@@ -394,6 +394,7 @@ public:
     template<typename T> T randomSelectElement(const std::vector<T>& collection)
     { return collection.at(randomN(collection.size())); }
 
+    // These are defined in Vec3.h:
     Vec3 randomUnitVector();
     Vec3 randomPointInUnitRadiusSphere();
     Vec3 randomPointInAxisAlignedBox(Vec3 a, Vec3 b);

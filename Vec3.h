@@ -473,7 +473,7 @@ inline Vec3 RandomSequence::random_point_in_axis_aligned_box(Vec3 a, Vec3 b)
                 random2(std::min(a.z(), b.z()), std::max(a.z(), b.z())));
 }
 
-// Generate a random point inside a unit diameter disk centered on origin.
+// Generate a random point inside a unit radius sphere centered on origin.
 inline Vec3 RandomSequence::random_point_in_unit_radius_sphere()
 {
     Vec3 v;
@@ -485,7 +485,7 @@ inline Vec3 RandomSequence::random_point_in_unit_radius_sphere()
     return v;
 }
 
-// Generate a random unit vector.
+// Generate a random unit vector (a point on the unit radius sphere).
 inline Vec3 RandomSequence::random_unit_vector()
 {
     Vec3 v;
@@ -497,4 +497,19 @@ inline Vec3 RandomSequence::random_unit_vector()
     }
     while (m == 0);
     return v / m;
+}
+
+Vec3 RandomSequence::randomPointInAxisAlignedBox(Vec3 a, Vec3 b)
+{
+    return RandomSequence::random_point_in_axis_aligned_box(a, b);
+}
+
+Vec3 RandomSequence::randomPointInUnitRadiusSphere()
+{
+    return RandomSequence::random_point_in_unit_radius_sphere();
+}
+
+Vec3 RandomSequence::randomUnitVector()
+{
+    return RandomSequence::random_unit_vector();
 }

@@ -12,6 +12,7 @@
 #include "Agent.h"
 #include "Boid.h"
 #include "dbscan.h"
+#include "Draw.h"
 #include "flock.h"
 #include "GP.h"
 #include "LazyPredator/LazyPredator.h"  // version 2.0 currently in subdirectory
@@ -35,6 +36,7 @@ void unit_test()
     Boid::unit_test();
     Flock::unit_test();
     LazyPredator::unit_test();
+    Draw::unit_test();
     std::cout << "All unit tests OK." << std::endl;
 }
 }  // end of namespace EvoFlock

@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include "Draw.h"
 #include "flock.h"
 #include "shape.h"
 // TODO 20240226 For now, a modified copy of LazyPredator is in a subdirectory.

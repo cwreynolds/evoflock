@@ -19,11 +19,24 @@
 // -----------------------------------------------------------------------------
 
 #pragma once
-#include "Vec3.h"
-#include "Utilities.h"
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240909 add Draw.h
+
+//#include "Vec3.h"
+//#include "Utilities.h"
+//#include "Boid.h"
+//#include "obstacle.h"
+//#include "dbscan.h"
+
 #include "Boid.h"
-#include "obstacle.h"
 #include "dbscan.h"
+#include "Draw.h"
+#include "obstacle.h"
+#include "Utilities.h"
+#include "Vec3.h"
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #include "LazyPredator/LazyPredator.h"
 namespace LP = LazyPredator;
 #include <fstream>  // for logging simulation data to file.

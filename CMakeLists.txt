@@ -35,6 +35,12 @@
 # target_link_libraries(evoflock PRIVATE Open3D::Open3D)
 
 
+
+# TODO 20240904 oops still need this optimization setting
+# Specify compiler optimization level
+#     In Xcode I have been using the default: "-Os" meaning "Fastest, Smallest".
+add_compile_options(-O3)
+
 # TODO 20240904 oops still need this to use "ranges" in c++20
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -70,20 +76,12 @@ else()
 endif()
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-
 # Find installed Open3D, which exports Open3D::Open3D
 find_package(Open3D REQUIRED)
-
-# add_executable(Draw)
-# target_sources(Draw PRIVATE Draw.cpp)
-# target_link_libraries(Draw PRIVATE Open3D::Open3D)
 
 add_executable(evoflock)
 target_sources(evoflock PRIVATE main.cpp)
 target_link_libraries(evoflock PRIVATE Open3D::Open3D)
-
-
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # On Windows if BUILD_SHARED_LIBS is enabled, copy .dll files to the executable directory

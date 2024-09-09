@@ -15,39 +15,29 @@
 
 
 #pragma once
-#include "Vec3.h"
-#include "Utilities.h"
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240909 add Draw.h
+
+//#include "Vec3.h"
+//#include "Utilities.h"
+//#include "Agent.h"
+//#include "obstacle.h"
+//#include <algorithm>  // For sorting cached_nearest_neighbors_.
+
 #include "Agent.h"
+#include "Draw.h"
 #include "obstacle.h"
+#include "Utilities.h"
+#include "Vec3.h"
+
 #include <algorithm>  // For sorting cached_nearest_neighbors_.
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Boid;
 typedef std::vector<Boid*> BoidPtrList;
 typedef std::vector<Boid> BoidInstanceList;
 
-// TODO 20240203 mock of Draw class for prototyping
-class Draw
-{
-public:
-    bool enable() { return false; }
-    double frame_duration() const { return frame_duration_; }
-    bool poll_events() const { return true; }
-    int frame_counter() const { return frame_counter_; }
-
-    // Measure how much wall clock time has elapsed for this simulation step.
-    void measure_frame_duration()
-    {
-        util::TimePoint frame_end_time = util::TimeClock::now();
-        frame_duration_ = util::time_diff_in_seconds(frame_end_time,
-                                                     frame_start_time);
-        frame_start_time = frame_end_time;
-        frame_counter_ += 1;
-    }
-    
-    util::TimePoint frame_start_time;
-    double frame_duration_ = 0; // measured in seconds
-    int frame_counter_ = 0;
-};
 
 // Basically a container for all flocking parameters relevant to optimization.
 class FlockParameters

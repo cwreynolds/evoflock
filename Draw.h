@@ -19,6 +19,12 @@
 class Draw
 {
 public:
+    Draw()
+    {
+        // Allocate TriangleMesh/LineSet objects which hold animated geometry.
+        animated_tri_mesh_ = std::make_shared<open3d::geometry::TriangleMesh>();
+        animated_line_set_ = std::make_shared<open3d::geometry::LineSet>();
+    }
     bool enable() { return false; }
     double frame_duration() const { return frame_duration_; }
     bool poll_events() const { return true; }
@@ -33,24 +39,14 @@ public:
         frame_start_time = frame_end_time;
         frame_counter_ += 1;
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240910 add animated TriangleMesh support.
-    //
-    // There is (eg) TriangleMesh::Clear(), maybe better to do that than make a
-    // new TriangleMesh each frame? It may be equivalent, but in case Open3D
-    // does something fancy to reduce the GPU overhead?
-    //
-    // vertex_colors_ from MeshBase
-    
-    // Clear per-frame collection of animating line segments for annotation.
-    void clearTrianglesFromScene()
+  
+    // Clear all animated geometry to begin building a new scene.
+    void clearAnimatedGeometryFromScene()
     {
-        scene_triangles_.clear();
-        scene_triangle_vertices_.clear();
-        scene_triangle_vertex_colors_.clear();
+        animated_tri_mesh_->Clear();
+        animated_line_set_->Clear();
     }
-        
+    
     // Add to per-frame collection of animating triangles: single color.
     // Typically used to add a small polyhedron (a boid's body) to the scene.
     void addTrianglesToScene(const std::vector<Vec3>& vertices,
@@ -60,106 +56,74 @@ public:
         std::vector<Vec3> colors(vertices.size(), color);
         addTrianglesToScene(vertices, triangles, colors);
     }
-    
+
     // Add to per-frame collection of animating triangles: per-vertex colors.
     void addTrianglesToScene(const std::vector<Vec3>& vertices,
                              const std::vector<std::size_t>& triangles,
                              const std::vector<Vec3>& colors)
     {
         assert(triangles.size() % 3 == 0);
-        auto ovc = scene_triangle_vertices_.size(); // old_vertex_count
-        for (auto& v : vertices) { scene_triangle_vertices_.push_back(v); }
-        for (auto& t : triangles) { scene_triangles_.push_back(t + ovc); }
-        for (auto& c : colors) { scene_triangle_vertex_colors_.push_back(c); }
+        assert(vertices.size() == colors.size());
+        auto ovc = animated_tri_mesh_->vertices_.size(); // old_vertex_count
+        for (auto& v : vertices)
+        {
+            animated_tri_mesh_->vertices_.push_back({v.x(), v.y(), v.z()});
+        }
+        for (int t = 0; t < triangles.size(); t += 3)
+        {
+            Eigen::Vector3i new_tri {int(ovc + triangles.at(t)),
+                                     int(ovc + triangles.at(t + 1)),
+                                     int(ovc + triangles.at(t + 2))};
+            animated_tri_mesh_->triangles_.push_back(new_tri);
+        }
+        for (auto& c : colors)
+        {
+            animated_tri_mesh_->vertex_colors_.push_back({c.x(), c.y(), c.z()});
+        }
     }
 
-    // TODO move to bottom of class later
-    // Per frame collection of animating triangles.
-    std::vector<std::size_t> scene_triangles_;
-    std::vector<Vec3> scene_triangle_vertices_;
-    std::vector<Vec3> scene_triangle_vertex_colors_;
-    
-#ifdef USE_OPEN3D
-    // Add to per-frame collection of animating line segments for annotation.
-    std::shared_ptr<open3d::geometry::TriangleMesh> makeTriangleMeshForScene()
-    {
-        assert(scene_triangles_.size() % 3 == 0);
-        auto tm = std::make_shared<open3d::geometry::TriangleMesh>();
-        for (auto& v : scene_triangle_vertices_)
-        {
-            tm->vertices_.push_back({v.x(), v.y(), v.z()});
-        }
-        for (int t = 0; t < scene_triangles_.size(); t += 3)
-        {
-            tm->triangles_.push_back({int(scene_triangles_.at(t)),
-                                      int(scene_triangles_.at(t + 1)),
-                                      int(scene_triangles_.at(t + 2))});
-        }
-        for (auto& c : scene_triangle_vertex_colors_)
-        {
-            tm->vertex_colors_.push_back({c.x(), c.y(), c.z()});
-        }
-        tm->ComputeVertexNormals();
-        return tm;
-    }
-#endif // USE_OPEN3D
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Clear per-frame collection of animating line segments for annotation.
-    void clearLineSegmentsFromScene()
-    {
-        scene_line_endpoints_.clear();
-        scene_line_segments_.clear();
-        scene_line_colors_.clear();
-    }
-    
     // Add to per-frame collection of animating line segments for annotation.
     void addLineSegmentToScene(const Vec3& endpoint0,
                                const Vec3& endpoint1,
                                const Vec3& color)
     {
-        scene_line_endpoints_.push_back(endpoint0);
-        scene_line_segments_.push_back(scene_line_endpoints_.size());
-        scene_line_endpoints_.push_back(endpoint1);
-        scene_line_segments_.push_back(scene_line_endpoints_.size());
-        scene_line_colors_.push_back(color);
+        auto s = animated_line_set_->points_.size();
+        auto ev3d=[](const Vec3& v){return Eigen::Vector3d(v.x(),v.y(),v.z());};
+        animated_line_set_->points_.push_back(ev3d(endpoint0));
+        animated_line_set_->points_.push_back(ev3d(endpoint1));
+        animated_line_set_->lines_.push_back({s, s + 1});
+        animated_line_set_->colors_.push_back(ev3d(color));
     }
     
-#ifdef USE_OPEN3D
-    // Add to per-frame collection of animating line segments for annotation.
-    std::shared_ptr<open3d::geometry::LineSet> makeLineSetForScene()
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240911 try evert TriangleMesh.
+        
+    // Flip orientation of each tri in a triangle mesh (destructively modifies)
+    // (pr to add to Open3D? https://github.com/isl-org/Open3D/discussions/6419)
+    void evertTriangleMesh(open3d::geometry::TriangleMesh& tri_mesh)
     {
-        assert(scene_line_segments_.size() % 2 == 0);
-        auto ls = std::make_shared<open3d::geometry::LineSet>();
-        for (auto& e : scene_line_endpoints_)
+        for (auto& tmt : tri_mesh.triangles_)
         {
-            ls->points_.push_back({e.x(), e.y(), e.z()});
+            std::reverse(std::begin(tmt), std::end(tmt));
         }
-        for (int s = 0; s < scene_line_segments_.size(); s += 2)
-        {
-            ls->lines_.push_back({s, s + 1});
-        }
-        for (auto& c : scene_line_colors_)
-        {
-            ls->colors_.push_back({c.x(), c.y(), c.z()});
-        }
-        return ls;
     }
-#endif // USE_OPEN3D
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Just for debugging and testing. Run Open3D tests and exit from app.
     void visualizeEvoflockFitnessTest()
     {
 #ifdef USE_OPEN3D
-        
-        //    LineWidthPointSizeTest();
-        //    return;
-        
+        clearAnimatedGeometryFromScene();
+
         double sphere_diameter = 100;
         double sphere_radius = sphere_diameter / 2;
         
         auto sphere = open3d::geometry::TriangleMesh::CreateSphere(sphere_radius);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240911 try evert TriangleMesh.
+        evertTriangleMesh(*sphere);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         sphere->ComputeVertexNormals();
         sphere->PaintUniformColor({0.5, 0.5, 0.5});
         
@@ -177,40 +141,29 @@ public:
             addLineSegmentToScene(a, b, c);
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240910 add animated TriangleMesh support.
+
         addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // vertices
                             {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // triangles
                             {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
         
         addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// vertices
                             {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // triangles
-                            {0.3,0.3,0.3});                         // colors
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                            {0.3,0.3,0.3});                         // color
 
         auto vis = open3d::visualization::Visualizer();
         int window_size = 2000;
         vis.CreateVisualizerWindow("evoflock", window_size, window_size, 0, 0);
         vis.AddGeometry(sphere);
-        vis.AddGeometry(makeLineSetForScene());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240910 add animated TriangleMesh support.
-        vis.AddGeometry(makeTriangleMeshForScene());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        animated_tri_mesh_->ComputeVertexNormals();
+        vis.AddGeometry(animated_tri_mesh_);
+        vis.AddGeometry(animated_line_set_);
         vis.GetRenderOption().line_width_ = 10.0;
         vis.GetRenderOption().point_size_ = 20.0;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240910 add animated TriangleMesh support.
-//        vis.GetRenderOption().mesh_show_back_face_ = true;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         vis.Run();
-        
         exit(EXIT_SUCCESS);
-        
 #endif // USE_OPEN3D
-    }
-    
+}
     
     // Example code from https://github.com/isl-org/Open3D/issues/6952
     //    void LineWidthPointSizeTest()
@@ -229,16 +182,13 @@ public:
     //        vis.Run();
     //    }
     
-    
-    
     static void unit_test() {}
     
     util::TimePoint frame_start_time;
     double frame_duration_ = 0; // measured in seconds
     int frame_counter_ = 0;
     
-    // Per frame collection of animating line segments for annotation.
-    std::vector<Vec3> scene_line_endpoints_;
-    std::vector<std::size_t> scene_line_segments_;
-    std::vector<Vec3> scene_line_colors_;
+    // TriangleMesh and LineSet objects in which animated geometry is stored.
+    std::shared_ptr<open3d::geometry::TriangleMesh> animated_tri_mesh_ = nullptr;
+    std::shared_ptr<open3d::geometry::LineSet> animated_line_set_ = nullptr;
 };

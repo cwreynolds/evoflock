@@ -171,6 +171,8 @@ public:
 
     int avoidance_failure_counter() const {return avoidance_failure_counter_;};
 
+    const Vec3& color() const { return color_; }
+    
     std::string name() const { return name_; }
     
     // Constructor
@@ -616,7 +618,31 @@ public:
     //            draw_tri(nose, wingtip0, apex,     color * 0.95)
     //            draw_tri(apex, wingtip0, wingtip1, color * 0.90)
     //            draw_tri(nose, wingtip1, wingtip0, color * 0.70)
-    //
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240911 try drawing boid body
+    // for testing
+    
+//    void draw(Vec3 position, Vec3 side, Vec3 up, Vec3 forward,
+//                      double body_radius, Vec3 color)
+//    void draw_body() const
+    void draw_body()
+    {
+        double bd = fp().body_radius * 2;  // body diameter (defaults to 1)
+        Vec3 center = position();
+        Vec3 nose = center + forward() * fp().body_radius;
+        Vec3 tail = center - forward() * fp().body_radius;
+        Vec3 apex = tail + (up() * 0.25 * bd) + (forward() * 0.1 * bd);
+        Vec3 wingtip0 = tail + (side() * 0.3 * bd);
+        Vec3 wingtip1 = tail - (side() * 0.3 * bd);
+        draw().addTrianglesToScene({nose, apex, wingtip0, wingtip1},// vertices
+                                   {1,2,3, 3,2,0, 0,1,3, 2,1,0},    // triangles
+                                   color());                        // color
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
     //    # Should this Boid be annotated? (At most its those near selected boid.)
     //    def should_annotate(self):
     //        return (Draw.enable and

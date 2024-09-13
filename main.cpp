@@ -24,7 +24,11 @@ int main(int argc, const char * argv[])
 {
 
 #ifdef USE_OPEN3D
-    Draw().visualizeEvoflockFitnessTest();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240913 WIP draw during fitness tests.
+//    Draw().visualizeEvoflockFitnessTest();
+//    exit(EXIT_SUCCESS);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
 
     EF::setRS(LP::LPRS());
@@ -69,8 +73,10 @@ int main(int argc, const char * argv[])
 //    Boid::GP_not_GA = true;
 //    // 20240813
 //    Boid::GP_not_GA = false;
-    // 20240814
-    Boid::GP_not_GA = true;
+//    // 20240814
+//    Boid::GP_not_GA = true;
+    // 20240913
+    Boid::GP_not_GA = false;
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     
     
@@ -291,34 +297,33 @@ int main(int argc, const char * argv[])
     {
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240913 WIP draw during fitness tests.
+        
+//        Draw::globalDrawObjectTemp = std::make_shared<Draw>();
+//        debugPrint(Draw::globalDrawObjectTemp);
+//        Draw::globalDrawObjectTemp->beginAnimatedDisplay();
+        
+#ifdef USE_OPEN3D
+        Draw().visualizeEvoflockFitnessTest();
+#endif  // USE_OPEN3D
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for (int i = 0; i < max_evolution_steps; i++)
         {
             GP::save_fitness_time_series(*population);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240619 WIP first GP_not_GA run
-            
-//            population->evolutionStep(GP::evoflock_fitness_function,
-//                                      GP::scalarize_fitness);
-
-//            population->evolutionStep((GP_not_GA ?
-//                                       GP::evoflock_gp_fitness_function :
-//                                       GP::evoflock_ga_fitness_function),
-//                                      GP::scalarize_fitness);
-
-//            std::cout << "evolution step: " << i << std::endl;
-            
             population->evolutionStep(fitness_function, GP::scalarize_fitness);
-            
-            
             if ((population->getStepCount() % 100) == 0)
             {
                 LP::Individual* individual = population->bestFitness();
                 std::cout << individual->tree().to_string(true) << std::endl;
             }
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             std::cout << std::endl;
         }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240913 WIP draw during fitness tests.
+//        Draw::globalDrawObjectTemp->endAnimatedDisplay();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // Save end of run data.

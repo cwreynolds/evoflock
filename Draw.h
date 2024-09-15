@@ -25,125 +25,56 @@
 class Draw
 {
 public:
-    Draw()
+
+    Draw() { beginGraphics(); }
+
+    ~Draw() { endGraphics(); }
+
+    // These might be called before/after each simulation run (fitness test) or
+    // perhaps the Visualizer and window stick around for a whole evolution run?
+private:
+    // should only be called from constructor, maybe make it private?
+    void beginGraphics()
     {
         // Allocate TriangleMesh/LineSet objects which hold animated geometry.
         animated_tri_mesh_ = std::make_shared<open3d::geometry::TriangleMesh>();
         animated_line_set_ = std::make_shared<open3d::geometry::LineSet>();
-    }
-//    bool enable() { return false; }
-//    double frame_duration() const { return frame_duration_; }
-//    bool poll_events() const { return true; }
-//    int frame_counter() const { return frame_counter_; }
-//    
-//    // Measure how much wall clock time has elapsed for this simulation step.
-//    void measure_frame_duration()
-//    {
-//        util::TimePoint frame_end_time = util::TimeClock::now();
-//        frame_duration_ = util::time_diff_in_seconds(frame_end_time,
-//                                                     frame_start_time);
-//        frame_start_time = frame_end_time;
-//        frame_counter_ += 1;
-//    }
 
-//    // Clear all animated geometry to begin building a new scene.
-//    void clearAnimatedGeometryFromScene()
-//    {
-//        animated_tri_mesh_->Clear();
-//        animated_line_set_->Clear();
-//    }
-//    
-//    // Add to per-frame collection of animating triangles: single color.
-//    // Typically used to add a small polyhedron (a boid's body) to the scene.
-//    void addTrianglesToScene(const std::vector<Vec3>& vertices,
-//                             const std::vector<std::size_t>& triangles,
-//                             const Vec3& color)
-//    {
-//        std::vector<Vec3> colors(vertices.size(), color);
-//        addTrianglesToScene(vertices, triangles, colors);
-//    }
-//
-//    // Add to per-frame collection of animating triangles: per-vertex colors.
-//    void addTrianglesToScene(const std::vector<Vec3>& vertices,
-//                             const std::vector<std::size_t>& triangles,
-//                             const std::vector<Vec3>& colors)
-//    {
-//        assert(triangles.size() % 3 == 0);
-//        assert(vertices.size() == colors.size());
-//        auto ovc = animated_tri_mesh_->vertices_.size(); // old_vertex_count
-//        for (auto& v : vertices)
-//        {
-//            animated_tri_mesh_->vertices_.push_back({v.x(), v.y(), v.z()});
-//        }
-//        for (int t = 0; t < triangles.size(); t += 3)
-//        {
-//            Eigen::Vector3i new_tri {int(ovc + triangles.at(t)),
-//                                     int(ovc + triangles.at(t + 1)),
-//                                     int(ovc + triangles.at(t + 2))};
-//            animated_tri_mesh_->triangles_.push_back(new_tri);
-//        }
-//        for (auto& c : colors)
-//        {
-//            animated_tri_mesh_->vertex_colors_.push_back({c.x(), c.y(), c.z()});
-//        }
-//    }
-//
-//    // Add to per-frame collection of animating line segments for annotation.
-//    void addLineSegmentToScene(const Vec3& endpoint0,
-//                               const Vec3& endpoint1,
-//                               const Vec3& color)
-//    {
-//        auto s = animated_line_set_->points_.size();
-//        auto ev3d=[](const Vec3& v){return Eigen::Vector3d(v.x(),v.y(),v.z());};
-//        animated_line_set_->points_.push_back(ev3d(endpoint0));
-//        animated_line_set_->points_.push_back(ev3d(endpoint1));
-//        animated_line_set_->lines_.push_back({s, s + 1});
-//        animated_line_set_->colors_.push_back(ev3d(color));
-//    }
-//    
-//    void tempAddSphere()
-//    {
-//        auto sphere = open3d::geometry::TriangleMesh::CreateSphere(50);
-//        evertTriangleMesh(*sphere);
-//        sphere->ComputeVertexNormals();
-//        sphere->PaintUniformColor({0.5, 0.5, 0.5});
-//        visualizer_->AddGeometry(sphere);
-//    }
+        debugPrint(visualizer_);
+        visualizer_ = std::make_shared<open3d::visualization::Visualizer>();
+        
+        int window_size = 2000;
+        visualizer_->CreateVisualizerWindow("evoflock",
+                                            window_size, window_size,
+                                            0, 0);
+        debugPrint(visualizer_);
+        debugPrint(visualizer_->GetRenderOption().line_width_);
+        visualizer_->GetRenderOption().line_width_ = 10.0;
+        visualizer_->GetRenderOption().point_size_ = 20.0;
+        tempAddSphere();
+    }
+
+    // should only be called from constructor, maybe make it private?
+    void endGraphics()
+    {
+//        visualizer_->DestroyVisualizerWindow();
+//        visualizer_.reset();
+
+        globalDrawObjectTemp.reset();
+        globalDrawObjectTemp = nullptr;
+    }
     
-    // These might be called before/after each simulation run (fitness test) or
-    // perhaps the Visualizer and window stick around for a whole evolution run?
-    
+public:
+
     // TODO 20240912 make into parameters: win size, win pos, win title,
     //     line_width_, point_size_, plus all the static geometry (obstacles)
     void beginAnimatedDisplay()
     {
-        if (not visualizer_)
-        {
-            debugPrint(visualizer_);
-            visualizer_ = std::make_shared<open3d::visualization::Visualizer>();
-            debugPrint(visualizer_);
-            visualizer_->GetRenderOption().line_width_ = 10.0;
-            visualizer_->GetRenderOption().point_size_ = 20.0;
-            tempAddSphere();
-            
-            int window_size = 2000;
-            visualizer_->CreateVisualizerWindow("evoflock", window_size, window_size, 0, 0);
-
-        }
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240913 WIP draw during fitness tests.
-    // VERY TEMP JUST FOR PROTOTYPING
-    
-    static inline std::shared_ptr<Draw> globalDrawObjectTemp = nullptr;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
     void endAnimatedDisplay()
     {
-        visualizer_->DestroyVisualizerWindow();
     }
     
     void beginOneAnimatedFrame()
@@ -216,7 +147,10 @@ public:
     
     void tempAddSphere()
     {
-        auto sphere = open3d::geometry::TriangleMesh::CreateSphere(50);
+        double sphere_diameter = 100;
+        double sphere_radius = sphere_diameter / 2;
+
+        auto sphere = open3d::geometry::TriangleMesh::CreateSphere(sphere_radius);
         evertTriangleMesh(*sphere);
         sphere->ComputeVertexNormals();
         sphere->PaintUniformColor({0.5, 0.5, 0.5});
@@ -261,26 +195,25 @@ public:
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240913 WIP draw during fitness tests.
+    // VERY TEMP JUST FOR PROTOTYPING
+    static inline std::shared_ptr<Draw> globalDrawObjectTemp = nullptr;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
-    // Just for debugging and testing. Run Open3D tests and exit from app.
-    void visualizeEvoflockFitnessTest()
+    // Just for debugging and testing. Run Open3D tests.
+    static void visualizeEvoflockFitnessTest()
     {
 #ifdef USE_OPEN3D
-        clearAnimatedGeometryFromScene();
-
-        double sphere_diameter = 100;
-        double sphere_radius = sphere_diameter / 2;
+        globalDrawObjectTemp = std::make_shared<Draw>();
+        std::shared_ptr<Draw> draw = globalDrawObjectTemp;
+        draw->clearAnimatedGeometryFromScene();
+        draw->tempAddSphere();
         
-        auto sphere = open3d::geometry::TriangleMesh::CreateSphere(sphere_radius);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240911 try evert TriangleMesh.
-        evertTriangleMesh(*sphere);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        sphere->ComputeVertexNormals();
-        sphere->PaintUniformColor({0.5, 0.5, 0.5});
-        
-        addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
-        addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
+        draw->addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
+        draw->addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
         
         auto& rs = EF::RS();
         Vec3 a;
@@ -290,47 +223,44 @@ public:
             a = b;
             b = b + rs.random_unit_vector() * 0.5;
             auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
-            addLineSegmentToScene(a, b, c);
+            draw->addLineSegmentToScene(a, b, c);
         }
 
-        addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // vertices
-                            {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // triangles
-                            {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
+        draw->addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // vertices
+                                 {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // triangles
+                                 {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
         
-        addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// vertices
-                            {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // triangles
-                            {0.3,0.3,0.3});                         // color
+        draw->addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// vertices
+                                 {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // triangles
+                                 {0.3,0.3,0.3});                         // color
+        
+        draw->drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
 
-        drawBoidBody(Vec3(3, 3, 0), Vec3(1,0,0), Vec3(0,1,0), Vec3(0,0,1),
-                     0.5, Vec3(1,1,0));
-                
         for (int i = 0; i < 100; i++)
         {
             Vec3 p = rs.randomPointInUnitRadiusSphere() * 30;
             auto ls = LocalSpace().randomize_orientation();
             auto c = rs.random_point_in_axis_aligned_box(Vec3(0.4, 0.4, 0.4),
                                                          Vec3(1.0, 1.0, 1.0));
-            drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
+            draw->drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
         }
 
-        auto vis = open3d::visualization::Visualizer();
-        int window_size = 2000;
-        vis.CreateVisualizerWindow("evoflock", window_size, window_size, 0, 0);
-        vis.AddGeometry(sphere);
+        draw->animated_tri_mesh_->ComputeVertexNormals();
+        draw->visualizer_->AddGeometry(draw->animated_tri_mesh_);
+        draw->visualizer_->AddGeometry(draw->animated_line_set_);
+
+        debugPrint(draw->visualizer_->GetRenderOption().line_width_);
+        debugPrint(draw->visualizer_->GetRenderOption().point_size_);
+        draw->visualizer_->GetRenderOption().line_width_ = 10.0;
+        draw->visualizer_->GetRenderOption().point_size_ = 20.0;
+        debugPrint(draw->visualizer_->GetRenderOption().line_width_);
+        debugPrint(draw->visualizer_->GetRenderOption().point_size_);
         
-        animated_tri_mesh_->ComputeVertexNormals();
-        vis.AddGeometry(animated_tri_mesh_);
-        vis.AddGeometry(animated_line_set_);
-        vis.GetRenderOption().line_width_ = 10.0;
-        vis.GetRenderOption().point_size_ = 20.0;
-        
-//        vis.GetRenderOption().ToggleLightOn();
-//        debugPrint(vis.GetViewStatus());
-        
-        vis.Run();
-//        exit(EXIT_SUCCESS);
+        draw->visualizer_->Run();
 #endif // USE_OPEN3D
-}
+    }
+
+    
     
     bool enable() { return false; }
     double frame_duration() const { return frame_duration_; }

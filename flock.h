@@ -50,7 +50,11 @@ private:
     BoidPtrList boids_;
     ObstaclePtrList obstacles_;
     BoidInstanceList boid_instance_list_;
-    Draw draw_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240914 using globalDrawObjectTemp
+//    Draw draw_;
+    Draw& draw_ = *Draw::globalDrawObjectTemp;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // TODO Parameters that may (or may not?) be better kept separate from FP.
     int boid_count_ = 200;

@@ -304,8 +304,13 @@ int main(int argc, const char * argv[])
 //        debugPrint(Draw::globalDrawObjectTemp);
 //        Draw::globalDrawObjectTemp->beginAnimatedDisplay();
         
+//    #ifdef USE_OPEN3D
+//            Draw().visualizeEvoflockFitnessTest();
+//    #endif  // USE_OPEN3D
+
 #ifdef USE_OPEN3D
-        Draw().visualizeEvoflockFitnessTest();
+        Draw::visualizeEvoflockFitnessTest();
+        exit(EXIT_SUCCESS);
 #endif  // USE_OPEN3D
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

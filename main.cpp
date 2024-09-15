@@ -7,7 +7,7 @@
 //
 //------------------------------------------------------------------------------
 
-#define USE_OPEN3D
+//#define USE_OPEN3D
 
 #include "evoflock.h"
 
@@ -23,13 +23,6 @@
 int main(int argc, const char * argv[])
 {
 
-#ifdef USE_OPEN3D
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240913 WIP draw during fitness tests.
-//    Draw().visualizeEvoflockFitnessTest();
-//    exit(EXIT_SUCCESS);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#endif  // USE_OPEN3D
 
     EF::setRS(LP::LPRS());
     EF::unit_test();
@@ -300,17 +293,9 @@ int main(int argc, const char * argv[])
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240913 WIP draw during fitness tests.
         
-//        Draw::globalDrawObjectTemp = std::make_shared<Draw>();
-//        debugPrint(Draw::globalDrawObjectTemp);
-//        Draw::globalDrawObjectTemp->beginAnimatedDisplay();
-        
-//    #ifdef USE_OPEN3D
-//            Draw().visualizeEvoflockFitnessTest();
-//    #endif  // USE_OPEN3D
-
 #ifdef USE_OPEN3D
         Draw::visualizeEvoflockFitnessTest();
-        exit(EXIT_SUCCESS);
+//        exit(EXIT_SUCCESS);
 #endif  // USE_OPEN3D
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -325,10 +310,6 @@ int main(int argc, const char * argv[])
             }
             std::cout << std::endl;
         }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240913 WIP draw during fitness tests.
-//        Draw::globalDrawObjectTemp->endAnimatedDisplay();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // Save end of run data.

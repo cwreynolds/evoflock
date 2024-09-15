@@ -52,8 +52,11 @@ private:
     BoidInstanceList boid_instance_list_;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240914 using globalDrawObjectTemp
-//    Draw draw_;
+#ifdef USE_OPEN3D
     Draw& draw_ = *Draw::globalDrawObjectTemp;
+#else  // USE_OPEN3D
+    Draw draw_;
+#endif  // USE_OPEN3D
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // TODO Parameters that may (or may not?) be better kept separate from FP.

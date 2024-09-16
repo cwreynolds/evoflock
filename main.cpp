@@ -7,7 +7,7 @@
 //
 //------------------------------------------------------------------------------
 
-//#define USE_OPEN3D
+#define USE_OPEN3D
 
 #include "evoflock.h"
 
@@ -84,7 +84,11 @@ int main(int argc, const char * argv[])
 //    // 20240814
 //    EF::enable_multithreading = false;
 
-    // 20240822
+//    // 20240822
+//    EF::enable_multithreading = true;
+
+    // 20240915
+//    EF::enable_multithreading = false;
     EF::enable_multithreading = true;
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -296,6 +300,9 @@ int main(int argc, const char * argv[])
 #ifdef USE_OPEN3D
         Draw::visualizeEvoflockFitnessTest();
 //        exit(EXIT_SUCCESS);
+        
+        Draw draw;
+        
 #endif  // USE_OPEN3D
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

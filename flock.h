@@ -134,6 +134,10 @@ public:
         make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
         // self.draw()
         // self.cycle_obstacle_selection()
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240916 reset frame_counter, etc.
+        draw().beginAnimatedDisplay();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         save_centers_to_file_start();
 
@@ -155,6 +159,10 @@ public:
         }
         save_centers_to_file_end();
         // Draw.close_visualizer()
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240916 reset frame_counter, etc.
+        draw().endAnimatedDisplay();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //        std::cout << "Exit at step:" << draw().frame_counter() << std::endl;
         if (max_simulation_steps() == std::numeric_limits<double>::infinity())
         {

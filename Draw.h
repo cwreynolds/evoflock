@@ -28,6 +28,9 @@ public:
 
     Draw()
     {
+        assert(globalDrawObjectTemp == nullptr);
+        globalDrawObjectTemp = this;
+
 #ifdef USE_OPEN3D
         // Allocate TriangleMesh/LineSet objects which hold animated geometry.
         animated_tri_mesh_ = std::make_shared<open3d::geometry::TriangleMesh>();
@@ -57,6 +60,10 @@ public:
     //     line_width_, point_size_, plus all the static geometry (obstacles)
     void beginAnimatedDisplay()
     {
+        frame_counter_ = 0;
+        frame_duration_ = 0;
+        // TODO 20240915 this is wrong but I'm not sure what is right:
+        frame_start_time = util::TimePoint();
     }
 
     void endAnimatedDisplay()
@@ -205,7 +212,12 @@ public:
     static void visualizeEvoflockFitnessTest()
     {
 #ifdef USE_OPEN3D
-        globalDrawObjectTemp = new Draw();
+
+//        globalDrawObjectTemp = new Draw();
+        Draw draw;
+//        globalDrawObjectTemp = &draw;
+
+        
         globalDrawObjectTemp->clearAnimatedGeometryFromScene();
         globalDrawObjectTemp->tempAddSphere();
         globalDrawObjectTemp->addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});

@@ -59,6 +59,11 @@ private:
 #endif  // USE_OPEN3D
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240917 Prototype of animation timer to be allocated per flock.
+    AnimationTimer animation_timer;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // TODO Parameters that may (or may not?) be better kept separate from FP.
     int boid_count_ = 200;
     double max_simulation_steps_ = std::numeric_limits<double>::infinity();
@@ -90,6 +95,12 @@ public:
     
     Draw& draw() { return draw_; }
     const Draw& draw() const { return draw_; }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240917 Prototype of animation timer to be allocated per flock.
+    AnimationTimer& aTimer() { return animation_timer; }
+    const AnimationTimer& aTimer() const { return animation_timer; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     double max_simulation_steps() const { return max_simulation_steps_; }
     void set_max_simulation_steps(double mss) { max_simulation_steps_ = mss; }
@@ -148,11 +159,19 @@ public:
                 // Draw.clear_scene()
                 fly_boids((fixed_time_step() or not draw().enable()) ?
                           1.0 / fixed_fps() :
-                          draw().frame_duration());
+                          //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                          // TODO 20240917 Prototype of animation timer.
+//                          draw().frame_duration());
+                          aTimer().frame_duration());
+                          //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 save_centers_to_file_1_step();
                 // self.draw()
                 // Draw.update_scene()
-                if (not simulation_paused_) { draw().measure_frame_duration(); }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20240917 Prototype of animation timer.
+//                if (not simulation_paused_) { draw().measure_frame_duration(); }
+                if (not simulation_paused_) { aTimer().measure_frame_duration(); }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 log_stats();
                 update_fps();
             }
@@ -167,7 +186,11 @@ public:
         if (max_simulation_steps() == std::numeric_limits<double>::infinity())
         {
             std::cout << log_prefix << "Exit at step: ";
-            std::cout << draw().frame_counter() << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240916 reset frame_counter, etc.
+//            std::cout << draw().frame_counter() << std::endl;
+            std::cout << aTimer().frame_counter() << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
     }
 
@@ -529,7 +552,11 @@ public:
             increment_boid_update_counter();
         }
         if (all_speed_good) { count_steps_good_speed++; }
-        if (0 == (draw().frame_counter() % cluster_score_stride_))
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240916 reset frame_counter, etc.
+//        if (0 == (draw().frame_counter() % cluster_score_stride_))
+        if (0 == (aTimer().frame_counter() % cluster_score_stride_))
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             double cs = util::remap_interval_clip(count_clusters(), 0, 5, 0, 1);
             cluster_score_sum_ += cs;
@@ -659,7 +686,11 @@ public:
     }
     double get_speed_score() const
     {
-        return count_steps_good_speed / double(draw().frame_counter());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240917 Prototype of animation timer.
+//        return count_steps_good_speed / double(draw().frame_counter());
+        return count_steps_good_speed / double(aTimer().frame_counter());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     double get_avoid_obstacle_score() const
     {
@@ -694,7 +725,11 @@ public:
     void log_stats()
     {
         if ((not simulation_paused_) and
-            (draw().frame_counter() % getLogStatInterval() == 0))
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240917 Prototype of animation timer.
+//            (draw().frame_counter() % getLogStatInterval() == 0))
+            (aTimer().frame_counter() % getLogStatInterval() == 0))
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             double average_speed = 0;
             for (Boid* b : boids()) { average_speed += b->speed(); }
@@ -727,7 +762,12 @@ public:
             
             grabPrintLock_evoflock();
             std::cout << log_prefix;
-            std::cout << draw().frame_counter();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240917 Prototype of animation timer.
+//            std::cout << draw().frame_counter();
+            std::cout << aTimer().frame_counter();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240917 Prototype of animation timer.
             // std::cout << " fps=" << 0; // round(self.fps.value));
             std::cout << " fps=" << fps_.value;
             std::cout << ", ave_speed=" << average_speed;
@@ -747,7 +787,10 @@ public:
     // Keep track of a smoothed (LPF) version of frames per second metric.
     void update_fps()
     {
-        double fd = draw().frame_duration();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240917 Prototype of animation timer.
+        double fd = aTimer().frame_duration();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         fps_.blend((fixed_time_step() ? fixed_fps() : int(1 / fd)),
                    0.95);
     }
@@ -1029,7 +1072,11 @@ public:
     bool still_running()
     {
         bool a = (not draw().enable()) ? true : draw().poll_events();
-        bool b = draw().frame_counter() < max_simulation_steps();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240917 Prototype of animation timer to be allocated per flock.
+//        bool b = draw().frame_counter() < max_simulation_steps();
+        bool b = aTimer().frame_counter() < max_simulation_steps();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return a and b;
     }
     

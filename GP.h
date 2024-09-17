@@ -918,10 +918,10 @@ LP::FunctionSet evoflock_gp_function_set()
                         // TOODO 20240809 why is obstacle avoidance broken?
 //                        debugPrint(first_collision)
                         
-                        debugPrint(Draw().frame_counter())
-                        bool log = (boid.is_first_boid() and
-                                    ((Draw().frame_counter() % 100) == 0));
-                        if (log) { debugPrint(first_collision) }
+//                        debugPrint(Draw().frame_counter())
+//                        bool log = (boid.is_first_boid() and
+//                                    ((Draw().frame_counter() % 100) == 0));
+//                        if (log) { debugPrint(first_collision) }
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                         
                         normal = first_collision.normal_at_poi;

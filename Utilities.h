@@ -237,6 +237,35 @@ private:
 };
 
 
+// Timer/clock class for animation. Originally misplaced in Draw in the earlier
+// Python "flock" project. Now split off because in evoflock the lifetime of
+// Draw is unrelated to the lifetime of an animation clock. Perhaps this should
+// eventually be merged into Timer class (just above in this file)?
+class AnimationTimer
+{
+public:
+    AnimationTimer() : frame_start_time_(TimeClock::now()) {}
+
+    double frame_duration() const { return frame_duration_; }
+    bool poll_events() const { return true; }
+    int frame_counter() const { return frame_counter_; }
+    
+    // Measure how much wall clock time has elapsed for this simulation step.
+    void measure_frame_duration()
+    {
+        TimePoint frame_end_time = TimeClock::now();
+        frame_duration_ = time_diff_in_seconds(frame_end_time, frame_start_time_);
+        frame_start_time_ = frame_end_time;
+        frame_counter_ += 1;
+    }
+    
+private:
+    TimePoint frame_start_time_;
+    double frame_duration_ = 0; // measured in seconds
+    int frame_counter_ = 0;
+};
+
+
 // Measure the execution time of a given "work load" function (of no arguments)
 // and an optional suggested repetition count.
 double executions_per_second(std::function<void()> work_load, int count = 500000)

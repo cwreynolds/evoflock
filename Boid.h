@@ -4,35 +4,23 @@
 //
 //  Boid class, specialization of Agent.
 //
-//  A Flock is a collection of Boid instances. Boid.fly_with_flock() is its main
-//  entry point. Boids are normally created by a Flock. Each Boid is created
-//  with a link back to its Flock, for finding neighbors, etc.
+//  A Flock is a collection of Boid instances. Boid.steer_to_flock() is its main
+//  entry point (accessed through plan_next_steer() and apply_next_steer() for
+//  deterministic behavior). Boids are normally created by a Flock. Each Boid is
+//  created with a link back to its Flock.
 //
 //  Created by Craig Reynolds on January 27, 2024.
 //  (Based on earlier C++ and Python versions.)
 //  MIT License -- Copyright © 2024 Craig Reynolds
 //------------------------------------------------------------------------------
 
-
 #pragma once
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240909 add Draw.h
-
-//#include "Vec3.h"
-//#include "Utilities.h"
-//#include "Agent.h"
-//#include "obstacle.h"
-//#include <algorithm>  // For sorting cached_nearest_neighbors_.
-
 #include "Agent.h"
 #include "Draw.h"
 #include "obstacle.h"
 #include "Utilities.h"
 #include "Vec3.h"
-
 #include <algorithm>  // For sorting cached_nearest_neighbors_.
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Boid;
 typedef std::vector<Boid*> BoidPtrList;

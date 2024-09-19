@@ -19,23 +19,12 @@
 // -----------------------------------------------------------------------------
 
 #pragma once
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240909 add Draw.h
-
-//#include "Vec3.h"
-//#include "Utilities.h"
-//#include "Boid.h"
-//#include "obstacle.h"
-//#include "dbscan.h"
-
 #include "Boid.h"
 #include "dbscan.h"
 #include "Draw.h"
 #include "obstacle.h"
 #include "Utilities.h"
 #include "Vec3.h"
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #include "LazyPredator/LazyPredator.h"
 namespace LP = LazyPredator;
@@ -59,10 +48,7 @@ private:
 #endif  // USE_OPEN3D
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240917 Prototype of animation timer to be allocated per flock.
-    AnimationTimer animation_timer;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    util::AnimationTimer animation_timer;
 
     // TODO Parameters that may (or may not?) be better kept separate from FP.
     int boid_count_ = 200;
@@ -96,11 +82,8 @@ public:
     Draw& draw() { return draw_; }
     const Draw& draw() const { return draw_; }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240917 Prototype of animation timer to be allocated per flock.
-    AnimationTimer& aTimer() { return animation_timer; }
-    const AnimationTimer& aTimer() const { return animation_timer; }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    util::AnimationTimer& aTimer() { return animation_timer; }
+    const util::AnimationTimer& aTimer() const { return animation_timer; }
 
     double max_simulation_steps() const { return max_simulation_steps_; }
     void set_max_simulation_steps(double mss) { max_simulation_steps_ = mss; }
@@ -159,19 +142,11 @@ public:
                 // Draw.clear_scene()
                 fly_boids((fixed_time_step() or not draw().enable()) ?
                           1.0 / fixed_fps() :
-                          //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                          // TODO 20240917 Prototype of animation timer.
-//                          draw().frame_duration());
                           aTimer().frame_duration());
-                          //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 save_centers_to_file_1_step();
                 // self.draw()
                 // Draw.update_scene()
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240917 Prototype of animation timer.
-//                if (not simulation_paused_) { draw().measure_frame_duration(); }
                 if (not simulation_paused_) { aTimer().measure_frame_duration(); }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 log_stats();
                 update_fps();
             }
@@ -686,11 +661,7 @@ public:
     }
     double get_speed_score() const
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240917 Prototype of animation timer.
-//        return count_steps_good_speed / double(draw().frame_counter());
         return count_steps_good_speed / double(aTimer().frame_counter());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     double get_avoid_obstacle_score() const
     {
@@ -725,11 +696,7 @@ public:
     void log_stats()
     {
         if ((not simulation_paused_) and
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240917 Prototype of animation timer.
-//            (draw().frame_counter() % getLogStatInterval() == 0))
             (aTimer().frame_counter() % getLogStatInterval() == 0))
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             double average_speed = 0;
             for (Boid* b : boids()) { average_speed += b->speed(); }
@@ -762,12 +729,7 @@ public:
             
             grabPrintLock_evoflock();
             std::cout << log_prefix;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240917 Prototype of animation timer.
-//            std::cout << draw().frame_counter();
             std::cout << aTimer().frame_counter();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240917 Prototype of animation timer.
             // std::cout << " fps=" << 0; // round(self.fps.value));
             std::cout << " fps=" << fps_.value;
             std::cout << ", ave_speed=" << average_speed;
@@ -787,12 +749,8 @@ public:
     // Keep track of a smoothed (LPF) version of frames per second metric.
     void update_fps()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240917 Prototype of animation timer.
         double fd = aTimer().frame_duration();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        fps_.blend((fixed_time_step() ? fixed_fps() : int(1 / fd)),
-                   0.95);
+        fps_.blend((fixed_time_step() ? fixed_fps() : int(1 / fd)), 0.95);
     }
     
     // Based on pause/play and single step. Called once per frame from main loop.
@@ -1072,11 +1030,7 @@ public:
     bool still_running()
     {
         bool a = (not draw().enable()) ? true : draw().poll_events();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240917 Prototype of animation timer to be allocated per flock.
-//        bool b = draw().frame_counter() < max_simulation_steps();
         bool b = aTimer().frame_counter() < max_simulation_steps();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return a and b;
     }
     

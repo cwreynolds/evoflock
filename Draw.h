@@ -55,6 +55,7 @@ public:
 
     ~Draw()
     {
+        visualizer_->DestroyVisualizerWindow();
         globalDrawObjectTemp = nullptr;
         std::cout << "End graphics session using. Total triangles drawn: ";
         std::cout << triangle_count_ << "." << std::endl;
@@ -64,10 +65,6 @@ public:
     //     line_width_, point_size_, plus all the static geometry (obstacles)
     void beginAnimatedDisplay()
     {
-//        frame_counter_ = 0;
-//        frame_duration_ = 0;
-//        // TODO 20240915 this is wrong but I'm not sure what is right:
-//        frame_start_time = util::TimePoint();
     }
 
     void endAnimatedDisplay()
@@ -265,32 +262,34 @@ public:
         globalDrawObjectTemp->animated_tri_mesh_->ComputeVertexNormals();
         globalDrawObjectTemp->visualizer_->AddGeometry(globalDrawObjectTemp->animated_tri_mesh_);
         globalDrawObjectTemp->visualizer_->AddGeometry(globalDrawObjectTemp->animated_line_set_);
+        
         globalDrawObjectTemp->visualizer_->Run();
 
+//        while (globalDrawObjectTemp->pollEvents())
+//        {
+//            
+//        }
+        
+        
 #endif  // USE_OPEN3D
     }
 
     bool enable() { return false; }
-    bool poll_events() const { return true; }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240917 Prototype of animation timer to be allocated per flock.
-    //               Would it make any sense to integrate this with util::Timer?
-
-//    double frame_duration() const { return frame_duration_; }
-//    int frame_counter() const { return frame_counter_; }
-//    
-//    // Measure how much wall clock time has elapsed for this simulation step.
-//    void measure_frame_duration()
+    
+//    bool poll_events() const { return true; }
+//    bool pollEvents() const
 //    {
-//        util::TimePoint frame_end_time = util::TimeClock::now();
-//        frame_duration_ = util::time_diff_in_seconds(frame_end_time,
-//                                                     frame_start_time);
-//        frame_start_time = frame_end_time;
-//        frame_counter_ += 1;
+//        visualizer_->PollEvents();
+//        return true;
 //    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240919 trying to handle commands with register_key_callback
+    bool pollEvents() const
+    {
+        return visualizer_->PollEvents();
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Example code from https://github.com/isl-org/Open3D/issues/6952
     //    void LineWidthPointSizeTest()
@@ -311,15 +310,6 @@ public:
     
     static void unit_test() {}
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240917 Prototype of animation timer to be allocated per flock.
-    //               Would it make any sense to integrate this with util::Timer?
-
-//    util::TimePoint frame_start_time;
-//    double frame_duration_ = 0; // measured in seconds
-//    int frame_counter_ = 0;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 private:
 #ifdef USE_OPEN3D
 

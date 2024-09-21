@@ -89,8 +89,11 @@ int main(int argc, const char * argv[])
 
     // 20240915
 //    EF::enable_multithreading = false;
-    EF::enable_multithreading = true;
+//    EF::enable_multithreading = true;
 
+    // 20240919
+    EF::enable_multithreading = false;
+    
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -299,10 +302,7 @@ int main(int argc, const char * argv[])
         
 #ifdef USE_OPEN3D
         Draw::visualizeEvoflockFitnessTest();
-//        exit(EXIT_SUCCESS);
-        
         Draw draw;
-        
 #endif  // USE_OPEN3D
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

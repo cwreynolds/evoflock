@@ -1029,7 +1029,11 @@ public:
     // Simulation continues running until this returns false.
     bool still_running()
     {
-        bool a = (not draw().enable()) ? true : draw().poll_events();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240919 trying to handle commands with register_key_callback
+//        bool a = (not draw().enable()) ? true : draw().poll_events();
+        bool a = (not draw().enable()) ? true : draw().pollEvents();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         bool b = aTimer().frame_counter() < max_simulation_steps();
         return a and b;
     }

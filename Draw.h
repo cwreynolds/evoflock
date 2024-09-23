@@ -24,29 +24,28 @@
 class Draw
 {
 public:
+    // Pointer to main global drawing context.
+    static inline Draw* globalObject = nullptr;
 
     Draw()
     {
         std::cout << "Begin graphics session using: ";
         open3d::PrintOpen3DVersion();
         
-        assert(globalDrawObjectTemp == nullptr);
-        globalDrawObjectTemp = this;
+        assert(globalObject == nullptr);
+        globalObject = this;
 
 #ifdef USE_OPEN3D
         // Allocate TriangleMesh/LineSet objects which hold animated geometry.
         animated_tri_mesh_ = std::make_shared<open3d::geometry::TriangleMesh>();
         animated_line_set_ = std::make_shared<open3d::geometry::LineSet>();
         
-//        debugPrint(visualizer_);
         visualizer_ = std::make_shared<open3d::visualization::Visualizer>();
         
         int window_size = 2000;
         visualizer_->CreateVisualizerWindow("evoflock",
                                             window_size, window_size,
                                             0, 0);
-//        debugPrint(visualizer_);
-//        debugPrint(visualizer_->GetRenderOption().line_width_);
         visualizer_->GetRenderOption().line_width_ = 10.0;
         visualizer_->GetRenderOption().point_size_ = 20.0;
         tempAddSphere();
@@ -56,7 +55,7 @@ public:
     ~Draw()
     {
         visualizer_->DestroyVisualizerWindow();
-        globalDrawObjectTemp = nullptr;
+        globalObject = nullptr;
         std::cout << "End graphics session using. Total triangles drawn: ";
         std::cout << triangle_count_ << "." << std::endl;
     }
@@ -167,16 +166,17 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240911 try evert TriangleMesh.
 #ifdef USE_OPEN3D
-
-    // Flip orientation of each tri in a triangle mesh (destructively modifies)
+    
+    // Flip orientation of each tri in a triangle mesh (destructively modifies).
     // (pr to add to Open3D? https://github.com/isl-org/Open3D/discussions/6419)
     void evertTriangleMesh(open3d::geometry::TriangleMesh& tri_mesh)
     {
-        for (auto& tmt : tri_mesh.triangles_)
+        for (auto& triangle : tri_mesh.triangles_)
         {
-            std::reverse(std::begin(tmt), std::end(tmt));
+            std::reverse(std::begin(triangle), std::end(triangle));
         }
     }
+
 #endif  // USE_OPEN3D
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -204,27 +204,19 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240913 WIP draw during fitness tests.
-    // VERY TEMP JUST FOR PROTOTYPING
-    static inline Draw* globalDrawObjectTemp = nullptr;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240922 revised
+
     // Just for debugging and testing. Run Open3D tests.
     static void visualizeEvoflockFitnessTest()
     {
 #ifdef USE_OPEN3D
-
-//        globalDrawObjectTemp = new Draw();
         Draw draw;
-//        globalDrawObjectTemp = &draw;
-
-        
-        globalDrawObjectTemp->clearAnimatedGeometryFromScene();
-        globalDrawObjectTemp->tempAddSphere();
-        globalDrawObjectTemp->addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
-        globalDrawObjectTemp->addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
+        draw.clearAnimatedGeometryFromScene();
+        draw.tempAddSphere();
+        draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
+        draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
 
         auto& rs = EF::RS();
         Vec3 a;
@@ -234,61 +226,46 @@ public:
             a = b;
             b = b + rs.random_unit_vector() * 0.5;
             auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
-            globalDrawObjectTemp->addLineSegmentToScene(a, b, c);
+            draw.addLineSegmentToScene(a, b, c);
         }
 
-        globalDrawObjectTemp->
-        addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // vertices
-                            {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // triangles
-                            {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
+        draw.addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // verts
+                                 {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // tris
+                                 {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
         
-        globalDrawObjectTemp->
-        addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// vertices
-                            {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // triangles
-                            {0.3,0.3,0.3});                         // color
+        draw.addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// verts
+                                 {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // tris
+                                 {0.3,0.3,0.3});                         // color
         
-        globalDrawObjectTemp->
-        drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
-
+        draw.drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
         for (int i = 0; i < 100; i++)
         {
             Vec3 p = rs.randomPointInUnitRadiusSphere() * 30;
             auto ls = LocalSpace().randomize_orientation();
             auto c = rs.random_point_in_axis_aligned_box(Vec3(0.4, 0.4, 0.4),
                                                          Vec3(1.0, 1.0, 1.0));
-            globalDrawObjectTemp->drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
+            draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
         }
 
-        globalDrawObjectTemp->animated_tri_mesh_->ComputeVertexNormals();
-        globalDrawObjectTemp->visualizer_->AddGeometry(globalDrawObjectTemp->animated_tri_mesh_);
-        globalDrawObjectTemp->visualizer_->AddGeometry(globalDrawObjectTemp->animated_line_set_);
-        
-        globalDrawObjectTemp->visualizer_->Run();
-
-//        while (globalDrawObjectTemp->pollEvents())
-//        {
-//            
-//        }
-        
-        
+        draw.animated_tri_mesh_->ComputeVertexNormals();
+        draw.visualizer_->AddGeometry(draw.animated_tri_mesh_);
+        draw.visualizer_->AddGeometry(draw.animated_line_set_);
+        while (draw.pollEvents())
+        {
+            draw.visualizer_->UpdateGeometry();
+            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        }
 #endif  // USE_OPEN3D
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     bool enable() { return false; }
     
-//    bool poll_events() const { return true; }
-//    bool pollEvents() const
-//    {
-//        visualizer_->PollEvents();
-//        return true;
-//    }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240919 trying to handle commands with register_key_callback
     bool pollEvents() const
     {
         return visualizer_->PollEvents();
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
     // Example code from https://github.com/isl-org/Open3D/issues/6952

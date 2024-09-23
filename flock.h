@@ -40,9 +40,9 @@ private:
     ObstaclePtrList obstacles_;
     BoidInstanceList boid_instance_list_;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240914 using globalDrawObjectTemp
+    // TODO 20240914 using Draw::globalObject
 #ifdef USE_OPEN3D
-    Draw& draw_ = *Draw::globalDrawObjectTemp;
+    Draw& draw_ = *Draw::globalObject;
 #else  // USE_OPEN3D
     Draw draw_;
 #endif  // USE_OPEN3D

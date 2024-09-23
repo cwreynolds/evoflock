@@ -22,6 +22,12 @@
 
 int main(int argc, const char * argv[])
 {
+    //--------------------------------------------------------------------------
+    // TODO 20240923 more fiddling with point/line sizes
+    //               see https://github.com/isl-org/Open3D/issues/6952
+//    Draw::LineWidthPointSizeTest();
+//    return EXIT_SUCCESS;
+    //--------------------------------------------------------------------------
 
 
     EF::setRS(LP::LPRS());

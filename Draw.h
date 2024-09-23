@@ -267,7 +267,6 @@ public:
         return visualizer_->PollEvents();
     }
 
-
     // Example code from https://github.com/isl-org/Open3D/issues/6952
     //    void LineWidthPointSizeTest()
     //    {
@@ -285,6 +284,22 @@ public:
     //        vis.Run();
     //    }
     
+    // Example code from https://github.com/isl-org/Open3D/issues/6952
+    static void LineWidthPointSizeTest()
+    {
+        open3d::PrintOpen3DVersion();
+        auto lineset = std::make_shared<open3d::geometry::LineSet>();
+        lineset->points_ = {{5, 0, 0}, {-5, 0, 0}, {0, 5, 0}, {0, -5, 0}, {0, 0, 5}, {0, 0, -5}};
+        lineset->lines_ = {{0, 1}, {2, 3}, {4, 5}};
+        lineset->colors_ = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+        open3d::visualization::gui::Application::GetInstance().Initialize();
+        auto vis = open3d::visualization::visualizer::O3DVisualizer("name", 500, 500);
+        vis.AddGeometry("lines", {lineset});
+        vis.SetLineWidth(10);
+        vis.SetPointSize(20);
+        open3d::visualization::gui::Application::GetInstance().Run();
+    }
+
     static void unit_test() {}
     
 private:

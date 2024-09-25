@@ -26,6 +26,11 @@ class Draw
 public:
     // Pointer to main global drawing context.
     static inline Draw* globalObject = nullptr;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240924 add key command to toggle graphics
+    typedef open3d::visualization::VisualizerWithKeyCallback vis_t;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     Draw()
     {
@@ -40,8 +45,14 @@ public:
         animated_tri_mesh_ = std::make_shared<open3d::geometry::TriangleMesh>();
         animated_line_set_ = std::make_shared<open3d::geometry::LineSet>();
         
-        visualizer_ = std::make_shared<open3d::visualization::Visualizer>();
-        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240924 add key command to toggle graphics
+                
+//        visualizer_ = std::make_shared<open3d::visualization::Visualizer>();
+        visualizer_ = std::make_shared<vis_t>();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         int window_size = 2000;
         visualizer_->CreateVisualizerWindow("evoflock",
                                             window_size, window_size,
@@ -49,6 +60,43 @@ public:
         visualizer_->GetRenderOption().line_width_ = 10.0;
         visualizer_->GetRenderOption().point_size_ = 20.0;
         tempAddSphere();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240924 add key command to toggle graphics
+
+        // flock.py
+        //    # Register single key commands with the Open3D visualizer GUI.
+        //    def register_single_key_commands(self):
+        //        Draw.register_key_callback(ord(' '), Flock.toggle_paused_mode)
+        //        Draw.register_key_callback(ord('1'), Flock.set_single_step_mode)
+        //        Draw.register_key_callback(ord('S'), Flock.select_next_boid)
+        //        Draw.register_key_callback(ord('A'), Flock.toggle_annotation)
+        //        Draw.register_key_callback(ord('C'), Flock.toggle_tracking_camera)
+        //        Draw.register_key_callback(ord('W'), Flock.toggle_wrap_vs_avoid)
+        //        Draw.register_key_callback(ord('E'), Flock.toggle_dynamic_erase)
+        //        Draw.register_key_callback(ord('F'), Flock.toggle_fixed_time_step)
+        //        Draw.register_key_callback(ord('B'), Flock.toggle_avoid_blend_mode)
+        //        Draw.register_key_callback(ord('O'), Flock.cycle_obstacle_selection)
+        //        Draw.register_key_callback(ord('H'), Flock.print_help)
+
+        // draw.py
+        //    def register_key_callback(key, callback_func):
+        //        if Draw.enable:
+        //            Draw.vis.register_key_callback(key, callback_func)
+
+//        Draw.vis.register_key_callback(key, callback_func)
+        
+
+
+        auto toggle_enable_callback = [&](open3d::visualization::Visualizer* vis)
+        {
+            toggleEnable();
+            return true;
+        };
+        visualizer_->RegisterKeyCallback('G', toggle_enable_callback);
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #endif  // USE_OPEN3D
     }
 
@@ -213,6 +261,12 @@ public:
     {
 #ifdef USE_OPEN3D
         Draw draw;
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240924 add key command to toggle graphics
+        draw.setEnable(true);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         draw.clearAnimatedGeometryFromScene();
         draw.tempAddSphere();
         draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
@@ -238,7 +292,8 @@ public:
                                  {0.3,0.3,0.3});                         // color
         
         draw.drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
-        for (int i = 0; i < 100; i++)
+//        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 500; i++)
         {
             Vec3 p = rs.randomPointInUnitRadiusSphere() * 30;
             auto ls = LocalSpace().randomize_orientation();
@@ -250,18 +305,58 @@ public:
         draw.animated_tri_mesh_->ComputeVertexNormals();
         draw.visualizer_->AddGeometry(draw.animated_tri_mesh_);
         draw.visualizer_->AddGeometry(draw.animated_line_set_);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240924 add key command to toggle graphics
+        
+//        while (draw.pollEvents())
+//        {
+//            double jiggle = 0.01;
+//            auto& endpoints = draw.animated_line_set_->points_;
+//            for (int i = 5; i < endpoints.size(); i += 2)
+//            {
+//                endpoints[i].x() += EF::RS().random2(-jiggle, jiggle);
+//                endpoints[i].y() += EF::RS().random2(-jiggle, jiggle);
+//                endpoints[i].z() += EF::RS().random2(-jiggle, jiggle);
+//                endpoints[i+1] = endpoints[i];
+//            }
+//            draw.visualizer_->UpdateGeometry();
+//            std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
+//        }
+
         while (draw.pollEvents())
         {
-            draw.visualizer_->UpdateGeometry();
-            std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            if (draw.enable())
+            {
+                double jiggle = 0.01;
+                auto& endpoints = draw.animated_line_set_->points_;
+                for (int i = 5; i < endpoints.size(); i += 2)
+                {
+                    endpoints[i].x() += EF::RS().random2(-jiggle, jiggle);
+                    endpoints[i].y() += EF::RS().random2(-jiggle, jiggle);
+                    endpoints[i].z() += EF::RS().random2(-jiggle, jiggle);
+                    endpoints[i+1] = endpoints[i];
+                }
+                draw.visualizer_->UpdateGeometry();
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
         }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    bool enable() { return false; }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240924 add key command to toggle graphics
+//    bool enable() { return false; }
+    bool enable_ = false;
+    bool enable() const { return enable_; }
+    void setEnable(bool e) { enable_ = e; }
+    void toggleEnable() { enable_ = not enable_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     bool pollEvents() const
     {
         return visualizer_->PollEvents();
@@ -311,9 +406,17 @@ private:
     // Open3D LineSet object for storing and drawing animated line segments.
     std::shared_ptr<open3d::geometry::LineSet> animated_line_set_ = nullptr;
     
-    // Retain pointer to Open3D Visualizer object.
-    std::shared_ptr<open3d::visualization::Visualizer> visualizer_ = nullptr;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240924 add key command to toggle graphics
     
+//    // Retain pointer to Open3D Visualizer object.
+//    std::shared_ptr<open3d::visualization::Visualizer> visualizer_ = nullptr;
+    
+    // Retain pointer to Open3D Visualizer object.
+    std::shared_ptr<vis_t> visualizer_ = nullptr;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Count all triangles drawn during graphics session.
     int triangle_count_ = 0;
 

@@ -4,6 +4,10 @@
 //
 //  Graphics utilities for evoflock based on Open3D.
 //  An instance of Draw provides the (optional) graphics context and utilities.
+//  Draw is a "singleton" class, for which only one instance exists at any time.
+//  Creating a Draw object creates an Open3D visualizer object, an associated
+//  window, and provides API for adding/modifying static and animated geometry
+//  in the scene displayed in the window.
 //
 //  Created by Craig Reynolds on September 9, 2024.
 //  MIT License -- Copyright © 2024 Craig Reynolds
@@ -21,22 +25,38 @@
 #include "LocalSpace.h"
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+
+// TODO 20240912 make into parameters: win size, win pos, win title,
+//     line_width_, point_size_, plus all the static geometry (obstacles)
+
+
 class Draw
 {
 public:
-    // Pointer to main global drawing context.
-    static inline Draw* globalObject = nullptr;
-    
 #ifdef USE_OPEN3D
     // Short names for the Open3D visualizer class used here and base class:
     typedef open3d::visualization::VisualizerWithKeyCallback vis_t;
     typedef open3d::visualization::Visualizer base_vis_t;
 #endif  // USE_OPEN3D
 
-    Draw()
+    // Used to get the current global Draw object (drawing context).
+    static Draw& getInstance() { return *global_object_; }
+    
+    // Default constructor
+    Draw() : Draw(false) {}
+    
+    // Constructor with args for
+    Draw(bool enabled,
+         Vec3 window_xy_size = Vec3(2000, 2000, 0),
+         Vec3 window_xy_position_ul = Vec3(),
+         std::string window_title = "evoflock",
+         int line_width = 10,
+         int point_size = 20)
     {
-        assert(globalObject == nullptr);
-        globalObject = this;
+        assert(global_object_ == nullptr);
+        global_object_ = this;
+        setEnable(true);
 
 #ifdef USE_OPEN3D
         std::cout << "Begin graphics session using: ";
@@ -50,14 +70,23 @@ public:
         animated_line_set_ = std::make_shared<open3d::geometry::LineSet>();
         
         // Create window for visualizer.
-        int window_size = 2000;
-        visualizer_->CreateVisualizerWindow("evoflock",
-                                            window_size, window_size,
-                                            0, 0);
-        // TODO does not work, see https://github.com/isl-org/Open3D/issues/6952
-        visualizer_->GetRenderOption().line_width_ = 10.0;
-        visualizer_->GetRenderOption().point_size_ = 20.0;
+//        int window_size = 2000;
+//        visualizer_->CreateVisualizerWindow("evoflock",
+//                                            window_size, window_size,
+//                                            0, 0);
+//        // TODO does not work, see https://github.com/isl-org/Open3D/issues/6952
+//        visualizer_->GetRenderOption().line_width_ = 10.0;
+//        visualizer_->GetRenderOption().point_size_ = 20.0;
         
+        visualizer_->CreateVisualizerWindow(window_title,
+                                            window_xy_size.x(),
+                                            window_xy_size.y(),
+                                            window_xy_position_ul.x(),
+                                            window_xy_position_ul.y());
+        // TODO does not work, see https://github.com/isl-org/Open3D/issues/6952
+        visualizer_->GetRenderOption().line_width_ = line_width;
+        visualizer_->GetRenderOption().point_size_ = point_size;
+
         // TODO temporary work-around to create the big sphere.
         tempAddSphere();
         
@@ -71,33 +100,28 @@ public:
     ~Draw()
     {
 #ifdef USE_OPEN3D
+        // TODO 20240927 is this necessary?
+        //               doesn't this happen when visualizer_ goes out of scope?
         visualizer_->DestroyVisualizerWindow();
 #endif  // USE_OPEN3D
-        globalObject = nullptr;
+        global_object_ = nullptr;
         std::cout << "End graphics session using. Total triangles drawn: ";
         std::cout << triangle_count_ << "." << std::endl;
     }
 
-    // TODO 20240912 make into parameters: win size, win pos, win title,
-    //     line_width_, point_size_, plus all the static geometry (obstacles)
-    void beginAnimatedDisplay()
+//    void beginAnimatedDisplay()
+    void beginAnimatedScene()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
         clearAnimatedGeometryFromScene();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
-    void endAnimatedDisplay()
+//    void endAnimatedDisplay()
+    void endAnimatedScene()
     {
     }
     
     void beginOneAnimatedFrame()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
-//        clearAnimatedGeometryFromScene();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     void endOneAnimatedFrame()
@@ -237,21 +261,11 @@ public:
     static void visualizeEvoflockFitnessTest()
     {
 #ifdef USE_OPEN3D
-        Draw draw;
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
-        draw.beginAnimatedDisplay();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Draw draw(true);
+        draw.beginAnimatedScene();
 
-        // TODO maybe enable-ness should be an optional parameter of constructor?
-        draw.setEnable(true);
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
-//        draw.clearAnimatedGeometryFromScene();
-//        draw.tempAddSphere();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO maybe enable-ness should be an optional parameter of constructor?
+//        draw.setEnable(true);
 
         draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
         draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
@@ -285,22 +299,19 @@ public:
             draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
         }
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
+        // Add animated_tri_mesh_ and animated_line_set_ to scene
+        // TODO 20240927 shouldn't this be inside a method of Draw?
+        // Maybe we SHOULD reconstruct the geometry every frame?
         draw.animated_tri_mesh_->ComputeVertexNormals();
         draw.visualizer_->AddGeometry(draw.animated_tri_mesh_);
         draw.visualizer_->AddGeometry(draw.animated_line_set_);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Loop for displaying animated graphics.
         while (draw.pollEvents())
         {
             if (draw.enable())
             {
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
                 draw.beginOneAnimatedFrame();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 double jiggle = 0.01;
                 auto& endpoints = draw.animated_line_set_->points_;
                 for (int i = 5; i < endpoints.size(); i += 2)
@@ -310,19 +321,11 @@ public:
                     endpoints[i].z() += EF::RS().random2(-jiggle, jiggle);
                     endpoints[i+1] = endpoints[i];
                 }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240926 use beginAnimatedDisplay() and endAnimatedDisplay()
-//                draw.visualizer_->UpdateGeometry();
                 draw.endOneAnimatedFrame();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
             }
-//            std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
         }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
-        draw.endAnimatedDisplay();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        draw.endAnimatedScene();
 #endif  // USE_OPEN3D
     }
 
@@ -372,11 +375,17 @@ public:
     static void unit_test() {}
     
 private:
-#ifdef USE_OPEN3D
+    // Pointer to main global drawing context.
+    static inline Draw* global_object_ = nullptr;
     
     // Runtime switch to turn graphical display on and off.
     bool enable_ = false;
 
+    // Count all triangles drawn during graphics session.
+    int triangle_count_ = 0;
+    
+#ifdef USE_OPEN3D
+    
     // Open3D TriangleMesh object for storing and drawing animated triangles.
     std::shared_ptr<open3d::geometry::TriangleMesh> animated_tri_mesh_ = nullptr;
     
@@ -386,8 +395,5 @@ private:
     // Retain pointer to Open3D Visualizer object.
     std::shared_ptr<vis_t> visualizer_ = nullptr;
     
-    // Count all triangles drawn during graphics session.
-    int triangle_count_ = 0;
-
 #endif  // USE_OPEN3D
 };

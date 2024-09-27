@@ -42,7 +42,8 @@ private:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240914 using Draw::globalObject
 #ifdef USE_OPEN3D
-    Draw& draw_ = *Draw::globalObject;
+//    Draw& draw_ = *Draw::globalObject;
+    Draw& draw_ = Draw::getInstance();
 #else  // USE_OPEN3D
     Draw draw_;
 #endif  // USE_OPEN3D
@@ -130,7 +131,8 @@ public:
         // self.cycle_obstacle_selection()
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240916 reset frame_counter, etc.
-        draw().beginAnimatedDisplay();
+//        draw().beginAnimatedDisplay();
+        draw().beginAnimatedScene();
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         save_centers_to_file_start();
@@ -155,7 +157,7 @@ public:
         // Draw.close_visualizer()
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240916 reset frame_counter, etc.
-        draw().endAnimatedDisplay();
+        draw().endAnimatedScene();
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //        std::cout << "Exit at step:" << draw().frame_counter() << std::endl;
         if (max_simulation_steps() == std::numeric_limits<double>::infinity())

@@ -82,6 +82,10 @@ public:
     //     line_width_, point_size_, plus all the static geometry (obstacles)
     void beginAnimatedDisplay()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
+        clearAnimatedGeometryFromScene();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     void endAnimatedDisplay()
@@ -90,7 +94,10 @@ public:
     
     void beginOneAnimatedFrame()
     {
-        clearAnimatedGeometryFromScene();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
+//        clearAnimatedGeometryFromScene();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     void endOneAnimatedFrame()
@@ -231,11 +238,21 @@ public:
     {
 #ifdef USE_OPEN3D
         Draw draw;
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
+        draw.beginAnimatedDisplay();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         // TODO maybe enable-ness should be an optional parameter of constructor?
         draw.setEnable(true);
 
-        draw.clearAnimatedGeometryFromScene();
-        draw.tempAddSphere();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
+//        draw.clearAnimatedGeometryFromScene();
+//        draw.tempAddSphere();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
         draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
 
@@ -268,15 +285,22 @@ public:
             draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
         }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
         draw.animated_tri_mesh_->ComputeVertexNormals();
         draw.visualizer_->AddGeometry(draw.animated_tri_mesh_);
         draw.visualizer_->AddGeometry(draw.animated_line_set_);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Loop for displaying animated graphics.
         while (draw.pollEvents())
         {
             if (draw.enable())
             {
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
+                draw.beginOneAnimatedFrame();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 double jiggle = 0.01;
                 auto& endpoints = draw.animated_line_set_->points_;
                 for (int i = 5; i < endpoints.size(); i += 2)
@@ -286,10 +310,19 @@ public:
                     endpoints[i].z() += EF::RS().random2(-jiggle, jiggle);
                     endpoints[i+1] = endpoints[i];
                 }
-                draw.visualizer_->UpdateGeometry();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20240926 use beginAnimatedDisplay() and endAnimatedDisplay()
+//                draw.visualizer_->UpdateGeometry();
+                draw.endOneAnimatedFrame();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
             }
-            std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
+//            std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
         }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240926 use beginOneAnimatedFrame() and endOneAnimatedFrame()
+        draw.endAnimatedDisplay();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
     }
 

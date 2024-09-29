@@ -269,21 +269,221 @@ public:
 
 
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240922 revised
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240929 update Draw::visualizeEvoflockFitnessTest()
 
+
+//        // Just for debugging and testing. Run Open3D tests.
+//        static void visualizeEvoflockFitnessTest()
+//        {
+//    #ifdef USE_OPEN3D
+//            Draw draw(true);
+//            draw.beginAnimatedScene();
+//
+//    //        // TODO maybe enable-ness should be an optional parameter of constructor?
+//    //        draw.setEnable(true);
+//
+//            draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
+//            draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
+//
+//            auto& rs = EF::RS();
+//            Vec3 a;
+//            Vec3 b;
+//            for (int i = 0; i < 1000; i++)
+//            {
+//                a = b;
+//                b = b + rs.random_unit_vector() * 0.5;
+//                auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
+//                draw.addLineSegmentToScene(a, b, c);
+//            }
+//
+//            draw.addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // verts
+//                                     {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // tris
+//                                     {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
+//
+//            draw.addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// verts
+//                                     {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // tris
+//                                     {0.3,0.3,0.3});                         // color
+//
+//            draw.drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
+//            for (int i = 0; i < 500; i++)
+//            {
+//                Vec3 p = rs.randomPointInUnitRadiusSphere() * 30;
+//                auto ls = LocalSpace().randomize_orientation();
+//                auto c = rs.random_point_in_axis_aligned_box(Vec3(0.4, 0.4, 0.4),
+//                                                             Vec3(1.0, 1.0, 1.0));
+//                draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
+//            }
+//
+//            // Add animated_tri_mesh_ and animated_line_set_ to scene
+//            // TODO 20240927 shouldn't this be inside a method of Draw?
+//            // Maybe we SHOULD reconstruct the geometry every frame?
+//            draw.animated_tri_mesh_->ComputeVertexNormals();
+//            draw.visualizer_->AddGeometry(draw.animated_tri_mesh_);
+//            draw.visualizer_->AddGeometry(draw.animated_line_set_);
+//
+//            // Loop for displaying animated graphics.
+//            while (draw.pollEvents())
+//            {
+//                if (draw.enable())
+//                {
+//                    draw.beginOneAnimatedFrame();
+//                    double jiggle = 0.01;
+//                    auto& endpoints = draw.animated_line_set_->points_;
+//                    for (int i = 5; i < endpoints.size(); i += 2)
+//                    {
+//                        endpoints[i].x() += EF::RS().random2(-jiggle, jiggle);
+//                        endpoints[i].y() += EF::RS().random2(-jiggle, jiggle);
+//                        endpoints[i].z() += EF::RS().random2(-jiggle, jiggle);
+//                        endpoints[i+1] = endpoints[i];
+//                    }
+//                    draw.endOneAnimatedFrame();
+//                    std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
+//                }
+//            }
+//            draw.endAnimatedScene();
+//    #endif  // USE_OPEN3D
+//        }
+    
+    
+//        // Just for debugging and testing. Run Open3D tests.
+//        static void visualizeEvoflockFitnessTest()
+//        {
+//    #ifdef USE_OPEN3D
+//            Draw draw(true);
+//            draw.beginAnimatedScene();
+//
+//
+//        draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
+//        draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
+//
+//        auto& rs = EF::RS();
+//        Vec3 a;
+//        Vec3 b;
+//        for (int i = 0; i < 1000; i++)
+//        {
+//            a = b;
+//            b = b + rs.random_unit_vector() * 0.5;
+//            auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
+//            draw.addLineSegmentToScene(a, b, c);
+//        }
+//
+//        draw.addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // verts
+//                                 {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // tris
+//                                 {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
+//        
+//        draw.addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// verts
+//                                 {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // tris
+//                                 {0.3,0.3,0.3});                         // color
+//        
+//        draw.drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
+//        for (int i = 0; i < 500; i++)
+//        {
+//            Vec3 p = rs.randomPointInUnitRadiusSphere() * 30;
+//            auto ls = LocalSpace().randomize_orientation();
+//            auto c = rs.random_point_in_axis_aligned_box(Vec3(0.4, 0.4, 0.4),
+//                                                         Vec3(1.0, 1.0, 1.0));
+//            draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
+//        }
+
+//        // Add animated_tri_mesh_ and animated_line_set_ to scene
+//        // TODO 20240927 shouldn't this be inside a method of Draw?
+//        // Maybe we SHOULD reconstruct the geometry every frame?
+//        draw.animated_tri_mesh_->ComputeVertexNormals();
+//        draw.visualizer_->AddGeometry(draw.animated_tri_mesh_);
+//        draw.visualizer_->AddGeometry(draw.animated_line_set_);
+
+        
+//        // Just for debugging and testing. Run Open3D tests.
+//        static void visualizeEvoflockFitnessTest()
+//        {
+//    #ifdef USE_OPEN3D
+//            Draw draw(true);
+//            draw.beginAnimatedScene();
+//
+//
+//            // Loop for displaying animated graphics.
+//            while (draw.pollEvents())
+//            {
+//                if (draw.enable())
+//                {
+//                    draw.beginOneAnimatedFrame();
+//
+//
+//                    draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
+//                    draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
+//
+//                    auto& rs = EF::RS();
+//                    Vec3 a;
+//                    Vec3 b;
+//                    for (int i = 0; i < 1000; i++)
+//                    {
+//                        a = b;
+//                        b = b + rs.random_unit_vector() * 0.5;
+//                        auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
+//                        draw.addLineSegmentToScene(a, b, c);
+//                    }
+//
+//                    draw.addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // verts
+//                                             {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // tris
+//                                             {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
+//
+//                    draw.addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// verts
+//                                             {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // tris
+//                                             {0.3,0.3,0.3});                         // color
+//
+//                    draw.drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
+//                    for (int i = 0; i < 500; i++)
+//                    {
+//                        Vec3 p = rs.randomPointInUnitRadiusSphere() * 30;
+//                        auto ls = LocalSpace().randomize_orientation();
+//                        auto c = rs.random_point_in_axis_aligned_box(Vec3(0.4, 0.4, 0.4),
+//                                                                     Vec3(1.0, 1.0, 1.0));
+//                        draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
+//                    }
+//
+//
+//
+//
+//
+//
+//
+//
+//                    double jiggle = 0.01;
+//                    auto& endpoints = draw.animated_line_set_->points_;
+//                    for (int i = 5; i < endpoints.size(); i += 2)
+//                    {
+//                        endpoints[i].x() += EF::RS().random2(-jiggle, jiggle);
+//                        endpoints[i].y() += EF::RS().random2(-jiggle, jiggle);
+//                        endpoints[i].z() += EF::RS().random2(-jiggle, jiggle);
+//                        endpoints[i+1] = endpoints[i];
+//                    }
+//                    draw.endOneAnimatedFrame();
+//                    std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
+//                }
+//            }
+//            draw.endAnimatedScene();
+//    #endif  // USE_OPEN3D
+//        }
+
+    
     // Just for debugging and testing. Run Open3D tests.
     static void visualizeEvoflockFitnessTest()
     {
 #ifdef USE_OPEN3D
         Draw draw(true);
         draw.beginAnimatedScene();
+        
+        
+//        // Allocate TriangleMesh/LineSet objects which hold animated geometry.
+//        animated_tri_mesh_ = std::make_shared<open3d::geometry::TriangleMesh>();
+//        animated_line_set_ = std::make_shared<open3d::geometry::LineSet>();
 
-//        // TODO maybe enable-ness should be an optional parameter of constructor?
-//        draw.setEnable(true);
-
-        draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
-        draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
+        
+//        std::shared_ptr<open3d::geometry::TriangleMesh> animated_tri_mesh_ = nullptr;
+//        std::shared_ptr<open3d::geometry::LineSet> animated_line_set_ = nullptr;
+        auto saved_tri_mesh_ = std::make_shared<open3d::geometry::TriangleMesh>();
+        auto saved_line_set_ = std::make_shared<open3d::geometry::LineSet>();
 
         auto& rs = EF::RS();
         Vec3 a;
@@ -295,38 +495,81 @@ public:
             auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
             draw.addLineSegmentToScene(a, b, c);
         }
+        
+//        saved_line_set_->points_ = draw.animated_line_set_->points_;
+//        saved_line_set_->lines_ = draw.animated_line_set_->lines_;
+//        saved_line_set_->colors_ = draw.animated_line_set_->colors_;
 
-        draw.addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // verts
-                                 {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // tris
-                                 {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
-        
-        draw.addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// verts
-                                 {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // tris
-                                 {0.3,0.3,0.3});                         // color
-        
-        draw.drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
-        for (int i = 0; i < 500; i++)
+        auto copyLineSet = [](auto a, auto b)
         {
-            Vec3 p = rs.randomPointInUnitRadiusSphere() * 30;
-            auto ls = LocalSpace().randomize_orientation();
-            auto c = rs.random_point_in_axis_aligned_box(Vec3(0.4, 0.4, 0.4),
-                                                         Vec3(1.0, 1.0, 1.0));
-            draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
-        }
+            a->points_ = b->points_;
+            a->lines_ = b->lines_;
+            a->colors_ = b->colors_;
 
-        // Add animated_tri_mesh_ and animated_line_set_ to scene
-        // TODO 20240927 shouldn't this be inside a method of Draw?
-        // Maybe we SHOULD reconstruct the geometry every frame?
-        draw.animated_tri_mesh_->ComputeVertexNormals();
-        draw.visualizer_->AddGeometry(draw.animated_tri_mesh_);
-        draw.visualizer_->AddGeometry(draw.animated_line_set_);
+        };
+        
+        copyLineSet(saved_line_set_, draw.animated_line_set_);
 
+        
+        
         // Loop for displaying animated graphics.
         while (draw.pollEvents())
         {
             if (draw.enable())
             {
                 draw.beginOneAnimatedFrame();
+                
+                
+                draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
+                draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
+                
+//                auto& rs = EF::RS();
+//                Vec3 a;
+//                Vec3 b;
+//                for (int i = 0; i < 1000; i++)
+//                {
+//                    a = b;
+//                    b = b + rs.random_unit_vector() * 0.5;
+//                    auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
+//                    draw.addLineSegmentToScene(a, b, c);
+//                }
+                
+
+                
+                draw.addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // verts
+                                         {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // tris
+                                         {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
+                
+                draw.addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// verts
+                                         {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // tris
+                                         {0.3,0.3,0.3});                         // color
+                
+                draw.drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
+                for (int i = 0; i < 500; i++)
+                {
+                    Vec3 p = rs.randomPointInUnitRadiusSphere() * 30;
+                    auto ls = LocalSpace().randomize_orientation();
+                    auto c = rs.random_point_in_axis_aligned_box(Vec3(0.4, 0.4, 0.4),
+                                                                 Vec3(1.0, 1.0, 1.0));
+                    draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
+                }
+
+
+                
+                
+                
+                
+//                draw.animated_line_set_ = saved_line_set_;
+//                draw.animated_line_set_->points_ = saved_line_set_->points_;
+                
+//                draw.animated_line_set_->points_ = saved_line_set_->points_;
+//                draw.animated_line_set_->lines_ = saved_line_set_->lines_;
+//                draw.animated_line_set_->colors_ = saved_line_set_->colors_;
+
+                copyLineSet(draw.animated_line_set_, saved_line_set_);
+
+
+                
                 double jiggle = 0.01;
                 auto& endpoints = draw.animated_line_set_->points_;
                 for (int i = 5; i < endpoints.size(); i += 2)
@@ -336,6 +579,22 @@ public:
                     endpoints[i].z() += EF::RS().random2(-jiggle, jiggle);
                     endpoints[i+1] = endpoints[i];
                 }
+                
+//                saved_line_set_->points_ = draw.animated_line_set_->points_;
+//                debugPrint(saved_line_set_->points_.size());
+//                for (int i = 0; i < 10; i++)
+//                {
+//                    debugPrint(draw.animated_line_set_->points_[i].transpose());
+//                }
+                
+//                saved_line_set_->points_ = draw.animated_line_set_->points_;
+//                saved_line_set_->lines_ = draw.animated_line_set_->lines_;
+//                saved_line_set_->colors_ = draw.animated_line_set_->colors_;
+                copyLineSet(saved_line_set_, draw.animated_line_set_);
+
+                draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
+                draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
+
                 draw.endOneAnimatedFrame();
                 std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
             }
@@ -343,6 +602,9 @@ public:
         draw.endAnimatedScene();
 #endif  // USE_OPEN3D
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_; }

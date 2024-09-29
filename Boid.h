@@ -124,7 +124,7 @@ public:
 //    void set_flock_boids(BoidPtrList* bpl) { flock_boids_ = bpl; }
     
     
-    // TODO each boid keeps its own "approximjately sorted" list of flockmates.
+    // TODO each boid keeps its own "approximately sorted" list of flockmates.
     
     BoidPtrList& flock_boids() { return flock_boids_; }
     const BoidPtrList& flock_boids() const { return flock_boids_; }
@@ -182,6 +182,11 @@ public:
     void apply_next_steer(double time_step)
     {
         steer(next_steer_, time_step);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240928 integrate with Flock simulation
+        //               rethink where this call should be made
+        draw_body();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

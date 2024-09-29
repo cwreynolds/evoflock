@@ -307,8 +307,15 @@ int main(int argc, const char * argv[])
         // TODO 20240913 WIP draw during fitness tests.
         
 #ifdef USE_OPEN3D
-        Draw::visualizeEvoflockFitnessTest();
-        Draw draw;
+//        Draw::visualizeEvoflockFitnessTest();
+//        Draw draw;
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240928 integrate with Flock simulation
+        Draw draw(true);
+//        draw.beginAnimatedScene();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #endif  // USE_OPEN3D
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -323,6 +330,14 @@ int main(int argc, const char * argv[])
             }
             std::cout << std::endl;
         }
+        
+#ifdef USE_OPEN3D
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20240928 integrate with Flock simulation
+//        draw.endAnimatedScene();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#endif  // USE_OPEN3D
+
     }
     
     // Save end of run data.

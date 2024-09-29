@@ -109,10 +109,17 @@ public:
         std::cout << triangle_count_ << "." << std::endl;
     }
 
-//    void beginAnimatedDisplay()
+//    //    void beginAnimatedDisplay()
+//        void beginAnimatedScene()
+//        {
+//            clearAnimatedGeometryFromScene();
+//        }
+
     void beginAnimatedScene()
     {
         clearAnimatedGeometryFromScene();
+        visualizer_->AddGeometry(animated_tri_mesh_);
+        visualizer_->AddGeometry(animated_line_set_);
     }
 
 //    void endAnimatedDisplay()
@@ -120,8 +127,17 @@ public:
     {
     }
     
+//        void beginOneAnimatedFrame()
+//        {
+//        }
+    
     void beginOneAnimatedFrame()
     {
+#ifdef USE_OPEN3D
+        animated_tri_mesh_->Clear();
+        animated_line_set_->Clear();
+#endif  // USE_OPEN3D
+
     }
     
     void endOneAnimatedFrame()
@@ -132,7 +148,6 @@ public:
         visualizer_->UpdateGeometry(animated_line_set_);
 #endif  // USE_OPEN3D
     }
-    
 
     // Clear all animated geometry to begin building a new scene.
     void clearAnimatedGeometryFromScene()

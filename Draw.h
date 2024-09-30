@@ -59,8 +59,8 @@ public:
         setEnable(true);
 
 #ifdef USE_OPEN3D
-        std::cout << "Begin graphics session using: ";
-        open3d::PrintOpen3DVersion();
+        std::cout << "Begin graphics session using: Open3D ";
+        std::cout << OPEN3D_VERSION << std::endl;
 
         // Allocate Open3D visualizer object.
         visualizer_ = std::make_shared<vis_t>();
@@ -70,14 +70,6 @@ public:
         animated_line_set_ = std::make_shared<open3d::geometry::LineSet>();
         
         // Create window for visualizer.
-//        int window_size = 2000;
-//        visualizer_->CreateVisualizerWindow("evoflock",
-//                                            window_size, window_size,
-//                                            0, 0);
-//        // TODO does not work, see https://github.com/isl-org/Open3D/issues/6952
-//        visualizer_->GetRenderOption().line_width_ = 10.0;
-//        visualizer_->GetRenderOption().point_size_ = 20.0;
-        
         visualizer_->CreateVisualizerWindow(window_title,
                                             window_xy_size.x(),
                                             window_xy_size.y(),
@@ -105,32 +97,22 @@ public:
         visualizer_->DestroyVisualizerWindow();
 #endif  // USE_OPEN3D
         global_object_ = nullptr;
-        std::cout << "End graphics session using. Total triangles drawn: ";
+        std::cout << "End graphics session. Total triangles drawn: ";
         std::cout << triangle_count_ << "." << std::endl;
     }
-
-//    //    void beginAnimatedDisplay()
-//        void beginAnimatedScene()
-//        {
-//            clearAnimatedGeometryFromScene();
-//        }
 
     void beginAnimatedScene()
     {
         clearAnimatedGeometryFromScene();
-        visualizer_->AddGeometry(animated_tri_mesh_);
-        visualizer_->AddGeometry(animated_line_set_);
+        // add empty animated geometry object to scene (no reset_bounding_box).
+        visualizer_->AddGeometry(animated_tri_mesh_, false);
+        visualizer_->AddGeometry(animated_line_set_, false);
     }
 
-//    void endAnimatedDisplay()
     void endAnimatedScene()
     {
     }
-    
-//        void beginOneAnimatedFrame()
-//        {
-//        }
-    
+
     void beginOneAnimatedFrame()
     {
 #ifdef USE_OPEN3D
@@ -160,18 +142,18 @@ public:
     
     // Add to per-frame collection of animating triangles: single color.
     // Typically used to add a small polyhedron (a boid's body) to the scene.
-    void addTrianglesToScene(const std::vector<Vec3>& vertices,
-                             const std::vector<std::size_t>& triangles,
-                             const Vec3& color)
+    void addTriMeshToAnimatedFrame(const std::vector<Vec3>& vertices,
+                                   const std::vector<std::size_t>& triangles,
+                                   const Vec3& color)
     {
         std::vector<Vec3> colors(vertices.size(), color);
-        addTrianglesToScene(vertices, triangles, colors);
+        addTriMeshToAnimatedFrame(vertices, triangles, colors);
     }
     
     // Add to per-frame collection of animating triangles: per-vertex colors.
-    void addTrianglesToScene(const std::vector<Vec3>& vertices,
-                             const std::vector<std::size_t>& triangles,
-                             const std::vector<Vec3>& colors)
+    void addTriMeshToAnimatedFrame(const std::vector<Vec3>& vertices,
+                                   const std::vector<std::size_t>& triangles,
+                                   const std::vector<Vec3>& colors)
     {
 #ifdef USE_OPEN3D
         assert(triangles.size() % 3 == 0);
@@ -198,9 +180,9 @@ public:
     }
     
     // Add to per-frame collection of animating line segments for annotation.
-    void addLineSegmentToScene(const Vec3& endpoint0,
-                               const Vec3& endpoint1,
-                               const Vec3& color)
+    void addLineSegmentToAnimatedFrame(const Vec3& endpoint0,
+                                       const Vec3& endpoint1,
+                                       const Vec3& color)
     {
 #ifdef USE_OPEN3D
         auto s = animated_line_set_->points_.size();
@@ -211,7 +193,7 @@ public:
         animated_line_set_->colors_.push_back(ev3d(color));
 #endif  // USE_OPEN3D
     }
-    
+
     void tempAddSphere()
     {
 #ifdef USE_OPEN3D
@@ -260,211 +242,12 @@ public:
         Vec3 apex = tail + (up * 0.25 * bd) + (forward * 0.1 * bd);
         Vec3 wingtip0 = tail + (side * 0.3 * bd);
         Vec3 wingtip1 = tail - (side * 0.3 * bd);
-        addTrianglesToScene({nose, apex, wingtip0, wingtip1},  // vertices
-                            {1,2,3, 3,2,0, 0,1,3, 2,1,0},      // triangles
-                            color);                            // color
+        addTriMeshToAnimatedFrame({nose, apex, wingtip0, wingtip1}, // vertices
+                                  {1,2,3, 3,2,0, 0,1,3, 2,1,0},     // triangles
+                                  color);                           // color
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240929 update Draw::visualizeEvoflockFitnessTest()
-
-
-//        // Just for debugging and testing. Run Open3D tests.
-//        static void visualizeEvoflockFitnessTest()
-//        {
-//    #ifdef USE_OPEN3D
-//            Draw draw(true);
-//            draw.beginAnimatedScene();
-//
-//    //        // TODO maybe enable-ness should be an optional parameter of constructor?
-//    //        draw.setEnable(true);
-//
-//            draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
-//            draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
-//
-//            auto& rs = EF::RS();
-//            Vec3 a;
-//            Vec3 b;
-//            for (int i = 0; i < 1000; i++)
-//            {
-//                a = b;
-//                b = b + rs.random_unit_vector() * 0.5;
-//                auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
-//                draw.addLineSegmentToScene(a, b, c);
-//            }
-//
-//            draw.addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // verts
-//                                     {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // tris
-//                                     {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
-//
-//            draw.addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// verts
-//                                     {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // tris
-//                                     {0.3,0.3,0.3});                         // color
-//
-//            draw.drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
-//            for (int i = 0; i < 500; i++)
-//            {
-//                Vec3 p = rs.randomPointInUnitRadiusSphere() * 30;
-//                auto ls = LocalSpace().randomize_orientation();
-//                auto c = rs.random_point_in_axis_aligned_box(Vec3(0.4, 0.4, 0.4),
-//                                                             Vec3(1.0, 1.0, 1.0));
-//                draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
-//            }
-//
-//            // Add animated_tri_mesh_ and animated_line_set_ to scene
-//            // TODO 20240927 shouldn't this be inside a method of Draw?
-//            // Maybe we SHOULD reconstruct the geometry every frame?
-//            draw.animated_tri_mesh_->ComputeVertexNormals();
-//            draw.visualizer_->AddGeometry(draw.animated_tri_mesh_);
-//            draw.visualizer_->AddGeometry(draw.animated_line_set_);
-//
-//            // Loop for displaying animated graphics.
-//            while (draw.pollEvents())
-//            {
-//                if (draw.enable())
-//                {
-//                    draw.beginOneAnimatedFrame();
-//                    double jiggle = 0.01;
-//                    auto& endpoints = draw.animated_line_set_->points_;
-//                    for (int i = 5; i < endpoints.size(); i += 2)
-//                    {
-//                        endpoints[i].x() += EF::RS().random2(-jiggle, jiggle);
-//                        endpoints[i].y() += EF::RS().random2(-jiggle, jiggle);
-//                        endpoints[i].z() += EF::RS().random2(-jiggle, jiggle);
-//                        endpoints[i+1] = endpoints[i];
-//                    }
-//                    draw.endOneAnimatedFrame();
-//                    std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
-//                }
-//            }
-//            draw.endAnimatedScene();
-//    #endif  // USE_OPEN3D
-//        }
-    
-    
-//        // Just for debugging and testing. Run Open3D tests.
-//        static void visualizeEvoflockFitnessTest()
-//        {
-//    #ifdef USE_OPEN3D
-//            Draw draw(true);
-//            draw.beginAnimatedScene();
-//
-//
-//        draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
-//        draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
-//
-//        auto& rs = EF::RS();
-//        Vec3 a;
-//        Vec3 b;
-//        for (int i = 0; i < 1000; i++)
-//        {
-//            a = b;
-//            b = b + rs.random_unit_vector() * 0.5;
-//            auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
-//            draw.addLineSegmentToScene(a, b, c);
-//        }
-//
-//        draw.addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // verts
-//                                 {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // tris
-//                                 {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
-//        
-//        draw.addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// verts
-//                                 {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // tris
-//                                 {0.3,0.3,0.3});                         // color
-//        
-//        draw.drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
-//        for (int i = 0; i < 500; i++)
-//        {
-//            Vec3 p = rs.randomPointInUnitRadiusSphere() * 30;
-//            auto ls = LocalSpace().randomize_orientation();
-//            auto c = rs.random_point_in_axis_aligned_box(Vec3(0.4, 0.4, 0.4),
-//                                                         Vec3(1.0, 1.0, 1.0));
-//            draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
-//        }
-
-//        // Add animated_tri_mesh_ and animated_line_set_ to scene
-//        // TODO 20240927 shouldn't this be inside a method of Draw?
-//        // Maybe we SHOULD reconstruct the geometry every frame?
-//        draw.animated_tri_mesh_->ComputeVertexNormals();
-//        draw.visualizer_->AddGeometry(draw.animated_tri_mesh_);
-//        draw.visualizer_->AddGeometry(draw.animated_line_set_);
-
-        
-//        // Just for debugging and testing. Run Open3D tests.
-//        static void visualizeEvoflockFitnessTest()
-//        {
-//    #ifdef USE_OPEN3D
-//            Draw draw(true);
-//            draw.beginAnimatedScene();
-//
-//
-//            // Loop for displaying animated graphics.
-//            while (draw.pollEvents())
-//            {
-//                if (draw.enable())
-//                {
-//                    draw.beginOneAnimatedFrame();
-//
-//
-//                    draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
-//                    draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
-//
-//                    auto& rs = EF::RS();
-//                    Vec3 a;
-//                    Vec3 b;
-//                    for (int i = 0; i < 1000; i++)
-//                    {
-//                        a = b;
-//                        b = b + rs.random_unit_vector() * 0.5;
-//                        auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
-//                        draw.addLineSegmentToScene(a, b, c);
-//                    }
-//
-//                    draw.addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // verts
-//                                             {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // tris
-//                                             {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
-//
-//                    draw.addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// verts
-//                                             {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // tris
-//                                             {0.3,0.3,0.3});                         // color
-//
-//                    draw.drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
-//                    for (int i = 0; i < 500; i++)
-//                    {
-//                        Vec3 p = rs.randomPointInUnitRadiusSphere() * 30;
-//                        auto ls = LocalSpace().randomize_orientation();
-//                        auto c = rs.random_point_in_axis_aligned_box(Vec3(0.4, 0.4, 0.4),
-//                                                                     Vec3(1.0, 1.0, 1.0));
-//                        draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
-//                    }
-//
-//
-//
-//
-//
-//
-//
-//
-//                    double jiggle = 0.01;
-//                    auto& endpoints = draw.animated_line_set_->points_;
-//                    for (int i = 5; i < endpoints.size(); i += 2)
-//                    {
-//                        endpoints[i].x() += EF::RS().random2(-jiggle, jiggle);
-//                        endpoints[i].y() += EF::RS().random2(-jiggle, jiggle);
-//                        endpoints[i].z() += EF::RS().random2(-jiggle, jiggle);
-//                        endpoints[i+1] = endpoints[i];
-//                    }
-//                    draw.endOneAnimatedFrame();
-//                    std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
-//                }
-//            }
-//            draw.endAnimatedScene();
-//    #endif  // USE_OPEN3D
-//        }
 
     
     // Just for debugging and testing. Run Open3D tests.
@@ -473,18 +256,8 @@ public:
 #ifdef USE_OPEN3D
         Draw draw(true);
         draw.beginAnimatedScene();
-        
-        
-//        // Allocate TriangleMesh/LineSet objects which hold animated geometry.
-//        animated_tri_mesh_ = std::make_shared<open3d::geometry::TriangleMesh>();
-//        animated_line_set_ = std::make_shared<open3d::geometry::LineSet>();
-
-        
-//        std::shared_ptr<open3d::geometry::TriangleMesh> animated_tri_mesh_ = nullptr;
-//        std::shared_ptr<open3d::geometry::LineSet> animated_line_set_ = nullptr;
         auto saved_tri_mesh_ = std::make_shared<open3d::geometry::TriangleMesh>();
         auto saved_line_set_ = std::make_shared<open3d::geometry::LineSet>();
-
         auto& rs = EF::RS();
         Vec3 a;
         Vec3 b;
@@ -493,57 +266,30 @@ public:
             a = b;
             b = b + rs.random_unit_vector() * 0.5;
             auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
-            draw.addLineSegmentToScene(a, b, c);
+            draw.addLineSegmentToAnimatedFrame(a, b, c);
         }
-        
-//        saved_line_set_->points_ = draw.animated_line_set_->points_;
-//        saved_line_set_->lines_ = draw.animated_line_set_->lines_;
-//        saved_line_set_->colors_ = draw.animated_line_set_->colors_;
-
         auto copyLineSet = [](auto a, auto b)
         {
             a->points_ = b->points_;
             a->lines_ = b->lines_;
             a->colors_ = b->colors_;
-
         };
-        
         copyLineSet(saved_line_set_, draw.animated_line_set_);
 
-        
-        
         // Loop for displaying animated graphics.
         while (draw.pollEvents())
         {
             if (draw.enable())
             {
                 draw.beginOneAnimatedFrame();
-                
-                
-                draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
-                draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
-                
-//                auto& rs = EF::RS();
-//                Vec3 a;
-//                Vec3 b;
-//                for (int i = 0; i < 1000; i++)
-//                {
-//                    a = b;
-//                    b = b + rs.random_unit_vector() * 0.5;
-//                    auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
-//                    draw.addLineSegmentToScene(a, b, c);
-//                }
-                
-
-                
-                draw.addTrianglesToScene({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},  // verts
-                                         {1,2,3, 3,2,0, 0,1,3, 2,1,0},          // tris
-                                         {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}}); // colors
-                
-                draw.addTrianglesToScene({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},// verts
-                                         {3,2,1, 0,2,3, 3,1,0, 0,1,2},           // tris
-                                         {0.3,0.3,0.3});                         // color
-                
+                draw.addTriMeshToAnimatedFrame
+                ({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},     // verts
+                 {1,2,3, 3,2,0, 0,1,3, 2,1,0},             // tris
+                 {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}});    // colors
+                draw.addTriMeshToAnimatedFrame
+                ({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},  // verts
+                 {3,2,1, 0,2,3, 3,1,0, 0,1,2},             // tris
+                 {0.3,0.3,0.3});                           // color
                 draw.drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
                 for (int i = 0; i < 500; i++)
                 {
@@ -553,23 +299,8 @@ public:
                                                                  Vec3(1.0, 1.0, 1.0));
                     draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
                 }
-
-
                 
-                
-                
-                
-//                draw.animated_line_set_ = saved_line_set_;
-//                draw.animated_line_set_->points_ = saved_line_set_->points_;
-                
-//                draw.animated_line_set_->points_ = saved_line_set_->points_;
-//                draw.animated_line_set_->lines_ = saved_line_set_->lines_;
-//                draw.animated_line_set_->colors_ = saved_line_set_->colors_;
-
                 copyLineSet(draw.animated_line_set_, saved_line_set_);
-
-
-                
                 double jiggle = 0.01;
                 auto& endpoints = draw.animated_line_set_->points_;
                 for (int i = 5; i < endpoints.size(); i += 2)
@@ -579,22 +310,14 @@ public:
                     endpoints[i].z() += EF::RS().random2(-jiggle, jiggle);
                     endpoints[i+1] = endpoints[i];
                 }
-                
-//                saved_line_set_->points_ = draw.animated_line_set_->points_;
-//                debugPrint(saved_line_set_->points_.size());
-//                for (int i = 0; i < 10; i++)
-//                {
-//                    debugPrint(draw.animated_line_set_->points_[i].transpose());
-//                }
-                
-//                saved_line_set_->points_ = draw.animated_line_set_->points_;
-//                saved_line_set_->lines_ = draw.animated_line_set_->lines_;
-//                saved_line_set_->colors_ = draw.animated_line_set_->colors_;
                 copyLineSet(saved_line_set_, draw.animated_line_set_);
 
-                draw.addLineSegmentToScene({ 0, 60, 0}, {0, -60, 0}, {1, 1, 0});
-                draw.addLineSegmentToScene({-5,  0, 0}, {5,   0, 0}, {0, 1, 1});
-
+                draw.addLineSegmentToAnimatedFrame({ 0, 60, 0},
+                                                   {0, -60, 0},
+                                                   {1, 1, 0});
+                draw.addLineSegmentToAnimatedFrame({-5,  0, 0},
+                                                   {5,   0, 0},
+                                                   {0, 1, 1});
                 draw.endOneAnimatedFrame();
                 std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
             }

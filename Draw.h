@@ -103,31 +103,44 @@ public:
 
     void beginAnimatedScene()
     {
-        clearAnimatedGeometryFromScene();
-        // add empty animated geometry object to scene (no reset_bounding_box).
-        visualizer_->AddGeometry(animated_tri_mesh_, false);
-        visualizer_->AddGeometry(animated_line_set_, false);
+        if (enable())
+        {
+            clearAnimatedGeometryFromScene();
+            // add empty animated geometry object to scene (no reset_bounding_box).
+            visualizer_->AddGeometry(animated_tri_mesh_, false);
+            visualizer_->AddGeometry(animated_line_set_, false);
+        }
     }
 
     void endAnimatedScene()
     {
+        if (enable())
+        {
+        }
     }
 
     void beginOneAnimatedFrame()
     {
 #ifdef USE_OPEN3D
-        animated_tri_mesh_->Clear();
-        animated_line_set_->Clear();
+        if (enable())
+        {
+            animated_tri_mesh_->Clear();
+            animated_line_set_->Clear();
+        }
+        // TODO 20240930 maybe should also set some global "exit from run" flag?
+        pollEvents();
 #endif  // USE_OPEN3D
-
     }
     
     void endOneAnimatedFrame()
     {
 #ifdef USE_OPEN3D
-        animated_tri_mesh_->ComputeVertexNormals();
-        visualizer_->UpdateGeometry(animated_tri_mesh_);
-        visualizer_->UpdateGeometry(animated_line_set_);
+        if (enable())
+        {
+            animated_tri_mesh_->ComputeVertexNormals();
+            visualizer_->UpdateGeometry(animated_tri_mesh_);
+            visualizer_->UpdateGeometry(animated_line_set_);
+        }
 #endif  // USE_OPEN3D
     }
 
@@ -156,26 +169,29 @@ public:
                                    const std::vector<Vec3>& colors)
     {
 #ifdef USE_OPEN3D
-        assert(triangles.size() % 3 == 0);
-        assert(vertices.size() == colors.size());
-        auto ovc = animated_tri_mesh_->vertices_.size(); // old_vertex_count
-        for (auto& v : vertices)
+        if (enable())
         {
-            animated_tri_mesh_->vertices_.push_back({v.x(), v.y(), v.z()});
+            assert(triangles.size() % 3 == 0);
+            assert(vertices.size() == colors.size());
+            auto ovc = animated_tri_mesh_->vertices_.size(); // old_vertex_count
+            for (auto& v : vertices)
+            {
+                animated_tri_mesh_->vertices_.push_back({v.x(), v.y(), v.z()});
+            }
+            for (int t = 0; t < triangles.size(); t += 3)
+            {
+                Eigen::Vector3i new_tri {int(ovc + triangles.at(t)),
+                    int(ovc + triangles.at(t + 1)),
+                    int(ovc + triangles.at(t + 2))};
+                animated_tri_mesh_->triangles_.push_back(new_tri);
+            }
+            for (auto& c : colors)
+            {
+                animated_tri_mesh_->vertex_colors_.push_back({c.x(), c.y(), c.z()});
+            }
+            // Count all triangles drawn during graphics session.
+            triangle_count_ += triangles.size() / 3;
         }
-        for (int t = 0; t < triangles.size(); t += 3)
-        {
-            Eigen::Vector3i new_tri {int(ovc + triangles.at(t)),
-                int(ovc + triangles.at(t + 1)),
-                int(ovc + triangles.at(t + 2))};
-            animated_tri_mesh_->triangles_.push_back(new_tri);
-        }
-        for (auto& c : colors)
-        {
-            animated_tri_mesh_->vertex_colors_.push_back({c.x(), c.y(), c.z()});
-        }
-        // Count all triangles drawn during graphics session.
-        triangle_count_ += triangles.size() / 3;
 #endif  // USE_OPEN3D
     }
     

@@ -309,8 +309,8 @@ int main(int argc, const char * argv[])
 #ifdef USE_OPEN3D
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240929 update Draw::visualizeEvoflockFitnessTest()
-        Draw::visualizeEvoflockFitnessTest();
-        exit(EXIT_SUCCESS);
+//        Draw::visualizeEvoflockFitnessTest();
+//        exit(EXIT_SUCCESS);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         

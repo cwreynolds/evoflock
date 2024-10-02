@@ -592,26 +592,6 @@ public:
         return steer_memory_.blend(steer, 0.8);  // Ad hoc smoothness param.
     }
 
-    //    # Draw this Boid's “body” -- currently an irregular tetrahedron.
-    //    def draw(self, color=None):
-    //        if Draw.enable:
-    //            center = self.position
-    //            nose = center + self.forward * self.body_radius
-    //            tail = center - self.forward * self.body_radius
-    //            bd = self.body_radius * 2  # body diameter (defaults to 1)
-    //            apex = tail + self.up * 0.25 * bd + self.forward * 0.1 * bd
-    //            wingtip0 = tail + self.side * 0.3 * bd
-    //            wingtip1 = tail - self.side * 0.3 * bd
-    //            # Draw the 4 triangles of a boid's body.
-    //            def draw_tri(a, b, c, color):
-    //                Draw.add_colored_triangle(a, b, c, color)
-    //            if color is None:
-    //                color = self.color
-    //            draw_tri(nose, apex,     wingtip1, color * 1.00)
-    //            draw_tri(nose, wingtip0, apex,     color * 0.95)
-    //            draw_tri(apex, wingtip0, wingtip1, color * 0.90)
-    //            draw_tri(nose, wingtip1, wingtip0, color * 0.70)
-
     // Use Draw api to draw this Boid's “body” -- an irregular tetrahedron.
     void draw_body()
     {
@@ -631,72 +611,44 @@ public:
                                          color());
     }
 
-    //    # Should this Boid be annotated? (At most its those near selected boid.)
-    //    def should_annotate(self):
-    //        return (Draw.enable and
-    //                self.flock.enable_annotation and
-    //                self.flock.tracking_camera and
-    //                ((self == self.flock.selected_boid()) or
-    //                 (self.flock.selected_boid().is_neighbor(self))))
+    // Should this Boid be annotated? (At most its those near selected boid.)
+    bool should_annotate() const
+    {
+        return (draw().enable() and
+                //    self.flock.enable_annotation and
+                //    self.flock.tracking_camera and
+                //    ((self == self.flock.selected_boid()) or
+                //     (self.flock.selected_boid().is_neighbor(self)))
+                true);  // TODO temp
+    }
 
     // Draw optional annotation of this Boid's current steering forces
     void annotation(const Vec3& separation,
-                    const Vec3& alignment, 
-                    const Vec3& cohesion, 
+                    const Vec3& alignment,
+                    const Vec3& cohesion,
                     const Vec3& avoidance,
                     const Vec3& combined)
     {
-        if (draw().enable())
+        if (should_annotate())
         {
-            //    scale = 0.05
-            //    center = self.position
-            //    def relative_force_annotation(offset, color):
-            //        Draw.add_line_segment(center, center + offset * scale, color)
-            //    if self.should_annotate():
-            //        relative_force_annotation(separation, Vec3(1, 0, 0))
-            //        relative_force_annotation(alignment,  Vec3(0, 1, 0))
-            //        relative_force_annotation(cohesion,   Vec3(0, 0, 1))
-            //        relative_force_annotation(avoidance,  Vec3(1, 0, 1))
-            //        relative_force_annotation(combined,   Vec3(0.5, 0.5, 0.5))
+            double scale = 0.05;
+            auto relative_force_annotation = [&](const Vec3& offset,
+                                                 const Vec3& color)
+            {
+                Vec3 ep = position() + offset * scale;
+                draw().addLineSegmentToAnimatedFrame(position(), ep, color);
+            };
+            relative_force_annotation(separation, Vec3(1, 0, 0));
+            relative_force_annotation(alignment,  Vec3(0, 1, 0));
+            relative_force_annotation(cohesion,   Vec3(0, 0, 1));
+            relative_force_annotation(avoidance,  Vec3(1, 0, 1));
+            relative_force_annotation(combined,   Vec3(0.5, 0.5, 0.5));
         }
     }
 
     
     //    def is_neighbor(self, other_boid):
     //        return other_boid in self.flock.selected_boid().cached_nearest_neighbors
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240625 in evoflock GP mode seeing too much accel==0
-    //               Make really sure this always returns a unit length vector.
-
-//    // Bird-like roll control: blends vector toward path curvature center with
-//    // global up. Overrides method in base class Agent
-//    Vec3 up_reference(const Vec3& acceleration) override
-//    {
-//        Vec3 global_up_scaled = Vec3(0, acceleration.length(), 0);
-//        Vec3 new_up = acceleration + global_up_scaled;
-//        up_memory_.blend(new_up, 0.95);
-//        return up_memory_.value.normalize();
-//    }
-    
-//        // Bird-like roll control: blends vector toward path curvature center with
-//        // global up. Overrides method in base class Agent
-//        Vec3 up_reference(const Vec3& acceleration) override
-//        {
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20240625 in evoflock GP mode seeing too much accel==0
-//
-//    //        Vec3 global_up_scaled = Vec3(0, acceleration.length(), 0);
-//
-//            double accel_mag = acceleration.length();
-//            Vec3 global_up_scaled = Vec3(0, (accel_mag > 0 ? accel_mag : 1), 0);
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//            Vec3 new_up = acceleration + global_up_scaled;
-//            up_memory_.blend(new_up, 0.95);
-//            return up_memory_.value.normalize();
-//        }
 
     // Bird-like roll control: blends vector toward path curvature center with
     // global up. Overrides method in base class Agent
@@ -705,9 +657,6 @@ public:
         Vec3 global_up_scaled = Vec3(0, acceleration.length(), 0);
         Vec3 new_up = acceleration + global_up_scaled;
         up_memory_.blend(new_up, 0.95);
-        
-//        return up_memory_.value.normalize();
-
         Vec3 up_ref = up_memory_.value.normalize();
         // Make REALLY sure this always returns a unit length vector.
         return (up_ref.is_unit_length() ? up_ref : Vec3(0, 1, 0));

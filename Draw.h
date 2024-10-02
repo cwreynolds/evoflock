@@ -201,12 +201,16 @@ public:
                                        const Vec3& color)
     {
 #ifdef USE_OPEN3D
-        auto s = animated_line_set_->points_.size();
-        auto ev3d=[](const Vec3& v){return Eigen::Vector3d(v.x(),v.y(),v.z());};
-        animated_line_set_->points_.push_back(ev3d(endpoint0));
-        animated_line_set_->points_.push_back(ev3d(endpoint1));
-        animated_line_set_->lines_.push_back({s, s + 1});
-        animated_line_set_->colors_.push_back(ev3d(color));
+        if (enable())
+        {
+            auto s = animated_line_set_->points_.size();
+            auto ev3d = [](const Vec3& v)
+                { return Eigen::Vector3d(v.x(), v.y(), v.z()); };
+            animated_line_set_->points_.push_back(ev3d(endpoint0));
+            animated_line_set_->points_.push_back(ev3d(endpoint1));
+            animated_line_set_->lines_.push_back({s, s + 1});
+            animated_line_set_->colors_.push_back(ev3d(color));
+        }
 #endif  // USE_OPEN3D
     }
 

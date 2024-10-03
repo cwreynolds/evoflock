@@ -27,6 +27,12 @@ int main(int argc, const char * argv[])
     //               see https://github.com/isl-org/Open3D/issues/6952
 //    Draw::LineWidthPointSizeTest();
 //    return EXIT_SUCCESS;
+    
+//    //    Draw::Oct2Test();
+//        Draw::test();
+//        Draw::test2();
+//        return EXIT_SUCCESS;
+
     //--------------------------------------------------------------------------
 
 

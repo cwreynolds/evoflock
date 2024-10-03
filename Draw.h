@@ -15,21 +15,11 @@
 
 #pragma once
 
+#include "LocalSpace.h"
+
 #ifdef USE_OPEN3D
 #include "open3d/Open3D.h"
 #endif  // USE_OPEN3D
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240911 try drawing boid body
-// temp for testing
-#include "LocalSpace.h"
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-// TODO 20240912 make into parameters: win size, win pos, win title,
-//     line_width_, point_size_, plus all the static geometry (obstacles)
-
 
 class Draw
 {
@@ -54,6 +44,12 @@ public:
          int line_width = 10,
          int point_size = 20)
     {
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241002 add camera.
+        camera_ = camera_.fromTo({60, 60, 60}, {});
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         assert(global_object_ == nullptr);
         global_object_ = this;
         setEnable(true);
@@ -119,19 +115,77 @@ public:
         }
     }
 
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241002 add camera.
+
+//        void beginOneAnimatedFrame()
+//        {
+//    #ifdef USE_OPEN3D
+//            if (enable())
+//            {
+//                animated_tri_mesh_->Clear();
+//                animated_line_set_->Clear();
+//            }
+//            // TODO 20240930 maybe should also set some global "exit from run" flag?
+//            pollEvents();
+//    #endif  // USE_OPEN3D
+//        }
+
+
     void beginOneAnimatedFrame()
     {
 #ifdef USE_OPEN3D
+        // TODO 20240930 maybe should also set some global "exit from run" flag?
+        pollEvents();
         if (enable())
         {
             animated_tri_mesh_->Clear();
             animated_line_set_->Clear();
+            
+//            std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+//            
+//            debugPrint(camera_);
+//            debugPrint(visualizer_->GetViewControl().GetUp().transpose());
+//            debugPrint(visualizer_->GetViewControl().GetFront().transpose());
+            visualizer_->GetViewControl().SetUp(vec3ToEv3d(camera_.j()));
+            visualizer_->GetViewControl().SetFront(vec3ToEv3d(camera_.k()));
+//
+//            
+//            debugPrint(visualizer_->GetViewControl().GetUp().transpose());
+//            debugPrint(visualizer_->GetViewControl().GetFront().transpose());
+//            
+            Vec3 cross_jK = camera_.j().cross(camera_.k());
+//            debugPrint(cross_jK);
+//            
+//            std::cout << "GetViewMatrix():" << std::endl;
+//            std::cout << visualizer_->GetViewControl().GetViewMatrix() << std::endl;
+            
+            //    GetViewMatrix():
+            //       -0.707107 -6.47193e-18     0.707107           -0
+            //       -0.408248     0.816497    -0.408248           -0
+            //        -0.57735     -0.57735     -0.57735     -121.244
+            //               0            0            0            1
+                        
+            Eigen::Matrix4d my_view_mat;
+            my_view_mat <<
+            cross_jK.x(),    cross_jK.y(),    cross_jK.z(),  camera_.p().x(),
+            camera_.j().x(), camera_.j().y(), camera_.j().z(), camera_.p().y(),
+            camera_.k().x(), camera_.k().y(), camera_.k().z(), camera_.p().z(),
+            0, 0, 0, 1;
+            
+//            std::cout << "my_view_mat():" << std::endl;
+//            std::cout << my_view_mat << std::endl;
+            
+            // TODO 20241003 Turns out this by itself does not seem to work, I
+            //               had to bring back SetUp() and SetFront().
+            visualizer_->GetViewControl().SetViewMatrices(my_view_mat);
         }
-        // TODO 20240930 maybe should also set some global "exit from run" flag?
-        pollEvents();
 #endif  // USE_OPEN3D
     }
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     void endOneAnimatedFrame()
     {
 #ifdef USE_OPEN3D
@@ -204,12 +258,10 @@ public:
         if (enable())
         {
             auto s = animated_line_set_->points_.size();
-            auto ev3d = [](const Vec3& v)
-                { return Eigen::Vector3d(v.x(), v.y(), v.z()); };
-            animated_line_set_->points_.push_back(ev3d(endpoint0));
-            animated_line_set_->points_.push_back(ev3d(endpoint1));
+            animated_line_set_->points_.push_back(vec3ToEv3d(endpoint0));
+            animated_line_set_->points_.push_back(vec3ToEv3d(endpoint1));
             animated_line_set_->lines_.push_back({s, s + 1});
-            animated_line_set_->colors_.push_back(ev3d(color));
+            animated_line_set_->colors_.push_back(vec3ToEv3d(color));
         }
 #endif  // USE_OPEN3D
     }
@@ -392,6 +444,50 @@ public:
         open3d::visualization::gui::Application::GetInstance().Run();
     }
 
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241002 add camera.
+    
+    // Example code for https://stackoverflow.com/q/79048820/1991373
+    
+//    static void Oct2Test()
+    static void test()
+    {
+        open3d::PrintOpen3DVersion();
+        auto vis = open3d::visualization::Visualizer();
+        vis.CreateVisualizerWindow();
+        auto ball = open3d::geometry::TriangleMesh::CreateSphere(5);
+        ball->ComputeVertexNormals();
+        ball->PaintUniformColor({1, 0, 0});
+        vis.AddGeometry(ball);
+        
+        vis.GetViewControl().SetLookat({5,5,5});
+        
+        vis.Run();
+    }
+
+    static void test2()
+    {
+        
+        open3d::PrintOpen3DVersion();
+        
+        open3d::visualization::gui::Application::GetInstance().Initialize();
+        auto vis = open3d::visualization::visualizer::O3DVisualizer("name", 500, 500);
+        
+        auto ball = open3d::geometry::TriangleMesh::CreateSphere(5);
+        ball->ComputeVertexNormals();
+        ball->PaintUniformColor({1, 0, 0});
+
+        vis.AddGeometry("ball", {ball});
+        open3d::visualization::gui::Application::GetInstance().Run();
+
+    }
+
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
     static void unit_test() {}
     
 private:
@@ -404,6 +500,11 @@ private:
     // Count all triangles drawn during graphics session.
     int triangle_count_ = 0;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241002 add camera.
+    LocalSpace camera_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #ifdef USE_OPEN3D
     
     // Open3D TriangleMesh object for storing and drawing animated triangles.
@@ -415,5 +516,16 @@ private:
     // Retain pointer to Open3D Visualizer object.
     std::shared_ptr<vis_t> visualizer_ = nullptr;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241002 add camera.
+    
+    // Utility to convert a Vec3 to an Eigen::Vector3d.
+    static Eigen::Vector3d vec3ToEv3d(const Vec3& v)
+    {
+        return Eigen::Vector3d(v.x(), v.y(), v.z());
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #endif  // USE_OPEN3D
 };

@@ -36,7 +36,7 @@ public:
     // Default constructor
     Draw() : Draw(false) {}
     
-    // Constructor with args for
+    // Constructor with args for visualizer window.
     Draw(bool enabled,
          Vec3 window_xy_size = Vec3(2000, 2000, 0),
          Vec3 window_xy_position_ul = Vec3(),
@@ -45,11 +45,10 @@ public:
          int point_size = 20)
     {
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241002 add camera.
-        camera_ = camera_.fromTo({60, 60, 60}, {});
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241002 This initial state is just for debugging, fix later.
+        camera() = camera().fromTo({60, 60, 60}, {});
 
+        // Handle pointer to singleton instance of Draw class.
         assert(global_object_ == nullptr);
         global_object_ = this;
         setEnable(true);
@@ -58,28 +57,25 @@ public:
         std::cout << "Begin graphics session using: Open3D ";
         std::cout << OPEN3D_VERSION << std::endl;
 
-        // Allocate Open3D visualizer object.
-        visualizer_ = std::make_shared<vis_t>();
-
         // Allocate TriangleMesh/LineSet objects which hold animated geometry.
         animated_tri_mesh_ = std::make_shared<open3d::geometry::TriangleMesh>();
         animated_line_set_ = std::make_shared<open3d::geometry::LineSet>();
         
         // Create window for visualizer.
-        visualizer_->CreateVisualizerWindow(window_title,
+        visualizer().CreateVisualizerWindow(window_title,
                                             window_xy_size.x(),
                                             window_xy_size.y(),
                                             window_xy_position_ul.x(),
                                             window_xy_position_ul.y());
         // TODO does not work, see https://github.com/isl-org/Open3D/issues/6952
-        visualizer_->GetRenderOption().line_width_ = line_width;
-        visualizer_->GetRenderOption().point_size_ = point_size;
+        visualizer().GetRenderOption().line_width_ = line_width;
+        visualizer().GetRenderOption().point_size_ = point_size;
 
         // TODO temporary work-around to create the big sphere.
         tempAddSphere();
         
         // Add single key command callback to toggle "graphics mode"
-        visualizer_->RegisterKeyCallback('G',
+        visualizer().RegisterKeyCallback('G',
                                          [&](base_vis_t* vis)
                                          { toggleEnable(); return true; });
 #endif  // USE_OPEN3D
@@ -87,11 +83,6 @@ public:
 
     ~Draw()
     {
-#ifdef USE_OPEN3D
-        // TODO 20240927 is this necessary?
-        //               doesn't this happen when visualizer_ goes out of scope?
-        visualizer_->DestroyVisualizerWindow();
-#endif  // USE_OPEN3D
         global_object_ = nullptr;
         std::cout << "End graphics session. Total triangles drawn: ";
         std::cout << triangle_count_ << "." << std::endl;
@@ -102,9 +93,9 @@ public:
         if (enable())
         {
             clearAnimatedGeometryFromScene();
-            // add empty animated geometry object to scene (no reset_bounding_box).
-            visualizer_->AddGeometry(animated_tri_mesh_, false);
-            visualizer_->AddGeometry(animated_line_set_, false);
+            // Add empty animated geometry object to scene (no reset_bounding_box).
+            visualizer().AddGeometry(animated_tri_mesh_, false);
+            visualizer().AddGeometry(animated_line_set_, false);
         }
     }
 
@@ -115,24 +106,6 @@ public:
         }
     }
 
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241002 add camera.
-
-//        void beginOneAnimatedFrame()
-//        {
-//    #ifdef USE_OPEN3D
-//            if (enable())
-//            {
-//                animated_tri_mesh_->Clear();
-//                animated_line_set_->Clear();
-//            }
-//            // TODO 20240930 maybe should also set some global "exit from run" flag?
-//            pollEvents();
-//    #endif  // USE_OPEN3D
-//        }
-
-
     void beginOneAnimatedFrame()
     {
 #ifdef USE_OPEN3D
@@ -142,58 +115,20 @@ public:
         {
             animated_tri_mesh_->Clear();
             animated_line_set_->Clear();
-            
-//            std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-//            
-//            debugPrint(camera_);
-//            debugPrint(visualizer_->GetViewControl().GetUp().transpose());
-//            debugPrint(visualizer_->GetViewControl().GetFront().transpose());
-            visualizer_->GetViewControl().SetUp(vec3ToEv3d(camera_.j()));
-            visualizer_->GetViewControl().SetFront(vec3ToEv3d(camera_.k()));
-//
-//            
-//            debugPrint(visualizer_->GetViewControl().GetUp().transpose());
-//            debugPrint(visualizer_->GetViewControl().GetFront().transpose());
-//            
-            Vec3 cross_jK = camera_.j().cross(camera_.k());
-//            debugPrint(cross_jK);
-//            
-//            std::cout << "GetViewMatrix():" << std::endl;
-//            std::cout << visualizer_->GetViewControl().GetViewMatrix() << std::endl;
-            
-            //    GetViewMatrix():
-            //       -0.707107 -6.47193e-18     0.707107           -0
-            //       -0.408248     0.816497    -0.408248           -0
-            //        -0.57735     -0.57735     -0.57735     -121.244
-            //               0            0            0            1
-                        
-            Eigen::Matrix4d my_view_mat;
-            my_view_mat <<
-            cross_jK.x(),    cross_jK.y(),    cross_jK.z(),  camera_.p().x(),
-            camera_.j().x(), camera_.j().y(), camera_.j().z(), camera_.p().y(),
-            camera_.k().x(), camera_.k().y(), camera_.k().z(), camera_.p().z(),
-            0, 0, 0, 1;
-            
-//            std::cout << "my_view_mat():" << std::endl;
-//            std::cout << my_view_mat << std::endl;
-            
-            // TODO 20241003 Turns out this by itself does not seem to work, I
-            //               had to bring back SetUp() and SetFront().
-            visualizer_->GetViewControl().SetViewMatrices(my_view_mat);
+            updateCamera();
+            setOpen3dViewFromCamera();
         }
 #endif  // USE_OPEN3D
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+    
     void endOneAnimatedFrame()
     {
 #ifdef USE_OPEN3D
         if (enable())
         {
             animated_tri_mesh_->ComputeVertexNormals();
-            visualizer_->UpdateGeometry(animated_tri_mesh_);
-            visualizer_->UpdateGeometry(animated_line_set_);
+            visualizer().UpdateGeometry(animated_tri_mesh_);
+            visualizer().UpdateGeometry(animated_line_set_);
         }
 #endif  // USE_OPEN3D
     }
@@ -276,7 +211,7 @@ public:
         evertTriangleMesh(*sphere);
         sphere->ComputeVertexNormals();
         sphere->PaintUniformColor({0.5, 0.5, 0.5});
-        visualizer_->AddGeometry(sphere);
+        visualizer().AddGeometry(sphere);
 #endif  // USE_OPEN3D
     }
 
@@ -406,12 +341,14 @@ public:
     void setEnable(bool e) { enable_ = e; }
     void toggleEnable() { enable_ = not enable_; }
 
-    bool pollEvents() const
+    bool pollEvents()
     {
-        return visualizer_->PollEvents();
+        return visualizer().PollEvents();
     }
 
+    //--------------------------------------------------------------------------
     // Example code from https://github.com/isl-org/Open3D/issues/6952
+    
     //    void LineWidthPointSizeTest()
     //    {
     //        open3d::PrintOpen3DVersion();
@@ -444,11 +381,7 @@ public:
         open3d::visualization::gui::Application::GetInstance().Run();
     }
 
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241002 add camera.
-    
+    //--------------------------------------------------------------------------
     // Example code for https://stackoverflow.com/q/79048820/1991373
     
 //    static void Oct2Test()
@@ -483,11 +416,42 @@ public:
         open3d::visualization::gui::Application::GetInstance().Run();
 
     }
+    //--------------------------------------------------------------------------
 
+    // Accessor for camera object, represented as a LocalSpace.
+    LocalSpace& camera() { return camera_; }
+    const LocalSpace& camera() const { return camera_; }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Accessor for Open3D Visualizer instance.
+    vis_t& visualizer() { return visualizer_; }
+    const vis_t& visualizer() const { return visualizer_; }
 
+    void updateCamera()
+    {
+    }
     
+    void setOpen3dViewFromCamera()
+    {
+        Vec3 camI = camera().i();
+        Vec3 camJ = camera().j();
+        Vec3 camK = camera().k();
+        Vec3 camP = camera().p();
+        
+        // Explicitly set ViewControl's "up" and "front". WHY IS THIS NEEDED?!
+        visualizer().GetViewControl().SetUp(vec3ToEv3d(camJ));
+        visualizer().GetViewControl().SetFront(vec3ToEv3d(camK));
+        
+        // Construct the view matrix by picking out scalar camera parameters.
+        Eigen::Matrix4d eigen_view_matrix;
+        eigen_view_matrix << camI.x(), camI.y(), camI.z(), camP.x(),
+                             camJ.x(), camJ.y(), camJ.z(), camP.y(),
+                             camK.x(), camK.y(), camK.z(), camP.z(),
+                             0,        0,        0,        1;
+        
+        // Set Open3D's Visualizer's ViewControl's view matrices.
+        visualizer().GetViewControl().SetViewMatrices(eigen_view_matrix);
+    }
+
     static void unit_test() {}
     
 private:
@@ -500,10 +464,7 @@ private:
     // Count all triangles drawn during graphics session.
     int triangle_count_ = 0;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241002 add camera.
     LocalSpace camera_;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #ifdef USE_OPEN3D
     
@@ -512,20 +473,15 @@ private:
     
     // Open3D LineSet object for storing and drawing animated line segments.
     std::shared_ptr<open3d::geometry::LineSet> animated_line_set_ = nullptr;
-        
-    // Retain pointer to Open3D Visualizer object.
-    std::shared_ptr<vis_t> visualizer_ = nullptr;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241002 add camera.
-    
-    // Utility to convert a Vec3 to an Eigen::Vector3d.
+    // Open3D Visualizer object.
+    vis_t visualizer_;
+
+    // Private utility to convert a Vec3 to an Eigen::Vector3d.
     static Eigen::Vector3d vec3ToEv3d(const Vec3& v)
     {
         return Eigen::Vector3d(v.x(), v.y(), v.z());
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #endif  // USE_OPEN3D
 };

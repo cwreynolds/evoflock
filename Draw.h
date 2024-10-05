@@ -44,10 +44,6 @@ public:
          int line_width = 10,
          int point_size = 20)
     {
-        
-        // TODO 20241002 This initial state is just for debugging, fix later.
-        camera() = camera().fromTo({60, 60, 60}, {});
-
         // Handle pointer to singleton instance of Draw class.
         assert(global_object_ == nullptr);
         global_object_ = this;
@@ -115,8 +111,17 @@ public:
         {
             animated_tri_mesh_->Clear();
             animated_line_set_->Clear();
-            updateCamera();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20241004 follow cam
+            
+//            updateCamera();
+//            setOpen3dViewFromCamera();
+            
+//            updateCamera();
+
             setOpen3dViewFromCamera();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
         }
 #endif  // USE_OPEN3D
     }
@@ -418,18 +423,174 @@ public:
     }
     //--------------------------------------------------------------------------
 
-    // Accessor for camera object, represented as a LocalSpace.
-    LocalSpace& camera() { return camera_; }
-    const LocalSpace& camera() const { return camera_; }
-    
     // Accessor for Open3D Visualizer instance.
     vis_t& visualizer() { return visualizer_; }
     const vis_t& visualizer() const { return visualizer_; }
 
+    // Accessor for camera object, represented as a LocalSpace.
+    LocalSpace& camera() { return camera_; }
+    const LocalSpace& camera() const { return camera_; }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241004 follow cam
+    
+    // Accessor for camera aim target posItion.
+    Vec3& aimTarget() { return aim_target_; }
+    const Vec3& aimTarget() const { return aim_target_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+//        void updateCamera()
+//        {
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241004 follow cam
+//            // TODO 20241002 This initial state is just for debugging, fix later.
+//    //        camera() = camera().fromTo({60, 60, 60}, {});
+//
+//    //        camera() = camera().fromTo({60, 60, 60}, aimTarget());
+//
+//            // This prints 60. As in 60 degrees? Does not change with “scroll wheel”
+//    //        debugPrint(visualizer().GetViewControl().GetFieldOfView());
+//
+//    //        Vec3 testpos(6, 6, 6);
+//    //        Vec3 testpos(3, 3, 3);
+//            Vec3 testpos(1, 1, 1);
+//            camera() = camera().fromTo(testpos - aimTarget(), aimTarget());
+//    //        camera() = camera().fromTo(aimTarget() - testpos, aimTarget());
+//
+//    //        Vec3 camera_position = camera().p();
+//    //        Vec3 camera_forward = camera().k();
+//
+//
+//
+//
+//            // TODO 20241005 maybe I can directly set the matrix using
+//            // open3d::camera::PinholeCameraParameters::extrinsic_ and
+//            // open3d::visualization::ViewControl::ConvertFromPinholeCameraParameters()
+//
+//            // or could we use this (from ViewControl.cpp)?:
+//            //     view_matrix_ = gl_util::LookAt(eye_, lookat_, up_);
+//
+//
+//            open3d::visualization::gl_util::LookAt(vec3ToEv3d(camera().p()),
+//                                                   vec3ToEv3d(aimTarget()),
+//                                                   vec3ToEv3d(Vec3(0, 1, 0)));
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//        }
+
     void updateCamera()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241004 follow cam
+
+
+        // TODO 20241005 maybe I can directly set the matrix using
+        // open3d::camera::PinholeCameraParameters::extrinsic_ and
+        // open3d::visualization::ViewControl::ConvertFromPinholeCameraParameters()
+        
+        // or could we use this (from ViewControl.cpp)?:
+        //     view_matrix_ = gl_util::LookAt(eye_, lookat_, up_);
+        // no, that simply computes and returns the view matrix.
+
+        // combining?
+        open3d::camera::PinholeCameraParameters pcp;
+        
+                
+        auto la = [](Vec3 from, Vec3 to, Vec3 up)
+        {
+            return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
+                                                          vec3ToEv3d(to),
+                                                          vec3ToEv3d(up));
+        };
+        
+        
+//        auto la_matrix = la(camera().p(), aimTarget(), Vec3(0, 1, 0));
+//        auto la_matrix = la(Vec3(60, 60, 60), aimTarget(), Vec3(0, 1, 0));
+        auto la_matrix = la(Vec3(60, 60, 60), Vec3(), Vec3(0, 1, 0));
+
+        // TODO There MUST be a cleaner way to copy the one extrinsic to another
+        for (int j = 0; j < 4; j++)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                pcp.extrinsic_(i, j) = la_matrix(i, j);
+            }
+        }
+        
+        open3d::camera::PinholeCameraParameters previous_pcp;
+        visualizer().GetViewControl().ConvertToPinholeCameraParameters(previous_pcp);
+        std::cout << "previous_pcp.extrinsic_:" << std::endl;
+        std::cout << previous_pcp.extrinsic_ << std::endl;
+        
+//        int     width_ = -1
+//        Width of the image. More...
+//        
+//        int     height_ = -1
+//        Height of the image. More...
+//        
+//        Eigen::Matrix3d     intrinsic_matrix_
+
+//        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp,
+//                                                                         true);
+
+//        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+
+        debugPrint(previous_pcp.intrinsic_.width_)
+        debugPrint(previous_pcp.intrinsic_.height_)
+
+        std::cout << "previous_pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
+        std::cout << previous_pcp.intrinsic_.intrinsic_matrix_ << std::endl;
+
+        
+        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        //
+        // do something to globally capture the initial pcp.intrinsic_
+        //
+        // copy into per-frame PCP before ConvertFromPinholeCameraParameters(pcp)
+        
+        static bool default_pcp_captured = false;
+        static open3d::camera::PinholeCameraParameters default_pcp;
+        if (not default_pcp_captured)
+        {
+            visualizer().GetViewControl().ConvertToPinholeCameraParameters(default_pcp);
+            default_pcp_captured = true;
+        }
+        
+        pcp.intrinsic_ = default_pcp.intrinsic_;
+        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+
+        std::cout << "pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
+        std::cout << pcp.intrinsic_.intrinsic_matrix_ << std::endl;
+
+        
+        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+        
+        //{
+        //	"class_name" : "ViewTrajectory",
+        //	"interval" : 29,
+        //	"is_loop" : false,
+        //	"trajectory" :
+        //	[
+        //		{
+        //			"boundingbox_max" : [ 50.0, 50.0, 50.0 ],
+        //			"boundingbox_min" : [ -50.0, -50.0, -50.0 ],
+        //			"field_of_view" : 60.0,
+        //			"front" : [ 0.0, 0.0, 1.0 ],
+        //			"lookat" : [ 0.0, 0.0, 0.0 ],
+        //			"up" : [ 0.0, 1.0, 0.0 ],
+        //			"zoom" : 0.69999999999999996
+        //		}
+        //	],
+        //	"version_major" : 1,
+        //	"version_minor" : 0
+        //}
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     }
-    
+
     void setOpen3dViewFromCamera()
     {
         Vec3 camI = camera().i();
@@ -440,7 +601,11 @@ public:
         // Explicitly set ViewControl's "up" and "front". WHY IS THIS NEEDED?!
         visualizer().GetViewControl().SetUp(vec3ToEv3d(camJ));
         visualizer().GetViewControl().SetFront(vec3ToEv3d(camK));
-        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241004 follow cam
+        visualizer().GetViewControl().SetLookat(vec3ToEv3d(aimTarget()));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         // Construct the view matrix by picking out scalar camera parameters.
         Eigen::Matrix4d eigen_view_matrix;
         eigen_view_matrix << camI.x(), camI.y(), camI.z(), camP.x(),
@@ -465,6 +630,12 @@ private:
     int triangle_count_ = 0;
     
     LocalSpace camera_;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241004 follow cam
+    Vec3 aim_target_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 #ifdef USE_OPEN3D
     

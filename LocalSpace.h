@@ -106,10 +106,10 @@ public:
     LocalSpace fromTo(Vec3 from_position, Vec3 to_position, Vec3 reference_up)
     {
         setP(from_position);
-        return rotate_to_new_forward((to_position - from_position).normalize(),
-                                     reference_up);
+        Vec3 new_forward = (to_position - from_position).normalize();
+        return rotate_to_new_forward(new_forward, reference_up);
     }
-    
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     static void unit_test()

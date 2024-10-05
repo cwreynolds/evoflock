@@ -141,10 +141,10 @@ public:
         {
             if (run_simulation_this_frame())
             {
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20240928 integrate with Flock simulation
                 draw().beginOneAnimatedFrame();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // Draw.clear_scene()
                 fly_boids((fixed_time_step() or not draw().enable()) ?
                           1.0 / fixed_fps() :
@@ -155,10 +155,16 @@ public:
                 if (not simulation_paused_) { aTimer().measure_frame_duration(); }
                 log_stats();
                 update_fps();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20241004 follow cam
+                draw().aimTarget() = selectedBoid()->position();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20240928 integrate with Flock simulation
                 draw().endOneAnimatedFrame();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
         save_centers_to_file_end();
@@ -771,12 +777,19 @@ public:
         return ok_to_run;
     }
 
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241004 follow cam
+
     //        # Returns currently selected boid, the one that the tracking camera
     //        # tracks, for which steering force annotation is shown.
     //        def selected_boid(self):
     //            return self.boids[self.selected_boid_index]
-    //
+
+    Boid* selectedBoid() { return boids().front(); }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
     //        # Register single key commands with the Open3D visualizer GUI.
     //        def register_single_key_commands(self):
     //            Draw.register_key_callback(ord(' '), Flock.toggle_paused_mode)

@@ -49,6 +49,13 @@ public:
         global_object_ = this;
         setEnable(true);
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241004 follow cam
+        // TODO 20241006 follow cam
+//        camera() = camera().fromTo({60, 60, 60}, {});
+        camera() = camera().fromTo(Vec3(1,1,1).normalize() * 10, {});
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #ifdef USE_OPEN3D
         std::cout << "Begin graphics session using: Open3D ";
         std::cout << OPEN3D_VERSION << std::endl;
@@ -111,16 +118,21 @@ public:
         {
             animated_tri_mesh_->Clear();
             animated_line_set_->Clear();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20241004 follow cam
-            
+            // TODO 20241006 follow cam
+
 //            updateCamera();
 //            setOpen3dViewFromCamera();
             
-//            updateCamera();
+            updateCamera();
 
-            setOpen3dViewFromCamera();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            setOpen3dViewFromCamera();
+            
+            debugPrint((camera().p() - aimTarget()).length());
+//            std::this_thread::sleep_for(std::chrono::milliseconds(1000/60));
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000/30));
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
         }
 #endif  // USE_OPEN3D
@@ -479,8 +491,130 @@ public:
 //
 //        }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241004 follow cam
+    // TODO 20241006 follow cam
+
+//        void updateCamera()
+//        {
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241004 follow cam
+//
+//
+//            // TODO 20241005 maybe I can directly set the matrix using
+//            // open3d::camera::PinholeCameraParameters::extrinsic_ and
+//            // open3d::visualization::ViewControl::ConvertFromPinholeCameraParameters()
+//
+//            // or could we use this (from ViewControl.cpp)?:
+//            //     view_matrix_ = gl_util::LookAt(eye_, lookat_, up_);
+//            // no, that simply computes and returns the view matrix.
+//
+//            // combining?
+//            open3d::camera::PinholeCameraParameters pcp;
+//
+//
+//            auto la = [](Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
+//            {
+//                return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
+//                                                              vec3ToEv3d(to),
+//                                                              vec3ToEv3d(up));
+//            };
+//
+//
+//
+//    //        auto la_matrix = la(camera().p(), aimTarget(), Vec3(0, 1, 0));
+//    //        auto la_matrix = la(Vec3(60, 60, 60), aimTarget(), Vec3(0, 1, 0));
+//            auto la_matrix = la(Vec3(60, 60, 60), Vec3(), Vec3(0, 1, 0));
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+//            // TODO There MUST be a cleaner way to copy the one extrinsic to another
+//            for (int j = 0; j < 4; j++)
+//            {
+//                for (int i = 0; i < 4; i++)
+//                {
+//                    pcp.extrinsic_(i, j) = la_matrix(i, j);
+//                }
+//            }
+//
+//            open3d::camera::PinholeCameraParameters previous_pcp;
+//            visualizer().GetViewControl().ConvertToPinholeCameraParameters(previous_pcp);
+//            std::cout << "previous_pcp.extrinsic_:" << std::endl;
+//            std::cout << previous_pcp.extrinsic_ << std::endl;
+//
+//    //        int     width_ = -1
+//    //        Width of the image. More...
+//    //
+//    //        int     height_ = -1
+//    //        Height of the image. More...
+//    //
+//    //        Eigen::Matrix3d     intrinsic_matrix_
+//
+//    //        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp,
+//    //                                                                         true);
+//
+//    //        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+//
+//            debugPrint(previous_pcp.intrinsic_.width_)
+//            debugPrint(previous_pcp.intrinsic_.height_)
+//
+//            std::cout << "previous_pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
+//            std::cout << previous_pcp.intrinsic_.intrinsic_matrix_ << std::endl;
+//
+//
+//            //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//            //
+//            // do something to globally capture the initial pcp.intrinsic_
+//            //
+//            // copy into per-frame PCP before ConvertFromPinholeCameraParameters(pcp)
+//
+//            static bool default_pcp_captured = false;
+//            static open3d::camera::PinholeCameraParameters default_pcp;
+//            if (not default_pcp_captured)
+//            {
+//                visualizer().GetViewControl().ConvertToPinholeCameraParameters(default_pcp);
+//                default_pcp_captured = true;
+//            }
+//
+//            pcp.intrinsic_ = default_pcp.intrinsic_;
+//            visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+//
+//            std::cout << "pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
+//            std::cout << pcp.intrinsic_.intrinsic_matrix_ << std::endl;
+//
+//
+//            //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//
+//            //{
+//            //	"class_name" : "ViewTrajectory",
+//            //	"interval" : 29,
+//            //	"is_loop" : false,
+//            //	"trajectory" :
+//            //	[
+//            //		{
+//            //			"boundingbox_max" : [ 50.0, 50.0, 50.0 ],
+//            //			"boundingbox_min" : [ -50.0, -50.0, -50.0 ],
+//            //			"field_of_view" : 60.0,
+//            //			"front" : [ 0.0, 0.0, 1.0 ],
+//            //			"lookat" : [ 0.0, 0.0, 0.0 ],
+//            //			"up" : [ 0.0, 1.0, 0.0 ],
+//            //			"zoom" : 0.69999999999999996
+//            //		}
+//            //	],
+//            //	"version_major" : 1,
+//            //	"version_minor" : 0
+//            //}
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//        }
+
     void updateCamera()
     {
+        bool print_enable = false;
+        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241004 follow cam
 
@@ -497,7 +631,7 @@ public:
         open3d::camera::PinholeCameraParameters pcp;
         
                 
-        auto la = [](Vec3 from, Vec3 to, Vec3 up)
+        auto la = [](Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
         {
             return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
                                                           vec3ToEv3d(to),
@@ -505,9 +639,11 @@ public:
         };
         
         
-//        auto la_matrix = la(camera().p(), aimTarget(), Vec3(0, 1, 0));
-//        auto la_matrix = la(Vec3(60, 60, 60), aimTarget(), Vec3(0, 1, 0));
-        auto la_matrix = la(Vec3(60, 60, 60), Vec3(), Vec3(0, 1, 0));
+        std::vector<Vec3> from_to = computeFollowCameraFromTo();
+        auto la_matrix = la(from_to.at(0), from_to.at(1));
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
         // TODO There MUST be a cleaner way to copy the one extrinsic to another
         for (int j = 0; j < 4; j++)
@@ -520,28 +656,18 @@ public:
         
         open3d::camera::PinholeCameraParameters previous_pcp;
         visualizer().GetViewControl().ConvertToPinholeCameraParameters(previous_pcp);
-        std::cout << "previous_pcp.extrinsic_:" << std::endl;
-        std::cout << previous_pcp.extrinsic_ << std::endl;
         
-//        int     width_ = -1
-//        Width of the image. More...
-//        
-//        int     height_ = -1
-//        Height of the image. More...
-//        
-//        Eigen::Matrix3d     intrinsic_matrix_
-
-//        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp,
-//                                                                         true);
-
-//        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
-
-        debugPrint(previous_pcp.intrinsic_.width_)
-        debugPrint(previous_pcp.intrinsic_.height_)
-
-        std::cout << "previous_pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
-        std::cout << previous_pcp.intrinsic_.intrinsic_matrix_ << std::endl;
-
+        if (print_enable)
+        {
+            std::cout << "previous_pcp.extrinsic_:" << std::endl;
+            std::cout << previous_pcp.extrinsic_ << std::endl;
+            
+            //debugPrint(previous_pcp.intrinsic_.width_)
+            //debugPrint(previous_pcp.intrinsic_.height_)
+            //
+            //std::cout << "previous_pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
+            //std::cout << previous_pcp.intrinsic_.intrinsic_matrix_ << std::endl;
+        }
         
         //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         //
@@ -560,39 +686,60 @@ public:
         pcp.intrinsic_ = default_pcp.intrinsic_;
         visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
 
-        std::cout << "pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
-        std::cout << pcp.intrinsic_.intrinsic_matrix_ << std::endl;
-
+        if (print_enable)
+        {
+            // std::cout << "pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
+            // std::cout << pcp.intrinsic_.intrinsic_matrix_ << std::endl;
+        }
         
         //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
         
-        //{
-        //	"class_name" : "ViewTrajectory",
-        //	"interval" : 29,
-        //	"is_loop" : false,
-        //	"trajectory" :
-        //	[
-        //		{
-        //			"boundingbox_max" : [ 50.0, 50.0, 50.0 ],
-        //			"boundingbox_min" : [ -50.0, -50.0, -50.0 ],
-        //			"field_of_view" : 60.0,
-        //			"front" : [ 0.0, 0.0, 1.0 ],
-        //			"lookat" : [ 0.0, 0.0, 0.0 ],
-        //			"up" : [ 0.0, 1.0, 0.0 ],
-        //			"zoom" : 0.69999999999999996
-        //		}
-        //	],
-        //	"version_major" : 1,
-        //	"version_minor" : 0
-        //}
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241004 follow cam
+    // TODO 20241006 follow cam
+    
+    std::vector<Vec3> computeFollowCameraFromTo()
+    {
+//        double offset_dist_target = 10;
+//        double offset_dist_target = 40;
+        double offset_dist_target = 20;
+        Vec3 camera_pos = camera().p();
+        Vec3 offset_from_cam_to_target = aimTarget() - camera_pos;
+        double offset_distance = offset_from_cam_to_target.length();
+        Vec3 offset_direction = offset_from_cam_to_target / offset_distance;
+        Vec3 offset_target = aimTarget() - (offset_direction * offset_dist_target);
+//        Vec3 new_cam_pos = util::interpolate(0.001, camera_pos, aimTarget());
+        Vec3 new_cam_pos = util::interpolate(0.01, camera_pos, aimTarget());
+        return {new_cam_pos, offset_target};
+    }
+
+    void updateFollowCameraPosition()
+    {
+        std::vector<Vec3> from_to = computeFollowCameraFromTo();
+        camera() = camera().fromTo(from_to.at(0), from_to.at(1));
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     void setOpen3dViewFromCamera()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241004 follow cam
+        // TODO 20241006 follow cam
+                
+        updateFollowCameraPosition();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         Vec3 camI = camera().i();
         Vec3 camJ = camera().j();
         Vec3 camK = camera().k();

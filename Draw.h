@@ -81,8 +81,27 @@ public:
         visualizer().RegisterKeyCallback('G',
                                          [&](base_vis_t* vis)
                                          { toggleEnable(); return true; });
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241007 follow cam -- to/from tracker balls
+        
+
+        to_ball = open3d::geometry::TriangleMesh::CreateSphere(1);
+        from_ball = open3d::geometry::TriangleMesh::CreateSphere(1);
+        to_ball->PaintUniformColor({0, 1, 0});
+        from_ball->PaintUniformColor({1, 0, 1});
+        visualizer().AddGeometry(to_ball);
+        visualizer().AddGeometry(from_ball);
+        
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241007 follow cam -- to/from tracker balls
+    std::shared_ptr<open3d::geometry::TriangleMesh> from_ball;
+    std::shared_ptr<open3d::geometry::TriangleMesh> to_ball;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     ~Draw()
     {
@@ -121,6 +140,10 @@ public:
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20241004 follow cam
             // TODO 20241006 follow cam
+            
+//            updateFollowCameraPosition();   // !! Oct 7
+            
+
 
 //            updateCamera();
 //            setOpen3dViewFromCamera();
@@ -146,6 +169,11 @@ public:
             animated_tri_mesh_->ComputeVertexNormals();
             visualizer().UpdateGeometry(animated_tri_mesh_);
             visualizer().UpdateGeometry(animated_line_set_);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20241007 follow cam -- to/from tracker balls
+            visualizer().UpdateGeometry(from_ball);
+            visualizer().UpdateGeometry(to_ball);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
 #endif  // USE_OPEN3D
     }
@@ -640,8 +668,27 @@ public:
         
         
         std::vector<Vec3> from_to = computeFollowCameraFromTo();
+        
+        camera() = camera().fromTo(from_to.at(0), from_to.at(1));
+
         auto la_matrix = la(from_to.at(0), from_to.at(1));
 
+        
+        std::cout << std::endl;
+        std::cout << "my cam pos: " << camera().p() << std::endl;
+        std::cout << "O3d GetEye: " << visualizer().GetViewControl().GetEye().transpose() << std::endl;
+        std::cout << "target pos: " << aimTarget() << std::endl;
+
+        debugPrint(from_to.at(0))
+        debugPrint(from_to.at(1))
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241007 follow cam -- to/from tracker balls
+        from_ball->Translate(vec3ToEv3d(from_to.at(0)), false);
+        to_ball->Translate(vec3ToEv3d(from_to.at(1)), false);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -684,7 +731,12 @@ public:
         }
         
         pcp.intrinsic_ = default_pcp.intrinsic_;
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241007 follow cam -- to/from tracker balls
         visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
         if (print_enable)
         {
@@ -707,24 +759,86 @@ public:
     // TODO 20241004 follow cam
     // TODO 20241006 follow cam
     
+//        std::vector<Vec3> computeFollowCameraFromTo()
+//        {
+//    //        double offset_dist_target = 10;
+//    //        double offset_dist_target = 40;
+//            double offset_dist_target = 20;
+//            Vec3 camera_pos = camera().p();
+//            Vec3 offset_from_cam_to_target = aimTarget() - camera_pos;
+//            double offset_distance = offset_from_cam_to_target.length();
+//            Vec3 offset_direction = offset_from_cam_to_target / offset_distance;
+//            Vec3 offset_target = aimTarget() - (offset_direction * offset_dist_target);
+//    //        Vec3 new_cam_pos = util::interpolate(0.001, camera_pos, aimTarget());
+//            Vec3 new_cam_pos = util::interpolate(0.01, camera_pos, aimTarget());
+//            return {new_cam_pos, offset_target};
+//        }
+
+//        std::vector<Vec3> computeFollowCameraFromTo()
+//        {
+//            double offset_dist_target = 20;
+//            Vec3 camera_pos = camera().p();
+//            Vec3 target_pos = aimTarget();
+//
+//    //        Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
+//            Vec3 offset_from_camera_to_target = target_pos - camera_pos;
+//
+//            double offset_distance = offset_from_camera_to_target.length();
+//            Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
+//
+//    //        Vec3 offset_target = aimTarget() - (offset_direction * offset_dist_target);
+//            Vec3 offset_target = aimTarget() - (offset_direction * offset_dist_target);
+//
+//    //        Vec3 new_cam_pos = util::interpolate(0.01, camera_pos, aimTarget());
+//    //        return {new_cam_pos, offset_target};
+//
+//            Vec3 new_cam_pos = util::interpolate(0.01, camera_pos, offset_target);
+//            return {new_cam_pos, target_pos};
+//        }
+
+//        std::vector<Vec3> computeFollowCameraFromTo()
+//        {
+//    //        double offset_dist_target = 20;
+//            double desired_offset_dist = 20;
+//            Vec3 camera_pos = camera().p();
+//            Vec3 target_pos = aimTarget();
+//            Vec3 offset_from_camera_to_target = target_pos - camera_pos;
+//            double offset_distance = offset_from_camera_to_target.length();
+//            Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
+//    //        Vec3 offset_target = aimTarget() - (offset_direction * offset_dist_target);
+//            Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
+//    //        Vec3 new_cam_pos = util::interpolate(0.01, camera_pos, offset_target);
+//            Vec3 new_cam_pos = util::interpolate(0.1, camera_pos, offset_target);
+//            return {new_cam_pos, target_pos};
+//        }
+
     std::vector<Vec3> computeFollowCameraFromTo()
     {
-//        double offset_dist_target = 10;
-//        double offset_dist_target = 40;
-        double offset_dist_target = 20;
+        double desired_offset_dist = 10;
         Vec3 camera_pos = camera().p();
-        Vec3 offset_from_cam_to_target = aimTarget() - camera_pos;
-        double offset_distance = offset_from_cam_to_target.length();
-        Vec3 offset_direction = offset_from_cam_to_target / offset_distance;
-        Vec3 offset_target = aimTarget() - (offset_direction * offset_dist_target);
-//        Vec3 new_cam_pos = util::interpolate(0.001, camera_pos, aimTarget());
-        Vec3 new_cam_pos = util::interpolate(0.01, camera_pos, aimTarget());
-        return {new_cam_pos, offset_target};
+        Vec3 target_pos = aimTarget();
+        Vec3 offset_from_camera_to_target = target_pos - camera_pos;
+        double offset_distance = offset_from_camera_to_target.length();
+        Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
+        Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
+        Vec3 new_cam_pos = util::interpolate(0.1, camera_pos, offset_target);
+        return {new_cam_pos, target_pos};
     }
 
+    
     void updateFollowCameraPosition()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241007 follow cam -- to/from tracker balls
+        assert(false);  // Make sure we are not calling this
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         std::vector<Vec3> from_to = computeFollowCameraFromTo();
+        
+        debugPrint(from_to.at(0))
+        debugPrint(from_to.at(1))
+
+        // XXX this is now duplicated in updateCamera() -- needs clean up!!
         camera() = camera().fromTo(from_to.at(0), from_to.at(1));
     }
     
@@ -733,12 +847,17 @@ public:
     void setOpen3dViewFromCamera()
     {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241004 follow cam
-        // TODO 20241006 follow cam
-                
-        updateFollowCameraPosition();
-        
+        // TODO 20241007 follow cam -- to/from tracker balls
+        assert(false);  // Make sure we are not calling this
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20241004 follow cam
+//        // TODO 20241006 follow cam
+//                
+//        updateFollowCameraPosition();
+//        
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Vec3 camI = camera().i();
         Vec3 camJ = camera().j();

@@ -102,12 +102,23 @@ public:
     {
         return fromTo(from_position, to_position, Vec3(0, 1, 0));
     }
-    
+
+//    LocalSpace fromTo(Vec3 from_position, Vec3 to_position, Vec3 reference_up)
+//    {
+//        LocalSpace ls;
+//        Vec3 new_forward = (to_position - from_position).normalize();
+//        ls = ls.rotate_to_new_forward(new_forward, reference_up);
+//        ls.setP(from_position);
+//        return ls;
+//    }
+
     LocalSpace fromTo(Vec3 from_position, Vec3 to_position, Vec3 reference_up)
     {
-        setP(from_position);
+        LocalSpace ls;
+        ls.setP(from_position);
         Vec3 new_forward = (to_position - from_position).normalize();
-        return rotate_to_new_forward(new_forward, reference_up);
+        ls = ls.rotate_to_new_forward(new_forward, reference_up);
+        return ls;
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

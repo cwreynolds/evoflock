@@ -456,11 +456,27 @@ public:
         auto ball = open3d::geometry::TriangleMesh::CreateSphere(5);
         ball->ComputeVertexNormals();
         ball->PaintUniformColor({1, 0, 0});
-
+        
         vis.AddGeometry("ball", {ball});
         open3d::visualization::gui::Application::GetInstance().Run();
-
+        
     }
+    
+    // TODO 20241008 wondered about using O3DVisualizer without Application, but
+    // apparently not. It gets "gui::Initialize() must be called before creating
+    // a window or UI element."
+    static void test3()
+    {
+        open3d::PrintOpen3DVersion();
+        // open3d::visualization::gui::Application::GetInstance().Initialize();
+        auto vis = open3d::visualization::visualizer::O3DVisualizer("name", 500, 500);
+        auto ball = open3d::geometry::TriangleMesh::CreateSphere(5);
+        ball->ComputeVertexNormals();
+        ball->PaintUniformColor({1, 0, 0});
+        vis.AddGeometry("ball", {ball});
+        // open3d::visualization::gui::Application::GetInstance().Run();
+    }
+    
     //--------------------------------------------------------------------------
 
     // Accessor for Open3D Visualizer instance.
@@ -639,26 +655,214 @@ public:
 //
 //        }
 
+//        void updateCamera()
+//        {
+//            bool print_enable = false;
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241004 follow cam
+//
+//
+//            // TODO 20241005 maybe I can directly set the matrix using
+//            // open3d::camera::PinholeCameraParameters::extrinsic_ and
+//            // open3d::visualization::ViewControl::ConvertFromPinholeCameraParameters()
+//
+//            // or could we use this (from ViewControl.cpp)?:
+//            //     view_matrix_ = gl_util::LookAt(eye_, lookat_, up_);
+//            // no, that simply computes and returns the view matrix.
+//
+//            // combining?
+//            open3d::camera::PinholeCameraParameters pcp;
+//
+//
+//            auto la = [](Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
+//            {
+//                return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
+//                                                              vec3ToEv3d(to),
+//                                                              vec3ToEv3d(up));
+//            };
+//
+//
+//            std::vector<Vec3> from_to = computeFollowCameraFromTo();
+//
+//            camera() = camera().fromTo(from_to.at(0), from_to.at(1));
+//
+//            auto la_matrix = la(from_to.at(0), from_to.at(1));
+//
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241008 "Igor: reverse the polarity!"
+//    //        la_matrix = la_matrix.inverse();
+//    //        la_matrix = la_matrix.inverse().eval();
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+//
+//            std::cout << std::endl;
+//            std::cout << "my cam pos: " << camera().p() << std::endl;
+//            std::cout << "O3d GetEye: " << visualizer().GetViewControl().GetEye().transpose() << std::endl;
+//            std::cout << "target pos: " << aimTarget() << std::endl;
+//
+//            debugPrint(from_to.at(0))
+//            debugPrint(from_to.at(1))
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241007 follow cam -- to/from tracker balls
+//            from_ball->Translate(vec3ToEv3d(from_to.at(0)), false);
+//            to_ball->Translate(vec3ToEv3d(from_to.at(1)), false);
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+//            // TODO There MUST be a cleaner way to copy the one extrinsic to another
+//            for (int j = 0; j < 4; j++)
+//            {
+//                for (int i = 0; i < 4; i++)
+//                {
+//                    pcp.extrinsic_(i, j) = la_matrix(i, j);
+//                }
+//            }
+//
+//            open3d::camera::PinholeCameraParameters previous_pcp;
+//            visualizer().GetViewControl().ConvertToPinholeCameraParameters(previous_pcp);
+//
+//            if (print_enable)
+//            {
+//                std::cout << "previous_pcp.extrinsic_:" << std::endl;
+//                std::cout << previous_pcp.extrinsic_ << std::endl;
+//
+//                //debugPrint(previous_pcp.intrinsic_.width_)
+//                //debugPrint(previous_pcp.intrinsic_.height_)
+//                //
+//                //std::cout << "previous_pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
+//                //std::cout << previous_pcp.intrinsic_.intrinsic_matrix_ << std::endl;
+//            }
+//
+//            //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//            //
+//            // do something to globally capture the initial pcp.intrinsic_
+//            //
+//            // copy into per-frame PCP before ConvertFromPinholeCameraParameters(pcp)
+//
+//            static bool default_pcp_captured = false;
+//            static open3d::camera::PinholeCameraParameters default_pcp;
+//            if (not default_pcp_captured)
+//            {
+//                visualizer().GetViewControl().ConvertToPinholeCameraParameters(default_pcp);
+//                default_pcp_captured = true;
+//            }
+//
+//            pcp.intrinsic_ = default_pcp.intrinsic_;
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241007 follow cam -- to/from tracker balls
+//            visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+//            if (print_enable)
+//            {
+//                // std::cout << "pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
+//                // std::cout << pcp.intrinsic_.intrinsic_matrix_ << std::endl;
+//            }
+//
+//            //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//        }
+
+//        void updateCamera()
+//        {
+//    //        bool print_enable = false;
+//
+//            // Nickname for open3d::visualization::gl_util::LookAt() args are Vec3.
+//            auto la = [](Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
+//            {
+//                return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
+//                                                              vec3ToEv3d(to),
+//                                                              vec3ToEv3d(up));
+//            };
+//
+//            // Invoke the "follow cam" model, update look_from / look_at points
+//            std::vector<Vec3> from_to = computeFollowCameraFromTo();
+//            const Vec3& look_from = from_to.at(0);
+//            const Vec3& look_at = from_to.at(1);
+//
+//            // Update this Draw instance's camera to from/at orientation
+//            camera() = camera().fromTo(look_from, look_at);
+//
+//            // Compute from/at 4x4 matrix (type GLMatrix4f)
+//            auto la_matrix = la(look_from, look_at);
+//
+//            std::cout << std::endl;
+//            std::cout << "my cam pos: " << camera().p() << std::endl;
+//            std::cout << "O3d GetEye: " << visualizer().GetViewControl().GetEye().transpose() << std::endl;
+//            std::cout << "target pos: " << aimTarget() << std::endl;
+//            debugPrint(look_from)
+//            debugPrint(look_at)
+//
+//            // Update from/at tracking balls (only for debugging
+//            from_ball->Translate(vec3ToEv3d(look_from), false);
+//            to_ball->Translate(vec3ToEv3d(look_at), false);
+//
+//            // TODO There MUST be a cleaner way to copy the one extrinsic to another
+//            open3d::camera::PinholeCameraParameters pcp;
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            for (int j = 0; j < 4; j++)
+//            {
+//                for (int i = 0; i < 4; i++)
+//                {
+//                    pcp.extrinsic_(i, j) = la_matrix(i, j);
+//                }
+//            }
+//
+//    //        open3d::camera::PinholeCameraParameters previous_pcp;
+//    //        visualizer().GetViewControl().ConvertToPinholeCameraParameters(previous_pcp);
+//    //
+//    //        if (print_enable)
+//    //        {
+//    //            std::cout << "previous_pcp.extrinsic_:" << std::endl;
+//    //            std::cout << previous_pcp.extrinsic_ << std::endl;
+//    //        }
+//
+//    //        // do something to globally capture the initial pcp.intrinsic_
+//    //        // copy into per-frame PCP before ConvertFromPinholeCameraParameters(pcp)
+//    //
+//    //        static bool default_pcp_captured = false;
+//    //        static open3d::camera::PinholeCameraParameters default_pcp;
+//    //        if (not default_pcp_captured)
+//    //        {
+//    //            visualizer().GetViewControl().ConvertToPinholeCameraParameters(default_pcp);
+//    //            default_pcp_captured = true;
+//    //        }
+//    //
+//    //        pcp.intrinsic_ = default_pcp.intrinsic_;
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241007 follow cam -- to/from tracker balls
+//            visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+//    //        if (print_enable)
+//    //        {
+//    //            // std::cout << "pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
+//    //            // std::cout << pcp.intrinsic_.intrinsic_matrix_ << std::endl;
+//    //        }
+//        }
+
+    
     void updateCamera()
     {
-        bool print_enable = false;
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241004 follow cam
-
-
-        // TODO 20241005 maybe I can directly set the matrix using
-        // open3d::camera::PinholeCameraParameters::extrinsic_ and
-        // open3d::visualization::ViewControl::ConvertFromPinholeCameraParameters()
-        
-        // or could we use this (from ViewControl.cpp)?:
-        //     view_matrix_ = gl_util::LookAt(eye_, lookat_, up_);
-        // no, that simply computes and returns the view matrix.
-
-        // combining?
-        open3d::camera::PinholeCameraParameters pcp;
-        
-                
+        // Nickname for open3d::visualization::gl_util::LookAt() args are Vec3.
         auto la = [](Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
         {
             return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
@@ -666,33 +870,44 @@ public:
                                                           vec3ToEv3d(up));
         };
         
-        
+        // Invoke the "follow cam" model, update look_from / look_at points
         std::vector<Vec3> from_to = computeFollowCameraFromTo();
-        
-        camera() = camera().fromTo(from_to.at(0), from_to.at(1));
-
-        auto la_matrix = la(from_to.at(0), from_to.at(1));
+        const Vec3& look_from = from_to.at(0);
+        const Vec3& look_at = from_to.at(1);
 
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241008 at this point, I don't think camera is being used at all
+        //               Oops no, its used for computeFollowCameraFromTo()
+        //
+        //               Oh, instead of the awkward passing back two values, what
+        //               about stashing them in the instance, like the camera
+        //               itself, say into cameraLookFrom() and cameraLookAt()?
+        
+        // Update this Draw instance's camera to from/at orientation
+        camera() = camera().fromTo(look_from, look_at);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        // Compute from/at 4x4 matrix (type GLMatrix4f)
+        auto la_matrix = la(look_from, look_at);
+
         std::cout << std::endl;
         std::cout << "my cam pos: " << camera().p() << std::endl;
         std::cout << "O3d GetEye: " << visualizer().GetViewControl().GetEye().transpose() << std::endl;
         std::cout << "target pos: " << aimTarget() << std::endl;
-
-        debugPrint(from_to.at(0))
-        debugPrint(from_to.at(1))
+        debugPrint(look_from)
+        debugPrint(look_at)
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241007 follow cam -- to/from tracker balls
-        from_ball->Translate(vec3ToEv3d(from_to.at(0)), false);
-        to_ball->Translate(vec3ToEv3d(from_to.at(1)), false);
+        // Update from/at tracking balls (only for debugging).
+        from_ball->Translate(vec3ToEv3d(look_from), false);
+        to_ball->Translate(vec3ToEv3d(look_at), false);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-        // TODO There MUST be a cleaner way to copy the one extrinsic to another
+        // Get current PinholeCameraParameters, then overwrite view matrix.
+        open3d::camera::PinholeCameraParameters pcp;
+        visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
+        // TODO There MUST be a cleaner way to copy one extrinsic into another.
         for (int j = 0; j < 4; j++)
         {
             for (int i = 0; i < 4; i++)
@@ -701,54 +916,8 @@ public:
             }
         }
         
-        open3d::camera::PinholeCameraParameters previous_pcp;
-        visualizer().GetViewControl().ConvertToPinholeCameraParameters(previous_pcp);
-        
-        if (print_enable)
-        {
-            std::cout << "previous_pcp.extrinsic_:" << std::endl;
-            std::cout << previous_pcp.extrinsic_ << std::endl;
-            
-            //debugPrint(previous_pcp.intrinsic_.width_)
-            //debugPrint(previous_pcp.intrinsic_.height_)
-            //
-            //std::cout << "previous_pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
-            //std::cout << previous_pcp.intrinsic_.intrinsic_matrix_ << std::endl;
-        }
-        
-        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        //
-        // do something to globally capture the initial pcp.intrinsic_
-        //
-        // copy into per-frame PCP before ConvertFromPinholeCameraParameters(pcp)
-        
-        static bool default_pcp_captured = false;
-        static open3d::camera::PinholeCameraParameters default_pcp;
-        if (not default_pcp_captured)
-        {
-            visualizer().GetViewControl().ConvertToPinholeCameraParameters(default_pcp);
-            default_pcp_captured = true;
-        }
-        
-        pcp.intrinsic_ = default_pcp.intrinsic_;
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241007 follow cam -- to/from tracker balls
+        // Write back PinholeCameraParameters with new from/at view matrix.
         visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-        if (print_enable)
-        {
-            // std::cout << "pcp.intrinsic_.intrinsic_matrix_:" << std::endl;
-            // std::cout << pcp.intrinsic_.intrinsic_matrix_ << std::endl;
-        }
-        
-        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

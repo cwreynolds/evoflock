@@ -943,61 +943,108 @@ public:
 //            visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
 //        }
 
+//        void updateCamera()
+//        {
+//    //            // Nickname for open3d::visualization::gl_util::LookAt() args are Vec3.
+//    //            auto la = [](Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
+//    //            {
+//    //                auto mat = open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
+//    //                                                                  vec3ToEv3d(to),
+//    //                                                                  vec3ToEv3d(up));
+//    //    //            return mat.cast<double>();
+//    //    //            return mat;
+//    //                return mat.cast<double>();
+//    //            };
+//
+//            // Nickname for open3d::visualization::gl_util::LookAt() args are Vec3.
+//            auto la = [](Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
+//            {
+//                return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
+//                                                              vec3ToEv3d(to),
+//                                                              vec3ToEv3d(up));
+//            };
+//
+//            // Invoke the "follow cam" model, update look_from / look_at points
+//    //        std::vector<Vec3> from_to = computeFollowCameraFromTo();
+//    //        const Vec3& look_from = from_to.at(0);
+//    //        const Vec3& look_at = from_to.at(1);
+//            computeFollowCameraFromTo();
+//
+//            assert(cameraLookFrom() != cameraLookAt());
+//
+//            // Update this Draw instance's camera to from/at orientation
+//    //        camera() = camera().fromTo(look_from, look_at);
+//            camera() = camera().fromTo(cameraLookFrom(), cameraLookAt());
+//
+//            // Compute from/at 4x4 matrix (type GLMatrix4f)
+//    //        auto la_matrix = la(look_from, look_at);
+//            auto la_matrix = la(cameraLookFrom(), cameraLookAt());
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            std::cout << std::endl;
+//            std::cout << "my cam pos: " << camera().p() << std::endl;
+//            std::cout << "O3d GetEye: " << visualizer().GetViewControl().GetEye().transpose() << std::endl;
+//            std::cout << "target pos: " << aimTarget() << std::endl;
+//    //        debugPrint(look_from)
+//    //        debugPrint(look_at)
+//            debugPrint(cameraLookFrom());
+//            debugPrint(cameraLookAt());
+//            // Update from/at tracking balls (only for debugging).
+//    //        from_ball->Translate(vec3ToEv3d(look_from), false);
+//    //        to_ball->Translate(vec3ToEv3d(look_at), false);
+//            from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
+//            to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            // Get current PinholeCameraParameters (pcp).
+//            open3d::camera::PinholeCameraParameters pcp;
+//            visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
+//
+//            // Then overwrite the pcp's view matrix with the new lookat matrix.
+//            pcp.extrinsic_ = la_matrix.cast<double>();
+//
+//            // Write back PinholeCameraParameters with new from/at view matrix.
+//            visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+//        }
+
     void updateCamera()
     {
         // Nickname for open3d::visualization::gl_util::LookAt() args are Vec3.
         auto la = [](Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
         {
-//            return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
-//                                                          vec3ToEv3d(to),
-//                                                          vec3ToEv3d(up));
-            auto mat = open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
-                                                              vec3ToEv3d(to),
-                                                              vec3ToEv3d(up));
-            return mat.cast<double>();
+            return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
+                                                          vec3ToEv3d(to),
+                                                          vec3ToEv3d(up));
         };
-        
-        // Invoke the "follow cam" model, update look_from / look_at points
-        std::vector<Vec3> from_to = computeFollowCameraFromTo();
-        const Vec3& look_from = from_to.at(0);
-        const Vec3& look_at = from_to.at(1);
 
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241008 at this point, I don't think camera is being used at all
-        //               Oops no, its used for computeFollowCameraFromTo()
-        //
-        //               Oh, instead of the awkward passing back two values, what
-        //               about stashing them in the instance, like the camera
-        //               itself, say into cameraLookFrom() and cameraLookAt()?
+        // Invoke the "follow cam" model, update look_from / look_at points
+        computeFollowCameraFromTo();
         
         // Update this Draw instance's camera to from/at orientation
-        camera() = camera().fromTo(look_from, look_at);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        camera() = camera().fromTo(cameraLookFrom(), cameraLookAt());
 
         // Compute from/at 4x4 matrix (type GLMatrix4f)
-        auto la_matrix = la(look_from, look_at);
+        auto la_matrix = la(cameraLookFrom(), cameraLookAt());
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        std::cout << std::endl;
-        std::cout << "my cam pos: " << camera().p() << std::endl;
-        std::cout << "O3d GetEye: " << visualizer().GetViewControl().GetEye().transpose() << std::endl;
-        std::cout << "target pos: " << aimTarget() << std::endl;
-        debugPrint(look_from)
-        debugPrint(look_at)
-        // Update from/at tracking balls (only for debugging).
-        from_ball->Translate(vec3ToEv3d(look_from), false);
-        to_ball->Translate(vec3ToEv3d(look_at), false);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        {
+            std::cout << std::endl;
+            std::cout << "my cam pos: " << camera().p() << std::endl;
+            std::cout << "O3d GetEye: " << visualizer().GetViewControl().GetEye().transpose() << std::endl;
+            std::cout << "target pos: " << aimTarget() << std::endl;
+            debugPrint(cameraLookFrom());
+            debugPrint(cameraLookAt());
+            // Update from/at tracking balls (only for debugging).
+            from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
+            to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
+        }
 
         // Get current PinholeCameraParameters (pcp).
         open3d::camera::PinholeCameraParameters pcp;
         visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
 
         // Then overwrite the pcp's view matrix with the new lookat matrix.
-//        pcp.extrinsic_ = la_matrix.cast<double>();
-        pcp.extrinsic_ = la_matrix;
-
+        pcp.extrinsic_ = la_matrix.cast<double>();
+        
         // Write back PinholeCameraParameters with new from/at view matrix.
         visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
     }
@@ -1064,76 +1111,131 @@ public:
 //            return {new_cam_pos, target_pos};
 //        }
 
-    std::vector<Vec3> computeFollowCameraFromTo()
+    
+//    std::vector<Vec3> computeFollowCameraFromTo()
+//    {
+//        double desired_offset_dist = 10;
+//        Vec3 camera_pos = camera().p();
+//        Vec3 target_pos = aimTarget();
+//        Vec3 offset_from_camera_to_target = target_pos - camera_pos;
+//        double offset_distance = offset_from_camera_to_target.length();
+//        Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
+//        Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
+//        Vec3 new_cam_pos = util::interpolate(0.1, camera_pos, offset_target);
+//        return {new_cam_pos, target_pos};
+//    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241010 Oh, instead of the awkward passing back two values, what
+    //               about stashing them in the instance, like the camera
+    //               itself, say into cameraLookFrom() and cameraLookAt()?
+    
+//    // Invoke the "follow cam" model, update look_from / look_at points
+//    std::vector<Vec3> from_to = computeFollowCameraFromTo();
+//    const Vec3& look_from = from_to.at(0);
+//    const Vec3& look_at = from_to.at(1);
+    
+    
+    Vec3 camera_look_from_;
+    Vec3 camera_look_at_;    // This is identical to aimTarget() right? merge?
+    
+    Vec3 cameraLookFrom() const { return camera_look_from_; }
+    Vec3 cameraLookAt() const { return camera_look_at_; }
+
+
+//        void computeFollowCameraFromTo()
+//        {
+//            double desired_offset_dist = 10;
+//            Vec3 camera_pos = camera().p();
+//            Vec3 target_pos = aimTarget();
+//            Vec3 offset_from_camera_to_target = target_pos - camera_pos;
+//            double offset_distance = offset_from_camera_to_target.length();
+//            Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
+//            Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
+//            Vec3 new_cam_pos = util::interpolate(0.1, camera_pos, offset_target);
+//    //        return {new_cam_pos, target_pos};
+//
+//            camera_look_from_ = new_cam_pos;
+//            camera_look_at_ = aimTarget();
+//        }
+
+    // Invoke the "follow camera" model, update look_from / look_at points.
+    void computeFollowCameraFromTo()
     {
         double desired_offset_dist = 10;
         Vec3 camera_pos = camera().p();
-        Vec3 target_pos = aimTarget();
-        Vec3 offset_from_camera_to_target = target_pos - camera_pos;
+        Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
         double offset_distance = offset_from_camera_to_target.length();
         Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
         Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
         Vec3 new_cam_pos = util::interpolate(0.1, camera_pos, offset_target);
-        return {new_cam_pos, target_pos};
+        camera_look_from_ = new_cam_pos;
+        camera_look_at_ = aimTarget();
     }
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
-    void updateFollowCameraPosition()
-    {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241007 follow cam -- to/from tracker balls
-        assert(false);  // Make sure we are not calling this
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        std::vector<Vec3> from_to = computeFollowCameraFromTo();
-        
-        debugPrint(from_to.at(0))
-        debugPrint(from_to.at(1))
-
-        // XXX this is now duplicated in updateCamera() -- needs clean up!!
-        camera() = camera().fromTo(from_to.at(0), from_to.at(1));
-    }
+    
+    
+//    void updateFollowCameraPosition()
+//    {
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20241007 follow cam -- to/from tracker balls
+//        assert(false);  // Make sure we are not calling this
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//        std::vector<Vec3> from_to = computeFollowCameraFromTo();
+//        
+//        debugPrint(from_to.at(0))
+//        debugPrint(from_to.at(1))
+//
+//        // XXX this is now duplicated in updateCamera() -- needs clean up!!
+//        camera() = camera().fromTo(from_to.at(0), from_to.at(1));
+//    }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    void setOpen3dViewFromCamera()
-    {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241007 follow cam -- to/from tracker balls
-        assert(false);  // Make sure we are not calling this
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20241004 follow cam
-//        // TODO 20241006 follow cam
-//                
-//        updateFollowCameraPosition();
-//        
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        Vec3 camI = camera().i();
-        Vec3 camJ = camera().j();
-        Vec3 camK = camera().k();
-        Vec3 camP = camera().p();
-        
-        // Explicitly set ViewControl's "up" and "front". WHY IS THIS NEEDED?!
-        visualizer().GetViewControl().SetUp(vec3ToEv3d(camJ));
-        visualizer().GetViewControl().SetFront(vec3ToEv3d(camK));
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241004 follow cam
-        visualizer().GetViewControl().SetLookat(vec3ToEv3d(aimTarget()));
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        // Construct the view matrix by picking out scalar camera parameters.
-        Eigen::Matrix4d eigen_view_matrix;
-        eigen_view_matrix << camI.x(), camI.y(), camI.z(), camP.x(),
-                             camJ.x(), camJ.y(), camJ.z(), camP.y(),
-                             camK.x(), camK.y(), camK.z(), camP.z(),
-                             0,        0,        0,        1;
-        
-        // Set Open3D's Visualizer's ViewControl's view matrices.
-        visualizer().GetViewControl().SetViewMatrices(eigen_view_matrix);
-    }
+//        void setOpen3dViewFromCamera()
+//        {
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241007 follow cam -- to/from tracker balls
+//            assert(false);  // Make sure we are not calling this
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//    //        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //        // TODO 20241004 follow cam
+//    //        // TODO 20241006 follow cam
+//    //
+//    //        updateFollowCameraPosition();
+//    //
+//    //        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            Vec3 camI = camera().i();
+//            Vec3 camJ = camera().j();
+//            Vec3 camK = camera().k();
+//            Vec3 camP = camera().p();
+//
+//            // Explicitly set ViewControl's "up" and "front". WHY IS THIS NEEDED?!
+//            visualizer().GetViewControl().SetUp(vec3ToEv3d(camJ));
+//            visualizer().GetViewControl().SetFront(vec3ToEv3d(camK));
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241004 follow cam
+//            visualizer().GetViewControl().SetLookat(vec3ToEv3d(aimTarget()));
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            // Construct the view matrix by picking out scalar camera parameters.
+//            Eigen::Matrix4d eigen_view_matrix;
+//            eigen_view_matrix << camI.x(), camI.y(), camI.z(), camP.x(),
+//                                 camJ.x(), camJ.y(), camJ.z(), camP.y(),
+//                                 camK.x(), camK.y(), camK.z(), camP.z(),
+//                                 0,        0,        0,        1;
+//
+//            // Set Open3D's Visualizer's ViewControl's view matrices.
+//            visualizer().GetViewControl().SetViewMatrices(eigen_view_matrix);
+//        }
 
     static void unit_test() {}
     

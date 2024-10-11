@@ -81,6 +81,20 @@ public:
         visualizer().RegisterKeyCallback('G',
                                          [&](base_vis_t* vis)
                                          { toggleEnable(); return true; });
+        
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241010 add "C" command, for now toggle follow vs global camera
+        
+        // Add add "C" command, to cycle through camera aiming modes.
+        visualizer().RegisterKeyCallback('C',
+                                         [&](base_vis_t* vis)
+                                         { camera_mode_ = not camera_mode_;
+                                           return true; });
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241007 follow cam -- to/from tracker balls
         
@@ -92,6 +106,13 @@ public:
         visualizer().AddGeometry(to_ball);
         visualizer().AddGeometry(from_ball);
         
+        la_to_ball = open3d::geometry::TriangleMesh::CreateSphere(1);
+        la_from_ball = open3d::geometry::TriangleMesh::CreateSphere(1);
+        la_to_ball->PaintUniformColor({0, 0, 1});
+        la_from_ball->PaintUniformColor({1, 1, 0});
+        visualizer().AddGeometry(la_to_ball);
+        visualizer().AddGeometry(la_from_ball);
+        
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
@@ -101,6 +122,8 @@ public:
     // TODO 20241007 follow cam -- to/from tracker balls
     std::shared_ptr<open3d::geometry::TriangleMesh> from_ball;
     std::shared_ptr<open3d::geometry::TriangleMesh> to_ball;
+    std::shared_ptr<open3d::geometry::TriangleMesh> la_from_ball;
+    std::shared_ptr<open3d::geometry::TriangleMesh> la_to_ball;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     ~Draw()
@@ -152,7 +175,7 @@ public:
 
 //            setOpen3dViewFromCamera();
             
-            debugPrint((camera().p() - aimTarget()).length());
+//            debugPrint((camera().p() - aimTarget()).length());
 //            std::this_thread::sleep_for(std::chrono::milliseconds(1000/60));
             std::this_thread::sleep_for(std::chrono::milliseconds(1000/30));
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -169,11 +192,13 @@ public:
             animated_tri_mesh_->ComputeVertexNormals();
             visualizer().UpdateGeometry(animated_tri_mesh_);
             visualizer().UpdateGeometry(animated_line_set_);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20241007 follow cam -- to/from tracker balls
             visualizer().UpdateGeometry(from_ball);
             visualizer().UpdateGeometry(to_ball);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            visualizer().UpdateGeometry(la_from_ball);
+            visualizer().UpdateGeometry(la_to_ball);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
 #endif  // USE_OPEN3D
     }
@@ -1007,48 +1032,248 @@ public:
 //            visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
 //        }
 
+    
+    // Nickname for open3d::visualization::gl_util::LookAt() with Vec3 args.
+    typedef open3d::visualization::gl_util::GLMatrix4f GLMatrix4f;
+    static GLMatrix4f glLookAt(Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
+    {
+        return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
+                                                      vec3ToEv3d(to),
+                                                      vec3ToEv3d(up));
+    };
+    
+
+    // TODO very temp experiment
+    // Nickname for open3d::visualization::gl_util::LookAt() with Vec3 args.
+    GLMatrix4f myLookAt()
+    {
+        Vec3 camI = camera().i();
+        Vec3 camJ = camera().j();
+        Vec3 camK = camera().k();
+        Vec3 camP = camera().p();
+                
+        // Construct the view matrix by picking out scalar camera parameters.
+        Eigen::Matrix4f eigen_view_matrix;
+        eigen_view_matrix << camI.x(), camI.y(), camI.z(), camP.x(),
+                             camJ.x(), camJ.y(), camJ.z(), camP.y(),
+                             camK.x(), camK.y(), camK.z(), camP.z(),
+                             0,        0,        0,        1;
+        
+        return eigen_view_matrix;
+    };
+
+    
+
+//        void updateCamera()
+//        {
+//            // Invoke the "follow cam" model, update look_from / look_at points
+//            computeFollowCameraFromTo();
+//
+//            // Update this Draw instance's camera to from/at orientation
+//            camera() = camera().fromTo(cameraLookFrom(), cameraLookAt());
+//
+//            // Compute from/at 4x4 matrix (type GLMatrix4f)
+//            GLMatrix4f la_matrix = glLookAt(cameraLookFrom(), cameraLookAt());
+//
+//
+//            // TODO 20241010 grasping at straws
+//    //        la_matrix = la_matrix.transpose().eval();
+//    //        la_matrix = la_matrix.inverse().eval();
+//    //        la_matrix = la_matrix.inverse().transpose().eval();
+//    //        la_matrix = la_matrix.transpose().inverse().eval();
+//    //        la_matrix = la_matrix.transpose().inverse().transpose().eval();
+//
+//
+//            {
+//                std::cout << std::endl;
+//                std::cout << "my cam pos: " << camera().p() << std::endl;
+//                std::cout << "O3d GetEye: " <<
+//                visualizer().GetViewControl().GetEye().transpose() << std::endl;
+//                std::cout << "target pos: " << aimTarget() << std::endl;
+//                debugPrint(cameraLookFrom());
+//                debugPrint(cameraLookAt());
+//                // Update from/at tracking balls (only for debugging).
+//                from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
+//                to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
+//
+//                debugPrint((camera().p() - aimTarget()).length());
+//
+//
+//
+//                double d = (camera().p() - aimTarget()).length();
+//
+//    //            auto p = la_matrix.cast<double>() * Eigen::Vector4d(0, 0, 0, 1);
+//    //            auto q = la_matrix.cast<double>() * Eigen::Vector4d(0, 0, d, 1);
+//
+//                Eigen::Matrix<double,4,4> lam = la_matrix.cast<double>();
+//                Eigen::Matrix<double,4,4> laminv = lam.inverse().eval();
+//
+//
+//    //            auto p = lam * Eigen::Vector4d(0, 0, 0, 1);
+//    //            auto q = lam * Eigen::Vector4d(0, 0, d, 1);
+//    //            auto p = laminv * Eigen::Vector4d(0, 0, 0, 1);
+//    //            auto q = laminv * Eigen::Vector4d(0, 0, -d, 1);
+//                Eigen::Vector4d p = laminv * Eigen::Vector4d(0, 0, 0, 1);
+//                Eigen::Vector4d q = laminv * Eigen::Vector4d(0, 0, -d, 1);
+//
+//
+//
+//    //            Eigen::Vector3d pp({p(0), p(1), p(2)});
+//    //            Eigen::Vector3d qq({q(0), q(1), q(2)});
+//    //            Vec3 ppp({p(0), p(1), p(2)});
+//    //            Vec3 qqq({q(0), q(1), q(2)});
+//                Eigen::Vector3d pp({p(0) / p(3), p(1) / p(3), p(2) / p(3)});
+//                Eigen::Vector3d qq({q(0) / q(3), q(1) / q(3), q(2) / q(3)});
+//                Vec3 ppp({pp(0), pp(1), pp(2)});
+//                Vec3 qqq({qq(0), qq(1), qq(2)});
+//
+//                la_from_ball->Translate(pp, false);
+//                la_to_ball->Translate(qq, false);
+//
+//    //            debugPrint(pp.transpose())
+//    //            debugPrint(qq.transpose())
+//                debugPrint(ppp)
+//                debugPrint(qqq)
+//
+//                Vec3 top(0,  50, 0);
+//                Vec3 bot(0, -50, 0);
+//                addLineSegmentToAnimatedFrame(top, cameraLookFrom(), Vec3(0, 0, 0));
+//                addLineSegmentToAnimatedFrame(top, cameraLookAt(),   Vec3(1, 1, 1));
+//    //            addLineSegmentToAnimatedFrame(bot, {p(0), p(1), p(2)}, Vec3(0, 0, 0));
+//    //            addLineSegmentToAnimatedFrame(bot, {q(0), q(1), q(2)}, Vec3(1, 1, 1));
+//                addLineSegmentToAnimatedFrame(bot, ppp, Vec3(0, 0, 0));
+//                addLineSegmentToAnimatedFrame(bot, qqq, Vec3(1, 1, 1));
+//
+//
+//                std::cout << "la_matrix.cast<double>(): " << std::endl;
+//                std::cout << la_matrix.cast<double>() << std::endl;
+//
+//                std::cout << "la_matrix: " << std::endl;
+//                std::cout << la_matrix << std::endl;
+//
+//                std::cout << " myLookAt(): " << std::endl;
+//                std::cout <<  myLookAt() << std::endl;
+//
+//
+//    //                for (int i = 0; i < 10; i++)
+//    //                {
+//    //    //                Eigen::Vector4d rv(EF::RS().random2(-5, 5),
+//    //    //                                   EF::RS().random2(-5, 5),
+//    //    //                                   EF::RS().random2(-5, 5),
+//    //    //                                   1);
+//    //                    Eigen::Vector4d rv(0,
+//    //                                       0,
+//    //                                       EF::RS().random2(-5, 5),
+//    //                                       1);
+//    //                    debugPrint((la_matrix.cast<double>() * rv).transpose());
+//    //                }
+//
+//            }
+//            if (cameraMode() == true)
+//            {
+//                // Get current PinholeCameraParameters (pcp).
+//                open3d::camera::PinholeCameraParameters pcp;
+//                visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
+//
+//                // Then overwrite the pcp's view matrix with the new lookat matrix.
+//                pcp.extrinsic_ = la_matrix.cast<double>();
+//
+//                // Write back PinholeCameraParameters with new from/at view matrix.
+//                visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+//            }
+//        }
+
     void updateCamera()
     {
-        // Nickname for open3d::visualization::gl_util::LookAt() args are Vec3.
-        auto la = [](Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
-        {
-            return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
-                                                          vec3ToEv3d(to),
-                                                          vec3ToEv3d(up));
-        };
-
         // Invoke the "follow cam" model, update look_from / look_at points
         computeFollowCameraFromTo();
         
         // Update this Draw instance's camera to from/at orientation
         camera() = camera().fromTo(cameraLookFrom(), cameraLookAt());
+//        camera() = camera().fromTo(cameraLookAt(), cameraLookFrom());
 
         // Compute from/at 4x4 matrix (type GLMatrix4f)
-        auto la_matrix = la(cameraLookFrom(), cameraLookAt());
+        GLMatrix4f la_matrix = glLookAt(cameraLookFrom(), cameraLookAt());
+//        GLMatrix4f la_matrix = glLookAt(cameraLookAt(), cameraLookFrom());
+
+        Eigen::Matrix<double,4,4> lam = la_matrix.cast<double>();
+        Eigen::Matrix<double,4,4> laminv = lam.inverse().eval();
 
         {
             std::cout << std::endl;
             std::cout << "my cam pos: " << camera().p() << std::endl;
-            std::cout << "O3d GetEye: " << visualizer().GetViewControl().GetEye().transpose() << std::endl;
+            std::cout << "O3d GetEye: " <<
+            visualizer().GetViewControl().GetEye().transpose() << std::endl;
             std::cout << "target pos: " << aimTarget() << std::endl;
             debugPrint(cameraLookFrom());
             debugPrint(cameraLookAt());
             // Update from/at tracking balls (only for debugging).
             from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
             to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
-        }
+            
+            debugPrint((camera().p() - aimTarget()).length());
 
-        // Get current PinholeCameraParameters (pcp).
-        open3d::camera::PinholeCameraParameters pcp;
-        visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
-
-        // Then overwrite the pcp's view matrix with the new lookat matrix.
-        pcp.extrinsic_ = la_matrix.cast<double>();
         
-        // Write back PinholeCameraParameters with new from/at view matrix.
-        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
-    }
+            
 
+//            Eigen::Matrix<double,4,4> lam = la_matrix.cast<double>();
+//            Eigen::Matrix<double,4,4> laminv = lam.inverse().eval();
+
+
+            double d = (camera().p() - aimTarget()).length();
+            Eigen::Vector4d p = laminv * Eigen::Vector4d(0, 0, 0, 1);
+            Eigen::Vector4d q = laminv * Eigen::Vector4d(0, 0, -d, 1);
+
+            Eigen::Vector3d pp({p(0) / p(3), p(1) / p(3), p(2) / p(3)});
+            Eigen::Vector3d qq({q(0) / q(3), q(1) / q(3), q(2) / q(3)});
+            Vec3 ppp({pp(0), pp(1), pp(2)});
+            Vec3 qqq({qq(0), qq(1), qq(2)});
+
+            la_from_ball->Translate(pp, false);
+            la_to_ball->Translate(qq, false);
+            
+            debugPrint(ppp)
+            debugPrint(qqq)
+
+            Vec3 top(0,  50, 0);
+            Vec3 bot(0, -50, 0);
+            addLineSegmentToAnimatedFrame(top, cameraLookFrom(), Vec3(0, 0, 0));
+            addLineSegmentToAnimatedFrame(top, cameraLookAt(),   Vec3(1, 1, 1));
+            addLineSegmentToAnimatedFrame(bot, ppp, Vec3(0, 0, 0));
+            addLineSegmentToAnimatedFrame(bot, qqq, Vec3(1, 1, 1));
+            
+            
+//            std::cout << "la_matrix.cast<double>(): " << std::endl;
+//            std::cout << la_matrix.cast<double>() << std::endl;
+//            
+//            std::cout << "la_matrix: " << std::endl;
+//            std::cout << la_matrix << std::endl;
+            
+            std::cout << "lam: " << std::endl;
+            std::cout << lam << std::endl;
+            
+            std::cout << "laminv: " << std::endl;
+            std::cout << laminv << std::endl;
+
+            std::cout << " myLookAt(): " << std::endl;
+            std::cout <<  myLookAt() << std::endl;
+            
+        }
+        if (cameraMode() == true)
+        {
+            // Get current PinholeCameraParameters (pcp).
+            open3d::camera::PinholeCameraParameters pcp;
+            visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
+            
+            // Then overwrite the pcp's view matrix with the new lookat matrix.
+//            pcp.extrinsic_ = la_matrix.cast<double>();
+            pcp.extrinsic_ = lam;
+//            pcp.extrinsic_ = laminv;
+
+            // Write back PinholeCameraParameters with new from/at view matrix.
+            visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+        }
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1159,17 +1384,49 @@ public:
 //            camera_look_at_ = aimTarget();
 //        }
 
+//    // Invoke the "follow camera" model, update look_from / look_at points.
+//    void computeFollowCameraFromTo()
+//    {
+//        double desired_offset_dist = 10;
+//        Vec3 camera_pos = camera().p();
+//        Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
+//        double offset_distance = offset_from_camera_to_target.length();
+//        Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
+//        Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
+//        Vec3 new_cam_pos = util::interpolate(0.1, camera_pos, offset_target);
+//        camera_look_from_ = new_cam_pos;
+//        camera_look_at_ = aimTarget();
+//    }
+
+//        // Invoke the "follow camera" model, update look_from / look_at points.
+//        void computeFollowCameraFromTo()
+//        {
+//            double desired_offset_dist = 10;
+//            Vec3 camera_pos = camera().p();
+//            Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
+//            double offset_distance = offset_from_camera_to_target.length();
+//            Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
+//            Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
+//    //        Vec3 new_cam_pos = util::interpolate(0.1, camera_pos, offset_target);
+//    //        camera_look_from_ = new_cam_pos;
+//            camera_look_from_ = util::interpolate(0.1, camera_pos, offset_target);
+//            camera_look_at_ = aimTarget();
+//        }
+
     // Invoke the "follow camera" model, update look_from / look_at points.
     void computeFollowCameraFromTo()
     {
         double desired_offset_dist = 10;
+//        double position_speed = 0.1;  // On [0:1]
+//        double position_speed = 0.05;  // On [0:1]
+        double position_speed = 0.07;  // On [0:1]
         Vec3 camera_pos = camera().p();
         Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
         double offset_distance = offset_from_camera_to_target.length();
         Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
         Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
-        Vec3 new_cam_pos = util::interpolate(0.1, camera_pos, offset_target);
-        camera_look_from_ = new_cam_pos;
+//        camera_look_from_ = util::interpolate(0.1, camera_pos, offset_target);
+        camera_look_from_ = util::interpolate(position_speed, camera_pos, offset_target);
         camera_look_at_ = aimTarget();
     }
 
@@ -1237,6 +1494,13 @@ public:
 //            visualizer().GetViewControl().SetViewMatrices(eigen_view_matrix);
 //        }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241010 add "C" command, for now toggle follow vs global camera
+    
+    // Camera mode. Currently cycles between follow and global.
+    bool& cameraMode() { return camera_mode_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     static void unit_test() {}
     
 private:
@@ -1267,6 +1531,13 @@ private:
     
     // Open3D Visualizer object.
     vis_t visualizer_;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241010 add "C" command, for now toggle follow vs global camera
+
+    // Camera mode. Currently cycles between follow and global.
+    bool camera_mode_ = true;  // Follow mode.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Private utility to convert a Vec3 to an Eigen::Vector3d.
     static Eigen::Vector3d vec3ToEv3d(const Vec3& v)

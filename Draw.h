@@ -98,16 +98,26 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241007 follow cam -- to/from tracker balls
         
+        
+        // TODO 20241011 YAY!! working now!
+//        to_ball = open3d::geometry::TriangleMesh::CreateSphere(1);
+//        from_ball = open3d::geometry::TriangleMesh::CreateSphere(1);
+//        to_ball->PaintUniformColor({0, 1, 0});
+//        from_ball->PaintUniformColor({1, 0, 1});
+//        visualizer().AddGeometry(to_ball);
+//        visualizer().AddGeometry(from_ball);
 
-        to_ball = open3d::geometry::TriangleMesh::CreateSphere(1);
-        from_ball = open3d::geometry::TriangleMesh::CreateSphere(1);
+//        double ball_radius = 1;
+        double ball_radius = 0.3;
+        to_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
+        from_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
         to_ball->PaintUniformColor({0, 1, 0});
         from_ball->PaintUniformColor({1, 0, 1});
         visualizer().AddGeometry(to_ball);
         visualizer().AddGeometry(from_ball);
-        
-        la_to_ball = open3d::geometry::TriangleMesh::CreateSphere(1);
-        la_from_ball = open3d::geometry::TriangleMesh::CreateSphere(1);
+
+        la_to_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
+        la_from_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
         la_to_ball->PaintUniformColor({0, 0, 1});
         la_from_ball->PaintUniformColor({1, 1, 0});
         visualizer().AddGeometry(la_to_ball);
@@ -1265,13 +1275,43 @@ public:
             open3d::camera::PinholeCameraParameters pcp;
             visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
             
+//                // Then overwrite the pcp's view matrix with the new lookat matrix.
+//    //            pcp.extrinsic_ = la_matrix.cast<double>();
+//                pcp.extrinsic_ = lam;
+//    //            pcp.extrinsic_ = laminv;
+//
+//                // TODO 20241011 TEMP why are basis vectors negated in
+//                //                    ViewControl::ConvertToPinholeCameraParameters?
+//    //            for (int j = 0; j < 3; j++)
+//    //            {
+//    //                for (int i = 0; i < 3; i++)
+//    //                {
+//    //                    pcp.extrinsic_(i, j) *= -1;
+//    //                }
+//    //            }
+//
+//                // TODO 20241011 YAY!! working now!
+//                for (int j = 0; j < 4; j++)
+//                {
+//                    for (int i = 0; i < 4; i++)
+//                    {
+//                        pcp.extrinsic_(i, j) *= -1;
+//                    }
+//                }
+//                pcp.extrinsic_(3, 3) = 1;
+
+            
             // Then overwrite the pcp's view matrix with the new lookat matrix.
-//            pcp.extrinsic_ = la_matrix.cast<double>();
-            pcp.extrinsic_ = lam;
-//            pcp.extrinsic_ = laminv;
+            pcp.extrinsic_ = -lam;
+            pcp.extrinsic_(3, 3) = 1;
 
             // Write back PinholeCameraParameters with new from/at view matrix.
             visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+            
+            
+//            // TODO 20241011 TEMP flip camera around?
+//            visualizer().GetViewControl().ResetCameraLocalRotate();
+//            visualizer().GetViewControl().CameraLocalRotate(180, 0);
         }
     }
 
@@ -1413,19 +1453,40 @@ public:
 //            camera_look_at_ = aimTarget();
 //        }
 
+//        // Invoke the "follow camera" model, update look_from / look_at points.
+//        void computeFollowCameraFromTo()
+//        {
+//            double desired_offset_dist = 10;
+//    //        double position_speed = 0.1;  // On [0:1]
+//    //        double position_speed = 0.05;  // On [0:1]
+//            double position_speed = 0.07;  // On [0:1]
+//            Vec3 camera_pos = camera().p();
+//            Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
+//            double offset_distance = offset_from_camera_to_target.length();
+//            Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
+//            Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
+//    //        camera_look_from_ = util::interpolate(0.1, camera_pos, offset_target);
+//            camera_look_from_ = util::interpolate(position_speed, camera_pos, offset_target);
+//            camera_look_at_ = aimTarget();
+//        }
+
+    
+    // TODO 20241011 YAY!! working now!
+
     // Invoke the "follow camera" model, update look_from / look_at points.
     void computeFollowCameraFromTo()
     {
+//        double desired_offset_dist = 10;
+//        double desired_offset_dist = 15;
         double desired_offset_dist = 10;
-//        double position_speed = 0.1;  // On [0:1]
+//        double position_speed = 0.07;  // On [0:1]
 //        double position_speed = 0.05;  // On [0:1]
-        double position_speed = 0.07;  // On [0:1]
+        double position_speed = 0.025;  // On [0:1]
         Vec3 camera_pos = camera().p();
         Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
         double offset_distance = offset_from_camera_to_target.length();
         Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
         Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
-//        camera_look_from_ = util::interpolate(0.1, camera_pos, offset_target);
         camera_look_from_ = util::interpolate(position_speed, camera_pos, offset_target);
         camera_look_at_ = aimTarget();
     }

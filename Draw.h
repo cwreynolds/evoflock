@@ -82,12 +82,17 @@ public:
                                          [&](base_vis_t* vis)
                                          { toggleEnable(); return true; });
         
+//        // Add add "C" command, to cycle through camera aiming modes.
+//        visualizer().RegisterKeyCallback('C',
+//                                         [&](base_vis_t* vis)
+//                                         { camera_mode_ = not camera_mode_;
+//                                           return true; });
+  
         // Add add "C" command, to cycle through camera aiming modes.
         visualizer().RegisterKeyCallback('C',
                                          [&](base_vis_t* vis)
-                                         { camera_mode_ = not camera_mode_;
-                                           return true; });
-        
+                                         { nextCameraMode(); return true; });
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241007 follow cam -- to/from tracker balls
         
@@ -498,18 +503,6 @@ public:
     
     //--------------------------------------------------------------------------
 
-    // Accessor for Open3D Visualizer instance.
-    vis_t& visualizer() { return visualizer_; }
-    const vis_t& visualizer() const { return visualizer_; }
-
-    // Accessor for camera object, represented as a LocalSpace.
-    LocalSpace& camera() { return camera_; }
-    const LocalSpace& camera() const { return camera_; }
-    
-    // Accessor for camera aim target posItion.
-    Vec3& aimTarget() { return aim_target_; }
-    const Vec3& aimTarget() const { return aim_target_; }
-    
     // Nickname for open3d::visualization::gl_util::LookAt() with Vec3 args.
     typedef open3d::visualization::gl_util::GLMatrix4f GLMatrix4f;
     static GLMatrix4f glLookAt(Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
@@ -544,15 +537,29 @@ public:
         // Invoke the "follow cam" model, update look_from / look_at points
         computeFollowCameraFromTo();
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241014 smooth over all 3 components of from/at/up camera
+
         // Update this Draw instance's camera to from/at orientation
-        camera() = camera().fromTo(cameraLookFrom(), cameraLookAt());
+//        camera() = camera().fromTo(cameraLookFrom(), cameraLookAt());
+        camera() = camera().fromTo(cameraLookFrom(), cameraLookAt(), camera_look_up_);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Either set view to from/at points or set markers in static view.
         if (cameraMode() == true)
         {
-            setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt());
-            from_ball->Translate({0, 1000, 0}, false);
-            to_ball->Translate({0, 1000, 0}, false);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20241014 smooth over all 3 components of from/at/up camera
+
+//            setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt());
+            setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt(), camera_look_up_);
+
+//            from_ball->Translate({0, 1000, 0}, false);
+//            to_ball->Translate({0, 1000, 0}, false);
+            from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
+            to_ball->Translate(vec3ToEv3d(aimTarget()), false);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         else
         {
@@ -591,26 +598,177 @@ public:
         visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
     }
     
-    // Accessors for look_from / look_at points.
-    Vec3 cameraLookFrom() const { return camera_look_from_; }
-    Vec3 cameraLookAt() const { return camera_look_at_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241014 smooth over all 3 components of from/at/up camera
+    
+    
+//    // Store global camera look_from / look_at points.
+//    Vec3 camera_look_from_;
+//    Vec3 camera_look_at_;    // TODO Now same as aimTarget(), blended later?
+//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    // TODO 20241014 smooth over all 3 components of from/at/up camera
+//    Vec3 camera_look_up_;
+//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//    // Invoke the "follow camera" model, update look_from / look_at points.
+//    void computeFollowCameraFromTo()
+//    {
+//        double desired_offset_dist = 10;
+//        double position_speed = 0.025;  // On [0:1]
+//        Vec3 camera_pos = camera().p();
+//        Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
+//        double offset_distance = offset_from_camera_to_target.length();
+//        Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
+//        Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
+//        camera_look_from_ = util::interpolate(position_speed, camera_pos, offset_target);
+//        camera_look_at_ = aimTarget();
+//    }
+
+    
+    
+    // Low pass filter for roll control ("up" target).
+    util::Blender<Vec3> up_memory_;
+    
+    util::Blender<Vec3> from_memory_;
+    util::Blender<Vec3> at_memory_;
+    
+
+//        // Invoke the "follow camera" model, update look_from / look_at points.
+//        void computeFollowCameraFromTo()
+//        {
+//    //            double desired_offset_dist = 10;
+//    //    //        double position_speed = 0.025;  // On [0:1]
+//    //    //        double position_speed = 0.1;  // On [0:1]
+//    //            double position_speed = 1;  // On [0:1]
+//
+//            double desired_offset_dist = 15;
+//            double position_speed = 1;  // On [0:1]
+//
+//
+//            Vec3 camera_pos = camera().p();
+//            Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
+//            double offset_distance = offset_from_camera_to_target.length();
+//            Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
+//            Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
+//
+//    //        camera_look_from_ = util::interpolate(position_speed, camera_pos, offset_target);
+//    //        camera_look_at_ = aimTarget();
+//
+//            Vec3 new_from = util::interpolate(position_speed, camera_pos, offset_target);
+//            Vec3 new_at = aimTarget();
+//            Vec3 new_up = camera().j();
+//
+//    //        from_memory_.blend(new_from, 0.95);
+//    //        at_memory_.blend(new_at, 0.95);
+//    //        up_memory_.blend(new_up, 0.95);
+//
+//    //        double b = 0.99;
+//    //        double b = 0.9;
+//    //            from_memory_.blend(new_from, 0.9);
+//    //            at_memory_.blend(new_at, 0.9);
+//    //    //        up_memory_.blend(new_up, 0.98);
+//    //            up_memory_.blend(new_up, 0.99);
+//
+//    //        from_memory_.blend(new_from, 0.9);
+//    //        at_memory_.blend(new_at, 0.95);
+//    //        up_memory_.blend(new_up, 0.995);
+//
+//    //        from_memory_.blend(new_from, 0.9);
+//    //        at_memory_.blend(new_at, 0.92);
+//    //        up_memory_.blend(new_up, 0.999);
+//
+//    //        from_memory_.blend(new_from, 0.9);
+//    //        at_memory_.blend(new_at, 0.92);
+//    //        up_memory_.blend(new_up, 0.99);
+//
+//    //        from_memory_.blend(new_from, 0.9);
+//    //        at_memory_.blend(new_at, 0.85);
+//    //        up_memory_.blend(new_up, 0.99);
+//
+//            from_memory_.blend(new_from, 0.90);
+//            at_memory_.blend(new_at,     0.80);
+//            up_memory_.blend(new_up,     0.97);
+//
+//            camera_look_from_ = from_memory_.value;
+//            camera_look_at_ = at_memory_.value;
+//            camera_look_up_ = up_memory_.value.normalize();
+//
+//        }
+
+//        // Invoke the "follow camera" model, update look_from / look_at points.
+//        void computeFollowCameraFromTo()
+//        {
+//            double desired_offset_dist = 15;
+//    //        double position_speed = 1;  // On [0:1]
+//
+//
+//            Vec3 camera_pos = camera().p();
+//            Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
+//            double offset_distance = offset_from_camera_to_target.length();
+//            Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
+//            Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
+//
+//    //        Vec3 new_from = util::interpolate(position_speed, camera_pos, offset_target);
+//            Vec3 new_from = offset_target;
+//
+//            Vec3 new_at = aimTarget();
+//    //        Vec3 new_up = camera().j();
+//    //        Vec3 new_up = (camera().j() + Vec3(0, 0.1, 0)).normalize();
+//            Vec3 new_up = (camera().j() + Vec3(0, 0.3, 0)).normalize();
+//
+//            from_memory_.blend(new_from, 0.90);
+//            at_memory_.blend(new_at,     0.80);
+//            up_memory_.blend(new_up,     0.97);
+//
+//            camera_look_from_ = from_memory_.value;
+//            camera_look_at_ = at_memory_.value;
+//            camera_look_up_ = up_memory_.value.normalize();
+//        }
 
     // Invoke the "follow camera" model, update look_from / look_at points.
+    //
+    // TODO: this is called from exactly one place, where it is immediately
+    // followed by setting the camera() to the transform we compute here.
+    // Shouldn't those two steps be combined here? Then it could be called just
+    // plain Draw::computeFollowCamera().
+    //
     void computeFollowCameraFromTo()
     {
-        double desired_offset_dist = 10;
-        double position_speed = 0.025;  // On [0:1]
+        double desired_offset_dist = 15;
         Vec3 camera_pos = camera().p();
         Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
         double offset_distance = offset_from_camera_to_target.length();
         Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
         Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
-        camera_look_from_ = util::interpolate(position_speed, camera_pos, offset_target);
-        camera_look_at_ = aimTarget();
+        Vec3 new_from = offset_target;
+        Vec3 new_at = aimTarget();
+        Vec3 new_up = (camera().j() + Vec3(0, 0.3, 0)).normalize();
+        camera_look_from_ = from_memory_.blend(new_from, 0.90);
+        camera_look_at_   =   at_memory_.blend(new_at,   0.80);
+        camera_look_up_   =   up_memory_.blend(new_up,   0.97).normalize();
     }
 
-    // Camera mode. Currently cycles between follow and global.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    // Accessor for Open3D Visualizer instance.
+    vis_t& visualizer() { return visualizer_; }
+    const vis_t& visualizer() const { return visualizer_; }
+    
+    // Accessor for camera object, represented as a LocalSpace.
+    LocalSpace& camera() { return camera_; }
+    const LocalSpace& camera() const { return camera_; }
+    
+    // Accessor for camera aim target posItion.
+    Vec3& aimTarget() { return aim_target_; }
+    const Vec3& aimTarget() const { return aim_target_; }
+    
+    // Accessors for look_from / look_at points.
+    Vec3 cameraLookFrom() const { return camera_look_from_; }
+    Vec3 cameraLookAt() const { return camera_look_at_; }
+    
+    // Settable accessor for  camera mode. Now cycles between follow and global.
     bool& cameraMode() { return camera_mode_; }
+    void nextCameraMode() { camera_mode_ = not camera_mode_; }
     
     static void unit_test() {}
     
@@ -636,6 +794,10 @@ private:
     // Store global camera look_from / look_at points.
     Vec3 camera_look_from_;
     Vec3 camera_look_at_;    // TODO Now same as aimTarget(), blended later?
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241014 smooth over all 3 components of from/at/up camera
+    Vec3 camera_look_up_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 #ifdef USE_OPEN3D

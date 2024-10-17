@@ -55,7 +55,7 @@ public:
 //        camera() = camera().fromTo({60, 60, 60}, {});
         camera() = camera().fromTo(Vec3(1,1,1).normalize() * 10, {});
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+        
 #ifdef USE_OPEN3D
         std::cout << "Begin graphics session using: Open3D ";
         std::cout << OPEN3D_VERSION << std::endl;
@@ -531,35 +531,106 @@ public:
         return eigen_view_matrix;
     };
 
+//        // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
+//        void updateCamera()
+//        {
+//            // Invoke the "follow cam" model, update look_from / look_at points
+//            computeFollowCameraFromTo();
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241014 smooth over all 3 components of from/at/up camera
+//
+//            // Update this Draw instance's camera to from/at orientation
+//    //        camera() = camera().fromTo(cameraLookFrom(), cameraLookAt());
+//            camera() = camera().fromTo(cameraLookFrom(), cameraLookAt(), camera_look_up_);
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            // Either set view to from/at points or set markers in static view.
+//            if (cameraMode() == true)
+//            {
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20241014 smooth over all 3 components of from/at/up camera
+//
+//    //            setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt());
+//                setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt(), camera_look_up_);
+//
+//    //            from_ball->Translate({0, 1000, 0}, false);
+//    //            to_ball->Translate({0, 1000, 0}, false);
+//                from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
+//                to_ball->Translate(vec3ToEv3d(aimTarget()), false);
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            }
+//            else
+//            {
+//                from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
+//                to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
+//            }
+//        }
+    
+//        // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
+//        void updateCamera()
+//        {
+//            // Invoke the "follow cam" model, update look_from / look_at points
+//            computeFollowCameraFromTo();
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241014 smooth over all 3 components of from/at/up camera
+//
+//            // Update this Draw instance's camera to from/at orientation
+//    //        camera() = camera().fromTo(cameraLookFrom(), cameraLookAt());
+//    //        camera() = camera().fromTo(cameraLookFrom(), cameraLookAt(), camera_look_up_);
+//
+//            camera() = camera().fromTo(cameraLookFrom(),
+//                                       cameraLookAt(),
+//                                       cameraLookUp());
+//
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            // Either set view to from/at points or set markers in static view.
+//            if (cameraMode() == true)
+//            {
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20241014 smooth over all 3 components of from/at/up camera
+//
+//    //            setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt());
+//    //            setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt(), camera_look_up_);
+//                setVisualizerViewByFromAt(cameraLookFrom(),
+//                                          cameraLookAt(),
+//                                          cameraLookUp());
+//
+//    //            from_ball->Translate({0, 1000, 0}, false);
+//    //            to_ball->Translate({0, 1000, 0}, false);
+//                from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
+//                to_ball->Translate(vec3ToEv3d(aimTarget()), false);
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            }
+//            else
+//            {
+//                from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
+//                to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
+//            }
+//        }
+
+    
     // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
     void updateCamera()
     {
         // Invoke the "follow cam" model, update look_from / look_at points
         computeFollowCameraFromTo();
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241014 smooth over all 3 components of from/at/up camera
-
         // Update this Draw instance's camera to from/at orientation
-//        camera() = camera().fromTo(cameraLookFrom(), cameraLookAt());
-        camera() = camera().fromTo(cameraLookFrom(), cameraLookAt(), camera_look_up_);
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+        camera() = camera().fromTo(cameraLookFrom(),
+                                   cameraLookAt(),
+                                   cameraLookUp());
         // Either set view to from/at points or set markers in static view.
         if (cameraMode() == true)
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20241014 smooth over all 3 components of from/at/up camera
-
-//            setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt());
-            setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt(), camera_look_up_);
-
-//            from_ball->Translate({0, 1000, 0}, false);
-//            to_ball->Translate({0, 1000, 0}, false);
-            from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
-            to_ball->Translate(vec3ToEv3d(aimTarget()), false);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            setVisualizerViewByFromAt(cameraLookFrom(),
+                                      cameraLookAt(),
+                                      cameraLookUp());
+            from_ball->Translate({0, 1000, 0}, false);
+            to_ball->Translate({0, 1000, 0}, false);
         }
         else
         {
@@ -567,9 +638,155 @@ public:
             to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
         }
     }
-    
-    // Set the "camera view" of current Open3D visualizer according to a look at
+
+//    // Set the "camera view" of current Open3D visualizer according to a look at
+//    // specification. Optional "up" defaults to global Y direction.
+//    //
+//    // This is the work-around developed Oct 7-11, 2024 for setting an Open3D
+//    // "legacy" Visualizer's ViewControl using a from/at(/up) specification. It
+//    // might be a candidate for merging into ViewControl. If I can do what I
+//    // need in the new Application framework that seems better and reduces the
+//    // motivation to do a PR.
+//    //
+//    void setVisualizerViewByFromAt(Vec3 look_from,
+//                                   Vec3 look_at,
+//                                   Vec3 up = Vec3(0, 1, 0))
+//    {
+//        // Compute 4x4 from/at matrix.
+//        GLMatrix4f glla = glLookAt(look_from, look_at, up);
+//        Eigen::Matrix4d la_matrix = glla.cast<double>();
+//
+//        // Get current PinholeCameraParameters (pcp).
+//        open3d::camera::PinholeCameraParameters pcp;
+//        visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
+//        
+//        // Overwrite the pcp's previous view matrix with the new look_at matrix.
+//        // (I am deeply puzzled by the need for that negation, but here we are.)
+//        pcp.extrinsic_ = -la_matrix;
+//        pcp.extrinsic_(3, 3) = 1;
+//        
+//        // Write back PinholeCameraParameters with new from/at view matrix.
+//        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+//    }
+  
+    // Set the "camera view" of current Open3D visualizer according to a look/at
     // specification. Optional "up" defaults to global Y direction.
+    //
+    void setVisualizerViewByFromAt(Vec3 look_from,
+                                   Vec3 look_at,
+                                   Vec3 up = Vec3(0, 1, 0))
+    {
+//        // Compute 4x4 from/at matrix.
+//        GLMatrix4f glla = glLookAt(look_from, look_at, up);
+//        Eigen::Matrix4d la_matrix = glla.cast<double>();
+//        
+//        // Get current PinholeCameraParameters (pcp).
+//        open3d::camera::PinholeCameraParameters pcp;
+//        visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
+//        
+//        // Overwrite the pcp's previous view matrix with the new look_at matrix.
+//        // (I am deeply puzzled by the need for that negation, but here we are.)
+//        pcp.extrinsic_ = -la_matrix;
+//        pcp.extrinsic_(3, 3) = 1;
+//        
+//        // Write back PinholeCameraParameters with new from/at view matrix.
+//        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+        
+        
+        setOpen3DVisualizerViewByFromAt(visualizer(),
+                                        vec3ToEv3d(look_from),
+                                        vec3ToEv3d(look_at),
+                                        vec3ToEv3d(up));
+    }
+
+    
+    
+//        // TODO 20241016 experimental "Open3D style" version
+//        void setVisualizerViewByFromAtOpen3D(const Eigen::Vector3d& look_from,
+//                                             const Eigen::Vector3d& look_at,
+//                                             const Eigen::Vector3d& up = {0, 1, 0})
+//        {
+//    //        // Nickname for open3d::visualization::gl_util::LookAt() with Vec3 args.
+//    //        typedef open3d::visualization::gl_util::GLMatrix4f GLMatrix4f;
+//    //        static GLMatrix4f glLookAt(Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
+//    //        {
+//    //            return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
+//    //                                                          vec3ToEv3d(to),
+//    //                                                          vec3ToEv3d(up));
+//    //        };
+//
+//    //        // Compute 4x4 from/at matrix.
+//    //        GLMatrix4f glla = glLookAt(look_from, look_at, up);
+//    //        Eigen::Matrix4d la_matrix = glla.cast<double>();
+//
+//    //        // Compute 4x4 from/at matrix.
+//    //        open3d::visualization::gl_util::GLMatrix4f glla = open3d::visualization::gl_util::LookAt(look_from, look_at, up);
+//    //        Eigen::Matrix4d la_matrix = glla.cast<double>();
+//
+//    //        // Compute 4x4 from/at matrix.
+//    //        using namespace open3d::visualization::gl_util;
+//    //        GLMatrix4f glla = LookAt(look_from, look_at, up);
+//    //        Eigen::Matrix4d la_matrix = glla.cast<double>();
+//
+//    //        // Compute 4x4 from/at matrix.
+//    //        using namespace open3d::visualization::gl_util;
+//    //        GLMatrix4f la_matrix_float = LookAt(look_from, look_at, up);
+//    //        Eigen::Matrix4d la_matrix = la_matrix_float.cast<double>();
+//
+//            // Compute 4x4 from/at matrix.
+//            using namespace open3d::visualization::gl_util;
+//            Eigen::Matrix4d la_matrix = LookAt(look_from, look_at, up).cast<double>();
+//
+//            // Get current PinholeCameraParameters (pcp).
+//            open3d::camera::PinholeCameraParameters pcp;
+//            visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
+//
+//            // Overwrite the pcp's previous view matrix with the new look_at matrix.
+//            // (I am deeply puzzled by the need for that negation, but here we are.)
+//            pcp.extrinsic_ = -la_matrix;
+//            pcp.extrinsic_(3, 3) = 1;
+//
+//            // Write back PinholeCameraParameters with new from/at view matrix.
+//            visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+//        }
+
+//        // TODO 20241016 experimental "Open3D style" version
+//        //
+//        // This is the work-around developed Oct 7-11, 2024 for setting an Open3D
+//        // "legacy" Visualizer's ViewControl using a from/at(/up) specification. It
+//        // might be a candidate for merging into ViewControl. If I can do what I
+//        // need in the new Application framework that seems better and reduces the
+//        // motivation to do a PR.
+//        //
+//        static
+//        void setVisualizerViewByFromAtOpen3D(open3d::visualization::Visualizer& vis,
+//                                             const Eigen::Vector3d& look_from,
+//                                             const Eigen::Vector3d& look_at,
+//                                             const Eigen::Vector3d& up = {0, 1, 0})
+//        {
+//            // Compute 4x4 from/at matrix.
+//            using namespace open3d::visualization::gl_util;
+//            Eigen::Matrix4d la_matrix = LookAt(look_from, look_at, up).cast<double>();
+//
+//            // Get current PinholeCameraParameters (pcp).
+//            open3d::camera::PinholeCameraParameters pcp;
+//    //        visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
+//            vis.GetViewControl().ConvertToPinholeCameraParameters(pcp);
+//
+//            // Overwrite the pcp's previous view matrix with the new look_at matrix.
+//            // (I am deeply puzzled by the need for that negation, but here we are.)
+//            pcp.extrinsic_ = -la_matrix;
+//            pcp.extrinsic_(3, 3) = 1;
+//
+//            // Write back PinholeCameraParameters with new from/at view matrix.
+//    //        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+//            vis.GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+//        }
+
+    // TODO 20241016 experimental "Open3D style" version
+    //
+    // Similar to open3d::visualization::visualizer::O3DVisualizer::SetupCamera()
+    // but does not set fov.
     //
     // This is the work-around developed Oct 7-11, 2024 for setting an Open3D
     // "legacy" Visualizer's ViewControl using a from/at(/up) specification. It
@@ -577,26 +794,29 @@ public:
     // need in the new Application framework that seems better and reduces the
     // motivation to do a PR.
     //
-    void setVisualizerViewByFromAt(Vec3 look_from,
-                                   Vec3 look_at,
-                                   Vec3 up = Vec3(0, 1, 0))
+    static
+    void setOpen3DVisualizerViewByFromAt(open3d::visualization::Visualizer& vis,
+                                         const Eigen::Vector3d& look_from,
+                                         const Eigen::Vector3d& look_at,
+                                         const Eigen::Vector3d& up = {0, 1, 0})
     {
         // Compute 4x4 from/at matrix.
-        GLMatrix4f glla = glLookAt(look_from, look_at, up);
-        Eigen::Matrix4d la_matrix = glla.cast<double>();
+        using namespace open3d::visualization::gl_util;
+        Eigen::Matrix4d la_matrix = LookAt(look_from, look_at, up).cast<double>();
 
-        // Get current PinholeCameraParameters (pcp).
+        // Get current PinholeCameraParameters.
         open3d::camera::PinholeCameraParameters pcp;
-        visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
-        
+        vis.GetViewControl().ConvertToPinholeCameraParameters(pcp);
+
         // Overwrite the pcp's previous view matrix with the new look_at matrix.
         // (I am deeply puzzled by the need for that negation, but here we are.)
         pcp.extrinsic_ = -la_matrix;
         pcp.extrinsic_(3, 3) = 1;
         
         // Write back PinholeCameraParameters with new from/at view matrix.
-        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+        vis.GetViewControl().ConvertFromPinholeCameraParameters(pcp);
     }
+
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241014 smooth over all 3 components of from/at/up camera
@@ -727,7 +947,7 @@ public:
 
     // Invoke the "follow camera" model, update look_from / look_at points.
     //
-    // TODO: this is called from exactly one place, where it is immediately
+    // TODO 20241014 this is called from exactly one place, then is immediately
     // followed by setting the camera() to the transform we compute here.
     // Shouldn't those two steps be combined here? Then it could be called just
     // plain Draw::computeFollowCamera().
@@ -765,6 +985,7 @@ public:
     // Accessors for look_from / look_at points.
     Vec3 cameraLookFrom() const { return camera_look_from_; }
     Vec3 cameraLookAt() const { return camera_look_at_; }
+    Vec3 cameraLookUp() const { return camera_look_up_; }
     
     // Settable accessor for  camera mode. Now cycles between follow and global.
     bool& cameraMode() { return camera_mode_; }

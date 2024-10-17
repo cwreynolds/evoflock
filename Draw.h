@@ -614,6 +614,59 @@ public:
 //        }
 
     
+//        // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
+//        void updateCamera()
+//        {
+//            // Invoke the "follow cam" model, update look_from / look_at points
+//            computeFollowCameraFromTo();
+//            // Update this Draw instance's camera to from/at orientation
+//            camera() = camera().fromTo(cameraLookFrom(),
+//                                       cameraLookAt(),
+//                                       cameraLookUp());
+//            // Either set view to from/at points or set markers in static view.
+//            if (cameraMode() == true)
+//            {
+//                setVisualizerViewByFromAt(cameraLookFrom(),
+//                                          cameraLookAt(),
+//                                          cameraLookUp());
+//                from_ball->Translate({0, 1000, 0}, false);
+//                to_ball->Translate({0, 1000, 0}, false);
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20241017 draw circle around aimTarget()
+//
+//    //            double radius = 2;
+//    //            Vec3 offset_to_aim = aimTarget() - cameraLookFrom();
+//    //            Vec3 perp_to_offset = offset_to_aim.normalize().find_perpendicular();
+//    //            Vec3 spoke = perp_to_offset * radius;
+//
+//    //            LocalSpace ls;
+//    //            ls = ls.fromTo(aimTarget(), cameraLookFrom());
+//    //            Vec3 local_spoke(0, 1, 0);
+//    //
+//    //            double steps = 30;
+//    //            double angle = 2 * M_PI / steps;
+//    //            bool b_or_w = true;
+//    //            for (int i = 0; i < steps; i++)
+//    //            {
+//    //                Vec3 new_spoke = local_spoke.rotate_xy_about_z(angle);
+//    //                addLineSegmentToAnimatedFrame(ls.globalize(local_spoke),
+//    //                                              ls.globalize(new_spoke),
+//    //                                              b_or_w ? Vec3(1,1,1) : Vec3(0,0,0));
+//    //                local_spoke = new_spoke;
+//    //                b_or_w = ! b_or_w;
+//    //            }
+//
+//                addBlackAndWhiteCircularReticle(aimTarget(), 2, 30);
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            }
+//            else
+//            {
+//                from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
+//                to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
+//            }
+//        }
+    
     // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
     void updateCamera()
     {
@@ -631,12 +684,35 @@ public:
                                       cameraLookUp());
             from_ball->Translate({0, 1000, 0}, false);
             to_ball->Translate({0, 1000, 0}, false);
+            // Draw circle around aimTarget() pointing toward camera.
+            addBlackAndWhiteCircularReticle(aimTarget(), 2, 30);
         }
         else
         {
             from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
             to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
         }
+    }
+
+    
+    void addBlackAndWhiteCircularReticle(Vec3 center,
+                                         double radius,
+                                         double chords)
+    {
+        bool b_or_w = true;
+        Vec3 local_spoke(0, 1, 0);
+        double angle = 2 * M_PI / chords;
+        LocalSpace ls = LocalSpace().fromTo(center, cameraLookFrom());
+        for (int i = 0; i < chords; i++)
+        {
+            Vec3 new_spoke = local_spoke.rotate_xy_about_z(angle);
+            addLineSegmentToAnimatedFrame(ls.globalize(local_spoke),
+                                          ls.globalize(new_spoke),
+                                          b_or_w ? Vec3(1,1,1) : Vec3(0,0,0));
+            local_spoke = new_spoke;
+            b_or_w = ! b_or_w;
+        }
+
     }
 
 //    // Set the "camera view" of current Open3D visualizer according to a look at

@@ -181,14 +181,10 @@ public:
     // Apply desired steering for this simulation step
     void apply_next_steer(double time_step)
     {
-        steer(next_steer_, time_step);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240928 integrate with Flock simulation
-        //               rethink where this call should be made
         draw_body();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        steer(next_steer_, time_step);
     }
-    
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run
     //               VERY PROTOTYPE!!

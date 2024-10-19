@@ -81,13 +81,6 @@ public:
         visualizer().RegisterKeyCallback('G',
                                          [&](base_vis_t* vis)
                                          { toggleEnable(); return true; });
-        
-//        // Add add "C" command, to cycle through camera aiming modes.
-//        visualizer().RegisterKeyCallback('C',
-//                                         [&](base_vis_t* vis)
-//                                         { camera_mode_ = not camera_mode_;
-//                                           return true; });
-  
         // Add add "C" command, to cycle through camera aiming modes.
         visualizer().RegisterKeyCallback('C',
                                          [&](base_vis_t* vis)
@@ -159,26 +152,10 @@ public:
         {
             animated_tri_mesh_->Clear();
             animated_line_set_->Clear();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20241004 follow cam
-            // TODO 20241006 follow cam
-            
-//            updateFollowCameraPosition();   // !! Oct 7
-            
-
-
-//            updateCamera();
-//            setOpen3dViewFromCamera();
-            
             updateCamera();
-
-//            setOpen3dViewFromCamera();
-            
-//            debugPrint((camera().p() - aimTarget()).length());
-//            std::this_thread::sleep_for(std::chrono::milliseconds(1000/60));
+            // TODO 20241019 this should sleep from end of draw UNTIL next
+            // frame time, so keep the overall frame duration at 30 or 60 fps.
             std::this_thread::sleep_for(std::chrono::milliseconds(1000/30));
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
         }
 #endif  // USE_OPEN3D
     }
@@ -531,142 +508,6 @@ public:
         return eigen_view_matrix;
     };
 
-//        // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
-//        void updateCamera()
-//        {
-//            // Invoke the "follow cam" model, update look_from / look_at points
-//            computeFollowCameraFromTo();
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20241014 smooth over all 3 components of from/at/up camera
-//
-//            // Update this Draw instance's camera to from/at orientation
-//    //        camera() = camera().fromTo(cameraLookFrom(), cameraLookAt());
-//            camera() = camera().fromTo(cameraLookFrom(), cameraLookAt(), camera_look_up_);
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//            // Either set view to from/at points or set markers in static view.
-//            if (cameraMode() == true)
-//            {
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20241014 smooth over all 3 components of from/at/up camera
-//
-//    //            setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt());
-//                setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt(), camera_look_up_);
-//
-//    //            from_ball->Translate({0, 1000, 0}, false);
-//    //            to_ball->Translate({0, 1000, 0}, false);
-//                from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
-//                to_ball->Translate(vec3ToEv3d(aimTarget()), false);
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            }
-//            else
-//            {
-//                from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
-//                to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
-//            }
-//        }
-    
-//        // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
-//        void updateCamera()
-//        {
-//            // Invoke the "follow cam" model, update look_from / look_at points
-//            computeFollowCameraFromTo();
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20241014 smooth over all 3 components of from/at/up camera
-//
-//            // Update this Draw instance's camera to from/at orientation
-//    //        camera() = camera().fromTo(cameraLookFrom(), cameraLookAt());
-//    //        camera() = camera().fromTo(cameraLookFrom(), cameraLookAt(), camera_look_up_);
-//
-//            camera() = camera().fromTo(cameraLookFrom(),
-//                                       cameraLookAt(),
-//                                       cameraLookUp());
-//
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//            // Either set view to from/at points or set markers in static view.
-//            if (cameraMode() == true)
-//            {
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20241014 smooth over all 3 components of from/at/up camera
-//
-//    //            setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt());
-//    //            setVisualizerViewByFromAt(cameraLookFrom(), cameraLookAt(), camera_look_up_);
-//                setVisualizerViewByFromAt(cameraLookFrom(),
-//                                          cameraLookAt(),
-//                                          cameraLookUp());
-//
-//    //            from_ball->Translate({0, 1000, 0}, false);
-//    //            to_ball->Translate({0, 1000, 0}, false);
-//                from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
-//                to_ball->Translate(vec3ToEv3d(aimTarget()), false);
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            }
-//            else
-//            {
-//                from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
-//                to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
-//            }
-//        }
-
-    
-//        // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
-//        void updateCamera()
-//        {
-//            // Invoke the "follow cam" model, update look_from / look_at points
-//            computeFollowCameraFromTo();
-//            // Update this Draw instance's camera to from/at orientation
-//            camera() = camera().fromTo(cameraLookFrom(),
-//                                       cameraLookAt(),
-//                                       cameraLookUp());
-//            // Either set view to from/at points or set markers in static view.
-//            if (cameraMode() == true)
-//            {
-//                setVisualizerViewByFromAt(cameraLookFrom(),
-//                                          cameraLookAt(),
-//                                          cameraLookUp());
-//                from_ball->Translate({0, 1000, 0}, false);
-//                to_ball->Translate({0, 1000, 0}, false);
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20241017 draw circle around aimTarget()
-//
-//    //            double radius = 2;
-//    //            Vec3 offset_to_aim = aimTarget() - cameraLookFrom();
-//    //            Vec3 perp_to_offset = offset_to_aim.normalize().find_perpendicular();
-//    //            Vec3 spoke = perp_to_offset * radius;
-//
-//    //            LocalSpace ls;
-//    //            ls = ls.fromTo(aimTarget(), cameraLookFrom());
-//    //            Vec3 local_spoke(0, 1, 0);
-//    //
-//    //            double steps = 30;
-//    //            double angle = 2 * M_PI / steps;
-//    //            bool b_or_w = true;
-//    //            for (int i = 0; i < steps; i++)
-//    //            {
-//    //                Vec3 new_spoke = local_spoke.rotate_xy_about_z(angle);
-//    //                addLineSegmentToAnimatedFrame(ls.globalize(local_spoke),
-//    //                                              ls.globalize(new_spoke),
-//    //                                              b_or_w ? Vec3(1,1,1) : Vec3(0,0,0));
-//    //                local_spoke = new_spoke;
-//    //                b_or_w = ! b_or_w;
-//    //            }
-//
-//                addBlackAndWhiteCircularReticle(aimTarget(), 2, 30);
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            }
-//            else
-//            {
-//                from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
-//                to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
-//            }
-//        }
-    
     // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
     void updateCamera()
     {
@@ -685,7 +526,7 @@ public:
             from_ball->Translate({0, 1000, 0}, false);
             to_ball->Translate({0, 1000, 0}, false);
             // Draw circle around aimTarget() pointing toward camera.
-            addBlackAndWhiteCircularReticle(aimTarget(), 2, 30);
+            addBlackAndWhiteCircularReticle(aimTarget());
         }
         else
         {
@@ -694,13 +535,17 @@ public:
         }
     }
 
-    
+    // Draw a B&W circle at given center pointing at the current camera.
+    void addBlackAndWhiteCircularReticle(Vec3 center)
+    {
+        addBlackAndWhiteCircularReticle(center, 0.75, 30);
+    }
     void addBlackAndWhiteCircularReticle(Vec3 center,
                                          double radius,
                                          double chords)
     {
         bool b_or_w = true;
-        Vec3 local_spoke(0, 1, 0);
+        Vec3 local_spoke(0, radius, 0);
         double angle = 2 * M_PI / chords;
         LocalSpace ls = LocalSpace().fromTo(center, cameraLookFrom());
         for (int i = 0; i < chords; i++)
@@ -714,36 +559,6 @@ public:
         }
 
     }
-
-//    // Set the "camera view" of current Open3D visualizer according to a look at
-//    // specification. Optional "up" defaults to global Y direction.
-//    //
-//    // This is the work-around developed Oct 7-11, 2024 for setting an Open3D
-//    // "legacy" Visualizer's ViewControl using a from/at(/up) specification. It
-//    // might be a candidate for merging into ViewControl. If I can do what I
-//    // need in the new Application framework that seems better and reduces the
-//    // motivation to do a PR.
-//    //
-//    void setVisualizerViewByFromAt(Vec3 look_from,
-//                                   Vec3 look_at,
-//                                   Vec3 up = Vec3(0, 1, 0))
-//    {
-//        // Compute 4x4 from/at matrix.
-//        GLMatrix4f glla = glLookAt(look_from, look_at, up);
-//        Eigen::Matrix4d la_matrix = glla.cast<double>();
-//
-//        // Get current PinholeCameraParameters (pcp).
-//        open3d::camera::PinholeCameraParameters pcp;
-//        visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
-//        
-//        // Overwrite the pcp's previous view matrix with the new look_at matrix.
-//        // (I am deeply puzzled by the need for that negation, but here we are.)
-//        pcp.extrinsic_ = -la_matrix;
-//        pcp.extrinsic_(3, 3) = 1;
-//        
-//        // Write back PinholeCameraParameters with new from/at view matrix.
-//        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
-//    }
   
     // Set the "camera view" of current Open3D visualizer according to a look/at
     // specification. Optional "up" defaults to global Y direction.
@@ -752,112 +567,11 @@ public:
                                    Vec3 look_at,
                                    Vec3 up = Vec3(0, 1, 0))
     {
-//        // Compute 4x4 from/at matrix.
-//        GLMatrix4f glla = glLookAt(look_from, look_at, up);
-//        Eigen::Matrix4d la_matrix = glla.cast<double>();
-//        
-//        // Get current PinholeCameraParameters (pcp).
-//        open3d::camera::PinholeCameraParameters pcp;
-//        visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
-//        
-//        // Overwrite the pcp's previous view matrix with the new look_at matrix.
-//        // (I am deeply puzzled by the need for that negation, but here we are.)
-//        pcp.extrinsic_ = -la_matrix;
-//        pcp.extrinsic_(3, 3) = 1;
-//        
-//        // Write back PinholeCameraParameters with new from/at view matrix.
-//        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
-        
-        
         setOpen3DVisualizerViewByFromAt(visualizer(),
                                         vec3ToEv3d(look_from),
                                         vec3ToEv3d(look_at),
                                         vec3ToEv3d(up));
     }
-
-    
-    
-//        // TODO 20241016 experimental "Open3D style" version
-//        void setVisualizerViewByFromAtOpen3D(const Eigen::Vector3d& look_from,
-//                                             const Eigen::Vector3d& look_at,
-//                                             const Eigen::Vector3d& up = {0, 1, 0})
-//        {
-//    //        // Nickname for open3d::visualization::gl_util::LookAt() with Vec3 args.
-//    //        typedef open3d::visualization::gl_util::GLMatrix4f GLMatrix4f;
-//    //        static GLMatrix4f glLookAt(Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
-//    //        {
-//    //            return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
-//    //                                                          vec3ToEv3d(to),
-//    //                                                          vec3ToEv3d(up));
-//    //        };
-//
-//    //        // Compute 4x4 from/at matrix.
-//    //        GLMatrix4f glla = glLookAt(look_from, look_at, up);
-//    //        Eigen::Matrix4d la_matrix = glla.cast<double>();
-//
-//    //        // Compute 4x4 from/at matrix.
-//    //        open3d::visualization::gl_util::GLMatrix4f glla = open3d::visualization::gl_util::LookAt(look_from, look_at, up);
-//    //        Eigen::Matrix4d la_matrix = glla.cast<double>();
-//
-//    //        // Compute 4x4 from/at matrix.
-//    //        using namespace open3d::visualization::gl_util;
-//    //        GLMatrix4f glla = LookAt(look_from, look_at, up);
-//    //        Eigen::Matrix4d la_matrix = glla.cast<double>();
-//
-//    //        // Compute 4x4 from/at matrix.
-//    //        using namespace open3d::visualization::gl_util;
-//    //        GLMatrix4f la_matrix_float = LookAt(look_from, look_at, up);
-//    //        Eigen::Matrix4d la_matrix = la_matrix_float.cast<double>();
-//
-//            // Compute 4x4 from/at matrix.
-//            using namespace open3d::visualization::gl_util;
-//            Eigen::Matrix4d la_matrix = LookAt(look_from, look_at, up).cast<double>();
-//
-//            // Get current PinholeCameraParameters (pcp).
-//            open3d::camera::PinholeCameraParameters pcp;
-//            visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
-//
-//            // Overwrite the pcp's previous view matrix with the new look_at matrix.
-//            // (I am deeply puzzled by the need for that negation, but here we are.)
-//            pcp.extrinsic_ = -la_matrix;
-//            pcp.extrinsic_(3, 3) = 1;
-//
-//            // Write back PinholeCameraParameters with new from/at view matrix.
-//            visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
-//        }
-
-//        // TODO 20241016 experimental "Open3D style" version
-//        //
-//        // This is the work-around developed Oct 7-11, 2024 for setting an Open3D
-//        // "legacy" Visualizer's ViewControl using a from/at(/up) specification. It
-//        // might be a candidate for merging into ViewControl. If I can do what I
-//        // need in the new Application framework that seems better and reduces the
-//        // motivation to do a PR.
-//        //
-//        static
-//        void setVisualizerViewByFromAtOpen3D(open3d::visualization::Visualizer& vis,
-//                                             const Eigen::Vector3d& look_from,
-//                                             const Eigen::Vector3d& look_at,
-//                                             const Eigen::Vector3d& up = {0, 1, 0})
-//        {
-//            // Compute 4x4 from/at matrix.
-//            using namespace open3d::visualization::gl_util;
-//            Eigen::Matrix4d la_matrix = LookAt(look_from, look_at, up).cast<double>();
-//
-//            // Get current PinholeCameraParameters (pcp).
-//            open3d::camera::PinholeCameraParameters pcp;
-//    //        visualizer().GetViewControl().ConvertToPinholeCameraParameters(pcp);
-//            vis.GetViewControl().ConvertToPinholeCameraParameters(pcp);
-//
-//            // Overwrite the pcp's previous view matrix with the new look_at matrix.
-//            // (I am deeply puzzled by the need for that negation, but here we are.)
-//            pcp.extrinsic_ = -la_matrix;
-//            pcp.extrinsic_(3, 3) = 1;
-//
-//            // Write back PinholeCameraParameters with new from/at view matrix.
-//    //        visualizer().GetViewControl().ConvertFromPinholeCameraParameters(pcp);
-//            vis.GetViewControl().ConvertFromPinholeCameraParameters(pcp);
-//        }
 
     // TODO 20241016 experimental "Open3D style" version
     //
@@ -897,130 +611,11 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241014 smooth over all 3 components of from/at/up camera
     
-    
-//    // Store global camera look_from / look_at points.
-//    Vec3 camera_look_from_;
-//    Vec3 camera_look_at_;    // TODO Now same as aimTarget(), blended later?
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    // TODO 20241014 smooth over all 3 components of from/at/up camera
-//    Vec3 camera_look_up_;
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//    // Invoke the "follow camera" model, update look_from / look_at points.
-//    void computeFollowCameraFromTo()
-//    {
-//        double desired_offset_dist = 10;
-//        double position_speed = 0.025;  // On [0:1]
-//        Vec3 camera_pos = camera().p();
-//        Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
-//        double offset_distance = offset_from_camera_to_target.length();
-//        Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
-//        Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
-//        camera_look_from_ = util::interpolate(position_speed, camera_pos, offset_target);
-//        camera_look_at_ = aimTarget();
-//    }
-
-    
-    
     // Low pass filter for roll control ("up" target).
     util::Blender<Vec3> up_memory_;
-    
     util::Blender<Vec3> from_memory_;
     util::Blender<Vec3> at_memory_;
     
-
-//        // Invoke the "follow camera" model, update look_from / look_at points.
-//        void computeFollowCameraFromTo()
-//        {
-//    //            double desired_offset_dist = 10;
-//    //    //        double position_speed = 0.025;  // On [0:1]
-//    //    //        double position_speed = 0.1;  // On [0:1]
-//    //            double position_speed = 1;  // On [0:1]
-//
-//            double desired_offset_dist = 15;
-//            double position_speed = 1;  // On [0:1]
-//
-//
-//            Vec3 camera_pos = camera().p();
-//            Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
-//            double offset_distance = offset_from_camera_to_target.length();
-//            Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
-//            Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
-//
-//    //        camera_look_from_ = util::interpolate(position_speed, camera_pos, offset_target);
-//    //        camera_look_at_ = aimTarget();
-//
-//            Vec3 new_from = util::interpolate(position_speed, camera_pos, offset_target);
-//            Vec3 new_at = aimTarget();
-//            Vec3 new_up = camera().j();
-//
-//    //        from_memory_.blend(new_from, 0.95);
-//    //        at_memory_.blend(new_at, 0.95);
-//    //        up_memory_.blend(new_up, 0.95);
-//
-//    //        double b = 0.99;
-//    //        double b = 0.9;
-//    //            from_memory_.blend(new_from, 0.9);
-//    //            at_memory_.blend(new_at, 0.9);
-//    //    //        up_memory_.blend(new_up, 0.98);
-//    //            up_memory_.blend(new_up, 0.99);
-//
-//    //        from_memory_.blend(new_from, 0.9);
-//    //        at_memory_.blend(new_at, 0.95);
-//    //        up_memory_.blend(new_up, 0.995);
-//
-//    //        from_memory_.blend(new_from, 0.9);
-//    //        at_memory_.blend(new_at, 0.92);
-//    //        up_memory_.blend(new_up, 0.999);
-//
-//    //        from_memory_.blend(new_from, 0.9);
-//    //        at_memory_.blend(new_at, 0.92);
-//    //        up_memory_.blend(new_up, 0.99);
-//
-//    //        from_memory_.blend(new_from, 0.9);
-//    //        at_memory_.blend(new_at, 0.85);
-//    //        up_memory_.blend(new_up, 0.99);
-//
-//            from_memory_.blend(new_from, 0.90);
-//            at_memory_.blend(new_at,     0.80);
-//            up_memory_.blend(new_up,     0.97);
-//
-//            camera_look_from_ = from_memory_.value;
-//            camera_look_at_ = at_memory_.value;
-//            camera_look_up_ = up_memory_.value.normalize();
-//
-//        }
-
-//        // Invoke the "follow camera" model, update look_from / look_at points.
-//        void computeFollowCameraFromTo()
-//        {
-//            double desired_offset_dist = 15;
-//    //        double position_speed = 1;  // On [0:1]
-//
-//
-//            Vec3 camera_pos = camera().p();
-//            Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
-//            double offset_distance = offset_from_camera_to_target.length();
-//            Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
-//            Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
-//
-//    //        Vec3 new_from = util::interpolate(position_speed, camera_pos, offset_target);
-//            Vec3 new_from = offset_target;
-//
-//            Vec3 new_at = aimTarget();
-//    //        Vec3 new_up = camera().j();
-//    //        Vec3 new_up = (camera().j() + Vec3(0, 0.1, 0)).normalize();
-//            Vec3 new_up = (camera().j() + Vec3(0, 0.3, 0)).normalize();
-//
-//            from_memory_.blend(new_from, 0.90);
-//            at_memory_.blend(new_at,     0.80);
-//            up_memory_.blend(new_up,     0.97);
-//
-//            camera_look_from_ = from_memory_.value;
-//            camera_look_at_ = at_memory_.value;
-//            camera_look_up_ = up_memory_.value.normalize();
-//        }
-
     // Invoke the "follow camera" model, update look_from / look_at points.
     //
     // TODO 20241014 this is called from exactly one place, then is immediately

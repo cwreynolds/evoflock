@@ -29,6 +29,9 @@ public:
     double x() const { return x_; }
     double y() const { return y_; }
     double z() const { return z_; }
+    double& x() { return x_; }
+    double& y() { return y_; }
+    double& z() { return z_; }
 
     // Basic operators.
     bool operator==(const Vec3 v) const

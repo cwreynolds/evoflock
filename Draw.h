@@ -544,22 +544,23 @@ public:
                                          double radius,
                                          double chords)
     {
-        bool b_or_w = true;
-        Vec3 local_spoke(0, radius, 0);
+        double color = 0;
         double angle = 2 * M_PI / chords;
-        LocalSpace ls = LocalSpace().fromTo(center, cameraLookFrom());
+        Vec3 up = cameraLookUp();
+        LocalSpace ls = LocalSpace().fromTo(center, cameraLookFrom(), up);
+        Vec3 lup = ls.localize(up);
+        Vec3 local_spoke = Vec3(lup.x(), lup.y(), 0).normalize() * radius;
         for (int i = 0; i < chords; i++)
         {
             Vec3 new_spoke = local_spoke.rotate_xy_about_z(angle);
             addLineSegmentToAnimatedFrame(ls.globalize(local_spoke),
                                           ls.globalize(new_spoke),
-                                          b_or_w ? Vec3(1,1,1) : Vec3(0,0,0));
+                                          Vec3(color, color, color));
             local_spoke = new_spoke;
-            b_or_w = ! b_or_w;
+            color = color ? 0 : 1;
         }
-
     }
-  
+
     // Set the "camera view" of current Open3D visualizer according to a look/at
     // specification. Optional "up" defaults to global Y direction.
     //

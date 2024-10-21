@@ -80,12 +80,10 @@ int main(int argc, const char * argv[])
 //    Boid::GP_not_GA = true;
 //    Boid::GP_not_GA = false;
 //    Boid::GP_not_GA = true;
-//    // 20240813
-//    Boid::GP_not_GA = false;
-//    // 20240814
-//    Boid::GP_not_GA = true;
-    // 20240913
-    Boid::GP_not_GA = false;
+//    Boid::GP_not_GA = false;  // 20240813
+//    Boid::GP_not_GA = true;  // 20240814
+    Boid::GP_not_GA = false;  // 20240913
+//    Boid::GP_not_GA = true;  // 20241021
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     
     

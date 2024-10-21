@@ -38,7 +38,8 @@ public:
     
     // Constructor with args for visualizer window.
     Draw(bool enabled,
-         Vec3 window_xy_size = Vec3(2000, 2000, 0),
+//         Vec3 window_xy_size = Vec3(2000, 2000, 0),
+         Vec3 window_xy_size = Vec3(1024, 1024, 0),
          Vec3 window_xy_position_ul = Vec3(),
          std::string window_title = "evoflock",
          int line_width = 10,
@@ -512,7 +513,8 @@ public:
     void updateCamera()
     {
         // Invoke the "follow cam" model, update look_from / look_at points
-        computeFollowCameraFromTo();
+//        computeFollowCameraFromTo();
+        animateFollowCameraFromTo();
         // Update this Draw instance's camera to from/at orientation
         camera() = camera().fromTo(cameraLookFrom(),
                                    cameraLookAt(),
@@ -546,7 +548,8 @@ public:
     {
         double color = 0;
         double angle = 2 * M_PI / chords;
-        Vec3 up = cameraLookUp();
+//        Vec3 up = cameraLookUp();
+        Vec3 up = camera().j();
         LocalSpace ls = LocalSpace().fromTo(center, cameraLookFrom(), up);
         Vec3 lup = ls.localize(up);
         Vec3 local_spoke = Vec3(lup.x(), lup.y(), 0).normalize() * radius;
@@ -624,7 +627,8 @@ public:
     // Shouldn't those two steps be combined here? Then it could be called just
     // plain Draw::computeFollowCamera().
     //
-    void computeFollowCameraFromTo()
+//    void computeFollowCameraFromTo()
+    void animateFollowCameraFromTo()
     {
         double desired_offset_dist = 15;
         Vec3 camera_pos = camera().p();
@@ -636,7 +640,9 @@ public:
         Vec3 new_at = aimTarget();
         Vec3 new_up = (camera().j() + Vec3(0, 0.3, 0)).normalize();
         camera_look_from_ = from_memory_.blend(new_from, 0.90);
-        camera_look_at_   =   at_memory_.blend(new_at,   0.80);
+//        camera_look_at_   =   at_memory_.blend(new_at,   0.80);
+//        camera_look_at_   =   at_memory_.blend(new_at,   0.70);
+        camera_look_at_   =   at_memory_.blend(new_at,   0.75);
         camera_look_up_   =   up_memory_.blend(new_up,   0.97).normalize();
     }
 

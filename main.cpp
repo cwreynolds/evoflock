@@ -22,24 +22,6 @@
 
 int main(int argc, const char * argv[])
 {
-    //--------------------------------------------------------------------------
-    // TODO 20240923 more fiddling with point/line sizes
-    //               see https://github.com/isl-org/Open3D/issues/6952
-//    Draw::LineWidthPointSizeTest();
-//    return EXIT_SUCCESS;
-    
-//    //    Draw::Oct2Test();
-//        Draw::test();
-//        Draw::test2();
-//        return EXIT_SUCCESS;
-
-//    // TODO 20241008
-//    Draw::test3();
-//    return EXIT_SUCCESS;
-
-    //--------------------------------------------------------------------------
-
-
     EF::setRS(LP::LPRS());
     EF::unit_test();
 
@@ -308,28 +290,17 @@ int main(int argc, const char * argv[])
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
     
+#ifdef USE_OPEN3D
+
+    // Create Draw context and window using Open3D.
+    Draw draw(true);
+
+#endif  // USE_OPEN3D
+    
     {
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240913 WIP draw during fitness tests.
-        
-#ifdef USE_OPEN3D
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240929 update Draw::visualizeEvoflockFitnessTest()
-//        Draw::visualizeEvoflockFitnessTest();
-//        exit(EXIT_SUCCESS);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240928 integrate with Flock simulation
-        Draw draw(true);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-#endif  // USE_OPEN3D
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for (int i = 0; i < max_evolution_steps; i++)
         {
             GP::save_fitness_time_series(*population);
@@ -341,14 +312,6 @@ int main(int argc, const char * argv[])
             }
             std::cout << std::endl;
         }
-        
-#ifdef USE_OPEN3D
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240928 integrate with Flock simulation
-//        draw.endAnimatedScene();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#endif  // USE_OPEN3D
-
     }
     
     // Save end of run data.

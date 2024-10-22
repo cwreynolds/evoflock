@@ -38,8 +38,7 @@ public:
     
     // Constructor with args for visualizer window.
     Draw(bool enabled,
-//         Vec3 window_xy_size = Vec3(2000, 2000, 0),
-         Vec3 window_xy_size = Vec3(1024, 1024, 0),
+         Vec3 window_xy_size = Vec3(2000, 2000, 0),
          Vec3 window_xy_position_ul = Vec3(),
          std::string window_title = "evoflock",
          int line_width = 10,
@@ -48,7 +47,7 @@ public:
         // Handle pointer to singleton instance of Draw class.
         assert(global_object_ == nullptr);
         global_object_ = this;
-        setEnable(true);
+        setEnable(enabled);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241004 follow cam

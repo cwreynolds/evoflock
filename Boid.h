@@ -181,7 +181,13 @@ public:
     // Apply desired steering for this simulation step
     void apply_next_steer(double time_step)
     {
+        // Note this draws PREVIOUS state. Drawing the current state would have
+        // required more work, which did not seem worth the effort (to sync up
+        // annotation and Draw::aimTarget in Flock) just for visualization.
         draw_body();
+        
+        // Apply the "steering force" (computed in plan_next_steer() during a
+        // previous pass) to this Boid's geometric state.
         steer(next_steer_, time_step);
     }
 

@@ -146,8 +146,7 @@ public:
     void beginOneAnimatedFrame()
     {
 #ifdef USE_OPEN3D
-        // TODO 20240930 maybe should also set some global "exit from run" flag?
-        pollEvents();
+        setExitFromRun(! pollEvents());
         if (enable())
         {
             animated_tri_mesh_->Clear();
@@ -383,7 +382,7 @@ public:
 
 
     // Runtime switch to turn graphical display on and off.
-    bool enable() const { return enable_; }
+    bool enable() const { return enable_ and not exitFromRun(); }
     void setEnable(bool e) { enable_ = e; }
     void toggleEnable() { enable_ = not enable_; }
 
@@ -668,6 +667,10 @@ public:
     bool& cameraMode() { return camera_mode_; }
     void nextCameraMode() { camera_mode_ = not camera_mode_; }
     
+    // Set to true when user types ESC or closes Visualizer window.
+    bool exitFromRun() const { return exit_from_run_; }
+    void setExitFromRun(bool efr) { exit_from_run_ = efr; }
+    
     static void unit_test() {}
     
 private:
@@ -697,6 +700,8 @@ private:
     Vec3 camera_look_up_;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    // Set to true when user types ESC or closes Visualizer window.
+    bool exit_from_run_ = false;
 
 #ifdef USE_OPEN3D
     

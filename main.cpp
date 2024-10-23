@@ -303,6 +303,8 @@ int main(int argc, const char * argv[])
 
         for (int i = 0; i < max_evolution_steps; i++)
         {
+            // Exit if user interactively exits run.
+            if (draw.exitFromRun()) { break; }
             GP::save_fitness_time_series(*population);
             population->evolutionStep(fitness_function, GP::scalarize_fitness);
             if ((population->getStepCount() % 100) == 0)
@@ -346,7 +348,7 @@ int main(int argc, const char * argv[])
             debugPrint(fitness);
         }
     };
-    record_top_10();
+    if (not draw.exitFromRun()) { record_top_10(); }
     delete population;
     LP::Individual::leakCheck();
     return EXIT_SUCCESS;

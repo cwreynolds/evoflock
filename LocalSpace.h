@@ -95,33 +95,22 @@ public:
         return LocalSpace(new_side, new_up, new_forward, p());
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241002 add camera.
-    
     LocalSpace fromTo(Vec3 from_position, Vec3 to_position)
     {
         return fromTo(from_position, to_position, Vec3(0, 1, 0));
     }
 
-//    LocalSpace fromTo(Vec3 from_position, Vec3 to_position, Vec3 reference_up)
-//    {
-//        LocalSpace ls;
-//        Vec3 new_forward = (to_position - from_position).normalize();
-//        ls = ls.rotate_to_new_forward(new_forward, reference_up);
-//        ls.setP(from_position);
-//        return ls;
-//    }
-
     LocalSpace fromTo(Vec3 from_position, Vec3 to_position, Vec3 reference_up)
     {
         LocalSpace ls;
-        ls.setP(from_position);
-        Vec3 new_forward = (to_position - from_position).normalize();
-        ls = ls.rotate_to_new_forward(new_forward, reference_up);
+        if (not Vec3::is_equal_within_epsilon(from_position, to_position))
+        {
+            ls.setP(from_position);
+            Vec3 new_forward = (to_position - from_position).normalize();
+            ls = ls.rotate_to_new_forward(new_forward, reference_up);
+        }
         return ls;
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     static void unit_test()
     {

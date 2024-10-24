@@ -49,13 +49,6 @@ public:
         global_object_ = this;
         setEnable(enabled);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241004 follow cam
-        // TODO 20241006 follow cam
-//        camera() = camera().fromTo({60, 60, 60}, {});
-        camera() = camera().fromTo(Vec3(1,1,1).normalize() * 10, {});
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
 #ifdef USE_OPEN3D
         std::cout << "Begin graphics session using: Open3D ";
         std::cout << OPEN3D_VERSION << std::endl;
@@ -88,8 +81,6 @@ public:
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241007 follow cam -- to/from tracker balls
-        
-        
         double ball_radius = 0.3;
         to_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
         from_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
@@ -97,15 +88,6 @@ public:
         from_ball->PaintUniformColor({1, 0, 1});
         visualizer().AddGeometry(to_ball);
         visualizer().AddGeometry(from_ball);
-
-//        la_to_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
-//        la_from_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
-//        la_to_ball->PaintUniformColor({0, 0, 1});
-//        la_from_ball->PaintUniformColor({1, 1, 0});
-//        visualizer().AddGeometry(la_to_ball);
-//        visualizer().AddGeometry(la_from_ball);
-        
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
     }
@@ -114,8 +96,6 @@ public:
     // TODO 20241007 follow cam -- to/from tracker balls
     std::shared_ptr<open3d::geometry::TriangleMesh> from_ball;
     std::shared_ptr<open3d::geometry::TriangleMesh> to_ball;
-//    std::shared_ptr<open3d::geometry::TriangleMesh> la_from_ball;
-//    std::shared_ptr<open3d::geometry::TriangleMesh> la_to_ball;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     ~Draw()
@@ -171,8 +151,6 @@ public:
             // TODO 20241007 follow cam -- to/from tracker balls
             visualizer().UpdateGeometry(from_ball);
             visualizer().UpdateGeometry(to_ball);
-//            visualizer().UpdateGeometry(la_from_ball);
-//            visualizer().UpdateGeometry(la_to_ball);
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
 #endif  // USE_OPEN3D
@@ -511,12 +489,7 @@ public:
     void updateCamera()
     {
         // Invoke the "follow cam" model, update look_from / look_at points
-//        computeFollowCameraFromTo();
-        animateFollowCameraFromTo();
-        // Update this Draw instance's camera to from/at orientation
-        camera() = camera().fromTo(cameraLookFrom(),
-                                   cameraLookAt(),
-                                   cameraLookUp());
+        animateFollowCamera();
         // Either set view to from/at points or set markers in static view.
         if (cameraMode() == true)
         {
@@ -609,42 +582,23 @@ public:
         vis.GetViewControl().ConvertFromPinholeCameraParameters(pcp);
     }
 
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241014 smooth over all 3 components of from/at/up camera
-    
-    // Low pass filter for roll control ("up" target).
-    util::Blender<Vec3> up_memory_;
-    util::Blender<Vec3> from_memory_;
-    util::Blender<Vec3> at_memory_;
-    
-    // Invoke the "follow camera" model, update look_from / look_at points.
-    //
-    // TODO 20241014 this is called from exactly one place, then is immediately
-    // followed by setting the camera() to the transform we compute here.
-    // Shouldn't those two steps be combined here? Then it could be called just
-    // plain Draw::computeFollowCamera().
-    //
-//    void computeFollowCameraFromTo()
-    void animateFollowCameraFromTo()
+    // Invoke the "follow camera" model, update look_from/look_at/up and camera.
+    void animateFollowCamera()
     {
         double desired_offset_dist = 15;
         Vec3 camera_pos = camera().p();
         Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
-        double offset_distance = offset_from_camera_to_target.length();
-        Vec3 offset_direction = offset_from_camera_to_target / offset_distance;
-        Vec3 offset_target = aimTarget() - (offset_direction * desired_offset_dist);
-        Vec3 new_from = offset_target;
+        Vec3 offset_direction = offset_from_camera_to_target.normalize_or_0();
+        Vec3 new_from = aimTarget() - (offset_direction * desired_offset_dist);
         Vec3 new_at = aimTarget();
         Vec3 new_up = (camera().j() + Vec3(0, 0.3, 0)).normalize();
         camera_look_from_ = from_memory_.blend(new_from, 0.90);
-//        camera_look_at_   =   at_memory_.blend(new_at,   0.80);
-//        camera_look_at_   =   at_memory_.blend(new_at,   0.70);
         camera_look_at_   =   at_memory_.blend(new_at,   0.75);
         camera_look_up_   =   up_memory_.blend(new_up,   0.97).normalize();
+        camera() = camera().fromTo(cameraLookFrom(),
+                                   cameraLookAt(),
+                                   cameraLookUp());
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Accessor for Open3D Visualizer instance.
     vis_t& visualizer() { return visualizer_; }
@@ -692,13 +646,15 @@ private:
     // Aim target for follow camera. Set externally (eg to selected boid).
     Vec3 aim_target_;
 
-    // Store global camera look_from / look_at points.
+    // Store global camera look from/to/up vectors.
     Vec3 camera_look_from_;
-    Vec3 camera_look_at_;    // TODO Now same as aimTarget(), blended later?
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241014 smooth over all 3 components of from/at/up camera
+    Vec3 camera_look_at_;
     Vec3 camera_look_up_;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    // Low pass filter for camera look from/to/up vectors.
+    util::Blender<Vec3> up_memory_;
+    util::Blender<Vec3> from_memory_;
+    util::Blender<Vec3> at_memory_;
 
     // Set to true when user types ESC or closes Visualizer window.
     bool exit_from_run_ = false;

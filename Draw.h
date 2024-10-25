@@ -89,6 +89,27 @@ public:
         visualizer().AddGeometry(to_ball);
         visualizer().AddGeometry(from_ball);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241025 experiment mouse scroll input desired_offset_dist_
+
+        auto mouse_scroll_callback = [&](base_vis_t* vis, double x, double y)
+        {
+            if (cameraMode() == true)
+            {
+                // change follow distance
+                desired_offset_dist_ = std::max(0.5, desired_offset_dist_ + y);
+            }
+            return true;
+        };
+
+        // Both of these seem to work. The first is normal interactive control.
+        // The second is “follow camera with adjustable offset”
+        visualizer().RegisterMouseScrollCallback(nullptr);
+        visualizer().RegisterMouseScrollCallback(mouse_scroll_callback);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
     }
 
@@ -582,14 +603,20 @@ public:
         vis.GetViewControl().ConvertFromPinholeCameraParameters(pcp);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241025 experiment mouse scroll input desired_offset_dist_
+
+    double desired_offset_dist_ = 15;
+
+    
     // Invoke the "follow camera" model, update look_from/look_at/up and camera.
     void animateFollowCamera()
     {
-        double desired_offset_dist = 15;
+//        double desired_offset_dist = 15;
         Vec3 camera_pos = camera().p();
         Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
         Vec3 offset_direction = offset_from_camera_to_target.normalize_or_0();
-        Vec3 new_from = aimTarget() - (offset_direction * desired_offset_dist);
+        Vec3 new_from = aimTarget() - (offset_direction * desired_offset_dist_);
         Vec3 new_at = aimTarget();
         Vec3 new_up = (camera().j() + Vec3(0, 0.3, 0)).normalize();
         camera_look_from_ = from_memory_.blend(new_from, 0.90);
@@ -599,6 +626,8 @@ public:
                                    cameraLookAt(),
                                    cameraLookUp());
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Accessor for Open3D Visualizer instance.
     vis_t& visualizer() { return visualizer_; }

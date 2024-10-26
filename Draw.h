@@ -78,6 +78,9 @@ public:
         visualizer().RegisterKeyCallback('C',
                                          [&](base_vis_t* vis)
                                          { nextCameraMode(); return true; });
+        
+        // Set mouse scroll policy based on current camera mode.
+        updateMouseScrollCallback();
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241007 follow cam -- to/from tracker balls
@@ -88,27 +91,6 @@ public:
         from_ball->PaintUniformColor({1, 0, 1});
         visualizer().AddGeometry(to_ball);
         visualizer().AddGeometry(from_ball);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241025 experiment mouse scroll input desired_offset_dist_
-
-        auto mouse_scroll_callback = [&](base_vis_t* vis, double x, double y)
-        {
-            if (cameraMode() == true)
-            {
-                // change follow distance
-                desired_offset_dist_ = std::max(0.5, desired_offset_dist_ + y);
-            }
-            return true;
-        };
-
-        // Both of these seem to work. The first is normal interactive control.
-        // The second is “follow camera with adjustable offset”
-        visualizer().RegisterMouseScrollCallback(nullptr);
-        visualizer().RegisterMouseScrollCallback(mouse_scroll_callback);
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
     }
@@ -603,20 +585,14 @@ public:
         vis.GetViewControl().ConvertFromPinholeCameraParameters(pcp);
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241025 experiment mouse scroll input desired_offset_dist_
-
-    double desired_offset_dist_ = 15;
-
-    
     // Invoke the "follow camera" model, update look_from/look_at/up and camera.
     void animateFollowCamera()
     {
-//        double desired_offset_dist = 15;
         Vec3 camera_pos = camera().p();
         Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
         Vec3 offset_direction = offset_from_camera_to_target.normalize_or_0();
-        Vec3 new_from = aimTarget() - (offset_direction * desired_offset_dist_);
+        Vec3 target_offset = offset_direction * cameraDesiredOffsetDistance();
+        Vec3 new_from = aimTarget() - target_offset;
         Vec3 new_at = aimTarget();
         Vec3 new_up = (camera().j() + Vec3(0, 0.3, 0)).normalize();
         camera_look_from_ = from_memory_.blend(new_from, 0.90);
@@ -627,7 +603,23 @@ public:
                                    cameraLookUp());
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    void updateMouseScrollCallback()
+    {
+        std::function<bool(base_vis_t *, double, double)> mscb = nullptr;
+        if (cameraMode() == true)
+        {
+            mscb = [&](base_vis_t* vis, double x, double y)
+            {
+                // Change follow distance.
+                double adjust_speed = 0.8;
+                double min = 0.05;
+                double d = cameraDesiredOffsetDistance() + (y * adjust_speed);
+                cameraDesiredOffsetDistance() = std::max(min, d);
+                return true;
+            };
+        }
+        visualizer().RegisterMouseScrollCallback(mscb);
+    }
 
     // Accessor for Open3D Visualizer instance.
     vis_t& visualizer() { return visualizer_; }
@@ -648,11 +640,22 @@ public:
     
     // Settable accessor for  camera mode. Now cycles between follow and global.
     bool& cameraMode() { return camera_mode_; }
-    void nextCameraMode() { camera_mode_ = not camera_mode_; }
+    void nextCameraMode()
+    {
+        camera_mode_ = not camera_mode_;
+        updateMouseScrollCallback();
+    }
     
     // Set to true when user types ESC or closes Visualizer window.
     bool exitFromRun() const { return exit_from_run_; }
     void setExitFromRun(bool efr) { exit_from_run_ = efr; }
+    
+    // Settable accessor for desired offset distance in follow camera mode.
+    double& cameraDesiredOffsetDistance()
+    {
+        return camera_desired_offset_dist_;
+    }
+
     
     static void unit_test() {}
     
@@ -674,6 +677,9 @@ private:
 
     // Aim target for follow camera. Set externally (eg to selected boid).
     Vec3 aim_target_;
+
+    // Desired offset distance in follow camera mode.
+    double camera_desired_offset_dist_ = 15;
 
     // Store global camera look from/to/up vectors.
     Vec3 camera_look_from_;

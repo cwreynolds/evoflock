@@ -2,12 +2,12 @@
 //
 //  Draw.h -- new flock experiments
 //
-//  Graphics utilities for evoflock based on Open3D.
-//  An instance of Draw provides the (optional) graphics context and utilities.
-//  Draw is a "singleton" class, for which only one instance exists at any time.
-//  Creating a Draw object creates an Open3D visualizer object, an associated
-//  window, and provides API for adding/modifying static and animated geometry
-//  in the scene displayed in the window.
+//  Graphics utilities for evoflock based on Open3D. A Draw instance provides an
+//  (optional) graphics context and utilities. Draw is a "singleton" class, for
+//  which only one instance exists, accessed with Draw::getInstance(). Creating
+//  a Draw object creates an Open3D visualizer object, an associated window, and
+//  provides API for adding/modifying static and animated geometry in the scene
+//  displayed in the window.
 //
 //  Created by Craig Reynolds on September 9, 2024.
 //  MIT License -- Copyright © 2024 Craig Reynolds
@@ -24,14 +24,28 @@
 class Draw
 {
 public:
+
 #ifdef USE_OPEN3D
     // Short names for the Open3D visualizer class used here and base class:
     typedef open3d::visualization::VisualizerWithKeyCallback vis_t;
     typedef open3d::visualization::Visualizer base_vis_t;
 #endif  // USE_OPEN3D
 
-    // Used to get the current global Draw object (drawing context).
-    static Draw& getInstance() { return *global_object_; }
+    // Used to get the current global Draw object (drawing context). Returns the
+    // existing instance, creating a new one if needed.
+    static Draw& getInstance() { return getInstance(true); }
+    static Draw& getInstance(bool enabled)
+    {
+        if (not global_object_) { global_object_ = new Draw(enabled); }
+        return *global_object_;
+    }
+
+private:
+
+    // TODO 20241026 -- Temporary for debugging odd symptom: running from inside
+    // Xcode launches a separate copy of the executable about a second after the
+    // first. Oddly this symptom seems to come and go as I edit main.cpp
+    static inline int constructor_count = 0;
     
     // Default constructor
     Draw() : Draw(false) {}
@@ -44,6 +58,12 @@ public:
          int line_width = 10,
          int point_size = 20)
     {
+        // TODO 20241026 -- Temporary for debugging odd symptom: running from inside
+        // Xcode launches a separate copy of the executable about a second after the
+        // first. Oddly this symptom seems to come and go as I edit main.cpp
+        constructor_count++;
+        assert(constructor_count == 1);
+
         // Handle pointer to singleton instance of Draw class.
         assert(global_object_ == nullptr);
         global_object_ = this;
@@ -100,6 +120,8 @@ public:
     std::shared_ptr<open3d::geometry::TriangleMesh> from_ball;
     std::shared_ptr<open3d::geometry::TriangleMesh> to_ball;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+public:
 
     ~Draw()
     {

@@ -289,14 +289,7 @@ int main(int argc, const char * argv[])
         
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
-    
-#ifdef USE_OPEN3D
 
-    // Create Draw context and window using Open3D.
-    Draw draw(true);
-
-#endif  // USE_OPEN3D
-    
     {
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
@@ -304,7 +297,7 @@ int main(int argc, const char * argv[])
         for (int i = 0; i < max_evolution_steps; i++)
         {
             // Exit if user interactively exits run.
-            if (draw.exitFromRun()) { break; }
+            if (Draw::getInstance().exitFromRun()) { break; }
             GP::save_fitness_time_series(*population);
             population->evolutionStep(fitness_function, GP::scalarize_fitness);
             if ((population->getStepCount() % 100) == 0)
@@ -348,8 +341,10 @@ int main(int argc, const char * argv[])
             debugPrint(fitness);
         }
     };
-    if (not draw.exitFromRun()) { record_top_10(); }
+    
+    if (not Draw::getInstance().exitFromRun()) { record_top_10(); }
     delete population;
     LP::Individual::leakCheck();
+    delete &Draw::getInstance();
     return EXIT_SUCCESS;
 }

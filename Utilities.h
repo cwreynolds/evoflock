@@ -257,6 +257,13 @@ public:
         frame_duration_ = time_diff_in_seconds(frame_end_time, frame_start_time_);
         frame_start_time_ = frame_end_time;
         frame_counter_ += 1;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241029 actually measure elapsed frame time
+        if (0 == (frame_counter_ % 100))
+        {
+            std::cout << "frame_duration_= " << frame_duration_ << std::endl;
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
 private:

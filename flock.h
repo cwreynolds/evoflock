@@ -129,11 +129,7 @@ public:
         make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
         // self.draw()
         // self.cycle_obstacle_selection()
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240916 reset frame_counter, etc.
-//        draw().beginAnimatedDisplay();
         draw().beginAnimatedScene();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         save_centers_to_file_start();
 
@@ -141,10 +137,7 @@ public:
         {
             if (run_simulation_this_frame())
             {
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240928 integrate with Flock simulation
                 draw().beginOneAnimatedFrame();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // Draw.clear_scene()
                 fly_boids((fixed_time_step() or not draw().enable()) ?
                           1.0 / fixed_fps() :
@@ -155,33 +148,17 @@ public:
                 if (not simulation_paused_) { aTimer().measure_frame_duration(); }
                 log_stats();
                 update_fps();
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20241004 follow cam
                 draw().aimTarget() = selectedBoid()->position();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240928 integrate with Flock simulation
                 draw().endOneAnimatedFrame();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
         save_centers_to_file_end();
         // Draw.close_visualizer()
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240916 reset frame_counter, etc.
         draw().endAnimatedScene();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        std::cout << "Exit at step:" << draw().frame_counter() << std::endl;
         if (max_simulation_steps() == std::numeric_limits<double>::infinity())
         {
             std::cout << log_prefix << "Exit at step: ";
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240916 reset frame_counter, etc.
-//            std::cout << draw().frame_counter() << std::endl;
             std::cout << aTimer().frame_counter() << std::endl;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
     }
 
@@ -543,11 +520,7 @@ public:
             increment_boid_update_counter();
         }
         if (all_speed_good) { count_steps_good_speed++; }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240916 reset frame_counter, etc.
-//        if (0 == (draw().frame_counter() % cluster_score_stride_))
         if (0 == (aTimer().frame_counter() % cluster_score_stride_))
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             double cs = util::remap_interval_clip(count_clusters(), 0, 5, 0, 1);
             cluster_score_sum_ += cs;

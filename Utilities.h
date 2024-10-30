@@ -250,18 +250,76 @@ public:
     bool poll_events() const { return true; }
     int frame_counter() const { return frame_counter_; }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241029 actually measure elapsed frame time
+    
+    // Record real time at beginning of frame.
+    void setFrameStartTime()
+    {
+        frame_start_time_ = TimeClock::now();
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241029 actually measure elapsed frame time
+    
+
+    // Called at end of frame to sleep until min_frame_time_seconds.
+    void sleepUntilEndOfFrame(double min_frame_time_seconds)
+    {
+        non_sleep_sec_ = time_diff_in_seconds(TimeClock::now(), frame_start_time_);
+        if (min_frame_time_seconds > non_sleep_sec_)
+        {
+            double wuc = 0.01;  // "weird unexplained correction"
+            double sleep_sec = min_frame_time_seconds - non_sleep_sec_ - wuc;
+            int micros = sleep_sec * 1000000;
+            std::this_thread::sleep_for(std::chrono::microseconds(micros));
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241029 actually measure elapsed frame time
+
+    double non_sleep_sec_ = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Measure how much wall clock time has elapsed for this simulation step.
     void measure_frame_duration()
     {
         TimePoint frame_end_time = TimeClock::now();
         frame_duration_ = time_diff_in_seconds(frame_end_time, frame_start_time_);
-        frame_start_time_ = frame_end_time;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241029 actually measure elapsed frame time
+//        frame_start_time_ = frame_end_time;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         frame_counter_ += 1;
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241029 actually measure elapsed frame time
+        
+        // TODO hack? for testing?
+        
+//        static double smoothed_frame_duration = 0;
+        static Blender<double> smoothed_frame_duration;
+        smoothed_frame_duration.blend(frame_duration_, 0.95);
+
+
         if (0 == (frame_counter_ % 100))
         {
-            std::cout << "frame_duration_= " << frame_duration_ << std::endl;
+//            std::cout << "frame_duration_= " << frame_duration_;
+//            std::cout << " vs 1/30 = " << 1.0 / 30 << std::endl;
+
+//            std::cout << "frame_duration_= " << frame_duration_;
+//            std::cout << " (1/30 = " << 1.0 / 30 << ") non_sleep_sec_= ";
+//            std::cout << non_sleep_sec_ << std::endl;
+
+
+            std::cout << "smoothed_frame_duration = ";
+            std::cout << smoothed_frame_duration.value;
+            std::cout << " (1/30 = " << 1.0 / 30 << ") non_sleep_sec_= ";
+            std::cout << non_sleep_sec_ << std::endl;
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }

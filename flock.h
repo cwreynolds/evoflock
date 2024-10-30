@@ -137,19 +137,45 @@ public:
         {
             if (run_simulation_this_frame())
             {
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20241029 actually measure elapsed frame time
+                aTimer().setFrameStartTime();
+                // Run simulation steps "as fast as possible" or at fixed rate?
+                bool afap = not (fixed_time_step() or not draw().enable());
+                double step_duration = (afap ?
+                                        aTimer().frame_duration() :
+                                        1.0 / fixed_fps());
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 draw().beginOneAnimatedFrame();
                 // Draw.clear_scene()
-                fly_boids((fixed_time_step() or not draw().enable()) ?
-                          1.0 / fixed_fps() :
-                          aTimer().frame_duration());
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20241029 actually measure elapsed frame time
+//                fly_boids((fixed_time_step() or not draw().enable()) ?
+//                          1.0 / fixed_fps() :
+//                          aTimer().frame_duration());
+//                fly_boids(afap ? aTimer().frame_duration() : 1.0 / fixed_fps());
+                fly_boids(step_duration);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 save_centers_to_file_1_step();
                 // self.draw()
                 // Draw.update_scene()
-                if (not simulation_paused_) { aTimer().measure_frame_duration(); }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20241029 actually measure elapsed frame time
+//                if (not simulation_paused_) { aTimer().measure_frame_duration(); }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 log_stats();
                 update_fps();
                 draw().aimTarget() = selectedBoid()->position();
                 draw().endOneAnimatedFrame();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20241029 actually measure elapsed frame time
+                aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20241029 actually measure elapsed frame time
+                if (not simulation_paused_) { aTimer().measure_frame_duration(); }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
         save_centers_to_file_end();

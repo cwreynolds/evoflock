@@ -161,7 +161,7 @@ public:
             // TODO 20241029 actually measure elapsed frame time
             // TODO 20241019 this should sleep from end of draw UNTIL next
             // frame time, so keep the overall frame duration at 30 or 60 fps.
-            std::this_thread::sleep_for(std::chrono::milliseconds(1000/30));
+//            std::this_thread::sleep_for(std::chrono::milliseconds(1000/30));
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
 #endif  // USE_OPEN3D

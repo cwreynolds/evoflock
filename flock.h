@@ -137,54 +137,29 @@ public:
         {
             if (run_simulation_this_frame())
             {
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20241029 actually measure elapsed frame time
                 aTimer().setFrameStartTime();
                 // Run simulation steps "as fast as possible" or at fixed rate?
                 bool afap = not (fixed_time_step() or not draw().enable());
                 double step_duration = (afap ?
-                                        aTimer().frame_duration() :
+                                        aTimer().frameDuration() :
                                         1.0 / fixed_fps());
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 draw().beginOneAnimatedFrame();
-                // Draw.clear_scene()
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20241029 actually measure elapsed frame time
-//                fly_boids((fixed_time_step() or not draw().enable()) ?
-//                          1.0 / fixed_fps() :
-//                          aTimer().frame_duration());
-//                fly_boids(afap ? aTimer().frame_duration() : 1.0 / fixed_fps());
                 fly_boids(step_duration);
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 save_centers_to_file_1_step();
-                // self.draw()
-                // Draw.update_scene()
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20241029 actually measure elapsed frame time
-//                if (not simulation_paused_) { aTimer().measure_frame_duration(); }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 log_stats();
                 update_fps();
                 draw().aimTarget() = selectedBoid()->position();
                 draw().endOneAnimatedFrame();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20241029 actually measure elapsed frame time
                 aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20241029 actually measure elapsed frame time
-                if (not simulation_paused_) { aTimer().measure_frame_duration(); }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                if (not simulation_paused_) { aTimer().measureFrameDuration(); }
             }
         }
         save_centers_to_file_end();
-        // Draw.close_visualizer()
         draw().endAnimatedScene();
         if (max_simulation_steps() == std::numeric_limits<double>::infinity())
         {
             std::cout << log_prefix << "Exit at step: ";
-            std::cout << aTimer().frame_counter() << std::endl;
+            std::cout << aTimer().frameCounter() << std::endl;
         }
     }
 
@@ -546,7 +521,7 @@ public:
             increment_boid_update_counter();
         }
         if (all_speed_good) { count_steps_good_speed++; }
-        if (0 == (aTimer().frame_counter() % cluster_score_stride_))
+        if (0 == (aTimer().frameCounter() % cluster_score_stride_))
         {
             double cs = util::remap_interval_clip(count_clusters(), 0, 5, 0, 1);
             cluster_score_sum_ += cs;
@@ -676,7 +651,7 @@ public:
     }
     double get_speed_score() const
     {
-        return count_steps_good_speed / double(aTimer().frame_counter());
+        return count_steps_good_speed / double(aTimer().frameCounter());
     }
     double get_avoid_obstacle_score() const
     {
@@ -711,7 +686,7 @@ public:
     void log_stats()
     {
         if ((not simulation_paused_) and
-            (aTimer().frame_counter() % getLogStatInterval() == 0))
+            (aTimer().frameCounter() % getLogStatInterval() == 0))
         {
             double average_speed = 0;
             for (Boid* b : boids()) { average_speed += b->speed(); }
@@ -744,7 +719,7 @@ public:
             
             grabPrintLock_evoflock();
             std::cout << log_prefix;
-            std::cout << aTimer().frame_counter();
+            std::cout << aTimer().frameCounter();
             // std::cout << " fps=" << 0; // round(self.fps.value));
             std::cout << " fps=" << fps_.value;
             std::cout << ", ave_speed=" << average_speed;
@@ -764,7 +739,7 @@ public:
     // Keep track of a smoothed (LPF) version of frames per second metric.
     void update_fps()
     {
-        double fd = aTimer().frame_duration();
+        double fd = aTimer().frameDuration();
         fps_.blend((fixed_time_step() ? fixed_fps() : int(1 / fd)), 0.95);
     }
     
@@ -1052,7 +1027,7 @@ public:
     bool still_running()
     {
         bool a = (not draw().enable()) ? true : not draw().exitFromRun();
-        bool b = aTimer().frame_counter() < max_simulation_steps();
+        bool b = aTimer().frameCounter() < max_simulation_steps();
         return a and b;
     }
     

@@ -918,9 +918,9 @@ LP::FunctionSet evoflock_gp_function_set()
                         // TOODO 20240809 why is obstacle avoidance broken?
 //                        debugPrint(first_collision)
                         
-//                        debugPrint(Draw().frame_counter())
+//                        debugPrint(Draw().frameCounter())
 //                        bool log = (boid.is_first_boid() and
-//                                    ((Draw().frame_counter() % 100) == 0));
+//                                    ((Draw().frameCounter() % 100) == 0));
 //                        if (log) { debugPrint(first_collision) }
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                         
@@ -1155,7 +1155,7 @@ LP::FunctionSet evoflock_gp_function_set()
 //                            //-  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
 //                            // TODO 20240810 weird time issue in GP mode?
 //                            if (boid.is_first_boid() and
-//                                ((boid.draw().frame_counter() % 20) == 0))
+//                                ((boid.draw().frameCounter() % 20) == 0))
 //                            {
 //                                Vec3 f = boid.forward();
 //                                Vec3 lat_avoid = avoidance.perpendicular_component(f);
@@ -1177,7 +1177,7 @@ LP::FunctionSet evoflock_gp_function_set()
 //
 //    //                            Vec3 local_lat_avoid = boid.ls().localize(lat_avoid);
 //                                debugPrint(first_collision)
-//                                std::cout << boid.draw().frame_counter() << ": ";
+//                                std::cout << boid.draw().frameCounter() << ": ";
 //    //                            std::cout << local_lat_avoid.normalize_or_0();
 //    //                            std::cout << std::endl;
 //    //                            debugPrint(local_lat_avoid.normalize_or_0())
@@ -1299,14 +1299,14 @@ LP::FunctionSet test_gp_boid_function_set()
                     }
 //                        // temp:
 //                        if (boid.is_first_boid() and
-//                            ((boid.draw().frame_counter() % 20) == 0))
+//                            ((boid.draw().frameCounter() % 20) == 0))
 //                        {
 //                            if (collisions.size() > 0)
 //                            {
-//                                std::cout << boid.draw().frame_counter() << ": ";
+//                                std::cout << boid.draw().frameCounter() << ": ";
 //                                debugPrint(collisions.front())
 //                            }
-//                            std::cout << boid.draw().frame_counter() << ": ";
+//                            std::cout << boid.draw().frameCounter() << ": ";
 //    //                        debugPrint(lateral)
 //                            debugPrint(steer)
 //                        }

@@ -51,3 +51,8 @@ xcuserdata/
 
 ## Gcc Patch
 /*.gcno
+
+#---------------------------------------------------------------------- cmake
+
+# ignore the cmake build folder
+build/

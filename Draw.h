@@ -29,6 +29,17 @@ public:
     // Short names for the Open3D visualizer class used here and base class:
     typedef open3d::visualization::VisualizerWithKeyCallback vis_t;
     typedef open3d::visualization::Visualizer base_vis_t;
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241102 manage static geometry, for Obstacles.
+
+    // shared pointers to Open3D TriangleMesh objects
+    typedef open3d::geometry::TriangleMesh tri_mesh_t;
+    typedef std::shared_ptr<tri_mesh_t> sp_tri_mesh_t;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 #endif  // USE_OPEN3D
 
     // Used to get the current global Draw object (drawing context). Returns the
@@ -117,8 +128,10 @@ private:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241007 follow cam -- to/from tracker balls
-    std::shared_ptr<open3d::geometry::TriangleMesh> from_ball;
-    std::shared_ptr<open3d::geometry::TriangleMesh> to_ball;
+//    std::shared_ptr<open3d::geometry::TriangleMesh> from_ball;
+//    std::shared_ptr<open3d::geometry::TriangleMesh> to_ball;
+    sp_tri_mesh_t from_ball;
+    sp_tri_mesh_t to_ball;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 public:
@@ -245,6 +258,52 @@ public:
         }
 #endif  // USE_OPEN3D
     }
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241102 manage static geometry, for Obstacles.
+    
+    // Collection of static scene geometry, such as obstacles, represented as
+    // shared pointers to Open3D TriangleMesh objects, aka sp_tri_mesh_t.
+    std::vector<sp_tri_mesh_t> static_tri_meshes_;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241102 manage static geometry, for Obstacles.
+    
+    // Clear all previous TriangleMesh objects from static scene.
+    void clearStaticScene()
+    {
+        for (sp_tri_mesh_t tm : static_tri_meshes_)
+        {
+            visualizer().RemoveGeometry(tm, false);
+        }
+        static_tri_meshes_.clear();
+    }
+    
+    
+    
+    // TODO name by analogy to addTriMeshToAnimatedFrame()
+    
+//    // Add to per-frame collection of animating triangles: per-vertex colors.
+//    void addTriMeshToStaticScene(const std::vector<Vec3>& vertices,
+//                                   const std::vector<std::size_t>& triangles,
+//                                   const std::vector<Vec3>& colors)
+//    {
+//    }
+  
+    // Add to per-frame collection of animating triangles: per-vertex colors.
+    void addTriMeshToStaticScene(const sp_tri_mesh_t tri_mesh)
+    {
+        static_tri_meshes_.push_back(tri_mesh);
+        visualizer().AddGeometry(tri_mesh);
+    }
+
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     void tempAddSphere()
     {
@@ -252,11 +311,31 @@ public:
         double sphere_diameter = 100;
         double sphere_radius = sphere_diameter / 2;
 
-        auto sphere = open3d::geometry::TriangleMesh::CreateSphere(sphere_radius);
+//        auto sphere = open3d::geometry::TriangleMesh::CreateSphere(sphere_radius);
+        auto sphere = tri_mesh_t::CreateSphere(sphere_radius);
         evertTriangleMesh(*sphere);
         sphere->ComputeVertexNormals();
         sphere->PaintUniformColor({0.5, 0.5, 0.5});
-        visualizer().AddGeometry(sphere);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241102 manage static geometry, for Obstacles.
+//        visualizer().AddGeometry(sphere);
+        addTriMeshToStaticScene(sphere);
+        
+        
+        
+        
+        // TODO while I'm at it, might as well mock up the CylinderObstacle.
+        auto cyl_obs = tri_mesh_t::CreateCylinder(sphere_radius * 0.2,
+                                                  sphere_diameter);
+        auto rotation = cyl_obs->GetRotationMatrixFromXYZ({3.1415 / 2, 0, 0});
+        cyl_obs->Rotate(rotation, {0,0,0});
+        cyl_obs->Translate({sphere_radius * 0.6, 0, 0});
+
+        cyl_obs->ComputeVertexNormals();
+        cyl_obs->PaintUniformColor({0.75, 0.75, 0.75});
+        addTriMeshToStaticScene(cyl_obs);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
     }
 
@@ -716,8 +795,9 @@ private:
 #ifdef USE_OPEN3D
     
     // Open3D TriangleMesh object for storing and drawing animated triangles.
-    std::shared_ptr<open3d::geometry::TriangleMesh> animated_tri_mesh_ = nullptr;
-    
+//    std::shared_ptr<open3d::geometry::TriangleMesh> animated_tri_mesh_ = nullptr;
+    sp_tri_mesh_t animated_tri_mesh_ = nullptr;
+
     // Open3D LineSet object for storing and drawing animated line segments.
     std::shared_ptr<open3d::geometry::LineSet> animated_line_set_ = nullptr;
     

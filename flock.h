@@ -872,61 +872,41 @@ public:
                                                         Obstacle::outside));
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240812 change from 1 to 6 cylinders
-
-//        // TODO 20240218 experiments for "sim starts in more flock-like state"
-//        double ecr = fp().sphere_radius;
-//        Vec3 ect = fp().sphere_center + Vec3(ecr * 0.6, ecr, 0);
-//        Vec3 ecb = fp().sphere_center + Vec3(ecr * 0.6, -ecr, 0);
-//        obstacles().push_back(new CylinderObstacle(ecr * 0.2, ect, ecb,
-//                                                   Obstacle::inside));
+        
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20241102 manage static geometry, for Obstacles.
+        //               change back from 6 to 1
 
 
-//        // 6 symmetric cylinders on main axes.
-//        double c3r = fp().sphere_radius *  4 / 30;
-//        double c3o = fp().sphere_radius * 15 / 30;
-//        double c3h = fp().sphere_radius * 20 / 30;
-//        auto add_cyl = [&](double r, Vec3 t, Vec3 b)
-//        {
-//            obstacles().push_back(new CylinderObstacle(r, t, b));
-//        };
-//        add_cyl(c3r, Vec3(-c3h, 0, c3o), Vec3(c3h, 0, c3o));
-//        add_cyl(c3r, Vec3(c3o, -c3h, 0), Vec3(c3o, c3h, 0));
-//        add_cyl(c3r, Vec3(0, c3o, -c3h), Vec3(0, c3o, c3h));
-//        c3o = - c3o;
-//        add_cyl(c3r, Vec3(-c3h, 0, c3o), Vec3(c3h, 0, c3o));
-//        add_cyl(c3r, Vec3(c3o, -c3h, 0), Vec3(c3o, c3h, 0));
-//        add_cyl(c3r, Vec3(0, c3o, -c3h), Vec3(0, c3o, c3h));
+        // TODO 20240218 experiments for "sim starts in more flock-like state"
+        double ecr = fp().sphere_radius;
+        Vec3 ect = fp().sphere_center + Vec3(ecr * 0.6, ecr, 0);
+        Vec3 ecb = fp().sphere_center + Vec3(ecr * 0.6, -ecr, 0);
+        obstacles().push_back(new CylinderObstacle(ecr * 0.2, ect, ecb,
+                                                   Obstacle::inside));
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
-//        // 6 symmetric cylinders on main axes.
-//        double c3r = fp().sphere_radius *  4 / 30;
-//        double c3o = fp().sphere_radius * 15 / 30;
-//        double c3h = fp().sphere_radius * 20 / 30;
-//        auto add_3_cyl = [&]()
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20241102 manage static geometry, for Obstacles.
+        //               change back from 6 to 1
+
+//        // 6 symmetric cylinders parallel to main axes.
+//        double c6r = fp().sphere_radius *  4 / 30;
+//        double c6o = fp().sphere_radius * 15 / 30;
+//        double c6h = fp().sphere_radius * 20 / 30;
+//        auto add_3_cyl = [&](double c6o)
 //        {
 //            auto add_cyl = [&](double r, Vec3 t, Vec3 b)
 //                { obstacles().push_back(new CylinderObstacle(r, t, b)); };
-//            add_cyl(c3r, Vec3(-c3h, 0, c3o), Vec3(c3h, 0, c3o));
-//            add_cyl(c3r, Vec3(c3o, -c3h, 0), Vec3(c3o, c3h, 0));
-//            add_cyl(c3r, Vec3(0, c3o, -c3h), Vec3(0, c3o, c3h));
+//            add_cyl(c6r, Vec3(-c6h, 0, c6o), Vec3(c6h, 0, c6o));
+//            add_cyl(c6r, Vec3(c6o, -c6h, 0), Vec3(c6o, c6h, 0));
+//            add_cyl(c6r, Vec3(0, c6o, -c6h), Vec3(0, c6o, c6h));
 //        };
-//        add_3_cyl();
-//        c3o = - c3o;
-//        add_3_cyl();
-
-        // 6 symmetric cylinders parallel to main axes.
-        double c6r = fp().sphere_radius *  4 / 30;
-        double c6o = fp().sphere_radius * 15 / 30;
-        double c6h = fp().sphere_radius * 20 / 30;
-        auto add_3_cyl = [&](double c6o)
-        {
-            auto add_cyl = [&](double r, Vec3 t, Vec3 b)
-                { obstacles().push_back(new CylinderObstacle(r, t, b)); };
-            add_cyl(c6r, Vec3(-c6h, 0, c6o), Vec3(c6h, 0, c6o));
-            add_cyl(c6r, Vec3(c6o, -c6h, 0), Vec3(c6o, c6h, 0));
-            add_cyl(c6r, Vec3(0, c6o, -c6h), Vec3(0, c6o, c6h));
-        };
-        add_3_cyl(c6o);
-        add_3_cyl(-c6o);
+//        add_3_cyl(c6o);
+//        add_3_cyl(-c6o);
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -969,6 +949,10 @@ public:
         //            [squat_cyl_obs, plane_obstacle],
         //            []]
 
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20241102 manage static geometry, for Obstacles.
+        debugPrint(obstacles().size());
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     }
     
     //

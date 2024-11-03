@@ -260,14 +260,6 @@ public:
     }
     
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241102 manage static geometry, for Obstacles.
-    
-    // Collection of static scene geometry, such as obstacles, represented as
-    // shared pointers to Open3D TriangleMesh objects, aka sp_tri_mesh_t.
-    std::vector<sp_tri_mesh_t> static_tri_meshes_;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -282,18 +274,7 @@ public:
         }
         static_tri_meshes_.clear();
     }
-    
-    
-    
-    // TODO name by analogy to addTriMeshToAnimatedFrame()
-    
-//    // Add to per-frame collection of animating triangles: per-vertex colors.
-//    void addTriMeshToStaticScene(const std::vector<Vec3>& vertices,
-//                                   const std::vector<std::size_t>& triangles,
-//                                   const std::vector<Vec3>& colors)
-//    {
-//    }
-  
+
     // Add to per-frame collection of animating triangles: per-vertex colors.
     void addTriMeshToStaticScene(const sp_tri_mesh_t tri_mesh)
     {
@@ -301,7 +282,6 @@ public:
         visualizer().AddGeometry(tri_mesh);
     }
 
-    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -358,106 +338,6 @@ public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240911 try drawing boid body
-    // for testing
-    
-    void drawBoidBody(Vec3 position, Vec3 side, Vec3 up, Vec3 forward,
-                      double body_radius, Vec3 color)
-    {
-        double bd = body_radius * 2;  // body diameter (defaults to 1)
-        Vec3 center = position;
-        Vec3 nose = center + forward * body_radius;
-        Vec3 tail = center - forward * body_radius;
-        Vec3 apex = tail + (up * 0.25 * bd) + (forward * 0.1 * bd);
-        Vec3 wingtip0 = tail + (side * 0.3 * bd);
-        Vec3 wingtip1 = tail - (side * 0.3 * bd);
-        addTriMeshToAnimatedFrame({nose, apex, wingtip0, wingtip1}, // vertices
-                                  {1,2,3, 3,2,0, 0,1,3, 2,1,0},     // triangles
-                                  color);                           // color
-    }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-    // Just for debugging and testing. Run Open3D tests.
-    static void visualizeEvoflockFitnessTest()
-    {
-#ifdef USE_OPEN3D
-        Draw draw(true);
-        draw.beginAnimatedScene();
-        auto saved_tri_mesh_ = std::make_shared<open3d::geometry::TriangleMesh>();
-        auto saved_line_set_ = std::make_shared<open3d::geometry::LineSet>();
-        auto& rs = EF::RS();
-        Vec3 a;
-        Vec3 b;
-        for (int i = 0; i < 1000; i++)
-        {
-            a = b;
-            b = b + rs.random_unit_vector() * 0.5;
-            auto c = rs.random_point_in_axis_aligned_box(Vec3(), Vec3(1, 1, 1));
-            draw.addLineSegmentToAnimatedFrame(a, b, c);
-        }
-        auto copyLineSet = [](auto a, auto b)
-        {
-            a->points_ = b->points_;
-            a->lines_ = b->lines_;
-            a->colors_ = b->colors_;
-        };
-        copyLineSet(saved_line_set_, draw.animated_line_set_);
-
-        // Loop for displaying animated graphics.
-        while (draw.pollEvents())
-        {
-            if (draw.enable())
-            {
-                draw.beginOneAnimatedFrame();
-                draw.addTriMeshToAnimatedFrame
-                ({{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}},     // verts
-                 {1,2,3, 3,2,0, 0,1,3, 2,1,0},             // tris
-                 {{1,1,1}, {1,0,0}, {0,1,0}, {0,0,1}});    // colors
-                draw.addTriMeshToAnimatedFrame
-                ({{0,0,0}, {-1,0,0}, {0,-1,0}, {0,0,-1}},  // verts
-                 {3,2,1, 0,2,3, 3,1,0, 0,1,2},             // tris
-                 {0.3,0.3,0.3});                           // color
-                draw.drawBoidBody({3, 3, 0}, {1,0,0}, {0,1,0}, {0,0,1}, 0.5, {1,1,0});
-                for (int i = 0; i < 500; i++)
-                {
-                    Vec3 p = rs.randomPointInUnitRadiusSphere() * 30;
-                    auto ls = LocalSpace().randomize_orientation();
-                    auto c = rs.random_point_in_axis_aligned_box(Vec3(0.4, 0.4, 0.4),
-                                                                 Vec3(1.0, 1.0, 1.0));
-                    draw.drawBoidBody(p, ls.i(), ls.j(), ls.k(), 0.5, c);
-                }
-                
-                copyLineSet(draw.animated_line_set_, saved_line_set_);
-                double jiggle = 0.01;
-                auto& endpoints = draw.animated_line_set_->points_;
-                for (int i = 5; i < endpoints.size(); i += 2)
-                {
-                    endpoints[i].x() += EF::RS().random2(-jiggle, jiggle);
-                    endpoints[i].y() += EF::RS().random2(-jiggle, jiggle);
-                    endpoints[i].z() += EF::RS().random2(-jiggle, jiggle);
-                    endpoints[i+1] = endpoints[i];
-                }
-                copyLineSet(saved_line_set_, draw.animated_line_set_);
-
-                draw.addLineSegmentToAnimatedFrame({ 0, 60, 0},
-                                                   {0, -60, 0},
-                                                   {1, 1, 0});
-                draw.addLineSegmentToAnimatedFrame({-5,  0, 0},
-                                                   {5,   0, 0},
-                                                   {0, 1, 1});
-                draw.endOneAnimatedFrame();
-                std::this_thread::sleep_for(std::chrono::milliseconds(33)); // 1/30
-            }
-        }
-        draw.endAnimatedScene();
-#endif  // USE_OPEN3D
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
     // Runtime switch to turn graphical display on and off.
@@ -469,122 +349,6 @@ public:
     {
         return visualizer().PollEvents();
     }
-
-    //--------------------------------------------------------------------------
-    // Example code from https://github.com/isl-org/Open3D/issues/6952
-    
-    //    void LineWidthPointSizeTest()
-    //    {
-    //        open3d::PrintOpen3DVersion();
-    //        auto lineset = std::make_shared<open3d::geometry::LineSet>();
-    //        lineset->points_ = {{5, 0, 0}, {-5, 0, 0}, {0, 5, 0}, {0, -5, 0}, {0, 0, 5}, {0, 0, -5}};
-    //        lineset->lines_ = {{0, 1}, {2, 3}, {4, 5}};
-    //        lineset->colors_ = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-    //
-    //        auto vis = open3d::visualization::Visualizer();
-    //        vis.CreateVisualizerWindow();
-    //        vis.AddGeometry(lineset);
-    //        vis.GetRenderOption().line_width_ = 10.0;
-    //        vis.GetRenderOption().point_size_ = 20.0;
-    //        vis.Run();
-    //    }
-    
-    // Example code from https://github.com/isl-org/Open3D/issues/6952
-    static void LineWidthPointSizeTest()
-    {
-        open3d::PrintOpen3DVersion();
-        auto lineset = std::make_shared<open3d::geometry::LineSet>();
-        lineset->points_ = {{5, 0, 0}, {-5, 0, 0}, {0, 5, 0}, {0, -5, 0}, {0, 0, 5}, {0, 0, -5}};
-        lineset->lines_ = {{0, 1}, {2, 3}, {4, 5}};
-        lineset->colors_ = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-        open3d::visualization::gui::Application::GetInstance().Initialize();
-        auto vis = open3d::visualization::visualizer::O3DVisualizer("name", 500, 500);
-        vis.AddGeometry("lines", {lineset});
-        vis.SetLineWidth(10);
-        vis.SetPointSize(20);
-        open3d::visualization::gui::Application::GetInstance().Run();
-    }
-
-    //--------------------------------------------------------------------------
-    // Example code for https://stackoverflow.com/q/79048820/1991373
-    
-//    static void Oct2Test()
-    static void test()
-    {
-        open3d::PrintOpen3DVersion();
-        auto vis = open3d::visualization::Visualizer();
-        vis.CreateVisualizerWindow();
-        auto ball = open3d::geometry::TriangleMesh::CreateSphere(5);
-        ball->ComputeVertexNormals();
-        ball->PaintUniformColor({1, 0, 0});
-        vis.AddGeometry(ball);
-        
-        vis.GetViewControl().SetLookat({5,5,5});
-        
-        vis.Run();
-    }
-
-    static void test2()
-    {
-        
-        open3d::PrintOpen3DVersion();
-        
-        open3d::visualization::gui::Application::GetInstance().Initialize();
-        auto vis = open3d::visualization::visualizer::O3DVisualizer("name", 500, 500);
-        
-        auto ball = open3d::geometry::TriangleMesh::CreateSphere(5);
-        ball->ComputeVertexNormals();
-        ball->PaintUniformColor({1, 0, 0});
-        
-        vis.AddGeometry("ball", {ball});
-        open3d::visualization::gui::Application::GetInstance().Run();
-        
-    }
-    
-    // TODO 20241008 wondered about using O3DVisualizer without Application, but
-    // apparently not. It gets "gui::Initialize() must be called before creating
-    // a window or UI element."
-    static void test3()
-    {
-        open3d::PrintOpen3DVersion();
-        // open3d::visualization::gui::Application::GetInstance().Initialize();
-        auto vis = open3d::visualization::visualizer::O3DVisualizer("name", 500, 500);
-        auto ball = open3d::geometry::TriangleMesh::CreateSphere(5);
-        ball->ComputeVertexNormals();
-        ball->PaintUniformColor({1, 0, 0});
-        vis.AddGeometry("ball", {ball});
-        // open3d::visualization::gui::Application::GetInstance().Run();
-    }
-    
-    //--------------------------------------------------------------------------
-
-    // Nickname for open3d::visualization::gl_util::LookAt() with Vec3 args.
-    typedef open3d::visualization::gl_util::GLMatrix4f GLMatrix4f;
-    static GLMatrix4f glLookAt(Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
-    {
-        return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
-                                                      vec3ToEv3d(to),
-                                                      vec3ToEv3d(up));
-    };
-    
-    // TODO very temp experiment -- OK to delete now.
-    // Nickname for open3d::visualization::gl_util::LookAt() with Vec3 args.
-    GLMatrix4f myLookAt()
-    {
-        Vec3 camI = camera().i();
-        Vec3 camJ = camera().j();
-        Vec3 camK = camera().k();
-        Vec3 camP = camera().p();
-                
-        // Construct the view matrix by picking out scalar camera parameters.
-        Eigen::Matrix4f eigen_view_matrix;
-        eigen_view_matrix << camI.x(), camI.y(), camI.z(), camP.x(),
-                             camJ.x(), camJ.y(), camJ.z(), camP.y(),
-                             camK.x(), camK.y(), camK.z(), camP.z(),
-                             0,        0,        0,        1;
-        
-        return eigen_view_matrix;
-    };
 
     // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
     void updateCamera()
@@ -620,7 +384,6 @@ public:
     {
         double color = 0;
         double angle = 2 * M_PI / chords;
-//        Vec3 up = cameraLookUp();
         Vec3 up = camera().j();
         LocalSpace ls = LocalSpace().fromTo(center, cameraLookFrom(), up);
         Vec3 lup = ls.localize(up);
@@ -795,11 +558,19 @@ private:
 #ifdef USE_OPEN3D
     
     // Open3D TriangleMesh object for storing and drawing animated triangles.
-//    std::shared_ptr<open3d::geometry::TriangleMesh> animated_tri_mesh_ = nullptr;
     sp_tri_mesh_t animated_tri_mesh_ = nullptr;
 
     // Open3D LineSet object for storing and drawing animated line segments.
     std::shared_ptr<open3d::geometry::LineSet> animated_line_set_ = nullptr;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241102 manage static geometry, for Obstacles.
+    
+    // Collection of static scene geometry, such as obstacles, represented as
+    // shared pointers to Open3D TriangleMesh objects, aka sp_tri_mesh_t.
+    std::vector<sp_tri_mesh_t> static_tri_meshes_;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Open3D Visualizer object.
     vis_t visualizer_;

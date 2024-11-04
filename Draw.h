@@ -290,36 +290,57 @@ public:
 #ifdef USE_OPEN3D
         double sphere_diameter = 100;
         double sphere_radius = sphere_diameter / 2;
-
-//        auto sphere = open3d::geometry::TriangleMesh::CreateSphere(sphere_radius);
         auto sphere = tri_mesh_t::CreateSphere(sphere_radius);
         evertTriangleMesh(*sphere);
         sphere->ComputeVertexNormals();
         sphere->PaintUniformColor({0.5, 0.5, 0.5});
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241102 manage static geometry, for Obstacles.
-//        visualizer().AddGeometry(sphere);
+
         addTriMeshToStaticScene(sphere);
         
-        
-        
-        
         // TODO while I'm at it, might as well mock up the CylinderObstacle.
-        auto cyl_obs = tri_mesh_t::CreateCylinder(sphere_radius * 0.2,
-                                                  sphere_diameter);
-        auto rotation = cyl_obs->GetRotationMatrixFromXYZ({3.1415 / 2, 0, 0});
-        cyl_obs->Rotate(rotation, {0,0,0});
-        cyl_obs->Translate({sphere_radius * 0.6, 0, 0});
+        double r = sphere_radius * 0.2;
+        double x = sphere_radius * 0.6;
+        double h = sphere_diameter / 2;
 
+        
+        auto cyl_obs = constructO3dCylinder(r, Vec3(x, h, 0), Vec3(x, -h, 0));
         cyl_obs->ComputeVertexNormals();
-        cyl_obs->PaintUniformColor({0.75, 0.75, 0.75});
+        cyl_obs->PaintUniformColor({0.7, 0.8, 0.7});
         addTriMeshToStaticScene(cyl_obs);
+        
+        auto test_cyl = constructO3dCylinder(r, Vec3(), Vec3(30, 30, 30));
+        test_cyl->ComputeVertexNormals();
+        test_cyl->PaintUniformColor({0.7, 0.7, 0.8});
+        addTriMeshToStaticScene(test_cyl);
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
     }
 
-    
+    static sp_tri_mesh_t constructO3dCylinder(double radius,
+                                              const Vec3& endpoint0,
+                                              const Vec3& endpoint1)
+    {
+        double height = (endpoint1 - endpoint0).length();
+        assert(height > 0);
+        LocalSpace ls = LocalSpace().fromTo(endpoint0, endpoint1);
+        auto cylinder = tri_mesh_t::CreateCylinder(radius, height);
+        cylinder->Translate({0, 0, height / 2});  // Move endpoint to origin.
+        cylinder->Transform(lsToEigenMatrix4D(ls));
+        return cylinder;
+    }
+
+    // Construct an Eigen::Matrix4d from scalars LocalSpace parameters.
+    static Eigen::Matrix4d lsToEigenMatrix4D(const LocalSpace& ls)
+    {
+        Eigen::Matrix4d matrix;
+        for (int i = 0; i < 16; i++) { matrix(i / 4, i % 4) = ls[i]; }
+        std::cout << matrix << std::endl;
+        return matrix;
+    };
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240911 try evert TriangleMesh.
 #ifdef USE_OPEN3D

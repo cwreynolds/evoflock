@@ -95,6 +95,9 @@ public:
         return LocalSpace(new_side, new_up, new_forward, p());
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241102 manage static geometry, for Obstacles.
+
     LocalSpace fromTo(Vec3 from_position, Vec3 to_position)
     {
         return fromTo(from_position, to_position, Vec3(0, 1, 0));
@@ -105,12 +108,69 @@ public:
         LocalSpace ls;
         if (not Vec3::is_equal_within_epsilon(from_position, to_position))
         {
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20241102 manage static geometry, for Obstacles.
+            // TODO if (from_position - to_position) is parallel to reference_up
+            // we need to replace it with a new perpendicular.
+            // (Maybe write some utility like a.ensurePerpendicular(b)?)
+            
+            Vec3 offset_direction = (from_position - to_position).normalize();
+            if (offset_direction.is_parallel(reference_up))
+            {
+                debugPrint(reference_up);
+                reference_up = offset_direction.find_perpendicular();
+                debugPrint(reference_up);
+            }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            
             ls.setP(from_position);
             Vec3 new_forward = (to_position - from_position).normalize();
             ls = ls.rotate_to_new_forward(new_forward, reference_up);
         }
         return ls;
     }
+    
+    // Returns LS as 16 scalars for a 4x4 transformation matrix.
+    // Currently unused, candidate for deletion.
+    std::vector<double> asArray() const
+    {
+        std::vector<double> array;
+        auto a = [&](double s){ array.push_back(s); };
+        a(i().x()); a(i().y()); a(i().z()); a(p().x());
+        a(j().x()); a(j().y()); a(j().z()); a(p().y());
+        a(k().x()); a(k().y()); a(k().z()); a(p().z());
+        a(0);       a(0);       a(0);       a(1);
+        return array;
+    }
+    
+    // Return one scalar component of a LocalSpace. Considers the 16 parameters
+    // as a 4x4 homogeneous transformation matrix. Then linearizes them row by
+    // row into a 16 element array, then indexes into that. This prototype API
+    // may be changed later. Currently used only on one place for constructing
+    // an Eigen::Matrix4d in the Draw class.
+    double operator[](int index) const
+    {
+        assert(index > -1 and index < 16);
+        switch (index)
+        {
+            case  0: return i().x();
+            case  1: return i().y();
+            case  2: return i().z();
+            case  3: return p().x();
+            case  4: return j().x();
+            case  5: return j().y();
+            case  6: return j().z();
+            case  7: return p().y();
+            case  8: return k().x();
+            case  9: return k().y();
+            case 10: return k().z();
+            case 11: return p().z();
+            case 15: return 1;
+            default: return 0;
+        }
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     static void unit_test()
     {

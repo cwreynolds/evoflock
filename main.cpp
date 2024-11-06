@@ -293,6 +293,10 @@ int main(int argc, const char * argv[])
     {
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
+        
+        // TODO temporary work-around to create the big sphere.
+        Draw::getInstance().tempAddSphere();
+
 
         for (int i = 0; i < max_evolution_steps; i++)
         {

@@ -98,12 +98,14 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241102 manage static geometry, for Obstacles.
 
-    LocalSpace fromTo(Vec3 from_position, Vec3 to_position)
+    // TODO 20241106 these are written as methods (instance functions?) but they
+    // do not refer to instance state. Should they be static class functions?
+    static LocalSpace fromTo(Vec3 from_position, Vec3 to_position)
     {
         return fromTo(from_position, to_position, Vec3(0, 1, 0));
     }
 
-    LocalSpace fromTo(Vec3 from_position, Vec3 to_position, Vec3 reference_up)
+    static LocalSpace fromTo(Vec3 from_position, Vec3 to_position, Vec3 reference_up)
     {
         LocalSpace ls;
         if (not Vec3::is_equal_within_epsilon(from_position, to_position))
@@ -114,7 +116,7 @@ public:
             // we need to replace it with a new perpendicular.
             // (Maybe write some utility like a.ensurePerpendicular(b)?)
             
-            Vec3 offset_direction = (from_position - to_position).normalize();
+            Vec3 offset_direction = (to_position - from_position).normalize();
             if (offset_direction.is_parallel(reference_up))
             {
                 debugPrint(reference_up);
@@ -204,6 +206,33 @@ public:
         assert(n.is_orthonormal());
         assert(n.i().is_equal_within_epsilon(-o.k()));
         assert(n.j().is_equal_within_epsilon(o.j()));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241106 tests for fromTo()
+        
+        LocalSpace ft_ls;
+        Vec3 ft_tp(1, -2, 3);
+        Vec3 ft_move(0, 0, 1);
+        auto ft_tests = [&](Vec3 o)
+        {
+            assert(o.is_equal_within_epsilon(ft_ls.p()));
+            assert(ft_tp.is_equal_within_epsilon(ft_ls.localize(ft_tp)  + o));
+            assert(ft_tp.is_equal_within_epsilon(ft_ls.localize(ft_tp   + o)));
+            assert(ft_tp.is_equal_within_epsilon(ft_ls.globalize(ft_tp) - o));
+            assert(ft_tp.is_equal_within_epsilon(ft_ls.globalize(ft_tp  - o)));
+        };
+        // Test identity LocalSpace.
+        ft_tests(Vec3());
+        // Move LS and test again.
+        ft_ls.setP(ft_move);
+        ft_tests(ft_move);
+        // Now move LS to the same place using fromTo() and test again.
+        ft_ls = LocalSpace::fromTo(ft_move, ft_move * 2);
+        ft_tests(ft_move);
+        // Finally, use an arbitrary from-to, and check for cyclic consistancy.
+        ft_ls = LocalSpace::fromTo(Vec3(-5, 3, -1), Vec3(3, -4, 6));
+        Vec3 ft_cycle = ft_ls.globalize(ft_ls.localize(ft_tp));
+        assert(ft_tp.is_equal_within_epsilon(ft_cycle));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
 private:

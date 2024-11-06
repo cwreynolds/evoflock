@@ -97,9 +97,6 @@ private:
         // TODO does not work, see https://github.com/isl-org/Open3D/issues/6952
         visualizer().GetRenderOption().line_width_ = line_width;
         visualizer().GetRenderOption().point_size_ = point_size;
-
-        // TODO temporary work-around to create the big sphere.
-        tempAddSphere();
         
         // Add single key command callback to toggle "graphics mode"
         visualizer().RegisterKeyCallback('G',
@@ -294,32 +291,22 @@ public:
         evertTriangleMesh(*sphere);
         sphere->ComputeVertexNormals();
         sphere->PaintUniformColor({0.5, 0.5, 0.5});
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241102 manage static geometry, for Obstacles.
-
         addTriMeshToStaticScene(sphere);
         
         // TODO while I'm at it, might as well mock up the CylinderObstacle.
         double r = sphere_radius * 0.2;
         double x = sphere_radius * 0.6;
         double h = sphere_diameter / 2;
-
         
         auto cyl_obs = constructO3dCylinder(r, Vec3(x, h, 0), Vec3(x, -h, 0));
         cyl_obs->ComputeVertexNormals();
         cyl_obs->PaintUniformColor({0.7, 0.8, 0.7});
         addTriMeshToStaticScene(cyl_obs);
         
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20241105 debugging constructO3dCylinder()
-
-//        auto test_cyl = constructO3dCylinder(r, Vec3(), Vec3(30, 30, 30));
-//        test_cyl->ComputeVertexNormals();
-//        test_cyl->PaintUniformColor({0.7, 0.7, 0.8});
-//        addTriMeshToStaticScene(test_cyl);
-
         Vec3 tcep1;
         Vec3 tcep2(30, 30, 30);
+        
+        // TODO 20241106 this one (first ep at origin) looks correct using inverse
 
         auto cyl_test_1 = constructO3dCylinder(r, tcep1, tcep2);
         cyl_test_1->ComputeVertexNormals();
@@ -370,27 +357,12 @@ public:
         assert(height > 0);
 
         LocalSpace ls = LocalSpace().fromTo(endpoint0, endpoint1);
-        // TODO this has no effect
-//        LocalSpace ls = LocalSpace().fromTo(endpoint1, endpoint0);
-        
         debugPrint(ls);
 
         auto cylinder = tri_mesh_t::CreateCylinder(radius, height);
         // CreateCylinder's result is along the Z axis, move endpoint to origin.
         cylinder->Translate({0, 0, height / 2});
         
-//        cylinder->Transform(lsToEigenMatrix4D(ls));
-        
-//        Eigen::Matrix4d em4d = -lsToEigenMatrix4D(ls);
-//        em4d(3, 3) = 1;
-//        cylinder->Transform(em4d);
-        
-//        debugPrint(lsToEigenMatrix4D(ls))
-        
-//            Eigen::Matrix4d em4d = glLookAt(endpoint0, endpoint1).cast<double>();
-//    //        em4d = -em4d;
-//    //        em4d(3, 3) = 1;
-//            cylinder->Transform(em4d);
 
         std::cout <<
         "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"

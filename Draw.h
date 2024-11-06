@@ -310,14 +310,57 @@ public:
         cyl_obs->PaintUniformColor({0.7, 0.8, 0.7});
         addTriMeshToStaticScene(cyl_obs);
         
-        auto test_cyl = constructO3dCylinder(r, Vec3(), Vec3(30, 30, 30));
-        test_cyl->ComputeVertexNormals();
-        test_cyl->PaintUniformColor({0.7, 0.7, 0.8});
-        addTriMeshToStaticScene(test_cyl);
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20241105 debugging constructO3dCylinder()
+
+//        auto test_cyl = constructO3dCylinder(r, Vec3(), Vec3(30, 30, 30));
+//        test_cyl->ComputeVertexNormals();
+//        test_cyl->PaintUniformColor({0.7, 0.7, 0.8});
+//        addTriMeshToStaticScene(test_cyl);
+
+        Vec3 tcep1;
+        Vec3 tcep2(30, 30, 30);
+
+        auto cyl_test_1 = constructO3dCylinder(r, tcep1, tcep2);
+        cyl_test_1->ComputeVertexNormals();
+        cyl_test_1->PaintUniformColor({0.7, 0.7, 0.8});
+        addTriMeshToStaticScene(cyl_test_1);
+        
+        auto cyl_test_2 = constructO3dCylinder(r, tcep2, tcep1);
+        cyl_test_2->ComputeVertexNormals();
+        cyl_test_2->PaintUniformColor({0.8, 0.7, 0.7});
+        addTriMeshToStaticScene(cyl_test_2);
+        
+        
+        auto cyl_orig = tri_mesh_t::CreateCylinder(1, 90);
+        cyl_orig->Translate({0, 0, 90 / 2.0});  // Move endpoint to origin.
+        cyl_orig->PaintUniformColor({1, 1, 1});
+        addTriMeshToStaticScene(cyl_orig);
+
+        addTriMeshToStaticScene(tri_mesh_t::CreateCoordinateFrame(20));
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241105 debugging constructO3dCylinder()
+    
+    
+    // TODO 20241105 bring this back from the graveyard temporarily:
+    // Nickname for open3d::visualization::gl_util::LookAt() with Vec3 args.
+    typedef open3d::visualization::gl_util::GLMatrix4f GLMatrix4f;
+    static GLMatrix4f glLookAt(Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
+    {
+        return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
+                                                      vec3ToEv3d(to),
+                                                      vec3ToEv3d(up));
+    };
+
+    
+    
 
     static sp_tri_mesh_t constructO3dCylinder(double radius,
                                               const Vec3& endpoint0,
@@ -325,19 +368,53 @@ public:
     {
         double height = (endpoint1 - endpoint0).length();
         assert(height > 0);
+
         LocalSpace ls = LocalSpace().fromTo(endpoint0, endpoint1);
+        // TODO this has no effect
+//        LocalSpace ls = LocalSpace().fromTo(endpoint1, endpoint0);
+        
+        debugPrint(ls);
+
         auto cylinder = tri_mesh_t::CreateCylinder(radius, height);
-        cylinder->Translate({0, 0, height / 2});  // Move endpoint to origin.
-        cylinder->Transform(lsToEigenMatrix4D(ls));
+        // CreateCylinder's result is along the Z axis, move endpoint to origin.
+        cylinder->Translate({0, 0, height / 2});
+        
+//        cylinder->Transform(lsToEigenMatrix4D(ls));
+        
+//        Eigen::Matrix4d em4d = -lsToEigenMatrix4D(ls);
+//        em4d(3, 3) = 1;
+//        cylinder->Transform(em4d);
+        
+//        debugPrint(lsToEigenMatrix4D(ls))
+        
+//            Eigen::Matrix4d em4d = glLookAt(endpoint0, endpoint1).cast<double>();
+//    //        em4d = -em4d;
+//    //        em4d(3, 3) = 1;
+//            cylinder->Transform(em4d);
+
+        std::cout <<
+        "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        << std::endl;
+        std::cout << "lsToEigenMatrix4D(ls):"  << std::endl;
+        std::cout << lsToEigenMatrix4D(ls) << std::endl;
+        std::cout << "lsToEigenMatrix4D(ls).inverse():"  << std::endl;
+        std::cout << lsToEigenMatrix4D(ls).inverse() << std::endl;
+        cylinder->Transform(lsToEigenMatrix4D(ls).inverse());
+        std::cout <<
+        "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+        << std::endl;
+
         return cylinder;
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    // Construct an Eigen::Matrix4d from scalars LocalSpace parameters.
+    // Construct an Eigen::Matrix4d from the 16 scalars in a LocalSpace.
     static Eigen::Matrix4d lsToEigenMatrix4D(const LocalSpace& ls)
     {
         Eigen::Matrix4d matrix;
         for (int i = 0; i < 16; i++) { matrix(i / 4, i % 4) = ls[i]; }
-        std::cout << matrix << std::endl;
+//        std::cout << matrix << std::endl;
         return matrix;
     };
 

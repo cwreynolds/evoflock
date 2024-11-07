@@ -95,39 +95,25 @@ public:
         return LocalSpace(new_side, new_up, new_forward, p());
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241102 manage static geometry, for Obstacles.
-
-    // TODO 20241106 these are written as methods (instance functions?) but they
-    // do not refer to instance state. Should they be static class functions?
+    // Construct a LocalSpace whose origin is at "from_position" and whose "+z"
+    // axis points toward (intersects) "to_position". Optional "reference_up"
+    // is a hint to control "roll" around the z axis. It defaults to "global up"
+    // along the "y" axis.
     static LocalSpace fromTo(Vec3 from_position, Vec3 to_position)
     {
         return fromTo(from_position, to_position, Vec3(0, 1, 0));
     }
-
-    static LocalSpace fromTo(Vec3 from_position, Vec3 to_position, Vec3 reference_up)
+    static LocalSpace fromTo(Vec3 from_position,
+                             Vec3 to_position,
+                             Vec3 reference_up)
     {
         LocalSpace ls;
         if (not Vec3::is_equal_within_epsilon(from_position, to_position))
         {
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20241102 manage static geometry, for Obstacles.
-            // TODO if (from_position - to_position) is parallel to reference_up
-            // we need to replace it with a new perpendicular.
-            // (Maybe write some utility like a.ensurePerpendicular(b)?)
-            
-            Vec3 offset_direction = (to_position - from_position).normalize();
-            if (offset_direction.is_parallel(reference_up))
-            {
-                debugPrint(reference_up);
-                reference_up = offset_direction.find_perpendicular();
-                debugPrint(reference_up);
-            }
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            
             ls.setP(from_position);
             Vec3 new_forward = (to_position - from_position).normalize();
-            ls = ls.rotate_to_new_forward(new_forward, reference_up);
+            Vec3 new_ref_up = new_forward.ensure_not_parallel(reference_up);
+            ls = ls.rotate_to_new_forward(new_forward, new_ref_up);
         }
         return ls;
     }

@@ -177,9 +177,18 @@ public:
     Vec3 find_perpendicular() const
     {
         Vec3 reference(1, 0, 0);         // Any vector NOT parallel to "this"
-        return (is_parallel(reference) ? // parallel to "reference"?
+        return (is_parallel(reference) ? // is "this" parallel to "reference"?
                 Vec3(0, 1, 0) :          // perpendicular to "reference"
                 cross(reference).normalize());
+    }
+
+    // Wrapper for find_perpendicular(): ensures that the given reference is NOT
+    // PARALLEL to "this" Vec3, otherwise replacing it with a new perpendicular.
+    Vec3 ensure_not_parallel(const Vec3& reference) const
+    {
+        return (is_parallel(reference) ?  // Is "this" parallel to "reference"?
+                find_perpendicular() :    // If so find arbitrary perpendicular,
+                reference);               // otherwise use original "reference".
     }
     
     // Check if two vectors are within epsilon of being equal.

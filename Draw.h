@@ -305,7 +305,8 @@ public:
         
         Vec3 tcep1;
         Vec3 tcep2(30, 30, 30);
-        
+        Vec3 tcep3(-30, 30, 30);
+
         // TODO 20241106 this one (first ep at origin) looks correct using inverse
 
         auto cyl_test_1 = constructO3dCylinder(r, tcep1, tcep2);
@@ -313,7 +314,7 @@ public:
         cyl_test_1->PaintUniformColor({0.7, 0.7, 0.8});
         addTriMeshToStaticScene(cyl_test_1);
         
-        auto cyl_test_2 = constructO3dCylinder(r, tcep2, tcep1);
+        auto cyl_test_2 = constructO3dCylinder(r, tcep3, tcep1);
         cyl_test_2->ComputeVertexNormals();
         cyl_test_2->PaintUniformColor({0.8, 0.7, 0.7});
         addTriMeshToStaticScene(cyl_test_2);
@@ -332,83 +333,26 @@ public:
 #endif  // USE_OPEN3D
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241105 debugging constructO3dCylinder()
-    
-    
-    // TODO 20241105 bring this back from the graveyard temporarily:
-    // Nickname for open3d::visualization::gl_util::LookAt() with Vec3 args.
-    typedef open3d::visualization::gl_util::GLMatrix4f GLMatrix4f;
-    static GLMatrix4f glLookAt(Vec3 from, Vec3 to, Vec3 up = Vec3(0, 1, 0))
-    {
-        return open3d::visualization::gl_util::LookAt(vec3ToEv3d(from),
-                                                      vec3ToEv3d(to),
-                                                      vec3ToEv3d(up));
-    };
-
-    
-    
-
     static sp_tri_mesh_t constructO3dCylinder(double radius,
                                               const Vec3& endpoint0,
                                               const Vec3& endpoint1)
     {
+        // Get cylinder height and ensure it is not zero.
         double height = (endpoint1 - endpoint0).length();
         assert(height > 0);
-
-        LocalSpace ls = LocalSpace().fromTo(endpoint0, endpoint1);
-        debugPrint(ls);
-
+        
+        // LocalSpace with its position at one cyl ep, aligned with cyl axis.
+        LocalSpace local_space = LocalSpace().fromTo(endpoint0, endpoint1);
+        
+        // Use OpeneD's utility to create tri mesh with given radius and height.
         auto cylinder = tri_mesh_t::CreateCylinder(radius, height);
-        // CreateCylinder's result is along the Z axis, move endpoint to origin.
+        // That cylinder is along the Z axis. Move endpoint0 to origin.
         cylinder->Translate({0, 0, height / 2});
         
-
-        std::cout <<
-        "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        << std::endl;
-        std::cout << "lsToEigenMatrix4D(ls):"  << std::endl;
-        std::cout << lsToEigenMatrix4D(ls) << std::endl;
-        std::cout << "lsToEigenMatrix4D(ls).inverse():"  << std::endl;
-        std::cout << lsToEigenMatrix4D(ls).inverse() << std::endl;
-        cylinder->Transform(lsToEigenMatrix4D(ls).inverse());
-        std::cout <<
-        "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        << std::endl;
-
+        // Transform cylinder's vertices by the LocalSpace.
+        transformTriangleMesh(*cylinder, local_space);
         return cylinder;
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // Construct an Eigen::Matrix4d from the 16 scalars in a LocalSpace.
-    static Eigen::Matrix4d lsToEigenMatrix4D(const LocalSpace& ls)
-    {
-        Eigen::Matrix4d matrix;
-        for (int i = 0; i < 16; i++) { matrix(i / 4, i % 4) = ls[i]; }
-//        std::cout << matrix << std::endl;
-        return matrix;
-    };
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240911 try evert TriangleMesh.
-#ifdef USE_OPEN3D
-    
-    // Flip orientation of each tri in a triangle mesh (destructively modifies).
-    // (pr to add to Open3D? https://github.com/isl-org/Open3D/discussions/6419)
-    void evertTriangleMesh(open3d::geometry::TriangleMesh& tri_mesh)
-    {
-        for (auto& triangle : tri_mesh.triangles_)
-        {
-            std::reverse(std::begin(triangle), std::end(triangle));
-        }
-    }
-
-#endif  // USE_OPEN3D
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-
 
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }
@@ -650,6 +594,47 @@ private:
     {
         return Eigen::Vector3d(v.x(), v.y(), v.z());
     }
+    
+    // Private utility to convert an Eigen::Vector3d to an Vec3.
+    static Vec3 ev3dtoVec3(const Eigen::Vector3d& v)
+    {
+        return {v[0], v[1], v[2]};
+    }
+    
+    // Construct an Eigen::Matrix4d from the 16 scalars in a LocalSpace.
+    static Eigen::Matrix4d lsToEigenMatrix4D(const LocalSpace& ls)
+    {
+        Eigen::Matrix4d matrix;
+        for (int i = 0; i < 16; i++) { matrix(i / 4, i % 4) = ls[i]; }
+        return matrix;
+    };
+
+    // Transform (in place) vertices of TriangleMesh by given LocalSpace.
+    static void transformTriangleMesh(open3d::geometry::TriangleMesh& tri_mesh,
+                                      const LocalSpace& local_space)
+    {
+        for (Eigen::Vector3d& vertex : tri_mesh.vertices_)
+        {
+            vertex = vec3ToEv3d(local_space.globalize(ev3dtoVec3(vertex)));
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20240911 try evert TriangleMesh.
+#ifdef USE_OPEN3D
+    
+    // Flip orientation of each tri in a triangle mesh (destructively modifies).
+    // (pr to add to Open3D? https://github.com/isl-org/Open3D/discussions/6419)
+    static void evertTriangleMesh(open3d::geometry::TriangleMesh& tri_mesh)
+    {
+        for (auto& triangle : tri_mesh.triangles_)
+        {
+            std::reverse(std::begin(triangle), std::end(triangle));
+        }
+    }
+    
+#endif  // USE_OPEN3D
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
 #endif  // USE_OPEN3D
 };

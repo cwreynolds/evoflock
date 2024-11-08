@@ -39,16 +39,6 @@ private:
     BoidPtrList boids_;
     ObstaclePtrList obstacles_;
     BoidInstanceList boid_instance_list_;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240914 using Draw::globalObject
-#ifdef USE_OPEN3D
-//    Draw& draw_ = *Draw::globalObject;
-    Draw& draw_ = Draw::getInstance();
-#else  // USE_OPEN3D
-    Draw draw_;
-#endif  // USE_OPEN3D
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     util::AnimationTimer animation_timer;
 
     // TODO Parameters that may (or may not?) be better kept separate from FP.
@@ -80,8 +70,8 @@ public:
     ObstaclePtrList& obstacles() { return obstacles_; }
     const ObstaclePtrList& obstacles() const { return obstacles_; }
     
-    Draw& draw() { return draw_; }
-    const Draw& draw() const { return draw_; }
+    Draw& draw() { return Draw::getInstance(); }
+    const Draw& draw() const { return Draw::getInstance(); }
 
     util::AnimationTimer& aTimer() { return animation_timer; }
     const util::AnimationTimer& aTimer() const { return animation_timer; }

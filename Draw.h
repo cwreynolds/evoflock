@@ -81,8 +81,8 @@ private:
         setEnable(enabled);
 
 #ifdef USE_OPEN3D
-        std::cout << "Begin graphics session using: Open3D ";
-        std::cout << OPEN3D_VERSION << std::endl;
+        std::cout << "Begin Open3D (" << OPEN3D_VERSION;
+        std::cout << ") graphics session." << std::endl;
 
         // Allocate TriangleMesh/LineSet objects which hold animated geometry.
         animated_tri_mesh_ = std::make_shared<open3d::geometry::TriangleMesh>();

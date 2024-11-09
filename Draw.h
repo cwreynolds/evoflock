@@ -30,15 +30,9 @@ public:
     typedef open3d::visualization::VisualizerWithKeyCallback vis_t;
     typedef open3d::visualization::Visualizer base_vis_t;
     
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241102 manage static geometry, for Obstacles.
-
     // shared pointers to Open3D TriangleMesh objects
     typedef open3d::geometry::TriangleMesh tri_mesh_t;
     typedef std::shared_ptr<tri_mesh_t> sp_tri_mesh_t;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #endif  // USE_OPEN3D
 
@@ -256,12 +250,6 @@ public:
 #endif  // USE_OPEN3D
     }
     
-    
-
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241102 manage static geometry, for Obstacles.
-    
     // Clear all previous TriangleMesh objects from static scene.
     void clearStaticScene()
     {
@@ -278,9 +266,6 @@ public:
         static_tri_meshes_.push_back(tri_mesh);
         visualizer().AddGeometry(tri_mesh);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
     void tempAddSphere()
     {
@@ -307,8 +292,6 @@ public:
         Vec3 tcep2(30, 30, 30);
         Vec3 tcep3(-30, 30, 30);
 
-        // TODO 20241106 this one (first ep at origin) looks correct using inverse
-
         auto cyl_test_1 = constructO3dCylinder(r, tcep1, tcep2);
         cyl_test_1->ComputeVertexNormals();
         cyl_test_1->PaintUniformColor({0.7, 0.7, 0.8});
@@ -333,26 +316,40 @@ public:
 #endif  // USE_OPEN3D
     }
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20241108 try "Open3D native style" constructO3dCylinder
+    
+//    static sp_tri_mesh_t constructO3dCylinder(double radius,
+//                                              const Vec3& endpoint0,
+//                                              const Vec3& endpoint1)
+//    {
+//        // Get cylinder height and ensure it is not zero.
+//        double height = (endpoint1 - endpoint0).length();
+//        assert(height > 0);
+//        
+//        // LocalSpace with its position at one cyl ep, aligned with cyl axis.
+//        LocalSpace local_space = LocalSpace::fromTo(endpoint0, endpoint1);
+//
+//        // Use OpeneD's utility to create tri mesh with given radius and height.
+//        auto cylinder = tri_mesh_t::CreateCylinder(radius, height);
+//        // That cylinder is along the Z axis. Move endpoint0 to origin.
+//        cylinder->Translate({0, 0, height / 2});
+//        
+//        // Transform cylinder's vertices by the LocalSpace.
+//        transformTriangleMesh(*cylinder, local_space);
+//        return cylinder;
+//    }
+    
     static sp_tri_mesh_t constructO3dCylinder(double radius,
                                               const Vec3& endpoint0,
                                               const Vec3& endpoint1)
     {
-        // Get cylinder height and ensure it is not zero.
-        double height = (endpoint1 - endpoint0).length();
-        assert(height > 0);
-        
-        // LocalSpace with its position at one cyl ep, aligned with cyl axis.
-        LocalSpace local_space = LocalSpace().fromTo(endpoint0, endpoint1);
-        
-        // Use OpeneD's utility to create tri mesh with given radius and height.
-        auto cylinder = tri_mesh_t::CreateCylinder(radius, height);
-        // That cylinder is along the Z axis. Move endpoint0 to origin.
-        cylinder->Translate({0, 0, height / 2});
-        
-        // Transform cylinder's vertices by the LocalSpace.
-        transformTriangleMesh(*cylinder, local_space);
-        return cylinder;
+        return constructO3dCylinder(radius,
+                                    vec3ToEv3d(endpoint0),
+                                    vec3ToEv3d(endpoint1));
     }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }
@@ -399,7 +396,7 @@ public:
         double color = 0;
         double angle = 2 * M_PI / chords;
         Vec3 up = camera().j();
-        LocalSpace ls = LocalSpace().fromTo(center, cameraLookFrom(), up);
+        LocalSpace ls = LocalSpace::fromTo(center, cameraLookFrom(), up);
         Vec3 lup = ls.localize(up);
         Vec3 local_spoke = Vec3(lup.x(), lup.y(), 0).normalize() * radius;
         for (int i = 0; i < chords; i++)
@@ -426,40 +423,6 @@ public:
                                         vec3ToEv3d(up));
     }
 
-    // TODO 20241016 experimental "Open3D style" version
-    //
-    // Similar to open3d::visualization::visualizer::O3DVisualizer::SetupCamera()
-    // but does not set fov.
-    //
-    // This is the work-around developed Oct 7-11, 2024 for setting an Open3D
-    // "legacy" Visualizer's ViewControl using a from/at(/up) specification. It
-    // might be a candidate for merging into ViewControl. If I can do what I
-    // need in the new Application framework that seems better and reduces the
-    // motivation to do a PR.
-    //
-    static
-    void setOpen3DVisualizerViewByFromAt(open3d::visualization::Visualizer& vis,
-                                         const Eigen::Vector3d& look_from,
-                                         const Eigen::Vector3d& look_at,
-                                         const Eigen::Vector3d& up = {0, 1, 0})
-    {
-        // Compute 4x4 from/at matrix.
-        using namespace open3d::visualization::gl_util;
-        Eigen::Matrix4d la_matrix = LookAt(look_from, look_at, up).cast<double>();
-
-        // Get current PinholeCameraParameters.
-        open3d::camera::PinholeCameraParameters pcp;
-        vis.GetViewControl().ConvertToPinholeCameraParameters(pcp);
-
-        // Overwrite the pcp's previous view matrix with the new look_at matrix.
-        // (I am deeply puzzled by the need for that negation, but here we are.)
-        pcp.extrinsic_ = -la_matrix;
-        pcp.extrinsic_(3, 3) = 1;
-        
-        // Write back PinholeCameraParameters with new from/at view matrix.
-        vis.GetViewControl().ConvertFromPinholeCameraParameters(pcp);
-    }
-
     // Invoke the "follow camera" model, update look_from/look_at/up and camera.
     void animateFollowCamera()
     {
@@ -473,9 +436,9 @@ public:
         camera_look_from_ = from_memory_.blend(new_from, 0.90);
         camera_look_at_   =   at_memory_.blend(new_at,   0.75);
         camera_look_up_   =   up_memory_.blend(new_up,   0.97).normalize();
-        camera() = camera().fromTo(cameraLookFrom(),
-                                   cameraLookAt(),
-                                   cameraLookUp());
+        camera() = LocalSpace::fromTo(cameraLookFrom(),
+                                      cameraLookAt(),
+                                      cameraLookUp());
     }
 
     void updateMouseScrollCallback()
@@ -577,14 +540,9 @@ private:
     // Open3D LineSet object for storing and drawing animated line segments.
     std::shared_ptr<open3d::geometry::LineSet> animated_line_set_ = nullptr;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241102 manage static geometry, for Obstacles.
-    
     // Collection of static scene geometry, such as obstacles, represented as
     // shared pointers to Open3D TriangleMesh objects, aka sp_tri_mesh_t.
     std::vector<sp_tri_mesh_t> static_tri_meshes_;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Open3D Visualizer object.
     vis_t visualizer_;
@@ -619,10 +577,14 @@ private:
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240911 try evert TriangleMesh.
-#ifdef USE_OPEN3D
+    //--------------------------------------------------------------------------
+    // These are utilities meant to connect evoflock's way of doing things to
+    // Open3D's way of doing things. They can continue to live here, or they
+    // could potentially be moved to Open3D. Each of these is a potential
+    // "first pull request" as a way for me (Craig) to get more involved with
+    // Open3D maintenance.
     
+    // TODO 20240911 try evert TriangleMesh.
     // Flip orientation of each tri in a triangle mesh (destructively modifies).
     // (pr to add to Open3D? https://github.com/isl-org/Open3D/discussions/6419)
     static void evertTriangleMesh(open3d::geometry::TriangleMesh& tri_mesh)
@@ -633,8 +595,77 @@ private:
         }
     }
     
-#endif  // USE_OPEN3D
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+    // TODO 20241016 experimental "Open3D style" version
+    //
+    // Similar to open3d::visualization::visualizer::O3DVisualizer::SetupCamera()
+    // but does not set fov.
+    //
+    // This is the work-around developed Oct 7-11, 2024 for setting an Open3D
+    // "legacy" Visualizer's ViewControl using a from/at(/up) specification. It
+    // might be a candidate for merging into ViewControl. If I can do what I
+    // need in the new Application framework that seems better and reduces the
+    // motivation to do a PR.
+    //
+    static
+    void setOpen3DVisualizerViewByFromAt(open3d::visualization::Visualizer& vis,
+                                         const Eigen::Vector3d& look_from,
+                                         const Eigen::Vector3d& look_at,
+                                         const Eigen::Vector3d& up = {0, 1, 0})
+    {
+        // Compute 4x4 from/at matrix.
+        using namespace open3d::visualization::gl_util;
+        Eigen::Matrix4d la_matrix = LookAt(look_from, look_at, up).cast<double>();
+        
+        // Get current PinholeCameraParameters.
+        open3d::camera::PinholeCameraParameters pcp;
+        vis.GetViewControl().ConvertToPinholeCameraParameters(pcp);
+        
+        // Overwrite the pcp's previous view matrix with the new look_at matrix.
+        // (I am deeply puzzled by the need for that negation, but here we are.)
+        pcp.extrinsic_ = -la_matrix;
+        pcp.extrinsic_(3, 3) = 1;
+        
+        // Write back PinholeCameraParameters with new from/at view matrix.
+        vis.GetViewControl().ConvertFromPinholeCameraParameters(pcp);
+    }
+
+    // An "Open3D native style" constructO3dCylinder from two endpoints
+    static sp_tri_mesh_t constructO3dCylinder(double radius,
+                                              const Eigen::Vector3d& endpoint0,
+                                              const Eigen::Vector3d& endpoint1,
+                                              int resolution = 20,
+                                              int split = 4,
+                                              bool create_uv_map = false)
+    {
+        // Get cylinder height and ensure it is not zero.
+        double height = (endpoint1 - endpoint0).norm();
+        assert(height > 0);
+        Eigen::Vector3d axis = (endpoint1 - endpoint0) / height;
+
+        // Use Open3D utility to create tri mesh with given radius, height, etc.
+        using namespace open3d::geometry;
+        auto cylinder = TriangleMesh::CreateCylinder(radius, height, resolution,
+                                                     split, create_uv_map);
+        
+        // That cylinder is centered on Z axis. Move one endpoint to origin.
+        cylinder->Translate({0, 0, -height / 2});
+        
+        // Pick an "up" vector which is "least parallel" to cylinder axis
+        Eigen::Vector3d a(0, 1, 0);
+        Eigen::Vector3d b(1, 0, 0);
+        auto up = (std::abs(axis.dot(a)) < std::abs(axis.dot(b))) ? a : b;
+
+        // Transform with origin at one cylinder ep, aligned with cylinder axis.
+        using namespace open3d::visualization::gl_util;
+        Eigen::Matrix4d lookat = LookAt(endpoint0, endpoint1, up).cast<double>();
+        Eigen::Matrix4d cylinder_lookat_matrix = lookat.inverse();
+
+        // Transform cylinder by LookAt transform.
+        cylinder->Transform(cylinder_lookat_matrix);
+        return cylinder;
+    }
+
+    //--------------------------------------------------------------------------
+
 #endif  // USE_OPEN3D
 };

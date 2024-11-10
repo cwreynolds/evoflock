@@ -25,7 +25,13 @@ int main(int argc, const char * argv[])
     EF::setRS(LP::LPRS());
     EF::unit_test();
 
-    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    // TODO 20241109 2-point cylinder demo
+    Draw::getInstance().cylinders_on_tri_mesh_edges();
+    delete &Draw::getInstance();
+    return EXIT_SUCCESS;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+
     //--------------------------------------------------------------------------
     
 //        // TODO 20240715 WIP new approach to tree generation.

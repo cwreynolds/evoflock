@@ -665,6 +665,50 @@ private:
         return cylinder;
     }
 
+public:
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    // TODO 20241109 2-point cylinder demo
+    //               starting as instance method
+    //               later make into stand-alone static function
+    
+    void cylinders_on_tri_mesh_edges()
+    {
+        double radius = 0.07;
+        auto tri_mesh = open3d::geometry::TriangleMesh::CreateIcosahedron();
+        std::set<std::pair<int, int>> edges;
+        for (auto triangle : tri_mesh->triangles_)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                int a = triangle[i];
+                int b = triangle[(i + 1) % 3];
+                edges.insert(std::pair<int, int>(std::min(a, b), std::max(a, b)));
+            }
+        }
+        auto view = [&](const std::shared_ptr<open3d::geometry::TriangleMesh>& mesh)
+        {
+            mesh->ComputeVertexNormals();
+            mesh->PaintUniformColor({0.75, 0.37, 0});
+            visualizer().AddGeometry(mesh);
+        };
+        for (auto edge : edges)
+        {
+            auto v1 = tri_mesh->vertices_[edge.first];
+            auto v2 = tri_mesh->vertices_[edge.second];
+            auto cyl = constructO3dCylinder(radius, v1, v2, 100);
+            view(cyl);
+        }
+        for (auto vertex : tri_mesh->vertices_)
+        {
+            auto s = open3d::geometry::TriangleMesh::CreateSphere(radius, 100);
+            s->Translate(vertex);
+            view(s);
+        }
+        visualizer().Run();
+    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+
     //--------------------------------------------------------------------------
 
 #endif  // USE_OPEN3D

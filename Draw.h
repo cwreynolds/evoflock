@@ -260,7 +260,7 @@ public:
         static_tri_meshes_.clear();
     }
 
-    // Add to per-frame collection of animating triangles: per-vertex colors.
+    // Add a TriangleMesh objects to the static (non-animating) scene.
     void addTriMeshToStaticScene(const sp_tri_mesh_t tri_mesh)
     {
         static_tri_meshes_.push_back(tri_mesh);
@@ -669,11 +669,12 @@ public:
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     // TODO 20241109 2-point cylinder demo
-    //               starting as instance method
-    //               later make into stand-alone static function
     
-    void cylinders_on_tri_mesh_edges()
+    static void cylinders_on_tri_mesh_edges()
     {
+        auto vis = open3d::visualization::VisualizerWithKeyCallback();
+        vis.CreateVisualizerWindow("TriangleMesh edges", 2000, 2000, 0, 0);
+        
         double radius = 0.07;
         auto tri_mesh = open3d::geometry::TriangleMesh::CreateIcosahedron();
         std::set<std::pair<int, int>> edges;
@@ -683,14 +684,14 @@ public:
             {
                 int a = triangle[i];
                 int b = triangle[(i + 1) % 3];
-                edges.insert(std::pair<int, int>(std::min(a, b), std::max(a, b)));
+                edges.insert(std::pair(std::min(a, b), std::max(a, b)));
             }
         }
-        auto view = [&](const std::shared_ptr<open3d::geometry::TriangleMesh>& mesh)
+        auto view = [&](const std::shared_ptr<open3d::geometry::TriangleMesh>& m)
         {
-            mesh->ComputeVertexNormals();
-            mesh->PaintUniformColor({0.75, 0.37, 0});
-            visualizer().AddGeometry(mesh);
+            m->ComputeVertexNormals();
+            m->PaintUniformColor({0.75, 0.37, 0});
+            vis.AddGeometry(m);
         };
         for (auto edge : edges)
         {
@@ -705,7 +706,7 @@ public:
             s->Translate(vertex);
             view(s);
         }
-        visualizer().Run();
+        vis.Run();
     }
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 

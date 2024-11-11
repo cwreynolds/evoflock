@@ -27,8 +27,7 @@ int main(int argc, const char * argv[])
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     // TODO 20241109 2-point cylinder demo
-    Draw::getInstance().cylinders_on_tri_mesh_edges();
-    delete &Draw::getInstance();
+    Draw::cylinders_on_tri_mesh_edges();
     return EXIT_SUCCESS;
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 

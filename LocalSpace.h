@@ -192,9 +192,8 @@ public:
         assert(n.is_orthonormal());
         assert(n.i().is_equal_within_epsilon(-o.k()));
         assert(n.j().is_equal_within_epsilon(o.j()));
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241106 tests for fromTo()
         
+        // Tests for fromTo()
         LocalSpace ft_ls;
         Vec3 ft_tp(1, -2, 3);
         Vec3 ft_move(0, 0, 1);
@@ -218,7 +217,6 @@ public:
         ft_ls = LocalSpace::fromTo(Vec3(-5, 3, -1), Vec3(3, -4, 6));
         Vec3 ft_cycle = ft_ls.globalize(ft_ls.localize(ft_tp));
         assert(ft_tp.is_equal_within_epsilon(ft_cycle));
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
 private:

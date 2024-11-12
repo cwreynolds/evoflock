@@ -316,30 +316,6 @@ public:
 #endif  // USE_OPEN3D
     }
 
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20241108 try "Open3D native style" constructO3dCylinder
-    
-//    static sp_tri_mesh_t constructO3dCylinder(double radius,
-//                                              const Vec3& endpoint0,
-//                                              const Vec3& endpoint1)
-//    {
-//        // Get cylinder height and ensure it is not zero.
-//        double height = (endpoint1 - endpoint0).length();
-//        assert(height > 0);
-//        
-//        // LocalSpace with its position at one cyl ep, aligned with cyl axis.
-//        LocalSpace local_space = LocalSpace::fromTo(endpoint0, endpoint1);
-//
-//        // Use OpeneD's utility to create tri mesh with given radius and height.
-//        auto cylinder = tri_mesh_t::CreateCylinder(radius, height);
-//        // That cylinder is along the Z axis. Move endpoint0 to origin.
-//        cylinder->Translate({0, 0, height / 2});
-//        
-//        // Transform cylinder's vertices by the LocalSpace.
-//        transformTriangleMesh(*cylinder, local_space);
-//        return cylinder;
-//    }
-    
     static sp_tri_mesh_t constructO3dCylinder(double radius,
                                               const Vec3& endpoint0,
                                               const Vec3& endpoint1)
@@ -348,8 +324,6 @@ public:
                                     vec3ToEv3d(endpoint0),
                                     vec3ToEv3d(endpoint1));
     }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }
@@ -566,16 +540,6 @@ private:
         for (int i = 0; i < 16; i++) { matrix(i / 4, i % 4) = ls[i]; }
         return matrix;
     };
-
-    // Transform (in place) vertices of TriangleMesh by given LocalSpace.
-    static void transformTriangleMesh(open3d::geometry::TriangleMesh& tri_mesh,
-                                      const LocalSpace& local_space)
-    {
-        for (Eigen::Vector3d& vertex : tri_mesh.vertices_)
-        {
-            vertex = vec3ToEv3d(local_space.globalize(ev3dtoVec3(vertex)));
-        }
-    }
 
     //--------------------------------------------------------------------------
     // These are utilities meant to connect evoflock's way of doing things to

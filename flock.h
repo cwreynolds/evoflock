@@ -127,9 +127,16 @@ public:
         {
             if (run_simulation_this_frame())
             {
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20241110 typing G or ESC to vis does not speed up sim.
+
                 aTimer().setFrameStartTime();
                 // Run simulation steps "as fast as possible" or at fixed rate?
-                bool afap = not (fixed_time_step() or not draw().enable());
+                
+//                bool afap = not (fixed_time_step() or not draw().enable());
+//                bool afap = not (fixed_time_step() or draw().enable());
+                bool afap = not (fixed_time_step() and draw().enable());
+
                 double step_duration = (afap ?
                                         aTimer().frameDuration() :
                                         1.0 / fixed_fps());
@@ -142,6 +149,15 @@ public:
                 draw().endOneAnimatedFrame();
                 aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
                 if (not simulation_paused_) { aTimer().measureFrameDuration(); }
+                
+//                std::cout << "In Flock::run(): ";
+//                std::cout << " fixed_time_step()=" << fixed_time_step();
+//                std::cout << " draw().enable()=" << draw().enable();
+//                std::cout << " afap=" << afap;
+//                std::cout << " step_duration=" << step_duration;
+//                std::cout << std::endl;
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
         save_centers_to_file_end();

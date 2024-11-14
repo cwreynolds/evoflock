@@ -256,18 +256,30 @@ public:
     // Record real time at beginning of frame.
     void setFrameStartTime() { frame_start_time_ = TimeClock::now(); }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241110 typing G or ESC to vis does not speed up sim.
+
     // Called at end of frame to sleep until min_frame_time_seconds.
     void sleepUntilEndOfFrame(double min_frame_time_seconds)
     {
-        non_sleep_sec_ = time_diff_in_seconds(TimeClock::now(), frame_start_time_);
-        if (min_frame_time_seconds > non_sleep_sec_)
+//        non_sleep_sec_ = time_diff_in_seconds(TimeClock::now(), frame_start_time_);
+        non_sleep_sec_ = std::max(0.0, time_diff_in_seconds(TimeClock::now(),
+                                                            frame_start_time_));
+
+//        if (min_frame_time_seconds > non_sleep_sec_)
+//        if (min_frame_time_seconds > std::max(0.0, non_sleep_sec_))
+        if (min_frame_time_seconds >= non_sleep_sec_)
         {
             double wuc = 0.01;  // "weird unexplained correction"
+//            double wuc = 0;  // "weird unexplained correction"
+            
             double sleep_sec = min_frame_time_seconds - non_sleep_sec_ - wuc;
             int micro_sec = sleep_sec * 1000000;
             std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Measure how much wall clock time has elapsed for this simulation step.
     void measureFrameDuration()

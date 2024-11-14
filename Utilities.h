@@ -356,6 +356,42 @@ template <typename T> std::string vec_to_string(const std::vector<T>& vector)
     return vec_to_string(vector, 0);
 }
 
+// A "rolling average" or "box filter" for a data stream. Initialized with a
+// type T and a width/history-length "size". A new datum is added with insert().
+// A history of the given size is maintained. Use average() to return the mean
+// of the last "size" data points.
+template<typename T>
+class RollingAverage
+{
+public:
+    RollingAverage() {}
+    RollingAverage(size_t size) : size_(size) {}
+    void insert(T new_data)
+    {
+        if (size_ > data_.size())
+        {
+            data_.push_back(new_data);
+        }
+        else
+        {
+            data_[index_] = new_data;
+            index_ = (index_ + 1) % size_;
+        }
+    }
+    T sum() const
+    {
+        return std::reduce(data_.begin(), data_.end(), 0.0, std::plus());
+    }
+    T average() const
+    {
+        return sum() / data_.size();
+    }
+private:
+    size_t size_ = 0;
+    size_t index_ = 0;
+    std::vector<T> data_;
+};
+
 static void unit_test()
 {
     assert (clip01(1.5) == 1);
@@ -405,6 +441,13 @@ static void unit_test()
 
     std::vector<double> vd({0.1, 2.3, 4.5, 5.6});
     assert (vec_to_string(vd, 4) == "0.1000, 2.3000, 4.5000, 5.6000");
+
+    RollingAverage<int> rai(5);
+    for (int i = 0; i < 9; i++) { rai.insert(i); }
+    assert (rai.average() == 6);
+    RollingAverage<double> rad(100);
+    for (int i = 0; i < 413; i++) { rad.insert(i * 1.23); }
+    assert (rad.average() == 445.875);
 
     // TODO 20230409 test random-number utilities, later RandomSequence.
 }

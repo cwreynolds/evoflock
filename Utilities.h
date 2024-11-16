@@ -455,42 +455,6 @@ template <typename T> std::string vec_to_string(const std::vector<T>& vector)
     return vec_to_string(vector, 0);
 }
 
-//    // A "rolling average" or "box filter" for a data stream. Initialized with a
-//    // type T and a width/history-length "size". A new datum is added with insert().
-//    // A history of the given size is maintained. Use average() to return the mean
-//    // of the last "size" data points.
-//    template<typename T>
-//    class RollingAverage
-//    {
-//    public:
-//        RollingAverage() {}
-//        RollingAverage(size_t size) : size_(size) {}
-//        void insert(T new_data)
-//        {
-//            if (size_ > data_.size())
-//            {
-//                data_.push_back(new_data);
-//            }
-//            else
-//            {
-//                data_[index_] = new_data;
-//                index_ = (index_ + 1) % size_;
-//            }
-//        }
-//        T sum() const
-//        {
-//            return std::reduce(data_.begin(), data_.end(), 0.0, std::plus());
-//        }
-//        T average() const
-//        {
-//            return sum() / data_.size();
-//        }
-//    private:
-//        size_t size_ = 0;
-//        size_t index_ = 0;
-//        std::vector<T> data_;
-//    };
-
 static void unit_test()
 {
     assert (clip01(1.5) == 1);
@@ -532,6 +496,29 @@ static void unit_test()
     b.blend(5.6, 0.5);
     assert (within_epsilon(b.value, 3.51));
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241116 reality check for time utils
+    
+    // Verify times are positive and monotone increasing, as long as they are
+    // larger than some architecture/compiler-dependent threshold/granulaity.
+    int batch_size = 100000;
+    double s_prev = 0;
+    double sum = 0;
+    for (int i = 1; i < 5; i++)
+    {
+        Timer t;
+        for (int b = 1; b < batch_size; b++) { sum += std::log(double(b)); }
+        double s = t.elapsedSeconds();
+        //std::cout << "s = " << s << ", batch_size = " << batch_size << std::endl;
+        //std::cout << "sum = " << sum << std::endl;
+        assert (s >= 0);
+        assert (s >= s_prev);
+        s_prev = s;
+        batch_size *= 10;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     int pi = 0;
     std::vector<int> pairs = {0,1, 0,2, 0,3, 0,4, 1,2, 1,3, 1,4, 2,3, 2,4, 3,4};
     apply_to_pairwise_combinations([&](int p, int q){assert(p == pairs[pi++]);

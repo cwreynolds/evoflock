@@ -236,6 +236,42 @@ private:
     TimePoint start_time_;
 };
 
+// A "rolling average" or "box filter" for a data stream. Initialized with a
+// type T and a width/history-length "size". A new datum is added with insert().
+// A history of the given size is maintained. Use average() to return the mean
+// of the last "size" data points.
+template<typename T>
+class RollingAverage
+{
+public:
+    RollingAverage() {}
+    RollingAverage(size_t size) : size_(size) {}
+    void insert(T new_data)
+    {
+        if (size_ > data_.size())
+        {
+            data_.push_back(new_data);
+        }
+        else
+        {
+//            data_[index_] = new_data;
+            data_.at(index_) = new_data;
+            index_ = (index_ + 1) % size_;
+        }
+    }
+    T sum() const
+    {
+        return std::reduce(data_.begin(), data_.end(), 0.0, std::plus());
+    }
+    T average() const
+    {
+        return sum() / data_.size();
+    }
+private:
+    size_t size_ = 0;
+    size_t index_ = 0;
+    std::vector<T> data_;
+};
 
 // Timer/clock class for animation. Originally misplaced in Draw in the earlier
 // Python "flock" project. Now split off because in evoflock the lifetime of
@@ -244,7 +280,11 @@ private:
 class AnimationTimer
 {
 public:
-    AnimationTimer() : frame_start_time_(TimeClock::now()) {}
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241110 typing G or ESC to vis does not speed up sim.
+    AnimationTimer()
+      : frame_start_time_(TimeClock::now()), frame_duration_history_(30) {}
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Measured duration of the previous frame. Used as the simulation time step
     // for the current frame. I think that off-by-one delay is inevitable.
@@ -259,25 +299,68 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241110 typing G or ESC to vis does not speed up sim.
 
+//        // Called at end of frame to sleep until min_frame_time_seconds.
+//        void sleepUntilEndOfFrame(double min_frame_time_seconds)
+//        {
+//    //        non_sleep_sec_ = time_diff_in_seconds(TimeClock::now(), frame_start_time_);
+//            non_sleep_sec_ = std::max(0.0, time_diff_in_seconds(TimeClock::now(),
+//                                                                frame_start_time_));
+//
+//    //        if (min_frame_time_seconds > non_sleep_sec_)
+//    //        if (min_frame_time_seconds > std::max(0.0, non_sleep_sec_))
+//            if (min_frame_time_seconds >= non_sleep_sec_)
+//            {
+//                double wuc = 0.01;  // "weird unexplained correction"
+//    //            double wuc = 0;  // "weird unexplained correction"
+//
+//                double sleep_sec = min_frame_time_seconds - non_sleep_sec_ - wuc;
+//                int micro_sec = sleep_sec * 1000000;
+//                std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
+//            }
+//        }
+
     // Called at end of frame to sleep until min_frame_time_seconds.
     void sleepUntilEndOfFrame(double min_frame_time_seconds)
     {
-//        non_sleep_sec_ = time_diff_in_seconds(TimeClock::now(), frame_start_time_);
-        non_sleep_sec_ = std::max(0.0, time_diff_in_seconds(TimeClock::now(),
-                                                            frame_start_time_));
-
-//        if (min_frame_time_seconds > non_sleep_sec_)
-//        if (min_frame_time_seconds > std::max(0.0, non_sleep_sec_))
-        if (min_frame_time_seconds >= non_sleep_sec_)
+//        non_sleep_sec_ = std::max(0.0, time_diff_in_seconds(TimeClock::now(),
+//                                                            frame_start_time_));
+        non_sleep_sec_ = time_diff_in_seconds(TimeClock::now(), frame_start_time_);
+        if (min_frame_time_seconds >= std::max(0.0, non_sleep_sec_))
         {
-            double wuc = 0.01;  // "weird unexplained correction"
-//            double wuc = 0;  // "weird unexplained correction"
+//            std::cout << "min_frame_time_seconds >= non_sleep_sec_" << std::endl;
             
-            double sleep_sec = min_frame_time_seconds - non_sleep_sec_ - wuc;
+//            double wuc = 0.01;  // "weird unexplained correction"
+//            double sleep_sec = min_frame_time_seconds - non_sleep_sec_ - wuc;
+
+            double fd_average = frame_duration_history_.average();
+            
+            // TODO this sleeps for 0
+            double fd_error = fd_average - min_frame_time_seconds;
+//            // TODO this sleeps for 0.0666667 sec (15 fps)
+//            double fd_error = min_frame_time_seconds - fd_average;
+
+            double raw_sleep_sec = min_frame_time_seconds + fd_error - non_sleep_sec_;
+            
+            double sleep_sec = clip(raw_sleep_sec, 0, 2 * min_frame_time_seconds);
+
+            std::cout << std::endl;
+            std::cout << "fd_average=" << fd_average << std::endl;
+            std::cout << "fd_error=" << fd_error << std::endl;
+            std::cout << "raw_sleep_sec=" << raw_sleep_sec << std::endl;
+            std::cout << "sleep_sec=" << sleep_sec << std::endl;
+
+
             int micro_sec = sleep_sec * 1000000;
             std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
         }
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241110 typing G or ESC to vis does not speed up sim.
+    
+//    TimePoint my_time_base = TimeClock::now();
+    TimePoint my_time_base;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -287,6 +370,18 @@ public:
         TimePoint frame_end_time = TimeClock::now();
         frame_duration_ = time_diff_in_seconds(frame_end_time, frame_start_time_);
         frame_counter_ += 1;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241110 typing G or ESC to vis does not speed up sim.
+        frame_duration_history_.insert(frame_duration_);
+//        std::cout << "frame_start_time_=" << frame_start_time_ << std::endl;
+//        std::cout << "frame_end_time=" << frame_end_time << std::endl;
+        
+//        std::cout << std::chrono::high_resolution_clock::now() << " UTC\n";
+        
+        std::cout << "frame_start_time_= " << time_diff_in_seconds(frame_start_time_, my_time_base) << " sec" << std::endl;
+        std::cout << "frame_end_time   = " << time_diff_in_seconds(frame_end_time, my_time_base) << " sec" << std::endl;
+        std::cout << "frame_duration_  = " << frame_duration_ << std::endl;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         static Blender<double> smoothed_frame_duration;
         smoothed_frame_duration.blend(frame_duration_, 0.95);
         if (0 == (frame_counter_ % 100))
@@ -303,6 +398,10 @@ private:
     int frame_counter_ = 0;      // Total number of frames so far.
     double frame_duration_ = 0;  // Duration of frame, measured in seconds.
     double non_sleep_sec_ = 0;   // Compute time, ignoring any sleep pad at end.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241110 typing G or ESC to vis does not speed up sim.
+    RollingAverage<double> frame_duration_history_;  // Last 30 frame durations.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 
@@ -356,41 +455,41 @@ template <typename T> std::string vec_to_string(const std::vector<T>& vector)
     return vec_to_string(vector, 0);
 }
 
-// A "rolling average" or "box filter" for a data stream. Initialized with a
-// type T and a width/history-length "size". A new datum is added with insert().
-// A history of the given size is maintained. Use average() to return the mean
-// of the last "size" data points.
-template<typename T>
-class RollingAverage
-{
-public:
-    RollingAverage() {}
-    RollingAverage(size_t size) : size_(size) {}
-    void insert(T new_data)
-    {
-        if (size_ > data_.size())
-        {
-            data_.push_back(new_data);
-        }
-        else
-        {
-            data_[index_] = new_data;
-            index_ = (index_ + 1) % size_;
-        }
-    }
-    T sum() const
-    {
-        return std::reduce(data_.begin(), data_.end(), 0.0, std::plus());
-    }
-    T average() const
-    {
-        return sum() / data_.size();
-    }
-private:
-    size_t size_ = 0;
-    size_t index_ = 0;
-    std::vector<T> data_;
-};
+//    // A "rolling average" or "box filter" for a data stream. Initialized with a
+//    // type T and a width/history-length "size". A new datum is added with insert().
+//    // A history of the given size is maintained. Use average() to return the mean
+//    // of the last "size" data points.
+//    template<typename T>
+//    class RollingAverage
+//    {
+//    public:
+//        RollingAverage() {}
+//        RollingAverage(size_t size) : size_(size) {}
+//        void insert(T new_data)
+//        {
+//            if (size_ > data_.size())
+//            {
+//                data_.push_back(new_data);
+//            }
+//            else
+//            {
+//                data_[index_] = new_data;
+//                index_ = (index_ + 1) % size_;
+//            }
+//        }
+//        T sum() const
+//        {
+//            return std::reduce(data_.begin(), data_.end(), 0.0, std::plus());
+//        }
+//        T average() const
+//        {
+//            return sum() / data_.size();
+//        }
+//    private:
+//        size_t size_ = 0;
+//        size_t index_ = 0;
+//        std::vector<T> data_;
+//    };
 
 static void unit_test()
 {

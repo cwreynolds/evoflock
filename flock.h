@@ -129,6 +129,8 @@ public:
             {
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20241110 typing G or ESC to vis does not speed up sim.
+                
+//                util::Timer t ("do one frame");
 
                 aTimer().setFrameStartTime();
                 // Run simulation steps "as fast as possible" or at fixed rate?

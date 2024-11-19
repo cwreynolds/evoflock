@@ -295,52 +295,22 @@ public:
     {
         if (min_frame_time_seconds > 0)
         {
-//            if (frame_duration_history_.empty())
-//            {
-//                frame_duration_history_.insert(min_frame_time_seconds);
-//            }
-            
-            
-            // Get rolling average of the previous n=30 frame durations.
-            double fd_average = frame_duration_history_.average();
+            // Get rolling average of the previous n=30 frame durations. Clip
+            // to ignore super-long frames, eg from mouse-adjusting window size.
+            double fd_average = clip(frame_duration_history_.average(),
+                                     0, min_frame_time_seconds * 1.1);
             // Negative feedback: if average frame duration average is
             // too long, scale down sleep time, otherwise scale it up.
-            double adjust = (fd_average > min_frame_time_seconds) ? 0.8 : 1.2;
+            double adjust = (fd_average > min_frame_time_seconds) ? 0.5 : 1;
             // Sleep time for this frame is recent average times adjustment.
             double sleep_sec = fd_average * adjust;
-            
             int micro_sec = sleep_sec * 1000000;
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20241118 tried to respond faster to long delays
-            // from mouse-sizing window, but started running AFAP all the time.
-
-//            int sleep_max = 2 * min_frame_time_seconds;
-//            int micro_sec = clip(sleep_sec, 0, sleep_max) * 1000000;
-  
-//            int sleep_clipped = clip(sleep_sec,
-//                                     0.5 * fd_average,
-//                                     2 * fd_average);
-
-//            int sleep_clip = clip(sleep_sec,
-//                                  0.5 * min_frame_time_seconds,
-//                                  2.0 * min_frame_time_seconds);
-
-//            int sleep_clip = clip(sleep_sec,
-//                                  0,
-//                                  2 * min_frame_time_seconds);
-//            int micro_sec = sleep_clip * 1000000;
-
-//            std::cout << std::endl;
-//            std::cout << "min_frame_time_seconds = " << min_frame_time_seconds << std::endl;
-//            std::cout << "fd_average             = " << fd_average << std::endl;
-//            std::cout << "adjust                 = " << adjust << std::endl;
-//            std::cout << "sleep_sec              = " << sleep_sec << std::endl;
-//            std::cout << "sleep_clip             = " << sleep_sec << std::endl;
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
             std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
+            //std::cout << std::endl;
+            //std::cout << "fd_average = " << fd_average << std::endl;
+            //std::cout << "adjust     = " << adjust << std::endl;
+            //std::cout << "sleep_sec  = " << sleep_sec << std::endl;
+            //std::cout << "micro_sec  = " << micro_sec << std::endl;
         }
     }
 

@@ -254,7 +254,6 @@ public:
         }
         else
         {
-//            data_[index_] = new_data;
             data_.at(index_) = new_data;
             index_ = (index_ + 1) % size_;
         }
@@ -263,10 +262,8 @@ public:
     {
         return std::reduce(data_.begin(), data_.end(), 0.0, std::plus());
     }
-    T average() const
-    {
-        return sum() / data_.size();
-    }
+    T average() const { return sum() / data_.size(); }
+    bool empty() const { return data_.empty(); }
 private:
     size_t size_ = 0;
     size_t index_ = 0;
@@ -280,18 +277,8 @@ private:
 class AnimationTimer
 {
 public:
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241110 typing G or ESC to vis does not speed up sim.
-//    AnimationTimer()
-//      : frame_start_time_(TimeClock::now()), frame_duration_history_(30) {}
-    
     AnimationTimer()
-      : frame_start_time_(TimeClock::now()),
-        frame_duration_history_(30)
-//        , my_time_base(TimeClock::now()) // TEMP TODO
-    {}
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      : frame_start_time_(TimeClock::now()), frame_duration_history_(30) {}
 
     // Measured duration of the previous frame. Used as the simulation time step
     // for the current frame. I think that off-by-one delay is inevitable.
@@ -303,163 +290,67 @@ public:
     // Record real time at beginning of frame.
     void setFrameStartTime() { frame_start_time_ = TimeClock::now(); }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241110 typing G or ESC to vis does not speed up sim.
-
-//        // Called at end of frame to sleep until min_frame_time_seconds.
-//        void sleepUntilEndOfFrame(double min_frame_time_seconds)
-//        {
-//    //        non_sleep_sec_ = time_diff_in_seconds(TimeClock::now(), frame_start_time_);
-//            non_sleep_sec_ = std::max(0.0, time_diff_in_seconds(TimeClock::now(),
-//                                                                frame_start_time_));
-//
-//    //        if (min_frame_time_seconds > non_sleep_sec_)
-//    //        if (min_frame_time_seconds > std::max(0.0, non_sleep_sec_))
-//            if (min_frame_time_seconds >= non_sleep_sec_)
-//            {
-//                double wuc = 0.01;  // "weird unexplained correction"
-//    //            double wuc = 0;  // "weird unexplained correction"
-//
-//                double sleep_sec = min_frame_time_seconds - non_sleep_sec_ - wuc;
-//                int micro_sec = sleep_sec * 1000000;
-//                std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
-//            }
-//        }
-
-//        // Called at end of frame to sleep until min_frame_time_seconds.
-//        void sleepUntilEndOfFrame(double min_frame_time_seconds)
-//        {
-//    //        non_sleep_sec_ = std::max(0.0, time_diff_in_seconds(TimeClock::now(),
-//    //                                                            frame_start_time_));
-//            non_sleep_sec_ = time_diff_in_seconds(TimeClock::now(), frame_start_time_);
-//            if (min_frame_time_seconds >= std::max(0.0, non_sleep_sec_))
-//            {
-//    //            std::cout << "min_frame_time_seconds >= non_sleep_sec_" << std::endl;
-//
-//    //            double wuc = 0.01;  // "weird unexplained correction"
-//    //            double sleep_sec = min_frame_time_seconds - non_sleep_sec_ - wuc;
-//
-//                double fd_average = frame_duration_history_.average();
-//
-//                // TODO this sleeps for 0
-//                double fd_error = fd_average - min_frame_time_seconds;
-//    //            // TODO this sleeps for 0.0666667 sec (15 fps)
-//    //            double fd_error = min_frame_time_seconds - fd_average;
-//
-//                double raw_sleep_sec = min_frame_time_seconds + fd_error - non_sleep_sec_;
-//
-//                double sleep_sec = clip(raw_sleep_sec, 0, 2 * min_frame_time_seconds);
-//
-//                std::cout << std::endl;
-//                std::cout << "fd_average=" << fd_average << std::endl;
-//                std::cout << "fd_error=" << fd_error << std::endl;
-//                std::cout << "raw_sleep_sec=" << raw_sleep_sec << std::endl;
-//                std::cout << "sleep_sec=" << sleep_sec << std::endl;
-//
-//
-//                int micro_sec = sleep_sec * 1000000;
-//                std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
-//            }
-//        }
-
-//        // Called at end of frame to sleep until min_frame_time_seconds.
-//        void sleepUntilEndOfFrame(double min_frame_time_seconds)
-//        {
-//            // TODO special case for empty frame_duration_history_?
-//
-//
-//            if (min_frame_time_seconds > 0)
-//            {
-//                double fd_average = frame_duration_history_.average();
-//
-//                if (fd_average <= 0) { fd_average = min_frame_time_seconds / 2; }
-//
-//                double sleep_sec = fd_average;
-//    //            if (fd_average > min_frame_time_seconds)
-//    //            {
-//    //                sleep_sec *= 0.95;
-//    //            }
-//    //            else
-//    //            {
-//    //                sleep_sec *= 1.05;
-//    //            }
-//
-//    //            double adjust = (fd_average > min_frame_time_seconds) ? 0.95 : 1.05;
-//    //            sleep_sec *= adjust;
-//
-//                sleep_sec *= (fd_average > min_frame_time_seconds) ? 0.95 : 1.05;
-//
-//                sleep_sec = clip(sleep_sec, 0, 2);
-//
-//                std::cout << std::endl;
-//                std::cout << "fd_average=" << fd_average << std::endl;
-//                std::cout << "sleep_sec=" << sleep_sec << std::endl;
-//
-//                int micro_sec = sleep_sec * 1000000;
-//                std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
-//            }
-//        }
-
     // Called at end of frame to sleep until min_frame_time_seconds.
     void sleepUntilEndOfFrame(double min_frame_time_seconds)
     {
-        // TODO special case for empty frame_duration_history_?
-        
-        
         if (min_frame_time_seconds > 0)
         {
+//            if (frame_duration_history_.empty())
+//            {
+//                frame_duration_history_.insert(min_frame_time_seconds);
+//            }
+            
+            
+            // Get rolling average of the previous n=30 frame durations.
             double fd_average = frame_duration_history_.average();
-            if (fd_average <= 0) { fd_average = min_frame_time_seconds / 2; }
-            double sleep_sec = fd_average;
-//            sleep_sec *= (fd_average > min_frame_time_seconds) ? 0.95 : 1.05;
-//            double adjust = (fd_average > min_frame_time_seconds) ? 0.95 : 1.05;
-//            double adjust = (fd_average > min_frame_time_seconds) ? 0.8 : 1.2;
-//            double adjust = (fd_average > min_frame_time_seconds) ? 0.9 : 1.1;
-//            double adjust = (fd_average > min_frame_time_seconds) ? 0.7 : 1.3;
-//            double adjust = (fd_average > min_frame_time_seconds) ? 0.85 : 1.15;
+            // Negative feedback: if average frame duration average is
+            // too long, scale down sleep time, otherwise scale it up.
             double adjust = (fd_average > min_frame_time_seconds) ? 0.8 : 1.2;
-            sleep_sec *= adjust;
-//            sleep_sec = clip(sleep_sec, 0, 2);
-            sleep_sec = clip(sleep_sec, 0, 2 * min_frame_time_seconds);
-//            std::cout << std::endl;
-//            std::cout << "fd_average = " << fd_average << std::endl;
-//            std::cout << "adjust     = " << adjust     << std::endl;
-//            std::cout << "sleep_sec  = " << sleep_sec  << std::endl;
-
-            std::cout << "fd_average = " << fd_average;
-//            std::cout << ", adjust = " << adjust;
-            std::cout << ", adjust = " << ((fd_average > min_frame_time_seconds) ? "-" : "+");
-            std::cout << ", sleep_sec = " << sleep_sec << std::endl;
-
+            // Sleep time for this frame is recent average times adjustment.
+            double sleep_sec = fd_average * adjust;
+            
             int micro_sec = sleep_sec * 1000000;
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20241118 tried to respond faster to long delays
+            // from mouse-sizing window, but started running AFAP all the time.
+
+//            int sleep_max = 2 * min_frame_time_seconds;
+//            int micro_sec = clip(sleep_sec, 0, sleep_max) * 1000000;
+  
+//            int sleep_clipped = clip(sleep_sec,
+//                                     0.5 * fd_average,
+//                                     2 * fd_average);
+
+//            int sleep_clip = clip(sleep_sec,
+//                                  0.5 * min_frame_time_seconds,
+//                                  2.0 * min_frame_time_seconds);
+
+//            int sleep_clip = clip(sleep_sec,
+//                                  0,
+//                                  2 * min_frame_time_seconds);
+//            int micro_sec = sleep_clip * 1000000;
+
+//            std::cout << std::endl;
+//            std::cout << "min_frame_time_seconds = " << min_frame_time_seconds << std::endl;
+//            std::cout << "fd_average             = " << fd_average << std::endl;
+//            std::cout << "adjust                 = " << adjust << std::endl;
+//            std::cout << "sleep_sec              = " << sleep_sec << std::endl;
+//            std::cout << "sleep_clip             = " << sleep_sec << std::endl;
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
         }
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241110 typing G or ESC to vis does not speed up sim.
-    
-//    TimePoint my_time_base;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Measure how much wall clock time has elapsed for this simulation step.
     void measureFrameDuration()
     {
         TimePoint frame_end_time = TimeClock::now();
-//        frame_duration_ = time_diff_in_seconds(frame_end_time, frame_start_time_);
         frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
         frame_counter_ += 1;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241110 typing G or ESC to vis does not speed up sim.
         frame_duration_history_.insert(frame_duration_);
-
-//        std::cout << "frame_start_time_= " << time_diff_in_seconds(my_time_base, frame_start_time_) << " sec" << std::endl;
-//        std::cout << "frame_end_time   = " << time_diff_in_seconds(my_time_base, frame_end_time) << " sec" << std::endl;
-//        std::cout << "frame_duration_  = " << frame_duration_ << std::endl;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         static Blender<double> smoothed_frame_duration;
         smoothed_frame_duration.blend(frame_duration_, 0.95);
         if (0 == (frame_counter_ % 100))
@@ -476,10 +367,7 @@ private:
     int frame_counter_ = 0;      // Total number of frames so far.
     double frame_duration_ = 0;  // Duration of frame, measured in seconds.
     double non_sleep_sec_ = 0;   // Compute time, ignoring any sleep pad at end.
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241110 typing G or ESC to vis does not speed up sim.
     RollingAverage<double> frame_duration_history_;  // Last 30 frame durations.
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 

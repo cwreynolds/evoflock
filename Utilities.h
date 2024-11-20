@@ -113,16 +113,32 @@ bool zero_crossing(double a, double b)
     return ((a >= 0) and (b <= 0)) or ((a <= 0) and (b >= 0));
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240706 make global variable GP::mof_names into a function.
-
 // Maps from 0 to 1 into a sinusoid ramp ("slow in, slow out") from 0 to 1.
 inline double sinusoid (double x)
 {
     return (1 - std::cos(x * M_PI)) / 2;
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Convert a std::vector to a string, with comma-space between printed elements.
+// If not 0, fixed_precision allows printing columns each row is an std::vector.
+template <typename T> std::string vec_to_string(const std::vector<T>& vector,
+                                                int fixed_precision)
+{
+    std::stringstream s;
+    bool first = true;
+    if (fixed_precision > 0) { s << std::setprecision(4) << std::fixed; }
+    for (auto& element : vector)
+    {
+        if (first) first = false; else s << ", ";
+        s << element;
+    }
+    return s.str();
+}
+
+template <typename T> std::string vec_to_string(const std::vector<T>& vector)
+{
+    return vec_to_string(vector, 0);
+}
 
 // Note: "class Pairings" was here in the Python version. Still needed?
 
@@ -264,6 +280,8 @@ public:
     }
     T average() const { return sum() / data_.size(); }
     bool empty() const { return data_.empty(); }
+    std::string to_string() const { return vec_to_string(data_, 4); }
+    void fill(T x) { data_.resize(size_, x); }
 private:
     size_t size_ = 0;
     size_t index_ = 0;
@@ -278,7 +296,7 @@ class AnimationTimer
 {
 public:
     AnimationTimer()
-      : frame_start_time_(TimeClock::now()), frame_duration_history_(30) {}
+      : frame_start_time_(TimeClock::now()), frame_duration_history_(3) {}
 
     // Measured duration of the previous frame. Used as the simulation time step
     // for the current frame. I think that off-by-one delay is inevitable.
@@ -290,27 +308,28 @@ public:
     // Record real time at beginning of frame.
     void setFrameStartTime() { frame_start_time_ = TimeClock::now(); }
 
-    // Called at end of frame to sleep until min_frame_time_seconds.
-    void sleepUntilEndOfFrame(double min_frame_time_seconds)
+    // Called after frame draw to sleep until min_frame_time.
+    void sleepUntilEndOfFrame(double min_frame_time)  // In seconds.
     {
-        if (min_frame_time_seconds > 0)
+        if (min_frame_time > 0)
         {
-            // Get rolling average of the previous n=30 frame durations. Clip
-            // to ignore super-long frames, eg from mouse-adjusting window size.
-            double fd_average = clip(frame_duration_history_.average(),
-                                     0, min_frame_time_seconds * 1.1);
-            // Negative feedback: if average frame duration average is
-            // too long, scale down sleep time, otherwise scale it up.
-            double adjust = (fd_average > min_frame_time_seconds) ? 0.5 : 1;
-            // Sleep time for this frame is recent average times adjustment.
-            double sleep_sec = fd_average * adjust;
-            int micro_sec = sleep_sec * 1000000;
+            // Initialize on first frame.
+            if (frame_duration_history_.empty())
+            {
+                frame_duration_history_.fill(min_frame_time);
+                sleep_time_ = min_frame_time * 0.8;
+            }
+            // Get rolling average of the previous N frame durations.
+            double fd_average = frame_duration_history_.average();
+            double adjust = (fd_average >= min_frame_time) ? 0.95 : 1.05;
+            sleep_time_ *= adjust;
+            int micro_sec = sleep_time_ * 1000000;
             std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
+
             //std::cout << std::endl;
-            //std::cout << "fd_average = " << fd_average << std::endl;
-            //std::cout << "adjust     = " << adjust << std::endl;
-            //std::cout << "sleep_sec  = " << sleep_sec << std::endl;
-            //std::cout << "micro_sec  = " << micro_sec << std::endl;
+            //std::cout << "fd_average   = " << fd_average << std::endl;
+            //std::cout << "adjust       = " << adjust << std::endl;
+            //std::cout << "sleep_time_  = " << sleep_time_ << std::endl;
         }
     }
 
@@ -321,23 +340,22 @@ public:
         frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
         frame_counter_ += 1;
         frame_duration_history_.insert(frame_duration_);
-        static Blender<double> smoothed_frame_duration;
-        smoothed_frame_duration.blend(frame_duration_, 0.95);
-        if (0 == (frame_counter_ % 100))
-        {
-            std::cout << "smoothed_frame_duration = ";
-            std::cout << smoothed_frame_duration.value;
-            std::cout << " (1/30 = " << 1.0 / 30 << ") non_sleep_sec_= ";
-            std::cout << non_sleep_sec_ << std::endl;
-        }
+        
+        //static Blender<double> smoothed_frame_duration;
+        //smoothed_frame_duration.blend(frame_duration_, 0.95);
+        //if (0 == (frame_counter_ % 100))
+        //{
+        //    std::cout << "smoothed_frame_duration = ";
+        //    std::cout << smoothed_frame_duration.value << std::endl;
+        //}
     }
-    
+
 private:
     TimePoint frame_start_time_;
     int frame_counter_ = 0;      // Total number of frames so far.
     double frame_duration_ = 0;  // Duration of frame, measured in seconds.
-    double non_sleep_sec_ = 0;   // Compute time, ignoring any sleep pad at end.
-    RollingAverage<double> frame_duration_history_;  // Last 30 frame durations.
+    double sleep_time_ = 0;      // Per frame sleep time, updated each frame.
+    RollingAverage<double> frame_duration_history_;  // Last N frame durations.
 };
 
 
@@ -368,27 +386,6 @@ void apply_to_pairwise_combinations(F pair_func, const std::vector<T>& collectio
             pair_func(collection[p], collection[q]);
         }
     }
-}
-
-// Convert a std::vector to a string, with comma-space between printed elements.
-// If not 0, fixed_precision allows printing columns each row is an std::vector.
-template <typename T> std::string vec_to_string(const std::vector<T>& vector,
-                                                int fixed_precision)
-{
-    std::stringstream s;
-    bool first = true;
-    if (fixed_precision > 0) { s << std::setprecision(4) << std::fixed; }
-    for (auto& element : vector)
-    {
-        if (first) first = false; else s << ", ";
-        s << element;
-    }
-    return s.str();
-}
-
-template <typename T> std::string vec_to_string(const std::vector<T>& vector)
-{
-    return vec_to_string(vector, 0);
 }
 
 static void unit_test()

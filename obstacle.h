@@ -14,6 +14,10 @@
 #pragma once
 #include "Vec3.h"
 #include "shape.h"
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20241121 integrate Draw into Obstacles classes
+#include "Draw.h"
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Obstacle
 {
@@ -367,23 +371,39 @@ public:
         return distance_to_axis - radius_;
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241121 integrate Draw into Obstacles classes
+
+//    void draw() const override
+//    {
+//    //    def draw(self):
+//    //        if not self.tri_mesh:
+//    //            self.tri_mesh = Draw.new_empty_tri_mesh()
+//    //            Draw.add_line_segment(self.endpoint,
+//    //                                  self.endpoint + (self.tangent * self.length),
+//    //                                  color = Vec3(1, 1, 1) * 0.8,
+//    //                                  radius = self.radius,
+//    //                                  sides = 50,
+//    //                                  tri_mesh = self.tri_mesh,
+//    //                                  flat_end_caps=True)
+//    //            self.tri_mesh.compute_vertex_normals()
+//    //            self.original_center = Vec3.from_array(self.tri_mesh.get_center())
+//    //        Draw.adjust_static_scene_object(self.tri_mesh, self.original_center)
+//    }
+
     void draw() const override
     {
-    //    def draw(self):
-    //        if not self.tri_mesh:
-    //            self.tri_mesh = Draw.new_empty_tri_mesh()
-    //            Draw.add_line_segment(self.endpoint,
-    //                                  self.endpoint + (self.tangent * self.length),
-    //                                  color = Vec3(1, 1, 1) * 0.8,
-    //                                  radius = self.radius,
-    //                                  sides = 50,
-    //                                  tri_mesh = self.tri_mesh,
-    //                                  flat_end_caps=True)
-    //            self.tri_mesh.compute_vertex_normals()
-    //            self.original_center = Vec3.from_array(self.tri_mesh.get_center())
-    //        Draw.adjust_static_scene_object(self.tri_mesh, self.original_center)
+        auto& d = Draw::getInstance();
+        auto cyl_mesh = d.constructO3dCylinder(radius_, ep0(), ep1());
+        cyl_mesh->ComputeVertexNormals();
+        cyl_mesh->PaintUniformColor({0.7, 0.8, 0.7});
+        d.addTriMeshToStaticScene(cyl_mesh);
     }
-    
+
+    Vec3 ep0() const { return endpoint_; }
+    Vec3 ep1() const { return endpoint_ + tangent_ * length_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     std::string to_string() const override { return "CylinderObstacle"; }
     
 private:

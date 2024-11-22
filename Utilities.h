@@ -296,7 +296,7 @@ class AnimationTimer
 {
 public:
     AnimationTimer()
-      : frame_start_time_(TimeClock::now()), frame_duration_history_(3) {}
+      : frame_start_time_(TimeClock::now()), frame_duration_history_(5) {}
 
     // Measured duration of the previous frame. Used as the simulation time step
     // for the current frame. I think that off-by-one delay is inevitable.
@@ -308,28 +308,28 @@ public:
     // Record real time at beginning of frame.
     void setFrameStartTime() { frame_start_time_ = TimeClock::now(); }
 
-    // Called after frame draw to sleep until min_frame_time.
+    // Called after simulation step and frame draw: sleeps until min_frame_time.
     void sleepUntilEndOfFrame(double min_frame_time)  // In seconds.
     {
         if (min_frame_time > 0)
         {
-            // Initialize on first frame.
-            if (frame_duration_history_.empty())
-            {
-                frame_duration_history_.fill(min_frame_time);
-                sleep_time_ = min_frame_time * 0.8;
-            }
-            // Get rolling average of the previous N frame durations.
+            // Elapsed time since beginning of frame: simulation and graphics.
+            double non_sleep_time = time_diff_in_seconds(frame_start_time_,
+                                                         TimeClock::now());
+            // Amount of time to sleep until the end of the current frame.
+            double sleep_time = min_frame_time - non_sleep_time;
+            // Adjust based on N previous frame durations, clip, and sleep.
             double fd_average = frame_duration_history_.average();
-            double adjust = (fd_average >= min_frame_time) ? 0.95 : 1.05;
-            sleep_time_ *= adjust;
-            int micro_sec = sleep_time_ * 1000000;
+            double adjust = fd_average - min_frame_time;
+            double clipped_time = clip(sleep_time - adjust, 0, min_frame_time);
+            int micro_sec = clipped_time * 1000000;
             std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
 
             //std::cout << std::endl;
-            //std::cout << "fd_average   = " << fd_average << std::endl;
-            //std::cout << "adjust       = " << adjust << std::endl;
-            //std::cout << "sleep_time_  = " << sleep_time_ << std::endl;
+            //std::cout << "fd_average     = " << fd_average << std::endl;
+            //std::cout << "non_sleep_time = " << non_sleep_time << std::endl;
+            //std::cout << "sleep_time     = " << sleep_time << std::endl;
+            //std::cout << "clipped_time   = " << clipped_time << std::endl;
         }
     }
 
@@ -341,12 +341,10 @@ public:
         frame_counter_ += 1;
         frame_duration_history_.insert(frame_duration_);
         
-        //static Blender<double> smoothed_frame_duration;
-        //smoothed_frame_duration.blend(frame_duration_, 0.95);
         //if (0 == (frame_counter_ % 100))
         //{
-        //    std::cout << "smoothed_frame_duration = ";
-        //    std::cout << smoothed_frame_duration.value << std::endl;
+        //    std::cout << "Recent average frame duration = ";
+        //    std::cout << frame_duration_history_.average() << std::endl;
         //}
     }
 

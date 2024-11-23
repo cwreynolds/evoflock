@@ -172,13 +172,28 @@ public:
         return distance_to_center - radius_;
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241121 integrate Draw into Obstacles classes
+
+//    void draw() const override
+//    {
+//        //def draw(self):
+//        //    if not self.tri_mesh:
+//        //        self.tri_mesh = Draw.make_everted_sphere(self.radius, self.center)
+//        //    Draw.adjust_static_scene_object(self.tri_mesh)
+//    }
+
     void draw() const override
     {
-        //def draw(self):
-        //    if not self.tri_mesh:
-        //        self.tri_mesh = Draw.make_everted_sphere(self.radius, self.center)
-        //    Draw.adjust_static_scene_object(self.tri_mesh)
+        auto mesh = Draw::constructSphereTriMesh(radius_,
+                                                 center_,
+                                                 {0.5, 0.5, 0.5},
+                                                 true,
+                                                 getExcludeFrom() == inside);
+        Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     std::string to_string() const override { return "EvertedSphereObstacle"; }
 
@@ -391,17 +406,41 @@ public:
 //    //        Draw.adjust_static_scene_object(self.tri_mesh, self.original_center)
 //    }
 
+//    void draw() const override
+//    {
+//        auto& d = Draw::getInstance();
+//        auto cyl_mesh = d.constructO3dCylinder(radius_, ep0(), ep1());
+//        cyl_mesh->ComputeVertexNormals();
+//        cyl_mesh->PaintUniformColor({0.7, 0.8, 0.7});
+//        d.addTriMeshToStaticScene(cyl_mesh);
+//    }
+
+//    void draw() const override
+//    {
+//        auto& d = Draw::getInstance();
+//        auto cyl_mesh = d.constructCylinderTriMesh(radius_,
+//                                                   ep0(),
+//                                                   ep1(),
+//                                                   {0.7, 0.8, 0.7},
+//                                                   true,
+//                                                   getExcludeFrom() == inside);
+//        d.addTriMeshToStaticScene(cyl_mesh);
+//    }
+
     void draw() const override
     {
-        auto& d = Draw::getInstance();
-        auto cyl_mesh = d.constructO3dCylinder(radius_, ep0(), ep1());
-        cyl_mesh->ComputeVertexNormals();
-        cyl_mesh->PaintUniformColor({0.7, 0.8, 0.7});
-        d.addTriMeshToStaticScene(cyl_mesh);
+        auto mesh = Draw::constructCylinderTriMesh(radius_,
+                                                   endpoint0(),
+                                                   endpoint1(),
+                                                   {0.7, 0.8, 0.7},
+                                                   true,
+                                                   getExcludeFrom() == inside);
+        Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
 
-    Vec3 ep0() const { return endpoint_; }
-    Vec3 ep1() const { return endpoint_ + tangent_ * length_; }
+    Vec3 endpoint0() const { return endpoint_; }
+    Vec3 endpoint1() const { return endpoint_ + tangent_ * length_; }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     std::string to_string() const override { return "CylinderObstacle"; }

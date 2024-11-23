@@ -270,12 +270,20 @@ public:
     void tempAddSphere()
     {
 #ifdef USE_OPEN3D
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241121 integrate Draw into Obstacles classes
+        
         double sphere_diameter = 100;
         double sphere_radius = sphere_diameter / 2;
-        auto sphere = tri_mesh_t::CreateSphere(sphere_radius);
-        evertTriangleMesh(*sphere);
-        sphere->ComputeVertexNormals();
-        sphere->PaintUniformColor({0.5, 0.5, 0.5});
+//        auto sphere = tri_mesh_t::CreateSphere(sphere_radius);
+//        evertTriangleMesh(*sphere);
+//        sphere->ComputeVertexNormals();
+//        sphere->PaintUniformColor({0.5, 0.5, 0.5});
+        auto sphere = constructSphereTriMesh(sphere_radius,
+                                             Vec3(),
+                                             {0.5, 0.5, 0.5},
+                                             true,
+                                             true);
         addTriMeshToStaticScene(sphere);
         
         // TODO while I'm at it, might as well mock up the CylinderObstacle.
@@ -283,32 +291,41 @@ public:
         double x = sphere_radius * 0.6;
         double h = sphere_diameter / 2;
         
-        auto cyl_obs = constructO3dCylinder(r, Vec3(x, h, 0), Vec3(x, -h, 0));
-        cyl_obs->ComputeVertexNormals();
-        cyl_obs->PaintUniformColor({0.7, 0.8, 0.7});
+//        auto cyl_obs = constructO3dCylinder(r, Vec3(x, h, 0), Vec3(x, -h, 0));
+//        cyl_obs->ComputeVertexNormals();
+//        cyl_obs->PaintUniformColor({0.7, 0.8, 0.7});
+//        addTriMeshToStaticScene(cyl_obs);
+        
+        auto cyl_obs = constructCylinderTriMesh(r,
+                                                Vec3(x, h, 0),
+                                                Vec3(x, -h, 0),
+                                                {0.7, 0.8, 0.7},
+                                                true,
+                                                false);
         addTriMeshToStaticScene(cyl_obs);
-        
-        Vec3 tcep1;
-        Vec3 tcep2(30, 30, 30);
-        Vec3 tcep3(-30, 30, 30);
 
-        auto cyl_test_1 = constructO3dCylinder(r, tcep1, tcep2);
-        cyl_test_1->ComputeVertexNormals();
-        cyl_test_1->PaintUniformColor({0.7, 0.7, 0.8});
-        addTriMeshToStaticScene(cyl_test_1);
+//        Vec3 tcep1;
+//        Vec3 tcep2(30, 30, 30);
+//        Vec3 tcep3(-30, 30, 30);
+//
+//        auto cyl_test_1 = constructO3dCylinder(r, tcep1, tcep2);
+//        cyl_test_1->ComputeVertexNormals();
+//        cyl_test_1->PaintUniformColor({0.7, 0.7, 0.8});
+//        addTriMeshToStaticScene(cyl_test_1);
+//        
+//        auto cyl_test_2 = constructO3dCylinder(r, tcep3, tcep1);
+//        cyl_test_2->ComputeVertexNormals();
+//        cyl_test_2->PaintUniformColor({0.8, 0.7, 0.7});
+//        addTriMeshToStaticScene(cyl_test_2);
         
-        auto cyl_test_2 = constructO3dCylinder(r, tcep3, tcep1);
-        cyl_test_2->ComputeVertexNormals();
-        cyl_test_2->PaintUniformColor({0.8, 0.7, 0.7});
-        addTriMeshToStaticScene(cyl_test_2);
-        
-        
-        auto cyl_orig = tri_mesh_t::CreateCylinder(1, 90);
-        cyl_orig->Translate({0, 0, 90 / 2.0});  // Move endpoint to origin.
-        cyl_orig->PaintUniformColor({1, 1, 1});
-        addTriMeshToStaticScene(cyl_orig);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        addTriMeshToStaticScene(tri_mesh_t::CreateCoordinateFrame(20));
+//        auto cyl_orig = tri_mesh_t::CreateCylinder(1, 90);
+//        cyl_orig->Translate({0, 0, 90 / 2.0});  // Move endpoint to origin.
+//        cyl_orig->PaintUniformColor({1, 1, 1});
+//        addTriMeshToStaticScene(cyl_orig);
+//
+//        addTriMeshToStaticScene(tri_mesh_t::CreateCoordinateFrame(20));
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -316,14 +333,51 @@ public:
 #endif  // USE_OPEN3D
     }
 
-    static sp_tri_mesh_t constructO3dCylinder(double radius,
-                                              const Vec3& endpoint0,
-                                              const Vec3& endpoint1)
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241121 integrate Draw into Obstacles classes
+
+//    static sp_tri_mesh_t constructO3dCylinder(double radius,
+//                                              const Vec3& endpoint0,
+//                                              const Vec3& endpoint1)
+//    {
+//        return constructO3dCylinder(radius,
+//                                    vec3ToEv3d(endpoint0),
+//                                    vec3ToEv3d(endpoint1));
+//    }
+
+    // Make cylinder: returns shared pointer to tri mesh with given parameters.
+    static sp_tri_mesh_t constructCylinderTriMesh(double radius,
+                                                  const Vec3& endpoint0,
+                                                  const Vec3& endpoint1,
+                                                  const Vec3& color,
+                                                  bool compute_normals,
+                                                  bool evert)
     {
-        return constructO3dCylinder(radius,
-                                    vec3ToEv3d(endpoint0),
-                                    vec3ToEv3d(endpoint1));
+        auto cyl_mesh = constructO3dCylinder(radius,
+                                             vec3ToEv3d(endpoint0),
+                                             vec3ToEv3d(endpoint1));
+        cyl_mesh->PaintUniformColor(vec3ToEv3d(color));
+        if (compute_normals) { cyl_mesh->ComputeVertexNormals(); }
+        if (evert) { evertTriangleMesh(*cyl_mesh); }
+        return cyl_mesh;
     }
+
+    // Make sphere: returns shared pointer to tri mesh with given parameters.
+    static sp_tri_mesh_t constructSphereTriMesh(double radius,
+                                                const Vec3& center,
+                                                const Vec3& color,
+                                                bool compute_normals,
+                                                bool evert)
+    {
+        auto mesh = tri_mesh_t::CreateSphere(radius);
+        mesh->Translate(vec3ToEv3d(center));
+        mesh->PaintUniformColor(vec3ToEv3d(color));
+        if (compute_normals) { mesh->ComputeVertexNormals(); }
+        if (evert) { evertTriangleMesh(*mesh); }
+        return mesh;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }

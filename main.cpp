@@ -299,8 +299,13 @@ int main(int argc, const char * argv[])
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
         
-        // TODO temporary work-around to create the big sphere.
-        Draw::getInstance().tempAddSphere();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241124 integrate Draw with legacy pre_defined_obstacle_sets()
+
+//        // TODO temporary work-around to create the big sphere.
+//        Draw::getInstance().tempAddSphere();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
         for (int i = 0; i < max_evolution_steps; i++)

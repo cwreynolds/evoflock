@@ -189,7 +189,10 @@ public:
                                                  center_,
                                                  {0.5, 0.5, 0.5},
                                                  true,
-                                                 getExcludeFrom() == inside);
+//                                                 getExcludeFrom() == inside);
+                                                 getExcludeFrom() == outside,
+//                                                 100);
+                                                 500);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
 
@@ -434,7 +437,10 @@ public:
                                                    endpoint1(),
                                                    {0.7, 0.8, 0.7},
                                                    true,
-                                                   getExcludeFrom() == inside);
+//                                                   getExcludeFrom() == inside);
+                                                   getExcludeFrom() == outside,
+//                                                   100);
+                                                   500);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
 

@@ -221,6 +221,21 @@ public:
         setExcludeFrom(ef);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241126 add PlaneObstacle::draw()
+    
+    PlaneObstacle(const Vec3& normal,
+                  const Vec3& center,
+                  double visible_radius,
+                  double visible_thickness)
+      : Obstacle(),
+        normal_(normal),
+        center_(center),
+        visible_radius_(visible_radius),
+        visible_thickness_(visible_thickness) {}
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 ray_intersection(const Vec3& origin,
                           const Vec3& tangent,
@@ -292,11 +307,51 @@ public:
         return from_plane_to_query_point.dot(normal_);
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241126 add PlaneObstacle::draw()
+    
+//        void draw() const override
+//        {
+//    //        // What is the best way to define these "fake" parameters?
+//    //        double visible_radius = 50;
+//    //        double thickness = visible_radius * 0.005;
+//    //        Vec3 ep_offset = center_ + normal_ * thickness;
+//            Vec3 ep_offset = center_ + normal_ * visible_thickness_;
+//
+//            auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
+//                                                       center_ + ep_offset,
+//                                                       center_ - ep_offset,
+//                                                       {0.7, 0.7, 0.8},
+//                                                       true,
+//                                                       false, // don't evert
+//                                                       500);
+//            Draw::getInstance().addTriMeshToStaticScene(mesh);
+//        }
+    
+    void draw() const override
+    {
+        Vec3 ep_offset = center_ + normal_ * visible_thickness_;
+        auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
+                                                   center_ + ep_offset,
+                                                   center_ - ep_offset,
+                                                   {0.7, 0.7, 0.8},
+                                                   true,
+                                                   false, // don't evert
+                                                   500);
+        Draw::getInstance().addTriMeshToStaticScene(mesh);
+    }
+
+
     std::string to_string() const override { return "PlaneObstacle"; }
 
 private:
     Vec3 normal_;
     Vec3 center_;
+
+    // These are used only for drawing the obstacle (as a large thin disk).
+    // They have no effect on the functioning of the PlaneObstacle itself.
+    double visible_radius_ = 100;
+    double visible_thickness_ = visible_radius_ * 0.001;
 };
 
 

@@ -100,8 +100,6 @@ private:
         visualizer().RegisterKeyCallback('C',
                                          [&](base_vis_t* vis)
                                          { nextCameraMode(); return true; });
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241125 add [p]ause and o[bstacle] commands
         
         // Add "P" command, to pause simulation (just toggles public flag).
         visualizer().RegisterKeyCallback('P',
@@ -113,8 +111,6 @@ private:
                                          [&](base_vis_t* vis)
                                          { nextObstacleSet(); return true; });
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         // Set mouse scroll policy based on current camera mode.
         updateMouseScrollCallback();
 
@@ -459,9 +455,6 @@ public:
         return camera_desired_offset_dist_;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241125 add [p]ause and o[bstacle] commands
-    
     // Runtime switch which the simulation can query to pause itself.
     bool& simPause() { return sim_pause_; }
     bool simPause() const { return sim_pause_; }
@@ -473,9 +466,6 @@ public:
     int obstacleSetIndex() const { return obstacle_set_index_; }
     void nextObstacleSet() { obstacle_set_index_ += 1; }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-
     static void unit_test() {}
     
 private:
@@ -513,18 +503,12 @@ private:
     // Set to true when user types ESC or closes Visualizer window.
     bool exit_from_run_ = false;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241125 add [p]ause and o[bstacle] commands
-    
     // Runtime switch which the simulation can query to pause itself.
     bool sim_pause_ = false;
     
     // Runtime counter the simulation can use to change predefined obs sets.
     // (TODO this seems very specific to flock simulation is it OK to be here?)
     int obstacle_set_index_ = 0;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
 
 #ifdef USE_OPEN3D
     

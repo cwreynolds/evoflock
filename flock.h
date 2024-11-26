@@ -55,6 +55,9 @@ private:
     int cumulative_sep_fail_ = 0;   // separation fail: a pair of boids touch.
 
     util::Blender<double> fps_;
+    
+    std::vector<ObstaclePtrList> obstacle_presets_;
+    static inline int obstacle_selection_counter_ = -1;
 
 public:
     
@@ -89,9 +92,6 @@ public:
     int boid_count() const { return boid_count_; }
     void set_boid_count(int bc) { boid_count_ = bc; }
 
-    
-    
-
     // TODO 20240131 since c++ has no keyword syntax, perhaps move to creating a
     // default Flock then using (eg) set_boid_count(500) to change things? Or
     // just list all of them in the call?!
@@ -107,32 +107,8 @@ public:
     Flock() : occupancy_map(Vec3(25, 25, 25), Vec3(100, 100, 100), Vec3())
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241124 integrate Draw with legacy pre_defined_obstacle_sets()
-//        pre_defined_obstacle_sets();
         preDefinedObstacleSets();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241125 add [p]ause and o[bstacle] commands
-    
-    // TODO from the Python Flock initializer:
-    //        # Flock's current list of obstacles.
-    //        self.obstacles = []
-    //        # Switchable pre-defined obstacle sets.
-    //        self.obstacle_presets = self.pre_defined_obstacle_sets()
-    //        self.obstacle_selection_counter = 0
-    
-    
-    std::vector<ObstaclePtrList> obstacle_presets_;
-//    int obstacle_selection_counter_ = 0;
-//    static inline int obstacle_selection_counter_ = 0;
-    static inline int obstacle_selection_counter_ = -1;
-
-
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Run boids simulation.
     void run()
@@ -185,18 +161,7 @@ public:
 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20241125 add [p]ause and o[bstacle] commands
-                
-//                int dosi = draw().obstacleSetIndex() % obstacle_presets_.size();
-//                if (dosi != obstacle_selection_counter_)
-//                {
-//                    useObstacleSet(dosi);
-//                }
-                
                 updateObstacleSet();
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
         save_centers_to_file_end();
@@ -208,16 +173,6 @@ public:
         }
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241125 add [p]ause and o[bstacle] commands
-    void updateObstacleSet()
-    {
-        int o = draw().obstacleSetIndex() % obstacle_presets_.size();
-        if (o != obstacle_selection_counter_) { useObstacleSet(o); }
-    }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
     // Populate this flock by creating "count" boids with uniformly distributed
     // random positions inside a sphere with the given "radius" and "center".
     // Each boid has a uniformly distributed random orientation.
@@ -918,145 +873,6 @@ public:
     //                description += 'none'
     //            print(description + '\n')
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241124 integrate Draw with legacy pre_defined_obstacle_sets()
-
-
-//        void pre_defined_obstacle_sets()
-//        {
-//            obstacles().push_back(new EvertedSphereObstacle(fp().sphere_radius,
-//                                                            fp().sphere_center,
-//                                                            Obstacle::outside));
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20240812 change from 1 to 6 cylinders
-//
-//
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//            // TODO 20241102 manage static geometry, for Obstacles.
-//            //               change back from 6 to 1
-//
-//
-//            // TODO 20240218 experiments for "sim starts in more flock-like state"
-//            double ecr = fp().sphere_radius;
-//            Vec3 ect = fp().sphere_center + Vec3(ecr * 0.6, ecr, 0);
-//            Vec3 ecb = fp().sphere_center + Vec3(ecr * 0.6, -ecr, 0);
-//            obstacles().push_back(new CylinderObstacle(ecr * 0.2, ect, ecb,
-//                                                       Obstacle::inside));
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//
-//
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//            // TODO 20241102 manage static geometry, for Obstacles.
-//            //               change back from 6 to 1
-//
-//    //        // 6 symmetric cylinders parallel to main axes.
-//    //        double c6r = fp().sphere_radius *  4 / 30;
-//    //        double c6o = fp().sphere_radius * 15 / 30;
-//    //        double c6h = fp().sphere_radius * 20 / 30;
-//    //        auto add_3_cyl = [&](double c6o)
-//    //        {
-//    //            auto add_cyl = [&](double r, Vec3 t, Vec3 b)
-//    //                { obstacles().push_back(new CylinderObstacle(r, t, b)); };
-//    //            add_cyl(c6r, Vec3(-c6h, 0, c6o), Vec3(c6h, 0, c6o));
-//    //            add_cyl(c6r, Vec3(c6o, -c6h, 0), Vec3(c6o, c6h, 0));
-//    //            add_cyl(c6r, Vec3(0, c6o, -c6h), Vec3(0, c6o, c6h));
-//    //        };
-//    //        add_3_cyl(c6o);
-//    //        add_3_cyl(-c6o);
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//            //# Builds a list of preset obstacle combinations, each a list of Obstacles.
-//            //def pre_defined_obstacle_sets(self):
-//            //    main_sphere = EvertedSphereObstacle(self.sphere_radius, self.sphere_center)
-//            //    plane_obstacle = PlaneObstacle()
-//            //
-//            //    cep = Vec3(0, self.sphere_radius + 0.1, 0)
-//            //    cobs = CylinderObstacle(10, cep, -cep)
-//            //
-//            //    scep = Vec3(-1, 1, 1) * self.sphere_radius * 0.8
-//            //    squat_cyl_obs = CylinderObstacle(20, scep, -scep)
-//            //
-//            //    diag = Vec3(1,1,1).normalize()
-//            //    uncentered_cyl_obs = CylinderObstacle(5, diag * 5, diag * 30)
-//            //
-//            //    # 6 symmetric cylinders on main axes.
-//            //    c3r =  4 / 30 * self.sphere_radius
-//            //    c3o = 15 / 30 * self.sphere_radius
-//            //    c3h = 20 / 30 * self.sphere_radius
-//            //    cyl3x = CylinderObstacle(c3r, Vec3(-c3h, 0, c3o), Vec3(c3h, 0, c3o))
-//            //    cyl3y = CylinderObstacle(c3r, Vec3(c3o, -c3h, 0), Vec3(c3o, c3h, 0))
-//            //    cyl3z = CylinderObstacle(c3r, Vec3(0, c3o, -c3h), Vec3(0, c3o, c3h))
-//            //    c3o = - c3o
-//            //    cyl3p = CylinderObstacle(c3r, Vec3(-c3h, 0, c3o), Vec3(c3h, 0, c3o))
-//            //    cyl3q = CylinderObstacle(c3r, Vec3(c3o, -c3h, 0), Vec3(c3o, c3h, 0))
-//            //    cyl3r = CylinderObstacle(c3r, Vec3(0, c3o, -c3h), Vec3(0, c3o, c3h))
-//            //
-//            //    # Preset obstacle combinations:
-//            //    return [[main_sphere],
-//            //            [main_sphere, plane_obstacle],
-//            //            [main_sphere, uncentered_cyl_obs],
-//            //            [main_sphere, cyl3x, cyl3y, cyl3z, cyl3p, cyl3q, cyl3r],
-//            //            [main_sphere, cobs],
-//            //            [main_sphere, plane_obstacle, cobs],
-//            //            [cobs],
-//            //            [squat_cyl_obs],
-//            //            [squat_cyl_obs, main_sphere],
-//            //            [squat_cyl_obs, plane_obstacle],
-//            //            []]
-//
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//            // TODO 20241102 manage static geometry, for Obstacles.
-//            debugPrint(obstacles().size());
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//        }
-    
-    
-//        // Define several sets of obstacles, to allow interactively switching
-//        // between them, and making one active.
-//        // TODO this architecture is left over from the Python version and may need
-//        // to be refactored in the evoflock environment.
-//
-//        void preDefinedObstacleSets()
-//        {
-//            // TODO prototyping -- add everted SphereObstacle
-//            obstacles().push_back(new EvertedSphereObstacle(fp().sphere_radius,
-//                                                            fp().sphere_center,
-//                                                            Obstacle::outside));
-//
-//    //        // TODO prototyping -- right hand vertical cylinder.
-//    //        // TODO 20240218 experiments for "sim starts in more flock-like state"
-//    //        double ecr = fp().sphere_radius;
-//    //        Vec3 ect = fp().sphere_center + Vec3(ecr * 0.6, ecr, 0);
-//    //        Vec3 ecb = fp().sphere_center + Vec3(ecr * 0.6, -ecr, 0);
-//    //        obstacles().push_back(new CylinderObstacle(ecr * 0.2, ect, ecb,
-//    //                                                   Obstacle::inside));
-//
-//
-//
-//            // 6 symmetric cylinders parallel to main axes.
-//            double c6r = fp().sphere_radius *  4 / 30;
-//            double c6o = fp().sphere_radius * 15 / 30;
-//            double c6h = fp().sphere_radius * 20 / 30;
-//            auto add_3_cyl = [&](double c6o)
-//            {
-//                auto add_cyl = [&](double r, Vec3 t, Vec3 b)
-//                { obstacles().push_back(new CylinderObstacle(r, t, b)); };
-//                add_cyl(c6r, Vec3(-c6h, 0, c6o), Vec3(c6h, 0, c6o));
-//                add_cyl(c6r, Vec3(c6o, -c6h, 0), Vec3(c6o, c6h, 0));
-//                add_cyl(c6r, Vec3(0, c6o, -c6h), Vec3(0, c6o, c6h));
-//            };
-//            add_3_cyl(c6o);
-//            add_3_cyl(-c6o);
-//
-//
-//
-//            // TODO 20241102 manage static geometry, for Obstacles.
-//            debugPrint(obstacles().size());
-//
-//            for (auto& o : obstacles()) { o->draw(); }
-//        }
 
     // Define several sets of obstacles, to allow interactively switching
     // between them, and making one active.
@@ -1065,41 +881,30 @@ public:
     
     void preDefinedObstacleSets()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241125 add [p]ause and o[bstacle] commands
-        
-        //        std::vector<ObstaclePtrList> obstacle_presets_;
-        //        int obstacle_selection_counter_ = 0;
-        
-        std::vector<ObstaclePtrList>obs_sets = obstacle_presets_;
         ObstaclePtrList obs;
+        
+        double sr = fp().sphere_radius;
+        Vec3 sc = fp().sphere_center;
+
 
         // Set 1: sphere and right hand vertical cylinder.
         obs.clear();
         // TODO prototyping -- add everted SphereObstacle
         obs.push_back(new EvertedSphereObstacle(fp().sphere_radius,
-                                                        fp().sphere_center,
-                                                        Obstacle::outside));
-        // TODO prototyping -- right hand vertical cylinder.
-        // TODO 20240218 experiments for "sim starts in more flock-like state"
-        double ecr = fp().sphere_radius;
-        Vec3 ect = fp().sphere_center + Vec3(ecr * 0.6, ecr, 0);
-        Vec3 ecb = fp().sphere_center + Vec3(ecr * 0.6, -ecr, 0);
-        obs.push_back(new CylinderObstacle(ecr * 0.2, ect, ecb, Obstacle::inside));
-        
+                                                fp().sphere_center,
+                                                Obstacle::outside));
+        Vec3 ect = sc + Vec3(sr * 0.6, sr, 0);
+        Vec3 ecb = sc + Vec3(sr * 0.6, -sr, 0);
+        obs.push_back(new CylinderObstacle(sr * 0.2, ect, ecb, Obstacle::inside));
         obstacle_presets_.push_back(obs);
-        
         
         // Set 2: sphere and 6 cylinders.
         obs.clear();
-        obs.push_back(new EvertedSphereObstacle(fp().sphere_radius,
-                                                fp().sphere_center,
-                                                Obstacle::outside));
-
+        obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
         // 6 symmetric cylinders parallel to main axes.
-        double c6r = fp().sphere_radius *  4 / 30;
-        double c6o = fp().sphere_radius * 15 / 30;
-        double c6h = fp().sphere_radius * 20 / 30;
+        double c6r = sr *  4 / 30;
+        double c6o = sr * 15 / 30;
+        double c6h = sr * 20 / 30;
         auto add_3_cyl = [&](double c6o)
         {
             auto add_cyl = [&](double r, Vec3 t, Vec3 b)
@@ -1112,53 +917,22 @@ public:
         add_3_cyl(-c6o);
         obstacle_presets_.push_back(obs);
 
-        
-        // Set 3 just the big sphere.
+        // Set 3 sphere and horizontal plane
         obs.clear();
-        obs.push_back(new EvertedSphereObstacle(fp().sphere_radius,
-                                                fp().sphere_center,
-                                                Obstacle::outside));
+        obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
+        obs.push_back(new PlaneObstacle(Vec3(0, 1, 0), sc, sr, sr * 0.001));
         obstacle_presets_.push_back(obs);
-
-
-//        obstacle_selection_counter_ = 0;
-//        obstacles() = obstacle_presets_.at(obstacle_selection_counter_);
-//        for (auto& o : obstacles()) { o->draw(); }
-//        // TODO 20241102 manage static geometry, for Obstacles.
-//        debugPrint(obstacles().size());
-
-//        obstacle_selection_counter_ = 0;
-//        useObstacleSet(0);
-  
-//        useObstacleSet(obstacle_selection_counter_);
         
+        // Set 4 just the big sphere.
+        obs.clear();
+        obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
+        obstacle_presets_.push_back(obs);
+        
+        // Finally, activate the first (zeroth) obstacle set.
         updateObstacleSet();
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        
-        
-
-        
-        
-//            // TODO 20241102 manage static geometry, for Obstacles.
-//            debugPrint(obstacles().size());
-//
-//            for (auto& o : obstacles()) { o->draw(); }
-//
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20241125 add [p]ause and o[bstacle] commands
-//
-//    //        std::vector<ObstaclePtrList> obstacle_presets_;
-//    //        int obstacle_selection_counter_ = 0;
-        
-        
-        
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241125 add [p]ause and o[bstacle] commands
+
+    // Switch to obstacle set N.
     void useObstacleSet(int n)
     {
         draw().clearStaticScene();
@@ -1167,8 +941,13 @@ public:
         for (auto& o : obstacles()) { o->draw(); }
         debugPrint(obstacles().size());
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+    
+    // Check if obstacle set needs to changed in response to "O" cmd in UI.
+    void updateObstacleSet()
+    {
+        int o = draw().obstacleSetIndex() % obstacle_presets_.size();
+        if (o != obstacle_selection_counter_) { useObstacleSet(o); }
+    }
     
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

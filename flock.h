@@ -109,6 +109,52 @@ public:
     {
         preDefinedObstacleSets();
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241127 respond to Draw::simPause()
+
+//    // Run boids simulation.
+//    void run()
+//    {
+//        // Draw.start_visualizer(self.sphere_radius, self.sphere_center)
+//        // Flock.vis_pairs.add_pair(Draw.vis, self)  # Pairing for key handlers.
+//        // self.register_single_key_commands() # For Open3D visualizer GUI.
+//        make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
+//        // self.draw()
+//        // self.cycle_obstacle_selection()
+//        draw().beginAnimatedScene();
+//
+//        save_centers_to_file_start();
+//
+//        while (still_running())
+//        {
+//            if (run_simulation_this_frame())
+//            {
+//                aTimer().setFrameStartTime();
+//                // Run simulation steps "as fast as possible" or at fixed rate?
+//                bool afap = not (fixed_time_step() and draw().enable());
+//                double step_duration = (afap ?
+//                                        aTimer().frameDuration() :
+//                                        1.0 / fixed_fps());
+//                draw().beginOneAnimatedFrame();
+//                fly_boids(step_duration);
+//                save_centers_to_file_1_step();
+//                log_stats();
+//                update_fps();
+//                draw().aimTarget() = selectedBoid()->position();
+//                draw().endOneAnimatedFrame();
+//                aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
+//                if (not simulation_paused_) { aTimer().measureFrameDuration(); }
+//                updateObstacleSet();
+//            }
+//        }
+//        save_centers_to_file_end();
+//        draw().endAnimatedScene();
+//        if (max_simulation_steps() == std::numeric_limits<double>::infinity())
+//        {
+//            std::cout << log_prefix << "Exit at step: ";
+//            std::cout << aTimer().frameCounter() << std::endl;
+//        }
+//    }
 
     // Run boids simulation.
     void run()
@@ -127,18 +173,9 @@ public:
         {
             if (run_simulation_this_frame())
             {
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20241110 typing G or ESC to vis does not speed up sim.
-                
-//                util::Timer t ("do one frame");
-
                 aTimer().setFrameStartTime();
                 // Run simulation steps "as fast as possible" or at fixed rate?
-                
-//                bool afap = not (fixed_time_step() or not draw().enable());
-//                bool afap = not (fixed_time_step() or draw().enable());
                 bool afap = not (fixed_time_step() and draw().enable());
-
                 double step_duration = (afap ?
                                         aTimer().frameDuration() :
                                         1.0 / fixed_fps());
@@ -151,18 +188,15 @@ public:
                 draw().endOneAnimatedFrame();
                 aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
                 if (not simulation_paused_) { aTimer().measureFrameDuration(); }
-                
-//                std::cout << "In Flock::run(): ";
-//                std::cout << " fixed_time_step()=" << fixed_time_step();
-//                std::cout << " draw().enable()=" << draw().enable();
-//                std::cout << " afap=" << afap;
-//                std::cout << " step_duration=" << step_duration;
-//                std::cout << std::endl;
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                
                 updateObstacleSet();
             }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20241127 respond to Draw::simPause()
+            else
+            {
+                draw().pollEvents();
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         save_centers_to_file_end();
         draw().endAnimatedScene();
@@ -172,7 +206,73 @@ public:
             std::cout << aTimer().frameCounter() << std::endl;
         }
     }
-    
+
+//        // Run boids simulation.
+//        void run()
+//        {
+//            // Draw.start_visualizer(self.sphere_radius, self.sphere_center)
+//            // Flock.vis_pairs.add_pair(Draw.vis, self)  # Pairing for key handlers.
+//            // self.register_single_key_commands() # For Open3D visualizer GUI.
+//            make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
+//            // self.draw()
+//            // self.cycle_obstacle_selection()
+//            draw().beginAnimatedScene();
+//
+//            save_centers_to_file_start();
+//
+//            while (still_running())
+//            {
+//    //            if (run_simulation_this_frame())
+//    //            {
+//    //                aTimer().setFrameStartTime();
+//    //                // Run simulation steps "as fast as possible" or at fixed rate?
+//    //                bool afap = not (fixed_time_step() and draw().enable());
+//    //                double step_duration = (afap ?
+//    //                                        aTimer().frameDuration() :
+//    //                                        1.0 / fixed_fps());
+//    //                draw().beginOneAnimatedFrame();
+//    //                fly_boids(step_duration);
+//    //                save_centers_to_file_1_step();
+//    //                log_stats();
+//    //                update_fps();
+//    //                draw().aimTarget() = selectedBoid()->position();
+//    //                draw().endOneAnimatedFrame();
+//    //                aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
+//    //                if (not simulation_paused_) { aTimer().measureFrameDuration(); }
+//    //                updateObstacleSet();
+//    //            }
+//
+//                aTimer().setFrameStartTime();
+//                // Run simulation steps "as fast as possible" or at fixed rate?
+//                bool afap = not (fixed_time_step() and draw().enable());
+//                double step_duration = (afap ?
+//                                        aTimer().frameDuration() :
+//                                        1.0 / fixed_fps());
+//                draw().beginOneAnimatedFrame();
+//                if (run_simulation_this_frame())
+//                {
+//                    fly_boids(step_duration);
+//                    save_centers_to_file_1_step();
+//                    log_stats();
+//                    update_fps();
+//                    draw().aimTarget() = selectedBoid()->position();
+//                }
+//                draw().endOneAnimatedFrame();
+//                aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
+//                if (not simulation_paused_) { aTimer().measureFrameDuration(); }
+//                updateObstacleSet();
+//            }
+//            save_centers_to_file_end();
+//            draw().endAnimatedScene();
+//            if (max_simulation_steps() == std::numeric_limits<double>::infinity())
+//            {
+//                std::cout << log_prefix << "Exit at step: ";
+//                std::cout << aTimer().frameCounter() << std::endl;
+//            }
+//        }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Populate this flock by creating "count" boids with uniformly distributed
     // random positions inside a sphere with the given "radius" and "center".
     // Each boid has a uniformly distributed random orientation.
@@ -756,23 +856,22 @@ public:
     // Based on pause/play and single step. Called once per frame from main loop.
     bool run_simulation_this_frame()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241127 respond to Draw::simPause()
+        simulation_paused_ = draw().simPause();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         bool ok_to_run = single_step_ or not simulation_paused_;
         single_step_ = false;
         return ok_to_run;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241004 follow cam
-
-    //        # Returns currently selected boid, the one that the tracking camera
-    //        # tracks, for which steering force annotation is shown.
-    //        def selected_boid(self):
-    //            return self.boids[self.selected_boid_index]
-
+    // TODO 20241004 follow cam. This is only partially updated from the Python
+    //               version. Assumes the selected boid is always the first one.
+    //
+    // Returns currently selected boid, the one that the tracking camera
+    // tracks, for which steering force annotation is shown.
     Boid* selectedBoid() { return boids().front(); }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     
     //        # Register single key commands with the Open3D visualizer GUI.
     //        def register_single_key_commands(self):

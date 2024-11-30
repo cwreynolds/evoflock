@@ -162,11 +162,29 @@ public:
         }
     }
 
-    void beginOneAnimatedFrame()
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241129 more on sim_paused
+
+//        void beginOneAnimatedFrame()
+//        {
+//    #ifdef USE_OPEN3D
+//            setExitFromRun(! pollEvents());
+//            if (enable())
+//            {
+//                animated_tri_mesh_->Clear();
+//                animated_line_set_->Clear();
+//                updateCamera();
+//            }
+//    #endif  // USE_OPEN3D
+//        }
+
+//    void beginOneAnimatedFrame()
+    void beginOneAnimatedFrame(bool sim_paused = false)
     {
 #ifdef USE_OPEN3D
-        setExitFromRun(! pollEvents());
+//        setExitFromRun(! pollEvents());
         if (enable())
+//        if (enable() and not sim_paused)
         {
             animated_tri_mesh_->Clear();
             animated_line_set_->Clear();
@@ -174,7 +192,8 @@ public:
         }
 #endif  // USE_OPEN3D
     }
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     void endOneAnimatedFrame()
     {
 #ifdef USE_OPEN3D
@@ -454,6 +473,25 @@ public:
     {
         return camera_desired_offset_dist_;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241129 more on sim_paused
+    // TODO 20241127 respond to Draw::simPause()
+
+    
+    // Based on pause/play and single step. Called once per frame from main loop.
+    bool runSimulationThisFrame()
+    {
+        setExitFromRun(! pollEvents());
+        bool ok_to_run = single_step_ or not simPause();
+        single_step_ = false;
+        return ok_to_run;
+    }
+
+    bool single_step_ = false;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     // Runtime switch which the simulation can query to pause itself.
     bool& simPause() { return sim_pause_; }

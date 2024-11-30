@@ -171,7 +171,12 @@ public:
 
         while (still_running())
         {
-            if (run_simulation_this_frame())
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20241129 more on sim_paused
+//            if (run_simulation_this_frame())
+            if (draw().runSimulationThisFrame())
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             {
                 aTimer().setFrameStartTime();
                 // Run simulation steps "as fast as possible" or at fixed rate?
@@ -192,10 +197,10 @@ public:
             }
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20241127 respond to Draw::simPause()
-            else
-            {
-                draw().pollEvents();
-            }
+//            else
+//            {
+//                draw().pollEvents();
+//            }
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         save_centers_to_file_end();
@@ -223,24 +228,7 @@ public:
 //            while (still_running())
 //            {
 //    //            if (run_simulation_this_frame())
-//    //            {
-//    //                aTimer().setFrameStartTime();
-//    //                // Run simulation steps "as fast as possible" or at fixed rate?
-//    //                bool afap = not (fixed_time_step() and draw().enable());
-//    //                double step_duration = (afap ?
-//    //                                        aTimer().frameDuration() :
-//    //                                        1.0 / fixed_fps());
-//    //                draw().beginOneAnimatedFrame();
-//    //                fly_boids(step_duration);
-//    //                save_centers_to_file_1_step();
-//    //                log_stats();
-//    //                update_fps();
-//    //                draw().aimTarget() = selectedBoid()->position();
-//    //                draw().endOneAnimatedFrame();
-//    //                aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
-//    //                if (not simulation_paused_) { aTimer().measureFrameDuration(); }
-//    //                updateObstacleSet();
-//    //            }
+//                bool sim_frame = run_simulation_this_frame();
 //
 //                aTimer().setFrameStartTime();
 //                // Run simulation steps "as fast as possible" or at fixed rate?
@@ -248,19 +236,24 @@ public:
 //                double step_duration = (afap ?
 //                                        aTimer().frameDuration() :
 //                                        1.0 / fixed_fps());
-//                draw().beginOneAnimatedFrame();
-//                if (run_simulation_this_frame())
+//                if (sim_frame)
 //                {
+//                    draw().beginOneAnimatedFrame();
 //                    fly_boids(step_duration);
 //                    save_centers_to_file_1_step();
 //                    log_stats();
 //                    update_fps();
 //                    draw().aimTarget() = selectedBoid()->position();
+//                    draw().endOneAnimatedFrame();
+//                    if ()
+//                        aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
+//                    if (not simulation_paused_) { aTimer().measureFrameDuration(); }
+//                    updateObstacleSet();
 //                }
-//                draw().endOneAnimatedFrame();
-//                aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
-//                if (not simulation_paused_) { aTimer().measureFrameDuration(); }
-//                updateObstacleSet();
+//
+//
+//
+//
 //            }
 //            save_centers_to_file_end();
 //            draw().endAnimatedScene();
@@ -862,6 +855,10 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         bool ok_to_run = single_step_ or not simulation_paused_;
         single_step_ = false;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241129 more on sim_paused
+        debugPrint(ok_to_run);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return ok_to_run;
     }
 

@@ -48,8 +48,8 @@ private:
     int fixed_fps_ = 60;
     int seed_ = 1234567890;
 
-    bool simulation_paused_ = false; // Simulation stopped, display continues.
-    bool single_step_ = false;       // perform one simulation step then pause.
+//    bool simulation_paused_ = false; // Simulation stopped, display continues.
+//    bool single_step_ = false;       // perform one simulation step then pause.
 
     int total_stalls_ = 0;
     int cumulative_sep_fail_ = 0;   // separation fail: a pair of boids touch.
@@ -112,50 +112,6 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241127 respond to Draw::simPause()
 
-//    // Run boids simulation.
-//    void run()
-//    {
-//        // Draw.start_visualizer(self.sphere_radius, self.sphere_center)
-//        // Flock.vis_pairs.add_pair(Draw.vis, self)  # Pairing for key handlers.
-//        // self.register_single_key_commands() # For Open3D visualizer GUI.
-//        make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
-//        // self.draw()
-//        // self.cycle_obstacle_selection()
-//        draw().beginAnimatedScene();
-//
-//        save_centers_to_file_start();
-//
-//        while (still_running())
-//        {
-//            if (run_simulation_this_frame())
-//            {
-//                aTimer().setFrameStartTime();
-//                // Run simulation steps "as fast as possible" or at fixed rate?
-//                bool afap = not (fixed_time_step() and draw().enable());
-//                double step_duration = (afap ?
-//                                        aTimer().frameDuration() :
-//                                        1.0 / fixed_fps());
-//                draw().beginOneAnimatedFrame();
-//                fly_boids(step_duration);
-//                save_centers_to_file_1_step();
-//                log_stats();
-//                update_fps();
-//                draw().aimTarget() = selectedBoid()->position();
-//                draw().endOneAnimatedFrame();
-//                aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
-//                if (not simulation_paused_) { aTimer().measureFrameDuration(); }
-//                updateObstacleSet();
-//            }
-//        }
-//        save_centers_to_file_end();
-//        draw().endAnimatedScene();
-//        if (max_simulation_steps() == std::numeric_limits<double>::infinity())
-//        {
-//            std::cout << log_prefix << "Exit at step: ";
-//            std::cout << aTimer().frameCounter() << std::endl;
-//        }
-//    }
-
     // Run boids simulation.
     void run()
     {
@@ -171,12 +127,7 @@ public:
 
         while (still_running())
         {
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20241129 more on sim_paused
-//            if (run_simulation_this_frame())
             if (draw().runSimulationThisFrame())
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             {
                 aTimer().setFrameStartTime();
                 // Run simulation steps "as fast as possible" or at fixed rate?
@@ -192,16 +143,9 @@ public:
                 draw().aimTarget() = selectedBoid()->position();
                 draw().endOneAnimatedFrame();
                 aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
-                if (not simulation_paused_) { aTimer().measureFrameDuration(); }
+                if (not draw().simPause()) { aTimer().measureFrameDuration(); }
                 updateObstacleSet();
             }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20241127 respond to Draw::simPause()
-//            else
-//            {
-//                draw().pollEvents();
-//            }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         save_centers_to_file_end();
         draw().endAnimatedScene();
@@ -211,58 +155,6 @@ public:
             std::cout << aTimer().frameCounter() << std::endl;
         }
     }
-
-//        // Run boids simulation.
-//        void run()
-//        {
-//            // Draw.start_visualizer(self.sphere_radius, self.sphere_center)
-//            // Flock.vis_pairs.add_pair(Draw.vis, self)  # Pairing for key handlers.
-//            // self.register_single_key_commands() # For Open3D visualizer GUI.
-//            make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
-//            // self.draw()
-//            // self.cycle_obstacle_selection()
-//            draw().beginAnimatedScene();
-//
-//            save_centers_to_file_start();
-//
-//            while (still_running())
-//            {
-//    //            if (run_simulation_this_frame())
-//                bool sim_frame = run_simulation_this_frame();
-//
-//                aTimer().setFrameStartTime();
-//                // Run simulation steps "as fast as possible" or at fixed rate?
-//                bool afap = not (fixed_time_step() and draw().enable());
-//                double step_duration = (afap ?
-//                                        aTimer().frameDuration() :
-//                                        1.0 / fixed_fps());
-//                if (sim_frame)
-//                {
-//                    draw().beginOneAnimatedFrame();
-//                    fly_boids(step_duration);
-//                    save_centers_to_file_1_step();
-//                    log_stats();
-//                    update_fps();
-//                    draw().aimTarget() = selectedBoid()->position();
-//                    draw().endOneAnimatedFrame();
-//                    if ()
-//                        aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
-//                    if (not simulation_paused_) { aTimer().measureFrameDuration(); }
-//                    updateObstacleSet();
-//                }
-//
-//
-//
-//
-//            }
-//            save_centers_to_file_end();
-//            draw().endAnimatedScene();
-//            if (max_simulation_steps() == std::numeric_limits<double>::infinity())
-//            {
-//                std::cout << log_prefix << "Exit at step: ";
-//                std::cout << aTimer().frameCounter() << std::endl;
-//            }
-//        }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -788,7 +680,8 @@ public:
     // Calculate and log various statistics for flock.
     void log_stats()
     {
-        if ((not simulation_paused_) and
+//        if ((not simulation_paused_) and
+        if ((not draw().simPause()) and
             (aTimer().frameCounter() % getLogStatInterval() == 0))
         {
             double average_speed = 0;
@@ -846,21 +739,21 @@ public:
         fps_.blend((fixed_time_step() ? fixed_fps() : int(1 / fd)), 0.95);
     }
     
-    // Based on pause/play and single step. Called once per frame from main loop.
-    bool run_simulation_this_frame()
-    {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241127 respond to Draw::simPause()
-        simulation_paused_ = draw().simPause();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        bool ok_to_run = single_step_ or not simulation_paused_;
-        single_step_ = false;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241129 more on sim_paused
-        debugPrint(ok_to_run);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        return ok_to_run;
-    }
+//    // Based on pause/play and single step. Called once per frame from main loop.
+//    bool run_simulation_this_frame()
+//    {
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20241127 respond to Draw::simPause()
+//        simulation_paused_ = draw().simPause();
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        bool ok_to_run = single_step_ or not simulation_paused_;
+//        single_step_ = false;
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20241129 more on sim_paused
+//        debugPrint(ok_to_run);
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        return ok_to_run;
+//    }
 
     // TODO 20241004 follow cam. This is only partially updated from the Python
     //               version. Assumes the selected boid is always the first one.

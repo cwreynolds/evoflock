@@ -488,7 +488,12 @@ public:
         return ok_to_run;
     }
 
+    // TODO -- always false for now, need to add back functionality
     bool single_step_ = false;
+
+    // TODO -- these were in Flock before moving runSimulationThisFrame() to here
+//    bool simulation_paused_ = false; // Simulation stopped, display continues.
+//    bool single_step_ = false;       // perform one simulation step then pause.
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

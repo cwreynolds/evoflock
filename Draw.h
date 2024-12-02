@@ -101,8 +101,8 @@ private:
                                          [&](base_vis_t* vis)
                                          { nextCameraMode(); return true; });
         
-        // Add "P" command, to pause simulation (just toggles public flag).
-        visualizer().RegisterKeyCallback('P',
+        // Add " " (space) command, toggles public pause simulation flag.
+        visualizer().RegisterKeyCallback(' ',
                                          [&](base_vis_t* vis)
                                          { toggleSimPause(); return true; });
         
@@ -111,6 +111,20 @@ private:
                                          [&](base_vis_t* vis)
                                          { nextObstacleSet(); return true; });
         
+        //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+        // TODO 20241201 add support and UI for single step mode
+        
+//        bool& getSingleStepMode() { return single_step_; }
+//        bool getSingleStepMode() const { return single_step_; }
+//        void setSingleStepMode(bool ssm = true) { single_step_ = ssm; }
+        
+        // Add "1" command, to set single step mode.
+        visualizer().RegisterKeyCallback('1',
+                                         [&](base_vis_t* vis)
+                                         { setSingleStepMode(); return true; });
+
+        //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+
         // Set mouse scroll policy based on current camera mode.
         updateMouseScrollCallback();
 
@@ -483,8 +497,13 @@ public:
     bool runSimulationThisFrame()
     {
         setExitFromRun(! pollEvents());
-        bool ok_to_run = single_step_ or not simPause();
-        single_step_ = false;
+        //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+        // TODO 20241201 add support and UI for single step mode
+//        bool ok_to_run = single_step_ or not simPause();
+//        single_step_ = false;
+        bool ok_to_run = getSingleStepMode() or not simPause();
+        setSingleStepMode(false);
+        //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
         return ok_to_run;
     }
 
@@ -497,6 +516,13 @@ public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+    // TODO 20241201 add support and UI for single step mode
+    
+    bool& getSingleStepMode() { return single_step_; }
+    bool getSingleStepMode() const { return single_step_; }
+    void setSingleStepMode(bool ssm = true) { single_step_ = ssm; }
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 
     // Runtime switch which the simulation can query to pause itself.
     bool& simPause() { return sim_pause_; }

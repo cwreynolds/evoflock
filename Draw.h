@@ -348,7 +348,15 @@ public:
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }
     void setEnable(bool e) { enable_ = e; }
-    void toggleEnable() { enable_ = not enable_; }
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+    // TODO 20241201 add support and UI for single step mode
+//    void toggleEnable() { enable_ = not enable_; }
+    void toggleEnable()
+    {
+        enable_ = not enable_;
+        updateMouseScrollCallback();
+    }
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 
     bool pollEvents()
     {
@@ -361,7 +369,11 @@ public:
         // Invoke the "follow cam" model, update look_from / look_at points
         animateFollowCamera();
         // Either set view to from/at points or set markers in static view.
-        if (cameraMode() == true)
+        //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+        // TODO 20241201 add support and UI for single step mode
+//        if (cameraMode() == true)
+        if (isFollowCameraMode())
+        //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
         {
             setVisualizerViewByFromAt(cameraLookFrom(),
                                       cameraLookAt(),
@@ -435,10 +447,15 @@ public:
                                       cameraLookUp());
     }
 
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+    // TODO 20241201 add support and UI for single step mode
+
     void updateMouseScrollCallback()
     {
         std::function<bool(base_vis_t *, double, double)> mscb = nullptr;
-        if (cameraMode() == true)
+//        if (cameraMode() == true)
+//        if ((cameraMode() == true) and (not simPause()))
+        if (isFollowCameraMode() and (not simPause()))
         {
             mscb = [&](base_vis_t* vis, double x, double y)
             {
@@ -452,6 +469,8 @@ public:
         }
         visualizer().RegisterMouseScrollCallback(mscb);
     }
+
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 
     // Accessor for Open3D Visualizer instance.
     vis_t& visualizer() { return visualizer_; }
@@ -477,7 +496,14 @@ public:
         camera_mode_ = not camera_mode_;
         updateMouseScrollCallback();
     }
-    
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+    // TODO 20241201 add support and UI for single step mode
+    bool isFollowCameraMode()
+    {
+        return cameraMode() == true;
+    }
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+
     // Set to true when user types ESC or closes Visualizer window.
     bool exitFromRun() const { return exit_from_run_; }
     void setExitFromRun(bool efr) { exit_from_run_ = efr; }
@@ -521,14 +547,26 @@ public:
     
     bool& getSingleStepMode() { return single_step_; }
     bool getSingleStepMode() const { return single_step_; }
-    void setSingleStepMode(bool ssm = true) { single_step_ = ssm; }
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+//    void setSingleStepMode(bool ssm = true) { single_step_ = ssm; }
+    void setSingleStepMode(bool ssm = true)
+    {
+        single_step_ = ssm;
+        if (single_step_) { sim_pause_ = true; }
+        updateMouseScrollCallback();
+    }
 
     // Runtime switch which the simulation can query to pause itself.
     bool& simPause() { return sim_pause_; }
     bool simPause() const { return sim_pause_; }
-    void toggleSimPause() { sim_pause_ = not sim_pause_; }
-    
+//    void toggleSimPause() { sim_pause_ = not sim_pause_; }
+    void toggleSimPause()
+    {
+        sim_pause_ = not sim_pause_;
+        updateMouseScrollCallback();
+    }
+
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+
     // Runtime counter the simulation can use to change predefined obs sets.
     // (TODO this seems very specific to flock simulation is it OK to be here?)
     int& obstacleSetIndex() { return obstacle_set_index_; }

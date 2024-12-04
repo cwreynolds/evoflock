@@ -182,6 +182,9 @@ inline FlockParameters init_fp(double max_force,
                                double fly_away_max_dist_in_br,
                                double min_time_to_collide)
 {
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241203 use default FlockParameters for testing
+    
     FlockParameters fp;
     fp.max_force = max_force;
     fp.max_speed = std::max(min_speed, max_speed);
@@ -202,6 +205,10 @@ inline FlockParameters init_fp(double max_force,
     fp.fly_away_max_dist_in_br = fly_away_max_dist_in_br;
     fp.min_time_to_collide = min_time_to_collide;
     return fp;
+    
+//    return FlockParameters();
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 
@@ -454,9 +461,12 @@ inline void evoflock_ga_crossover(const LP::GpTree& parent0,
             offspring.getSubtree(i) = parent1.getSubtree(i);
         }
     }
-    //std::cout << "parent0:   " << parent0.to_string()   << std::endl;
-    //std::cout << "parent1:   " << parent1.to_string()   << std::endl;
-    //std::cout << "offspring: " << offspring.to_string() << std::endl;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241203 use default FlockParameters for testing
+    std::cout << "parent0:   " << parent0.to_string()   << std::endl;
+    std::cout << "parent1:   " << parent1.to_string()   << std::endl;
+    std::cout << "offspring: " << offspring.to_string() << std::endl;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 

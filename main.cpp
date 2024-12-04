@@ -164,8 +164,17 @@ int main(int argc, const char * argv[])
 //    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
 
     // 20240810
-    int individuals = 500;
-    int subpops = 22;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241203 use default FlockParameters for testing
+//    int individuals = 500;
+//    int subpops = 22;
+    
+//    int individuals = 10;
+    int individuals = 20;
+
+//    int subpops = 1;
+    int subpops = 3;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
     int max_evolution_steps = Boid::GP_not_GA ? 20 : 30000;
 
@@ -299,17 +308,12 @@ int main(int argc, const char * argv[])
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241124 integrate Draw with legacy pre_defined_obstacle_sets()
-
-//        // TODO temporary work-around to create the big sphere.
-//        Draw::getInstance().tempAddSphere();
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
         for (int i = 0; i < max_evolution_steps; i++)
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20241203 use default FlockParameters for testing
+            debugPrint(Boid::GP_not_GA);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // Exit if user interactively exits run.
             if (Draw::getInstance().exitFromRun()) { break; }
             GP::save_fitness_time_series(*population);

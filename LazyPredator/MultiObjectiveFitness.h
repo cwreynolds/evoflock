@@ -108,6 +108,7 @@ public:
                 "understand that and want to use “unnormalized” fitness values, "
                 "set LazyPredator::MultiObjectiveFitness::assert_normalized to "
                 " false." << std::endl;
+                std::cout << to_string() << std::endl;
             }
             assert(all_normalized);
         }

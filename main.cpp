@@ -26,9 +26,6 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
-#include "evoflock.h"
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240628 can we do an eval of a const tree?
 //#define eval_const_20240628
@@ -37,6 +34,7 @@
 #endif // eval_const_20240628
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+#include "evoflock.h"
 
 int main(int argc, const char * argv[])
 {
@@ -328,10 +326,6 @@ int main(int argc, const char * argv[])
         
         for (int i = 0; i < max_evolution_steps; i++)
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20241203 use default FlockParameters for testing
-            debugPrint(Boid::GP_not_GA);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // Exit if user interactively exits run.
             if (Draw::getInstance().exitFromRun()) { break; }
             GP::save_fitness_time_series(*population);

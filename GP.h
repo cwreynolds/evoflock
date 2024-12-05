@@ -533,21 +533,146 @@ void replace_scalar_fitness_metric(LP::Population& population,
     scalarize_fitness = scalarizer_func;
 }
 
+// The default (in GpType::defaultJiggleScale()) is 0.05
+double jiggle_scale = 0.1;
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20241203 use default FlockParameters for testing
 #ifdef     USE_DEFAULT_FP
 
-double jiggle_scale = 0;
+// This is a degenerate GP function set, for what is essentially a GA problem:
+// selecting a set of real number parameters for a flock simulation, via an
+// absolute and fixed fitness metric. There is only one function, all GpTrees
+// are exactly one function deep, differing only in their parameter values.
+LazyPredator::FunctionSet evoflock_ga_function_set =
+{
+    {
+        { "Multi_Objective_Fitness" },
+//        { "Real_0_1",    0.0,   1.0, jiggle_scale },
+//        { "Real_0_10",   0.0,  10.0, jiggle_scale },
+//        { "Real_0_100",  0.0, 100.0, jiggle_scale },
+//        { "Real_0_200",  0.0, 200.0, jiggle_scale },  // TODO keep?
+//        { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
+//        { "Real_20_20",  20.0,  20.0, 0 },            // for boid speed values
+
+        { "max_force",  100.0,  100.0, 0.0 },
+        
+        { "max_speed",  20.0,  20.0, 0.0 },
+        { "min_speed",  20.0,  20.0, 0.0 },
+        { "speed",      20.0,  20.0, 0.0 },
+        
+//        double weight_forward  = 4;
+        {"weight_forward", 4.0, 4.0, 0.0 },
+//        double weight_separate = 23;
+        {"weight_separate", 23.0, 23.0, 0.0},
+//        double weight_align    = 12;
+        {"weight_align", 12.0, 12.0, 0.0},
+//        double weight_cohere   = 18;
+        {"weight_cohere", 18.0, 18.0, 0.0},
+//        double weight_avoid    = 40;
+        {"weight_avoid", 40.0, 40.0, 0.0},
+        
+        {"max_dist_separate_in_body_radii", 15.0, 15.0, 0.0},
+        
+        {"exponent", 1.0, 1.0, 0.0},
+        
+//        double angle_separate = -0.707;  // 135°
+        {"angle_separate", -0.707, -0.707, 0.0},
+//        double angle_align    =  0.940;  // 20°
+        {"angle_align", 0.940, 0.940, 0.0},
+//        double angle_cohere   =  0;      // 90°
+        {"angle_cohere", 0.0, 0.0, 0.0},
+
+//        double fly_away_max_dist_in_br = 20;  // max fly-away dist from obs surface
+        {"fly_away_max_dist_in_br", 20.0, 20.0, 0.0},
+//        double min_time_to_collide = 0.8;     // react to predicted impact (seconds)
+        {"min_time_to_collide", 0.8, 0.8, 0.0},
+
+    },
+    {
+        {
+            // GP function name:
+            "Run_Flock",
+            
+            // Return type (in this case it returns a MultiObjectiveFitness):
+            "Multi_Objective_Fitness",
+            
+            // Function parameter type list:
+            //     TODO cf "FlockParameters" for details
+            //     TODO note that I slightly reordering / reparameterizing
+            //     TODO should body_radius be held constant at 0.5?
+            {
+                "max_force",  // max_force
+                // 20240427 Policy change: specify rather than optimize speed:
+                "max_speed",  // max_speed
+                "min_speed",  // min_speed
+                "speed",  // speed
+
+                "weight_forward",  // weight_forward
+                "weight_separate",  // weight_separate
+                "weight_align",  // weight_align
+                "weight_cohere",  // weight_cohere
+                "weight_avoid",  // weight_avoid
+                
+                "max_dist_separate_in_body_radii",  // max_dist_separate_in_body_radii
+                
+                // TODO set to 100, essentially infinity, in the FlockParameters
+                // class. Keep them that way for now but needs to be revisited.
+                //"Real_0_200",  // max_dist_align_in_body_radii
+                //"Real_0_200",  // max_dist_cohere_in_body_radii
+                
+                "exponent",   // exponent_separate
+                "exponent",   // exponent_align
+                "exponent",   // exponent_cohere
+                
+                // Cosine of threshold angle (max angle from forward to be seen)
+                "angle_separate",  // angle_separate
+                "angle_align",  // angle_align
+                "angle_cohere",  // angle_cohere
+                
+                "fly_away_max_dist_in_br", // fly_away_max_dist_in_br
+                "min_time_to_collide",  // min_time_to_collide
+            },
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240628 can we do an eval of a const tree?
+            
+            // Evaluation function, which runs a flock simulation with the given
+            // parameters and returns the fitness.
+#ifdef eval_const_20240628
+            [](const LazyPredator::GpTree& t)
+#else  // eval_const_20240628
+            [](LazyPredator::GpTree& t)
+#endif // eval_const_20240628
+            {
+                FlockParameters fp = init_fp(t.evalSubtree<double>(0),
+                                             t.evalSubtree<double>(1),
+                                             t.evalSubtree<double>(2),
+                                             t.evalSubtree<double>(3),
+                                             t.evalSubtree<double>(4),
+                                             t.evalSubtree<double>(5),
+                                             t.evalSubtree<double>(6),
+                                             t.evalSubtree<double>(7),
+                                             t.evalSubtree<double>(8),
+                                             t.evalSubtree<double>(9),
+                                             t.evalSubtree<double>(10),
+                                             t.evalSubtree<double>(11),
+                                             t.evalSubtree<double>(12),
+                                             t.evalSubtree<double>(13),
+                                             t.evalSubtree<double>(14),
+                                             t.evalSubtree<double>(15),
+                                             t.evalSubtree<double>(16),
+                                             t.evalSubtree<double>(17));
+                auto fitness = run_flock_simulation(fp);
+                return std::any(fitness);
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        }
+    }
+};
 
 #else   // USE_DEFAULT_FP
-
-// The default (in GpType::defaultJiggleScale()) is 0.05
-double jiggle_scale = 0.1;
-
-#endif  // USE_DEFAULT_FP
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 // This is a degenerate GP function set, for what is essentially a GA problem:
 // selecting a set of real number parameters for a flock simulation, via an
@@ -645,6 +770,9 @@ LazyPredator::FunctionSet evoflock_ga_function_set =
     }
 };
 
+
+#endif  // USE_DEFAULT_FP
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Called each step to handle writing log file with fitness over time data.
 void save_fitness_time_series(LP::Population& population)

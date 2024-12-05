@@ -143,12 +143,42 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 //                    // cluster,
 //                    // curvature,
 //                    // occupy,
+                    
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20241204 why are all GP fitnesses {0, 0, 0, 0, 0}?
+
+#ifdef     PREVENT_0_FITNESS
+
+                    // 20241204:
+//                    util::clip01(avoid    + EF::RS().random2(0.0, 0.01)),
+//                    util::clip01(separate + EF::RS().random2(0.0, 0.01)),
+//                    util::clip01(cohere   + EF::RS().random2(0.0, 0.01)),
+//                    util::clip01(cluster  + EF::RS().random2(0.0, 0.01)),
+//                    util::clip01(occupy   + EF::RS().random2(0.0, 0.01)),
+
+//                    std::max(0.01, avoid),
+//                    std::max(0.01, separate),
+//                    std::max(0.01, cohere),
+//                    std::max(0.01, cluster),
+//                    std::max(0.01, occupy),
+
+                    std::max(EF::RS().random2(0.001, 0.01), avoid),
+                    std::max(EF::RS().random2(0.001, 0.01), separate),
+                    std::max(EF::RS().random2(0.001, 0.01), cohere),
+                    std::max(EF::RS().random2(0.001, 0.01), cluster),
+                    std::max(EF::RS().random2(0.001, 0.01), occupy),
+
+#else   // PREVENT_0_FITNESS
+                    
                     // 20240813:
                     avoid,
                     separate,
                     cohere,
                     cluster,
                     occupy,
+
+#endif  // PREVENT_0_FITNESS
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 })
             );
 }
@@ -185,6 +215,12 @@ inline FlockParameters init_fp(double max_force,
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241203 use default FlockParameters for testing
     
+#ifdef     USE_DEFAULT_FP
+
+    return FlockParameters();
+
+#else   // USE_DEFAULT_FP
+
     FlockParameters fp;
     fp.max_force = max_force;
     fp.max_speed = std::max(min_speed, max_speed);
@@ -206,8 +242,8 @@ inline FlockParameters init_fp(double max_force,
     fp.min_time_to_collide = min_time_to_collide;
     return fp;
     
-//    return FlockParameters();
-    
+#endif  // USE_DEFAULT_FP
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
@@ -453,7 +489,14 @@ inline void evoflock_ga_crossover(const LP::GpTree& parent0,
                                   int max_size,
                                   int fs_min_size)
 {
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241203 use default FlockParameters for testing
+
     offspring = parent0;
+
+#ifdef     USE_DEFAULT_FP
+#else   // USE_DEFAULT_FP
+
     for (int i = 0; i < parent0.subtrees().size(); i++)
     {
         if (EF::RS().randomBool())
@@ -461,6 +504,10 @@ inline void evoflock_ga_crossover(const LP::GpTree& parent0,
             offspring.getSubtree(i) = parent1.getSubtree(i);
         }
     }
+
+#endif  // USE_DEFAULT_FP
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241203 use default FlockParameters for testing
     std::cout << "parent0:   " << parent0.to_string()   << std::endl;
@@ -487,8 +534,20 @@ void replace_scalar_fitness_metric(LP::Population& population,
 }
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20241203 use default FlockParameters for testing
+#ifdef     USE_DEFAULT_FP
+
+double jiggle_scale = 0;
+
+#else   // USE_DEFAULT_FP
+
 // The default (in GpType::defaultJiggleScale()) is 0.05
 double jiggle_scale = 0.1;
+
+#endif  // USE_DEFAULT_FP
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 // This is a degenerate GP function set, for what is essentially a GA problem:
 // selecting a set of real number parameters for a flock simulation, via an

@@ -220,6 +220,10 @@ public:
     //      Is this misplaced, or are they?
     void mutate()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241203 use default FlockParameters for testing
+#ifdef     USE_DEFAULT_FP
+#else   // USE_DEFAULT_FP
         if (isLeaf())
         {
             setRootValue(getRootType()->jiggleConstant(getRootValue()),
@@ -229,6 +233,8 @@ public:
         {
             for (auto& subtree : subtrees()) subtree.mutate();
         }
+#endif  // USE_DEFAULT_FP
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     // Essentially like operator==() but needs to be a template for the sake of
     // the std::any leaf nodes. Used only in the unit tests.

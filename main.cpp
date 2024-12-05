@@ -9,6 +9,24 @@
 
 #define USE_OPEN3D
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20241203 use default FlockParameters for testing
+#define    USE_DEFAULT_FP
+#ifdef     USE_DEFAULT_FP
+#else   // USE_DEFAULT_FP
+#endif  // USE_DEFAULT_FP
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20241204 why are all GP fitnesses {0, 0, 0, 0, 0}?
+#define    PREVENT_0_FITNESS
+#ifdef     PREVENT_0_FITNESS
+#else   // PREVENT_0_FITNESS
+#endif  // PREVENT_0_FITNESS
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
 #include "evoflock.h"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

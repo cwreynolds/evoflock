@@ -109,8 +109,6 @@ public:
     {
         preDefinedObstacleSets();
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241127 respond to Draw::simPause()
 
     // Run boids simulation.
     void run()
@@ -155,8 +153,6 @@ public:
             std::cout << aTimer().frameCounter() << std::endl;
         }
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Populate this flock by creating "count" boids with uniformly distributed
     // random positions inside a sphere with the given "radius" and "center".
@@ -739,22 +735,6 @@ public:
         fps_.blend((fixed_time_step() ? fixed_fps() : int(1 / fd)), 0.95);
     }
     
-//    // Based on pause/play and single step. Called once per frame from main loop.
-//    bool run_simulation_this_frame()
-//    {
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20241127 respond to Draw::simPause()
-//        simulation_paused_ = draw().simPause();
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        bool ok_to_run = single_step_ or not simulation_paused_;
-//        single_step_ = false;
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20241129 more on sim_paused
-//        debugPrint(ok_to_run);
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        return ok_to_run;
-//    }
-
     // TODO 20241004 follow cam. This is only partially updated from the Python
     //               version. Assumes the selected boid is always the first one.
     //

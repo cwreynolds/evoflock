@@ -274,7 +274,8 @@ int main(int argc, const char * argv[])
 //                          GP::evoflock_gp_function_set() :
                           GP::test_gp_boid_function_set() :
                           //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                          GP::evoflock_ga_function_set);
+//                          GP::evoflock_ga_function_set);
+                          GP::evoflock_ga_function_set());
 
     {
         std::cout << "Create population." << std::endl;

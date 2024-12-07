@@ -111,19 +111,10 @@ private:
                                          [&](base_vis_t* vis)
                                          { nextObstacleSet(); return true; });
         
-        //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-        // TODO 20241201 add support and UI for single step mode
-        
-//        bool& getSingleStepMode() { return single_step_; }
-//        bool getSingleStepMode() const { return single_step_; }
-//        void setSingleStepMode(bool ssm = true) { single_step_ = ssm; }
-        
         // Add "1" command, to set single step mode.
         visualizer().RegisterKeyCallback('1',
                                          [&](base_vis_t* vis)
                                          { setSingleStepMode(); return true; });
-
-        //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 
         // Set mouse scroll policy based on current camera mode.
         updateMouseScrollCallback();
@@ -348,20 +339,9 @@ public:
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }
     void setEnable(bool e) { enable_ = e; }
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-    // TODO 20241201 add support and UI for single step mode
-//    void toggleEnable() { enable_ = not enable_; }
-    void toggleEnable()
-    {
-        enable_ = not enable_;
-        updateMouseScrollCallback();
-    }
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+    void toggleEnable() { enable_ = not enable_; updateMouseScrollCallback(); }
 
-    bool pollEvents()
-    {
-        return visualizer().PollEvents();
-    }
+    bool pollEvents() { return visualizer().PollEvents(); }
 
     // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
     void updateCamera()
@@ -369,11 +349,7 @@ public:
         // Invoke the "follow cam" model, update look_from / look_at points
         animateFollowCamera();
         // Either set view to from/at points or set markers in static view.
-        //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-        // TODO 20241201 add support and UI for single step mode
-//        if (cameraMode() == true)
         if (isFollowCameraMode())
-        //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
         {
             setVisualizerViewByFromAt(cameraLookFrom(),
                                       cameraLookAt(),
@@ -451,9 +427,6 @@ public:
                                       cameraLookUp());
     }
 
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-    // TODO 20241201 add support and UI for single step mode
-
     void updateMouseScrollCallback()
     {
         std::function<bool(base_vis_t *, double, double)> mscb = nullptr;
@@ -471,8 +444,6 @@ public:
         }
         visualizer().RegisterMouseScrollCallback(mscb);
     }
-
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 
     // Accessor for Open3D Visualizer instance.
     vis_t& visualizer() { return visualizer_; }
@@ -498,13 +469,7 @@ public:
         camera_mode_ = not camera_mode_;
         updateMouseScrollCallback();
     }
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-    // TODO 20241201 add support and UI for single step mode
-    bool isFollowCameraMode()
-    {
-        return cameraMode() == true;
-    }
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+    bool isFollowCameraMode() { return cameraMode() == true; }
 
     // Set to true when user types ESC or closes Visualizer window.
     bool exitFromRun() const { return exit_from_run_; }
@@ -516,58 +481,33 @@ public:
         return camera_desired_offset_dist_;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241129 more on sim_paused
-    // TODO 20241127 respond to Draw::simPause()
-
-    
     // Based on pause/play and single step. Called once per frame from main loop.
     bool runSimulationThisFrame()
     {
         setExitFromRun(! pollEvents());
-        //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-        // TODO 20241201 add support and UI for single step mode
-//        bool ok_to_run = single_step_ or not simPause();
-//        single_step_ = false;
         bool ok_to_run = getSingleStepMode() or not simPause();
         setSingleStepMode(false);
-        //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
         return ok_to_run;
     }
-
-    // TODO -- always false for now, need to add back functionality
-    bool single_step_ = false;
-
-    // TODO -- these were in Flock before moving runSimulationThisFrame() to here
-//    bool simulation_paused_ = false; // Simulation stopped, display continues.
-//    bool single_step_ = false;       // perform one simulation step then pause.
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-    // TODO 20241201 add support and UI for single step mode
     
-    bool& getSingleStepMode() { return single_step_; }
-    bool getSingleStepMode() const { return single_step_; }
-//    void setSingleStepMode(bool ssm = true) { single_step_ = ssm; }
+    // Single step mode means simulation should take one step, then pause again.
+    bool& getSingleStepMode() { return single_step_mode_; }
+    bool getSingleStepMode() const { return single_step_mode_; }
     void setSingleStepMode(bool ssm = true)
     {
-        single_step_ = ssm;
-        if (single_step_) { sim_pause_ = true; }
+        single_step_mode_ = ssm;
+        if (single_step_mode_) { sim_pause_ = true; }
         updateMouseScrollCallback();
     }
 
     // Runtime switch which the simulation can query to pause itself.
     bool& simPause() { return sim_pause_; }
     bool simPause() const { return sim_pause_; }
-//    void toggleSimPause() { sim_pause_ = not sim_pause_; }
     void toggleSimPause()
     {
         sim_pause_ = not sim_pause_;
         updateMouseScrollCallback();
     }
-
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 
     // Runtime counter the simulation can use to change predefined obs sets.
     // (TODO this seems very specific to flock simulation is it OK to be here?)
@@ -614,6 +554,9 @@ private:
 
     // Runtime switch which the simulation can query to pause itself.
     bool sim_pause_ = false;
+    
+    // Simulation will take one step, then reenter pause mode.
+    bool single_step_mode_ = false;
     
     // Runtime counter the simulation can use to change predefined obs sets.
     // (TODO this seems very specific to flock simulation is it OK to be here?)

@@ -243,6 +243,15 @@ public:
         return longest;
     }
     
+    // Adjust distance between points "a" and "b" to be "d". Returns a "new a"
+    // slid along line from "b" to "a" so the distance between them is now "d".
+    // TODO needs unit test.
+    static Vec3 adjustAbDist(Vec3 a, Vec3 b, double d)
+    {
+        auto tangent = (a - b).normalize_or_0();
+        return b + tangent * d;;
+    }
+
     // Convert to printable string.
     // Defaults to "float" precision. Use 15 for full "double" (64bit) precision.
     std::string to_string(int precision = 6) const

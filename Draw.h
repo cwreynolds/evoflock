@@ -442,6 +442,10 @@ public:
         camera_look_from_ = from_memory_.blend(new_from, 0.90);
         camera_look_at_   =   at_memory_.blend(new_at,   0.75);
         camera_look_up_   =   up_memory_.blend(new_up,   0.97).normalize();
+        // Adjust "from" point so it is the desired offset distance from "at".
+        camera_look_from_ = Vec3::adjustAbDist(cameraLookFrom(),
+                                               cameraLookAt(),
+                                               cameraDesiredOffsetDistance());
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
@@ -453,8 +457,6 @@ public:
     void updateMouseScrollCallback()
     {
         std::function<bool(base_vis_t *, double, double)> mscb = nullptr;
-//        if (cameraMode() == true)
-//        if ((cameraMode() == true) and (not simPause()))
         if (isFollowCameraMode() and (not simPause()))
         {
             mscb = [&](base_vis_t* vis, double x, double y)

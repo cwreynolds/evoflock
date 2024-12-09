@@ -15,7 +15,11 @@
 
 #pragma once
 
-#include "LocalSpace.h"
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20241208 work toward “wingman cam”
+//#include "LocalSpace.h"
+#include "Agent.h"
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #ifdef USE_OPEN3D
 #include "open3d/Open3D.h"
@@ -357,7 +361,12 @@ public:
             from_ball->Translate({0, 1000, 0}, false);
             to_ball->Translate({0, 1000, 0}, false);
             // Draw circle around aimTarget() pointing toward camera.
-            addBlackAndWhiteCircularReticle(aimTarget());
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20241208 work toward “wingman cam”
+//            addBlackAndWhiteCircularReticle(aimTarget());
+//            addBlackAndWhiteCircularReticle(aimAgent().p());
+            addBlackAndWhiteCircularReticle(aimAgent().position());
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         else
         {
@@ -405,27 +414,159 @@ public:
                                         vec3ToEv3d(up));
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241208 work toward “wingman cam”
+
+//    // Invoke the "follow camera" model, update look_from/look_at/up and camera.
+//    void animateFollowCamera()
+//    {
+//        Vec3 camera_pos = camera().p();
+//        Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
+//        Vec3 offset_direction = offset_from_camera_to_target.normalize_or_0();
+//        Vec3 target_offset = offset_direction * cameraDesiredOffsetDistance();
+//        Vec3 new_from = aimTarget() - target_offset;
+//        Vec3 new_at = aimTarget();
+//        Vec3 new_up = (camera().j() + Vec3(0, 0.3, 0)).normalize();
+//        camera_look_from_ = from_memory_.blend(new_from, 0.90);
+//        camera_look_at_   =   at_memory_.blend(new_at,   0.75);
+//        camera_look_up_   =   up_memory_.blend(new_up,   0.97).normalize();
+//        // Adjust "from" point so it is the desired offset distance from "at".
+//        camera_look_from_ = Vec3::adjustAbDist(cameraLookFrom(),
+//                                               cameraLookAt(),
+//                                               cameraDesiredOffsetDistance());
+//        camera() = LocalSpace::fromTo(cameraLookFrom(),
+//                                      cameraLookAt(),
+//                                      cameraLookUp());
+//    }
+
     // Invoke the "follow camera" model, update look_from/look_at/up and camera.
     void animateFollowCamera()
     {
+        // TEMP TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        animateWingmanCamera();
+        return;
+        
+        
         Vec3 camera_pos = camera().p();
-        Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241208 work toward “wingman cam”
+//        Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
+//        Vec3 offset_from_camera_to_target = aimAgent().p() - camera_pos;
+        Vec3 offset_from_camera_to_target = aimAgent().position() - camera_pos;
         Vec3 offset_direction = offset_from_camera_to_target.normalize_or_0();
         Vec3 target_offset = offset_direction * cameraDesiredOffsetDistance();
-        Vec3 new_from = aimTarget() - target_offset;
-        Vec3 new_at = aimTarget();
+//        Vec3 new_from = aimTarget() - target_offset;
+//        Vec3 new_at = aimTarget();
+        Vec3 new_from = aimAgent().position() - target_offset;
+        Vec3 new_at = aimAgent().position();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 new_up = (camera().j() + Vec3(0, 0.3, 0)).normalize();
-        camera_look_from_ = from_memory_.blend(new_from, 0.90);
-        camera_look_at_   =   at_memory_.blend(new_at,   0.75);
-        camera_look_up_   =   up_memory_.blend(new_up,   0.97).normalize();
+//        camera_look_from_ = from_memory_.blend(new_from, 0.90);
+//        camera_look_at_   =   at_memory_.blend(new_at,   0.75);
+//        camera_look_up_   =   up_memory_.blend(new_up,   0.97).normalize();
+//        // Adjust "from" point so it is the desired offset distance from "at".
+//        camera_look_from_ = Vec3::adjustAbDist(cameraLookFrom(),
+//                                               cameraLookAt(),
+//                                               cameraDesiredOffsetDistance());
+
+        cameraLookFrom() = from_memory_.blend(new_from, 0.90);
+        cameraLookAt()   =   at_memory_.blend(new_at,   0.75);
+        cameraLookUp()   =   up_memory_.blend(new_up,   0.97).normalize();
         // Adjust "from" point so it is the desired offset distance from "at".
-        camera_look_from_ = Vec3::adjustAbDist(cameraLookFrom(),
-                                               cameraLookAt(),
-                                               cameraDesiredOffsetDistance());
+        cameraLookFrom() = Vec3::adjustAbDist(cameraLookFrom(),
+                                              cameraLookAt(),
+                                              cameraDesiredOffsetDistance());
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
     }
+
+    
+//        // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
+//        void animateWingmanCamera()
+//        {
+//    //        Vec3 camera_pos = camera().p();
+//    //        Vec3 offset_from_camera_to_target = aimTarget() - camera_pos;
+//    //        Vec3 offset_direction = offset_from_camera_to_target.normalize_or_0();
+//    //        Vec3 target_offset = offset_direction * cameraDesiredOffsetDistance();
+//    //        Vec3 new_from = aimTarget() - target_offset;
+//    //        Vec3 new_at = aimTarget();
+//    //        Vec3 new_up = (camera().j() + Vec3(0, 0.3, 0)).normalize();
+//
+//
+//
+//            // Set "from" as a local offset (right, up, and behind) from target.
+//    //        Vec3 local_offset = Vec3(3, 2, -5).normalize();
+//    //        Vec3 local_offset = Vec3(3, 5, -7).normalize();
+//            Vec3 local_offset = Vec3(10, 5, -3).normalize();
+//            Vec3 scaled_offset = local_offset * cameraDesiredOffsetDistance();
+//            Vec3 offset = aimAgent().globalize(scaled_offset);
+//
+//
+//
+//    //        cameraLookFrom() = from_memory_.blend(new_from, 0.90);
+//    //        cameraLookAt()   =   at_memory_.blend(new_at,   0.75);
+//    //        cameraLookUp()   =   up_memory_.blend(new_up,   0.97).normalize();
+//
+//            cameraLookFrom() = from_memory_.blend(offset,         0.90);
+//            cameraLookAt()   =   at_memory_.blend(aimAgent().p(), 0.75);
+//            cameraLookUp()   =   up_memory_.blend(aimAgent().k(), 0.97).normalize();
+//
+//
+//            // Adjust "from" point so it is the desired offset distance from "at".
+//            cameraLookFrom() = Vec3::adjustAbDist(cameraLookFrom(),
+//                                                  cameraLookAt(),
+//                                                  cameraDesiredOffsetDistance());
+//            camera() = LocalSpace::fromTo(cameraLookFrom(),
+//                                          cameraLookAt(),
+//                                          cameraLookUp());
+//        }
+
+//        // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
+//        void animateWingmanCamera()
+//        {
+//            // Set "from" as a local offset (right, up, and behind) from target.
+//            Vec3 local_offset = Vec3(10, 5, -3).normalize();
+//            Vec3 scaled_offset = local_offset * cameraDesiredOffsetDistance();
+//    //        Vec3 offset = aimAgent().globalize(scaled_offset);
+//            Vec3 offset = aimAgent().ls().globalize(scaled_offset);
+//            // Smooth look/at parameters.
+//            cameraLookFrom() = from_memory_.blend(offset, 0.90);
+//    //        cameraLookAt()   =   at_memory_.blend(aimAgent().p(), 0.75);
+//    //        cameraLookUp()   =   up_memory_.blend(aimAgent().j(), 0.97).normalize();
+//            cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
+//            cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
+//            // Adjust "from" point so it is the desired offset distance from "at".
+//            cameraLookFrom() = Vec3::adjustAbDist(cameraLookFrom(),
+//                                                  cameraLookAt(),
+//                                                  cameraDesiredOffsetDistance());
+//            camera() = LocalSpace::fromTo(cameraLookFrom(),
+//                                          cameraLookAt(),
+//                                          cameraLookUp());
+//        }
+
+    // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
+    void animateWingmanCamera()
+    {
+        // Set "from" as a local offset (right, up, and behind) from target.
+//        Vec3 local_offset = Vec3(10, 5, -3).normalize();
+        Vec3 local_offset = Vec3(10, 8, -4).normalize();
+        Vec3 scaled_offset = local_offset * cameraDesiredOffsetDistance();
+        Vec3 offset = aimAgent().ls().globalize(scaled_offset);
+        // Smooth look/at parameters.
+        cameraLookFrom() = from_memory_.blend(offset, 0.90);
+        cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
+        cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
+        // Adjust "from" point so it is the desired offset distance from "at".
+        cameraLookFrom() = Vec3::adjustAbDist(cameraLookFrom(),
+                                              cameraLookAt(),
+                                              cameraDesiredOffsetDistance());
+        camera() = LocalSpace::fromTo(cameraLookFrom(),
+                                      cameraLookAt(),
+                                      cameraLookUp());
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void updateMouseScrollCallback()
     {
@@ -453,15 +594,40 @@ public:
     LocalSpace& camera() { return camera_; }
     const LocalSpace& camera() const { return camera_; }
     
-    // Accessor for camera aim target posItion.
-    Vec3& aimTarget() { return aim_target_; }
-    const Vec3& aimTarget() const { return aim_target_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241208 work toward “wingman cam”
+
+//    // Accessor for camera aim target position.
+//    Vec3& aimTarget() { return aim_target_; }
+//    const Vec3& aimTarget() const { return aim_target_; }
     
-    // Accessors for look_from / look_at points.
+    
+    // TODO rough prototype.
+    //      Should it be an Agent?
+    //      Should it replace aimTarget()?
+
+    
+    // Accessor for camera aim target agent.
+//    LocalSpace& aimAgent() { return aim_agent_; }
+//    const LocalSpace& aimAgent() const { return aim_agent_; }
+    Agent& aimAgent() { return aim_agent_; }
+    const Agent& aimAgent() const { return aim_agent_; }
+
+    // TODO move to "private:"
+//    LocalSpace aim_agent_;
+    Agent aim_agent_;
+
+    // Writeable accessors for look_from / look_at points.
+    Vec3& cameraLookFrom() { return camera_look_from_; }
+    Vec3& cameraLookAt() { return camera_look_at_; }
+    Vec3& cameraLookUp() { return camera_look_up_; }
+    
+//    // Accessors for look_from / look_at points.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Vec3 cameraLookFrom() const { return camera_look_from_; }
     Vec3 cameraLookAt() const { return camera_look_at_; }
     Vec3 cameraLookUp() const { return camera_look_up_; }
-    
+
     // Settable accessor for  camera mode. Now cycles between follow and global.
     bool& cameraMode() { return camera_mode_; }
     void nextCameraMode()
@@ -533,8 +699,11 @@ private:
     // Camera mode. Currently cycles between follow and global.
     bool camera_mode_ = true;  // Follow mode.
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241208 work toward “wingman cam”
     // Aim target for follow camera. Set externally (eg to selected boid).
-    Vec3 aim_target_;
+//    Vec3 aim_target_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Desired offset distance in follow camera mode.
     double camera_desired_offset_dist_ = 15;

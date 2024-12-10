@@ -138,12 +138,7 @@ public:
                 save_centers_to_file_1_step();
                 log_stats();
                 update_fps();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20241208 work toward “wingman cam”
-//                draw().aimTarget() = selectedBoid()->position();
-//                draw().aimAgent() = selectedBoid()->ls();
                 draw().aimAgent() = *selectedBoid();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 draw().endOneAnimatedFrame();
                 aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
                 if (not draw().simPause()) { aTimer().measureFrameDuration(); }

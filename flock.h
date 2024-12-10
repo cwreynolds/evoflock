@@ -59,6 +59,9 @@ private:
     std::vector<ObstaclePtrList> obstacle_presets_;
     static inline int obstacle_selection_counter_ = -1;
 
+    // Currently selected boid's index in boids().
+    int selected_boid_index_ = 0;
+
 public:
     
     FlockParameters& fp() { return fp_; }
@@ -143,6 +146,7 @@ public:
                 aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
                 if (not draw().simPause()) { aTimer().measureFrameDuration(); }
                 updateObstacleSet();
+                updateSelectedBoid();
             }
         }
         save_centers_to_file_end();
@@ -735,14 +739,17 @@ public:
         fps_.blend((fixed_time_step() ? fixed_fps() : int(1 / fd)), 0.95);
     }
     
-    // TODO 20241004 follow cam. This is only partially updated from the Python
-    //               version. Assumes the selected boid is always the first one.
-    //
-    // Returns currently selected boid, the one that the tracking camera
-    // tracks, for which steering force annotation is shown.
-    Boid* selectedBoid() { return boids().front(); }
-    
-    
+    // Returns currently selected boid, the one that the tracking camera tracks,
+    // for which steering force annotation is shown.
+    Boid* selectedBoid() { return boids().at(selected_boid_index_); }
+
+    // Check if selected boid needs to be changed in response to "S" cmd in UI.
+    void updateSelectedBoid()
+    {
+        int s = draw().selectedBoidIndex() % boids().size();
+        if (s != selected_boid_index_) { selected_boid_index_ = s; }
+    }
+
     //        # Register single key commands with the Open3D visualizer GUI.
     //        def register_single_key_commands(self):
     //            Draw.register_key_callback(ord(' '), Flock.toggle_paused_mode)
@@ -911,7 +918,7 @@ public:
         debugPrint(obstacles().size());
     }
     
-    // Check if obstacle set needs to changed in response to "O" cmd in UI.
+    // Check if obstacle set needs to be changed in response to "O" cmd in UI.
     void updateObstacleSet()
     {
         int o = draw().obstacleSetIndex() % obstacle_presets_.size();

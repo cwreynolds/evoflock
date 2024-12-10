@@ -116,6 +116,11 @@ private:
                                          [&](base_vis_t* vis)
                                          { setSingleStepMode(); return true; });
 
+        // Add "S" command, to cycle selected boid through flock.
+        visualizer().RegisterKeyCallback('S',
+                                         [&](base_vis_t* vis)
+                                         { selectNextBoid(); return true; });
+
         // Set mouse scroll policy based on current camera mode.
         updateMouseScrollCallback();
 
@@ -548,6 +553,11 @@ public:
     int obstacleSetIndex() const { return obstacle_set_index_; }
     void nextObstacleSet() { obstacle_set_index_ += 1; }
     
+    // Runtime counter the simulation can use to change selected boid.
+    int& selectedBoidIndex() { return selected_boid_index_; }
+    int selectedBoidIndex() const { return selected_boid_index_; }
+    void selectNextBoid() { selected_boid_index_ += 1; }
+
     static void unit_test() {}
     
 private:
@@ -595,6 +605,9 @@ private:
     // Runtime counter the simulation can use to change predefined obs sets.
     // (TODO this seems very specific to flock simulation is it OK to be here?)
     int obstacle_set_index_ = 0;
+
+    // Runtime counter the simulation can use to change selected boid.
+    int selected_boid_index_ = 0;
 
 #ifdef USE_OPEN3D
     

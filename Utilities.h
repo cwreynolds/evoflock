@@ -164,6 +164,7 @@ public:
         first = false;
         return value;
     }
+    void clear() { first = true; }
     T value;
 private:
     bool first = true;

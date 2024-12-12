@@ -504,6 +504,7 @@ public:
     {
         camera_mode_ = (camera_mode_ + 1) % camera_mode_max_;
         updateMouseScrollCallback();
+        redrawNeeded();
     }
     bool isStaticCameraMode() { return (cameraMode() == 0); }
     bool isFollowCameraMode() { return (cameraMode() == 1); }
@@ -526,6 +527,21 @@ public:
         bool ok_to_run = getSingleStepMode() or not simPause();
         setSingleStepMode(false);
         return ok_to_run;
+    }
+    
+    // Called to trigger a scene redraw when simulation is paused. Currently
+    // called when camera-mode or selected_agent is changed, to make sure a
+    // redraw happens even if the simulation is paused.
+    // TODO ideally it would trigger ONLY the redraw and not a single sim step.
+    void redrawNeeded()
+    {
+        if (simPause())
+        {
+            setSingleStepMode();
+            up_memory_.clear();
+            from_memory_.clear();
+            at_memory_.clear();
+        }
     }
     
     // Single step mode means simulation should take one step, then pause again.
@@ -556,7 +572,7 @@ public:
     // Runtime counter the simulation can use to change selected boid.
     int& selectedBoidIndex() { return selected_boid_index_; }
     int selectedBoidIndex() const { return selected_boid_index_; }
-    void selectNextBoid() { selected_boid_index_ += 1; }
+    void selectNextBoid() { selected_boid_index_ += 1; redrawNeeded(); }
 
     static void unit_test() {}
     

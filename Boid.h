@@ -114,6 +114,9 @@ private:  // move to bottom of class later
     std::string name_;
     static inline int name_counter_ = 0;
     
+    // Flag set to true by flock for currently selected boid.
+    bool selected_ = false;
+
 public:
     // Accessors
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -162,6 +165,10 @@ public:
     const Vec3& color() const { return color_; }
     
     std::string name() const { return name_; }
+    
+    // Flag set to true by flock for currently selected boid.
+    bool& selected() { return selected_; }
+    bool selected() const { return selected_; }
     
     // Constructor
     Boid() : Agent()
@@ -616,13 +623,20 @@ public:
     // Should this Boid be annotated? (At most its those near selected boid.)
     bool should_annotate() const
     {
-        return (draw().enable() and
-                //    self.flock.enable_annotation and
-                //    self.flock.tracking_camera and
-                //    ((self == self.flock.selected_boid()) or
-                //     (self.flock.selected_boid().is_neighbor(self)))
-                true);  // TODO temp
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241212 set flag in selected boid, use for annotation.
+//        return (draw().enable() and (selected() or anyNeighborSelected()));
+        
+        return (draw().enable() and (selected() or amINeighborOfSelectedBoid()));
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
+
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241212 set flag in selected boid, use for annotation.
+    static inline int acounter = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Draw optional annotation of this Boid's current steering forces
     void annotation(const Vec3& separation,
@@ -631,8 +645,27 @@ public:
                     const Vec3& avoidance,
                     const Vec3& combined)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241212 set flag in selected boid, use for annotation.
+//        std::cout << "Calling should_annotate()" << std::endl;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         if (should_annotate())
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20241212 set flag in selected boid, use for annotation.
+            
+            acounter++;
+//            std::cout << "Draw annotation " << acounter << std::endl;
+//            
+//            for (auto b : flock_boids())
+//            {
+//                if (b->selected()) debugPrint(b)
+//            }
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+            
             double scale = 0.05;
             auto relative_force_annotation = [&](const Vec3& offset,
                                                  const Vec3& color)
@@ -652,6 +685,46 @@ public:
     //    def is_neighbor(self, other_boid):
     //        return other_boid in self.flock.selected_boid().cached_nearest_neighbors
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241212 set flag in selected boid, use for annotation.
+    
+
+//        // Are any of this Boid's (7) nearest neighbors the selected boid
+//        bool anyNeighborSelected() const
+//        {
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241212 set flag in selected boid, use for annotation.
+//    //        debugPrint(cached_nearest_neighbors().size())
+//            assert(cached_nearest_neighbors().size() == 7);
+//    //        debugPrint(util::vec_to_string(cached_nearest_neighbors()))
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            bool ans = false;
+//            for (auto n : cached_nearest_neighbors()) { ans = ans or n->selected(); }
+//            return ans;
+//        }
+    
+    // TODO this seem slow, I should rewrite it if it fixes the problem
+    
+    Boid* selectedBoid() const
+    {
+        for (auto b : flock_boids()) { if (b->selected()) { return b; } }
+        assert(false && "selected boid not found.");
+    }
+    
+    bool amINeighborOfSelectedBoid() const
+    {
+        bool ainosb = false;
+        Boid* sb = selectedBoid();
+        for (auto n : sb->cached_nearest_neighbors())
+        {
+            if (n == this) { ainosb = true; }
+        }
+        return ainosb;
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
     // Bird-like roll control: blends vector toward path curvature center with
     // global up. Overrides method in base class Agent
     Vec3 up_reference(const Vec3& acceleration) override

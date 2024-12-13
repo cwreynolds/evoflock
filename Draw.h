@@ -165,36 +165,12 @@ public:
         }
     }
 
-    void endAnimatedScene()
-    {
-        if (enable())
-        {
-        }
-    }
+    void endAnimatedScene() { if (enable()) { } }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241129 more on sim_paused
-
-//        void beginOneAnimatedFrame()
-//        {
-//    #ifdef USE_OPEN3D
-//            setExitFromRun(! pollEvents());
-//            if (enable())
-//            {
-//                animated_tri_mesh_->Clear();
-//                animated_line_set_->Clear();
-//                updateCamera();
-//            }
-//    #endif  // USE_OPEN3D
-//        }
-
-//    void beginOneAnimatedFrame()
-    void beginOneAnimatedFrame(bool sim_paused = false)
+    void beginOneAnimatedFrame()
     {
 #ifdef USE_OPEN3D
-//        setExitFromRun(! pollEvents());
         if (enable())
-//        if (enable() and not sim_paused)
         {
             animated_tri_mesh_->Clear();
             animated_line_set_->Clear();
@@ -202,7 +178,6 @@ public:
         }
 #endif  // USE_OPEN3D
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void endOneAnimatedFrame()
     {

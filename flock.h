@@ -138,12 +138,12 @@ public:
                 // TODO 20241212 set flag in selected boid, use for annotation.
                 
 //                std::cout << "Start frame ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << std::endl;
-                Boid::acounter = 0;
-                
-                int selected_counter = 0;
-                for (auto b : boids()) { if (b->selected()) { selected_counter++; } }
-                // debugPrint(selected_counter);
-                assert(selected_counter == 1);
+//                Boid::acounter = 0;
+//                
+//                int selected_counter = 0;
+//                for (auto b : boids()) { if (b->selected()) { selected_counter++; } }
+//                // debugPrint(selected_counter);
+//                assert(selected_counter == 1);
                 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -164,7 +164,7 @@ public:
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20241212 set flag in selected boid, use for annotation.
                 
-                assert(Boid::acounter == 8);
+//                assert(Boid::acounter == 8);
                 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
@@ -800,16 +800,28 @@ public:
 //        }
 //    }
 
+//    // Check if selected boid needs to be changed in response to "S" cmd in UI.
+//    void updateSelectedBoid()
+//    {
+//        int s = draw().selectedBoidIndex() % boids().size();
+//        if (s != selected_boid_index_)
+//        {
+//            std::cout << "Change selected boid index from "
+//                      << selected_boid_index_ << " to " << s << std::endl;
+//            
+//            
+//            for (auto b : boids()) { b->selected() = false; }
+//            boids().at(s)->selected() = true;
+//            selected_boid_index_ = s;
+//        }
+//    }
+
     // Check if selected boid needs to be changed in response to "S" cmd in UI.
     void updateSelectedBoid()
     {
         int s = draw().selectedBoidIndex() % boids().size();
         if (s != selected_boid_index_)
         {
-            std::cout << "Change selected boid index from "
-                      << selected_boid_index_ << " to " << s << std::endl;
-            
-            
             for (auto b : boids()) { b->selected() = false; }
             boids().at(s)->selected() = true;
             selected_boid_index_ = s;

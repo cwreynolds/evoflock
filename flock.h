@@ -134,19 +134,6 @@ public:
                 updateObstacleSet();
                 updateSelectedBoid();
 
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20241212 set flag in selected boid, use for annotation.
-                
-//                std::cout << "Start frame ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ " << std::endl;
-//                Boid::acounter = 0;
-//                
-//                int selected_counter = 0;
-//                for (auto b : boids()) { if (b->selected()) { selected_counter++; } }
-//                // debugPrint(selected_counter);
-//                assert(selected_counter == 1);
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
                 // Run simulation steps "as fast as possible" or at fixed rate?
                 bool afap = not (fixed_time_step() and draw().enable());
                 double step_duration = (afap ?
@@ -157,16 +144,11 @@ public:
                 save_centers_to_file_1_step();
                 log_stats();
                 update_fps();
+                selectedBoid()->drawAnnotationForBoidAndNeighbors();
                 draw().aimAgent() = *selectedBoid();
                 draw().endOneAnimatedFrame();
                 aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
                 if (not draw().simPause()) { aTimer().measureFrameDuration(); }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20241212 set flag in selected boid, use for annotation.
-                
-//                assert(Boid::acounter == 8);
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
         save_centers_to_file_end();
@@ -763,72 +745,12 @@ public:
     // for which steering force annotation is shown.
     Boid* selectedBoid() { return boids().at(selected_boid_index_); }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241212 set flag in selected boid, use for annotation.
-    
-//    // Check if selected boid needs to be changed in response to "S" cmd in UI.
-//    void updateSelectedBoid()
-//    {
-//        int s = draw().selectedBoidIndex() % boids().size();
-//        if (s != selected_boid_index_) { selected_boid_index_ = s; }
-//    }
-
-//    // Check if selected boid needs to be changed in response to "S" cmd in UI.
-//    void updateSelectedBoid()
-//    {
-//        int s = draw().selectedBoidIndex() % boids().size();
-//        if (s != selected_boid_index_)
-//        {
-//            if (selected_boid_index_ == -1) { selected_boid_index_ = 0; }
-//
-//            boids().at(selected_boid_index_)->selected() = false;
-//            selected_boid_index_ = s;
-//            boids().at(selected_boid_index_)->selected() = true;
-//        }
-//    }
-
-//    // Check if selected boid needs to be changed in response to "S" cmd in UI.
-//    void updateSelectedBoid()
-//    {
-//        int s = draw().selectedBoidIndex() % boids().size();
-//        if (s != selected_boid_index_)
-//        {
-//            int z = (selected_boid_index_ == -1) ? 0 : selected_boid_index_;
-//            boids().at(z)->selected() = false;
-//            boids().at(s)->selected() = true;
-//            selected_boid_index_ = s;
-//        }
-//    }
-
-//    // Check if selected boid needs to be changed in response to "S" cmd in UI.
-//    void updateSelectedBoid()
-//    {
-//        int s = draw().selectedBoidIndex() % boids().size();
-//        if (s != selected_boid_index_)
-//        {
-//            std::cout << "Change selected boid index from "
-//                      << selected_boid_index_ << " to " << s << std::endl;
-//            
-//            
-//            for (auto b : boids()) { b->selected() = false; }
-//            boids().at(s)->selected() = true;
-//            selected_boid_index_ = s;
-//        }
-//    }
-
     // Check if selected boid needs to be changed in response to "S" cmd in UI.
     void updateSelectedBoid()
     {
         int s = draw().selectedBoidIndex() % boids().size();
-        if (s != selected_boid_index_)
-        {
-            for (auto b : boids()) { b->selected() = false; }
-            boids().at(s)->selected() = true;
-            selected_boid_index_ = s;
-        }
+        if (s != selected_boid_index_) { selected_boid_index_ = s; }
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
     //        # Register single key commands with the Open3D visualizer GUI.

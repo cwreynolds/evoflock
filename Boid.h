@@ -114,8 +114,12 @@ private:  // move to bottom of class later
     std::string name_;
     static inline int name_counter_ = 0;
     
-    // Flag set to true by flock for currently selected boid.
-    bool selected_ = false;
+    // Save this Boid's steering forces for drawing annotation later.
+    Vec3 annote_separation_;
+    Vec3 annote_alignment_;
+    Vec3 annote_cohesion_;
+    Vec3 annote_avoidance_;
+    Vec3 annote_combined_;
 
 public:
     // Accessors
@@ -166,10 +170,6 @@ public:
     
     std::string name() const { return name_; }
     
-    // Flag set to true by flock for currently selected boid.
-    bool& selected() { return selected_; }
-    bool selected() const { return selected_; }
-    
     // Constructor
     Boid() : Agent()
     {
@@ -184,22 +184,14 @@ public:
     {
         next_steer_ = steer_to_flock();
     }
-
+  
     // Apply desired steering for this simulation step
     void apply_next_steer(double time_step)
     {
-        // Note this draws PREVIOUS state. Drawing the current state would have
-        // required more work, which did not seem worth the effort (to sync up
-        // annotation and Draw::aimTarget in Flock) just for visualization.
-        draw_body();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241213 store values for annotation in Boid instance.
-        drawAnnotation();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         // Apply the "steering force" (computed in plan_next_steer() during a
         // previous pass) to this Boid's geometric state.
         steer(next_steer_, time_step);
+        draw_body();
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -345,11 +337,7 @@ public:
             Vec3 o = steer_to_avoid() * fp().weight_avoid;
             Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
             combined_steering = anti_stall_adjustment(combined_steering);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20241213 store values for annotation in Boid instance.
-//            annotation(s, a, c, o, combined_steering);
             saveAnnotation(s, a, c, o, combined_steering);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             return combined_steering;
         }
     }
@@ -370,11 +358,7 @@ public:
         Vec3 o = steer_to_avoid() * fp().weight_avoid;
         Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
         combined_steering = anti_stall_adjustment(combined_steering);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241213 store values for annotation in Boid instance.
-//        annotation(s, a, c, o, combined_steering);
         saveAnnotation(s, a, c, o, combined_steering);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return combined_steering;
     }
 
@@ -631,111 +615,8 @@ public:
                                          // color
                                          color());
     }
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241213 store values for annotation in Boid instance.
-
     
-    // Should this Boid be annotated? (At most its those near selected boid.)
-    bool should_annotate() const
-    {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241212 set flag in selected boid, use for annotation.
-        //        return (draw().enable() and (selected() or anyNeighborSelected()));
-        
-        return (draw().enable() and (selected() or amINeighborOfSelectedBoid()));
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    }
-
-    
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    // TODO 20241212 set flag in selected boid, use for annotation.
-//    static inline int acounter = 0;
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//        // Draw optional annotation of this Boid's current steering forces
-//        void annotation(const Vec3& separation,
-//                        const Vec3& alignment,
-//                        const Vec3& cohesion,
-//                        const Vec3& avoidance,
-//                        const Vec3& combined)
-//        {
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20241212 set flag in selected boid, use for annotation.
-//    //        std::cout << "Calling should_annotate()" << std::endl;
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//            if (should_annotate())
-//            {
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20241212 set flag in selected boid, use for annotation.
-//
-//    //                acounter++;
-//    //    //            std::cout << "Draw annotation " << acounter << std::endl;
-//    //    //
-//    //    //            for (auto b : flock_boids())
-//    //    //            {
-//    //    //                if (b->selected()) debugPrint(b)
-//    //    //            }
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//
-//                double scale = 0.05;
-//                auto relative_force_annotation = [&](const Vec3& offset,
-//                                                     const Vec3& color)
-//                {
-//                    Vec3 ep = position() + offset * scale;
-//                    draw().addLineSegmentToAnimatedFrame(position(), ep, color);
-//                };
-//                relative_force_annotation(separation, Vec3(1, 0, 0));
-//                relative_force_annotation(alignment,  Vec3(0, 1, 0));
-//                relative_force_annotation(cohesion,   Vec3(0, 0, 1));
-//                relative_force_annotation(avoidance,  Vec3(1, 0, 1));
-//                relative_force_annotation(combined,   Vec3(0.5, 0.5, 0.5));
-//            }
-//        }
-
-    // TODO OLD ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    
-//    // Draw optional annotation of this Boid's current steering forces
-//    void annotation(const Vec3& separation,
-//                    const Vec3& alignment,
-//                    const Vec3& cohesion,
-//                    const Vec3& avoidance,
-//                    const Vec3& combined)
-//    {
-//        if (should_annotate())
-//        {
-//            double scale = 0.05;
-//            auto relative_force_annotation = [&](const Vec3& offset,
-//                                                 const Vec3& color)
-//            {
-//                Vec3 ep = position() + offset * scale;
-//                draw().addLineSegmentToAnimatedFrame(position(), ep, color);
-//            };
-//            relative_force_annotation(separation, Vec3(1, 0, 0));
-//            relative_force_annotation(alignment,  Vec3(0, 1, 0));
-//            relative_force_annotation(cohesion,   Vec3(0, 0, 1));
-//            relative_force_annotation(avoidance,  Vec3(1, 0, 1));
-//            relative_force_annotation(combined,   Vec3(0.5, 0.5, 0.5));
-//        }
-//    }
-    
-    // TODO NEW ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    
-    // move to "private:" eventually
-    Vec3 annote_separation_;
-    Vec3 annote_alignment_;
-    Vec3 annote_cohesion_;
-    Vec3 annote_avoidance_;
-    Vec3 annote_combined_;
-
-    
-    // Save this Boid's steering forces for annotation graphics.
+    // Save this Boid's steering forces for drawing annotation later.
     void saveAnnotation(const Vec3& separation,
                         const Vec3& alignment,
                         const Vec3& cohesion,
@@ -749,71 +630,33 @@ public:
         annote_combined_ = combined;
     }
 
-    
     // Draw optional annotation of this Boid's current steering forces
     void drawAnnotation()
     {
-        if (should_annotate())
+        double scale = 0.05;
+        auto relative_force_annotation = [&](const Vec3& offset,
+                                             const Vec3& color)
         {
-            double scale = 0.05;
-            auto relative_force_annotation = [&](const Vec3& offset,
-                                                 const Vec3& color)
-            {
-                Vec3 ep = position() + offset * scale;
-                draw().addLineSegmentToAnimatedFrame(position(), ep, color);
-            };
-            relative_force_annotation(annote_separation_, Vec3(1, 0, 0));
-            relative_force_annotation(annote_alignment_,  Vec3(0, 1, 0));
-            relative_force_annotation(annote_cohesion_,   Vec3(0, 0, 1));
-            relative_force_annotation(annote_avoidance_,  Vec3(1, 0, 1));
-            relative_force_annotation(annote_combined_,   Vec3(0.5, 0.5, 0.5));
-        }
+            Vec3 ep = position() + offset * scale;
+            draw().addLineSegmentToAnimatedFrame(position(), ep, color);
+        };
+        relative_force_annotation(annote_separation_, Vec3(1, 0, 0));
+        relative_force_annotation(annote_alignment_,  Vec3(0, 1, 0));
+        relative_force_annotation(annote_cohesion_,   Vec3(0, 0, 1));
+        relative_force_annotation(annote_avoidance_,  Vec3(1, 0, 1));
+        relative_force_annotation(annote_combined_,   Vec3(0.5, 0.5, 0.5));
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Called from Flock to draw annotation for selected Boid and its neighbors.
+    void drawAnnotationForBoidAndNeighbors()
+    {
+        drawAnnotation();
+        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
+    }
 
     
     //    def is_neighbor(self, other_boid):
     //        return other_boid in self.flock.selected_boid().cached_nearest_neighbors
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241212 set flag in selected boid, use for annotation.
-    
-
-//        // Are any of this Boid's (7) nearest neighbors the selected boid
-//        bool anyNeighborSelected() const
-//        {
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20241212 set flag in selected boid, use for annotation.
-//    //        debugPrint(cached_nearest_neighbors().size())
-//            assert(cached_nearest_neighbors().size() == 7);
-//    //        debugPrint(util::vec_to_string(cached_nearest_neighbors()))
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            bool ans = false;
-//            for (auto n : cached_nearest_neighbors()) { ans = ans or n->selected(); }
-//            return ans;
-//        }
-    
-    // TODO this seem slow, I should rewrite it if it fixes the problem
-    
-    Boid* selectedBoid() const
-    {
-        for (auto b : flock_boids()) { if (b->selected()) { return b; } }
-        assert(false && "selected boid not found.");
-    }
-    
-    bool amINeighborOfSelectedBoid() const
-    {
-        bool ainosb = false;
-        Boid* sb = selectedBoid();
-        for (auto n : sb->cached_nearest_neighbors())
-        {
-            if (n == this) { ainosb = true; }
-        }
-        return ainosb;
-    }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
     // Bird-like roll control: blends vector toward path curvature center with

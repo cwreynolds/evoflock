@@ -174,7 +174,6 @@ public:
         {
             animated_tri_mesh_->Clear();
             animated_line_set_->Clear();
-            updateCamera();
         }
 #endif  // USE_OPEN3D
     }
@@ -184,6 +183,7 @@ public:
 #ifdef USE_OPEN3D
         if (enable())
         {
+            updateCamera();
             animated_tri_mesh_->ComputeVertexNormals();
             visualizer().UpdateGeometry(animated_tri_mesh_);
             visualizer().UpdateGeometry(animated_line_set_);
@@ -644,7 +644,7 @@ private:
     
     // TODO 20240911 try evert TriangleMesh.
     // Flip orientation of each tri in a triangle mesh (destructively modifies).
-    // (pr to add to Open3D? https://github.com/isl-org/Open3D/discussions/6419)
+    // (pr for Open3D? See: https://github.com/isl-org/Open3D/discussions/6419)
     static void evertTriangleMesh(open3d::geometry::TriangleMesh& tri_mesh)
     {
         for (auto& triangle : tri_mesh.triangles_)

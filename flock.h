@@ -149,6 +149,13 @@ public:
                 draw().endOneAnimatedFrame();
                 aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
                 if (not draw().simPause()) { aTimer().measureFrameDuration(); }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20241216 why no obstacle avoidance?
+                
+//                debugPrint(selectedBoid()->flock_obstacles().size());
+//                debugPrint(selectedBoid()->steer_to_avoid());
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
         save_centers_to_file_end();
@@ -165,6 +172,20 @@ public:
     // Each boid has a uniformly distributed random orientation.
     void make_boids(int count, double radius, Vec3 center)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241216 why no obstacle avoidance?
+        std::cout << "in make_boids()" << std::endl;
+        debugPrint(obstacle_selection_counter_)
+        debugPrint(obstacles().size())
+        useObstacleSet();
+        debugPrint(obstacle_selection_counter_)
+        debugPrint(obstacles().size())
+        
+//        exit(0);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        
+        
         // Allocate default Boid instances.
         boid_instance_list().resize(boid_count());
         // Construct BoidPtrList.
@@ -172,6 +193,19 @@ public:
         // Set up each new Boid.
         RandomSequence& rs = EF::RS();
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241216 why no obstacle avoidance?
+        
+//    //        // TODO maybe call this "use current obstacle set"?
+//    //        useObstacleSet(obstacle_selection_counter_);
+//
+//    //        useCurrentObstacleSet();
+//
+//            useObstacleSet();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -911,7 +945,41 @@ public:
         updateObstacleSet();
     }
 
-    // Switch to obstacle set N.
+//    // Switch to obstacle set N.
+
+    
+//        // For each boid in the flock, set it to use obstacle set N (which defaults
+//        // the the currently selected obstacle set). (TODO 20241217 maybe optimize
+//        // out the clearing/re-drawing if the obstacle does not change.)
+//        void useObstacleSet() { useObstacleSet(obstacle_selection_counter_); }
+//        void useObstacleSet(int n)
+//        {
+//            draw().clearStaticScene();
+//            obstacle_selection_counter_ = n;
+//            obstacles() = obstacle_presets_.at(n);
+//            for (auto& o : obstacles()) { o->draw(); }
+//            debugPrint(obstacles().size());
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241216 why no obstacle avoidance?
+//
+//            // TODO -- AHA! this is zero on the first call
+//    //        debugPrint(boids().size())
+//    //        exit(0);
+//
+//            for (Boid* boid : boids())
+//            {
+//                boid->set_flock_obstacles(&obstacles());
+//            }
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//        }
+    
+    // For each boid in the flock, set it to use obstacle set N (which defaults
+    // the the currently selected obstacle set). (TODO 20241217 maybe optimize
+    // out the clearing/re-drawing if the obstacle does not change.)
+    void useObstacleSet() { useObstacleSet(obstacle_selection_counter_); }
     void useObstacleSet(int n)
     {
         draw().clearStaticScene();
@@ -920,6 +988,45 @@ public:
         for (auto& o : obstacles()) { o->draw(); }
         debugPrint(obstacles().size());
     }
+
+//        // For each boid in the flock, set it to use obstacle set N (which defaults
+//        // the the currently selected obstacle set). (TODO 20241217 maybe optimize
+//        // out the clearing/re-drawing if the obstacle does not change.)
+//        void useObstacleSet() { useObstacleSet(obstacle_selection_counter_); }
+//        void useObstacleSet(int n)
+//        {
+//            if ((n != obstacle_selection_counter_) or
+//                (0 < obstacle_selection_counter_))
+//            {
+//                draw().clearStaticScene();
+//    //            obstacle_selection_counter_ = n;
+//    //            obstacles() = obstacle_presets_.at(n);
+//                for (auto& o : obstacles()) { o->draw(); }
+//                debugPrint(obstacles().size());
+//            }
+//            obstacle_selection_counter_ = n;
+//            obstacles() = obstacle_presets_.at(n);
+//        }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241216 why no obstacle avoidance?
+
+
+//    // TODO name? structure?
+//    void useCurrentObstacleSet()
+//    {
+//        useObstacleSet(obstacle_selection_counter_);
+//    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//    // Check if obstacle set needs to be changed in response to "O" cmd in UI.
+//    void updateObstacleSet()
+//    {
+//        int o = draw().obstacleSetIndex() % obstacle_presets_.size();
+//        if (o != obstacle_selection_counter_) { useObstacleSet(o); }
+//    }
+  
     
     // Check if obstacle set needs to be changed in response to "O" cmd in UI.
     void updateObstacleSet()
@@ -927,7 +1034,7 @@ public:
         int o = draw().obstacleSetIndex() % obstacle_presets_.size();
         if (o != obstacle_selection_counter_) { useObstacleSet(o); }
     }
-    
+
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

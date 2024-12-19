@@ -63,15 +63,6 @@ public:
     double angle_cohere   =  0;      // 90°
     double fly_away_max_dist_in_br = 20;  // max fly-away dist from obs surface
     double min_time_to_collide = 0.8;     // react to predicted impact (seconds)
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241216 why no obstacle avoidance?
-    
-//    // Historical holdovers, no longer used.
-//    bool wrap_vs_avoid = false;   // always false
-//    bool avoid_blend_mode = true; // obstacle avoid: blend vs hard switch
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 class Flock;
@@ -146,22 +137,7 @@ public:
 
     ObstaclePtrList& flock_obstacles() { return *flock_obstacles_; }
     const ObstaclePtrList& flock_obstacles() const { return *flock_obstacles_; }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241216 why no obstacle avoidance?
-    
-//    void set_flock_obstacles(ObstaclePtrList* opl) { flock_obstacles_ = opl; }
-   
-    void set_flock_obstacles(ObstaclePtrList* opl)
-    {
-        flock_obstacles_ = opl;
-        
-//        debugPrint(util::vec_to_string(*opl));
-//        debugPrint(util::vec_to_string(*flock_obstacles_));
-//        debugPrint(opl->size());
-//        debugPrint(flock_obstacles_->size());
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    void set_flock_obstacles(ObstaclePtrList* opl) { flock_obstacles_ = opl; }
 
     FlockParameters& fp() { return *fp_; }
     const FlockParameters& fp() const { return *fp_; }
@@ -443,24 +419,6 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241216 why no obstacle avoidance?
 
-//    // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
-//    // (I will collide with obstacle within min_time_to_collide seconds)
-//    // and "static" avoidance (I should fly away from this obstacle to add
-//    // clearance, to avoid scraping along everted containment obstacles).
-//    Vec3 steer_to_avoid()
-//    {
-//        Vec3 avoid;
-//        avoid_obstacle_annotation(0, Vec3::none(), 0);
-//        if (not fp().wrap_vs_avoid)
-//        {
-//            Vec3 predict_avoid = steer_for_predictive_avoidance();
-//            Vec3 static_avoid = fly_away_from_obstacles();
-//            avoid = static_avoid + predict_avoid;
-//        }
-//        avoid_obstacle_annotation(3, Vec3::none(), 0);
-//        return avoid;
-//    }
-
     // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
     // (I will collide with obstacle within min_time_to_collide seconds)
     // and "static" avoidance (I should fly away from this obstacle to add
@@ -475,40 +433,6 @@ public:
         avoid_obstacle_annotation(3, Vec3::none(), 0);
         return avoid;
     }
-
-
-//    // Steering force component for predictive obstacles avoidance.
-//    Vec3 steer_for_predictive_avoidance()
-//    {
-//        double weight = 0;
-//        Vec3 avoidance;
-//        CollisionList collisions = get_predicted_obstacle_collisions();
-//        if (not collisions.empty())
-//        {
-//            const Collision& first_collision = collisions.front();
-//            Vec3 poi = first_collision.point_of_impact;
-//            Vec3 normal = first_collision.normal_at_poi;
-//            Vec3 pure_steering = pure_lateral_steering(normal);
-//            avoidance = pure_steering.normalize();
-//            double min_dist = speed() * fp().min_time_to_collide;
-//            // Near enough to require avoidance steering?
-//            bool near = min_dist > first_collision.dist_to_collision;
-//            if (fp().avoid_blend_mode)
-//            {
-//                // Smooth weight transition from 80% to 120% of min dist.
-//                double d = util::remap_interval(first_collision.dist_to_collision,
-//                                                min_dist * 0.8, min_dist * 1.2,
-//                                                1, 0);
-//                weight = util::unit_sigmoid_on_01(d);
-//            }
-//            else
-//            {
-//                weight = near ? 1 : 0;
-//            }
-//            avoid_obstacle_annotation(1, poi, weight);
-//        }
-//        return avoidance * weight;
-//    }
 
     // Steering force component for predictive obstacles avoidance.
     Vec3 steer_for_predictive_avoidance()

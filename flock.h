@@ -26,8 +26,6 @@
 #include "Utilities.h"
 #include "Vec3.h"
 
-#include "LazyPredator/LazyPredator.h"
-namespace LP = LazyPredator;
 #include <fstream>  // for logging simulation data to file.
 
 
@@ -47,9 +45,6 @@ private:
     bool fixed_time_step_ = false;
     int fixed_fps_ = 60;
     int seed_ = 1234567890;
-
-//    bool simulation_paused_ = false; // Simulation stopped, display continues.
-//    bool single_step_ = false;       // perform one simulation step then pause.
 
     int total_stalls_ = 0;
     int cumulative_sep_fail_ = 0;   // separation fail: a pair of boids touch.
@@ -110,7 +105,6 @@ public:
     Flock() : occupancy_map(Vec3(25, 25, 25), Vec3(100, 100, 100), Vec3())
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
-        preDefinedObstacleSets();
     }
 
     // Run boids simulation.
@@ -123,9 +117,7 @@ public:
         // self.draw()
         // self.cycle_obstacle_selection()
         draw().beginAnimatedScene();
-
         save_centers_to_file_start();
-
         while (still_running())
         {
             if (draw().runSimulationThisFrame())
@@ -149,13 +141,6 @@ public:
                 draw().endOneAnimatedFrame();
                 aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
                 if (not draw().simPause()) { aTimer().measureFrameDuration(); }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20241216 why no obstacle avoidance?
-                
-//                debugPrint(selectedBoid()->flock_obstacles().size());
-//                debugPrint(selectedBoid()->steer_to_avoid());
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
         save_centers_to_file_end();
@@ -172,40 +157,15 @@ public:
     // Each boid has a uniformly distributed random orientation.
     void make_boids(int count, double radius, Vec3 center)
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241216 why no obstacle avoidance?
-        std::cout << "in make_boids()" << std::endl;
-        debugPrint(obstacle_selection_counter_)
-        debugPrint(obstacles().size())
-        useObstacleSet();
-        debugPrint(obstacle_selection_counter_)
-        debugPrint(obstacles().size())
-        
-//        exit(0);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        
-        
         // Allocate default Boid instances.
         boid_instance_list().resize(boid_count());
         // Construct BoidPtrList.
         for (Boid& boid : boid_instance_list()) { boids().push_back(&boid); }
+        // Ensure all obstacle sets are defined and one is made active.
+        preDefinedObstacleSets();
         // Set up each new Boid.
         RandomSequence& rs = EF::RS();
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241216 why no obstacle avoidance?
-        
-//    //        // TODO maybe call this "use current obstacle set"?
-//    //        useObstacleSet(obstacle_selection_counter_);
-//
-//    //        useCurrentObstacleSet();
-//
-//            useObstacleSet();
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -716,7 +676,6 @@ public:
     // Calculate and log various statistics for flock.
     void log_stats()
     {
-//        if ((not simulation_paused_) and
         if ((not draw().simPause()) and
             (aTimer().frameCounter() % getLogStatInterval() == 0))
         {
@@ -891,153 +850,85 @@ public:
     // between them, and making one active.
     // TODO this architecture is left over from the Python version and may need
     // to be refactored in the evoflock environment.
-    
-    void preDefinedObstacleSets()
+    const std::vector<ObstaclePtrList>& preDefinedObstacleSets()
     {
-        ObstaclePtrList obs;
-        
-        double sr = fp().sphere_radius;
-        Vec3 sc = fp().sphere_center;
-
-
-        // Set 1: sphere and right hand vertical cylinder.
-        obs.clear();
-        // TODO prototyping -- add everted SphereObstacle
-        obs.push_back(new EvertedSphereObstacle(fp().sphere_radius,
-                                                fp().sphere_center,
-                                                Obstacle::outside));
-        Vec3 ect = sc + Vec3(sr * 0.6, sr, 0);
-        Vec3 ecb = sc + Vec3(sr * 0.6, -sr, 0);
-        obs.push_back(new CylinderObstacle(sr * 0.2, ect, ecb, Obstacle::inside));
-        obstacle_presets_.push_back(obs);
-        
-        // Set 2: sphere and 6 cylinders.
-        obs.clear();
-        obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
-        // 6 symmetric cylinders parallel to main axes.
-        double c6r = sr *  4 / 30;
-        double c6o = sr * 15 / 30;
-        double c6h = sr * 20 / 30;
-        auto add_3_cyl = [&](double c6o)
+        if (obstacle_presets_.empty())
         {
-            auto add_cyl = [&](double r, Vec3 t, Vec3 b)
-                { obs.push_back(new CylinderObstacle(r, t, b)); };
-            add_cyl(c6r, Vec3(-c6h, 0, c6o), Vec3(c6h, 0, c6o));
-            add_cyl(c6r, Vec3(c6o, -c6h, 0), Vec3(c6o, c6h, 0));
-            add_cyl(c6r, Vec3(0, c6o, -c6h), Vec3(0, c6o, c6h));
-        };
-        add_3_cyl(c6o);
-        add_3_cyl(-c6o);
-        obstacle_presets_.push_back(obs);
+            ObstaclePtrList obs;
+            double sr = fp().sphere_radius;
+            Vec3 sc = fp().sphere_center;
+            
+            // Set 1: sphere and right hand vertical cylinder.
+            obs.clear();
+            // TODO prototyping -- add everted SphereObstacle
+            obs.push_back(new EvertedSphereObstacle(fp().sphere_radius,
+                                                    fp().sphere_center,
+                                                    Obstacle::outside));
+            Vec3 ect = sc + Vec3(sr * 0.6, sr, 0);
+            Vec3 ecb = sc + Vec3(sr * 0.6, -sr, 0);
+            obs.push_back(new CylinderObstacle(sr * 0.2, ect, ecb, Obstacle::inside));
+            obstacle_presets_.push_back(obs);
+            
+            // Set 2: sphere and 6 cylinders.
+            obs.clear();
+            obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
+            // 6 symmetric cylinders parallel to main axes.
+            double c6r = sr *  4 / 30;
+            double c6o = sr * 15 / 30;
+            double c6h = sr * 20 / 30;
+            auto add_3_cyl = [&](double c6o)
+            {
+                auto add_cyl = [&](double r, Vec3 t, Vec3 b)
+                    { obs.push_back(new CylinderObstacle(r, t, b)); };
+                add_cyl(c6r, Vec3(-c6h, 0, c6o), Vec3(c6h, 0, c6o));
+                add_cyl(c6r, Vec3(c6o, -c6h, 0), Vec3(c6o, c6h, 0));
+                add_cyl(c6r, Vec3(0, c6o, -c6h), Vec3(0, c6o, c6h));
+            };
+            add_3_cyl(c6o);
+            add_3_cyl(-c6o);
+            obstacle_presets_.push_back(obs);
+            
+            // Set 3 sphere and horizontal plane
+            obs.clear();
+            obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
+            obs.push_back(new PlaneObstacle(Vec3(0, 1, 0), sc, sr, sr * 0.001));
+            obstacle_presets_.push_back(obs);
+            
+            // Set 4 just the big sphere.
+            obs.clear();
+            obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
+            obstacle_presets_.push_back(obs);
 
-        // Set 3 sphere and horizontal plane
-        obs.clear();
-        obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
-        obs.push_back(new PlaneObstacle(Vec3(0, 1, 0), sc, sr, sr * 0.001));
-        obstacle_presets_.push_back(obs);
-        
-        // Set 4 just the big sphere.
-        obs.clear();
-        obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
-        obstacle_presets_.push_back(obs);
-        
-        // Finally, activate the first (zeroth) obstacle set.
-        updateObstacleSet();
+            // Initially make first obstacle set be active.
+            updateObstacleSet();
+            useObstacleSet(0);
+        }
+        return obstacle_presets_;
     }
 
-//    // Switch to obstacle set N.
-
-    
-//        // For each boid in the flock, set it to use obstacle set N (which defaults
-//        // the the currently selected obstacle set). (TODO 20241217 maybe optimize
-//        // out the clearing/re-drawing if the obstacle does not change.)
-//        void useObstacleSet() { useObstacleSet(obstacle_selection_counter_); }
-//        void useObstacleSet(int n)
-//        {
-//            draw().clearStaticScene();
-//            obstacle_selection_counter_ = n;
-//            obstacles() = obstacle_presets_.at(n);
-//            for (auto& o : obstacles()) { o->draw(); }
-//            debugPrint(obstacles().size());
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20241216 why no obstacle avoidance?
-//
-//            // TODO -- AHA! this is zero on the first call
-//    //        debugPrint(boids().size())
-//    //        exit(0);
-//
-//            for (Boid* boid : boids())
-//            {
-//                boid->set_flock_obstacles(&obstacles());
-//            }
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//        }
-    
     // For each boid in the flock, set it to use obstacle set N (which defaults
-    // the the currently selected obstacle set). (TODO 20241217 maybe optimize
-    // out the clearing/re-drawing if the obstacle does not change.)
+    // the the currently selected obstacle set).
     void useObstacleSet() { useObstacleSet(obstacle_selection_counter_); }
     void useObstacleSet(int n)
     {
-        draw().clearStaticScene();
-        obstacle_selection_counter_ = n;
-        obstacles() = obstacle_presets_.at(n);
-        for (auto& o : obstacles()) { o->draw(); }
-        debugPrint(obstacles().size());
+        obstacles() = preDefinedObstacleSets().at(n);
+        if (n != obstacle_selection_counter_)
+        {
+            draw().clearStaticScene();
+            obstacle_selection_counter_ = n;
+            for (auto& o : obstacles()) { o->draw(); }
+        }
+        for_all_boids([&](Boid* b){ b->set_flock_obstacles(&obstacles()); });
     }
-
-//        // For each boid in the flock, set it to use obstacle set N (which defaults
-//        // the the currently selected obstacle set). (TODO 20241217 maybe optimize
-//        // out the clearing/re-drawing if the obstacle does not change.)
-//        void useObstacleSet() { useObstacleSet(obstacle_selection_counter_); }
-//        void useObstacleSet(int n)
-//        {
-//            if ((n != obstacle_selection_counter_) or
-//                (0 < obstacle_selection_counter_))
-//            {
-//                draw().clearStaticScene();
-//    //            obstacle_selection_counter_ = n;
-//    //            obstacles() = obstacle_presets_.at(n);
-//                for (auto& o : obstacles()) { o->draw(); }
-//                debugPrint(obstacles().size());
-//            }
-//            obstacle_selection_counter_ = n;
-//            obstacles() = obstacle_presets_.at(n);
-//        }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241216 why no obstacle avoidance?
-
-
-//    // TODO name? structure?
-//    void useCurrentObstacleSet()
-//    {
-//        useObstacleSet(obstacle_selection_counter_);
-//    }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//    // Check if obstacle set needs to be changed in response to "O" cmd in UI.
-//    void updateObstacleSet()
-//    {
-//        int o = draw().obstacleSetIndex() % obstacle_presets_.size();
-//        if (o != obstacle_selection_counter_) { useObstacleSet(o); }
-//    }
   
-    
     // Check if obstacle set needs to be changed in response to "O" cmd in UI.
     void updateObstacleSet()
     {
-        int o = draw().obstacleSetIndex() % obstacle_presets_.size();
+        int o = draw().obstacleSetIndex() % preDefinedObstacleSets().size();
         if (o != obstacle_selection_counter_) { useObstacleSet(o); }
+        for_all_boids([&](Boid* b){ b->set_flock_obstacles(&obstacles()); });
     }
-
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     //
     //        # Print mini-help on shell.
     //        def print_help(self):

@@ -83,9 +83,12 @@ private:  // move to bottom of class later
     // Set during sense/plan phase, saved for steer phase.
     Vec3 next_steer_;
 
-    Vec3 color_;
-    Vec3 annote_avoid_poi_ = Vec3();  // This might be too elaborate: two vals
-    double annote_avoid_weight_ = 0;  // per boid just for avoid annotation.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241219 reconsider avoid_blend_mode
+//    Vec3 color_;
+//    Vec3 annote_avoid_poi_ = Vec3();  // This might be too elaborate: two vals
+//    double annote_avoid_weight_ = 0;  // per boid just for avoid annotation.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Cumulative count: how many avoidance failures (collisions) has it had?
     int avoidance_failure_counter_ = 0;
@@ -110,13 +113,24 @@ private:  // move to bottom of class later
     std::string name_;
     static inline int name_counter_ = 0;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241219 reconsider avoid_blend_mode
+    
+    Vec3 color_;
+//    Vec3 annote_avoid_poi_ = Vec3();  // This might be too elaborate: two vals
+//    double annote_avoid_weight_ = 0;  // per boid just for avoid annotation.
+
     // Save this Boid's steering forces for drawing annotation later.
     Vec3 annote_separation_;
     Vec3 annote_alignment_;
     Vec3 annote_cohesion_;
     Vec3 annote_avoidance_;
     Vec3 annote_combined_;
+    Vec3 annote_avoid_poi_ = Vec3();
+    double annote_avoid_weight_ = 0;
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
 public:
     // Accessors
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -433,7 +447,10 @@ public:
         avoid_obstacle_annotation(3, Vec3::none(), 0);
         return avoid;
     }
-
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241219 reconsider avoid_blend_mode
+    
     // Steering force component for predictive obstacles avoidance.
     Vec3 steer_for_predictive_avoidance()
     {
@@ -451,17 +468,20 @@ public:
 //            // Near enough to require avoidance steering?
 //            bool near = min_dist > first_collision.dist_to_collision;
 //            if (fp().avoid_blend_mode)
-            {
-                // Smooth weight transition from 80% to 120% of min dist.
-                double d = util::remap_interval(first_collision.dist_to_collision,
-                                                min_dist * 0.8, min_dist * 1.2,
-                                                1, 0);
-                weight = util::unit_sigmoid_on_01(d);
-            }
-//            else
 //            {
-//                weight = near ? 1 : 0;
+//                // Smooth weight transition from 80% to 120% of min dist.
+//                double d = util::remap_interval(first_collision.dist_to_collision,
+//                                                min_dist * 0.8, min_dist * 1.2,
+//                                                1, 0);
+//                weight = util::unit_sigmoid_on_01(d);
 //            }
+//            else
+            {
+                // Near enough to require avoidance steering?
+                bool near = min_dist > first_collision.dist_to_collision;
+
+                weight = near ? 1 : 0;
+            }
             avoid_obstacle_annotation(1, poi, weight);
         }
         return avoidance * weight;
@@ -487,23 +507,81 @@ public:
         return avoidance;
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241219 reconsider avoid_blend_mode
+
+//    // Draw a ray from Boid to point of impact, or nearest point for fly-away.
+//    // Magenta for strong avoidance, shades to background gray (85%) for gentle
+//    // avoidance. "Phase" used to show strongest avodiance: predictive vs static.
+//    void avoid_obstacle_annotation(int phase, Vec3 poi, double weight)
+//    {
+//        //    if phase == 0:
+//        //        self.annote_avoid_poi = Vec3()  # This might be too elaborate: two vals
+//        //        self.annote_avoid_weight = 0    # per boid just for avoid annotation.
+//        //    # For predictive avoidance (phase 0) just store poi and weight.
+//        //    if phase == 1:
+//        //        self.annote_avoid_poi = poi
+//        //        self.annote_avoid_weight = weight
+//        //    # For static avoidance (phase 1) use values for max weight.
+//        //    if phase == 2:
+//        //        if weight > self.annote_avoid_weight:
+//        //            self.annote_avoid_poi = poi
+//        //            self.annote_avoid_weight = weight
+//        //    if phase == 3:
+//        //        if self.should_annotate() and self.annote_avoid_weight > 0.01:
+//        //            Draw.add_line_segment(self.position,
+//        //                                  self.annote_avoid_poi,
+//        //                                  # Interp color between gray and magenta.
+//        //                                  util.interpolate(self.annote_avoid_weight,
+//        //                                                   Vec3(0.85, 0.85, 0.85),
+//        //                                                   Vec3(1, 0, 1)))
+//    }
+
     // Draw a ray from Boid to point of impact, or nearest point for fly-away.
     // Magenta for strong avoidance, shades to background gray (85%) for gentle
-    // avoidance. "Phase" used to show strongest avodiance: predictive vs static.
+    // avoidance. "Phase" used to show strongest avoidance: predictive vs static.
     void avoid_obstacle_annotation(int phase, Vec3 poi, double weight)
     {
         //    if phase == 0:
         //        self.annote_avoid_poi = Vec3()  # This might be too elaborate: two vals
         //        self.annote_avoid_weight = 0    # per boid just for avoid annotation.
+        
+        // TODO Phase 0 and 1 are identical?
+        
+        if (phase == 0)
+        {
+            annote_avoid_poi_ = Vec3();
+            annote_avoid_weight_ = 0;
+        }
+        
         //    # For predictive avoidance (phase 0) just store poi and weight.
         //    if phase == 1:
-        //        self.annote_avoid_poi = poi
-        //        self.annote_avoid_weight = weight
+        //        self.annote_avoid_poi = Vec3()  # This might be too elaborate: two vals
+        //        self.annote_avoid_weight = 0    # per boid just for avoid annotation.
+
+        if (phase == 1)
+        {
+//            annote_avoid_poi_ = Vec3();
+//            annote_avoid_weight_ = 0;
+            annote_avoid_poi_ = poi;
+            annote_avoid_weight_ = weight;
+        }
+        
         //    # For static avoidance (phase 1) use values for max weight.
         //    if phase == 2:
         //        if weight > self.annote_avoid_weight:
         //            self.annote_avoid_poi = poi
         //            self.annote_avoid_weight = weight
+        
+        if (phase == 2)
+        {
+            if (weight > annote_avoid_weight_)
+            {
+                annote_avoid_poi_ = poi;
+                annote_avoid_weight_ = weight;
+            }
+        }
+        
         //    if phase == 3:
         //        if self.should_annotate() and self.annote_avoid_weight > 0.01:
         //            Draw.add_line_segment(self.position,
@@ -513,7 +591,9 @@ public:
         //                                                   Vec3(0.85, 0.85, 0.85),
         //                                                   Vec3(1, 0, 1)))
     }
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Prevent "stalls" -- when a Boid's speed drops so low that it looks like
     // it is floating rather than flying. Tries to keep the boid's speed above
     // min_speed() (currently (20231227) self.max_speed * 0.3). It starts to
@@ -642,7 +722,26 @@ public:
         relative_force_annotation(annote_alignment_,  Vec3(0, 1, 0));
         relative_force_annotation(annote_cohesion_,   Vec3(0, 0, 1));
         relative_force_annotation(annote_avoidance_,  Vec3(1, 0, 1));
-        relative_force_annotation(annote_combined_,   Vec3(0.5, 0.5, 0.5));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241219 reconsider avoid_blend_mode
+//        relative_force_annotation(annote_combined_,   Vec3(0.5, 0.5, 0.5));
+        relative_force_annotation(annote_combined_,   Vec3(1, 1, 1));
+
+                    
+        if (annote_avoid_weight_ > 0.01)
+        {
+            Vec3 avoid_color = util::interpolate(annote_avoid_weight_,
+//                                                 Vec3(0.82, 0.82, 0.82),
+                                                 Vec3(0.4, 0.4, 0.4),
+                                                 Vec3(1, 0, 1));
+            draw().addLineSegmentToAnimatedFrame(position(),
+                                                 annote_avoid_poi_,
+                                                 avoid_color);
+            
+        }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     }
     
     // Called from Flock to draw annotation for selected Boid and its neighbors.

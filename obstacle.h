@@ -183,18 +183,36 @@ public:
 //        //    Draw.adjust_static_scene_object(self.tri_mesh)
 //    }
 
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+    // TODO 20241220 add random texture to obstacle TriMeshes
+    
+//        void draw() const override
+//        {
+//            auto mesh = Draw::constructSphereTriMesh(radius_,
+//                                                     center_,
+//                                                     {0.5, 0.5, 0.5},
+//                                                     true,
+//    //                                                 getExcludeFrom() == inside);
+//                                                     getExcludeFrom() == outside,
+//    //                                                 100);
+//                                                     500);
+//            Draw::getInstance().addTriMeshToStaticScene(mesh);
+//        }
+    
     void draw() const override
     {
+        Vec3 color(0.5, 0.5, 0.5);
         auto mesh = Draw::constructSphereTriMesh(radius_,
                                                  center_,
-                                                 {0.5, 0.5, 0.5},
+                                                 color,
                                                  true,
-//                                                 getExcludeFrom() == inside);
                                                  getExcludeFrom() == outside,
-//                                                 100);
                                                  500);
+        Draw::brightnessSpecklePerVertex(0.95, 1.00, color, mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
+
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -328,18 +346,38 @@ public:
 //            Draw::getInstance().addTriMeshToStaticScene(mesh);
 //        }
     
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
+    // TODO 20241220 add random texture to obstacle TriMeshes
+
+//    void draw() const override
+//    {
+//        Vec3 ep_offset = center_ + normal_ * visible_thickness_;
+//        auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
+//                                                   center_ + ep_offset,
+//                                                   center_ - ep_offset,
+//                                                   {0.7, 0.7, 0.8},
+//                                                   true,
+//                                                   false, // don't evert
+//                                                   500);
+//        Draw::getInstance().addTriMeshToStaticScene(mesh);
+//    }
+    
     void draw() const override
     {
         Vec3 ep_offset = center_ + normal_ * visible_thickness_;
+        Vec3 color(0.7, 0.7, 0.8);
         auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
                                                    center_ + ep_offset,
                                                    center_ - ep_offset,
-                                                   {0.7, 0.7, 0.8},
+                                                   color,
                                                    true,
                                                    false, // don't evert
                                                    500);
+        Draw::brightnessSpecklePerVertex(0.7, 1.0, color, mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
+    
+    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 
 
     std::string to_string() const override { return "PlaneObstacle"; }
@@ -485,17 +523,31 @@ public:
 //        d.addTriMeshToStaticScene(cyl_mesh);
 //    }
 
+//        void draw() const override
+//        {
+//            auto mesh = Draw::constructCylinderTriMesh(radius_,
+//                                                       endpoint0(),
+//                                                       endpoint1(),
+//                                                       {0.7, 0.8, 0.7},
+//                                                       true,
+//    //                                                   getExcludeFrom() == inside);
+//                                                       getExcludeFrom() == outside,
+//    //                                                   100);
+//                                                       500);
+//            Draw::getInstance().addTriMeshToStaticScene(mesh);
+//        }
+
     void draw() const override
     {
+        Vec3 color(0.7, 0.8, 0.7);
         auto mesh = Draw::constructCylinderTriMesh(radius_,
                                                    endpoint0(),
                                                    endpoint1(),
-                                                   {0.7, 0.8, 0.7},
+                                                   color,
                                                    true,
-//                                                   getExcludeFrom() == inside);
                                                    getExcludeFrom() == outside,
-//                                                   100);
                                                    500);
+        Draw::brightnessSpecklePerVertex(0.7, 1.0, color, mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
 

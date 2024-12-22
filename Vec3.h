@@ -397,7 +397,8 @@ public:
         assert (j.cross(i) == -k);
         assert (k.cross(j) == -i);
         
-        double pi = std::acos(-1);
+//        double pi = std::acos(-1);
+        double pi = util::pi;
         double pi2 = pi / 2;
         double pi3 = pi / 3;
         double pi4 = pi / 4;

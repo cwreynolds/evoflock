@@ -28,6 +28,12 @@ class Vec3;
 
 namespace Utilities 
 {
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20241221 square panels on cylinders
+
+double pi = std::acos(-1);
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Generic interpolation
 template<typename F,typename T>

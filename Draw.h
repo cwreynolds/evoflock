@@ -124,26 +124,26 @@ private:
         // Set mouse scroll policy based on current camera mode.
         updateMouseScrollCallback();
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241007 follow cam -- to/from tracker balls
-        double ball_radius = 0.3;
-        to_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
-        from_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
-        to_ball->PaintUniformColor({0, 1, 0});
-        from_ball->PaintUniformColor({1, 0, 1});
-        visualizer().AddGeometry(to_ball);
-        visualizer().AddGeometry(from_ball);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20241007 follow cam -- to/from tracker balls
+//        double ball_radius = 0.3;
+//        to_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
+//        from_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
+//        to_ball->PaintUniformColor({0, 1, 0});
+//        from_ball->PaintUniformColor({1, 0, 1});
+//        visualizer().AddGeometry(to_ball);
+//        visualizer().AddGeometry(from_ball);
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241007 follow cam -- to/from tracker balls
-//    std::shared_ptr<open3d::geometry::TriangleMesh> from_ball;
-//    std::shared_ptr<open3d::geometry::TriangleMesh> to_ball;
-    sp_tri_mesh_t from_ball;
-    sp_tri_mesh_t to_ball;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20241007 follow cam -- to/from tracker balls
+//    //    std::shared_ptr<open3d::geometry::TriangleMesh> from_ball;
+//    //    std::shared_ptr<open3d::geometry::TriangleMesh> to_ball;
+//        sp_tri_mesh_t from_ball;
+//        sp_tri_mesh_t to_ball;
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 public:
 
@@ -187,11 +187,11 @@ public:
             animated_tri_mesh_->ComputeVertexNormals();
             visualizer().UpdateGeometry(animated_tri_mesh_);
             visualizer().UpdateGeometry(animated_line_set_);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20241007 follow cam -- to/from tracker balls
-            visualizer().UpdateGeometry(from_ball);
-            visualizer().UpdateGeometry(to_ball);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20241007 follow cam -- to/from tracker balls
+//            visualizer().UpdateGeometry(from_ball);
+//            visualizer().UpdateGeometry(to_ball);
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
 #endif  // USE_OPEN3D
     }
@@ -281,6 +281,28 @@ public:
         visualizer().AddGeometry(tri_mesh);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241221 square panels on cylinders
+    
+//    // Make cylinder: returns shared pointer to tri mesh with given parameters.
+//    static sp_tri_mesh_t constructCylinderTriMesh(double radius,
+//                                                  const Vec3& endpoint0,
+//                                                  const Vec3& endpoint1,
+//                                                  const Vec3& color,
+//                                                  bool compute_normals,
+//                                                  bool evert,
+//                                                  int subdivision)
+//    {
+//        auto cyl_mesh = constructO3dCylinder(radius,
+//                                             vec3ToEv3d(endpoint0),
+//                                             vec3ToEv3d(endpoint1),
+//                                             subdivision);
+//        cyl_mesh->PaintUniformColor(vec3ToEv3d(color));
+//        if (compute_normals) { cyl_mesh->ComputeVertexNormals(); }
+//        if (evert) { evertTriangleMesh(*cyl_mesh); }
+//        return cyl_mesh;
+//    }
+
     // Make cylinder: returns shared pointer to tri mesh with given parameters.
     static sp_tri_mesh_t constructCylinderTriMesh(double radius,
                                                   const Vec3& endpoint0,
@@ -290,10 +312,25 @@ public:
                                                   bool evert,
                                                   int subdivision)
     {
+        double height = (endpoint0 - endpoint1).length();
+//        double circumference = 2 * lp::util::pi * radius;
+//        double circumference = 2 * 3.14159 * radius;
+        double circumference = 2 * util::pi * radius;
+        double chord = circumference / subdivision;
         auto cyl_mesh = constructO3dCylinder(radius,
                                              vec3ToEv3d(endpoint0),
                                              vec3ToEv3d(endpoint1),
-                                             subdivision);
+//                                             subdivision);
+                                             subdivision,
+                                             
+//                                             height / 100
+//                                             height
+//                                             height * 3
+//                                             height * 4
+//                                             height / chord
+                                             std::max(1.0, height / chord)
+
+                                             );
         cyl_mesh->PaintUniformColor(vec3ToEv3d(color));
         if (compute_normals) { cyl_mesh->ComputeVertexNormals(); }
         if (evert) { evertTriangleMesh(*cyl_mesh); }
@@ -316,6 +353,8 @@ public:
         return mesh;
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }
     void setEnable(bool e) { enable_ = e; }
@@ -334,15 +373,15 @@ public:
             setVisualizerViewByFromAt(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
-            from_ball->Translate({0, 1000, 0}, false);
-            to_ball->Translate({0, 1000, 0}, false);
+//            from_ball->Translate({0, 1000, 0}, false);
+//            to_ball->Translate({0, 1000, 0}, false);
             // Draw circle around aimTarget() pointing toward camera.
             addBlackAndWhiteCircularReticle(aimAgent().position());
         }
         else
         {
-            from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
-            to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
+//            from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
+//            to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
         }
     }
 

@@ -446,9 +446,15 @@ public:
         cameraLookAt()   =   at_memory_.blend(new_at,   0.75);
         cameraLookUp()   =   up_memory_.blend(new_up,   0.97).normalize();
         // Adjust "from" point so it is the desired offset distance from "at".
-        cameraLookFrom() = Vec3::adjustAbDist(cameraLookFrom(),
-                                              cameraLookAt(),
-                                              cameraDesiredOffsetDistance());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241222 maybe obstacle_presets_ should be static?
+//        cameraLookFrom() = Vec3::adjustAbDist(cameraLookFrom(),
+//                                              cameraLookAt(),
+//                                              cameraDesiredOffsetDistance());
+        cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
+                                                 cameraLookAt(),
+                                                 cameraDesiredOffsetDistance());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
@@ -466,9 +472,15 @@ public:
         cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
         cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
         // Adjust "from" point so it is the desired offset distance from "at".
-        cameraLookFrom() = Vec3::adjustAbDist(cameraLookFrom(),
-                                              cameraLookAt(),
-                                              cameraDesiredOffsetDistance());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241222 maybe obstacle_presets_ should be static?
+//        cameraLookFrom() = Vec3::adjustAbDist(cameraLookFrom(),
+//                                              cameraLookAt(),
+//                                              cameraDesiredOffsetDistance());
+        cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
+                                                 cameraLookAt(),
+                                                 cameraDesiredOffsetDistance());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());

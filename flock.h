@@ -51,7 +51,16 @@ private:
 
     util::Blender<double> fps_;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241222 maybe obstacle_presets_ should be static?
+    //
+    // No, that change DOES NOT get rid of the ~1 second pause when switching
+    // to 6cyl obstacle set, but WORSE, it brings back the “all obstacles are
+    // ignored” bug.
+    
     std::vector<ObstaclePtrList> obstacle_presets_;
+//    static inline std::vector<ObstaclePtrList> obstacle_presets_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     static inline int obstacle_selection_counter_ = -1;
 
     // Currently selected boid's index in boids().

@@ -243,14 +243,30 @@ public:
         return longest;
     }
     
-    // Adjust distance between points "a" and "b" to be "d". Returns a "new a"
-    // slid along line from "b" to "a" so the distance between them is now "d".
-    // TODO needs unit test.
-    static Vec3 adjustAbDist(Vec3 a, Vec3 b, double d)
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241222 maybe obstacle_presets_ should be static?
+
+//    // Adjust distance between points "a" and "b" to be "d". Returns a "new a"
+//    // slid along line from "b" to "a" so the distance between them is now "d".
+//    // TODO needs unit test.
+//    static Vec3 adjustAbDist(Vec3 a, Vec3 b, double d)
+//    {
+//        auto tangent = (a - b).normalize_or_0();
+//        return b + tangent * d;;
+//    }
+
+    // Adjust the length of line segment between "adjustable_endpoint" and
+    // "fixed_endpoint" to be "distance". Returns "new adjustable_endpoint"
+    // which has been slid along the line so segment length is now "distance".
+    static Vec3 adjustSegLength(Vec3 adjustable_endpoint,
+                                Vec3 fixed_endpoint,
+                                double distance)
     {
-        auto tangent = (a - b).normalize_or_0();
-        return b + tangent * d;;
+        auto tangent = (adjustable_endpoint - fixed_endpoint).normalize_or_0();
+        return fixed_endpoint + tangent * distance;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Convert to printable string.
     // Defaults to "float" precision. Use 15 for full "double" (64bit) precision.
@@ -460,6 +476,15 @@ public:
 
         assert(v123.is_valid());
         assert(not none().is_valid());
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241222 maybe obstacle_presets_ should be static?
+        
+        assert(adjustSegLength({1, 1, 1}, {}, 1) == Vec3(1,1,1).normalize());
+        assert(adjustSegLength({1, 0, 0}, {5, 0, 0}, 2) == Vec3(3, 0, 0));
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
         // Verify unmodified:
         assert (v000 == Vec3(0, 0, 0));

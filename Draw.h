@@ -121,8 +121,17 @@ private:
                                          [&](base_vis_t* vis)
                                          { selectNextBoid(); return true; });
 
-        // Set mouse scroll policy based on current camera mode.
-        updateMouseScrollCallback();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241223 WIP on adjusting follow camera position with mouse
+
+//        // Set mouse scroll policy based on current camera mode.
+//        updateMouseScrollCallback();
+
+        // Set mouse scroll and move policies based on current camera mode.
+        updateMouseCallbacks();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 //        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //        // TODO 20241007 follow cam -- to/from tracker balls
@@ -358,7 +367,13 @@ public:
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }
     void setEnable(bool e) { enable_ = e; }
-    void toggleEnable() { enable_ = not enable_; updateMouseScrollCallback(); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241223 WIP on adjusting follow camera position with mouse
+    
+//    void toggleEnable() { enable_ = not enable_; updateMouseScrollCallback(); }
+    void toggleEnable() { enable_ = not enable_; updateMouseCallbacks(); }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     bool pollEvents() { return visualizer().PollEvents(); }
 
@@ -460,12 +475,31 @@ public:
                                       cameraLookUp());
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241223 WIP on adjusting follow camera position with mouse
+    
+    // Set "from" as a local offset (right, up, and behind) relative to target.
+    Vec3 wingman_cam_local_offset_ = Vec3(1, 3, -6).normalize();
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
     void animateWingmanCamera()
     {
-        // Set "from" as a local offset (right, up, and behind) from target.
-        Vec3 local_offset = Vec3(10, 8, -4).normalize();
-        Vec3 scaled_offset = local_offset * cameraDesiredOffsetDistance();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241223 WIP on adjusting follow camera position with mouse
+
+//            // Set "from" as a local offset (right, up, and behind) from target.
+//    //        Vec3 local_offset = Vec3(10, 8, -4).normalize();
+//    //        Vec3 local_offset = Vec3(3, 2, -8).normalize();
+//    //        Vec3 local_offset = Vec3(3, 5, -8).normalize();
+//            Vec3 local_offset = Vec3(1, 3, -6).normalize();
+
+//        Vec3 scaled_offset = local_offset * cameraDesiredOffsetDistance();
+        Vec3 scaled_offset = (wingman_cam_local_offset_ *
+                              cameraDesiredOffsetDistance());
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 offset = aimAgent().ls().globalize(scaled_offset);
         // Smooth look/at parameters.
         cameraLookFrom() = from_memory_.blend(offset, 0.90);
@@ -503,6 +537,55 @@ public:
         }
         visualizer().RegisterMouseScrollCallback(mscb);
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241223 WIP on adjusting follow camera position with mouse
+    
+//    void open3d::visualization::VisualizerWithKeyCallback::MouseMoveCallback
+//    (GLFWwindow *window, double x, double y)
+    
+//    void open3d::visualization::VisualizerWithKeyCallback::RegisterMouseMoveCallback
+//    (    std::function< bool(Visualizer *, double, double)>     callback    )
+
+    
+    // TODO this lambda should only be called when (say) the left button is down
+    //      see RegisterMouseButtonCallback()
+    
+    void updateMouseMoveCallback()
+    {
+        std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
+//        if ((not isStaticCameraMode()) and (not simPause()))
+        if (isWingmanCameraMode() and simPause())
+        {
+            mmcb = [&](base_vis_t* vis, double x, double y)
+            {
+                std::cout << "updateMouseMoveCallback() x=" << x
+                          << ", y=" << y << std::endl;
+                
+                
+//                // Change follow distance.
+//                double adjust_speed = 0.8;
+//                double min = 0.05;
+//                double d = cameraDesiredOffsetDistance() + (y * adjust_speed);
+//                cameraDesiredOffsetDistance() = std::max(min, d);
+                
+                auto aa = aimAgent();
+                Vec3 local_change = (aa.side() * x) + (aa.up() * y);
+                wingman_cam_local_offset_ += local_change;
+                
+                return true;
+            };
+        }
+        visualizer().RegisterMouseMoveCallback(mmcb);
+    }
+
+    void updateMouseCallbacks()
+    {
+        updateMouseScrollCallback();
+        updateMouseMoveCallback();
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Accessor for Open3D Visualizer instance.
     vis_t& visualizer() { return visualizer_; }
@@ -529,7 +612,11 @@ public:
     void nextCameraMode()
     {
         camera_mode_ = (camera_mode_ + 1) % camera_mode_max_;
-        updateMouseScrollCallback();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241223 WIP on adjusting follow camera position with mouse
+//        updateMouseScrollCallback();
+        updateMouseCallbacks();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         redrawNeeded();
     }
     bool isStaticCameraMode() { return (cameraMode() == 0); }
@@ -577,7 +664,11 @@ public:
     {
         single_step_mode_ = ssm;
         if (single_step_mode_) { sim_pause_ = true; }
-        updateMouseScrollCallback();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241223 WIP on adjusting follow camera position with mouse
+//        updateMouseScrollCallback();
+        updateMouseCallbacks();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Runtime switch which the simulation can query to pause itself.
@@ -586,7 +677,11 @@ public:
     void toggleSimPause()
     {
         sim_pause_ = not sim_pause_;
-        updateMouseScrollCallback();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241223 WIP on adjusting follow camera position with mouse
+//        updateMouseScrollCallback();
+        updateMouseCallbacks();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Runtime counter the simulation can use to change predefined obs sets.

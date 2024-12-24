@@ -908,9 +908,20 @@ public:
             obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
             obstacle_presets_.push_back(obs);
 
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20241223 change to use PlaneObstacle as first default
+            //               For debugging obstacle avoidance failures.
+            
             // Initially make first obstacle set be active.
             updateObstacleSet();
-            useObstacleSet(0);
+//            useObstacleSet(0);
+            
+            draw().obstacleSetIndex() = 2;
+            useObstacleSet(2);
+            
+            // Hmm, it is still starting at set 0 despite that change
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         return obstacle_presets_;
     }

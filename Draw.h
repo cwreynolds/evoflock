@@ -131,6 +131,13 @@ private:
         updateMouseCallbacks();
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241225 mock up mouse position for camera position control
+        mouse_position_3d_ = {10, 20, 40};
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 
 //        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -532,6 +539,13 @@ public:
                 double min = 0.05;
                 double d = cameraDesiredOffsetDistance() + (y * adjust_speed);
                 cameraDesiredOffsetDistance() = std::max(min, d);
+                
+                
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20241225 mock up mouse position for camera position control
+                mouse_position_3d_.z() = cameraDesiredOffsetDistance();
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
                 return true;
             };
         }
@@ -555,7 +569,11 @@ public:
     {
         std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
 //        if ((not isStaticCameraMode()) and (not simPause()))
-        if (isWingmanCameraMode() and simPause())
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20241225 add mouse button handler
+//        if (isWingmanCameraMode() and simPause())
+        if (isWingmanCameraMode() and simPause() and left_mouse_button_down_)
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         {
             mmcb = [&](base_vis_t* vis, double x, double y)
             {
@@ -573,17 +591,85 @@ public:
                 Vec3 local_change = (aa.side() * x) + (aa.up() * y);
                 wingman_cam_local_offset_ += local_change;
                 
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20241225 mock up mouse position for camera position control
+                
+                Vec3 new_pos_pixels(x, y, 0);
+                Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
+                double mouse_move_pixels = offset_pixels.length();
+                if (mouse_move_pixels < 100)
+                {
+//                    mouse_position_3d_ += offset_pixels * 0.01;
+//                    mouse_position_3d_ += offset_pixels * 0.1;
+                    mouse_position_3d_ += offset_pixels * 0.05;
+                }
+                
+                mouse_pos_pixels_ = new_pos_pixels;
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+                
                 return true;
             };
         }
         visualizer().RegisterMouseMoveCallback(mmcb);
     }
+    
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20241225 add mouse button handler
+    
+    
+//    // Set "from" as a local offset (right, up, and behind) relative to target.
+//    Vec3 wingman_cam_local_offset_ = Vec3(1, 3, -6).normalize();
+    
+    bool left_mouse_button_down_ = false;
 
+    
+//    void open3d::visualization::VisualizerWithKeyCallback::RegisterMouseButtonCallback
+//    (    std::function< bool(Visualizer *, int, int, int)>     callback    )
+
+    
+    void updateButtonCallback()
+    {
+        std::function<bool(base_vis_t *, int, int, int)> mbcb = nullptr;
+        if (isWingmanCameraMode() and simPause())
+        {
+            mbcb = [&](base_vis_t *, int button, int action, int mods)
+            {
+                std::cout << "updateButtonCallback() button=" << button
+                << ", action=" << action << ", mods=" << mods << std::endl;
+                
+                if (button == 0) { left_mouse_button_down_ = action; }
+                
+                return true;
+            };
+        }
+        visualizer().RegisterMouseButtonCallback(mbcb);
+    }
+
+    
+    
+
+//    void updateMouseCallbacks()
+//    {
+//        updateMouseScrollCallback();
+//        updateMouseMoveCallback();
+//    }
+  
     void updateMouseCallbacks()
     {
         updateMouseScrollCallback();
         updateMouseMoveCallback();
+        updateButtonCallback();
     }
+
+    // TODO 20241225 mock up mouse position for camera position control
+    Vec3 mouse_position_3d_;
+    Vec3 mouse_pos_pixels_;
+
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

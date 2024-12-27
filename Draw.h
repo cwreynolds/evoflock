@@ -135,7 +135,8 @@ private:
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241225 mock up mouse position for camera position control
-        mouse_position_3d_ = {10, 20, 40};
+//        mouse_position_3d_ = {10, 20, 40};
+        mouse_position_3d_ = {1, 3, -6};
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -494,6 +495,25 @@ public:
     void animateWingmanCamera()
     {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241226 WIP mouse_position_3d_ -> wingman_cam_local_offset_
+        
+//        wingman_cam_local_offset_ = mouse_position_3d_;
+        
+        wingman_cam_local_offset_ = mouse_position_3d_.normalize();
+        wingman_cam_local_offset_.z() *= -1;  // TODO reversed Z how to handle?
+
+//        debugPrint(wingman_cam_local_offset_);
+//        debugPrint(draw().mouse_position_3d_);
+        
+//        std::cout << "animateWingmanCamera()  wingman_cam_local_offset_: ";
+        std::cout << "wingman_cam_local_offset_: " << wingman_cam_local_offset_;
+        std::cout << "  mouse_position_3d_: " << mouse_position_3d_;
+        std::cout << std::endl;
+
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241223 WIP on adjusting follow camera position with mouse
 
 //            // Set "from" as a local offset (right, up, and behind) from target.
@@ -530,7 +550,10 @@ public:
     void updateMouseScrollCallback()
     {
         std::function<bool(base_vis_t *, double, double)> mscb = nullptr;
-        if ((not isStaticCameraMode()) and (not simPause()))
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20241225 add mouse button handler
+//        if ((not isStaticCameraMode()) and (not simPause()))
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         {
             mscb = [&](base_vis_t* vis, double x, double y)
             {
@@ -572,13 +595,13 @@ public:
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20241225 add mouse button handler
 //        if (isWingmanCameraMode() and simPause())
-        if (isWingmanCameraMode() and simPause() and left_mouse_button_down_)
+//        if (isWingmanCameraMode() and simPause() and left_mouse_button_down_)
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         {
             mmcb = [&](base_vis_t* vis, double x, double y)
             {
-                std::cout << "updateMouseMoveCallback() x=" << x
-                          << ", y=" << y << std::endl;
+//                std::cout << "updateMouseMoveCallback() x=" << x
+//                          << ", y=" << y << std::endl;
                 
                 
 //                // Change follow distance.
@@ -597,7 +620,8 @@ public:
                 Vec3 new_pos_pixels(x, y, 0);
                 Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
                 double mouse_move_pixels = offset_pixels.length();
-                if (mouse_move_pixels < 100)
+//                if (mouse_move_pixels < 100)
+                if ((mouse_move_pixels < 100) and left_mouse_button_down_)
                 {
 //                    mouse_position_3d_ += offset_pixels * 0.01;
 //                    mouse_position_3d_ += offset_pixels * 0.1;
@@ -632,12 +656,15 @@ public:
     void updateButtonCallback()
     {
         std::function<bool(base_vis_t *, int, int, int)> mbcb = nullptr;
-        if (isWingmanCameraMode() and simPause())
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20241225 add mouse button handler
+//        if (isWingmanCameraMode() and simPause())
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         {
             mbcb = [&](base_vis_t *, int button, int action, int mods)
             {
-                std::cout << "updateButtonCallback() button=" << button
-                << ", action=" << action << ", mods=" << mods << std::endl;
+//                std::cout << "updateButtonCallback() button=" << button
+//                << ", action=" << action << ", mods=" << mods << std::endl;
                 
                 if (button == 0) { left_mouse_button_down_ = action; }
                 

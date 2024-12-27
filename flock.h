@@ -154,7 +154,7 @@ public:
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20241225 mock up mouse position for camera position control
-            debugPrint(draw().mouse_position_3d_);
+//            debugPrint(draw().mouse_position_3d_);
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         save_centers_to_file_end();

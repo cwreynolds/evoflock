@@ -497,17 +497,26 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241226 WIP mouse_position_3d_ -> wingman_cam_local_offset_
         
-//        wingman_cam_local_offset_ = mouse_position_3d_;
         
-        wingman_cam_local_offset_ = mouse_position_3d_.normalize();
-        wingman_cam_local_offset_.z() *= -1;  // TODO reversed Z how to handle?
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20241227 mouse xy ROTATE around aimpoint
 
-//        debugPrint(wingman_cam_local_offset_);
-//        debugPrint(draw().mouse_position_3d_);
+//        wingman_cam_local_offset_ = mouse_position_3d_.normalize();
+//        wingman_cam_local_offset_.z() *= -1;  // TODO reversed Z how to handle?
         
-//        std::cout << "animateWingmanCamera()  wingman_cam_local_offset_: ";
-        std::cout << "wingman_cam_local_offset_: " << wingman_cam_local_offset_;
-        std::cout << "  mouse_position_3d_: " << mouse_position_3d_;
+        Vec3 offset_from_aim_to_mouse = mouse_position_3d_ - cameraLookAt();
+
+//        wingman_cam_local_offset_ = (offset_from_aim_to_mouse.normalize() *
+//                                     cameraDesiredOffsetDistance());
+        wingman_cam_local_offset_ = offset_from_aim_to_mouse.normalize();
+//        wingman_cam_local_offset_.z() *= -1;  // TODO reversed Z how to handle?
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
+        std::cout << std::endl;
+        std::cout << "wingman_cam_local_offset_ : " << wingman_cam_local_offset_;
+        std::cout << std::endl;
+        std::cout << "mouse_position_3d_        : " << mouse_position_3d_;
         std::cout << std::endl;
 
         
@@ -625,9 +634,18 @@ public:
                 {
 //                    mouse_position_3d_ += offset_pixels * 0.01;
 //                    mouse_position_3d_ += offset_pixels * 0.1;
-                    mouse_position_3d_ += offset_pixels * 0.05;
+//                    mouse_position_3d_ += offset_pixels * 0.05;
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20241227 mouse xy ROTATE around aimpoint
+//                    mouse_position_3d_ += offset_pixels * 0.05;
+                    mouse_position_3d_ += offset_pixels * 0.2;
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                 }
-                
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20241227 mouse xy ROTATE around aimpoint
+//                debugPrint(mouse_move_pixels);
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                 mouse_pos_pixels_ = new_pos_pixels;
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

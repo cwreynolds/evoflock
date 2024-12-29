@@ -536,7 +536,31 @@ public:
                               cameraDesiredOffsetDistance());
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         Vec3 offset = aimAgent().ls().globalize(scaled_offset);
+
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20241228 reset mouse_position_3d_ to sphere around aimpoint.
+        
+        //            mouse_position_3d_ = ((wingman_cam_local_offset_ *
+        //                                   cameraDesiredOffsetDistance()) +
+        //    //                              aimAgent().position());
+        //    //                              cameraLookAt());
+        //                                  aimAgent().position());
+        
+        
+//        aimAgent().ls().localize(scaled_offset)
+        
+        
+        mouse_position_3d_ = offset;
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        
+        
+        
+
+
         // Smooth look/at parameters.
         cameraLookFrom() = from_memory_.blend(offset, 0.90);
         cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
@@ -575,7 +599,13 @@ public:
                 
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 // TODO 20241225 mock up mouse position for camera position control
+                
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                // TODO 20241228 reset mouse_position_3d_ to sphere around aimpoint.
                 mouse_position_3d_.z() = cameraDesiredOffsetDistance();
+//                mouse_position_3d_.z() = -cameraDesiredOffsetDistance();
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
                 return true;
@@ -626,7 +656,13 @@ public:
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 // TODO 20241225 mock up mouse position for camera position control
                 
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                // TODO 20241228 reset mouse_position_3d_ to sphere around aimpoint.
                 Vec3 new_pos_pixels(x, y, 0);
+//                Vec3 new_pos_pixels(x, -y, 0);
+//                Vec3 new_pos_pixels(-x, y, 0);
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                
                 Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
                 double mouse_move_pixels = offset_pixels.length();
 //                if (mouse_move_pixels < 100)

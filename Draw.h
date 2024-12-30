@@ -540,22 +540,22 @@ public:
         Vec3 offset = aimAgent().ls().globalize(scaled_offset);
 
         
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20241228 reset mouse_position_3d_ to sphere around aimpoint.
-        
-        //            mouse_position_3d_ = ((wingman_cam_local_offset_ *
-        //                                   cameraDesiredOffsetDistance()) +
-        //    //                              aimAgent().position());
-        //    //                              cameraLookAt());
-        //                                  aimAgent().position());
-        
-        
-//        aimAgent().ls().localize(scaled_offset)
-        
-        
-        mouse_position_3d_ = offset;
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//            // TODO 20241228 reset mouse_position_3d_ to sphere around aimpoint.
+//
+//            //            mouse_position_3d_ = ((wingman_cam_local_offset_ *
+//            //                                   cameraDesiredOffsetDistance()) +
+//            //    //                              aimAgent().position());
+//            //    //                              cameraLookAt());
+//            //                                  aimAgent().position());
+//
+//
+//    //        aimAgent().ls().localize(scaled_offset)
+//
+//
+//            mouse_position_3d_ = offset;
+//
+//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         
         
         
@@ -578,6 +578,16 @@ public:
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
+        
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20241228 reset mouse_position_3d_ to sphere around aimpoint.
+        
+//        mouse_position_3d_ = offset;
+        mouse_position_3d_ = cameraLookFrom();
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     }
 
     void updateMouseScrollCallback()

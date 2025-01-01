@@ -427,7 +427,16 @@ public:
         }
         if (total_weight > 0) { neighbor_center /= total_weight; }
         direction = neighbor_center - position();
-        return direction.normalize_or_0();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241231 new ad hoc global pointer to selected Boid.
+        //               intended just for debugging
+        
+//        return direction.normalize_or_0();
+        
+        Vec3 direction_normalized = direction.normalize_or_0();
+        if (isSelected()) { debugPrint(total_weight); }
+        return direction_normalized;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -769,6 +778,12 @@ public:
 
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20241231 new ad hoc global pointer to selected Boid.
+    //               intended just for debugging
+    
+    static inline Boid* selected_boid_ = nullptr;
+    bool isSelected() const { return selected_boid_ == this; }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void flush_cache_of_predicted_obstacle_collisions()

@@ -757,6 +757,12 @@ public:
     {
         int s = draw().selectedBoidIndex() % boids().size();
         if (s != selected_boid_index_) { selected_boid_index_ = s; }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20241231 new ad hoc global pointer to selected Boid.
+        //               intended just for debugging
+        Boid::selected_boid_ = boids().at(selected_boid_index_);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
 

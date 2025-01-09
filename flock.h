@@ -58,8 +58,13 @@ private:
     // to 6cyl obstacle set, but WORSE, it brings back the “all obstacles are
     // ignored” bug.
     
-    std::vector<ObstaclePtrList> obstacle_presets_;
-//    static inline std::vector<ObstaclePtrList> obstacle_presets_;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250108 default to plane obs, user changes, resets back to that
+
+//    std::vector<ObstaclePtrList> obstacle_presets_;
+    static inline std::vector<ObstaclePtrList> obstacle_presets_;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     static inline int obstacle_selection_counter_ = -1;
 
@@ -180,6 +185,12 @@ public:
         // Set up each new Boid.
         RandomSequence& rs = EF::RS();
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250108 default to plane obs, user changes, resets back to that
+        useObstacleSet();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -956,8 +967,27 @@ public:
     void updateObstacleSet()
     {
         int o = draw().obstacleSetIndex() % preDefinedObstacleSets().size();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250108 default to plane obs, user changes, resets back to that
+//        auto pr = [&]()
+//        {
+//            std::cout << "in updateObstacleSet() o=" << o;
+//            std::cout << "  obstacle_selection_counter_=";
+//            std::cout << obstacle_selection_counter_;
+//            std::cout << std::endl;
+//        };
+//        pr();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         if (o != obstacle_selection_counter_) { useObstacleSet(o); }
         for_all_boids([&](Boid* b){ b->set_flock_obstacles(&obstacles()); });
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250108 default to plane obs, user changes, resets back to that
+//        pr();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     }
     
     //

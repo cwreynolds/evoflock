@@ -51,22 +51,12 @@ private:
 
     util::Blender<double> fps_;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241222 maybe obstacle_presets_ should be static?
-    //
-    // No, that change DOES NOT get rid of the ~1 second pause when switching
-    // to 6cyl obstacle set, but WORSE, it brings back the “all obstacles are
-    // ignored” bug.
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250108 default to plane obs, user changes, resets back to that
-
-//    std::vector<ObstaclePtrList> obstacle_presets_;
+    // The static collection of various obstacle set, selectable gtom GUI.
     static inline std::vector<ObstaclePtrList> obstacle_presets_;
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     static inline int obstacle_selection_counter_ = -1;
+    // Index of the obstacle set index used initially.
+    int default_obstacle_set_index_ = 2;  // Plane and sphere.
+    //  int default_obstacle_set_index_ = 1;  // 6 cylinders and sphere.
 
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
@@ -137,9 +127,8 @@ public:
             if (draw().runSimulationThisFrame())
             {
                 aTimer().setFrameStartTime();
-                updateObstacleSet();
-                updateSelectedBoid();
-
+                updateObstacleSetForGUI();
+                updateSelectedBoidForGUI();
                 // Run simulation steps "as fast as possible" or at fixed rate?
                 bool afap = not (fixed_time_step() and draw().enable());
                 double step_duration = (afap ?
@@ -156,11 +145,6 @@ public:
                 aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
                 if (not draw().simPause()) { aTimer().measureFrameDuration(); }
             }
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20241225 mock up mouse position for camera position control
-//            debugPrint(draw().mouse_position_3d_);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         save_centers_to_file_end();
         draw().endAnimatedScene();
@@ -185,12 +169,7 @@ public:
         // Set up each new Boid.
         RandomSequence& rs = EF::RS();
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250108 default to plane obs, user changes, resets back to that
         useObstacleSet();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -764,16 +743,15 @@ public:
     Boid* selectedBoid() { return boids().at(selected_boid_index_); }
 
     // Check if selected boid needs to be changed in response to "S" cmd in UI.
-    void updateSelectedBoid()
+    void updateSelectedBoidForGUI()
     {
         int s = draw().selectedBoidIndex() % boids().size();
         if (s != selected_boid_index_) { selected_boid_index_ = s; }
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241231 new ad hoc global pointer to selected Boid.
         //               intended just for debugging
         Boid::selected_boid_ = boids().at(selected_boid_index_);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
 
@@ -930,66 +908,42 @@ public:
             obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
             obstacle_presets_.push_back(obs);
 
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20241223 change to use PlaneObstacle as first default
-            //               For debugging obstacle avoidance failures.
-            
-            // Initially make first obstacle set be active.
-            updateObstacleSet();
-//            useObstacleSet(0);
-            
-            draw().obstacleSetIndex() = 2;
-            useObstacleSet(2);
-            
-            // Hmm, it is still starting at set 0 despite that change
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // Set initial obstacle set to the default.
+            draw().obstacleSetIndex() = default_obstacle_set_index_;
+            useObstacleSet(default_obstacle_set_index_);
         }
         return obstacle_presets_;
     }
 
+    // For each boid in flock: set its obstacle set to be the obstacle set
+    // currently selected for this flock.
+    void setObstaclesOnAllBoids()
+    {
+        for_all_boids([&](Boid* b){ b->set_flock_obstacles(&obstacles()); });
+    }
+    
     // For each boid in the flock, set it to use obstacle set N (which defaults
     // the the currently selected obstacle set).
     void useObstacleSet() { useObstacleSet(obstacle_selection_counter_); }
     void useObstacleSet(int n)
     {
         obstacles() = preDefinedObstacleSets().at(n);
+        setObstaclesOnAllBoids();
         if (n != obstacle_selection_counter_)
         {
             draw().clearStaticScene();
             obstacle_selection_counter_ = n;
             for (auto& o : obstacles()) { o->draw(); }
         }
-        for_all_boids([&](Boid* b){ b->set_flock_obstacles(&obstacles()); });
-    }
-  
-    // Check if obstacle set needs to be changed in response to "O" cmd in UI.
-    void updateObstacleSet()
-    {
-        int o = draw().obstacleSetIndex() % preDefinedObstacleSets().size();
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250108 default to plane obs, user changes, resets back to that
-//        auto pr = [&]()
-//        {
-//            std::cout << "in updateObstacleSet() o=" << o;
-//            std::cout << "  obstacle_selection_counter_=";
-//            std::cout << obstacle_selection_counter_;
-//            std::cout << std::endl;
-//        };
-//        pr();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        if (o != obstacle_selection_counter_) { useObstacleSet(o); }
-        for_all_boids([&](Boid* b){ b->set_flock_obstacles(&obstacles()); });
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250108 default to plane obs, user changes, resets back to that
-//        pr();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     }
     
+    // Check if obstacle set needs to be changed in response to "O" cmd in UI.
+    void updateObstacleSetForGUI()
+    {
+        int o = draw().obstacleSetIndex() % preDefinedObstacleSets().size();
+        if (o != obstacle_selection_counter_) { useObstacleSet(o); }
+    }
+
     //
     //        # Print mini-help on shell.
     //        def print_help(self):

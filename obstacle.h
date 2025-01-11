@@ -14,10 +14,7 @@
 #pragma once
 #include "Vec3.h"
 #include "shape.h"
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20241121 integrate Draw into Obstacles classes
 #include "Draw.h"
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Obstacle
 {
@@ -56,7 +53,8 @@ public:
     // maybe they can be combined?)
     virtual double signed_distance(const Vec3& query_point) const { return 0; }
     
-    virtual void draw() const {}
+    // Override this in derived to add tri-mesh model of Obstacle shape.
+    virtual void addToScene() const {}
     
     virtual std::string to_string() const { return "Obstacle"; }
     
@@ -172,34 +170,7 @@ public:
         return distance_to_center - radius_;
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241121 integrate Draw into Obstacles classes
-
-//    void draw() const override
-//    {
-//        //def draw(self):
-//        //    if not self.tri_mesh:
-//        //        self.tri_mesh = Draw.make_everted_sphere(self.radius, self.center)
-//        //    Draw.adjust_static_scene_object(self.tri_mesh)
-//    }
-
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-    // TODO 20241220 add random texture to obstacle TriMeshes
-    
-//        void draw() const override
-//        {
-//            auto mesh = Draw::constructSphereTriMesh(radius_,
-//                                                     center_,
-//                                                     {0.5, 0.5, 0.5},
-//                                                     true,
-//    //                                                 getExcludeFrom() == inside);
-//                                                     getExcludeFrom() == outside,
-//    //                                                 100);
-//                                                     500);
-//            Draw::getInstance().addTriMeshToStaticScene(mesh);
-//        }
-    
-    void draw() const override
+    void addToScene() const override
     {
         Vec3 color(0.5, 0.5, 0.5);
         auto mesh = Draw::constructSphereTriMesh(radius_,
@@ -211,10 +182,6 @@ public:
         Draw::brightnessSpecklePerVertex(0.95, 1.00, color, mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
-
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     std::string to_string() const override { return "EvertedSphereObstacle"; }
 
@@ -239,9 +206,6 @@ public:
         setExcludeFrom(ef);
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241126 add PlaneObstacle::draw()
-    
     PlaneObstacle(const Vec3& normal,
                   const Vec3& center,
                   double visible_radius,
@@ -251,8 +215,6 @@ public:
         center_(center),
         visible_radius_(visible_radius),
         visible_thickness_(visible_thickness) {}
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 ray_intersection(const Vec3& origin,
@@ -325,44 +287,7 @@ public:
         return from_plane_to_query_point.dot(normal_);
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241126 add PlaneObstacle::draw()
-    
-//        void draw() const override
-//        {
-//    //        // What is the best way to define these "fake" parameters?
-//    //        double visible_radius = 50;
-//    //        double thickness = visible_radius * 0.005;
-//    //        Vec3 ep_offset = center_ + normal_ * thickness;
-//            Vec3 ep_offset = center_ + normal_ * visible_thickness_;
-//
-//            auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
-//                                                       center_ + ep_offset,
-//                                                       center_ - ep_offset,
-//                                                       {0.7, 0.7, 0.8},
-//                                                       true,
-//                                                       false, // don't evert
-//                                                       500);
-//            Draw::getInstance().addTriMeshToStaticScene(mesh);
-//        }
-    
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-    // TODO 20241220 add random texture to obstacle TriMeshes
-
-//    void draw() const override
-//    {
-//        Vec3 ep_offset = center_ + normal_ * visible_thickness_;
-//        auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
-//                                                   center_ + ep_offset,
-//                                                   center_ - ep_offset,
-//                                                   {0.7, 0.7, 0.8},
-//                                                   true,
-//                                                   false, // don't evert
-//                                                   500);
-//        Draw::getInstance().addTriMeshToStaticScene(mesh);
-//    }
-    
-    void draw() const override
+    void addToScene() const override
     {
         Vec3 ep_offset = center_ + normal_ * visible_thickness_;
         Vec3 color(0.7, 0.7, 0.8);
@@ -376,9 +301,6 @@ public:
         Draw::brightnessSpecklePerVertex(0.7, 1.0, color, mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
-    
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-
 
     std::string to_string() const override { return "PlaneObstacle"; }
 
@@ -482,62 +404,7 @@ public:
         return distance_to_axis - radius_;
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241121 integrate Draw into Obstacles classes
-
-//    void draw() const override
-//    {
-//    //    def draw(self):
-//    //        if not self.tri_mesh:
-//    //            self.tri_mesh = Draw.new_empty_tri_mesh()
-//    //            Draw.add_line_segment(self.endpoint,
-//    //                                  self.endpoint + (self.tangent * self.length),
-//    //                                  color = Vec3(1, 1, 1) * 0.8,
-//    //                                  radius = self.radius,
-//    //                                  sides = 50,
-//    //                                  tri_mesh = self.tri_mesh,
-//    //                                  flat_end_caps=True)
-//    //            self.tri_mesh.compute_vertex_normals()
-//    //            self.original_center = Vec3.from_array(self.tri_mesh.get_center())
-//    //        Draw.adjust_static_scene_object(self.tri_mesh, self.original_center)
-//    }
-
-//    void draw() const override
-//    {
-//        auto& d = Draw::getInstance();
-//        auto cyl_mesh = d.constructO3dCylinder(radius_, ep0(), ep1());
-//        cyl_mesh->ComputeVertexNormals();
-//        cyl_mesh->PaintUniformColor({0.7, 0.8, 0.7});
-//        d.addTriMeshToStaticScene(cyl_mesh);
-//    }
-
-//    void draw() const override
-//    {
-//        auto& d = Draw::getInstance();
-//        auto cyl_mesh = d.constructCylinderTriMesh(radius_,
-//                                                   ep0(),
-//                                                   ep1(),
-//                                                   {0.7, 0.8, 0.7},
-//                                                   true,
-//                                                   getExcludeFrom() == inside);
-//        d.addTriMeshToStaticScene(cyl_mesh);
-//    }
-
-//        void draw() const override
-//        {
-//            auto mesh = Draw::constructCylinderTriMesh(radius_,
-//                                                       endpoint0(),
-//                                                       endpoint1(),
-//                                                       {0.7, 0.8, 0.7},
-//                                                       true,
-//    //                                                   getExcludeFrom() == inside);
-//                                                       getExcludeFrom() == outside,
-//    //                                                   100);
-//                                                       500);
-//            Draw::getInstance().addTriMeshToStaticScene(mesh);
-//        }
-
-    void draw() const override
+    void addToScene() const override
     {
         Vec3 color(0.7, 0.8, 0.7);
         auto mesh = Draw::constructCylinderTriMesh(radius_,
@@ -553,8 +420,6 @@ public:
 
     Vec3 endpoint0() const { return endpoint_; }
     Vec3 endpoint1() const { return endpoint_ + tangent_ * length_; }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     std::string to_string() const override { return "CylinderObstacle"; }
     
@@ -585,9 +450,6 @@ public:
     double dist_to_collision;
     Vec3 point_of_impact;
     Vec3 normal_at_poi;
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TOODO 20240809 why is obstacle avoidance broken?
     std::string to_string() const
     {
         std::stringstream ss;
@@ -598,11 +460,7 @@ public:
         ss << ", norm=" << normal_at_poi << ")";
         return ss.str();
     }
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 };
-
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TOODO 20240809 why is obstacle avoidance broken?
 
 // Serialize Collision object to stream.
 inline std::ostream& operator<<(std::ostream& os, const Collision& c)
@@ -610,7 +468,6 @@ inline std::ostream& operator<<(std::ostream& os, const Collision& c)
     os << c.to_string();
     return os;
 }
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 inline void Obstacle::unit_test()
 {

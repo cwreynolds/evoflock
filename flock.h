@@ -933,7 +933,7 @@ public:
         {
             draw().clearStaticScene();
             obstacle_selection_counter_ = n;
-            for (auto& o : obstacles()) { o->draw(); }
+            for (auto& o : obstacles()) { o->addToScene(); }
         }
     }
     

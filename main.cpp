@@ -41,6 +41,17 @@ int main(int argc, const char * argv[])
     EF::setRS(LP::LPRS());
     EF::unit_test();
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250111 arrange non-intersecting hollow spheres
+    
+    shape::arrangeNonOverlappingSpheres({1,2,3,4,5}, 5, 50);
+//    auto centers = shape::arrangeNonOverlappingSpheres({1,2,3,4,5}, 5, 50);
+    auto centers = shape::arrangeNonOverlappingSpheres({5,10,15,20,25}, 5, 50);
+
+    std::cout << util::vec_to_string(centers, 4) << std::endl;
+//    return EXIT_SUCCESS;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     // TODO 20241109 2-point cylinder demo
 //    Draw::cylinders_on_tri_mesh_edges();

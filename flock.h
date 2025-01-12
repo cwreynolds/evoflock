@@ -908,6 +908,29 @@ public:
             obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
             obstacle_presets_.push_back(obs);
 
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250111 arrange non-intersecting hollow spheres
+            
+            // Set 5 -- 10 random spheres
+            obs.clear();
+            int count = 10;
+            std::vector<double> radii;
+            for (int i = 0; i < count; i++)
+            {
+//                radii.push_back(EF::RS().random2(10, 30));
+//                radii.push_back(EF::RS().random2(5, 15));
+                radii.push_back(EF::RS().random2(3, 8));
+            }
+            auto centers = shape::arrangeNonOverlappingSpheres(radii, 5, 50);
+            for (int i = 0; i < count; i++)
+            {
+                obs.push_back(new EvertedSphereObstacle(radii[i],
+                                                        centers[i],
+                                                        Obstacle::inside));
+            }
+            obstacle_presets_.push_back(obs);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             // Set initial obstacle set to the default.
             draw().obstacleSetIndex() = default_obstacle_set_index_;
             useObstacleSet(default_obstacle_set_index_);

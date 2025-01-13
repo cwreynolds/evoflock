@@ -149,6 +149,82 @@ double distance_between_lines(const Vec3& origin1, const Vec3& tangent1,
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20250111 arrange non-intersecting hollow spheres
+//
+// should this use a simple utility Sphere class? (Maybe use later in Obstacle?)
+
+//    // Very ad hoc tool used to create an obstacle set. Given a list of "radii", a
+//    // "margin", and "max_distance" this function returns a list of sphere centers
+//    // (corresponding to the given radii) such that:
+//    //     (1) none of the spheres intersect/overlap and that all spheres are inside
+//    //         a sphere at the origin with radius "max_distance".
+//    //     (2) there is at least "margin" clearance between any two spheres.
+//
+//    std::vector<Vec3> arrangeNonOverlappingSpheres(std::vector<double> radii,
+//                                                   double margin,
+//                                                   double max_distance)
+//    {
+//    //    // Adjust for margins.
+//    //    max_distance -= margin / 2;
+//    //    for (auto& r : radii) { r += margin / 2; }
+//    //
+//    ////    std::vector<Vec3> centers(radii.size());
+//    //    std::vector<Vec3> centers;
+//    //
+//    //    for (auto& r : radii)
+//    //    {
+//    //        centers.push_back(EF::RS().randomPointInUnitRadiusSphere() * max_distance);
+//    //    }
+//
+//
+//        std::vector<Vec3> centers;
+//        max_distance -= margin / 2;  // Adjust for margins.
+//        for (auto& r : radii)
+//        {
+//            r += margin / 2;
+//            centers.push_back(EF::RS().randomPointInUnitRadiusSphere() * max_distance);
+//        }
+//
+//
+//        // Run relaxation run, moving spheres incrementally away from overlaps.
+//        int iterations = 100;
+//    //    int iterations = 1;
+//        for (int i = 0; i < iterations; i++)
+//        {
+//            std::vector<Vec3> adjustments(centers.size());
+//            for (int a = 0; a < centers.size(); a++)
+//            {
+//                for (int b = 0; b < a; b++)
+//                {
+//    //                std::cout << "a=" << a << ", b=" << b << std::endl;
+//
+//    //                Vec3 offset_from_a = centers[b] - centers[a];
+//    //                double center_distance = offset_from_a.length();
+//
+//                    Vec3 offset_from_b = centers[a] - centers[b];
+//                    double center_distance = offset_from_b.length();
+//                    double separation = center_distance - (radii[a] + radii[b]);
+//                    double overlap = margin - separation;
+//                    if (overlap > 0)
+//                    {
+//                        double adjust = overlap / 3;
+//                        adjustments.at(a) += offset_from_b.normalize() * adjust;
+//                    }
+//                }
+//            }
+//
+//
+//            for (int a = 0; a < centers.size(); a++)
+//            {
+//    //            centers[a] += adjustments[a];
+//    //            centers[a] -= adjustments[a];
+//                centers[a] -= adjustments[a];
+//            }
+//        }
+//
+//
+//    //    return {}; // TODO remove before flight
+//        return centers;
+//    }
 
 // Very ad hoc tool used to create an obstacle set. Given a list of "radii", a
 // "margin", and "max_distance" this function returns a list of sphere centers
@@ -161,19 +237,11 @@ std::vector<Vec3> arrangeNonOverlappingSpheres(std::vector<double> radii,
                                                double margin,
                                                double max_distance)
 {
-//    // Adjust for margins.
-//    max_distance -= margin / 2;
-//    for (auto& r : radii) { r += margin / 2; }
-//    
-////    std::vector<Vec3> centers(radii.size());
-//    std::vector<Vec3> centers;
-//
-//    for (auto& r : radii)
-//    {
-//        centers.push_back(EF::RS().randomPointInUnitRadiusSphere() * max_distance);
-//    }
-  
-    
+    // These should be parameters:
+    int iterations = 100;
+//    double rate = 0.33;
+    double rate = 0.6;
+
     std::vector<Vec3> centers;
     max_distance -= margin / 2;  // Adjust for margins.
     for (auto& r : radii)
@@ -182,45 +250,46 @@ std::vector<Vec3> arrangeNonOverlappingSpheres(std::vector<double> radii,
         centers.push_back(EF::RS().randomPointInUnitRadiusSphere() * max_distance);
     }
     
-    
     // Run relaxation run, moving spheres incrementally away from overlaps.
-    int iterations = 100;
-//    int iterations = 1;
     for (int i = 0; i < iterations; i++)
     {
-        std::vector<Vec3> adjustments(centers.size());
+//        std::vector<Vec3> adjustments(centers.size());
         for (int a = 0; a < centers.size(); a++)
         {
+            std::vector<Vec3> adjustments(centers.size());
             for (int b = 0; b < a; b++)
             {
-//                std::cout << "a=" << a << ", b=" << b << std::endl;
-                
-//                Vec3 offset_from_a = centers[b] - centers[a];
-//                double center_distance = offset_from_a.length();
-
                 Vec3 offset_from_b = centers[a] - centers[b];
                 double center_distance = offset_from_b.length();
                 double separation = center_distance - (radii[a] + radii[b]);
                 double overlap = margin - separation;
                 if (overlap > 0)
                 {
-                    double adjust = overlap / 3;
-                    adjustments.at(a) += offset_from_b.normalize() * adjust;
+                    double adjust = overlap * rate;
+//                    adjustments.at(a) += offset_from_b.normalize() * adjust;
+                    adjustments.at(a) += offset_from_b.normalize() * -adjust;
                 }
             }
-        }
+            
+            // Push toward origin is outside max_distance.
+            double max_r = centers[a].length() + radii[a] + margin;
+            double excess = max_r - max_distance;
+            if (excess > 0)
+            {
+//                debugPrint(excess);
+//                adjustments[a] += centers[a].normalize() * -excess;
+                adjustments[a] += centers[a].normalize() * excess;
+            }
         
         
-        for (int a = 0; a < centers.size(); a++)
-        {
-//            centers[a] += adjustments[a];
-//            centers[a] -= adjustments[a];
-            centers[a] -= adjustments[a];
+            // Adjust each center based on summed adjustments calculated above.
+            for (int a = 0; a < centers.size(); a++)
+            {
+                centers[a] -= adjustments[a];
+            }
         }
     }
 
-    
-//    return {}; // TODO remove before flight
     return centers;
 }
 

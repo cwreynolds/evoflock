@@ -54,9 +54,13 @@ private:
     // The static collection of various obstacle set, selectable gtom GUI.
     static inline std::vector<ObstaclePtrList> obstacle_presets_;
     static inline int obstacle_selection_counter_ = -1;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250111 arrange non-intersecting hollow spheres
     // Index of the obstacle set index used initially.
-    int default_obstacle_set_index_ = 2;  // Plane and sphere.
-    //  int default_obstacle_set_index_ = 1;  // 6 cylinders and sphere.
+    // int default_obstacle_set_index_ = 2;  // Plane and sphere.
+//     int default_obstacle_set_index_ = 1;  // 6 cylinders and sphere.
+    int default_obstacle_set_index_ = 4;  // Plane and sphere.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
@@ -919,7 +923,10 @@ public:
             {
 //                radii.push_back(EF::RS().random2(10, 30));
 //                radii.push_back(EF::RS().random2(5, 15));
-                radii.push_back(EF::RS().random2(3, 8));
+//                radii.push_back(EF::RS().random2(3, 8));
+//                radii.push_back(EF::RS().random2(5, 15));
+//                radii.push_back(EF::RS().random2(10, 30));
+                radii.push_back(EF::RS().random2(7, 17));
             }
             auto centers = shape::arrangeNonOverlappingSpheres(radii, 5, 50);
             for (int i = 0; i < count; i++)
@@ -928,6 +935,7 @@ public:
                                                         centers[i],
                                                         Obstacle::inside));
             }
+            obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
             obstacle_presets_.push_back(obs);
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

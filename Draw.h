@@ -452,6 +452,10 @@ public:
     {
         if (isFollowCameraMode()) { animateFollowCamera(); }
         if (isWingmanCameraMode()) { animateWingmanCamera(); }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250113 mouse adjust static camera view.
+        if (isStaticCameraMode()) { animateStaticCamera(); }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
 
@@ -590,6 +594,70 @@ public:
 
     }
 
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250113 mouse adjust static camera view.
+    
+//    Vec3 static_cam_aim_offset_;
+    
+//        // Adjust "static camera" model according to mouse input.
+//        void animateStaticCamera()
+//        {
+//
+//            // TODO just copying and pasting bit from animateWingmanCamera()
+//            //      need to extract that into utility functions called from both places
+//
+//            Vec3 offset_from_aim_to_mouse = mouse_position_3d_ - cameraLookAt();
+//            static_cam_aim_offset_ = offset_from_aim_to_mouse.normalize();
+//
+//            Vec3 scaled_offset = (static_cam_aim_offset_ *
+//                                  cameraDesiredOffsetDistance());
+//
+//
+//            Vec3 offset = scaled_offset;
+//
+//
+//
+//
+//
+//            // Smooth look/at parameters.
+//            cameraLookFrom() = from_memory_.blend(offset, 0.90);
+//    //        cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
+//    //        cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
+//            cameraLookAt()   =   at_memory_.blend(cameraLookAt(), 0.75);
+//            cameraLookUp()   =   up_memory_.blend(cameraLookUp(), 0.97).normalize();
+//
+//
+//            // Adjust "from" point so it is the desired offset distance from "at".
+//            cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
+//                                                     cameraLookAt(),
+//                                                     cameraDesiredOffsetDistance());
+//
+//            camera() = LocalSpace::fromTo(cameraLookFrom(),
+//                                          cameraLookAt(),
+//                                          cameraLookUp());
+//
+//
+//            // reset mouse_position_3d_ to sphere around aimpoint.
+//            mouse_position_3d_ = cameraLookFrom();
+//
+//
+//        }
+    
+    // Adjust "static camera" model according to mouse input.
+    void animateStaticCamera()
+    {
+        std::cout << "in animateStaticCamera()" << std::endl;
+
+        camera() = LocalSpace::fromTo(cameraLookFrom(),
+                                      cameraLookAt(),
+                                      cameraLookUp());
+    }
+
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     void updateMouseScrollCallback()
     {
         std::function<bool(base_vis_t *, double, double)> mscb = nullptr;
@@ -649,6 +717,9 @@ public:
         {
             mmcb = [&](base_vis_t* vis, double x, double y)
             {
+                bool request_redraw = false;
+                
+                
 //                std::cout << "updateMouseMoveCallback() x=" << x
 //                          << ", y=" << y << std::endl;
                 
@@ -686,17 +757,73 @@ public:
 //                    mouse_position_3d_ += offset_pixels * 0.05;
                     mouse_position_3d_ += offset_pixels * 0.2;
                     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    
+                    request_redraw = true;
+
                 }
                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                 // TODO 20241227 mouse xy ROTATE around aimpoint
 //                debugPrint(mouse_move_pixels);
                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
-                mouse_pos_pixels_ = new_pos_pixels;
+//                mouse_pos_pixels_ = new_pos_pixels;
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
                 
-                return true;
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250113 mouse adjust static camera view.
+                //
+                // Adding this because the "wingman case" seems to have become
+                // ridiculously complex. Starting over:
+                
+                if (isStaticCameraMode() and
+                    (mouse_move_pixels < 50) and
+                    left_mouse_button_down_)
+                {
+                    double speed = 0.8;
+                    
+                    double nx = offset_pixels.x() * speed;
+                    double ny = offset_pixels.y() * speed;
+
+                    std::cout << "updateMouseMoveCallback() for static cam,";
+                    std::cout << " nx=" << nx << " ny=" << ny << std::endl;
+
+                    
+                    
+                    // offset from look-at to look-from
+                    Vec3 offset = cameraLookFrom() - cameraLookAt();
+
+                    Vec3 new_look_from = (offset +
+                                          (camera().i() * nx) +
+                                          (camera().j() * ny));
+                    
+                    debugPrint(new_look_from)
+
+                    Vec3 restore_dist = (new_look_from.normalize() *
+                                         cameraDesiredOffsetDistance());
+                    
+                    debugPrint(cameraLookFrom())
+
+                    // TODO cameraLookAt() and cameraLookUp() stay unchanged.
+                    cameraLookFrom() = restore_dist + cameraLookAt();
+
+                    debugPrint(cameraLookFrom())
+                    
+                    
+                    camera() = LocalSpace::fromTo(cameraLookFrom(),
+                                                  cameraLookAt(),
+                                                  cameraLookUp());
+
+
+                    request_redraw = true;
+                }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                mouse_pos_pixels_ = new_pos_pixels;
+
+//                return true;
+                return request_redraw;
+
             };
         }
         visualizer().RegisterMouseMoveCallback(mmcb);

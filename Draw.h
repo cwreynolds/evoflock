@@ -138,29 +138,8 @@ private:
 //        mouse_position_3d_ = {10, 20, 40};
         mouse_position_3d_ = {1, 3, -6};
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20241007 follow cam -- to/from tracker balls
-//        double ball_radius = 0.3;
-//        to_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
-//        from_ball = open3d::geometry::TriangleMesh::CreateSphere(ball_radius);
-//        to_ball->PaintUniformColor({0, 1, 0});
-//        from_ball->PaintUniformColor({1, 0, 1});
-//        visualizer().AddGeometry(to_ball);
-//        visualizer().AddGeometry(from_ball);
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
     }
-
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20241007 follow cam -- to/from tracker balls
-//    //    std::shared_ptr<open3d::geometry::TriangleMesh> from_ball;
-//    //    std::shared_ptr<open3d::geometry::TriangleMesh> to_ball;
-//        sp_tri_mesh_t from_ball;
-//        sp_tri_mesh_t to_ball;
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 public:
 
@@ -201,14 +180,20 @@ public:
         if (enable())
         {
             updateCamera();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250115 why is camera frozen when isStaticCameraMode() ?
+            std::cout << "in endOneAnimatedFrame()" << std::endl;
+            
+//                addLineSegmentToAnimatedFrame(EF::RS().randomUnitVector(),
+//                                              EF::RS().randomUnitVector(),
+//    //                                          EF::RS().randomPointInAxisAlignedBox(Vec3(),
+//    //                                                                               Vec3(1,1,1))
+//                                              Vec3());
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             animated_tri_mesh_->ComputeVertexNormals();
             visualizer().UpdateGeometry(animated_tri_mesh_);
             visualizer().UpdateGeometry(animated_line_set_);
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20241007 follow cam -- to/from tracker balls
-//            visualizer().UpdateGeometry(from_ball);
-//            visualizer().UpdateGeometry(to_ball);
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
 #endif  // USE_OPEN3D
     }
@@ -385,28 +370,40 @@ public:
 
     bool pollEvents() { return visualizer().PollEvents(); }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250115 why is camera frozen when isStaticCameraMode() ?
+
+//    // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
+//    void updateCamera()
+//    {
+//        // Invoke the current camera motion model.
+//        animateCamera();
+//        // Either set view to from/at points or set markers in static view.
+//        if (not isStaticCameraMode())
+//        {
+//            setVisualizerViewByFromAt(cameraLookFrom(),
+//                                      cameraLookAt(),
+//                                      cameraLookUp());
+//            // Draw circle around aimTarget() pointing toward camera.
+//            addBlackAndWhiteCircularReticle(aimAgent().position());
+//        }
+//    }
+  
     // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
     void updateCamera()
     {
         // Invoke the current camera motion model.
         animateCamera();
-        // Either set view to from/at points or set markers in static view.
-        if (not isStaticCameraMode())
-        {
-            setVisualizerViewByFromAt(cameraLookFrom(),
-                                      cameraLookAt(),
-                                      cameraLookUp());
-//            from_ball->Translate({0, 1000, 0}, false);
-//            to_ball->Translate({0, 1000, 0}, false);
-            // Draw circle around aimTarget() pointing toward camera.
-            addBlackAndWhiteCircularReticle(aimAgent().position());
-        }
-        else
-        {
-//            from_ball->Translate(vec3ToEv3d(cameraLookFrom()), false);
-//            to_ball->Translate(vec3ToEv3d(cameraLookAt()), false);
-        }
+        // Set camera state in underly graphics system (Open3d).
+        setVisualizerViewByFromAt(cameraLookFrom(),
+                                  cameraLookAt(),
+                                  cameraLookUp());
+        // Draw circle around aimTarget() pointing toward camera.
+        addBlackAndWhiteCircularReticle(aimAgent().position());
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     // Draw a B&W circle at given center pointing at the current camera.
     void addBlackAndWhiteCircularReticle(Vec3 center)
@@ -644,6 +641,11 @@ public:
 //
 //        }
     
+    
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250115 why is camera frozen when isStaticCameraMode() ?
+
     // Adjust "static camera" model according to mouse input.
     void animateStaticCamera()
     {
@@ -652,7 +654,11 @@ public:
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
+        
+//        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
     }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     
     

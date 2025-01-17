@@ -434,7 +434,7 @@ public:
 //        return direction.normalize_or_0();
         
         Vec3 direction_normalized = direction.normalize_or_0();
-        if (isSelected()) { debugPrint(total_weight); }
+//        if (isSelected()) { debugPrint(total_weight); }
         return direction_normalized;
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }

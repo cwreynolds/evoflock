@@ -56,6 +56,13 @@ public:
     // Override this in derived to add tri-mesh model of Obstacle shape.
     virtual void addToScene() const {}
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+    Vec3 color_;
+    void setColor(Vec3 color) { color_ = color; }
+    Vec3 getColor() const { return color_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     virtual std::string to_string() const { return "Obstacle"; }
     
     static void unit_test();  // Defined at bottom of file.
@@ -111,6 +118,10 @@ public:
       : Obstacle(), radius_(radius), center_(center)
     {
         setExcludeFrom(ef);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+        setColor({0.5, 0.5, 0.5});
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
@@ -170,18 +181,24 @@ public:
         return distance_to_center - radius_;
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+
     void addToScene() const override
     {
-        Vec3 color(0.5, 0.5, 0.5);
+//        Vec3 color(0.5, 0.5, 0.5);
         auto mesh = Draw::constructSphereTriMesh(radius_,
                                                  center_,
-                                                 color,
+//                                                 color,
+                                                 getColor(),
                                                  true,
                                                  getExcludeFrom() == outside,
                                                  500);
-        Draw::brightnessSpecklePerVertex(0.95, 1.00, color, mesh);
+//        Draw::brightnessSpecklePerVertex(0.95, 1.00, color, mesh);
+        Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     std::string to_string() const override { return "EvertedSphereObstacle"; }
 
@@ -204,6 +221,10 @@ public:
       : PlaneObstacle(normal, center)
     {
         setExcludeFrom(ef);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+        setColor({0.7, 0.7, 0.8});
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     PlaneObstacle(const Vec3& normal,
@@ -287,20 +308,26 @@ public:
         return from_plane_to_query_point.dot(normal_);
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+
     void addToScene() const override
     {
         Vec3 ep_offset = center_ + normal_ * visible_thickness_;
-        Vec3 color(0.7, 0.7, 0.8);
+//        Vec3 color(0.7, 0.7, 0.8);
         auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
                                                    center_ + ep_offset,
                                                    center_ - ep_offset,
-                                                   color,
+//                                                   color,
+                                                   getColor(),
                                                    true,
                                                    false, // don't evert
                                                    500);
-        Draw::brightnessSpecklePerVertex(0.7, 1.0, color, mesh);
+//        Draw::brightnessSpecklePerVertex(0.7, 1.0, color, mesh);
+        Draw::brightnessSpecklePerVertex(0.7, 1.0, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     std::string to_string() const override { return "PlaneObstacle"; }
 
@@ -334,6 +361,10 @@ public:
       : CylinderObstacle(radius, endpoint0, endpoint1)
     {
         setExcludeFrom(ef);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+        setColor({0.7, 0.8, 0.7});
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Nearest point on the infinite line containing cylinder's axis.
@@ -404,19 +435,27 @@ public:
         return distance_to_axis - radius_;
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+
     void addToScene() const override
     {
-        Vec3 color(0.7, 0.8, 0.7);
+//        Vec3 color(0.7, 0.8, 0.7);
         auto mesh = Draw::constructCylinderTriMesh(radius_,
                                                    endpoint0(),
                                                    endpoint1(),
-                                                   color,
+//                                                   color,
+                                                   getColor(),
                                                    true,
                                                    getExcludeFrom() == outside,
                                                    500);
-        Draw::brightnessSpecklePerVertex(0.7, 1.0, color, mesh);
+//        Draw::brightnessSpecklePerVertex(0.7, 1.0, color, mesh);
+        Draw::brightnessSpecklePerVertex(0.7, 1.0, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     Vec3 endpoint0() const { return endpoint_; }
     Vec3 endpoint1() const { return endpoint_ + tangent_ * length_; }

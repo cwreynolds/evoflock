@@ -936,6 +936,17 @@ public:
                                                         Obstacle::inside));
             }
             obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+            
+            auto temp = new EvertedSphereObstacle(0.2, {}, Obstacle::outside);
+            temp->setColor({1, 0, 0});
+            obs.push_back(temp);
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            
             obstacle_presets_.push_back(obs);
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

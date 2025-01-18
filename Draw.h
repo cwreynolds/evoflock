@@ -63,6 +63,13 @@ private:
          int line_width = 10,
          int point_size = 20)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+        Vec3 cwr_screen_size(3456, 2234, 0);
+        window_xy_size = {1000, 1000, 0};
+        window_xy_position_ul = cwr_screen_size - window_xy_size ;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         // TODO 20241026 -- Temporary for debugging odd symptom: running from inside
         // Xcode launches a separate copy of the executable about a second after the
         // first. Oddly this symptom seems to come and go as I edit main.cpp
@@ -548,6 +555,16 @@ public:
     // Adjust "static camera" model according to mouse input.
     void animateStaticCamera()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+
+        cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
+                                                 cameraLookAt(),
+                                                 cameraDesiredOffsetDistance());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        
+        
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
@@ -564,11 +581,76 @@ public:
             double d = cameraDesiredOffsetDistance() + (y * adjust_speed);
             cameraDesiredOffsetDistance() = std::max(min, d);
             mouse_position_3d_.z() = cameraDesiredOffsetDistance();
-            return true;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+            
+//            std::cout << "MouseScrollCallback: ";
+//            debugPrint(cameraDesiredOffsetDistance());
+
+//            return true;
+            return false;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         };
         visualizer().RegisterMouseScrollCallback(mscb);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+
+//    void updateMouseMoveCallback()
+//    {
+//        std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
+//        {
+//            mmcb = [&](base_vis_t* vis, double x, double y)
+//            {
+//                auto aa = aimAgent();
+//                Vec3 local_change = (aa.side() * x) + (aa.up() * y);
+//                wingman_cam_local_offset_ += local_change;
+//                Vec3 new_pos_pixels(x, y, 0);
+//                Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
+//                double mouse_move_pixels = offset_pixels.length();
+//                if ((mouse_move_pixels < 100) and left_mouse_button_down_)
+//                {
+//                    mouse_position_3d_ += offset_pixels * 0.2;
+//                }
+//
+//                // TODO 20250113 mouse adjust static camera view.
+//                // Adding this because the "wingman case" seems to have become
+//                // ridiculously complex. Starting over:
+//                
+//                if (isStaticCameraMode() and
+//                    (mouse_move_pixels < 50) and
+//                    left_mouse_button_down_)
+//                {
+//                    double speed = 0.05;
+//                    double nx = offset_pixels.x() * speed;
+//                    double ny = offset_pixels.y() * speed;
+//                    // offset from look-at to look-from
+//                    Vec3 offset = cameraLookFrom() - cameraLookAt();
+//                    Vec3 new_look_from = (offset +
+//                                          (camera().i() * nx) +
+//                                          (camera().j() * ny));
+//                    Vec3 restore_dist = (new_look_from.normalize() *
+//                                         cameraDesiredOffsetDistance());
+//                    
+//                    
+//                    std::cout << std::endl;
+//                    std::cout << "in updateMouseMoveCallback(): ";
+//                    debugPrint(cameraLookFrom());
+//
+//                    // TODO cameraLookAt() and cameraLookUp() stay unchanged.
+//                    cameraLookFrom() = restore_dist + cameraLookAt();
+//                    
+//                    std::cout << "in updateMouseMoveCallback(): ";
+//                    debugPrint(cameraLookFrom());
+//                }
+//                mouse_pos_pixels_ = new_pos_pixels;
+//                return false;
+//            };
+//        }
+//        visualizer().RegisterMouseMoveCallback(mmcb);
+//    }
+    
     void updateMouseMoveCallback()
     {
         std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
@@ -594,6 +676,13 @@ public:
                     (mouse_move_pixels < 50) and
                     left_mouse_button_down_)
                 {
+                    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+                    
+                    cameraLookAt() = {};
+                    
+                    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+                    
                     double speed = 0.05;
                     double nx = offset_pixels.x() * speed;
                     double ny = offset_pixels.y() * speed;
@@ -613,6 +702,9 @@ public:
         }
         visualizer().RegisterMouseMoveCallback(mmcb);
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
     // True when the left mouse button currently depressed.
     bool left_mouse_button_down_ = false;

@@ -99,46 +99,48 @@ private:
         visualizer().GetRenderOption().line_width_ = line_width;
         visualizer().GetRenderOption().point_size_ = point_size;
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250118 speed up key commands, add “redraw” function.
+
         // Add single key command callback to toggle "graphics mode"
         visualizer().RegisterKeyCallback('G',
                                          [&](base_vis_t* vis)
-                                         { toggleEnable(); return true; });
+//                                         { toggleEnable(); return true; });
+                                         { toggleEnable(); return false; });
         // Add "C" command, to cycle through camera aiming modes.
         visualizer().RegisterKeyCallback('C',
                                          [&](base_vis_t* vis)
-                                         { nextCameraMode(); return true; });
-        
+//                                         { nextCameraMode(); return true; });
+                                         { nextCameraMode(); return false; });
+
         // Add " " (space) command, toggles public pause simulation flag.
         visualizer().RegisterKeyCallback(' ',
                                          [&](base_vis_t* vis)
-                                         { toggleSimPause(); return true; });
-        
+//                                         { toggleSimPause(); return true; });
+                                         { toggleSimPause(); return false; });
+
         // Add "O" command, to increment obstacle set counter.
         visualizer().RegisterKeyCallback('O',
                                          [&](base_vis_t* vis)
-                                         { nextObstacleSet(); return true; });
-        
+//                                         { nextObstacleSet(); return true; });
+                                         { nextObstacleSet(); return false; });
+
         // Add "1" command, to set single step mode.
         visualizer().RegisterKeyCallback('1',
                                          [&](base_vis_t* vis)
-                                         { setSingleStepMode(); return true; });
+//                                         { setSingleStepMode(); return true; });
+                                         { setSingleStepMode(); return false; });
 
         // Add "S" command, to cycle selected boid through flock.
         visualizer().RegisterKeyCallback('S',
                                          [&](base_vis_t* vis)
-                                         { selectNextBoid(); return true; });
-
+//                                         { selectNextBoid(); return true; });
+                                         { selectNextBoid(); return false; });
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241223 WIP on adjusting follow camera position with mouse
 
-//        // Set mouse scroll policy based on current camera mode.
-//        updateMouseScrollCallback();
-
+        
         // Set mouse scroll and move policies based on current camera mode.
         updateMouseCallbacks();
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241225 mock up mouse position for camera position control
@@ -170,28 +172,47 @@ public:
 
     void endAnimatedScene() { if (enable()) { } }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250118 speed up key commands, add “redraw” function.
+
+//        void beginOneAnimatedFrame()
+//        {
+//    #ifdef USE_OPEN3D
+//            if (enable())
+//            {
+//    //            animated_tri_mesh_->Clear();
+//    //            animated_line_set_->Clear();
+//                clearAnimatedGeometryFromScene();
+//            }
+//    #endif  // USE_OPEN3D
+//        }
+
     void beginOneAnimatedFrame()
     {
-#ifdef USE_OPEN3D
-        if (enable())
-        {
-            animated_tri_mesh_->Clear();
-            animated_line_set_->Clear();
-        }
-#endif  // USE_OPEN3D
+        if (enable()) { clearAnimatedGeometryFromScene(); }
     }
+
+//        void endOneAnimatedFrame()
+//        {
+//    #ifdef USE_OPEN3D
+//            if (enable())
+//            {
+//                updateCamera();
+//    //            animated_tri_mesh_->ComputeVertexNormals();
+//    //            visualizer().UpdateGeometry(animated_tri_mesh_);
+//    //            visualizer().UpdateGeometry(animated_line_set_);
+//                redrawScene();
+//            }
+//    #endif  // USE_OPEN3D
+//        }
 
     void endOneAnimatedFrame()
     {
-#ifdef USE_OPEN3D
         if (enable())
         {
             updateCamera();
-            animated_tri_mesh_->ComputeVertexNormals();
-            visualizer().UpdateGeometry(animated_tri_mesh_);
-            visualizer().UpdateGeometry(animated_line_set_);
+            redrawScene();
         }
-#endif  // USE_OPEN3D
     }
 
     // Clear all animated geometry to begin building a new scene.
@@ -202,7 +223,20 @@ public:
         animated_line_set_->Clear();
 #endif  // USE_OPEN3D
     }
-    
+
+    // Redraw scene to reflect scene, camera, or animation changes.
+    void redrawScene()
+    {
+//        updateCamera();
+#ifdef USE_OPEN3D
+        animated_tri_mesh_->ComputeVertexNormals();
+        visualizer().UpdateGeometry(animated_tri_mesh_);
+        visualizer().UpdateGeometry(animated_line_set_);
+#endif  // USE_OPEN3D
+    }
+        
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Add to per-frame collection of animating triangles: single color.
     // Typically used to add a small polyhedron (a boid's body) to the scene.
     void addTriMeshToAnimatedFrame(const std::vector<Vec3>& vertices,
@@ -356,13 +390,7 @@ public:
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }
     void setEnable(bool e) { enable_ = e; }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241223 WIP on adjusting follow camera position with mouse
-    
-//    void toggleEnable() { enable_ = not enable_; updateMouseScrollCallback(); }
     void toggleEnable() { enable_ = not enable_; updateMouseCallbacks(); }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     bool pollEvents() { return visualizer().PollEvents(); }
   
@@ -483,20 +511,8 @@ public:
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241223 WIP on adjusting follow camera position with mouse
-
-//            // Set "from" as a local offset (right, up, and behind) from target.
-//    //        Vec3 local_offset = Vec3(10, 8, -4).normalize();
-//    //        Vec3 local_offset = Vec3(3, 2, -8).normalize();
-//    //        Vec3 local_offset = Vec3(3, 5, -8).normalize();
-//            Vec3 local_offset = Vec3(1, 3, -6).normalize();
-
-//        Vec3 scaled_offset = local_offset * cameraDesiredOffsetDistance();
         Vec3 scaled_offset = (wingman_cam_local_offset_ *
                               cameraDesiredOffsetDistance());
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Vec3 offset = aimAgent().ls().globalize(scaled_offset);
 
@@ -756,11 +772,7 @@ public:
     void nextCameraMode()
     {
         camera_mode_ = (camera_mode_ + 1) % camera_mode_max_;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241223 WIP on adjusting follow camera position with mouse
-//        updateMouseScrollCallback();
         updateMouseCallbacks();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         redrawNeeded();
     }
     bool isStaticCameraMode() { return (cameraMode() == 0); }
@@ -794,7 +806,11 @@ public:
     {
         if (simPause())
         {
-            setSingleStepMode();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250118 speed up key commands, add “redraw” function.
+//            setSingleStepMode();
+            redrawScene();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             up_memory_.clear();
             from_memory_.clear();
             at_memory_.clear();
@@ -808,11 +824,7 @@ public:
     {
         single_step_mode_ = ssm;
         if (single_step_mode_) { sim_pause_ = true; }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241223 WIP on adjusting follow camera position with mouse
-//        updateMouseScrollCallback();
         updateMouseCallbacks();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Runtime switch which the simulation can query to pause itself.
@@ -821,11 +833,7 @@ public:
     void toggleSimPause()
     {
         sim_pause_ = not sim_pause_;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241223 WIP on adjusting follow camera position with mouse
-//        updateMouseScrollCallback();
         updateMouseCallbacks();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Runtime counter the simulation can use to change predefined obs sets.

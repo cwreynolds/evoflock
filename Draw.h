@@ -66,7 +66,9 @@ private:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250117 static cam: why no mouse adjust "offset distance"?
         Vec3 cwr_screen_size(3456, 2234, 0);
-        window_xy_size = {1000, 1000, 0};
+//        window_xy_size = {1000, 1000, 0};
+//        window_xy_size = {1500, 1500, 0};
+        window_xy_size = {1800, 1200, 0};
         window_xy_position_ul = cwr_screen_size - window_xy_size ;
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -100,42 +102,87 @@ private:
         visualizer().GetRenderOption().point_size_ = point_size;
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250118 speed up key commands, add “redraw” function.
+        // TODO 20250119 working on mouse move camera-from point
+
+//            // To trigger redraw after key command callback.
+//    //        bool rdakc = true;
+//    //        bool rdakc = false;
+//            bool rdakc = true;
+//
+//            // Add single key command callback to toggle "graphics mode"
+//            visualizer().RegisterKeyCallback('G',
+//                                             [&](base_vis_t* vis)
+//    //                                         { toggleEnable(); return true; });
+//    //                                         { toggleEnable(); return false; });
+//                                             { toggleEnable(); return rdakc; });
+//            // Add "C" command, to cycle through camera aiming modes.
+//            visualizer().RegisterKeyCallback('C',
+//                                             [&](base_vis_t* vis)
+//    //                                         { nextCameraMode(); return true; });
+//    //                                         { nextCameraMode(); return false; });
+//                                             { nextCameraMode(); return rdakc; });
+//
+//            // Add " " (space) command, toggles public pause simulation flag.
+//            visualizer().RegisterKeyCallback(' ',
+//                                             [&](base_vis_t* vis)
+//    //                                         { toggleSimPause(); return true; });
+//    //                                         { toggleSimPause(); return false; });
+//                                             { toggleSimPause(); return rdakc; });
+//
+//            // Add "O" command, to increment obstacle set counter.
+//            visualizer().RegisterKeyCallback('O',
+//                                             [&](base_vis_t* vis)
+//    //                                         { nextObstacleSet(); return true; });
+//    //                                         { nextObstacleSet(); return false; });
+//                                             { nextObstacleSet(); return rdakc; });
+//
+//            // Add "1" command, to set single step mode.
+//            visualizer().RegisterKeyCallback('1',
+//                                             [&](base_vis_t* vis)
+//    //                                         { setSingleStepMode(); return true; });
+//    //                                         { setSingleStepMode(); return false; });
+//                                             { setSingleStepMode(); return rdakc; });
+//
+//            // Add "S" command, to cycle selected boid through flock.
+//            visualizer().RegisterKeyCallback('S',
+//                                             [&](base_vis_t* vis)
+//    //                                         { selectNextBoid(); return true; });
+//    //                                         { selectNextBoid(); return false; });
+//                                             { selectNextBoid(); return rdakc; });
+        
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        
+        auto rk = [&](int key,std::function<bool(base_vis_t *)> callback)
+        {
+            visualizer().RegisterKeyCallback(key, callback);
+        };
+
+        // To trigger redraw after key command callback.
+//        bool rdakc = true;
+//        bool rdakc = false;
+        bool rdakc = true;
+
 
         // Add single key command callback to toggle "graphics mode"
-        visualizer().RegisterKeyCallback('G',
-                                         [&](base_vis_t* vis)
-//                                         { toggleEnable(); return true; });
-                                         { toggleEnable(); return false; });
+        rk('G', [&](base_vis_t* vis) { toggleEnable(); return rdakc; });
+
         // Add "C" command, to cycle through camera aiming modes.
-        visualizer().RegisterKeyCallback('C',
-                                         [&](base_vis_t* vis)
-//                                         { nextCameraMode(); return true; });
-                                         { nextCameraMode(); return false; });
+        rk('C', [&](base_vis_t* vis) { nextCameraMode(); return rdakc; });
 
         // Add " " (space) command, toggles public pause simulation flag.
-        visualizer().RegisterKeyCallback(' ',
-                                         [&](base_vis_t* vis)
-//                                         { toggleSimPause(); return true; });
-                                         { toggleSimPause(); return false; });
+        rk(' ', [&](base_vis_t* vis) { toggleSimPause(); return rdakc; });
 
         // Add "O" command, to increment obstacle set counter.
-        visualizer().RegisterKeyCallback('O',
-                                         [&](base_vis_t* vis)
-//                                         { nextObstacleSet(); return true; });
-                                         { nextObstacleSet(); return false; });
+        rk('O', [&](base_vis_t* vis) { nextObstacleSet(); return rdakc; });
 
         // Add "1" command, to set single step mode.
-        visualizer().RegisterKeyCallback('1',
-                                         [&](base_vis_t* vis)
-//                                         { setSingleStepMode(); return true; });
-                                         { setSingleStepMode(); return false; });
+        rk('1', [&](base_vis_t* vis) { setSingleStepMode(); return rdakc; });
 
         // Add "S" command, to cycle selected boid through flock.
-        visualizer().RegisterKeyCallback('S',
-                                         [&](base_vis_t* vis)
-//                                         { selectNextBoid(); return true; });
-                                         { selectNextBoid(); return false; });
+        rk('S', [&](base_vis_t* vis) { selectNextBoid(); return rdakc; });
+
+        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         
@@ -667,6 +714,65 @@ public:
 //        visualizer().RegisterMouseMoveCallback(mmcb);
 //    }
     
+//        void updateMouseMoveCallback()
+//        {
+//            std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
+//            {
+//                mmcb = [&](base_vis_t* vis, double x, double y)
+//                {
+//                    auto aa = aimAgent();
+//                    Vec3 local_change = (aa.side() * x) + (aa.up() * y);
+//                    wingman_cam_local_offset_ += local_change;
+//                    Vec3 new_pos_pixels(x, y, 0);
+//                    Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
+//                    double mouse_move_pixels = offset_pixels.length();
+//                    if ((mouse_move_pixels < 100) and left_mouse_button_down_)
+//                    {
+//                        mouse_position_3d_ += offset_pixels * 0.2;
+//                    }
+//
+//                    // TODO 20250113 mouse adjust static camera view.
+//                    // Adding this because the "wingman case" seems to have become
+//                    // ridiculously complex. Starting over:
+//
+//                    if (isStaticCameraMode() and
+//                        (mouse_move_pixels < 50) and
+//                        left_mouse_button_down_)
+//                    {
+//                        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//                        // TODO 20250119 working on mouse move camera-from point
+//                        // TODO Very temp, to better vis motion of "from" about "to"
+//
+//    //                    cameraLookAt() = {};
+//
+//                        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//
+//
+//                        double speed = 0.05;
+//                        double nx = offset_pixels.x() * speed;
+//                        double ny = offset_pixels.y() * speed;
+//                        // offset from look-at to look-from
+//                        Vec3 offset = cameraLookFrom() - cameraLookAt();
+//                        Vec3 new_look_from = (offset +
+//                                              (camera().i() * nx) +
+//                                              (camera().j() * ny));
+//                        Vec3 restore_dist = (new_look_from.normalize() *
+//                                             cameraDesiredOffsetDistance());
+//                        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//                        // TODO 20250119 working on mouse move camera-from point
+//
+//                        // Record new "look from", new "look up" from current camera.
+//                        cameraLookFrom() = restore_dist + cameraLookAt();
+//                        cameraLookUp() = camera().j();
+//                        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//                    }
+//                    mouse_pos_pixels_ = new_pos_pixels;
+//                    return false;
+//                };
+//            }
+//            visualizer().RegisterMouseMoveCallback(mmcb);
+//        }
+
     void updateMouseMoveCallback()
     {
         std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
@@ -693,24 +799,36 @@ public:
                     left_mouse_button_down_)
                 {
                     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+                    // TODO 20250119 working on mouse move camera-from point
                     
-                    cameraLookAt() = {};
-                    
-                    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//                    double speed = 0.05;
+                    double speed = 0.01;
 
-                    
-                    double speed = 0.05;
                     double nx = offset_pixels.x() * speed;
                     double ny = offset_pixels.y() * speed;
                     // offset from look-at to look-from
                     Vec3 offset = cameraLookFrom() - cameraLookAt();
-                    Vec3 new_look_from = (offset +
+                    
+                    Vec3 unit_offset = offset.normalize();
+
+
+//                    Vec3 new_look_from = (offset +
+                    Vec3 new_look_from = (unit_offset +
                                           (camera().i() * nx) +
                                           (camera().j() * ny));
+
+                    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
                     Vec3 restore_dist = (new_look_from.normalize() *
                                          cameraDesiredOffsetDistance());
-                    // TODO cameraLookAt() and cameraLookUp() stay unchanged.
+
+                    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+                    // TODO 20250119 working on mouse move camera-from point
+
+                    // Record new "look from", new "look up" from current camera.
                     cameraLookFrom() = restore_dist + cameraLookAt();
+                    cameraLookUp() = camera().j();
+                    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
                 }
                 mouse_pos_pixels_ = new_pos_pixels;
                 return false;
@@ -808,7 +926,20 @@ public:
         {
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250118 speed up key commands, add “redraw” function.
+            //
+            // replacing setSingleStepMode() with redrawScene() did not work,
+            // eg when sim paused: neither mouse scroll nor S key change display.
+            //
+            // So adding setSingleStepMode() back for now, but I really would
+            // prefer that it NOT take another simulation step in this situation.
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250119 working on mouse move camera-from point
+
 //            setSingleStepMode();
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
             redrawScene();
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             up_memory_.clear();

@@ -115,6 +115,53 @@ public:
     {
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250119 working on mouse move camera-from point
+
+//    // Run boids simulation.
+//    void run()
+//    {
+//        // Draw.start_visualizer(self.sphere_radius, self.sphere_center)
+//        // Flock.vis_pairs.add_pair(Draw.vis, self)  # Pairing for key handlers.
+//        // self.register_single_key_commands() # For Open3D visualizer GUI.
+//        make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
+//        // self.draw()
+//        // self.cycle_obstacle_selection()
+//        draw().beginAnimatedScene();
+//        save_centers_to_file_start();
+//        while (still_running())
+//        {
+//            if (draw().runSimulationThisFrame())
+//            {
+//                aTimer().setFrameStartTime();
+//                updateObstacleSetForGUI();
+//                updateSelectedBoidForGUI();
+//                // Run simulation steps "as fast as possible" or at fixed rate?
+//                bool afap = not (fixed_time_step() and draw().enable());
+//                double step_duration = (afap ?
+//                                        aTimer().frameDuration() :
+//                                        1.0 / fixed_fps());
+//                draw().beginOneAnimatedFrame();
+//                fly_boids(step_duration);
+//                save_centers_to_file_1_step();
+//                log_stats();
+//                update_fps();
+//                selectedBoid()->drawAnnotationForBoidAndNeighbors();
+//                draw().aimAgent() = *selectedBoid();
+//                draw().endOneAnimatedFrame();
+//                aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
+//                if (not draw().simPause()) { aTimer().measureFrameDuration(); }
+//            }
+//        }
+//        save_centers_to_file_end();
+//        draw().endAnimatedScene();
+//        if (max_simulation_steps() == std::numeric_limits<double>::infinity())
+//        {
+//            std::cout << log_prefix << "Exit at step: ";
+//            std::cout << aTimer().frameCounter() << std::endl;
+//        }
+//    }
+  
     // Run boids simulation.
     void run()
     {
@@ -128,27 +175,73 @@ public:
         save_centers_to_file_start();
         while (still_running())
         {
-            if (draw().runSimulationThisFrame())
+            // TODO SUPER TEMP
+            //
+            // AHA! for some mysterious reason this needs to be called BEFORE
+            // the block of code below. That was confusing to debug. I'd like to
+            // understand why so that whatever initialization is needed happens
+            // down in side Draw class. So that, for example, that call to
+            // draw().runSimulationThisFrame() could happen down in the IF
+            // statement like it did before.
+            //
+            bool run_sim_this_frame = draw().runSimulationThisFrame();
+            
+            
+            
+            aTimer().setFrameStartTime();
+            updateObstacleSetForGUI();
+            updateSelectedBoidForGUI();
+            // Run simulation steps "as fast as possible" or at fixed rate?
+            bool afap = not (fixed_time_step() and draw().enable());
+            double step_duration = (afap ?
+                                    aTimer().frameDuration() :
+                                    1.0 / fixed_fps());
+            draw().beginOneAnimatedFrame();
+            
+
+//            if (draw().runSimulationThisFrame())
+            if (run_sim_this_frame)
             {
-                aTimer().setFrameStartTime();
-                updateObstacleSetForGUI();
-                updateSelectedBoidForGUI();
-                // Run simulation steps "as fast as possible" or at fixed rate?
-                bool afap = not (fixed_time_step() and draw().enable());
-                double step_duration = (afap ?
-                                        aTimer().frameDuration() :
-                                        1.0 / fixed_fps());
-                draw().beginOneAnimatedFrame();
+                
+//                aTimer().setFrameStartTime();
+//                updateObstacleSetForGUI();
+//                updateSelectedBoidForGUI();
+//                // Run simulation steps "as fast as possible" or at fixed rate?
+//                bool afap = not (fixed_time_step() and draw().enable());
+//                double step_duration = (afap ?
+//                                        aTimer().frameDuration() :
+//                                        1.0 / fixed_fps());
+//                draw().beginOneAnimatedFrame();
+
                 fly_boids(step_duration);
                 save_centers_to_file_1_step();
                 log_stats();
                 update_fps();
-                selectedBoid()->drawAnnotationForBoidAndNeighbors();
-                draw().aimAgent() = *selectedBoid();
-                draw().endOneAnimatedFrame();
-                aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
-                if (not draw().simPause()) { aTimer().measureFrameDuration(); }
+
+//                selectedBoid()->drawAnnotationForBoidAndNeighbors();
+//                draw().aimAgent() = *selectedBoid();
+//                draw().endOneAnimatedFrame();
+//                aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
+//                if (not draw().simPause()) { aTimer().measureFrameDuration(); }
+            
             }
+            
+            
+            // TODO -- now BELATEDLY draw all boid bodies.
+            // Draw all Boid bodies whether sim was paused or not.
+            for_all_boids([&](Boid* b){ b->draw_body();});
+
+            // TODO SUPER TEMP
+            Vec3 a = selectedBoid()->position();
+            draw().addLineSegmentToAnimatedFrame(a, a + Vec3(0, 100, 0), Vec3());
+            
+            
+            selectedBoid()->drawAnnotationForBoidAndNeighbors();
+            draw().aimAgent() = *selectedBoid();
+            draw().endOneAnimatedFrame();
+            aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
+            if (not draw().simPause()) { aTimer().measureFrameDuration(); }
+
         }
         save_centers_to_file_end();
         draw().endAnimatedScene();
@@ -158,6 +251,8 @@ public:
             std::cout << aTimer().frameCounter() << std::endl;
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Populate this flock by creating "count" boids with uniformly distributed
     // random positions inside a sphere with the given "radius" and "center".

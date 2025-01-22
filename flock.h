@@ -57,9 +57,10 @@ private:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250111 arrange non-intersecting hollow spheres
     // Index of the obstacle set index used initially.
-    // int default_obstacle_set_index_ = 2;  // Plane and sphere.
-//     int default_obstacle_set_index_ = 1;  // 6 cylinders and sphere.
-    int default_obstacle_set_index_ = 4;  // Plane and sphere.
+    int default_obstacle_set_index_ = 0;  // Sphere and vertical cylinder.
+//    int default_obstacle_set_index_ = 1;  // 6 cylinders and sphere.
+//    int default_obstacle_set_index_ = 2;  // Plane and sphere.
+//    int default_obstacle_set_index_ = 4;  // Plane and sphere.
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Currently selected boid's index in boids().
@@ -870,7 +871,7 @@ public:
             double sr = fp().sphere_radius;
             Vec3 sc = fp().sphere_center;
             
-            // Set 1: sphere and right hand vertical cylinder.
+            // Set 0: sphere and right hand vertical cylinder.
             obs.clear();
             // TODO prototyping -- add everted SphereObstacle
             obs.push_back(new EvertedSphereObstacle(fp().sphere_radius,
@@ -881,7 +882,7 @@ public:
             obs.push_back(new CylinderObstacle(sr * 0.2, ect, ecb, Obstacle::inside));
             obstacle_presets_.push_back(obs);
             
-            // Set 2: sphere and 6 cylinders.
+            // Set 1: sphere and 6 cylinders.
             obs.clear();
             obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
             // 6 symmetric cylinders parallel to main axes.
@@ -900,19 +901,20 @@ public:
             add_3_cyl(-c6o);
             obstacle_presets_.push_back(obs);
             
-            // Set 3 sphere and horizontal plane
+            // Set 2 sphere and horizontal plane
             obs.clear();
             obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
             obs.push_back(new PlaneObstacle(Vec3(0, 1, 0), sc, sr, sr * 0.001));
             obstacle_presets_.push_back(obs);
             
-            // Set 4 just the big sphere.
+            // Set 3 just the big sphere.
             obs.clear();
             obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
             obstacle_presets_.push_back(obs);
 
-            // Set 5 -- 10 random spheres
+            // Set 4 -- 10 random spheres
             obs.clear();
+            obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
             int count = 10;
             std::vector<double> radii;
             for (int i = 0; i < count; i++)
@@ -925,7 +927,6 @@ public:
             {
                 obs.push_back(new EvertedSphereObstacle(radii[i], centers[i], ins));
             }
-            obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
             obstacle_presets_.push_back(obs);
 
             // Set initial obstacle set to the default.

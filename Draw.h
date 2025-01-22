@@ -524,95 +524,52 @@ public:
                                       cameraLookUp());
     }
     
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250121 update wingman cam to new mouse tracking approach
+
+    
     // Set "from" as a local offset (right, up, and behind) relative to target.
     Vec3 wingman_cam_local_offset_ = Vec3(1, 3, -6).normalize();
 
+    
     // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
     void animateWingmanCamera()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241226 WIP mouse_position_3d_ -> wingman_cam_local_offset_
-        
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20241227 mouse xy ROTATE around aimpoint
+//        Vec3 offset_from_aim_to_mouse = mouse_position_3d_ - cameraLookAt();
+        Vec3 offset_from_aim_to_cam = cameraLookFrom() - cameraLookAt();
 
-//        wingman_cam_local_offset_ = mouse_position_3d_.normalize();
-//        wingman_cam_local_offset_.z() *= -1;  // TODO reversed Z how to handle?
-        
-        Vec3 offset_from_aim_to_mouse = mouse_position_3d_ - cameraLookAt();
+//        wingman_cam_local_offset_ = offset_from_aim_to_mouse.normalize();
+//        wingman_cam_local_offset_ = offset_from_aim_to_cam.normalize();
 
-//        wingman_cam_local_offset_ = (offset_from_aim_to_mouse.normalize() *
-//                                     cameraDesiredOffsetDistance());
-        wingman_cam_local_offset_ = offset_from_aim_to_mouse.normalize();
-//        wingman_cam_local_offset_.z() *= -1;  // TODO reversed Z how to handle?
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
-//        std::cout << std::endl;
-//        std::cout << "wingman_cam_local_offset_ : " << wingman_cam_local_offset_;
-//        std::cout << std::endl;
-//        std::cout << "mouse_position_3d_        : " << mouse_position_3d_;
-//        std::cout << std::endl;
-
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        Vec3 scaled_offset = (wingman_cam_local_offset_ *
+//        Vec3 scaled_offset = (wingman_cam_local_offset_ *
+//                              cameraDesiredOffsetDistance());
+        Vec3 scaled_offset = (offset_from_aim_to_cam.normalize() *
                               cameraDesiredOffsetDistance());
+        
+        Vec3 new_look_from = scaled_offset + cameraLookAt();
 
-        Vec3 offset = aimAgent().ls().globalize(scaled_offset);
-
-        
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//            // TODO 20241228 reset mouse_position_3d_ to sphere around aimpoint.
-//
-//            //            mouse_position_3d_ = ((wingman_cam_local_offset_ *
-//            //                                   cameraDesiredOffsetDistance()) +
-//            //    //                              aimAgent().position());
-//            //    //                              cameraLookAt());
-//            //                                  aimAgent().position());
-//
-//
-//    //        aimAgent().ls().localize(scaled_offset)
-//
-//
-//            mouse_position_3d_ = offset;
-//
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        
-        
-        
-
+//        Vec3 offset = aimAgent().ls().globalize(scaled_offset);
 
         // Smooth look/at parameters.
-        cameraLookFrom() = from_memory_.blend(offset, 0.90);
+//        cameraLookFrom() = from_memory_.blend(offset, 0.90);
+//        cameraLookFrom() = from_memory_.blend(scaled_offset, 0.90);
+        cameraLookFrom() = from_memory_.blend(new_look_from, 0.90);
+
         cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
         cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
         // Adjust "from" point so it is the desired offset distance from "at".
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241222 maybe obstacle_presets_ should be static?
-//        cameraLookFrom() = Vec3::adjustAbDist(cameraLookFrom(),
-//                                              cameraLookAt(),
-//                                              cameraDesiredOffsetDistance());
         cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
                                                  cameraLookAt(),
                                                  cameraDesiredOffsetDistance());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
-        
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20241228 reset mouse_position_3d_ to sphere around aimpoint.
-        
-//        mouse_position_3d_ = offset;
         mouse_position_3d_ = cameraLookFrom();
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
 
     
     // Adjust "static camera" model according to mouse input.
@@ -633,7 +590,6 @@ public:
                                       cameraLookUp());
     }
 
-    
     void updateMouseScrollCallback()
     {
         auto mscb = [&](base_vis_t* vis, double x, double y)
@@ -644,76 +600,14 @@ public:
             double d = cameraDesiredOffsetDistance() + (y * adjust_speed);
             cameraDesiredOffsetDistance() = std::max(min, d);
             mouse_position_3d_.z() = cameraDesiredOffsetDistance();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250117 static cam: why no mouse adjust "offset distance"?
-            
-//            std::cout << "MouseScrollCallback: ";
-//            debugPrint(cameraDesiredOffsetDistance());
-
-//            return true;
             return false;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         };
         visualizer().RegisterMouseScrollCallback(mscb);
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+    // TODO 20250121 update wingman cam to new mouse tracking approach
 
-//    void updateMouseMoveCallback()
-//    {
-//        std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
-//        {
-//            mmcb = [&](base_vis_t* vis, double x, double y)
-//            {
-//                auto aa = aimAgent();
-//                Vec3 local_change = (aa.side() * x) + (aa.up() * y);
-//                wingman_cam_local_offset_ += local_change;
-//                Vec3 new_pos_pixels(x, y, 0);
-//                Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
-//                double mouse_move_pixels = offset_pixels.length();
-//                if ((mouse_move_pixels < 100) and left_mouse_button_down_)
-//                {
-//                    mouse_position_3d_ += offset_pixels * 0.2;
-//                }
-//
-//                // TODO 20250113 mouse adjust static camera view.
-//                // Adding this because the "wingman case" seems to have become
-//                // ridiculously complex. Starting over:
-//                
-//                if (isStaticCameraMode() and
-//                    (mouse_move_pixels < 50) and
-//                    left_mouse_button_down_)
-//                {
-//                    double speed = 0.05;
-//                    double nx = offset_pixels.x() * speed;
-//                    double ny = offset_pixels.y() * speed;
-//                    // offset from look-at to look-from
-//                    Vec3 offset = cameraLookFrom() - cameraLookAt();
-//                    Vec3 new_look_from = (offset +
-//                                          (camera().i() * nx) +
-//                                          (camera().j() * ny));
-//                    Vec3 restore_dist = (new_look_from.normalize() *
-//                                         cameraDesiredOffsetDistance());
-//                    
-//                    
-//                    std::cout << std::endl;
-//                    std::cout << "in updateMouseMoveCallback(): ";
-//                    debugPrint(cameraLookFrom());
-//
-//                    // TODO cameraLookAt() and cameraLookUp() stay unchanged.
-//                    cameraLookFrom() = restore_dist + cameraLookAt();
-//                    
-//                    std::cout << "in updateMouseMoveCallback(): ";
-//                    debugPrint(cameraLookFrom());
-//                }
-//                mouse_pos_pixels_ = new_pos_pixels;
-//                return false;
-//            };
-//        }
-//        visualizer().RegisterMouseMoveCallback(mmcb);
-//    }
-    
 //        void updateMouseMoveCallback()
 //        {
 //            std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
@@ -741,23 +635,28 @@ public:
 //                    {
 //                        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 //                        // TODO 20250119 working on mouse move camera-from point
-//                        // TODO Very temp, to better vis motion of "from" about "to"
 //
-//    //                    cameraLookAt() = {};
+//    //                    double speed = 0.05;
+//                        double speed = 0.01;
 //
-//                        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//
-//
-//                        double speed = 0.05;
 //                        double nx = offset_pixels.x() * speed;
 //                        double ny = offset_pixels.y() * speed;
 //                        // offset from look-at to look-from
 //                        Vec3 offset = cameraLookFrom() - cameraLookAt();
-//                        Vec3 new_look_from = (offset +
+//
+//                        Vec3 unit_offset = offset.normalize();
+//
+//
+//    //                    Vec3 new_look_from = (offset +
+//                        Vec3 new_look_from = (unit_offset +
 //                                              (camera().i() * nx) +
 //                                              (camera().j() * ny));
+//
+//                        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//
 //                        Vec3 restore_dist = (new_look_from.normalize() *
 //                                             cameraDesiredOffsetDistance());
+//
 //                        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 //                        // TODO 20250119 working on mouse move camera-from point
 //
@@ -790,45 +689,31 @@ public:
                     mouse_position_3d_ += offset_pixels * 0.2;
                 }
 
+                
                 // TODO 20250113 mouse adjust static camera view.
                 // Adding this because the "wingman case" seems to have become
                 // ridiculously complex. Starting over:
-                
-                if (isStaticCameraMode() and
+
+//                if (isStaticCameraMode() and
+                if ((isStaticCameraMode() or isWingmanCameraMode()) and
                     (mouse_move_pixels < 50) and
                     left_mouse_button_down_)
                 {
-                    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-                    // TODO 20250119 working on mouse move camera-from point
-                    
-//                    double speed = 0.05;
                     double speed = 0.01;
-
                     double nx = offset_pixels.x() * speed;
                     double ny = offset_pixels.y() * speed;
                     // offset from look-at to look-from
                     Vec3 offset = cameraLookFrom() - cameraLookAt();
-                    
                     Vec3 unit_offset = offset.normalize();
-
-
-//                    Vec3 new_look_from = (offset +
                     Vec3 new_look_from = (unit_offset +
                                           (camera().i() * nx) +
                                           (camera().j() * ny));
-
-                    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
                     Vec3 restore_dist = (new_look_from.normalize() *
                                          cameraDesiredOffsetDistance());
-
-                    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-                    // TODO 20250119 working on mouse move camera-from point
-
-                    // Record new "look from", new "look up" from current camera.
+                    // Record newly computed "look from".
                     cameraLookFrom() = restore_dist + cameraLookAt();
+                    // Copy "look up" of current camera.
                     cameraLookUp() = camera().j();
-                    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
                 }
                 mouse_pos_pixels_ = new_pos_pixels;
                 return false;

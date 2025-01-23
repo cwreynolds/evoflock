@@ -533,41 +533,153 @@ public:
     Vec3 wingman_cam_local_offset_ = Vec3(1, 3, -6).normalize();
 
     
+//        // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
+//        void animateWingmanCamera()
+//        {
+//    //        Vec3 offset_from_aim_to_mouse = mouse_position_3d_ - cameraLookAt();
+//            Vec3 offset_from_aim_to_cam = cameraLookFrom() - cameraLookAt();
+//
+//    //        wingman_cam_local_offset_ = offset_from_aim_to_mouse.normalize();
+//    //        wingman_cam_local_offset_ = offset_from_aim_to_cam.normalize();
+//
+//    //        Vec3 scaled_offset = (wingman_cam_local_offset_ *
+//    //                              cameraDesiredOffsetDistance());
+//            Vec3 scaled_offset = (offset_from_aim_to_cam.normalize() *
+//                                  cameraDesiredOffsetDistance());
+//
+//            Vec3 new_look_from = scaled_offset + cameraLookAt();
+//
+//    //        Vec3 offset = aimAgent().ls().globalize(scaled_offset);
+//
+//            // Smooth look/at parameters.
+//    //        cameraLookFrom() = from_memory_.blend(offset, 0.90);
+//    //        cameraLookFrom() = from_memory_.blend(scaled_offset, 0.90);
+//            cameraLookFrom() = from_memory_.blend(new_look_from, 0.90);
+//
+//            cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
+//            cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
+//            // Adjust "from" point so it is the desired offset distance from "at".
+//            cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
+//                                                     cameraLookAt(),
+//                                                     cameraDesiredOffsetDistance());
+//            camera() = LocalSpace::fromTo(cameraLookFrom(),
+//                                          cameraLookAt(),
+//                                          cameraLookUp());
+//            mouse_position_3d_ = cameraLookFrom();
+//        }
+
+    
+    //~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~
+    // TODO 20250122 newer wingman stuff
+    
+//    Vec3 new_wingman_local_offset_;
+    
+//        // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
+//        void animateWingmanCamera()
+//        {
+//    //        Vec3 offset_from_aim_to_mouse = mouse_position_3d_ - cameraLookAt();
+//            Vec3 offset_from_aim_to_cam = cameraLookFrom() - cameraLookAt();
+//
+//    //        wingman_cam_local_offset_ = offset_from_aim_to_mouse.normalize();
+//    //        wingman_cam_local_offset_ = offset_from_aim_to_cam.normalize();
+//
+//    //        Vec3 scaled_offset = (wingman_cam_local_offset_ *
+//    //                              cameraDesiredOffsetDistance());
+//            Vec3 scaled_offset = (offset_from_aim_to_cam.normalize() *
+//                                  cameraDesiredOffsetDistance());
+//
+//            Vec3 new_look_from = scaled_offset + cameraLookAt();
+//
+//    //        Vec3 offset = aimAgent().ls().globalize(scaled_offset);
+//
+//            // Smooth look/at parameters.
+//    //        cameraLookFrom() = from_memory_.blend(offset, 0.90);
+//    //        cameraLookFrom() = from_memory_.blend(scaled_offset, 0.90);
+//            cameraLookFrom() = from_memory_.blend(new_look_from, 0.90);
+//
+//            cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
+//            cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
+//            // Adjust "from" point so it is the desired offset distance from "at".
+//            cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
+//                                                     cameraLookAt(),
+//                                                     cameraDesiredOffsetDistance());
+//            camera() = LocalSpace::fromTo(cameraLookFrom(),
+//                                          cameraLookAt(),
+//                                          cameraLookUp());
+//            mouse_position_3d_ = cameraLookFrom();
+//        }
+
+//        // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
+//        void animateWingmanCamera()
+//        {
+//    //    //        Vec3 offset_from_aim_to_mouse = mouse_position_3d_ - cameraLookAt();
+//    //            Vec3 offset_from_aim_to_cam = cameraLookFrom() - cameraLookAt();
+//    //
+//    //    //        wingman_cam_local_offset_ = offset_from_aim_to_mouse.normalize();
+//    //    //        wingman_cam_local_offset_ = offset_from_aim_to_cam.normalize();
+//    //
+//    //    //        Vec3 scaled_offset = (wingman_cam_local_offset_ *
+//    //    //                              cameraDesiredOffsetDistance());
+//    //            Vec3 scaled_offset = (offset_from_aim_to_cam.normalize() *
+//    //                                  cameraDesiredOffsetDistance());
+//    //
+//    //            Vec3 new_look_from = scaled_offset + cameraLookAt();
+//    //
+//    //    //        Vec3 offset = aimAgent().ls().globalize(scaled_offset);
+//    //
+//    //            // Smooth look/at parameters.
+//    //    //        cameraLookFrom() = from_memory_.blend(offset, 0.90);
+//    //    //        cameraLookFrom() = from_memory_.blend(scaled_offset, 0.90);
+//
+//
+//
+//
+//
+//            Vec3 global_cam = aimAgent().ls().globalize(new_wingman_local_offset_);
+//
+//    //        cameraLookFrom() = from_memory_.blend(new_look_from, 0.90);
+//            cameraLookFrom() = from_memory_.blend(global_cam, 0.90);
+//
+//            cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
+//            cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
+//            // Adjust "from" point so it is the desired offset distance from "at".
+//            cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
+//                                                     cameraLookAt(),
+//                                                     cameraDesiredOffsetDistance());
+//            camera() = LocalSpace::fromTo(cameraLookFrom(),
+//                                          cameraLookAt(),
+//                                          cameraLookUp());
+//            mouse_position_3d_ = cameraLookFrom();
+//        }
+
+    
     // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
     void animateWingmanCamera()
     {
-//        Vec3 offset_from_aim_to_mouse = mouse_position_3d_ - cameraLookAt();
-        Vec3 offset_from_aim_to_cam = cameraLookFrom() - cameraLookAt();
+        Vec3 global_cam = aimAgent().ls().globalize(wingman_cam_local_offset_);
 
-//        wingman_cam_local_offset_ = offset_from_aim_to_mouse.normalize();
-//        wingman_cam_local_offset_ = offset_from_aim_to_cam.normalize();
-
-//        Vec3 scaled_offset = (wingman_cam_local_offset_ *
-//                              cameraDesiredOffsetDistance());
-        Vec3 scaled_offset = (offset_from_aim_to_cam.normalize() *
-                              cameraDesiredOffsetDistance());
-        
-        Vec3 new_look_from = scaled_offset + cameraLookAt();
-
-//        Vec3 offset = aimAgent().ls().globalize(scaled_offset);
-
-        // Smooth look/at parameters.
-//        cameraLookFrom() = from_memory_.blend(offset, 0.90);
-//        cameraLookFrom() = from_memory_.blend(scaled_offset, 0.90);
-        cameraLookFrom() = from_memory_.blend(new_look_from, 0.90);
-
+        cameraLookFrom() = from_memory_.blend(global_cam, 0.90);
         cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
         cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
+        
+        // TODO Seems like Vec3::adjustSegLength should not be necessary,
+        // but commenting it out makes it behave wanky.
+        
         // Adjust "from" point so it is the desired offset distance from "at".
         cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
                                                  cameraLookAt(),
                                                  cameraDesiredOffsetDistance());
+        
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
         mouse_position_3d_ = cameraLookFrom();
     }
 
+    //~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~
+
+    
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
 
@@ -672,24 +784,81 @@ public:
 //            visualizer().RegisterMouseMoveCallback(mmcb);
 //        }
 
+//        void updateMouseMoveCallback()
+//        {
+//            std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
+//            {
+//                mmcb = [&](base_vis_t* vis, double x, double y)
+//                {
+//                    auto aa = aimAgent();
+//                    Vec3 local_change = (aa.side() * x) + (aa.up() * y);
+//                    wingman_cam_local_offset_ += local_change;
+//                    Vec3 new_pos_pixels(x, y, 0);
+//                    Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
+//                    double mouse_move_pixels = offset_pixels.length();
+//                    if ((mouse_move_pixels < 100) and left_mouse_button_down_)
+//                    {
+//                        mouse_position_3d_ += offset_pixels * 0.2;
+//                    }
+//
+//
+//                    // TODO 20250113 mouse adjust static camera view.
+//                    // Adding this because the "wingman case" seems to have become
+//                    // ridiculously complex. Starting over:
+//
+//    //                if (isStaticCameraMode() and
+//                    if ((isStaticCameraMode() or isWingmanCameraMode()) and
+//                        (mouse_move_pixels < 50) and
+//                        left_mouse_button_down_)
+//                    {
+//                        double speed = 0.01;
+//                        double nx = offset_pixels.x() * speed;
+//                        double ny = offset_pixels.y() * speed;
+//                        // offset from look-at to look-from
+//                        Vec3 offset = cameraLookFrom() - cameraLookAt();
+//                        Vec3 unit_offset = offset.normalize();
+//                        Vec3 new_look_from = (unit_offset +
+//                                              (camera().i() * nx) +
+//                                              (camera().j() * ny));
+//                        Vec3 restore_dist = (new_look_from.normalize() *
+//                                             cameraDesiredOffsetDistance());
+//                        // Record newly computed "look from".
+//                        cameraLookFrom() = restore_dist + cameraLookAt();
+//                        // Copy "look up" of current camera.
+//                        cameraLookUp() = camera().j();
+//                    }
+//                    mouse_pos_pixels_ = new_pos_pixels;
+//                    return false;
+//                };
+//            }
+//            visualizer().RegisterMouseMoveCallback(mmcb);
+//        }
+
     void updateMouseMoveCallback()
     {
         std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
         {
             mmcb = [&](base_vis_t* vis, double x, double y)
             {
-                auto aa = aimAgent();
-                Vec3 local_change = (aa.side() * x) + (aa.up() * y);
-                wingman_cam_local_offset_ += local_change;
+
+                //~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~
+                // TODO 20250122 newer wingman stuff
+
+//                auto aa = aimAgent();
+//                Vec3 local_change = (aa.side() * x) + (aa.up() * y);
+//                wingman_cam_local_offset_ += local_change;
+                
                 Vec3 new_pos_pixels(x, y, 0);
                 Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
                 double mouse_move_pixels = offset_pixels.length();
-                if ((mouse_move_pixels < 100) and left_mouse_button_down_)
-                {
-                    mouse_position_3d_ += offset_pixels * 0.2;
-                }
-
                 
+//                if ((mouse_move_pixels < 100) and left_mouse_button_down_)
+//                {
+//                    mouse_position_3d_ += offset_pixels * 0.2;
+//                }
+
+                //~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~
+
                 // TODO 20250113 mouse adjust static camera view.
                 // Adding this because the "wingman case" seems to have become
                 // ridiculously complex. Starting over:
@@ -714,6 +883,15 @@ public:
                     cameraLookFrom() = restore_dist + cameraLookAt();
                     // Copy "look up" of current camera.
                     cameraLookUp() = camera().j();
+                    
+                    //~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~
+                    // TODO 20250122 newer wingman stuff
+                    
+                    // Transform new cam pos into local space of aimAgent()
+                    Vec3 local_cam = aimAgent().ls().localize(cameraLookFrom());
+                    wingman_cam_local_offset_ = local_cam;
+
+                    //~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~
                 }
                 mouse_pos_pixels_ = new_pos_pixels;
                 return false;

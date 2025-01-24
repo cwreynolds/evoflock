@@ -658,10 +658,19 @@ public:
     {
         Vec3 global_cam = aimAgent().ls().globalize(wingman_cam_local_offset_);
 
-        cameraLookFrom() = from_memory_.blend(global_cam, 0.90);
-        cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
-        cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
-        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20250123 adjust blend rate to keep up with target boid.
+
+//        cameraLookFrom() = from_memory_.blend(global_cam, 0.90);
+//        cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
+//        cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
+
+        cameraLookFrom() = from_memory_.blend(global_cam, 0.80);
+        cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.67);
+        cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.80).normalize();
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         // TODO Seems like Vec3::adjustSegLength should not be necessary,
         // but commenting it out makes it behave wanky.
         

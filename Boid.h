@@ -195,34 +195,12 @@ public:
         next_steer_ = steer_to_flock();
     }
   
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250119 working on mouse move camera-from point
-
-//    // Apply desired steering for this simulation step
-//    void apply_next_steer(double time_step)
-//    {
-//        // Apply the "steering force" (computed in plan_next_steer() during a
-//        // previous pass) to this Boid's geometric state.
-//        steer(next_steer_, time_step);
-//        draw_body();
-//    }
-
-//        // Apply the "steering force" -- previously computed in plan_next_steer()
-//        // during a separate pass -- to this Boid's geometric state.
-//        void apply_next_steer(double time_step)
-//        {
-//            steer(next_steer_, time_step);
-//    //        draw_body();
-//        }
-
     // Apply the "steering force" -- previously computed in plan_next_steer()
     // during a separate pass -- to this Boid's geometric state.
     void apply_next_steer(double time_step)
     {
         steer(next_steer_, time_step);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run

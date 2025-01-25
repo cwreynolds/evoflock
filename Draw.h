@@ -66,8 +66,6 @@ private:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250117 static cam: why no mouse adjust "offset distance"?
         Vec3 cwr_screen_size(3456, 2234, 0);
-//        window_xy_size = {1000, 1000, 0};
-//        window_xy_size = {1500, 1500, 0};
         window_xy_size = {1800, 1200, 0};
         window_xy_position_ul = cwr_screen_size - window_xy_size ;
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,68 +99,13 @@ private:
         visualizer().GetRenderOption().line_width_ = line_width;
         visualizer().GetRenderOption().point_size_ = point_size;
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250119 working on mouse move camera-from point
-
-//            // To trigger redraw after key command callback.
-//    //        bool rdakc = true;
-//    //        bool rdakc = false;
-//            bool rdakc = true;
-//
-//            // Add single key command callback to toggle "graphics mode"
-//            visualizer().RegisterKeyCallback('G',
-//                                             [&](base_vis_t* vis)
-//    //                                         { toggleEnable(); return true; });
-//    //                                         { toggleEnable(); return false; });
-//                                             { toggleEnable(); return rdakc; });
-//            // Add "C" command, to cycle through camera aiming modes.
-//            visualizer().RegisterKeyCallback('C',
-//                                             [&](base_vis_t* vis)
-//    //                                         { nextCameraMode(); return true; });
-//    //                                         { nextCameraMode(); return false; });
-//                                             { nextCameraMode(); return rdakc; });
-//
-//            // Add " " (space) command, toggles public pause simulation flag.
-//            visualizer().RegisterKeyCallback(' ',
-//                                             [&](base_vis_t* vis)
-//    //                                         { toggleSimPause(); return true; });
-//    //                                         { toggleSimPause(); return false; });
-//                                             { toggleSimPause(); return rdakc; });
-//
-//            // Add "O" command, to increment obstacle set counter.
-//            visualizer().RegisterKeyCallback('O',
-//                                             [&](base_vis_t* vis)
-//    //                                         { nextObstacleSet(); return true; });
-//    //                                         { nextObstacleSet(); return false; });
-//                                             { nextObstacleSet(); return rdakc; });
-//
-//            // Add "1" command, to set single step mode.
-//            visualizer().RegisterKeyCallback('1',
-//                                             [&](base_vis_t* vis)
-//    //                                         { setSingleStepMode(); return true; });
-//    //                                         { setSingleStepMode(); return false; });
-//                                             { setSingleStepMode(); return rdakc; });
-//
-//            // Add "S" command, to cycle selected boid through flock.
-//            visualizer().RegisterKeyCallback('S',
-//                                             [&](base_vis_t* vis)
-//    //                                         { selectNextBoid(); return true; });
-//    //                                         { selectNextBoid(); return false; });
-//                                             { selectNextBoid(); return rdakc; });
-        
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        
         auto rk = [&](int key,std::function<bool(base_vis_t *)> callback)
         {
             visualizer().RegisterKeyCallback(key, callback);
         };
 
         // To trigger redraw after key command callback.
-//        bool rdakc = true;
-//        bool rdakc = false;
         bool rdakc = true;
-
 
         // Add single key command callback to toggle "graphics mode"
         rk('G', [&](base_vis_t* vis) { toggleEnable(); return rdakc; });
@@ -182,18 +125,9 @@ private:
         // Add "S" command, to cycle selected boid through flock.
         rk('S', [&](base_vis_t* vis) { selectNextBoid(); return rdakc; });
 
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        
         // Set mouse scroll and move policies based on current camera mode.
         updateMouseCallbacks();
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241225 mock up mouse position for camera position control
-//        mouse_position_3d_ = {10, 20, 40};
-        mouse_position_3d_ = {1, 3, -6};
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif  // USE_OPEN3D
     }
 
@@ -219,39 +153,10 @@ public:
 
     void endAnimatedScene() { if (enable()) { } }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250118 speed up key commands, add “redraw” function.
-
-//        void beginOneAnimatedFrame()
-//        {
-//    #ifdef USE_OPEN3D
-//            if (enable())
-//            {
-//    //            animated_tri_mesh_->Clear();
-//    //            animated_line_set_->Clear();
-//                clearAnimatedGeometryFromScene();
-//            }
-//    #endif  // USE_OPEN3D
-//        }
-
     void beginOneAnimatedFrame()
     {
         if (enable()) { clearAnimatedGeometryFromScene(); }
     }
-
-//        void endOneAnimatedFrame()
-//        {
-//    #ifdef USE_OPEN3D
-//            if (enable())
-//            {
-//                updateCamera();
-//    //            animated_tri_mesh_->ComputeVertexNormals();
-//    //            visualizer().UpdateGeometry(animated_tri_mesh_);
-//    //            visualizer().UpdateGeometry(animated_line_set_);
-//                redrawScene();
-//            }
-//    #endif  // USE_OPEN3D
-//        }
 
     void endOneAnimatedFrame()
     {
@@ -274,15 +179,12 @@ public:
     // Redraw scene to reflect scene, camera, or animation changes.
     void redrawScene()
     {
-//        updateCamera();
 #ifdef USE_OPEN3D
         animated_tri_mesh_->ComputeVertexNormals();
         visualizer().UpdateGeometry(animated_tri_mesh_);
         visualizer().UpdateGeometry(animated_line_set_);
 #endif  // USE_OPEN3D
     }
-        
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Add to per-frame collection of animating triangles: single color.
     // Typically used to add a small polyhedron (a boid's body) to the scene.
@@ -523,157 +425,17 @@ public:
                                       cameraLookAt(),
                                       cameraLookUp());
     }
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250121 update wingman cam to new mouse tracking approach
-
-    
-    // Set "from" as a local offset (right, up, and behind) relative to target.
-    Vec3 wingman_cam_local_offset_ = Vec3(1, 3, -6).normalize();
-
-    
-//        // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
-//        void animateWingmanCamera()
-//        {
-//    //        Vec3 offset_from_aim_to_mouse = mouse_position_3d_ - cameraLookAt();
-//            Vec3 offset_from_aim_to_cam = cameraLookFrom() - cameraLookAt();
-//
-//    //        wingman_cam_local_offset_ = offset_from_aim_to_mouse.normalize();
-//    //        wingman_cam_local_offset_ = offset_from_aim_to_cam.normalize();
-//
-//    //        Vec3 scaled_offset = (wingman_cam_local_offset_ *
-//    //                              cameraDesiredOffsetDistance());
-//            Vec3 scaled_offset = (offset_from_aim_to_cam.normalize() *
-//                                  cameraDesiredOffsetDistance());
-//
-//            Vec3 new_look_from = scaled_offset + cameraLookAt();
-//
-//    //        Vec3 offset = aimAgent().ls().globalize(scaled_offset);
-//
-//            // Smooth look/at parameters.
-//    //        cameraLookFrom() = from_memory_.blend(offset, 0.90);
-//    //        cameraLookFrom() = from_memory_.blend(scaled_offset, 0.90);
-//            cameraLookFrom() = from_memory_.blend(new_look_from, 0.90);
-//
-//            cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
-//            cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
-//            // Adjust "from" point so it is the desired offset distance from "at".
-//            cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
-//                                                     cameraLookAt(),
-//                                                     cameraDesiredOffsetDistance());
-//            camera() = LocalSpace::fromTo(cameraLookFrom(),
-//                                          cameraLookAt(),
-//                                          cameraLookUp());
-//            mouse_position_3d_ = cameraLookFrom();
-//        }
-
-    
-    //~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~
-    // TODO 20250122 newer wingman stuff
-    
-//    Vec3 new_wingman_local_offset_;
-    
-//        // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
-//        void animateWingmanCamera()
-//        {
-//    //        Vec3 offset_from_aim_to_mouse = mouse_position_3d_ - cameraLookAt();
-//            Vec3 offset_from_aim_to_cam = cameraLookFrom() - cameraLookAt();
-//
-//    //        wingman_cam_local_offset_ = offset_from_aim_to_mouse.normalize();
-//    //        wingman_cam_local_offset_ = offset_from_aim_to_cam.normalize();
-//
-//    //        Vec3 scaled_offset = (wingman_cam_local_offset_ *
-//    //                              cameraDesiredOffsetDistance());
-//            Vec3 scaled_offset = (offset_from_aim_to_cam.normalize() *
-//                                  cameraDesiredOffsetDistance());
-//
-//            Vec3 new_look_from = scaled_offset + cameraLookAt();
-//
-//    //        Vec3 offset = aimAgent().ls().globalize(scaled_offset);
-//
-//            // Smooth look/at parameters.
-//    //        cameraLookFrom() = from_memory_.blend(offset, 0.90);
-//    //        cameraLookFrom() = from_memory_.blend(scaled_offset, 0.90);
-//            cameraLookFrom() = from_memory_.blend(new_look_from, 0.90);
-//
-//            cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
-//            cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
-//            // Adjust "from" point so it is the desired offset distance from "at".
-//            cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
-//                                                     cameraLookAt(),
-//                                                     cameraDesiredOffsetDistance());
-//            camera() = LocalSpace::fromTo(cameraLookFrom(),
-//                                          cameraLookAt(),
-//                                          cameraLookUp());
-//            mouse_position_3d_ = cameraLookFrom();
-//        }
-
-//        // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
-//        void animateWingmanCamera()
-//        {
-//    //    //        Vec3 offset_from_aim_to_mouse = mouse_position_3d_ - cameraLookAt();
-//    //            Vec3 offset_from_aim_to_cam = cameraLookFrom() - cameraLookAt();
-//    //
-//    //    //        wingman_cam_local_offset_ = offset_from_aim_to_mouse.normalize();
-//    //    //        wingman_cam_local_offset_ = offset_from_aim_to_cam.normalize();
-//    //
-//    //    //        Vec3 scaled_offset = (wingman_cam_local_offset_ *
-//    //    //                              cameraDesiredOffsetDistance());
-//    //            Vec3 scaled_offset = (offset_from_aim_to_cam.normalize() *
-//    //                                  cameraDesiredOffsetDistance());
-//    //
-//    //            Vec3 new_look_from = scaled_offset + cameraLookAt();
-//    //
-//    //    //        Vec3 offset = aimAgent().ls().globalize(scaled_offset);
-//    //
-//    //            // Smooth look/at parameters.
-//    //    //        cameraLookFrom() = from_memory_.blend(offset, 0.90);
-//    //    //        cameraLookFrom() = from_memory_.blend(scaled_offset, 0.90);
-//
-//
-//
-//
-//
-//            Vec3 global_cam = aimAgent().ls().globalize(new_wingman_local_offset_);
-//
-//    //        cameraLookFrom() = from_memory_.blend(new_look_from, 0.90);
-//            cameraLookFrom() = from_memory_.blend(global_cam, 0.90);
-//
-//            cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
-//            cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
-//            // Adjust "from" point so it is the desired offset distance from "at".
-//            cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
-//                                                     cameraLookAt(),
-//                                                     cameraDesiredOffsetDistance());
-//            camera() = LocalSpace::fromTo(cameraLookFrom(),
-//                                          cameraLookAt(),
-//                                          cameraLookUp());
-//            mouse_position_3d_ = cameraLookFrom();
-//        }
-
-    
+        
     // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
     void animateWingmanCamera()
     {
         Vec3 global_cam = aimAgent().ls().globalize(wingman_cam_local_offset_);
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20250123 adjust blend rate to keep up with target boid.
-
-//        cameraLookFrom() = from_memory_.blend(global_cam, 0.90);
-//        cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.75);
-//        cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.97).normalize();
-
         cameraLookFrom() = from_memory_.blend(global_cam, 0.80);
         cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.67);
         cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.80).normalize();
 
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
         // TODO Seems like Vec3::adjustSegLength should not be necessary,
-        // but commenting it out makes it behave wanky.
-        
+        // but commenting it out makes wingman cam behave wanky.
         // Adjust "from" point so it is the desired offset distance from "at".
         cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
                                                  cameraLookAt(),
@@ -682,30 +444,14 @@ public:
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
-        mouse_position_3d_ = cameraLookFrom();
     }
-
-    //~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~
-
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-
     
     // Adjust "static camera" model according to mouse input.
     void animateStaticCamera()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250117 static cam: why no mouse adjust "offset distance"?
-
         cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
                                                  cameraLookAt(),
                                                  cameraDesiredOffsetDistance());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        
-        
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
@@ -720,128 +466,10 @@ public:
             double min = 0.05;
             double d = cameraDesiredOffsetDistance() + (y * adjust_speed);
             cameraDesiredOffsetDistance() = std::max(min, d);
-            mouse_position_3d_.z() = cameraDesiredOffsetDistance();
             return false;
         };
         visualizer().RegisterMouseScrollCallback(mscb);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250121 update wingman cam to new mouse tracking approach
-
-//        void updateMouseMoveCallback()
-//        {
-//            std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
-//            {
-//                mmcb = [&](base_vis_t* vis, double x, double y)
-//                {
-//                    auto aa = aimAgent();
-//                    Vec3 local_change = (aa.side() * x) + (aa.up() * y);
-//                    wingman_cam_local_offset_ += local_change;
-//                    Vec3 new_pos_pixels(x, y, 0);
-//                    Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
-//                    double mouse_move_pixels = offset_pixels.length();
-//                    if ((mouse_move_pixels < 100) and left_mouse_button_down_)
-//                    {
-//                        mouse_position_3d_ += offset_pixels * 0.2;
-//                    }
-//
-//                    // TODO 20250113 mouse adjust static camera view.
-//                    // Adding this because the "wingman case" seems to have become
-//                    // ridiculously complex. Starting over:
-//
-//                    if (isStaticCameraMode() and
-//                        (mouse_move_pixels < 50) and
-//                        left_mouse_button_down_)
-//                    {
-//                        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//                        // TODO 20250119 working on mouse move camera-from point
-//
-//    //                    double speed = 0.05;
-//                        double speed = 0.01;
-//
-//                        double nx = offset_pixels.x() * speed;
-//                        double ny = offset_pixels.y() * speed;
-//                        // offset from look-at to look-from
-//                        Vec3 offset = cameraLookFrom() - cameraLookAt();
-//
-//                        Vec3 unit_offset = offset.normalize();
-//
-//
-//    //                    Vec3 new_look_from = (offset +
-//                        Vec3 new_look_from = (unit_offset +
-//                                              (camera().i() * nx) +
-//                                              (camera().j() * ny));
-//
-//                        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//
-//                        Vec3 restore_dist = (new_look_from.normalize() *
-//                                             cameraDesiredOffsetDistance());
-//
-//                        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//                        // TODO 20250119 working on mouse move camera-from point
-//
-//                        // Record new "look from", new "look up" from current camera.
-//                        cameraLookFrom() = restore_dist + cameraLookAt();
-//                        cameraLookUp() = camera().j();
-//                        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//                    }
-//                    mouse_pos_pixels_ = new_pos_pixels;
-//                    return false;
-//                };
-//            }
-//            visualizer().RegisterMouseMoveCallback(mmcb);
-//        }
-
-//        void updateMouseMoveCallback()
-//        {
-//            std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
-//            {
-//                mmcb = [&](base_vis_t* vis, double x, double y)
-//                {
-//                    auto aa = aimAgent();
-//                    Vec3 local_change = (aa.side() * x) + (aa.up() * y);
-//                    wingman_cam_local_offset_ += local_change;
-//                    Vec3 new_pos_pixels(x, y, 0);
-//                    Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
-//                    double mouse_move_pixels = offset_pixels.length();
-//                    if ((mouse_move_pixels < 100) and left_mouse_button_down_)
-//                    {
-//                        mouse_position_3d_ += offset_pixels * 0.2;
-//                    }
-//
-//
-//                    // TODO 20250113 mouse adjust static camera view.
-//                    // Adding this because the "wingman case" seems to have become
-//                    // ridiculously complex. Starting over:
-//
-//    //                if (isStaticCameraMode() and
-//                    if ((isStaticCameraMode() or isWingmanCameraMode()) and
-//                        (mouse_move_pixels < 50) and
-//                        left_mouse_button_down_)
-//                    {
-//                        double speed = 0.01;
-//                        double nx = offset_pixels.x() * speed;
-//                        double ny = offset_pixels.y() * speed;
-//                        // offset from look-at to look-from
-//                        Vec3 offset = cameraLookFrom() - cameraLookAt();
-//                        Vec3 unit_offset = offset.normalize();
-//                        Vec3 new_look_from = (unit_offset +
-//                                              (camera().i() * nx) +
-//                                              (camera().j() * ny));
-//                        Vec3 restore_dist = (new_look_from.normalize() *
-//                                             cameraDesiredOffsetDistance());
-//                        // Record newly computed "look from".
-//                        cameraLookFrom() = restore_dist + cameraLookAt();
-//                        // Copy "look up" of current camera.
-//                        cameraLookUp() = camera().j();
-//                    }
-//                    mouse_pos_pixels_ = new_pos_pixels;
-//                    return false;
-//                };
-//            }
-//            visualizer().RegisterMouseMoveCallback(mmcb);
-//        }
 
     void updateMouseMoveCallback()
     {
@@ -849,30 +477,9 @@ public:
         {
             mmcb = [&](base_vis_t* vis, double x, double y)
             {
-
-                //~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~
-                // TODO 20250122 newer wingman stuff
-
-//                auto aa = aimAgent();
-//                Vec3 local_change = (aa.side() * x) + (aa.up() * y);
-//                wingman_cam_local_offset_ += local_change;
-                
                 Vec3 new_pos_pixels(x, y, 0);
                 Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
                 double mouse_move_pixels = offset_pixels.length();
-                
-//                if ((mouse_move_pixels < 100) and left_mouse_button_down_)
-//                {
-//                    mouse_position_3d_ += offset_pixels * 0.2;
-//                }
-
-                //~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~
-
-                // TODO 20250113 mouse adjust static camera view.
-                // Adding this because the "wingman case" seems to have become
-                // ridiculously complex. Starting over:
-
-//                if (isStaticCameraMode() and
                 if ((isStaticCameraMode() or isWingmanCameraMode()) and
                     (mouse_move_pixels < 50) and
                     left_mouse_button_down_)
@@ -892,15 +499,9 @@ public:
                     cameraLookFrom() = restore_dist + cameraLookAt();
                     // Copy "look up" of current camera.
                     cameraLookUp() = camera().j();
-                    
-                    //~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~
-                    // TODO 20250122 newer wingman stuff
-                    
                     // Transform new cam pos into local space of aimAgent()
                     Vec3 local_cam = aimAgent().ls().localize(cameraLookFrom());
                     wingman_cam_local_offset_ = local_cam;
-
-                    //~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~  ~~~
                 }
                 mouse_pos_pixels_ = new_pos_pixels;
                 return false;
@@ -908,13 +509,7 @@ public:
         }
         visualizer().RegisterMouseMoveCallback(mmcb);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-    // True when the left mouse button currently depressed.
-    bool left_mouse_button_down_ = false;
-    
+        
     void updateButtonCallback()
     {
         auto mbcb = [&](base_vis_t *, int button, int action, int mods)
@@ -934,7 +529,6 @@ public:
     }
 
     // TODO 20241225 mock up mouse position for camera position control
-    Vec3 mouse_position_3d_;
     Vec3 mouse_pos_pixels_;
 
     // Accessor for Open3D Visualizer instance.
@@ -996,24 +590,7 @@ public:
     {
         if (simPause())
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250118 speed up key commands, add “redraw” function.
-            //
-            // replacing setSingleStepMode() with redrawScene() did not work,
-            // eg when sim paused: neither mouse scroll nor S key change display.
-            //
-            // So adding setSingleStepMode() back for now, but I really would
-            // prefer that it NOT take another simulation step in this situation.
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250119 working on mouse move camera-from point
-
-//            setSingleStepMode();
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
             redrawScene();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             up_memory_.clear();
             from_memory_.clear();
             at_memory_.clear();
@@ -1119,6 +696,12 @@ private:
 
     // Runtime counter the simulation can use to change selected boid.
     int selected_boid_index_ = 0;
+
+    // Set "from" as a local offset (right, up, and behind) relative to target.
+    Vec3 wingman_cam_local_offset_ = Vec3(1, 3, -6).normalize();
+
+    // True when the left mouse button currently depressed.
+    bool left_mouse_button_down_ = false;
 
 #ifdef USE_OPEN3D
     

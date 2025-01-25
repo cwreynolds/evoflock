@@ -348,10 +348,8 @@ public:
     {
         // Invoke the current camera motion model.
         animateCamera();
-        // Set camera state in underly graphics system (Open3d).
-        setVisualizerViewByFromAt(cameraLookFrom(),
-                                  cameraLookAt(),
-                                  cameraLookUp());
+        // Set camera state in underlying graphics system (Open3d).
+        setVisualizerViewByFromAt();
         // Draw circle around aimTarget() pointing toward camera.
         addBlackAndWhiteCircularReticle(aimAgent().position());
     }
@@ -382,9 +380,17 @@ public:
         }
     }
 
+    // Set the "camera view" of current Open3D visualizer according to the
+    // from-at-up values of this Draw instance, set by animateCamera().
+    void setVisualizerViewByFromAt()
+    {
+        setVisualizerViewByFromAt(cameraLookFrom(),
+                                  cameraLookAt(),
+                                  cameraLookUp());
+    }
+
     // Set the "camera view" of current Open3D visualizer according to a look/at
     // specification. Optional "up" defaults to global Y direction.
-    //
     void setVisualizerViewByFromAt(Vec3 look_from,
                                    Vec3 look_at,
                                    Vec3 up = Vec3(0, 1, 0))
@@ -417,13 +423,7 @@ public:
         cameraLookFrom() = from_memory_.blend(new_from, 0.90);
         cameraLookAt()   =   at_memory_.blend(new_at,   0.75);
         cameraLookUp()   =   up_memory_.blend(new_up,   0.97).normalize();
-        // Adjust "from" point so it is the desired offset distance from "at".
-        cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
-                                                 cameraLookAt(),
-                                                 cameraDesiredOffsetDistance());
-        camera() = LocalSpace::fromTo(cameraLookFrom(),
-                                      cameraLookAt(),
-                                      cameraLookUp());
+        setCameraByFromAtUp();
     }
         
     // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
@@ -433,21 +433,17 @@ public:
         cameraLookFrom() = from_memory_.blend(global_cam, 0.80);
         cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.67);
         cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.80).normalize();
-
-        // TODO Seems like Vec3::adjustSegLength should not be necessary,
-        // but commenting it out makes wingman cam behave wanky.
-        // Adjust "from" point so it is the desired offset distance from "at".
-        cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
-                                                 cameraLookAt(),
-                                                 cameraDesiredOffsetDistance());
-        
-        camera() = LocalSpace::fromTo(cameraLookFrom(),
-                                      cameraLookAt(),
-                                      cameraLookUp());
+        setCameraByFromAtUp();
     }
     
     // Adjust "static camera" model according to mouse input.
     void animateStaticCamera()
+    {
+        setCameraByFromAtUp();
+    }
+    
+    // Adjust "static camera" model according to mouse input.
+    void setCameraByFromAtUp()
     {
         cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
                                                  cameraLookAt(),

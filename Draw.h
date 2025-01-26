@@ -63,12 +63,10 @@ private:
          int line_width = 10,
          int point_size = 20)
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250117 static cam: why no mouse adjust "offset distance"?
+        // TODO 20250117 temp override to put viewer in lower right corner
         Vec3 cwr_screen_size(3456, 2234, 0);
         window_xy_size = {1800, 1200, 0};
         window_xy_position_ul = cwr_screen_size - window_xy_size ;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // TODO 20241026 -- Temporary for debugging odd symptom: running from inside
         // Xcode launches a separate copy of the executable about a second after the

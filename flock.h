@@ -54,13 +54,13 @@ private:
     // The static collection of various obstacle set, selectable gtom GUI.
     static inline std::vector<ObstaclePtrList> obstacle_presets_;
     static inline int obstacle_selection_counter_ = -1;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250111 arrange non-intersecting hollow spheres
     // Index of the obstacle set index used initially.
-    int default_obstacle_set_index_ = 0;  // Sphere and vertical cylinder.
-//    int default_obstacle_set_index_ = 1;  // 6 cylinders and sphere.
-//    int default_obstacle_set_index_ = 2;  // Plane and sphere.
-//    int default_obstacle_set_index_ = 4;  // Plane and sphere.
+    //int default_obstacle_set_index_ = 0;  // Sphere and vertical cylinder.
+    //int default_obstacle_set_index_ = 1;  // 6 cylinders and sphere.
+    //int default_obstacle_set_index_ = 2;  // Plane and sphere.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250125 debugging "non-everted" sphere obstacle.
+    int default_obstacle_set_index_ = 5;  // One sphere in another.
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Currently selected boid's index in boids().
@@ -873,10 +873,7 @@ public:
             
             // Set 0: sphere and right hand vertical cylinder.
             obs.clear();
-            // TODO prototyping -- add everted SphereObstacle
-            obs.push_back(new EvertedSphereObstacle(fp().sphere_radius,
-                                                    fp().sphere_center,
-                                                    Obstacle::outside));
+            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
             Vec3 ect = sc + Vec3(sr * 0.6, sr, 0);
             Vec3 ecb = sc + Vec3(sr * 0.6, -sr, 0);
             obs.push_back(new CylinderObstacle(sr * 0.2, ect, ecb, Obstacle::inside));
@@ -884,7 +881,7 @@ public:
             
             // Set 1: sphere and 6 cylinders.
             obs.clear();
-            obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
+            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
             // 6 symmetric cylinders parallel to main axes.
             double c6r = sr *  4 / 30;
             double c6o = sr * 15 / 30;
@@ -903,31 +900,45 @@ public:
             
             // Set 2 sphere and horizontal plane
             obs.clear();
-            obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
+            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
             obs.push_back(new PlaneObstacle(Vec3(0, 1, 0), sc, sr, sr * 0.001));
             obstacle_presets_.push_back(obs);
             
             // Set 3 just the big sphere.
             obs.clear();
-            obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
+            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
             obstacle_presets_.push_back(obs);
 
             // Set 4 -- 10 random spheres
             obs.clear();
-            obs.push_back(new EvertedSphereObstacle(sr, sc, Obstacle::outside));
-            int count = 10;
+            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
+            int count = 20; // TODO 20250125 crank up sphere count to test 10->20
             std::vector<double> radii;
             for (int i = 0; i < count; i++)
             {
-                radii.push_back(EF::RS().random2(7, 17));
+                radii.push_back(EF::RS().random2(5, 12));
             }
             auto centers = shape::arrangeNonOverlappingSpheres(radii, 5, 50);
             auto ins = Obstacle::inside;
             for (int i = 0; i < count; i++)
             {
-                obs.push_back(new EvertedSphereObstacle(radii[i], centers[i], ins));
+                obs.push_back(new SphereObstacle(radii[i], centers[i], ins));
             }
             obstacle_presets_.push_back(obs);
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250125 debugging "non-everted" sphere obstacle.
+            
+            // Set 5 -- one sphere inside another
+            //
+            // The boids should be inside the big sphere and outside the little
+            // one. Instead they are all inside the little one.
+
+            obs.clear();
+            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
+            obs.push_back(new SphereObstacle(12, sc, Obstacle::inside));
+            obstacle_presets_.push_back(obs);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             // Set initial obstacle set to the default.
             draw().obstacleSetIndex() = default_obstacle_set_index_;

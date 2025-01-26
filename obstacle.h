@@ -56,12 +56,8 @@ public:
     // Override this in derived to add tri-mesh model of Obstacle shape.
     virtual void addToScene() const {}
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250117 static cam: why no mouse adjust "offset distance"?
-    Vec3 color_;
     void setColor(Vec3 color) { color_ = color; }
     Vec3 getColor() const { return color_; }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     virtual std::string to_string() const { return "Obstacle"; }
     
@@ -105,23 +101,30 @@ public:
 
 private:
     ExcludeFrom exclude_from_ = neither;
+    Vec3 color_;
 };
 
 
-class EvertedSphereObstacle : public Obstacle
+//class EvertedSphereObstacle : public Obstacle
+class SphereObstacle : public Obstacle
 {
 public:
-    EvertedSphereObstacle(double radius, const Vec3& center)
-      : Obstacle(), radius_(radius), center_(center) {}
+    SphereObstacle() : Obstacle()
+    {
+        auto g = [](double b){ return Vec3(b, b, b); };
+        setColor(EF::RS().random_point_in_axis_aligned_box(g(0.49), g(0.51)));
+    }
+
+    SphereObstacle(double radius, const Vec3& center) : SphereObstacle()
+    {
+        radius_ = radius;
+        center_ = center;
+    }
     
-    EvertedSphereObstacle(double radius, const Vec3& center, ExcludeFrom ef)
-      : Obstacle(), radius_(radius), center_(center)
+    SphereObstacle(double radius, const Vec3& center, ExcludeFrom ef)
+      : SphereObstacle(radius, center)
     {
         setExcludeFrom(ef);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250117 static cam: why no mouse adjust "offset distance"?
-        setColor({0.5, 0.5, 0.5});
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
@@ -181,26 +184,19 @@ public:
         return distance_to_center - radius_;
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250117 static cam: why no mouse adjust "offset distance"?
-
     void addToScene() const override
     {
-//        Vec3 color(0.5, 0.5, 0.5);
         auto mesh = Draw::constructSphereTriMesh(radius_,
                                                  center_,
-//                                                 color,
                                                  getColor(),
                                                  true,
                                                  getExcludeFrom() == outside,
                                                  500);
-//        Draw::brightnessSpecklePerVertex(0.95, 1.00, color, mesh);
         Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    std::string to_string() const override { return "EvertedSphereObstacle"; }
+    std::string to_string() const override { return "SphereObstacle"; }
 
 private:
     double radius_ = 1;
@@ -221,10 +217,7 @@ public:
       : PlaneObstacle(normal, center)
     {
         setExcludeFrom(ef);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250117 static cam: why no mouse adjust "offset distance"?
         setColor({0.7, 0.7, 0.8});
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     PlaneObstacle(const Vec3& normal,
@@ -308,26 +301,19 @@ public:
         return from_plane_to_query_point.dot(normal_);
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250117 static cam: why no mouse adjust "offset distance"?
-
     void addToScene() const override
     {
         Vec3 ep_offset = center_ + normal_ * visible_thickness_;
-//        Vec3 color(0.7, 0.7, 0.8);
         auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
                                                    center_ + ep_offset,
                                                    center_ - ep_offset,
-//                                                   color,
                                                    getColor(),
                                                    true,
                                                    false, // don't evert
                                                    500);
-//        Draw::brightnessSpecklePerVertex(0.7, 1.0, color, mesh);
         Draw::brightnessSpecklePerVertex(0.7, 1.0, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     std::string to_string() const override { return "PlaneObstacle"; }
 
@@ -352,6 +338,7 @@ public:
         endpoint_ = endpoint0;
         Vec3 offset = endpoint1 - endpoint0;
         std::tie(tangent_, length_) = offset.normalize_and_length();
+        setColor({0.7, 0.8, 0.7});
     }
     
     CylinderObstacle(double radius,
@@ -361,10 +348,6 @@ public:
       : CylinderObstacle(radius, endpoint0, endpoint1)
     {
         setExcludeFrom(ef);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250117 static cam: why no mouse adjust "offset distance"?
-        setColor({0.7, 0.8, 0.7});
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Nearest point on the infinite line containing cylinder's axis.
@@ -435,27 +418,18 @@ public:
         return distance_to_axis - radius_;
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250117 static cam: why no mouse adjust "offset distance"?
-
     void addToScene() const override
     {
-//        Vec3 color(0.7, 0.8, 0.7);
         auto mesh = Draw::constructCylinderTriMesh(radius_,
                                                    endpoint0(),
                                                    endpoint1(),
-//                                                   color,
                                                    getColor(),
                                                    true,
                                                    getExcludeFrom() == outside,
                                                    500);
-//        Draw::brightnessSpecklePerVertex(0.7, 1.0, color, mesh);
         Draw::brightnessSpecklePerVertex(0.7, 1.0, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
     Vec3 endpoint0() const { return endpoint_; }
     Vec3 endpoint1() const { return endpoint_ + tangent_ * length_; }
@@ -513,9 +487,9 @@ inline void Obstacle::unit_test()
     Obstacle o;
     assert(o.to_string() == "Obstacle");
     
-    EvertedSphereObstacle eso(10, Vec3(1, 2, 3));
-    assert(eso.to_string() == "EvertedSphereObstacle");
-    
+    SphereObstacle eso;
+    assert(eso.to_string() == "SphereObstacle");
+
     PlaneObstacle po;
     assert(po.to_string() == "PlaneObstacle");
     
@@ -525,18 +499,16 @@ inline void Obstacle::unit_test()
     // Verify Collision can at least be instantiated and can read back obstacle.
     assert(Collision(o, 1, 2, Vec3(), Vec3(1, 2, 3)).obstacle == &o);
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // WIP prototype, slightly more testing, at least “historical repeatability”.
-    Vec3 eso_ri = eso.ray_intersection(Vec3(-2, 4, -3),           // ray origin
+    SphereObstacle tso(10, Vec3(1, 2, 3));
+    Vec3 tso_ri = tso.ray_intersection(Vec3(-2, 4, -3),           // ray origin
                                        Vec3(1, 3, -5).normalize(),// ray tangent
                                        0.5);
-    // debugPrint(eso_ri.to_string_double_precision())
-    Vec3 eso_ri_expected(-1.41115141100798,  // Recorded 20240127
+    Vec3 tso_ri_expected(-1.41115141100798,  // Recorded 20240127
                          5.76654576697607,
                          -5.94424294496012);
     double e = util::epsilon * 10;
-    assert(Vec3::is_equal_within_epsilon(eso_ri, eso_ri_expected, e));
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    assert(Vec3::is_equal_within_epsilon(tso_ri, tso_ri_expected, e));
 
     // Test ExcludeFrom testing with constraintViolation().
     Vec3 poop(0, 0.1, 0);

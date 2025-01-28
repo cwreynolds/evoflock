@@ -777,11 +777,15 @@ public:
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241231 new ad hoc global pointer to selected Boid.
-    //               intended just for debugging
+    // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
     
+    // This ad hoc global value is used only for debugging.
+    // Do not use this in "real" production code.
     static inline Boid* selected_boid_ = nullptr;
-    bool isSelected() const { return selected_boid_ == this; }
+//    bool isSelected() const { return selected_boid_ == this; }
+    bool isSelected() { return selected_boid_ == this; }
+    static void setSelected(Boid* b) { selected_boid_ = b; }
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void flush_cache_of_predicted_obstacle_collisions()
@@ -802,6 +806,10 @@ public:
     // Build a list of future collisions sorted by time, with soonest first.
     void cache_predicted_obstacle_collisions()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
+        if (isSelected()) { std::cout << std::endl; }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         predicted_obstacle_collisions_.clear();
         for (Obstacle* obstacle : flock_obstacles())
         {
@@ -809,6 +817,10 @@ public:
             Vec3 poi = obstacle->ray_intersection(position(),
                                                   forward(),
                                                   fp().body_radius);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
+            if (isSelected() and (poi != Vec3::none())) { debugPrint(poi); }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (not poi.is_none())
             {
                 double dist_to_collision = (poi - position()).length();

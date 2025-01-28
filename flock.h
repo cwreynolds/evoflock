@@ -120,6 +120,10 @@ public:
     void run()
     {
         make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
+        draw().simPause() = true;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         draw().beginAnimatedScene();
         save_centers_to_file_start();
         while (still_running())
@@ -752,9 +756,11 @@ public:
         int s = draw().selectedBoidIndex() % boids().size();
         if (s != selected_boid_index_) { selected_boid_index_ = s; }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241231 new ad hoc global pointer to selected Boid.
-        //               intended just for debugging
-        Boid::selected_boid_ = boids().at(selected_boid_index_);
+        // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
+        
+        // This ad hoc global value is used only for debugging.
+//        Boid::selected_boid_ = boids().at(selected_boid_index_);
+        Boid::setSelected(boids().at(selected_boid_index_));
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 

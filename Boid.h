@@ -755,7 +755,22 @@ public:
     void drawAnnotationForBoidAndNeighbors()
     {
         drawAnnotation();
-        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
+//        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
+        
+        
+        auto an = [&](Vec3 p)
+        {
+            Vec3 u(0, 100, 0);
+            Vec3 c = (p == rsi_p0) ? Vec3() : Vec3(1, 0, 0);
+            Draw::getInstance().addLineSegmentToAnimatedFrame(p, p+u, c);
+        };
+        an(rsi_p1);
+        an(rsi_p2);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     
@@ -819,7 +834,19 @@ public:
                                                   fp().body_radius);
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
-            if (isSelected() and (poi != Vec3::none())) { debugPrint(poi); }
+//            if (isSelected() and (poi != Vec3::none())) { debugPrint(poi); }
+            if (isSelected() and not poi.is_none())
+            {
+                debugPrint(poi);
+                rsi_p0 = poi;
+                rsi_p1 = shape::rsi_p1;
+                rsi_p2 = shape::rsi_p2;
+            }
+            else
+            {
+                rsi_p1 = Vec3::none();
+                rsi_p2 = Vec3::none();
+            }
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (not poi.is_none())
             {
@@ -841,6 +868,13 @@ public:
         };
         std::ranges::sort(predicted_obstacle_collisions_, sorted);
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
+    Vec3 rsi_p0;
+    Vec3 rsi_p1;
+    Vec3 rsi_p2;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     bool detectObstacleViolations()
     {

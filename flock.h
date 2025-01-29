@@ -941,7 +941,7 @@ public:
             // one. Instead they are all inside the little one.
 
             obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
+//            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
             obs.push_back(new SphereObstacle(12, sc, Obstacle::inside));
             obstacle_presets_.push_back(obs);
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

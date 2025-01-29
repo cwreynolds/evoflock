@@ -16,6 +16,12 @@
 namespace shape
 {
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
+Vec3 rsi_p1;
+Vec3 rsi_p2;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 // Returns the point of intersection of a ray (half-line) and sphere. Used
 // for finding intersection of an Agent's "forward" axis with a spherical
 // containment. Returns None if there is no intersection. Returns nearest
@@ -56,6 +62,19 @@ Vec3 ray_sphere_intersection(const Vec3& ray_origin,
         // Select point on ("forward") ray, if both, use one nearer origin.
         if (d1 >= 0) { intersection = p1; }
         if (d2 >= 0 and d2 < d1) { intersection = p2; }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
+        rsi_p1 = p1;
+        rsi_p2 = p2;
+        
+        // AH HA?! I think this shows there IS a tall vertical annotation line
+        // from both of the intersection points, and the BLACK one is the FIRST
+        // one along the ray, verifying this routine is working correctly. I think.
+        //
+        // This suggests the bug may be in SphereObstacle::normal_at_poi() which
+        // -- indeed -- does not consider the signed_distance.
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     return intersection;
 }

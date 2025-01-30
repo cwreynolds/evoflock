@@ -135,12 +135,34 @@ public:
         return shape::ray_sphere_intersection(origin, tangent, radius_, center_);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251029 treats "outside" spheres same as "inside"
+    //
+    // Note that this ignores agent position. Must have been adding ExcludeFrom
+    // functionality but somehow neglected this function.
+    
+    
+//    // Normal to the obstacle at a given point of interest.
+//    Vec3 normal_at_poi(const Vec3& poi,
+//                       const Vec3& agent_position) const override
+//    {
+//        return (center_ - poi).normalize();
+//    }
+
+    //
+    
     // Normal to the obstacle at a given point of interest.
     Vec3 normal_at_poi(const Vec3& poi,
                        const Vec3& agent_position) const override
     {
-        return (center_ - poi).normalize();
+        Vec3 perp_direction = (center_ - poi).normalize();
+        double agent_to_surface_signed_dist = signed_distance(agent_position);
+        // TODO clean up, with signum? ~~~~~~~~~~~~~~~~~~~~~~~~~
+        double sign = agent_to_surface_signed_dist < 0 ? 1 : -1;
+        return perp_direction * sign;
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Point on surface of obstacle nearest the given query_point.
     Vec3 nearest_point(const Vec3& query_point) const override

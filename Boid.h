@@ -841,6 +841,18 @@ public:
                 rsi_p0 = poi;
                 rsi_p1 = shape::rsi_p1;
                 rsi_p2 = shape::rsi_p2;
+                
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20251029 treats "outside" spheres same as "inside"
+                
+                // normal_at_poi(const Vec3 &poi, const Vec3 &agent_position)
+                
+//                debugPrint(obstacle->signed_distance(position()))
+                
+                // OK: plus is outside, minus is inside, as the comment before
+                // signed_distance() says.
+                
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             }
             else
             {

@@ -204,6 +204,10 @@ public:
         {
             assert(triangles.size() % 3 == 0);
             assert(vertices.size() == colors.size());
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250130 new "draw wide line to animated frame"
+            for (auto t : triangles){assert((t >= 0) and (t < triangles.size()));}
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             auto ovc = animated_tri_mesh_->vertices_.size(); // old_vertex_count
             for (auto& v : vertices)
             {
@@ -243,6 +247,42 @@ public:
 #endif  // USE_OPEN3D
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250130 new "draw wide line to animated frame"
+    
+    // This is a "thick" version of addLineSegmentToAnimatedFrame().
+    // (Converted from python code in Flock::Draw.py)
+    void addCylinderToAnimatedFrame(const Vec3& endpoint0,
+                                    const Vec3& endpoint1,
+                                    const Vec3& color,
+                                    double radius,
+                                    int sides = 5)
+    {
+        // Vector along the segment, from v1 to v2
+        Vec3 offset = endpoint1 - endpoint0;
+        double distance = offset.length();
+        if (distance > 0)
+        {
+            Vec3 tangent = offset / distance;
+            Vec3 basis1 = tangent.find_perpendicular();
+            Vec3 basis2 = tangent.cross(basis1);
+            // Make transform from "line segment space" to global space.
+            LocalSpace ls(basis1, basis2, tangent, endpoint0);
+            double angle_step = util::pi * 2 / sides;
+            Vec3 r(radius, 0, 0);
+            for (int i = 0; i < sides; i++)
+            {
+                Vec3 a = ls.globalize(r.rotate_xy_about_z(angle_step * i));
+                Vec3 b = ls.globalize(r.rotate_xy_about_z(angle_step * (i+1)));
+                Vec3 c = b + offset;
+                Vec3 d = a + offset;
+                addTriMeshToAnimatedFrame({a, b, c, d}, {0,1,3,  1,2,3}, color);
+            }
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Clear all previous TriangleMesh objects from static scene.
     void clearStaticScene()
     {

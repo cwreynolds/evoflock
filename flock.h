@@ -150,6 +150,17 @@ public:
             // Draw all Boid bodies, whether sim was paused or not.
             for_all_boids([&](Boid* b){ b->draw_body();});
             selectedBoid()->drawAnnotationForBoidAndNeighbors();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250130 new "draw wide line to animated frame"
+            Vec3 up(0, 5, 0);
+            draw().addCylinderToAnimatedFrame(selectedBoid()->position(),
+                                              selectedBoid()->position() + up,
+                                              Vec3(),
+//                                              0.05);
+//                                              0.1);
+//                                              0.2);
+                                              0.03);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             draw().aimAgent() = *selectedBoid();
             draw().endOneAnimatedFrame();
             aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);

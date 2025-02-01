@@ -149,17 +149,31 @@ public:
             }
             // Draw all Boid bodies, whether sim was paused or not.
             for_all_boids([&](Boid* b){ b->draw_body();});
-            selectedBoid()->drawAnnotationForBoidAndNeighbors();
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250130 new "draw wide line to animated frame"
-            Vec3 up(0, 5, 0);
-            draw().addCylinderToAnimatedFrame(selectedBoid()->position(),
-                                              selectedBoid()->position() + up,
-                                              Vec3(),
-//                                              0.05);
-//                                              0.1);
-//                                              0.2);
-                                              0.03);
+
+//            selectedBoid()->drawAnnotationForBoidAndNeighbors();
+            
+            Boid& sb = *selectedBoid();
+            sb.drawAnnotationForBoidAndNeighbors();
+
+//            Vec3 up(0, 5, 0);
+//                draw().addCylinderToAnimatedFrame(selectedBoid()->position(),
+//                                                  selectedBoid()->position() + up,
+//                                                  Vec3(),
+//    //                                              0.05);
+//    //                                              0.1);
+//    //                                              0.2);
+//                                                  0.03);
+            
+//            draw().addThickLineToAnimatedFrame(selectedBoid()->position(),
+//                                               selectedBoid()->position() + up,
+//                                               Color::black());
+
+            draw().addThickLineToAnimatedFrame(sb.position(),
+                                               sb.position() + sb.forward() * 100,
+                                               Color::black());
+
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             draw().aimAgent() = *selectedBoid();
             draw().endOneAnimatedFrame();

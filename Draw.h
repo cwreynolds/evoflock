@@ -21,6 +21,64 @@
 #include "open3d/Open3D.h"
 #endif  // USE_OPEN3D
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250131 add simple Color class
+
+class Color : public Vec3
+{
+public:
+    Color () : Vec3() {};
+    Color (Vec3 v) : Vec3(v) {};
+    Color (double gray) : Vec3(gray, gray, gray) {};
+    Color (double red, double green, double blue) : Vec3(red, green, blue) {};
+    
+    static Color black()   { return Color(0); }
+    static Color white()   { return Color(1); }
+    static Color red()     { return Color(1, 0, 0); }
+    static Color yellow()  { return Color(1, 1, 0); }
+    static Color green()   { return Color(0, 1, 0); }
+    static Color cyan()    { return Color(0, 1, 1); }
+    static Color blue()    { return Color(0, 0, 1); }
+    static Color magenta() { return Color(1, 0, 1); }
+};
+
+//class Color : public Vec3
+//{
+//public:
+//    Color () : Vec3() { init(); };
+//    Color (Vec3 v) : Vec3(v) { init(); };
+//    Color (double gray) : Vec3(gray, gray, gray) { init(); };
+//    Color (double red, double green, double blue) : Vec3(red, green, blue)
+//        { init(); };
+//    
+//    static inline Color black;
+//    static inline Color white;
+//    static inline Color red;
+//    static inline Color yellow;
+//    static inline Color green;
+//    static inline Color cyan;
+//    static inline Color blue;
+//    static inline Color magenta;
+//    static inline bool init_needed = true;
+//    void init()
+//    {
+//        if (init_needed)
+//        {
+//            black = Color(0);
+//            white = Color(1);
+//            red   = Color(1, 0, 0);
+//            yellow = Color(1, 1, 0);
+//            green = Color(0, 1, 0);
+//            cyan = Color(0, 1, 1);
+//            blue= Color(0, 0, 1);
+//            magenta = Color(1, 0, 1);
+//            init_needed = false;
+//        }
+//    }
+//};
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 class Draw
 {
 public:
@@ -249,6 +307,14 @@ public:
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250130 new "draw wide line to animated frame"
+    
+    void addThickLineToAnimatedFrame(const Vec3& endpoint0,
+                                     const Vec3& endpoint1,
+                                     const Vec3& color,
+                                     double radius = 0.03)
+    {
+        addCylinderToAnimatedFrame(endpoint0, endpoint1, color, radius);
+    }
     
     // This is a "thick" version of addLineSegmentToAnimatedFrame().
     // (Converted from python code in Flock::Draw.py)

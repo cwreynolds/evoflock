@@ -55,10 +55,11 @@ public:
     
     // Override this in derived to add tri-mesh model of Obstacle shape.
     virtual void addToScene() const {}
-    
-    void setColor(Vec3 color) { color_ = color; }
-    Vec3 getColor() const { return color_; }
-    
+
+    // Each obstacle has a color for drawing.
+    void setColor(Color color) { color_ = color; }
+    Color getColor() const { return color_; }
+
     virtual std::string to_string() const { return "Obstacle"; }
     
     static void unit_test();  // Defined at bottom of file.
@@ -111,8 +112,8 @@ class SphereObstacle : public Obstacle
 public:
     SphereObstacle() : Obstacle()
     {
-        auto g = [](double b){ return Vec3(b, b, b); };
-        setColor(EF::RS().random_point_in_axis_aligned_box(g(0.49), g(0.51)));
+        // +/- 1.5% color noise around middle gray.
+        setColor(Color::randomInRgbBox(Color(0.485), Color(0.515)));
     }
 
     SphereObstacle(double radius, const Vec3& center) : SphereObstacle()

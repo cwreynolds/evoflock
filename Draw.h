@@ -21,9 +21,8 @@
 #include "open3d/Open3D.h"
 #endif  // USE_OPEN3D
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250131 add simple Color class
 
+// Just a thin layer on top of Vec3 to more conveniently represent color values.
 class Color : public Vec3
 {
 public:
@@ -31,53 +30,21 @@ public:
     Color (Vec3 v) : Vec3(v) {};
     Color (double gray) : Vec3(gray, gray, gray) {};
     Color (double red, double green, double blue) : Vec3(red, green, blue) {};
-    
-    static Color black()   { return Color(0); }
-    static Color white()   { return Color(1); }
-    static Color red()     { return Color(1, 0, 0); }
-    static Color yellow()  { return Color(1, 1, 0); }
-    static Color green()   { return Color(0, 1, 0); }
-    static Color cyan()    { return Color(0, 1, 1); }
-    static Color blue()    { return Color(0, 0, 1); }
-    static Color magenta() { return Color(1, 0, 1); }
+    double r() const { return x(); }
+    double g() const { return y(); }
+    double b() const { return z(); }
+    static Color black()   { return {0, 0, 0};}
+    static Color white()   { return {1, 1, 1};}
+    static Color red()     { return {1, 0, 0};}
+    static Color yellow()  { return {1, 1, 0};}
+    static Color green()   { return {0, 1, 0};}
+    static Color cyan()    { return {0, 1, 1};}
+    static Color blue()    { return {0, 0, 1};}
+    static Color magenta() { return {1, 0, 1};}
+    static Color randomInRgbBox(Color a, Color b)
+        { return EF::RS().randomPointInAxisAlignedBox(a, b); }
 };
 
-//class Color : public Vec3
-//{
-//public:
-//    Color () : Vec3() { init(); };
-//    Color (Vec3 v) : Vec3(v) { init(); };
-//    Color (double gray) : Vec3(gray, gray, gray) { init(); };
-//    Color (double red, double green, double blue) : Vec3(red, green, blue)
-//        { init(); };
-//    
-//    static inline Color black;
-//    static inline Color white;
-//    static inline Color red;
-//    static inline Color yellow;
-//    static inline Color green;
-//    static inline Color cyan;
-//    static inline Color blue;
-//    static inline Color magenta;
-//    static inline bool init_needed = true;
-//    void init()
-//    {
-//        if (init_needed)
-//        {
-//            black = Color(0);
-//            white = Color(1);
-//            red   = Color(1, 0, 0);
-//            yellow = Color(1, 1, 0);
-//            green = Color(0, 1, 0);
-//            cyan = Color(0, 1, 1);
-//            blue= Color(0, 0, 1);
-//            magenta = Color(1, 0, 1);
-//            init_needed = false;
-//        }
-//    }
-//};
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Draw
 {
@@ -246,16 +213,16 @@ public:
     // Typically used to add a small polyhedron (a boid's body) to the scene.
     void addTriMeshToAnimatedFrame(const std::vector<Vec3>& vertices,
                                    const std::vector<std::size_t>& triangles,
-                                   const Vec3& color)
+                                   const Color& color)
     {
-        std::vector<Vec3> colors(vertices.size(), color);
+        std::vector<Color> colors(vertices.size(), color);
         addTriMeshToAnimatedFrame(vertices, triangles, colors);
     }
     
     // Add to per-frame collection of animating triangles: per-vertex colors.
     void addTriMeshToAnimatedFrame(const std::vector<Vec3>& vertices,
                                    const std::vector<std::size_t>& triangles,
-                                   const std::vector<Vec3>& colors)
+                                   const std::vector<Color>& colors)
     {
 #ifdef USE_OPEN3D
         if (enable())
@@ -280,7 +247,7 @@ public:
             }
             for (auto& c : colors)
             {
-                animated_tri_mesh_->vertex_colors_.push_back({c.x(), c.y(), c.z()});
+                animated_tri_mesh_->vertex_colors_.push_back({c.r(), c.g(), c.b()});
             }
             // Count all triangles drawn during graphics session.
             triangle_count_ += triangles.size() / 3;
@@ -291,7 +258,7 @@ public:
     // Add to per-frame collection of animating line segments for annotation.
     void addLineSegmentToAnimatedFrame(const Vec3& endpoint0,
                                        const Vec3& endpoint1,
-                                       const Vec3& color)
+                                       const Color& color)
     {
 #ifdef USE_OPEN3D
         if (enable())
@@ -310,7 +277,7 @@ public:
     
     void addThickLineToAnimatedFrame(const Vec3& endpoint0,
                                      const Vec3& endpoint1,
-                                     const Vec3& color,
+                                     const Color& color,
                                      double radius = 0.03)
     {
         addCylinderToAnimatedFrame(endpoint0, endpoint1, color, radius);
@@ -320,7 +287,7 @@ public:
     // (Converted from python code in Flock::Draw.py)
     void addCylinderToAnimatedFrame(const Vec3& endpoint0,
                                     const Vec3& endpoint1,
-                                    const Vec3& color,
+                                    const Color& color,
                                     double radius,
                                     int sides = 5)
     {
@@ -392,7 +359,8 @@ public:
     static sp_tri_mesh_t constructCylinderTriMesh(double radius,
                                                   const Vec3& endpoint0,
                                                   const Vec3& endpoint1,
-                                                  const Vec3& color,
+//                                                  const Vec3& color,
+                                                  const Color& color,
                                                   bool compute_normals,
                                                   bool evert,
                                                   int subdivision)
@@ -425,7 +393,7 @@ public:
     // Make sphere: returns shared pointer to tri mesh with given parameters.
     static sp_tri_mesh_t constructSphereTriMesh(double radius,
                                                 const Vec3& center,
-                                                const Vec3& color,
+                                                const Color& color,
                                                 bool compute_normals,
                                                 bool evert,
                                                 int subdivision)
@@ -467,7 +435,7 @@ public:
                                          double radius,
                                          double chords)
     {
-        double color = 0;
+        bool c = false;
         double angle = 2 * M_PI / chords;
         Vec3 up = camera().j();
         LocalSpace ls = LocalSpace::fromTo(center, cameraLookFrom(), up);
@@ -478,9 +446,9 @@ public:
             Vec3 new_spoke = local_spoke.rotate_xy_about_z(angle);
             addLineSegmentToAnimatedFrame(ls.globalize(local_spoke),
                                           ls.globalize(new_spoke),
-                                          Vec3(color, color, color));
+                                          c ? Color::white() : Color::black());
             local_spoke = new_spoke;
-            color = color ? 0 : 1;
+            c = not c;
         }
     }
 
@@ -733,7 +701,7 @@ public:
     // Set a random per-vertex color brightness (grayscale) for given mesh.
     static void brightnessSpecklePerVertex(double min_brightness,
                                            double max_brightness,
-                                           Vec3 base_color,
+                                           Color base_color,
                                            Draw::sp_tri_mesh_t mesh)
     {
         std::vector<Eigen::Vector3d> vertex_colors;

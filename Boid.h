@@ -82,13 +82,6 @@ private:  // move to bottom of class later
 
     // Set during sense/plan phase, saved for steer phase.
     Vec3 next_steer_;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241219 reconsider avoid_blend_mode
-//    Vec3 color_;
-//    Vec3 annote_avoid_poi_ = Vec3();  // This might be too elaborate: two vals
-//    double annote_avoid_weight_ = 0;  // per boid just for avoid annotation.
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Cumulative count: how many avoidance failures (collisions) has it had?
     int avoidance_failure_counter_ = 0;
@@ -113,12 +106,7 @@ private:  // move to bottom of class later
     std::string name_;
     static inline int name_counter_ = 0;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241219 reconsider avoid_blend_mode
-    
-    Vec3 color_;
-//    Vec3 annote_avoid_poi_ = Vec3();  // This might be too elaborate: two vals
-//    double annote_avoid_weight_ = 0;  // per boid just for avoid annotation.
+    Color color_;
 
     // Save this Boid's steering forces for drawing annotation later.
     Vec3 annote_separation_;
@@ -129,8 +117,6 @@ private:  // move to bottom of class later
     Vec3 annote_avoid_poi_ = Vec3();
     double annote_avoid_weight_ = 0;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
 public:
     // Accessors
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,16 +162,15 @@ public:
 
     int avoidance_failure_counter() const {return avoidance_failure_counter_;};
 
-    const Vec3& color() const { return color_; }
-    
+    const Color& color() const { return color_; }
+    void setColor(Color c) { color_ = c; }
+
     std::string name() const { return name_; }
     
     // Constructor
     Boid() : Agent()
     {
-        // Temp? Pick a random midrange boid color.
-        auto mrbc = [](){ return EF::RS().frandom2(0.5, 0.8); };
-        color_ = Vec3(mrbc(), mrbc(), mrbc());
+        color_ = Color::randomInRgbBox(Color(0.5), Color(0.8));
         name_ = "boid_" + std::to_string(name_counter_++);
     }
 
@@ -720,31 +705,26 @@ public:
     {
         double scale = 0.05;
         auto relative_force_annotation = [&](const Vec3& offset,
-                                             const Vec3& color)
+                                             const Color& color)
         {
             Vec3 ep = position() + offset * scale;
             draw().addLineSegmentToAnimatedFrame(position(), ep, color);
         };
-        relative_force_annotation(annote_separation_, Vec3(1, 0, 0));
-        relative_force_annotation(annote_alignment_,  Vec3(0, 1, 0));
-        relative_force_annotation(annote_cohesion_,   Vec3(0, 0, 1));
-        relative_force_annotation(annote_avoidance_,  Vec3(1, 0, 1));
+        relative_force_annotation(annote_separation_, Color::red());
+        relative_force_annotation(annote_alignment_,  Color::green());
+        relative_force_annotation(annote_cohesion_,   Color::blue());
+        relative_force_annotation(annote_avoidance_,  Color::magenta());
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241219 reconsider avoid_blend_mode
-//        relative_force_annotation(annote_combined_,   Vec3(0.5, 0.5, 0.5));
-        relative_force_annotation(annote_combined_,   Vec3(1, 1, 1));
+        relative_force_annotation(annote_combined_,   Color::white());
 
                     
         if (annote_avoid_weight_ > 0.01)
         {
-            Vec3 avoid_color = util::interpolate(annote_avoid_weight_,
-//                                                 Vec3(0.82, 0.82, 0.82),
-                                                 Vec3(0.4, 0.4, 0.4),
-                                                 Vec3(1, 0, 1));
-            draw().addLineSegmentToAnimatedFrame(position(),
-                                                 annote_avoid_poi_,
-                                                 avoid_color);
-            
+            Color c = util::interpolate(annote_avoid_weight_,
+                                        Color(0.4),
+                                        Color::magenta());
+            draw().addLineSegmentToAnimatedFrame(position(), annote_avoid_poi_, c);            
         }
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

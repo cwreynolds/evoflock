@@ -694,25 +694,19 @@ public:
     int& selectedBoidIndex() { return selected_boid_index_; }
     int selectedBoidIndex() const { return selected_boid_index_; }
     void selectNextBoid() { selected_boid_index_ += 1; redrawNeeded(); }
-    
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
-    // TODO 20241220 add random texture to obstacle TriMeshes
-    
+
     // Set a random per-vertex color brightness (grayscale) for given mesh.
     static void brightnessSpecklePerVertex(double min_brightness,
                                            double max_brightness,
                                            Color base_color,
                                            Draw::sp_tri_mesh_t mesh)
     {
-        std::vector<Eigen::Vector3d> vertex_colors;
         for (int i = 0; i < mesh->vertices_.size(); i++)
         {
             double b = EF::RS().random2(min_brightness, max_brightness);
-            vertex_colors.push_back(vec3ToEv3d(base_color * b));
+            mesh->vertex_colors_.at(i) = vec3ToEv3d(base_color * b);
         }
-        mesh->vertex_colors_ = vertex_colors;
     };
-    //--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --
 
     static void unit_test() {}
     

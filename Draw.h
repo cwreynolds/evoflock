@@ -278,7 +278,8 @@ public:
     void addThickLineToAnimatedFrame(const Vec3& endpoint0,
                                      const Vec3& endpoint1,
                                      const Color& color,
-                                     double radius = 0.03)
+//                                     double radius = 0.03)
+                                     double radius = 0.02)
     {
         addCylinderToAnimatedFrame(endpoint0, endpoint1, color, radius);
     }
@@ -309,7 +310,8 @@ public:
                 Vec3 b = ls.globalize(r.rotate_xy_about_z(angle_step * (i+1)));
                 Vec3 c = b + offset;
                 Vec3 d = a + offset;
-                addTriMeshToAnimatedFrame({a, b, c, d}, {0,1,3,  1,2,3}, color);
+//                addTriMeshToAnimatedFrame({a, b, c, d}, {0,1,3,  1,2,3}, color);
+                addTriMeshToAnimatedFrame({a, b, c, d}, {3,1,0, 3,2,1}, color);
             }
         }
     }

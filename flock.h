@@ -149,14 +149,29 @@ public:
             }
             // Draw all Boid bodies, whether sim was paused or not.
             for_all_boids([&](Boid* b){ b->draw_body();});
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20250130 new "draw wide line to animated frame"
+//                Boid& sb = *selectedBoid();
+//                sb.drawAnnotationForBoidAndNeighbors();
+//                draw().addThickLineToAnimatedFrame(sb.position(),
+//    //                                               sb.position() + sb.forward() * 100,
+//                                                   sb.position() + sb.forward() * 10000,
+//                                                   Color::black());
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250130 new "draw wide line to animated frame"
-            Boid& sb = *selectedBoid();
-            sb.drawAnnotationForBoidAndNeighbors();
-            draw().addThickLineToAnimatedFrame(sb.position(),
-                                               sb.position() + sb.forward() * 100,
-                                               Color::black());
+            // TODO 20250203 back to debugging avoidance of spheres from outside
+//            {
+//                Boid& sb = *selectedBoid();
+//                Vec3 sbp = sb.position();
+//                Vec3 f = sbp + sb.forward() * 100;
+//                sb.drawAnnotationForBoidAndNeighbors();
+//                draw().addThickLineToAnimatedFrame(sbp, f, Color::black());
+//            }
+            
+            selectedBoid()->drawAnnotationForBoidAndNeighbors();
+            
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             draw().aimAgent() = *selectedBoid();
             draw().endOneAnimatedFrame();
             aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);

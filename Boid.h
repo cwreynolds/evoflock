@@ -686,6 +686,11 @@ public:
                                          color());
     }
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250203 back to debugging avoidance of spheres from outside
+    
+    Vec3 annote_forward_temp_; // TEMP
+
     // Save this Boid's steering forces for drawing annotation later.
     void saveAnnotation(const Vec3& separation,
                         const Vec3& alignment,
@@ -698,6 +703,9 @@ public:
         annote_cohesion_ = cohesion;
         annote_avoidance_ = avoidance;
         annote_combined_ = combined;
+        
+        std::cout << "in saveAnnotation" << std::endl;
+        annote_forward_temp_ = forward(); // TEMP
     }
 
     // Draw optional annotation of this Boid's current steering forces
@@ -708,7 +716,8 @@ public:
                                              const Color& color)
         {
             Vec3 ep = position() + offset * scale;
-            draw().addLineSegmentToAnimatedFrame(position(), ep, color);
+//            draw().addLineSegmentToAnimatedFrame(position(), ep, color);
+            draw().addThickLineToAnimatedFrame(position(), ep, color);
         };
         relative_force_annotation(annote_separation_, Color::red());
         relative_force_annotation(annote_alignment_,  Color::green());
@@ -716,7 +725,8 @@ public:
         relative_force_annotation(annote_avoidance_,  Color::magenta());
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241219 reconsider avoid_blend_mode
-        relative_force_annotation(annote_combined_,   Color::white());
+//        relative_force_annotation(annote_combined_,   Color::white());
+        relative_force_annotation(annote_combined_,   Color::yellow());
 
                     
         if (annote_avoid_weight_ > 0.01)
@@ -724,13 +734,13 @@ public:
             Color c = util::interpolate(annote_avoid_weight_,
                                         Color(0.4),
                                         Color::magenta());
-            draw().addLineSegmentToAnimatedFrame(position(), annote_avoid_poi_, c);            
+//            draw().addLineSegmentToAnimatedFrame(position(), annote_avoid_poi_, c);
+            draw().addThickLineToAnimatedFrame(position(), annote_avoid_poi_, c);
         }
-        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     }
-    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     // Called from Flock to draw annotation for selected Boid and its neighbors.
     void drawAnnotationForBoidAndNeighbors()
     {
@@ -738,17 +748,41 @@ public:
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
+        
 //        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
         
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20250203 back to debugging avoidance of spheres from outside
         
+//    //        Boid& sb = *selectedBoid();
+//    //        Vec3 sbp = sb.position();
+//    //        Vec3 f = sbp + sb.forward() * 100;
+//    //        Vec3 f = position() + forward() * 100;
+//    //        sb.drawAnnotationForBoidAndNeighbors();
+//            draw().addThickLineToAnimatedFrame(position(),
+//    //                                           position() + forward() * 100,
+//                                               position() + annote_forward_temp_ * 100,
+//                                               Color::black());
+
+        debugPrint(annote_forward_temp_);
+        draw().addThickLineToAnimatedFrame(position(),
+                                           position() + annote_forward_temp_ * 100,
+                                           Color::black());
+
+        
+
         auto an = [&](Vec3 p)
         {
             Vec3 u(0, 100, 0);
             Vec3 c = (p == rsi_p0) ? Vec3() : Vec3(1, 0, 0);
-            Draw::getInstance().addLineSegmentToAnimatedFrame(p, p+u, c);
+//            Draw::getInstance().addLineSegmentToAnimatedFrame(p, p+u, c);
+//            draw().addLineSegmentToAnimatedFrame(p, p+u, c);
+            draw().addThickLineToAnimatedFrame(p, p+u, c);
         };
         an(rsi_p1);
         an(rsi_p2);
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }

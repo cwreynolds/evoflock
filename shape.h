@@ -180,7 +180,11 @@ std::vector<Vec3> arrangeNonOverlappingSpheres(std::vector<double> radii,
 {
     // These should be parameters:
     int iterations = 100;
-    double rate = 0.6;
+//    double rate = 0.6;
+//    double rate = 0.1;
+//    double rate = -0.1;
+//    double rate = 2;
+    double rate = 5;
     // Generate initial random sphere centers (without regard to intersection).
     std::vector<Vec3> centers;
     max_distance -= margin / 2;  // Adjust for margins.
@@ -190,8 +194,12 @@ std::vector<Vec3> arrangeNonOverlappingSpheres(std::vector<double> radii,
         centers.push_back(EF::RS().randomPointInUnitRadiusSphere() * max_distance);
     }
     // Run relaxation loop, moving spheres incrementally away from overlaps.
+    bool any_overlaps_found = true;
+//    for (int i = 0; i < iterations; i++)
+//    for (int i = 0; (i < iterations) or any_overlaps_found; i++)
     for (int i = 0; i < iterations; i++)
     {
+        any_overlaps_found = false;
         for (int a = 0; a < centers.size(); a++)
         {
             std::vector<Vec3> adjustments(centers.size());
@@ -205,6 +213,13 @@ std::vector<Vec3> arrangeNonOverlappingSpheres(std::vector<double> radii,
                 {
                     double adjust = overlap * rate;
                     adjustments.at(a) += offset_from_b.normalize() * -adjust;
+
+                    if (separation < 0)
+                    {
+                        any_overlaps_found = true;
+//                        debugPrint(any_overlaps_found);
+                        debugPrint(separation);
+                    }
                 }
             }
             
@@ -222,6 +237,7 @@ std::vector<Vec3> arrangeNonOverlappingSpheres(std::vector<double> radii,
             }
         }
     }
+    assert(not any_overlaps_found);
     return centers;
 }
 

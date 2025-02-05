@@ -58,10 +58,8 @@ private:
     //int default_obstacle_set_index_ = 0;  // Sphere and vertical cylinder.
     //int default_obstacle_set_index_ = 1;  // 6 cylinders and sphere.
     //int default_obstacle_set_index_ = 2;  // Plane and sphere.
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250125 debugging "non-everted" sphere obstacle.
-    int default_obstacle_set_index_ = 5;  // One sphere in another.
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //int default_obstacle_set_index_ = 5;  // One sphere in another.
+    int default_obstacle_set_index_ = 4;  // One sphere in another.
 
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
@@ -122,7 +120,7 @@ public:
         make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
-        draw().simPause() = true;
+//        draw().simPause() = true;
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         draw().beginAnimatedScene();
         save_centers_to_file_start();
@@ -149,29 +147,7 @@ public:
             }
             // Draw all Boid bodies, whether sim was paused or not.
             for_all_boids([&](Boid* b){ b->draw_body();});
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20250130 new "draw wide line to animated frame"
-//                Boid& sb = *selectedBoid();
-//                sb.drawAnnotationForBoidAndNeighbors();
-//                draw().addThickLineToAnimatedFrame(sb.position(),
-//    //                                               sb.position() + sb.forward() * 100,
-//                                                   sb.position() + sb.forward() * 10000,
-//                                                   Color::black());
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250203 back to debugging avoidance of spheres from outside
-//            {
-//                Boid& sb = *selectedBoid();
-//                Vec3 sbp = sb.position();
-//                Vec3 f = sbp + sb.forward() * 100;
-//                sb.drawAnnotationForBoidAndNeighbors();
-//                draw().addThickLineToAnimatedFrame(sbp, f, Color::black());
-//            }
-            
             selectedBoid()->drawAnnotationForBoidAndNeighbors();
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
             draw().aimAgent() = *selectedBoid();
             draw().endOneAnimatedFrame();
             aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
@@ -937,13 +913,20 @@ public:
             obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
             obstacle_presets_.push_back(obs);
 
-            // Set 4 -- 10 random spheres
+            // Set 4 -- 20 random spheres
             obs.clear();
             obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
-            int count = 20; // TODO 20250125 crank up sphere count to test 10->20
+//            int count = 20; // TODO 20250125 crank up sphere count to test 10->20
+            int count = 20;
             std::vector<double> radii;
             for (int i = 0; i < count; i++)
             {
+//                radii.push_back(EF::RS().random2(5, 12));
+//                radii.push_back(EF::RS().random2(8, 15));
+//                radii.push_back(EF::RS().random2(6, 14));
+//                radii.push_back(EF::RS().random2(5, 12));
+//                radii.push_back(EF::RS().random2(5, 6));
+//                radii.push_back(EF::RS().random2(2, 3));
                 radii.push_back(EF::RS().random2(5, 12));
             }
             auto centers = shape::arrangeNonOverlappingSpheres(radii, 5, 50);
@@ -963,7 +946,7 @@ public:
             // one. Instead they are all inside the little one.
 
             obs.clear();
-//            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
+            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
             obs.push_back(new SphereObstacle(12, sc, Obstacle::inside));
             obstacle_presets_.push_back(obs);
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

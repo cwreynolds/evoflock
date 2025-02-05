@@ -704,7 +704,6 @@ public:
         annote_avoidance_ = avoidance;
         annote_combined_ = combined;
         
-        std::cout << "in saveAnnotation" << std::endl;
         annote_forward_temp_ = forward(); // TEMP
     }
 
@@ -716,7 +715,6 @@ public:
                                              const Color& color)
         {
             Vec3 ep = position() + offset * scale;
-//            draw().addLineSegmentToAnimatedFrame(position(), ep, color);
             draw().addThickLineToAnimatedFrame(position(), ep, color);
         };
         relative_force_annotation(annote_separation_, Color::red());
@@ -725,16 +723,13 @@ public:
         relative_force_annotation(annote_avoidance_,  Color::magenta());
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20241219 reconsider avoid_blend_mode
-//        relative_force_annotation(annote_combined_,   Color::white());
         relative_force_annotation(annote_combined_,   Color::yellow());
-
                     
         if (annote_avoid_weight_ > 0.01)
         {
             Color c = util::interpolate(annote_avoid_weight_,
                                         Color(0.4),
                                         Color::magenta());
-//            draw().addLineSegmentToAnimatedFrame(position(), annote_avoid_poi_, c);
             draw().addThickLineToAnimatedFrame(position(), annote_avoid_poi_, c);
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -745,7 +740,6 @@ public:
     void drawAnnotationForBoidAndNeighbors()
     {
         drawAnnotation();
-        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
         
@@ -753,37 +747,18 @@ public:
         
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20250203 back to debugging avoidance of spheres from outside
-        
-//    //        Boid& sb = *selectedBoid();
-//    //        Vec3 sbp = sb.position();
-//    //        Vec3 f = sbp + sb.forward() * 100;
-//    //        Vec3 f = position() + forward() * 100;
-//    //        sb.drawAnnotationForBoidAndNeighbors();
-//            draw().addThickLineToAnimatedFrame(position(),
-//    //                                           position() + forward() * 100,
-//                                               position() + annote_forward_temp_ * 100,
-//                                               Color::black());
-
-        debugPrint(annote_forward_temp_);
-        draw().addThickLineToAnimatedFrame(position(),
-                                           position() + annote_forward_temp_ * 100,
-                                           Color::black());
-
-        
-
-        auto an = [&](Vec3 p)
         {
-            Vec3 u(0, 100, 0);
-            Vec3 c = (p == rsi_p0) ? Vec3() : Vec3(1, 0, 0);
-//            Draw::getInstance().addLineSegmentToAnimatedFrame(p, p+u, c);
-//            draw().addLineSegmentToAnimatedFrame(p, p+u, c);
-            draw().addThickLineToAnimatedFrame(p, p+u, c);
-        };
-        an(rsi_p1);
-        an(rsi_p2);
-        
+            Vec3 f = position() + annote_forward_temp_ * 100;
+            draw().addThickLineToAnimatedFrame(position(), f, Color::black());
+            auto an = [&](Vec3 p)
+            {
+                Color c = (p == rsi_p0) ? Color::black() : Color::red();
+                draw().addThickLineToAnimatedFrame(p, p + Vec3(0, 100, 0), c);
+            };
+            an(rsi_p1);
+            an(rsi_p2);
+        }
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
@@ -837,7 +812,7 @@ public:
     {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
-        if (isSelected()) { std::cout << std::endl; }
+//        if (isSelected()) { std::cout << std::endl; }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         predicted_obstacle_collisions_.clear();
         for (Obstacle* obstacle : flock_obstacles())
@@ -851,7 +826,7 @@ public:
 //            if (isSelected() and (poi != Vec3::none())) { debugPrint(poi); }
             if (isSelected() and not poi.is_none())
             {
-                debugPrint(poi);
+//                debugPrint(poi);
                 rsi_p0 = poi;
                 rsi_p1 = shape::rsi_p1;
                 rsi_p2 = shape::rsi_p2;

@@ -132,7 +132,12 @@ template <typename T> std::string vec_to_string(const std::vector<T>& vector,
 {
     std::stringstream s;
     bool first = true;
-    if (fixed_precision > 0) { s << std::setprecision(4) << std::fixed; }
+//    if (fixed_precision > 0) { s << std::setprecision(4) << std::fixed; }
+    if (fixed_precision > 0)
+    {
+//        s << std::setprecision(fixed_precision) << std::fixed;
+        s << std::fixed << std::setprecision(fixed_precision);
+    }
     for (auto& element : vector)
     {
         if (first) first = false; else s << ", ";
@@ -377,6 +382,11 @@ double executions_per_second(std::function<void()> work_load, int count = 500000
     return executions_per_second;
 }
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20250205 fixing shape::arrangeNonOverlappingSpheres()
+
+
+
 // Given an indexable collection of objects of type "T" (std::vector<T>) apply a
 // given function of two arguments (pair_func(T a, T b)) to each unique pairwise
 // combination of elements from the collection. (The function has wildcard type
@@ -392,6 +402,23 @@ void apply_to_pairwise_combinations(F pair_func, const std::vector<T>& collectio
         }
     }
 }
+
+// Identical to above but "collection" is not const
+template<typename T, typename F>
+// void apply_to_pairwise_combinations(F pair_func, const std::vector<T>& collection)
+void apply_to_pairwise_combinations(F pair_func, std::vector<T>& collection)
+{
+    for (int p = 0; p < collection.size(); p++)
+    {
+        for (int q = p + 1; q < collection.size(); q++)
+        {
+            pair_func(collection[p], collection[q]);
+        }
+    }
+}
+
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 static void unit_test()
 {
@@ -466,6 +493,7 @@ static void unit_test()
 
     std::vector<double> vd({0.1, 2.3, 4.5, 5.6});
     assert (vec_to_string(vd, 4) == "0.1000, 2.3000, 4.5000, 5.6000");
+    assert (vec_to_string(vd, 2) == "0.10, 2.30, 4.50, 5.60");
 
     RollingAverage<int> rai(5);
     for (int i = 0; i < 9; i++) { rai.insert(i); }

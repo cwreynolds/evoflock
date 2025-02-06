@@ -22,6 +22,21 @@ Vec3 rsi_p1;
 Vec3 rsi_p2;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250205 fixing shape::arrangeNonOverlappingSpheres()
+
+// Simple abstract class to represent a sphere.
+class Sphere
+{
+public:
+    Sphere() {}
+    Sphere(Vec3 center_, double radius_) : center(center_), radius(radius_){}
+    Vec3 center;
+    double radius;
+};
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 // Returns the point of intersection of a ray (half-line) and sphere. Used
 // for finding intersection of an Agent's "forward" axis with a spherical
 // containment. Returns None if there is no intersection. Returns nearest
@@ -166,6 +181,275 @@ double distance_between_lines(const Vec3& origin1, const Vec3& tangent1,
     return distance;
 }
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20250205 fixing shape::arrangeNonOverlappingSpheres()
+
+//    // Very ad hoc tool used to create an obstacle set. Given a list of "radii", a
+//    // "margin", and "max_distance" this function returns a list of sphere centers
+//    // (corresponding to the given radii) such that:
+//    //     (1) none of the spheres intersect/overlap AND that all spheres
+//    //         are inside a sphere at the origin with radius "max_distance".
+//    //     (2) there is at least "margin" clearance between any two spheres.
+//    // Should this use a simple utility Sphere class? (Maybe use later in Obstacle?)
+//    std::vector<Vec3> arrangeNonOverlappingSpheres(std::vector<double> radii,
+//                                                   double margin,
+//                                                   double max_distance)
+//    {
+//        // These should be parameters:
+//        int iterations = 100;
+//        double rate = 0.6;
+//    //    double rate = 0.1;
+//    //    double rate = -0.1;
+//    //    double rate = 2;
+//    //    double rate = 5;
+//        // Generate initial random sphere centers (without regard to intersection).
+//        std::vector<Vec3> centers;
+//        max_distance -= margin / 2;  // Adjust for margins.
+//        for (auto& r : radii)
+//        {
+//            r += margin / 2;
+//            centers.push_back(EF::RS().randomPointInUnitRadiusSphere() * max_distance);
+//        }
+//
+//
+//        auto pair_of_centers = [](const Vec3& a, const Vec3& b)
+//        {
+//            std::cout << "[" << a << ", " << b << "]" << std::endl;
+//        };
+//        util::apply_to_pairwise_combinations(pair_of_centers, centers);
+//
+//    //    radii.clear();
+//    //    radii = {20, 20};
+//    //
+//    //    centers.clear();
+//    //    centers = {{10, 0, 0}, {-10, 0, 0}};
+//
+//        std::cout << "centers before: " << util::vec_to_string(centers, 2) << std::endl;
+//
+//        // Run relaxation loop, moving spheres incrementally away from overlaps.
+//        bool any_overlaps_found = true;
+//    //    for (int i = 0; i < iterations; i++)
+//    //    for (int i = 0; (i < iterations) or any_overlaps_found; i++)
+//        for (int i = 0; i < iterations; i++)
+//        {
+//            any_overlaps_found = false;
+//            for (int a = 0; a < centers.size(); a++)
+//            {
+//                std::vector<Vec3> adjustments(centers.size());
+//                for (int b = 0; b < a; b++)
+//                {
+//                    Vec3 offset_from_b = centers[a] - centers[b];
+//                    double center_distance = offset_from_b.length();
+//                    double separation = center_distance - (radii[a] + radii[b]);
+//                    double overlap = margin - separation;
+//                    if (overlap > 0)
+//                    {
+//                        double adjust = overlap * rate;
+//                        adjustments.at(a) += offset_from_b.normalize() * -adjust;
+//
+//                        if (separation < 0)
+//                        {
+//                            any_overlaps_found = true;
+//    //                        debugPrint(any_overlaps_found);
+//    //                        debugPrint(separation);
+//                        }
+//                    }
+//                }
+//
+//                // Push toward origin if outside max_distance.
+//                double max_r = centers[a].length() + radii[a] + margin;
+//                double excess = max_r - max_distance;
+//                if (excess > 0)
+//                {
+//                    adjustments[a] += centers[a].normalize() * excess;
+//                }
+//                // Adjust each center based on summed adjustments calculated above.
+//                for (int a = 0; a < centers.size(); a++)
+//                {
+//                    centers[a] -= adjustments[a];
+//                }
+//            }
+//        }
+//
+//        std::cout << "centers after:  " << util::vec_to_string(centers, 2) << std::endl;
+//
+//        assert(not any_overlaps_found);
+//        return centers;
+//    }
+
+
+//    // Very ad hoc tool used to create an obstacle set. Given a list of "radii", a
+//    // "margin", and "max_distance" this function returns a list of sphere centers
+//    // (corresponding to the given radii) such that:
+//    //     (1) none of the spheres intersect/overlap AND that all spheres
+//    //         are inside a sphere at the origin with radius "max_distance".
+//    //     (2) there is at least "margin" clearance between any two spheres.
+//    // Should this use a simple utility Sphere class? (Maybe use later in Obstacle?)
+//    std::vector<Vec3> arrangeNonOverlappingSpheres(std::vector<double> radii,
+//                                                   double margin,
+//                                                   double max_distance)
+//    {
+//        // These should be parameters:
+//    //    int iterations = 100;
+//    //    int iterations = 1000;
+//    //    int iterations = 10000;
+//        int iterations = 50000;
+//    //    double rate = 0.6;
+//    //    double rate = 1;
+//    //    double rate = 1.5;
+//    //    double rate = 2;
+//    //    double rate = 0.8;
+//        double rate = 0.5;
+//
+//
+//        util::Timer t("arrangeNonOverlappingSpheres");
+//
+//        // Generate initial random sphere centers (without regard to intersection).
+//        std::vector<Vec3> centers;
+//        max_distance -= margin / 2;  // Adjust for margins.
+//        for (auto& r : radii)
+//        {
+//            r += margin / 2;
+//            centers.push_back(EF::RS().randomPointInUnitRadiusSphere() * max_distance);
+//        }
+//
+//
+//    //    auto pair_of_centers = [](const Vec3& a, const Vec3& b)
+//    //    {
+//    //        std::cout << "[" << a << ", " << b << "]" << std::endl;
+//    //    };
+//    //    util::apply_to_pairwise_combinations(pair_of_centers, centers);
+//
+//
+//        // TODO if we keep this design, this class should move to shape.h
+//        class Sphere
+//        {
+//        public:
+//            Sphere() {}
+//            Sphere(Vec3 center_, double radius_) : center(center_), radius(radius_){}
+//            Vec3 center;
+//            double radius;
+//        };
+//
+//        std::vector<Sphere> spheres;
+//        for (int i = 0; i < centers.size(); i++)
+//        {
+//            spheres.push_back(Sphere(centers[i], radii[i]));
+//        }
+//
+//        bool any_overlaps_found = true;
+//
+//
+//        auto adjust_sphere_pair = [&](Sphere& a, Sphere& b)
+//        {
+//    //        std::cout << "[" << a << ", " << b << "]" << std::endl;
+//
+//    //        Vec3 offset_from_b = centers[a] - centers[b];
+//            Vec3 offset_from_b = a.center - b.center;
+//            double center_distance = offset_from_b.length();
+//    //        double separation = center_distance - (radii[a] + radii[b]);
+//            double separation = center_distance - (a.radius + b.radius);
+//            double overlap = margin - separation;
+//            if (overlap > 0)
+//            {
+//    //            double adjust = overlap * rate;
+//                double adjust_mag = overlap * rate;
+//    //            adjustments.at(a) += offset_from_b.normalize() * -adjust;
+//                Vec3 adjust_vec = offset_from_b.normalize() * adjust_mag * 0.5;
+//                a.center += adjust_vec;
+//                b.center -= adjust_vec;
+//
+//                if (separation < 0) { any_overlaps_found = true; }
+//            }
+//
+//
+//
+//    //        double max_r = centers[a].length() + radii[a] + margin;
+//    //        double excess = max_r - max_distance;
+//    //        if (excess > 0)
+//    //        {
+//    //            adjustments[a] += centers[a].normalize() * excess;
+//    //        }
+//
+//            // Push toward origin if outside max_distance.
+//
+//            auto push_toward_origin = [&](Sphere& s)
+//            {
+//    //            double max_r = centers[a].length() + radii[a] + margin;
+//                double max_r = s.center.length() + s.radius + margin;
+//                double excess = max_r - max_distance;
+//                if (excess > 0)
+//                {
+//    //                adjustments[a] += centers[a].normalize() * excess;
+//                    s.center -= s.center.normalize() * excess;
+//                }
+//
+//            };
+//
+//            push_toward_origin(a);
+//            push_toward_origin(b);
+//
+//
+//        };
+//
+//        std::cout << "centers before: " << util::vec_to_string(centers, 2) << std::endl;
+//
+//        // Run relaxation loop, moving spheres incrementally away from overlaps.
+//    //    bool any_overlaps_found = true;
+//        for (int i = 0; i < iterations; i++)
+//        {
+//            any_overlaps_found = false;
+//
+//    //        for (int a = 0; a < centers.size(); a++)
+//    //        {
+//    //            std::vector<Vec3> adjustments(centers.size());
+//    //            for (int b = 0; b < a; b++)
+//    //            {
+//    //                Vec3 offset_from_b = centers[a] - centers[b];
+//    //                double center_distance = offset_from_b.length();
+//    //                double separation = center_distance - (radii[a] + radii[b]);
+//    //                double overlap = margin - separation;
+//    //                if (overlap > 0)
+//    //                {
+//    //                    double adjust = overlap * rate;
+//    //                    adjustments.at(a) += offset_from_b.normalize() * -adjust;
+//    //
+//    //                    if (separation < 0) { any_overlaps_found = true; }
+//    //                }
+//    //            }
+//    //
+//    //            // Push toward origin if outside max_distance.
+//    //            double max_r = centers[a].length() + radii[a] + margin;
+//    //            double excess = max_r - max_distance;
+//    //            if (excess > 0)
+//    //            {
+//    //                adjustments[a] += centers[a].normalize() * excess;
+//    //            }
+//    //            // Adjust each center based on summed adjustments calculated above.
+//    //            for (int a = 0; a < centers.size(); a++)
+//    //            {
+//    //                centers[a] -= adjustments[a];
+//    //            }
+//    //        }
+//
+//            util::apply_to_pairwise_combinations(adjust_sphere_pair, spheres);
+//
+//        }
+//
+//
+//        for (int i = 0; i < centers.size(); i++)
+//        {
+//            centers[i] = spheres[i].center;
+//        }
+//
+//
+//
+//        std::cout << "centers after:  " << util::vec_to_string(centers, 2) << std::endl;
+//
+//        assert(not any_overlaps_found);
+//        return centers;
+//    }
+
 
 // Very ad hoc tool used to create an obstacle set. Given a list of "radii", a
 // "margin", and "max_distance" this function returns a list of sphere centers
@@ -179,68 +463,85 @@ std::vector<Vec3> arrangeNonOverlappingSpheres(std::vector<double> radii,
                                                double max_distance)
 {
     // These should be parameters:
-    int iterations = 100;
-//    double rate = 0.6;
-//    double rate = 0.1;
-//    double rate = -0.1;
-//    double rate = 2;
-    double rate = 5;
+//    int iterations = 100;
+//    int iterations = 1000;
+//    int iterations = 10000;
+    int iterations = 50000;
+    double rate = 0.5;
+    
+    
+    util::Timer t("arrangeNonOverlappingSpheres");
+    
+    auto fuzz = [](){ return EF::RS().randomPointInUnitRadiusSphere(); };
+
     // Generate initial random sphere centers (without regard to intersection).
     std::vector<Vec3> centers;
     max_distance -= margin / 2;  // Adjust for margins.
     for (auto& r : radii)
     {
         r += margin / 2;
-        centers.push_back(EF::RS().randomPointInUnitRadiusSphere() * max_distance);
+//        centers.push_back(EF::RS().randomPointInUnitRadiusSphere() * max_distance);
+        centers.push_back(fuzz() * max_distance);
     }
-    // Run relaxation loop, moving spheres incrementally away from overlaps.
-    bool any_overlaps_found = true;
-//    for (int i = 0; i < iterations; i++)
-//    for (int i = 0; (i < iterations) or any_overlaps_found; i++)
-    for (int i = 0; i < iterations; i++)
-    {
-        any_overlaps_found = false;
-        for (int a = 0; a < centers.size(); a++)
-        {
-            std::vector<Vec3> adjustments(centers.size());
-            for (int b = 0; b < a; b++)
-            {
-                Vec3 offset_from_b = centers[a] - centers[b];
-                double center_distance = offset_from_b.length();
-                double separation = center_distance - (radii[a] + radii[b]);
-                double overlap = margin - separation;
-                if (overlap > 0)
-                {
-                    double adjust = overlap * rate;
-                    adjustments.at(a) += offset_from_b.normalize() * -adjust;
 
-                    if (separation < 0)
-                    {
-                        any_overlaps_found = true;
-//                        debugPrint(any_overlaps_found);
-                        debugPrint(separation);
-                    }
-                }
-            }
-            
-            // Push toward origin if outside max_distance.
-            double max_r = centers[a].length() + radii[a] + margin;
+    std::vector<Sphere> spheres;
+    for (int i = 0; i < centers.size(); i++)
+    {
+        spheres.push_back(Sphere(centers[i], radii[i]));
+    }
+
+    // Were any overlaps found during this iteration? Reset for each iteration.
+    bool any_overlaps_found = true;
+    
+    // Given 2 Spheres, if overlap: incrementally adjust distance between them.
+    auto adjust_sphere_pair = [&](Sphere& a, Sphere& b)
+    {
+        Vec3 offset_from_b = a.center - b.center;
+        double center_distance = offset_from_b.length();
+        double separation = center_distance - (a.radius + b.radius);
+        double overlap = margin - separation;
+        if (overlap > 0)
+        {
+            double adjust_mag = overlap * rate;
+            Vec3 adjust_vec = offset_from_b.normalize() * adjust_mag * 0.5;
+//            a.center += adjust_vec;
+//            b.center -= adjust_vec;
+            a.center += adjust_vec + fuzz();
+            b.center -= adjust_vec + fuzz();
+            if (separation < 0) { any_overlaps_found = true; }
+        }
+        // Push toward origin if Sphere extends outside max_distance.
+        auto push_toward_origin = [&](Sphere& s)
+        {
+            double max_r = s.center.length() + s.radius + margin;
             double excess = max_r - max_distance;
             if (excess > 0)
             {
-                adjustments[a] += centers[a].normalize() * excess;
+                s.center -= (s.center.normalize() * excess * rate) + fuzz();
             }
-            // Adjust each center based on summed adjustments calculated above.
-            for (int a = 0; a < centers.size(); a++)
-            {
-                centers[a] -= adjustments[a];
-            }
-        }
+        };
+        push_toward_origin(a);
+        push_toward_origin(b);
+    };
+
+//    std::cout << "centers before: " << util::vec_to_string(centers, 2) << std::endl;
+
+    // Run relaxation loop, moving spheres incrementally away from overlaps.
+    for (int i = 0; i < iterations; i++)
+    {
+        any_overlaps_found = false;
+        util::apply_to_pairwise_combinations(adjust_sphere_pair, spheres);
+        debugPrint(any_overlaps_found);
     }
+    
+    // Copy sphere centers back to output.
+    for (int i = 0; i < centers.size(); i++) { centers[i] = spheres[i].center; }
+//    std::cout << "centers after:  " << util::vec_to_string(centers, 2) << std::endl;
     assert(not any_overlaps_found);
     return centers;
 }
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 // Defines a 3d (axis aligned) voxel map of given voxel count, overall box_size,
 // and center. Calling add() with a given location (say a boid center) marks

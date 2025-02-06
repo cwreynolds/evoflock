@@ -182,34 +182,24 @@ public:
     {
         Vec3 avoidance;
         Vec3 p = agent_position;
-        
         bool agent_inside = 0 > signed_distance(p);
-        
         double r = radius_;
         Vec3 c = center_;
         Vec3 offset_to_sphere_center = c - p;
         double distance_to_sphere_center = offset_to_sphere_center.length();
-        double dist_from_wall = r - distance_to_sphere_center;
-        
-        double abs_dist_from_wall = std::abs(dist_from_wall);
-//        double signed_dist_from_wall = dist_from_wall * (agent_inside ? 1 : -1);
+//        double dist_from_wall = r - distance_to_sphere_center;
+//        double abs_dist_from_wall = std::abs(dist_from_wall);
+        double abs_dist_from_wall = std::abs(r - distance_to_sphere_center);
 
         // Close enough to obstacle surface to use static repulsion.
-        
-//        if (dist_from_wall < max_distance)
         if (abs_dist_from_wall < max_distance)
-
         {
             Vec3 normal = offset_to_sphere_center / distance_to_sphere_center;
             // Unless agent is already facing away from obstacle.
             if (normal.dot(agent_forward) < 0.9)
             {
                 // Weighting falls off further from obstacle surface
-                
-//                double weight = 1 - (dist_from_wall / max_distance);
                 double weight = 1 - (abs_dist_from_wall / max_distance);
-
-//                avoidance = normal * weight;
                 avoidance = normal * weight * (agent_inside ? 1 : -1);
             }
         }

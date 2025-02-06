@@ -913,45 +913,15 @@ public:
             obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
             obstacle_presets_.push_back(obs);
 
-            // Set 4 -- 20 random spheres
+            // Set 4 -- 35 random spheres
             obs.clear();
             obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
-//            int count = 20; // TODO 20250125 crank up sphere count to test 10->20
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250205 fixing shape::arrangeNonOverlappingSpheres()
-//            int count = 20;
-//            int count = 2;  // TEMP for testing
-//            int count = 4;  // TEMP for testing
-//            int count = 20;
-//            int count = 10;
-//            int count = 25;
-            int count = 30;
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            int count = 35;
             std::vector<double> radii;
             for (int i = 0; i < count; i++)
             {
-//                radii.push_back(EF::RS().random2(5, 12));
-//                radii.push_back(EF::RS().random2(8, 15));
-//                radii.push_back(EF::RS().random2(6, 14));
-//                radii.push_back(EF::RS().random2(5, 12));
-//                radii.push_back(EF::RS().random2(5, 6));
-//                radii.push_back(EF::RS().random2(2, 3));
-                // TODO TEMP Wednesday
-//                radii.push_back(EF::RS().random2(5, 12));
-//                radii.push_back(EF::RS().random2(4, 8));
-//                radii.push_back(EF::RS().random2(5, 9));
-//                radii.push_back(EF::RS().random2(6, 10));
-//                radii.push_back(EF::RS().random2(6, 11));
-//                radii.push_back(EF::RS().random2(6, 12));
-//                radii.push_back(EF::RS().random2(5, 12));
-//                radii.push_back(EF::RS().random2(4, 12));
-//                radii.push_back(EF::RS().random2(5, 10));
-//                radii.push_back(EF::RS().random2(5, 11));
-//                radii.push_back(EF::RS().random2(5, 12));
-                radii.push_back(EF::RS().random2(4, 12));
+                radii.push_back(EF::RS().random2(4, 13));
             }
-//            auto centers = shape::arrangeNonOverlappingSpheres(radii, 5, 50);
-//            double margin = 5;
             double margin = 3;
             auto centers = shape::arrangeNonOverlappingSpheres(radii, margin, sr);
             auto ins = Obstacle::inside;

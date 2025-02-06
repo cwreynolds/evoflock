@@ -382,11 +382,6 @@ double executions_per_second(std::function<void()> work_load, int count = 500000
     return executions_per_second;
 }
 
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20250205 fixing shape::arrangeNonOverlappingSpheres()
-
-
-
 // Given an indexable collection of objects of type "T" (std::vector<T>) apply a
 // given function of two arguments (pair_func(T a, T b)) to each unique pairwise
 // combination of elements from the collection. (The function has wildcard type
@@ -403,9 +398,9 @@ void apply_to_pairwise_combinations(F pair_func, const std::vector<T>& collectio
     }
 }
 
-// Identical to above but "collection" is not const
+// Identical to above but "collection" is not const. TODO see experiment below,
+// based on a stackoverflow post, maybe possible to do this with single template
 template<typename T, typename F>
-// void apply_to_pairwise_combinations(F pair_func, const std::vector<T>& collection)
 void apply_to_pairwise_combinations(F pair_func, std::vector<T>& collection)
 {
     for (int p = 0; p < collection.size(); p++)
@@ -417,6 +412,42 @@ void apply_to_pairwise_combinations(F pair_func, std::vector<T>& collection)
     }
 }
 
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20250205 maybe possible to do this with single template.
+
+
+//    // Is it possible to write two template functions as one when the only difference
+//    // is the const-ness of an argument? https://stackoverflow.com/q/30062390/1991373
+//
+//    // I have:
+//    //    template <class Foob, class T>
+//    //    void do_it(Foob& f, T& t) { f.proc(t); }
+//    //
+//    //    template <class Foob, class T>
+//    //    void do_it(Foob& f, const T& t) { f.proc(t); }
+//    //
+//    // Ans:
+//    //    // works for both lvalues and rvalues with any cv-qualification
+//    //    template <class Foob, class T>
+//    //    void do_it(Foob& f, T&& t) { f.proc(std::forward<T>(t)); }
+//
+//
+//    // Identical to above but "collection" is not const
+//    template<typename T, typename F>
+//    // void apply_to_pairwise_combinations(F pair_func, const std::vector<T>& collection)
+//    //void apply_to_pairwise_combinations(F pair_func, std::vector<T&&>& TEMP_collection)
+//    void TEMP_apply_to_pairwise_combinations(F pair_func, std::vector<T>&& TEMP_collection)
+//    {
+//        auto collection = std::forward<std::vector<T>>(TEMP_collection);
+//        for (int p = 0; p < collection.size(); p++)
+//        {
+//            for (int q = p + 1; q < collection.size(); q++)
+//            {
+//                pair_func(collection[p], collection[q]);
+//            }
+//        }
+//    }
 
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

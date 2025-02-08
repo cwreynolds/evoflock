@@ -382,74 +382,31 @@ double executions_per_second(std::function<void()> work_load, int count = 500000
     return executions_per_second;
 }
 
-// Given an indexable collection of objects of type "T" (std::vector<T>) apply a
-// given function of two arguments (pair_func(T a, T b)) to each unique pairwise
-// combination of elements from the collection. (The function has wildcard type
-// "F" to avoid fussy details.)
-template<typename T, typename F>
-void apply_to_pairwise_combinations(F pair_func, const std::vector<T>& collection)
+
+// Given an indexable "collection" (class C) of objects of type "T" (e.g.
+// std::vector<T>), apply a given function of 2 arguments (pair_func(T a, T b))
+// to each unique pairwise combination of elements from the collection. Except
+// that, through the mysteries of c++ templates, type "T" is never mentioned in
+// this definition. "pair_func" has wildcard type "F" to avoid fussy details.)
+//
+// This use of "&&", "perfect forwarding", and std::forward were all new to me.
+// I learned about them here:
+// Is it possible to write two template functions as one when the only difference
+// is the const-ness of an argument? https://stackoverflow.com/q/30062390/1991373
+//
+template<class C, typename F>
+void apply_to_pairwise_combinations(F pair_func, C&& collection)
 {
-    for (int p = 0; p < collection.size(); p++)
+    auto&& c = std::forward<C>(collection);
+    for (int p = 0; p < c.size(); p++)
     {
-        for (int q = p + 1; q < collection.size(); q++)
+        for (int q = p + 1; q < c.size(); q++)
         {
-            pair_func(collection[p], collection[q]);
+            pair_func(c[p], c[q]);
         }
     }
 }
 
-// Identical to above but "collection" is not const. TODO see experiment below,
-// based on a stackoverflow post, maybe possible to do this with single template
-template<typename T, typename F>
-void apply_to_pairwise_combinations(F pair_func, std::vector<T>& collection)
-{
-    for (int p = 0; p < collection.size(); p++)
-    {
-        for (int q = p + 1; q < collection.size(); q++)
-        {
-            pair_func(collection[p], collection[q]);
-        }
-    }
-}
-
-
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20250205 maybe possible to do this with single template.
-
-
-//    // Is it possible to write two template functions as one when the only difference
-//    // is the const-ness of an argument? https://stackoverflow.com/q/30062390/1991373
-//
-//    // I have:
-//    //    template <class Foob, class T>
-//    //    void do_it(Foob& f, T& t) { f.proc(t); }
-//    //
-//    //    template <class Foob, class T>
-//    //    void do_it(Foob& f, const T& t) { f.proc(t); }
-//    //
-//    // Ans:
-//    //    // works for both lvalues and rvalues with any cv-qualification
-//    //    template <class Foob, class T>
-//    //    void do_it(Foob& f, T&& t) { f.proc(std::forward<T>(t)); }
-//
-//
-//    // Identical to above but "collection" is not const
-//    template<typename T, typename F>
-//    // void apply_to_pairwise_combinations(F pair_func, const std::vector<T>& collection)
-//    //void apply_to_pairwise_combinations(F pair_func, std::vector<T&&>& TEMP_collection)
-//    void TEMP_apply_to_pairwise_combinations(F pair_func, std::vector<T>&& TEMP_collection)
-//    {
-//        auto collection = std::forward<std::vector<T>>(TEMP_collection);
-//        for (int p = 0; p < collection.size(); p++)
-//        {
-//            for (int q = p + 1; q < collection.size(); q++)
-//            {
-//                pair_func(collection[p], collection[q]);
-//            }
-//        }
-//    }
-
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 static void unit_test()
 {

@@ -106,7 +106,6 @@ private:
 };
 
 
-//class EvertedSphereObstacle : public Obstacle
 class SphereObstacle : public Obstacle
 {
 public:
@@ -115,11 +114,11 @@ public:
         // +/- 1.5% color noise around middle gray.
         setColor(Color::randomInRgbBox(Color(0.485), Color(0.515)));
     }
-
-    SphereObstacle(double radius, const Vec3& center) : SphereObstacle()
+    
+    SphereObstacle(double radius_, const Vec3& center_) : SphereObstacle()
     {
-        radius_ = radius;
-        center_ = center;
+        radius() = radius_;
+        center() = center_;
     }
     
     SphereObstacle(double radius, const Vec3& center, ExcludeFrom ef)
@@ -127,53 +126,32 @@ public:
     {
         setExcludeFrom(ef);
     }
-
+    
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 ray_intersection(const Vec3& origin,
                           const Vec3& tangent,
                           double body_radius) const override
     {
-        return shape::ray_sphere_intersection(origin, tangent, radius_, center_);
+        return shape::ray_sphere_intersection(origin, tangent, radius(), center());
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251029 treats "outside" spheres same as "inside"
-    //
-    // Note that this ignores agent position. Must have been adding ExcludeFrom
-    // functionality but somehow neglected this function.
-    
-    
-//    // Normal to the obstacle at a given point of interest.
-//    Vec3 normal_at_poi(const Vec3& poi,
-//                       const Vec3& agent_position) const override
-//    {
-//        return (center_ - poi).normalize();
-//    }
-
-    //
     
     // Normal to the obstacle at a given point of interest.
     Vec3 normal_at_poi(const Vec3& poi,
                        const Vec3& agent_position) const override
     {
-        Vec3 perp_direction = (center_ - poi).normalize();
+        Vec3 perp_direction = (center() - poi).normalize();
         double agent_to_surface_signed_dist = signed_distance(agent_position);
         // TODO clean up, with signum? ~~~~~~~~~~~~~~~~~~~~~~~~~
         double sign = agent_to_surface_signed_dist < 0 ? 1 : -1;
         return perp_direction * sign;
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Point on surface of obstacle nearest the given query_point.
     Vec3 nearest_point(const Vec3& query_point) const override
     {
-        return (query_point - center_).normalize() * radius_;
+        return (query_point - center()).normalize() * radius();
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250204 back to debugging avoidance of spheres from outside
-
+    
     // Compute direction for agent's static avoidance of nearby obstacles.
     Vec3 fly_away(const Vec3& agent_position,
                   const Vec3& agent_forward,
@@ -183,15 +161,10 @@ public:
         Vec3 avoidance;
         Vec3 p = agent_position;
         bool agent_inside = 0 > signed_distance(p);
-        double r = radius_;
-        Vec3 c = center_;
-        Vec3 offset_to_sphere_center = c - p;
+        Vec3 offset_to_sphere_center = center() - p;
         double distance_to_sphere_center = offset_to_sphere_center.length();
-//        double dist_from_wall = r - distance_to_sphere_center;
-//        double abs_dist_from_wall = std::abs(dist_from_wall);
-        double abs_dist_from_wall = std::abs(r - distance_to_sphere_center);
-
-        // Close enough to obstacle surface to use static repulsion.
+        double abs_dist_from_wall = std::abs(radius()-distance_to_sphere_center);
+        // Close enough to obstacle surface to require static repulsion.
         if (abs_dist_from_wall < max_distance)
         {
             Vec3 normal = offset_to_sphere_center / distance_to_sphere_center;
@@ -205,20 +178,19 @@ public:
         }
         return avoidance;
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+    
     // Signed distance function. (From a query point to the nearest point on
     // Obstacle's surface: negative inside, positive outside, zero at surface.)
     double signed_distance(const Vec3& query_point) const override
     {
-        double distance_to_center = (query_point - center_).length();
-        return distance_to_center - radius_;
+        double distance_to_center = (query_point - center()).length();
+        return distance_to_center - radius();
     }
     
     void addToScene() const override
     {
-        auto mesh = Draw::constructSphereTriMesh(radius_,
-                                                 center_,
+        auto mesh = Draw::constructSphereTriMesh(radius(),
+                                                 center(),
                                                  getColor(),
                                                  true,
                                                  getExcludeFrom() == outside,
@@ -226,12 +198,17 @@ public:
         Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
-
+    
     std::string to_string() const override { return "SphereObstacle"; }
-
+    
+    // TODO 20250208 can these be rewritten as 2 functions with &&/std::forward?
+    double radius() const { return sphere_.radius; }
+    double& radius() { return sphere_.radius; }
+    Vec3 center() const { return sphere_.center; }
+    Vec3& center() { return sphere_.center; }
+    
 private:
-    double radius_ = 1;
-    Vec3 center_;
+    shape::Sphere sphere_;
 };
 
 

@@ -30,7 +30,7 @@ public:
     Sphere() {}
     Sphere(Vec3 center_, double radius_) : center(center_), radius(radius_){}
     Vec3 center;
-    double radius;
+    double radius = 1;
 };
 
 // Returns the point of intersection of a ray (half-line) and sphere. Used

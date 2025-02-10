@@ -333,7 +333,21 @@ public:
             // Adjust based on N previous frame durations, clip, and sleep.
             double fd_average = frame_duration_history_.average();
             double adjust = fd_average - min_frame_time;
-            double clipped_time = clip(sleep_time - adjust, 0, min_frame_time);
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250209 investigate very slow (~2 sec) redraw during pause
+            //               To reproduce: launch, type SPACE, then type 1, 1, 1
+
+//            double clipped_time = clip(sleep_time - adjust, 0, min_frame_time);
+
+            // Provide some minimal sleep time so mouse tracking is not blocked
+            double min_sleep_time = min_frame_time * 0.01;
+            // Adjust sleep time by average of recent frame durations
+            double clipped_time = clip(sleep_time - adjust,
+                                       min_sleep_time,
+                                       min_frame_time);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             int micro_sec = clipped_time * 1000000;
             std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
 

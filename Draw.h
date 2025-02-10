@@ -404,7 +404,12 @@ public:
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }
     void setEnable(bool e) { enable_ = e; }
-    void toggleEnable() { enable_ = not enable_; updateMouseCallbacks(); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250209 investigate very slow (~2 sec) redraw during pause
+    //               To reproduce: launch, type SPACE, then type 1, 1, 1
+//    void toggleEnable() { enable_ = not enable_; updateMouseCallbacks(); }
+    void toggleEnable() { enable_ = not enable_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     bool pollEvents() { return visualizer().PollEvents(); }
   
@@ -617,8 +622,12 @@ public:
     void nextCameraMode()
     {
         camera_mode_ = (camera_mode_ + 1) % camera_mode_max_;
-        updateMouseCallbacks();
-        redrawNeeded();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250209 investigate very slow (~2 sec) redraw during pause
+        //               To reproduce: launch, type SPACE, then type 1, 1, 1
+//        updateMouseCallbacks();
+//        redrawNeeded();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     bool isStaticCameraMode() { return (cameraMode() == 0); }
     bool isFollowCameraMode() { return (cameraMode() == 1); }
@@ -651,7 +660,11 @@ public:
     {
         if (simPause())
         {
-            redrawScene();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250209 investigate very slow (~2 sec) redraw during pause
+            //               To reproduce: launch, type SPACE, then type 1, 1, 1
+//            redrawScene();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             up_memory_.clear();
             from_memory_.clear();
             at_memory_.clear();
@@ -665,7 +678,11 @@ public:
     {
         single_step_mode_ = ssm;
         if (single_step_mode_) { sim_pause_ = true; }
-        updateMouseCallbacks();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250209 investigate very slow (~2 sec) redraw during pause
+        //               To reproduce: launch, type SPACE, then type 1, 1, 1
+//        updateMouseCallbacks();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Runtime switch which the simulation can query to pause itself.
@@ -674,7 +691,11 @@ public:
     void toggleSimPause()
     {
         sim_pause_ = not sim_pause_;
-        updateMouseCallbacks();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250209 investigate very slow (~2 sec) redraw during pause
+        //               To reproduce: launch, type SPACE, then type 1, 1, 1
+//        updateMouseCallbacks();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Runtime counter the simulation can use to change predefined obs sets.
@@ -686,7 +707,12 @@ public:
     // Runtime counter the simulation can use to change selected boid.
     int& selectedBoidIndex() { return selected_boid_index_; }
     int selectedBoidIndex() const { return selected_boid_index_; }
-    void selectNextBoid() { selected_boid_index_ += 1; redrawNeeded(); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250209 investigate very slow (~2 sec) redraw during pause
+    //               To reproduce: launch, type SPACE, then type 1, 1, 1
+//    void selectNextBoid() { selected_boid_index_ += 1; redrawNeeded(); }
+    void selectNextBoid() { selected_boid_index_ += 1; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Set a random per-vertex color brightness (grayscale) for given mesh.
     static void brightnessSpecklePerVertex(double min_brightness,

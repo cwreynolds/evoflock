@@ -127,8 +127,12 @@ private:
             visualizer().RegisterKeyCallback(key, callback);
         };
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250210 did not seem to change the slow response to key cmds.
         // To trigger redraw after key command callback.
-        bool rdakc = true;
+//        bool rdakc = true;
+        bool rdakc = false;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Add single key command callback to toggle "graphics mode"
         rk('G', [&](base_vis_t* vis) { toggleEnable(); return rdakc; });

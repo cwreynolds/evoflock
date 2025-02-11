@@ -340,8 +340,16 @@ public:
 
 //            double clipped_time = clip(sleep_time - adjust, 0, min_frame_time);
 
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250210 is this too short? No, that's not it either.
+
             // Provide some minimal sleep time so mouse tracking is not blocked
-            double min_sleep_time = min_frame_time * 0.01;
+//            double min_sleep_time = min_frame_time * 0.01;
+            double min_sleep_time = min_frame_time * 0.1;
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+            
             // Adjust sleep time by average of recent frame durations
             double clipped_time = clip(sleep_time - adjust,
                                        min_sleep_time,

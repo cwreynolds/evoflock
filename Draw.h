@@ -149,8 +149,20 @@ private:
         // Add "1" command, to set single step mode.
         rk('1', [&](base_vis_t* vis) { setSingleStepMode(); return rdakc; });
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250211 can we detect slow frames after key commands?
+
         // Add "S" command, to cycle selected boid through flock.
-        rk('S', [&](base_vis_t* vis) { selectNextBoid(); return rdakc; });
+//        rk('S', [&](base_vis_t* vis) { selectNextBoid(); return rdakc; });
+        
+        rk('S', [&](base_vis_t* vis)
+        {
+            util::Timer t("key command handler for S key");
+            selectNextBoid();
+            return rdakc;
+        });
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Set mouse scroll and move policies based on current camera mode.
         updateMouseCallbacks();

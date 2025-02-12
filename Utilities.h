@@ -330,6 +330,15 @@ public:
                                                          TimeClock::now());
             // Amount of time to sleep until the end of the current frame.
             double sleep_time = min_frame_time - non_sleep_time;
+            
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20250211 can we detect slow frames after key commands?
+//            if (not between(sleep_time, 0, min_frame_time))
+//            {
+//                std::cout << "sleep_time = " << sleep_time << std::endl;
+//            }
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             // Adjust based on N previous frame durations, clip, and sleep.
             double fd_average = frame_duration_history_.average();
             double adjust = fd_average - min_frame_time;
@@ -356,6 +365,18 @@ public:
                                        min_frame_time);
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250211 can we detect slow frames after key commands?
+            if (not between(sleep_time, 0, min_frame_time))
+            {
+                std::cout << "sleep_time = " << sleep_time << ", ";
+                std::cout << "clipped_time = " << clipped_time << std::endl;
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            
             int micro_sec = clipped_time * 1000000;
             std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
 
@@ -380,6 +401,14 @@ public:
         //    std::cout << "Recent average frame duration = ";
         //    std::cout << frame_duration_history_.average() << std::endl;
         //}
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250211 can we detect slow frames after key commands?
+        if (not between(frame_duration_, 0, frameDuration()))
+        {
+            std::cout << "frame_duration_ = " << frame_duration_ << std::endl;
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
 private:

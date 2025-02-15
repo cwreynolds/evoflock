@@ -224,6 +224,17 @@ inline double time_diff_in_seconds(TimePoint start, TimePoint end)
     return time_duration_in_seconds(dt);
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250214 sleep utility with simple argument: seconds as a double
+
+// Make current thread sleep for the given duration in seconds.
+void thread_sleep_in_seconds(double sleep_time)
+{
+    int micro_seconds = sleep_time * 1000000;
+    std::this_thread::sleep_for(std::chrono::microseconds(micro_seconds));
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 // Simple tool for inline timing sections of code. For example:
 //    void foo()
@@ -377,8 +388,14 @@ public:
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             
-            int micro_sec = clipped_time * 1000000;
-            std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250214 sleep utility with simple argument: seconds as a double
+            
+//            int micro_sec = clipped_time * 1000000;
+//            std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
+            
+            thread_sleep_in_seconds(clipped_time);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             //std::cout << std::endl;
             //std::cout << "fd_average     = " << fd_average << std::endl;

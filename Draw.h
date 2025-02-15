@@ -122,17 +122,16 @@ private:
         visualizer().GetRenderOption().line_width_ = line_width;
         visualizer().GetRenderOption().point_size_ = point_size;
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250214 refactor GUI setup code
+                
         auto rk = [&](int key,std::function<bool(base_vis_t *)> callback)
         {
             visualizer().RegisterKeyCallback(key, callback);
         };
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250210 did not seem to change the slow response to key cmds.
         // To trigger redraw after key command callback.
-//        bool rdakc = true;
         bool rdakc = false;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Add single key command callback to toggle "graphics mode"
         rk('G', [&](base_vis_t* vis) { toggleEnable(); return rdakc; });
@@ -149,23 +148,38 @@ private:
         // Add "1" command, to set single step mode.
         rk('1', [&](base_vis_t* vis) { setSingleStepMode(); return rdakc; });
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         // TODO 20250211 can we detect slow frames after key commands?
 
         // Add "S" command, to cycle selected boid through flock.
 //        rk('S', [&](base_vis_t* vis) { selectNextBoid(); return rdakc; });
         
+//        rk('S', [&](base_vis_t* vis)
+//        {
+//            util::Timer t("key command handler for S key");
+//            selectNextBoid();
+//            return rdakc;
+//        });
+
         rk('S', [&](base_vis_t* vis)
-        {
+           {
+            util::thread_sleep_in_seconds(0.005);
+
             util::Timer t("key command handler for S key");
             selectNextBoid();
             return rdakc;
         });
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-        // Set mouse scroll and move policies based on current camera mode.
-        updateMouseCallbacks();
+//        // Set mouse scroll and move policies based on current camera mode.
+//        updateMouseCallbacks();
+        
+        
+        setupGuiCallbacks();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         
 #endif  // USE_OPEN3D
     }
@@ -730,6 +744,38 @@ public:
     void selectNextBoid() { selected_boid_index_ += 1; }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250214 refactor GUI setup code
+    
+    void setupGuiCallbacks()
+    {
+        typedef base_vis_t vis;
+        // To trigger redraw after key command callback.
+        bool rdakc = false;
+
+        auto rk = [&](int key, std::function<void()> inner_callback)
+        {
+            auto cb = [&](std::function<bool(vis *)>)
+            {
+                inner_callback();
+                return rdakc;
+            };
+
+            // TODO this line gets type error with lambda
+//            visualizer().RegisterKeyCallback(key, cb);
+        };
+        
+        
+        rk('5', [&](){ selectNextBoid(); });
+
+        
+        // Set mouse scroll and move policies based on current camera mode.
+        updateMouseCallbacks();
+
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     // Set a random per-vertex color brightness (grayscale) for given mesh.
     static void brightnessSpecklePerVertex(double min_brightness,
                                            double max_brightness,

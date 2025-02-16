@@ -103,6 +103,13 @@ private:
         assert(global_object_ == nullptr);
         global_object_ = this;
         setEnable(enabled);
+        
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20250215 why doesn't double lambda nested selectNextBoid() work?
+        debugPrint(this);
+        debugPrint(&getInstance());
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
 
 #ifdef USE_OPEN3D
         std::cout << "Begin Open3D (" << OPEN3D_VERSION;
@@ -161,14 +168,42 @@ private:
 //            return rdakc;
 //        });
 
+//        rk('S', [&](base_vis_t* vis)
+//           {
+//            util::thread_sleep_in_seconds(0.005);
+//
+//            util::Timer t("key command handler for S key");
+//            selectNextBoid();
+//            return rdakc;
+//        });
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20250215 ok this is like what is in setupGuiCallbacks() but HERE
+        // it compiles, but appears to do nothing (selected boid does not change) ?!
+        
+//        auto inner_snb = [&](){ selectNextBoid(); };
+        auto inner_snb = [&]()
+        {
+            
+            std::cout << "in inner_snb() ";
+            debugPrint(this);
+            std::cout << "in inner_snb() ";
+            debugPrint(&getInstance());
+
+//            selectNextBoid();
+//            getInstance().selectNextBoid();
+            Draw::getInstance().selectNextBoid();
+        };
+
         rk('S', [&](base_vis_t* vis)
            {
             util::thread_sleep_in_seconds(0.005);
-
             util::Timer t("key command handler for S key");
-            selectNextBoid();
+//            selectNextBoid();
+            inner_snb();
             return rdakc;
         });
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -767,6 +802,16 @@ public:
         
         
         rk('5', [&](){ selectNextBoid(); });
+        
+        
+        
+        auto inner_snb = [&](){ selectNextBoid(); };
+        auto cb_snb = [&](std::function<bool(vis *)>)
+        {
+            inner_snb();
+            return false;
+        };
+//        visualizer().RegisterKeyCallback('&', cb_snb);
 
         
         // Set mouse scroll and move policies based on current camera mode.

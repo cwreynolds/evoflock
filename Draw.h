@@ -78,7 +78,12 @@ private:
     static inline int constructor_count = 0;
     
     // Default constructor
-    Draw() : Draw(false) {}
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250216 why is "THIS not THIS"?
+//    Draw() : Draw(false) {}
+    Draw() : Draw(false)
+    {std::cout<<std::endl<<"CREATE NEW DRAW CONTEXT."<<std::endl<<std::endl;}
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Constructor with args for visualizer window.
     Draw(bool enabled,
@@ -88,6 +93,11 @@ private:
          int line_width = 10,
          int point_size = 20)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250216 why is "THIS not THIS"?
+        std::cout<<std::endl<<"CREATE NEW DRAW CONTEXT."<<std::endl<<std::endl;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         // TODO 20250117 temp override to put viewer in lower right corner
         Vec3 cwr_screen_size(3456, 2234, 0);
         window_xy_size = {1800, 1200, 0};
@@ -104,11 +114,16 @@ private:
         global_object_ = this;
         setEnable(enabled);
         
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20250215 why doesn't double lambda nested selectNextBoid() work?
-        debugPrint(this);
-        debugPrint(&getInstance());
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//        // TODO 20250215 why doesn't double lambda nested selectNextBoid() work?
+//        debugPrint(this);
+//        debugPrint(&getInstance());
+//        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250216 why is "THIS not THIS"?
+        this_not_this();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 #ifdef USE_OPEN3D
@@ -132,28 +147,28 @@ private:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250214 refactor GUI setup code
                 
-        auto rk = [&](int key,std::function<bool(base_vis_t *)> callback)
-        {
-            visualizer().RegisterKeyCallback(key, callback);
-        };
+//        auto rk = [&](int key,std::function<bool(base_vis_t *)> callback)
+//        {
+//            visualizer().RegisterKeyCallback(key, callback);
+//        };
+//
+//        // To trigger redraw after key command callback.
+//        bool rdakc = false;
 
-        // To trigger redraw after key command callback.
-        bool rdakc = false;
-
-        // Add single key command callback to toggle "graphics mode"
-        rk('G', [&](base_vis_t* vis) { toggleEnable(); return rdakc; });
-
-        // Add "C" command, to cycle through camera aiming modes.
-        rk('C', [&](base_vis_t* vis) { nextCameraMode(); return rdakc; });
-
-        // Add " " (space) command, toggles public pause simulation flag.
-        rk(' ', [&](base_vis_t* vis) { toggleSimPause(); return rdakc; });
-
-        // Add "O" command, to increment obstacle set counter.
-        rk('O', [&](base_vis_t* vis) { nextObstacleSet(); return rdakc; });
-
-        // Add "1" command, to set single step mode.
-        rk('1', [&](base_vis_t* vis) { setSingleStepMode(); return rdakc; });
+//        // Add single key command callback to toggle "graphics mode"
+//        rk('G', [&](base_vis_t* vis) { toggleEnable(); return rdakc; });
+//
+//        // Add "C" command, to cycle through camera aiming modes.
+//        rk('C', [&](base_vis_t* vis) { nextCameraMode(); return rdakc; });
+//
+//        // Add " " (space) command, toggles public pause simulation flag.
+//        rk(' ', [&](base_vis_t* vis) { toggleSimPause(); return rdakc; });
+//
+//        // Add "O" command, to increment obstacle set counter.
+//        rk('O', [&](base_vis_t* vis) { nextObstacleSet(); return rdakc; });
+//
+//        // Add "1" command, to set single step mode.
+//        rk('1', [&](base_vis_t* vis) { setSingleStepMode(); return rdakc; });
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         // TODO 20250211 can we detect slow frames after key commands?
@@ -181,30 +196,341 @@ private:
         // TODO 20250215 ok this is like what is in setupGuiCallbacks() but HERE
         // it compiles, but appears to do nothing (selected boid does not change) ?!
         
-//        auto inner_snb = [&](){ selectNextBoid(); };
-        auto inner_snb = [&]()
-        {
-            
-            std::cout << "in inner_snb() ";
-            debugPrint(this);
-            std::cout << "in inner_snb() ";
-            debugPrint(&getInstance());
-
-//            selectNextBoid();
-//            getInstance().selectNextBoid();
-            Draw::getInstance().selectNextBoid();
-        };
-
-        rk('S', [&](base_vis_t* vis)
-           {
-            util::thread_sleep_in_seconds(0.005);
-            util::Timer t("key command handler for S key");
-//            selectNextBoid();
-            inner_snb();
-            return rdakc;
-        });
+//    //        auto inner_snb = [&](){ selectNextBoid(); };
+//            auto inner_snb = [&]()
+//            {
+//
+//    //            std::cout << "in inner_snb() ";
+//    //            debugPrint(this);
+//    //            std::cout << "in inner_snb() ";
+//    //            debugPrint(&getInstance());
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20250216 why is "THIS not THIS"?
+//                //
+//                //    this_not_this():
+//                //    this:
+//                //    0x16f8ab090
+//                //    &getInstance():
+//                //    0x15601ba00
+//
+//                this_not_this();
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//    //            selectNextBoid();
+//    //            getInstance().selectNextBoid();
+//                Draw::getInstance().selectNextBoid();
+//            };
+//
+//            rk('S', [&](base_vis_t* vis)
+//               {
+//                util::thread_sleep_in_seconds(0.005);
+//                util::Timer t("key command handler for S key");
+//    //            selectNextBoid();
+//                inner_snb();
+//                return rdakc;
+//            });
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
+        
+//    //        auto new_rk = [&](int key, std::function<bool(base_vis_t *)> callback)
+//            auto new_rk = [&](int key, std::function<void()> inner_callback)
+//            {
+//                auto cb = [&](base_vis_t* vis)
+//                {
+//                    util::thread_sleep_in_seconds(0.005);
+//                    util::Timer t("key command handler for S key");
+//
+//                    Draw::getInstance().this_not_this();
+//
+//                    inner_callback();
+//                    return rdakc;
+//                };
+//                visualizer().RegisterKeyCallback(key, cb);
+//            };
+//
+//    //        auto inner_snb = [&]()
+//    //        {
+//    //            Draw::getInstance().selectNextBoid();
+//    //        };
+//    //
+//    //        new_rk('S', inner_snb);
+//
+//            new_rk('S', [&]() { Draw::getInstance().selectNextBoid(); });
+
+        
+        
+//    //        auto new_rk = [&](int key, std::function<bool(base_vis_t *)> callback)
+//            auto new_rk = [&](int key, std::function<void()> inner_callback)
+//            {
+//                auto cb = [&](base_vis_t* vis)
+//                {
+//                    util::thread_sleep_in_seconds(0.005);
+//                    util::Timer t("key command handler for S key");
+//
+//                    Draw::getInstance().this_not_this();
+//
+//                    inner_callback();
+//                    return rdakc;
+//                };
+//                visualizer().RegisterKeyCallback(key, cb);
+//            };
+//
+//    //        auto inner_snb = [&]()
+//    //        {
+//    //            Draw::getInstance().selectNextBoid();
+//    //        };
+//    //
+//    //        new_rk('S', inner_snb);
+//
+//            new_rk('S', [&]() { Draw::getInstance().selectNextBoid(); });
+
+        
+        
+        
+        
+        
+//            // Add "S" command, to cycle selected boid through flock.
+//            rk('S', [&](base_vis_t* vis)
+//            {
+//
+//                Draw::getInstance().this_not_this();
+//
+//    //            Draw::getInstance().selectNextBoid();
+//    //            getInstance().selectNextBoid();
+//    //            this->selectNextBoid();
+//
+//                static Draw* draw = this;
+//                draw->selectNextBoid();
+//
+//                return rdakc;
+//            });
+
+        // reverting to yesterday:
+        
+        
+//            auto inner_snb = [&]()
+//            {
+//
+//    //            std::cout << "in inner_snb() ";
+//    //            debugPrint(this);
+//    //            std::cout << "in inner_snb() ";
+//    //            debugPrint(&getInstance());
+//
+//                Draw::getInstance().this_not_this();
+//
+//    //            Draw::getInstance().selectNextBoid();
+//
+//    //            selectNextBoid();
+//    //            getInstance().selectNextBoid();
+//    //            Draw::getInstance().selectNextBoid();
+//
+//                this->selectNextBoid();
+//                Draw::getInstance().selectNextBoid();
+//
+//    //            Draw::getInstance().selectNextBoid();
+//            };
+//
+//            rk('S', [&](base_vis_t* vis)
+//               {
+//                util::thread_sleep_in_seconds(0.005);
+//                util::Timer t("key command handler for S key");
+//    //            selectNextBoid();
+//                inner_snb();
+//                return rdakc;
+//            });
+
+
+//            auto inner_snb = [&]()
+//            {
+//                Draw::getInstance().this_not_this();
+//                this->selectNextBoid();
+//                Draw::getInstance().selectNextBoid();
+//            };
+//
+//            rk('S', [&](base_vis_t* vis)
+//               {
+//    //            util::thread_sleep_in_seconds(0.005);
+//    //            util::Timer t("key command handler for S key");
+//                inner_snb();
+//                return rdakc;
+//            });
+
+        
+//            auto inner_snb = [&]()
+//            {
+//    //            Draw::getInstance().this_not_this();
+//                this->selectNextBoid();
+//                Draw::getInstance().selectNextBoid();
+//            };
+//
+//            rk('S', [&](base_vis_t* vis)
+//               {
+//                inner_snb();
+//                return rdakc;
+//            });
+
+//            auto inner_snb = [&]()
+//            {
+//    //            // This seems to work:
+//    //            this->selectNextBoid();
+//    //            Draw::getInstance().selectNextBoid();
+//
+//    //            // This does not (has long pause)
+//    //            //this->selectNextBoid();
+//    //            Draw::getInstance().selectNextBoid();
+//
+//    //            // This does not (is fast but has no effect!!)
+//    //            this->selectNextBoid();
+//    //            //Draw::getInstance().selectNextBoid();
+//
+//    //            assert(this == &Draw::getInstance());
+//
+//
+//                // Maybe Inner_snb should take one Draw* argument?
+//
+//
+//    //            if (this == &Draw::getInstance())
+//    //            {
+//    //                Draw::getInstance().selectNextBoid();
+//    //            }
+//    //            else
+//    //            {
+//    //                this->selectNextBoid();
+//    //                Draw::getInstance().selectNextBoid();
+//    //
+//    //                std::cout << "this != &Draw::getInstance()" << std::endl;
+//    //                std::cout << this << std::endl;
+//    //                std::cout << &Draw::getInstance() << std::endl;
+//    //            }
+//
+//
+//    //                Draw::getInstance().selectNextBoid();
+//    //
+//    //                if (this == &Draw::getInstance())
+//    //                {
+//    //    //                Draw::getInstance().selectNextBoid();
+//    //                }
+//    //                else
+//    //                {
+//    //    //                this->selectNextBoid();
+//    //    //                Draw::getInstance().selectNextBoid();
+//    //
+//    //                    std::cout << "this != &Draw::getInstance()" << std::endl;
+//    //                    std::cout << this << std::endl;
+//    //                    std::cout << &Draw::getInstance() << std::endl;
+//    //                }
+//
+//    //            Draw::getInstance().selectNextBoid();
+//
+//
+//
+//    //                if (this == &Draw::getInstance())
+//    //                {
+//    //                    Draw::getInstance().selectNextBoid();
+//    //                }
+//    //                else
+//    //                {
+//    //    //                this->selectNextBoid();
+//    //                    Draw::getInstance().selectNextBoid();
+//    //                    this->selectNextBoid();
+//    //                }
+//
+//
+//    //                Draw::getInstance().selectNextBoid();
+//    //
+//    //                if (this != &Draw::getInstance())
+//    //    //                {
+//    //    //    //                Draw::getInstance().selectNextBoid();
+//    //    //                }
+//    //    //                else
+//    //                {
+//    //    //                Draw::getInstance().selectNextBoid();
+//    //                    this->selectNextBoid();
+//    //                }
+//
+//
+//
+//                Draw::getInstance().selectNextBoid();
+//                if (this != &Draw::getInstance()) { this->selectNextBoid(); }
+//
+//            };
+        
+        
+//    //        auto inner_snb = [&]()
+//    //        auto inner_snb = [&](Draw& draw)
+//            auto inner_snb = [&](Draw* draw)
+//            {
+//    //            draw.selectNextBoid();
+//                draw->selectNextBoid();
+//            };
+//
+//            rk('S', [&](base_vis_t* vis)
+//               {
+//
+//    //            inner_snb();
+//
+//    //            inner_snb(Draw::getInstance());
+//    //            if (this != &Draw::getInstance()) { inner_snb(*this); }
+//
+//    //            inner_snb(&Draw::getInstance());
+//    //            if (this != &Draw::getInstance()) { inner_snb(this); }
+//
+//                inner_snb(&Draw::getInstance());
+//                inner_snb(this);
+//
+//
+//                return rdakc;
+//            });
+
+
+//        auto inner_snb = [&](Draw* draw)
+//        {
+//            draw->selectNextBoid();
+//        };
+        
+//            rk('S', [&](base_vis_t* vis)
+//               {
+//
+//    //            inner_snb();
+//
+//    //            inner_snb(Draw::getInstance());
+//    //            if (this != &Draw::getInstance()) { inner_snb(*this); }
+//
+//    //            inner_snb(&Draw::getInstance());
+//    //            if (this != &Draw::getInstance()) { inner_snb(this); }
+//
+//    //            inner_snb(&Draw::getInstance());
+//    //            inner_snb(this);
+//
+//
+//
+//    //            Draw::getInstance().selectNextBoid();
+//    //            if (this != &Draw::getInstance()) { this->selectNextBoid(); }
+//
+//                Draw::getInstance().selectNextBoid();
+//                this->selectNextBoid();
+//
+//
+//                return rdakc;
+//            });
+
+        
+//            // TODO 20250216 OH!! this "two Draw contexts get launched" bug was why
+//            //     I switched over to using the CMAKE build instead of Xcode build!!
+//
+//            rk('S', [&](base_vis_t* vis)
+//               {
+//    //            Draw::getInstance().selectNextBoid();
+//    //            this->selectNextBoid();
+//                selectNextBoid();
+//                return rdakc;
+//            });
+
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+        
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 //        // Set mouse scroll and move policies based on current camera mode.
@@ -220,6 +546,18 @@ private:
     }
 
 public:
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250216 why is "THIS not THIS"?
+    void this_not_this() const
+    {
+        std::cout << std::endl << "this_not_this():" << std::endl;
+        std::cout << "this:" << std::endl << this << std::endl;
+        std::cout << "&getInstance():" << std::endl << &getInstance();
+        std::cout << std::endl << std::endl;
+
+        assert(this == &getInstance());
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     ~Draw()
     {
@@ -782,42 +1120,229 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250214 refactor GUI setup code
     
+//        void setupGuiCallbacks()
+//        {
+//            typedef base_vis_t vis;
+//            // To trigger redraw after key command callback.
+//            bool rdakc = false;
+//
+//            auto rk = [&](int key, std::function<void()> inner_callback)
+//            {
+//                auto cb = [&](std::function<bool(vis *)>)
+//                {
+//                    inner_callback();
+//                    return rdakc;
+//                };
+//
+//                // TODO this line gets type error with lambda
+//    //            visualizer().RegisterKeyCallback(key, cb);
+//            };
+//
+//
+//            rk('5', [&](){ selectNextBoid(); });
+//
+//
+//
+//            auto inner_snb = [&](){ selectNextBoid(); };
+//            auto cb_snb = [&](std::function<bool(vis *)>)
+//            {
+//                inner_snb();
+//                return false;
+//            };
+//    //        visualizer().RegisterKeyCallback('&', cb_snb);
+//
+//
+//
+//
+//
+//
+//            // Set mouse scroll and move policies based on current camera mode.
+//            updateMouseCallbacks();
+//
+//        }
+    
+    
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250216 OH!! this "two Draw contexts get launched" bug was why
+    //     I switched over to using the CMAKE build instead of Xcode build!!
+    
+    
+    
+    
+//            void setupGuiCallbacks()
+//            {
+//    //            typedef base_vis_t vis;
+//                // To trigger redraw after key command callback.
+//                bool rdakc = false;
+//
+//    //            auto rk = [&](int key, std::function<void()> inner_callback)
+//    //            {
+//    //                auto cb = [&](std::function<bool(base_vis_t * v)>)
+//    //                {
+//    //                    inner_callback();
+//    //                    return rdakc;
+//    //                };
+//    //
+//    //                // TODO this line gets type error with lambda
+//    //                visualizer().RegisterKeyCallback(key, cb);
+//    //            };
+//    //
+//    //
+//    //            rk('5', [&](){ selectNextBoid(); });
+//    //
+//    //
+//    //
+//    //            auto inner_snb = [&](){ selectNextBoid(); };
+//    //            auto cb_snb = [&](std::function<bool(vis *)>)
+//    //            {
+//    //                inner_snb();
+//    //                return false;
+//    //            };
+//    //    //        visualizer().RegisterKeyCallback('&', cb_snb);
+//
+//
+//                auto rk = [&](int key,std::function<bool(base_vis_t *)> callback)
+//                {
+//                    visualizer().RegisterKeyCallback(key, callback);
+//                };
+//
+//
+//
+//                rk('S', [&](base_vis_t* vis) { selectNextBoid(); return rdakc; });
+//
+//
+//                // Set mouse scroll and move policies based on current camera mode.
+//                updateMouseCallbacks();
+//
+//            }
+//
+
+    
+//            void setupGuiCallbacks()
+//            {
+//                // To trigger redraw after key command callback.
+//                bool rdakc = false;
+//                typedef base_vis_t vis;
+//
+//    //            auto rk = [&](int key,std::function<bool(base_vis_t *)> callback)
+//                auto rk = [&](int key,std::function<bool(vis *)> callback)
+//                {
+//                    visualizer().RegisterKeyCallback(key, callback);
+//                };
+//
+//    //            rk('S', [&](base_vis_t* vis) { selectNextBoid(); return rdakc; });
+//                rk('S', [&](vis* v) { selectNextBoid(); return rdakc; });
+//
+//
+//                // Set mouse scroll and move policies based on current camera mode.
+//                updateMouseCallbacks();
+//
+//            }
+    
+//        void setupGuiCallbacks()
+//        {
+//            // To trigger redraw after key command callback.
+//            bool rdakc = false;
+//            // Abbreviated name for unused Visualizer class.
+//            typedef base_vis_t vis;
+//            // Register a key command.
+//            auto rk = [&](int key,std::function<bool(vis *)> callback)
+//            {
+//                visualizer().RegisterKeyCallback(key, callback);
+//            };
+//
+//    //        // Register a key command.
+//    //        auto rk = [&](int key,std::function<void(void)> inner_callback)
+//    //        {
+//    //            auto callback = [&](vis* v)
+//    //            {
+//    //                inner_callback();
+//    //                return rdakc;
+//    //            };
+//    //            visualizer().RegisterKeyCallback(key, callback);
+//    //        };
+//
+//            // Add single key command callback to toggle "graphics mode"
+//            rk('G', [&](vis* v) { toggleEnable(); return rdakc; });
+//
+//            // Add "C" command, to cycle through camera aiming modes.
+//            rk('C', [&](vis* v) { nextCameraMode(); return rdakc; });
+//
+//            // Add " " (space) command, toggles public pause simulation flag.
+//            rk(' ', [&](vis* v) { toggleSimPause(); return rdakc; });
+//
+//            // Add "O" command, to increment obstacle set counter.
+//            rk('O', [&](vis* v) { nextObstacleSet(); return rdakc; });
+//
+//            // Add "1" command, to set single step mode.
+//            rk('1', [&](vis* v) { setSingleStepMode(); return rdakc; });
+//
+//            // Add "S" command, to cycle selected boid through flock.
+//            rk('S', [&](vis* v) { selectNextBoid(); return rdakc; });
+//
+//    //        // Add single key command callback to toggle "graphics mode"
+//    //        rk('G', [&](){ toggleEnable(); });
+//    //
+//    //        // Add "C" command, to cycle through camera aiming modes.
+//    //        rk('C', [&](){ nextCameraMode(); });
+//    //
+//    //        // Add " " (space) command, toggles public pause simulation flag.
+//    //        rk(' ', [&](){ toggleSimPause(); });
+//    //
+//    //        // Add "O" command, to increment obstacle set counter.
+//    //        rk('O', [&](){ nextObstacleSet(); });
+//    //
+//    //        // Add "1" command, to set single step mode.
+//    //        rk('1', [&](){ setSingleStepMode(); });
+//    //
+//    //        // Add "S" command, to cycle selected boid through flock.
+//    //        rk('S', [&](){ selectNextBoid(); });
+//
+//            // Set mouse scroll and move policies based on current camera mode.
+//            updateMouseCallbacks();
+//        }
+
+    
     void setupGuiCallbacks()
     {
-        typedef base_vis_t vis;
         // To trigger redraw after key command callback.
-        bool rdakc = false;
-
-        auto rk = [&](int key, std::function<void()> inner_callback)
+//        bool rdakc = false;
+        bool rd = false;
+        // Abbreviated name for unused Visualizer class.
+        typedef base_vis_t vis;
+        // Register a key command.
+        auto rk = [&](int key,std::function<bool(vis *)> callback)
         {
-            auto cb = [&](std::function<bool(vis *)>)
-            {
-                inner_callback();
-                return rdakc;
-            };
-
-            // TODO this line gets type error with lambda
-//            visualizer().RegisterKeyCallback(key, cb);
+            visualizer().RegisterKeyCallback(key, callback);
         };
-        
-        
-        rk('5', [&](){ selectNextBoid(); });
-        
-        
-        
-        auto inner_snb = [&](){ selectNextBoid(); };
-        auto cb_snb = [&](std::function<bool(vis *)>)
-        {
-            inner_snb();
-            return false;
-        };
-//        visualizer().RegisterKeyCallback('&', cb_snb);
 
+        // Add single key command callback to toggle "graphics mode"
+        rk('G', [&](vis* v) { toggleEnable(); return rd; });
         
+        // Add "C" command, to cycle through camera aiming modes.
+        rk('C', [&](vis* v) { nextCameraMode(); return rd; });
+        
+        // Add " " (space) command, toggles public pause simulation flag.
+        rk(' ', [&](vis* v) { toggleSimPause(); return rd; });
+        
+        // Add "O" command, to increment obstacle set counter.
+        rk('O', [&](vis* v) { nextObstacleSet(); return rd; });
+        
+        // Add "1" command, to set single step mode.
+        rk('1', [&](vis* v) { setSingleStepMode(); return rd; });
+
+        // Add "S" command, to cycle selected boid through flock.
+        rk('S', [&](vis* v) { selectNextBoid(); return rd; });
+
         // Set mouse scroll and move policies based on current camera mode.
         updateMouseCallbacks();
-
     }
+
+
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     

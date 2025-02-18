@@ -123,6 +123,7 @@ private:
                                             window_xy_position_ul.x(),
                                             window_xy_position_ul.y());
         // TODO does not work, see https://github.com/isl-org/Open3D/issues/6952
+        // (See also replacement/work-around: addThickLineToAnimatedFrame())
         visualizer().GetRenderOption().line_width_ = line_width;
         visualizer().GetRenderOption().point_size_ = point_size;
         
@@ -449,12 +450,11 @@ public:
         if (isWingmanCameraMode()) { animateWingmanCamera(); }
         if (isStaticCameraMode()) { animateStaticCamera(); }
     }
-    
 
     // Invoke the "follow camera" model, update look_from/look_at/up and camera.
     void animateFollowCamera()
     {
-        Vec3 camera_pos = camera().p();
+        Vec3 camera_pos = cameraLookFrom();
         Vec3 offset_from_camera_to_target = aimAgent().position() - camera_pos;
         Vec3 offset_direction = offset_from_camera_to_target.normalize_or_0();
         Vec3 target_offset = offset_direction * cameraDesiredOffsetDistance();
@@ -466,7 +466,7 @@ public:
         cameraLookUp()   =   up_memory_.blend(new_up,   0.97).normalize();
         setCameraByFromAtUp();
     }
-        
+
     // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
     void animateWingmanCamera()
     {
@@ -494,7 +494,8 @@ public:
                                       cameraLookUp());
     }
 
-    void updateMouseScrollCallback()
+    // Set mouse scroll wheel handler for GUI.
+    void setMouseScrollCallback()
     {
         auto mscb = [&](base_vis_t* vis, double x, double y)
         {
@@ -508,7 +509,8 @@ public:
         visualizer().RegisterMouseScrollCallback(mscb);
     }
 
-    void updateMouseMoveCallback()
+    // Set mouse move handler for GUI.
+    void setMouseMoveCallback()
     {
         std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
         {
@@ -517,9 +519,7 @@ public:
                 Vec3 new_pos_pixels(x, y, 0);
                 Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
                 double mouse_move_pixels = offset_pixels.length();
-                if ((isStaticCameraMode() or isWingmanCameraMode()) and
-                    (mouse_move_pixels < 50) and
-                    left_mouse_button_down_)
+                if (left_mouse_button_down_ and (mouse_move_pixels < 50))
                 {
                     double speed = 0.01;
                     double nx = offset_pixels.x() * speed;
@@ -546,8 +546,9 @@ public:
         }
         visualizer().RegisterMouseMoveCallback(mmcb);
     }
-        
-    void updateButtonCallback()
+
+    // Set mouse button handler for GUI.
+    void setMouseButtonCallback()
     {
         auto mbcb = [&](base_vis_t *, int button, int action, int mods)
         {
@@ -557,12 +558,12 @@ public:
         visualizer().RegisterMouseButtonCallback(mbcb);
     }
 
-    // Update all mouse callback function in case relevant state has changed.
-    void updateMouseCallbacks()
+    // Set mouse move/scroll/button handlers for GUI.
+    void setMouseCallbacks()
     {
-        updateMouseScrollCallback();
-        updateMouseMoveCallback();
-        updateButtonCallback();
+        setMouseMoveCallback();
+        setMouseScrollCallback();
+        setMouseButtonCallback();
     }
 
     // TODO 20241225 mock up mouse position for camera position control
@@ -614,20 +615,6 @@ public:
         return ok_to_run;
     }
     
-    // Called to trigger a scene redraw when simulation is paused. Currently
-    // called when camera-mode or selected_agent is changed, to make sure a
-    // redraw happens even if the simulation is paused.
-    // TODO ideally it would trigger ONLY the redraw and not a single sim step.
-    void redrawNeeded()
-    {
-        if (simPause())
-        {
-            up_memory_.clear();
-            from_memory_.clear();
-            at_memory_.clear();
-        }
-    }
-    
     // Single step mode means simulation should take one step, then pause again.
     bool& getSingleStepMode() { return single_step_mode_; }
     bool getSingleStepMode() const { return single_step_mode_; }
@@ -656,10 +643,10 @@ public:
     // Called in constructor to set up the various key cmd and mouse callbacks.
     void setupGuiCallbacks()
     {
-        // Abbreviated name for unused Visualizer class.
-        typedef base_vis_t vis;
         // If "rv" is true, requests redraw after key command callback.
         bool rv = false;
+        // Abbreviated name for unused Visualizer class.
+        typedef base_vis_t vis;
         // Register a key command.
         auto rk = [&](int key,std::function<bool(vis *)> callback)
         {
@@ -684,8 +671,8 @@ public:
         // Add "S" command, to cycle selected boid through flock.
         rk('S', [&](vis* v) { selectNextBoid(); return rv; });
 
-        // Set mouse scroll and move policies based on current camera mode.
-        updateMouseCallbacks();
+        // Set mouse move/scroll/button handlers.
+        setMouseCallbacks();
     }
 
     // Set a random per-vertex color brightness (grayscale) for given mesh.

@@ -37,7 +37,8 @@ private:
     BoidPtrList boids_;
     ObstaclePtrList obstacles_;
     BoidInstanceList boid_instance_list_;
-    util::AnimationTimer animation_timer;
+//    util::AnimationTimer animation_timer;
+    util::AnimationTimer animation_timer_;
 
     // TODO Parameters that may (or may not?) be better kept separate from FP.
     int boid_count_ = 200;
@@ -81,8 +82,10 @@ public:
     Draw& draw() { return Draw::getInstance(); }
     const Draw& draw() const { return Draw::getInstance(); }
 
-    util::AnimationTimer& aTimer() { return animation_timer; }
-    const util::AnimationTimer& aTimer() const { return animation_timer; }
+//    util::AnimationTimer& aTimer() { return animation_timer; }
+//    const util::AnimationTimer& aTimer() const { return animation_timer; }
+    util::AnimationTimer& aTimer() { return animation_timer_; }
+    const util::AnimationTimer& aTimer() const { return animation_timer_; }
 
     double max_simulation_steps() const { return max_simulation_steps_; }
     void set_max_simulation_steps(double mss) { max_simulation_steps_ = mss; }
@@ -109,7 +112,9 @@ public:
     //               the enclosing EvertedSphereObstacle. The OccupancyMap
     //               should probably be constructed much later, perhaps in run()
     shape::OccupancyMap occupancy_map;
-    Flock() : occupancy_map(Vec3(25, 25, 25), Vec3(100, 100, 100), Vec3())
+    Flock()
+      : occupancy_map(Vec3(25, 25, 25), Vec3(100, 100, 100), Vec3()),
+        animation_timer_(fixed_fps())
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
     }

@@ -224,16 +224,12 @@ inline double time_diff_in_seconds(TimePoint start, TimePoint end)
     return time_duration_in_seconds(dt);
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250214 sleep utility with simple argument: seconds as a double
-
 // Make current thread sleep for the given duration in seconds.
 void thread_sleep_in_seconds(double sleep_time)
 {
     int micro_seconds = sleep_time * 1000000;
     std::this_thread::sleep_for(std::chrono::microseconds(micro_seconds));
 }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 // Simple tool for inline timing sections of code. For example:
@@ -318,8 +314,16 @@ private:
 class AnimationTimer
 {
 public:
-    AnimationTimer()
-      : frame_start_time_(TimeClock::now()), frame_duration_history_(5) {}
+//    AnimationTimer()
+//      : frame_start_time_(TimeClock::now()), frame_duration_history_(5) {}
+
+    AnimationTimer() : AnimationTimer(60) {}
+
+    AnimationTimer(int frames_per_second)
+      : frame_start_time_(TimeClock::now()),
+        frame_duration_history_(5),
+        frames_per_second_(frames_per_second)
+    {}
 
     // Measured duration of the previous frame. Used as the simulation time step
     // for the current frame. I think that off-by-one delay is inevitable.
@@ -341,61 +345,17 @@ public:
                                                          TimeClock::now());
             // Amount of time to sleep until the end of the current frame.
             double sleep_time = min_frame_time - non_sleep_time;
-            
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20250211 can we detect slow frames after key commands?
-//            if (not between(sleep_time, 0, min_frame_time))
-//            {
-//                std::cout << "sleep_time = " << sleep_time << std::endl;
-//            }
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            // Adjust based on N previous frame durations, clip, and sleep.
+            // Adjust based on N previous frame durations
             double fd_average = frame_duration_history_.average();
             double adjust = fd_average - min_frame_time;
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250209 investigate very slow (~2 sec) redraw during pause
-            //               To reproduce: launch, type SPACE, then type 1, 1, 1
-
-//            double clipped_time = clip(sleep_time - adjust, 0, min_frame_time);
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250210 is this too short? No, that's not it either.
-
-            // Provide some minimal sleep time so mouse tracking is not blocked
-//            double min_sleep_time = min_frame_time * 0.01;
-            double min_sleep_time = min_frame_time * 0.1;
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-            
+            // Provide some minimal sleep time for multithreading.
+            double min_sleep_time = min_frame_time * 0.01;
             // Adjust sleep time by average of recent frame durations
             double clipped_time = clip(sleep_time - adjust,
                                        min_sleep_time,
                                        min_frame_time);
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250211 can we detect slow frames after key commands?
-            if (not between(sleep_time, 0, min_frame_time))
-            {
-                std::cout << "sleep_time = " << sleep_time << ", ";
-                std::cout << "clipped_time = " << clipped_time << std::endl;
-            }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250214 sleep utility with simple argument: seconds as a double
-            
-//            int micro_sec = clipped_time * 1000000;
-//            std::this_thread::sleep_for(std::chrono::microseconds(micro_sec));
-            
+            // Sleep for that clipped interval.
             thread_sleep_in_seconds(clipped_time);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             //std::cout << std::endl;
             //std::cout << "fd_average     = " << fd_average << std::endl;
@@ -413,24 +373,48 @@ public:
         frame_counter_ += 1;
         frame_duration_history_.insert(frame_duration_);
         
+//        // TODO something like if the frame time is > 200%, clear history.
+//        double duration_target = 1.0 / frames_per_second_;
+//        if (frame_duration_ > (2 * duration_target))
+//        {
+//            std::cout << "frame_duration_history_.average() = ";
+//            std::cout << frame_duration_history_.average() << std::endl;
+//            frame_duration_history_.fill(duration_target);
+//        }
+        
+//            // TODO something like if the frame time is > 200%, clear history.
+//            double frame_duration_target = 1.0 / frames_per_second_;
+//            if (frame_duration_ > (2 * frame_duration_target))
+//            {
+//    //            std::cout << "frame_duration_history_.average() = ";
+//    //            std::cout << frame_duration_history_.average() << std::endl;
+//    //            frame_duration_history_.fill(frame_duration_target);
+//                resetHistory();
+//            }
+
+        // If frame time is twice the target duration, reset smoothing history.
+        if (frame_duration_ > (2 * frameDurationTarget())) { resetHistory(); }
+
         //if (0 == (frame_counter_ % 100))
         //{
         //    std::cout << "Recent average frame duration = ";
         //    std::cout << frame_duration_history_.average() << std::endl;
         //}
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250211 can we detect slow frames after key commands?
-        if (not between(frame_duration_, 0, frameDuration()))
-        {
-            std::cout << "frame_duration_ = " << frame_duration_ << std::endl;
-        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
+    
+    void resetHistory()
+    {
+        std::cout << "frame_duration_history_.average() = ";
+        std::cout << frame_duration_history_.average() << std::endl;
+        frame_duration_history_.fill(frameDurationTarget());
+    }
+    
+    double frameDurationTarget() const { return 1.0 / frames_per_second_; }
 
 private:
     TimePoint frame_start_time_;
     int frame_counter_ = 0;      // Total number of frames so far.
+    int frames_per_second_ = 0;
     double frame_duration_ = 0;  // Duration of frame, measured in seconds.
     double sleep_time_ = 0;      // Per frame sleep time, updated each frame.
     RollingAverage<double> frame_duration_history_;  // Last N frame durations.

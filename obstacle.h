@@ -35,8 +35,37 @@ public:
                                   const Vec3& tangent,
                                   double body_radius) const {return Vec3();}
 
-    virtual Vec3 normal_at_poi(const Vec3& poi,
-                               const Vec3& agent_position) const {return Vec3();}
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250219 experimental version to enforce constraint
+    // Maybe these should be called normal(poi) and normal_toward_agent(poi, p)
+
+    // TODO this is the "legacy API"
+    
+    virtual Vec3 normal_at_poi(const Vec3& poi, const Vec3& agent_position) const
+    {
+        std::cout << "unimplemented normal_at_poi()" << std::endl;
+        return Vec3();
+    }
+    
+    
+    // TODO these are the "new API"
+    
+    // Abstract normal for a given position. Points toward the +SDF side.
+    virtual Vec3 normal(const Vec3& poi) const
+    {
+        std::cout << "unimplemented normal()" << std::endl;
+        return Vec3();
+    }
+    
+    // Normal for a given position. Points toward side agent is on..
+    virtual Vec3 normal_toward_agent(const Vec3& poi,
+                                     const Vec3& agent_position) const
+    {
+        std::cout << "unimplemented normal_toward_agent()" << std::endl;
+        return Vec3();
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Point on surface of obstacle nearest the given query_point.
     virtual Vec3 nearest_point(const Vec3& query_point) const { return Vec3(); }
@@ -99,6 +128,47 @@ public:
         }
         return violation;
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250219 experimental version to enforce constraint
+    
+    // Detects constraint violation. (For example being inside an Obstacle with
+    // ExcludeFrom::inside.) When found, computes a new agent position which
+    // does not violate the constraint. Caller should compare value passed into
+    // "agent_position" with the returned value. If equal, the agent is fine.
+    // Otherwise the agent's position should be set to the value returned, and
+    // its speed set to zero.
+    
+    virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
+    {
+        Vec3 result = agent_position;
+        ExcludeFrom ef = getExcludeFrom();
+        double sdf = signed_distance(agent_position);
+        // Is constraint violated?
+        if (((sdf < 0) and (ef == inside)) or
+            ((sdf > 0) and (ef == outside)))
+        {
+            Vec3 surface_point = nearest_point(agent_position);
+//            Vec3 normal = normal_at_poi(agent_position, agent_position);
+//            Vec3 offset = normal * (signum(sdf) + agent_radius);
+            
+//            Vec3 offset = normal(agent_position) * -(signum(sdf) + agent_radius);
+//            Vec3 offset = (normal(agent_position) * (1 + agent_radius)
+//                           -(signum(sdf) + ));
+
+            Vec3 offset = (normal_toward_agent(agent_position, agent_position) *
+                           -agent_radius);
+            
+            result = surface_point + offset;
+        }
+        return result;
+    }
+    
+    // Historical signum function for local use in this class. (Move to util?)
+    static double signum(double x) { return x > 0 ? 1 : (x < 0 ? -1 : 0); }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 private:
     ExcludeFrom exclude_from_ = neither;
@@ -135,6 +205,12 @@ public:
         return shape::ray_sphere_intersection(origin, tangent, radius(), center());
     }
     
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250219 experimental version to enforce constraint
+        
+    // TODO this is the "legacy API"
+
     // Normal to the obstacle at a given point of interest.
     Vec3 normal_at_poi(const Vec3& poi,
                        const Vec3& agent_position) const override
@@ -145,6 +221,89 @@ public:
         double sign = agent_to_surface_signed_dist < 0 ? 1 : -1;
         return perp_direction * sign;
     }
+    
+    
+    // TODO these are the "new API"
+
+    //
+    //    // Abstract normal for a given position. Points toward the +SDF side.
+    //    virtual Vec3 normal(const Vec3& poi) const { return Vec3(); }
+    //
+
+//        Vec3 normal(const Vec3& poi) const override
+//        {
+//            Vec3 perp_direction = (center() - poi).normalize();
+//    //        double agent_to_surface_signed_dist = signed_distance(agent_position);
+//    //        // TODO clean up, with signum? ~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //        double sign = agent_to_surface_signed_dist < 0 ? 1 : -1;
+//            return perp_direction;
+//        }
+
+//        Vec3 normal(const Vec3& poi) const override
+//        {
+//    //        Vec3 perp_direction = (center() - poi).normalize();
+//    //        return perp_direction;
+//            return (center() - poi).normalize();
+//        }
+
+    // Abstract normal for a given position. Points toward the +SDF side.
+    Vec3 normal(const Vec3& poi) const override
+    {
+        return (poi - center()).normalize();
+    }
+
+    
+    //    // Normal for a given position. Points toward side agent is on..
+    //    virtual Vec3 normal_toward_agent(const Vec3& poi,
+    //                                     const Vec3& agent_position) const
+    //    {
+    //        return Vec3();
+    //    }
+
+//        // Normal for a given position. Points toward side agent is on..
+//        Vec3 normal_toward_agent(const Vec3& poi,
+//                                 const Vec3& agent_position) const override
+//        {
+//    //        Vec3 perp_direction = (center() - poi).normalize();
+//    //        double agent_to_surface_signed_dist = signed_distance(agent_position);
+//    //        // TODO clean up, with signum? ~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //        double sign = agent_to_surface_signed_dist < 0 ? 1 : -1;
+//    //        return perp_direction * sign;
+//
+//            Vec3 normal = normal(poi);
+//
+//            double agent_sdf = signed_distance(agent_position);
+//
+//            return normal * signum(agent_sdf);
+//        }
+
+//    // Normal for a given position. Points toward side agent is on..
+//    Vec3 normal_toward_agent(const Vec3& poi,
+//                             const Vec3& agent_position) const override
+//    {
+//        Vec3 normal = normal(poi);
+//        double agent_sdf = signed_distance(agent_position);
+//        return normal * signum(agent_sdf);
+//    }
+
+//        // Normal for a given position. Points toward side agent is on..
+//        Vec3 normal_toward_agent(const Vec3& poi,
+//                                 const Vec3& agent_position) const override
+//        {
+//    //        Vec3 normal = normal(poi);
+//    //        double agent_sdf = signed_distance(agent_position);
+//            return normal(poi) * signum(signed_distance(agent_position));
+//        }
+
+    // Normal for a given position. Points toward side agent is on..
+    Vec3 normal_toward_agent(const Vec3& poi,
+                             const Vec3& agent_position) const override
+    {
+        return normal(poi) * signum(signed_distance(agent_position));
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
     // Point on surface of obstacle nearest the given query_point.
     Vec3 nearest_point(const Vec3& query_point) const override
@@ -529,6 +688,17 @@ inline void Obstacle::unit_test()
     assert(not po_ef_outside.constraintViolation(poip, Vec3::none()));
     assert(not po_ef_inside.constraintViolation(poop, Vec3::none()));
     assert(po_ef_outside.constraintViolation(poop, Vec3::none()));
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250219 experimental version to enforce constraint
+        
+    assert(signum( 5.0) ==  1.0);
+    assert(signum( 0.5) ==  1.0);
+    assert(signum( 0.0) ==  0.0);
+    assert(signum(-0.5) == -1.0);
+    assert(signum(-5.0) == -1.0);
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 typedef std::vector<Obstacle*> ObstaclePtrList;

@@ -323,6 +323,30 @@ public:
     {
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250219 experimental version to enforce constraint
+        
+//        for_all_boids([&](Boid* b)
+//                      { if (EF::RS().randomBool(0.01))  { b->setSpeed(0); } });
+
+        auto test_obs_constraint = [&](Boid* b)
+        {
+            CollisionList cl = b->get_predicted_obstacle_collisions();
+            for (auto& cl : b->get_predicted_obstacle_collisions())
+            {
+                Obstacle* o = cl.obstacle;
+                Vec3 ec = o->enforceConstraint(b->position(), fp().body_radius);
+                
+                if (ec != b->position())
+                {
+                    b->setSpeed(0);
+                    b->setPosition(ec);
+                }
+            }
+        };
+        for_all_boids(test_obs_constraint);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         collect_flock_metrics();
     }
     

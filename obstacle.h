@@ -43,7 +43,7 @@ public:
     
     virtual Vec3 normal_at_poi(const Vec3& poi, const Vec3& agent_position) const
     {
-        std::cout << "unimplemented normal_at_poi()" << std::endl;
+        unimplemented("normal_at_poi()");
         return Vec3();
     }
     
@@ -53,7 +53,7 @@ public:
     // Abstract normal for a given position. Points toward the +SDF side.
     virtual Vec3 normal(const Vec3& poi) const
     {
-        std::cout << "unimplemented normal()" << std::endl;
+        unimplemented("normal()");
         return Vec3();
     }
     
@@ -61,7 +61,7 @@ public:
     virtual Vec3 normal_toward_agent(const Vec3& poi,
                                      const Vec3& agent_position) const
     {
-        std::cout << "unimplemented normal_toward_agent()" << std::endl;
+        unimplemented("normal_toward_agent()");
         return Vec3();
     }
     
@@ -139,36 +139,99 @@ public:
     // Otherwise the agent's position should be set to the value returned, and
     // its speed set to zero.
     
+//        virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
+//        {
+//            Vec3 result = agent_position;
+//            ExcludeFrom ef = getExcludeFrom();
+//            double sdf = signed_distance(agent_position);
+//            // Is constraint violated?
+//            if (((sdf < 0) and (ef == inside)) or
+//                ((sdf > 0) and (ef == outside)))
+//            {
+//                Vec3 surface_point = nearest_point(agent_position);
+//    //            Vec3 normal = normal_at_poi(agent_position, agent_position);
+//    //            Vec3 offset = normal * (signum(sdf) + agent_radius);
+//
+//    //            Vec3 offset = normal(agent_position) * -(signum(sdf) + agent_radius);
+//    //            Vec3 offset = (normal(agent_position) * (1 + agent_radius)
+//    //                           -(signum(sdf) + ));
+//
+//                Vec3 offset = (normal_toward_agent(agent_position, agent_position) *
+//                               -agent_radius);
+//
+//                result = surface_point + offset;
+//            }
+//            return result;
+//        }
+    
+//        virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
+//        {
+//            Vec3 result = agent_position;
+//            ExcludeFrom ef = getExcludeFrom();
+//            double sdf = signed_distance(agent_position);
+//            // Is constraint violated?
+//            if (((sdf < 0) and (ef == inside)) or
+//                ((sdf > 0) and (ef == outside)))
+//            {
+//                Vec3 surface_point = nearest_point(agent_position);
+//    //            Vec3 offset = (normal_toward_agent(agent_position, agent_position) *
+//    //                           -agent_radius);
+//    //            result = surface_point + offset;
+//
+//                Vec3 nta = normal_toward_agent(agent_position, agent_position);
+//                result = surface_point + (nta * -agent_radius);
+//            }
+//            return result;
+//        }
+
+//        virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
+//        {
+//            Vec3 result = agent_position;
+//            ExcludeFrom ef = getExcludeFrom();
+//            double sdf = signed_distance(agent_position);
+//            // Is constraint violated?
+//    //        if (((sdf < 0) and (ef == inside)) or
+//    //            ((sdf > 0) and (ef == outside)))
+//            if (((sdf < +agent_radius) and (ef == inside)) or
+//                ((sdf > -agent_radius) and (ef == outside)))
+//            {
+//                Vec3 surface_point = nearest_point(agent_position);
+//                Vec3 nta = normal_toward_agent(agent_position, agent_position);
+//                result = surface_point + (nta * -agent_radius);
+//            }
+//            return result;
+//        }
+
     virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
     {
         Vec3 result = agent_position;
         ExcludeFrom ef = getExcludeFrom();
         double sdf = signed_distance(agent_position);
         // Is constraint violated?
-        if (((sdf < 0) and (ef == inside)) or
-            ((sdf > 0) and (ef == outside)))
+        if (((sdf < +agent_radius) and (ef == inside)) or
+            ((sdf > -agent_radius) and (ef == outside)))
         {
             Vec3 surface_point = nearest_point(agent_position);
-//            Vec3 normal = normal_at_poi(agent_position, agent_position);
-//            Vec3 offset = normal * (signum(sdf) + agent_radius);
-            
-//            Vec3 offset = normal(agent_position) * -(signum(sdf) + agent_radius);
-//            Vec3 offset = (normal(agent_position) * (1 + agent_radius)
-//                           -(signum(sdf) + ));
-
-            Vec3 offset = (normal_toward_agent(agent_position, agent_position) *
-                           -agent_radius);
-            
-            result = surface_point + offset;
+            Vec3 nta = normal_toward_agent(agent_position, agent_position);
+            result = surface_point + (nta * -agent_radius);
         }
         return result;
     }
-    
+
     // Historical signum function for local use in this class. (Move to util?)
     static double signum(double x) { return x > 0 ? 1 : (x < 0 ? -1 : 0); }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250220 update normal(), etc., API for CylinderObstacle
+    
+    void unimplemented(const std::string& name) const
+    {
+        std::cout << "unimplemented " << name << std::endl;
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
 
 private:
     ExcludeFrom exclude_from_ = neither;
@@ -536,13 +599,49 @@ public:
                                                 length_);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250220 update normal(), etc., API for CylinderObstacle
+
+//    // Normal to the obstacle at a given point of interest.
+//    Vec3 normal_at_poi(const Vec3& poi,
+//                       const Vec3& agent_position) const override
+//    {
+//        Vec3 on_axis = nearest_point_on_axis(poi);
+//        return (poi - on_axis).normalize();
+//    }
+
+    // OLD API ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    
     // Normal to the obstacle at a given point of interest.
     Vec3 normal_at_poi(const Vec3& poi,
                        const Vec3& agent_position) const override
     {
+        return normal(poi);
+    }
+
+    // NEW API ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+
+    // Abstract normal for a given position. Points toward the +SDF side.
+    // TODO -- this ignores the end caps of the cylinder
+    Vec3 normal(const Vec3& poi) const override
+    {
         Vec3 on_axis = nearest_point_on_axis(poi);
         return (poi - on_axis).normalize();
     }
+    
+    
+    // Normal for a given position. Points toward side agent is on..
+    // TODO -- this ignores the end caps of the cylinder
+    Vec3 normal_toward_agent(const Vec3& poi,
+                             const Vec3& agent_position) const override
+    {
+        // This is a copy of the implementation from SphereObstacle
+        // Can this be a generic definition in the base class?
+        return normal(poi) * signum(signed_distance(agent_position));
+    }
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Point on surface of obstacle nearest the given query_point.
     Vec3 nearest_point(const Vec3& query_point) const override

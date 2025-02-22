@@ -341,10 +341,28 @@ public:
                 {
                     b->setSpeed(0);
                     b->setPosition(ec);
+                    
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20250221 tracking obstacle collisions
+                    if (b == selectedBoid())
+                    {
+                        std::cout << aTimer().frameCounter() << ": ";
+                        std::cout << "obstacle collision ";
+                        std::cout << "boid_at_" << b;
+                        std::cout << ", ";
+                        std::cout << "obstacle_at_" << o;
+                        std::cout << std::endl;
+                    }
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                 }
             }
         };
         for_all_boids(test_obs_constraint);
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20250221 tracking obstacle collisions
+        debugPrint(selectedBoid()->speed());
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         collect_flock_metrics();
@@ -773,8 +791,8 @@ public:
         fps_.blend((fixed_time_step() ? fixed_fps() : int(1 / fd)), 0.95);
     }
     
-    // Returns currently selected boid, the one that the tracking camera tracks,
-    // for which steering force annotation is shown.
+    // Returns pointer to the currently selected boid, the one that the tracking
+    // camera tracks, for which steering force annotation is shown.
     Boid* selectedBoid() { return boids().at(selected_boid_index_); }
 
     // Check if selected boid needs to be changed in response to "S" cmd in UI.

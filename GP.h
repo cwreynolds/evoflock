@@ -241,7 +241,12 @@ inline void init_flock(Flock& flock)
     flock.set_boid_count(200);
     flock.set_fixed_fps(30);
     flock.set_fixed_time_step(true);
-    flock.set_max_simulation_steps(500);  // 20240513: was 1000 before.
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250221 tracking obstacle collisions
+//    flock.set_max_simulation_steps(500);  // 20240513: was 1000 before.
+    flock.set_max_simulation_steps(10000);  // keep running, for demo
+    debugPrint(flock.max_simulation_steps());
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     flock.setLogStatInterval(flock.max_simulation_steps());
     flock.log_prefix = "    ";
 }

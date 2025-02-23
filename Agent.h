@@ -106,7 +106,7 @@ public:
     
     // TODO 20240113 experiment, return read-only const ref to LS.
     const LocalSpace& ls() const { return ls_; }
-    void set_ls(const LocalSpace&ls ) { ls_ = ls; }
+    void set_ls(const LocalSpace& ls) { ls_ = ls; }
     
     // Makes three lightweight verifications of basic Agent "flying." One is
     // "from first principles" and tests for agreement between a closed form

@@ -422,8 +422,24 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241216 why no obstacle avoidance?
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250222 put on the "brakes" when avoiding head-on collision.
+    //               If kept needs adjustment for time to impact.
+
+//    // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
+//    // (I will collide with obstacle within min_time_to_collide seconds)
+//    // and "static" avoidance (I should fly away from this obstacle to add
+//    // clearance, to avoid scraping along everted containment obstacles).
+//    Vec3 steer_to_avoid()
+//    {
+//        Vec3 avoid;
+//        avoid_obstacle_annotation(0, Vec3::none(), 0);
+//        Vec3 predict_avoid = steer_for_predictive_avoidance();
+//        Vec3 static_avoid = fly_away_from_obstacles();
+//        avoid = static_avoid + predict_avoid;
+//        avoid_obstacle_annotation(3, Vec3::none(), 0);
+//        return avoid;
+//    }
 
     // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
     // (I will collide with obstacle within min_time_to_collide seconds)
@@ -434,12 +450,40 @@ public:
         Vec3 avoid;
         avoid_obstacle_annotation(0, Vec3::none(), 0);
         Vec3 predict_avoid = steer_for_predictive_avoidance();
-        Vec3 static_avoid = fly_away_from_obstacles();
-        avoid = static_avoid + predict_avoid;
+        
+//        predict_avoid -= forward() * max_force() * 0.5;  // very ad hoc.
+//        debugPrint(predict_avoid.length());
+//        predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
+        
+        if (predict_avoid.length() > 0.5)
+        {
+//            predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
+//            predict_avoid -= forward() * max_force() * 0.01;  // very ad hoc.
+//            predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
+//            predict_avoid -= forward() * max_force() * 0.05;  // very ad hoc.
+//            predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
+            predict_avoid -= forward() * max_force() * 0.01;  // very ad hoc.
+        }
+        
+//        Vec3 static_avoid = fly_away_from_obstacles();
+//        avoid = static_avoid + predict_avoid;
+
+        if (predict_avoid.length() > 0.5)
+        {
+            avoid = predict_avoid;
+        }
+        else
+        {
+            Vec3 static_avoid = fly_away_from_obstacles();
+            avoid = static_avoid ;
+        }
+
         avoid_obstacle_annotation(3, Vec3::none(), 0);
         return avoid;
     }
     
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241219 reconsider avoid_blend_mode
     

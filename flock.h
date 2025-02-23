@@ -329,8 +329,14 @@ public:
 //        for_all_boids([&](Boid* b)
 //                      { if (EF::RS().randomBool(0.01))  { b->setSpeed(0); } });
 
+        
         auto test_obs_constraint = [&](Boid* b)
         {
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250222 when enforcing, point boid away from obs
+            static int collision_counter = 0;
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            
             CollisionList cl = b->get_predicted_obstacle_collisions();
             for (auto& cl : b->get_predicted_obstacle_collisions())
             {
@@ -343,11 +349,54 @@ public:
                     b->setPosition(ec);
                     
                     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20250222 when enforcing, point boid away from obs
+                    Vec3 bp = b->position();
+//                    b->set_ls(b->ls().fromTo(bp, bp + o->normal(bp)));
+//                    b->set_ls(b->ls().fromTo(bp, bp + o->normal(bp) * fp().body_radius));
+                    
+                    Vec3 to = bp + o->normal(bp) * fp().body_radius * 2;
+                    b->set_ls(b->ls().fromTo(bp, to));
+
+//                    selectedBoid()->speed() = 20
+//                    selectedBoid()->speed() = 20
+//                    24: obstacle collision boid_at_0x118158000, obstacle_at_0x60000328b660
+//                    selectedBoid()->speed() = 0
+//                    selectedBoid()->speed() = 0.960217
+//                    selectedBoid()->speed() = 1.94259
+//                    ...
+//                    selectedBoid()->speed() = 20
+//                    106: obstacle collision boid_at_0x118158000, obstacle_at_0x60000328b5c0
+//                    selectedBoid()->speed() = 0
+//                    selectedBoid()->speed() = 1.46068
+//                    108: obstacle collision boid_at_0x118158000, obstacle_at_0x60000328b5c0
+//                    selectedBoid()->speed() = 0
+//                    selectedBoid()->speed() = 1.02953
+//                    selectedBoid()->speed() = 1.91402
+
+                    
+// before braking:
+// step: 1357: obstacle collision #300: boid_at_0x1280d2c88, obstacle_at_0x6000005c7200
+
+// with 0.01 braking:
+// step: 1367: obstacle collision #300: boid_at_0x150099db0, obstacle_at_0x600001a2e490
+
+// with 0.1 braking:
+// step: 246: obstacle collision #300: boid_at_0x1200b5618, obstacle_at_0x60000238f2a0
+
+// with 0.05 braking:
+
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                     // TODO 20250221 tracking obstacle collisions
                     if (b == selectedBoid())
                     {
+                        collision_counter++;
+
+                        std::cout << "step: ";
                         std::cout << aTimer().frameCounter() << ": ";
                         std::cout << "obstacle collision ";
+                        std::cout << "#" << collision_counter << ": ";
                         std::cout << "boid_at_" << b;
                         std::cout << ", ";
                         std::cout << "obstacle_at_" << o;
@@ -361,7 +410,8 @@ public:
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         // TODO 20250221 tracking obstacle collisions
-        debugPrint(selectedBoid()->speed());
+//        debugPrint(selectedBoid()->speed());
+        if (selectedBoid()->speed() != 20){debugPrint(selectedBoid()->speed());}
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

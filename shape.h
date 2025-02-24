@@ -46,15 +46,19 @@ public:
 // a std::vector of intersections, and then a ray_sphere_intersection() wrapper
 // that handles the ray logic?
 //
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20250223 add overload of shape::ray_sphere_intersection() for Sphere.
+
 Vec3 ray_sphere_intersection(const Vec3& ray_origin,
                              const Vec3& ray_tangent,
-                             double sphere_radius,
-                             const Vec3& sphere_center)
+                             const Sphere& sphere)
 {
     Vec3 intersection = Vec3::none();
     assert(ray_tangent.is_unit_length());  // TODO 20240120 new, copy to python?
-    Vec3 c = sphere_center;
-    double r = sphere_radius;
+//    Vec3 c = sphere_center;
+//    double r = sphere_radius;
+    Vec3 c = sphere.center;
+    double r = sphere.radius;
     // Origin/endpoint and tangent (basis) of ray.
     Vec3 o = ray_origin;
     Vec3 u = ray_tangent;
@@ -89,6 +93,17 @@ Vec3 ray_sphere_intersection(const Vec3& ray_origin,
     }
     return intersection;
 }
+
+Vec3 ray_sphere_intersection(const Vec3& ray_origin,
+                             const Vec3& ray_tangent,
+                             double sphere_radius,
+                             const Vec3& sphere_center)
+{
+    Sphere s(sphere_center, sphere_radius);
+    return ray_sphere_intersection(ray_origin, ray_tangent, s);
+}
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
 // Returns the point of intersection of a ray (half-line) and a plane. Or it

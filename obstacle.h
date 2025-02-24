@@ -265,7 +265,7 @@ public:
                           const Vec3& tangent,
                           double body_radius) const override
     {
-        return shape::ray_sphere_intersection(origin, tangent, radius(), center());
+        return shape::ray_sphere_intersection(origin, tangent, sphere());
     }
     
     
@@ -428,6 +428,8 @@ public:
     double& radius() { return sphere_.radius; }
     Vec3 center() const { return sphere_.center; }
     Vec3& center() { return sphere_.center; }
+    shape::Sphere sphere(void) const { return sphere_; }
+    shape::Sphere& sphere(void) { return sphere_; }
     
 private:
     shape::Sphere sphere_;

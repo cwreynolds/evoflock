@@ -455,29 +455,51 @@ public:
 //        debugPrint(predict_avoid.length());
 //        predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
         
-        if (predict_avoid.length() > 0.5)
-        {
-//            predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
-//            predict_avoid -= forward() * max_force() * 0.01;  // very ad hoc.
-//            predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
-//            predict_avoid -= forward() * max_force() * 0.05;  // very ad hoc.
-//            predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
-            predict_avoid -= forward() * max_force() * 0.01;  // very ad hoc.
-        }
-        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250224 put back distance weighting for predictive avoidance.
+
+//            if (predict_avoid.length() > 0.5)
+//            {
+//    //            predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
+//    //            predict_avoid -= forward() * max_force() * 0.01;  // very ad hoc.
+//    //            predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
+//    //            predict_avoid -= forward() * max_force() * 0.05;  // very ad hoc.
+//    //            predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
+//                predict_avoid -= forward() * max_force() * 0.01;  // very ad hoc.
+//            }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 //        Vec3 static_avoid = fly_away_from_obstacles();
 //        avoid = static_avoid + predict_avoid;
 
-        if (predict_avoid.length() > 0.5)
-        {
-            avoid = predict_avoid;
-        }
-        else
-        {
-            Vec3 static_avoid = fly_away_from_obstacles();
-            avoid = static_avoid ;
-        }
+//        if (predict_avoid.length() > 0.5)
+//        {
+//            avoid = predict_avoid;
+//        }
+//        else
+//        {
+//            Vec3 static_avoid = fly_away_from_obstacles();
+//            avoid = static_avoid ;
+//        }
 
+//        Vec3 static_avoid = fly_away_from_obstacles();
+//        avoid = static_avoid + predict_avoid;
+
+        Vec3 static_avoid = fly_away_from_obstacles();
+//        avoid = ((predict_avoid.length() > static_avoid.length()) ?
+//                 predict_avoid :
+//                 static_avoid + predict_avoid);
+//        avoid = ((predict_avoid.length() > static_avoid.length()) ?
+//                 predict_avoid :
+//                 static_avoid + predict_avoid);
+
+//        avoid = ((predict_avoid.length() > 0.2) ?
+//                 predict_avoid :
+//                 predict_avoid + static_avoid);
+
+        avoid = static_avoid + predict_avoid;
+        
         avoid_obstacle_annotation(3, Vec3::none(), 0);
         return avoid;
     }
@@ -485,7 +507,125 @@ public:
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250224 put back distance weighting for predictive avoidance.
+    //
     // TODO 20241219 reconsider avoid_blend_mode
+    
+//        // Steering force component for predictive obstacles avoidance.
+//        Vec3 steer_for_predictive_avoidance()
+//        {
+//            double weight = 0;
+//            Vec3 avoidance;
+//            CollisionList collisions = get_predicted_obstacle_collisions();
+//            if (not collisions.empty())
+//            {
+//                const Collision& first_collision = collisions.front();
+//                Vec3 poi = first_collision.point_of_impact;
+//                Vec3 normal = first_collision.normal_at_poi;
+//                Vec3 pure_steering = pure_lateral_steering(normal);
+//                avoidance = pure_steering.normalize();
+//                double min_dist = speed() * fp().min_time_to_collide;
+//    //            // Near enough to require avoidance steering?
+//    //            bool near = min_dist > first_collision.dist_to_collision;
+//    //            if (fp().avoid_blend_mode)
+//    //            {
+//    //                // Smooth weight transition from 80% to 120% of min dist.
+//    //                double d = util::remap_interval(first_collision.dist_to_collision,
+//    //                                                min_dist * 0.8, min_dist * 1.2,
+//    //                                                1, 0);
+//    //                weight = util::unit_sigmoid_on_01(d);
+//    //            }
+//    //            else
+//                {
+//                    // Near enough to require avoidance steering?
+//                    bool near = min_dist > first_collision.dist_to_collision;
+//
+//                    weight = near ? 1 : 0;
+//                }
+//                avoid_obstacle_annotation(1, poi, weight);
+//            }
+//            return avoidance * weight;
+//        }
+
+    
+//        // Steering force component for predictive obstacles avoidance.
+//        Vec3 steer_for_predictive_avoidance()
+//        {
+//            double weight = 0;
+//            Vec3 avoidance;
+//            CollisionList collisions = get_predicted_obstacle_collisions();
+//            if (not collisions.empty())
+//            {
+//                const Collision& first_collision = collisions.front();
+//                Vec3 poi = first_collision.point_of_impact;
+//                Vec3 normal = first_collision.normal_at_poi;
+//                Vec3 pure_steering = pure_lateral_steering(normal);
+//                avoidance = pure_steering.normalize();
+//                double min_dist = speed() * fp().min_time_to_collide;
+//
+//    //    //            // Near enough to require avoidance steering?
+//    //    //            bool near = min_dist > first_collision.dist_to_collision;
+//    //    //            if (fp().avoid_blend_mode)
+//    //    //            {
+//    //    //                // Smooth weight transition from 80% to 120% of min dist.
+//    //    //                double d = util::remap_interval(first_collision.dist_to_collision,
+//    //    //                                                min_dist * 0.8, min_dist * 1.2,
+//    //    //                                                1, 0);
+//    //    //                weight = util::unit_sigmoid_on_01(d);
+//    //    //            }
+//    //    //            else
+//    //                {
+//    //                    // Near enough to require avoidance steering?
+//    //                    bool near = min_dist > first_collision.dist_to_collision;
+//    //
+//    //                    weight = near ? 1 : 0;
+//    //                }
+//
+//    //            // Near enough to require avoidance steering?
+//    //            bool near = min_dist > first_collision.dist_to_collision;
+//
+//    //            if (fp().avoid_blend_mode)
+//    //            {
+//
+//    //            // Smooth weight transition from 80% to 120% of min dist.
+//    //            double d = util::remap_interval(first_collision.dist_to_collision,
+//    //                                            min_dist * 0.8, min_dist * 1.2,
+//    //                                            1, 0);
+//    //            weight = util::unit_sigmoid_on_01(d);
+//
+//    //            // Smooth weight transition
+//    //            double dtc =
+//    //            weight = util::remap_interval(first_collision.dist_to_collision,
+//    //                                          0, min_dist,
+//    //                                          1, 0);
+//
+//                // Smooth weight transition
+//                double dtc = first_collision.dist_to_collision;
+//    //            weight = util::remap_interval(dtc,  0, min_dist,  1, 0);
+//                weight = util::remap_interval(dtc,  0, min_dist,  1, 0.5);
+//
+//
+//    //            }
+//    //                else
+//    //                {
+//    //    //                // Near enough to require avoidance steering?
+//    //    //                bool near = min_dist > first_collision.dist_to_collision;
+//    //
+//    //                    weight = near ? 1 : 0;
+//    //                }
+//
+//                avoid_obstacle_annotation(1, poi, weight);
+//            }
+//    //        return avoidance * weight;
+//
+//
+//            //                predict_avoid -= forward() * max_force() * 0.01;  // very ad hoc.
+//
+//    //        return (avoidance - (forward() * -0.5)) * weight;
+//            return (avoidance - (forward() * -0.2)) * weight;
+//        }
+
+    
     
     // Steering force component for predictive obstacles avoidance.
     Vec3 steer_for_predictive_avoidance()
@@ -501,26 +641,13 @@ public:
             Vec3 pure_steering = pure_lateral_steering(normal);
             avoidance = pure_steering.normalize();
             double min_dist = speed() * fp().min_time_to_collide;
-//            // Near enough to require avoidance steering?
-//            bool near = min_dist > first_collision.dist_to_collision;
-//            if (fp().avoid_blend_mode)
-//            {
-//                // Smooth weight transition from 80% to 120% of min dist.
-//                double d = util::remap_interval(first_collision.dist_to_collision,
-//                                                min_dist * 0.8, min_dist * 1.2,
-//                                                1, 0);
-//                weight = util::unit_sigmoid_on_01(d);
-//            }
-//            else
-            {
-                // Near enough to require avoidance steering?
-                bool near = min_dist > first_collision.dist_to_collision;
-
-                weight = near ? 1 : 0;
-            }
+            
+            // Smooth weight transition
+            double dtc = first_collision.dist_to_collision;
+            weight = util::remap_interval(dtc,  0, min_dist,  1, 0.5);
             avoid_obstacle_annotation(1, poi, weight);
         }
-        return avoidance * weight;
+        return (avoidance - (forward() * 0.2)) * weight;
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -540,7 +667,11 @@ public:
             avoid_obstacle_annotation(2, obstacle->nearest_point(p), weight);
             avoidance += oa;
         }
-        return avoidance;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250224 put back distance weighting for predictive avoidance.
+//        return avoidance;
+        return pure_lateral_steering(avoidance);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -791,17 +922,17 @@ public:
         
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20250203 back to debugging avoidance of spheres from outside
-        {
-            Vec3 f = position() + annote_forward_temp_ * 100;
-            draw().addThickLineToAnimatedFrame(position(), f, Color::black());
-            auto an = [&](Vec3 p)
-            {
-                Color c = (p == rsi_p0) ? Color::black() : Color::red();
-                draw().addThickLineToAnimatedFrame(p, p + Vec3(0, 100, 0), c);
-            };
-            an(rsi_p1);
-            an(rsi_p2);
-        }
+//        {
+//            Vec3 f = position() + annote_forward_temp_ * 100;
+//            draw().addThickLineToAnimatedFrame(position(), f, Color::black());
+//            auto an = [&](Vec3 p)
+//            {
+//                Color c = (p == rsi_p0) ? Color::black() : Color::red();
+//                draw().addThickLineToAnimatedFrame(p, p + Vec3(0, 100, 0), c);
+//            };
+//            an(rsi_p1);
+//            an(rsi_p2);
+//        }
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }

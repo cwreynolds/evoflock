@@ -447,6 +447,11 @@ public:
     // clearance, to avoid scraping along everted containment obstacles).
     Vec3 steer_to_avoid()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250225 how can boids escape big sphere despite constraint enforcement?
+        return {};
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         Vec3 avoid;
         avoid_obstacle_annotation(0, Vec3::none(), 0);
         Vec3 predict_avoid = steer_for_predictive_avoidance();
@@ -911,33 +916,62 @@ public:
     }
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250225 how can boids escape big sphere despite constraint enforcement?
+
+//        // Called from Flock to draw annotation for selected Boid and its neighbors.
+//        void drawAnnotationForBoidAndNeighbors()
+//        {
+//            drawAnnotation();
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
+//
+//    //        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
+//
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            // TODO 20250203 back to debugging avoidance of spheres from outside
+//    //        {
+//    //            Vec3 f = position() + annote_forward_temp_ * 100;
+//    //            draw().addThickLineToAnimatedFrame(position(), f, Color::black());
+//    //            auto an = [&](Vec3 p)
+//    //            {
+//    //                Color c = (p == rsi_p0) ? Color::black() : Color::red();
+//    //                draw().addThickLineToAnimatedFrame(p, p + Vec3(0, 100, 0), c);
+//    //            };
+//    //            an(rsi_p1);
+//    //            an(rsi_p2);
+//    //        }
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        }
+
+    
+    // TODO 20250225 very temp
+    Vec3 impact_on_obstacle;
+    Vec3 new_pos_after_impact;
+
+    
     // Called from Flock to draw annotation for selected Boid and its neighbors.
     void drawAnnotationForBoidAndNeighbors()
     {
-        drawAnnotation();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
-        
+//        drawAnnotation();
 //        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
         
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20250203 back to debugging avoidance of spheres from outside
-//        {
-//            Vec3 f = position() + annote_forward_temp_ * 100;
-//            draw().addThickLineToAnimatedFrame(position(), f, Color::black());
-//            auto an = [&](Vec3 p)
-//            {
-//                Color c = (p == rsi_p0) ? Color::black() : Color::red();
-//                draw().addThickLineToAnimatedFrame(p, p + Vec3(0, 100, 0), c);
-//            };
-//            an(rsi_p1);
-//            an(rsi_p2);
-//        }
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Vec3 f = position() + annote_forward_temp_ * 100;
+        draw().addThickLineToAnimatedFrame(position(), f, Color::black());
+        
+        draw().addThickLineToAnimatedFrame(impact_on_obstacle,
+                                           new_pos_after_impact,
+                                           Color::red());
+        draw().addThickLineToAnimatedFrame(impact_on_obstacle,
+                                           impact_on_obstacle + Vec3(0,1000,0),
+                                           Color::red());
     }
 
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     //    def is_neighbor(self, other_boid):
     //        return other_boid in self.flock.selected_boid().cached_nearest_neighbors
 

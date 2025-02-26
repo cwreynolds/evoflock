@@ -59,8 +59,9 @@ private:
     //int default_obstacle_set_index_ = 0;  // Sphere and vertical cylinder.
     //int default_obstacle_set_index_ = 1;  // 6 cylinders and sphere.
     //int default_obstacle_set_index_ = 2;  // Plane and sphere.
+    int default_obstacle_set_index_ = 3;  // just sphere.
     //int default_obstacle_set_index_ = 5;  // One sphere in another.
-    int default_obstacle_set_index_ = 4;  // One sphere in another.
+//    int default_obstacle_set_index_ = 4;  // One sphere in another.
 
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
@@ -314,6 +315,119 @@ public:
     //                    self.tracking_camera and
     //                    self.selected_boid().is_neighbor(boid))
     
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250225 how can boids escape big sphere despite constraint enforcement?
+
+//        // Fly each boid in flock for one simulation step. Consists of two sequential
+//        // steps to avoid artifacts from order of boids. First a "sense/plan" phase
+//        // which computes the desired steering based on current state. Then an "act"
+//        // phase which actually moves the boids. Finally statistics are collected.
+//        // (20240605 renamed  Flock::fly_flock() to Flock::fly_boids())
+//        void fly_boids(double time_step)
+//        {
+//            for_all_boids([&](Boid* b){ b->plan_next_steer();});
+//            for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20250219 experimental version to enforce constraint
+//
+//    //        for_all_boids([&](Boid* b)
+//    //                      { if (EF::RS().randomBool(0.01))  { b->setSpeed(0); } });
+//
+//
+//            auto test_obs_constraint = [&](Boid* b)
+//            {
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                // TODO 20250222 when enforcing, point boid away from obs
+//                static int collision_counter = 0;
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                CollisionList cl = b->get_predicted_obstacle_collisions();
+//                for (auto& cl : b->get_predicted_obstacle_collisions())
+//                {
+//                    Obstacle* o = cl.obstacle;
+//                    Vec3 ec = o->enforceConstraint(b->position(), fp().body_radius);
+//
+//                    if (ec != b->position())
+//                    {
+//                        b->setSpeed(0);
+//                        b->setPosition(ec);
+//
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                        // TODO 20250222 when enforcing, point boid away from obs
+//                        Vec3 bp = b->position();
+//    //                    b->set_ls(b->ls().fromTo(bp, bp + o->normal(bp)));
+//    //                    b->set_ls(b->ls().fromTo(bp, bp + o->normal(bp) * fp().body_radius));
+//
+//                        Vec3 to = bp + o->normal(bp) * fp().body_radius * 2;
+//                        b->set_ls(b->ls().fromTo(bp, to));
+//
+//    //                    selectedBoid()->speed() = 20
+//    //                    selectedBoid()->speed() = 20
+//    //                    24: obstacle collision boid_at_0x118158000, obstacle_at_0x60000328b660
+//    //                    selectedBoid()->speed() = 0
+//    //                    selectedBoid()->speed() = 0.960217
+//    //                    selectedBoid()->speed() = 1.94259
+//    //                    ...
+//    //                    selectedBoid()->speed() = 20
+//    //                    106: obstacle collision boid_at_0x118158000, obstacle_at_0x60000328b5c0
+//    //                    selectedBoid()->speed() = 0
+//    //                    selectedBoid()->speed() = 1.46068
+//    //                    108: obstacle collision boid_at_0x118158000, obstacle_at_0x60000328b5c0
+//    //                    selectedBoid()->speed() = 0
+//    //                    selectedBoid()->speed() = 1.02953
+//    //                    selectedBoid()->speed() = 1.91402
+//
+//
+//    // before braking:
+//    // step: 1357: obstacle collision #300: boid_at_0x1280d2c88, obstacle_at_0x6000005c7200
+//
+//    // with 0.01 braking:
+//    // step: 1367: obstacle collision #300: boid_at_0x150099db0, obstacle_at_0x600001a2e490
+//
+//    // with 0.1 braking:
+//    // step: 246: obstacle collision #300: boid_at_0x1200b5618, obstacle_at_0x60000238f2a0
+//
+//    // with 0.05 braking:
+//
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                        // TODO 20250221 tracking obstacle collisions
+//                        if (b == selectedBoid())
+//                        {
+//                            collision_counter++;
+//
+//                            std::cout << "step: ";
+//                            std::cout << aTimer().frameCounter() << ": ";
+//                            std::cout << "obstacle collision ";
+//                            std::cout << "#" << collision_counter << ": ";
+//                            std::cout << "boid_at_" << b;
+//                            std::cout << ", ";
+//                            std::cout << "obstacle_at_" << o;
+//                            std::cout << std::endl;
+//                        }
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                    }
+//                }
+//
+//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //            // TODO 20250224 put back distance weighting for predictive avoidance.
+//    //            debugPrint(b->fly_away_from_obstacles().length());
+//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            };
+//            for_all_boids(test_obs_constraint);
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            // TODO 20250221 tracking obstacle collisions
+//    //        debugPrint(selectedBoid()->speed());
+//            if (selectedBoid()->speed() != 20){debugPrint(selectedBoid()->speed());}
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            collect_flock_metrics();
+//        }
+    
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
     // which computes the desired steering based on current state. Then an "act"
@@ -337,10 +451,11 @@ public:
             static int collision_counter = 0;
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             
-            CollisionList cl = b->get_predicted_obstacle_collisions();
-            for (auto& cl : b->get_predicted_obstacle_collisions())
+//            CollisionList cl = b->get_predicted_obstacle_collisions();
+            for (auto& c : b->get_predicted_obstacle_collisions())
             {
-                Obstacle* o = cl.obstacle;
+//                Obstacle* o = cl.obstacle;
+                Obstacle* o = c.obstacle;
                 Vec3 ec = o->enforceConstraint(b->position(), fp().body_radius);
                 
                 if (ec != b->position())
@@ -348,44 +463,43 @@ public:
                     b->setSpeed(0);
                     b->setPosition(ec);
                     
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    // TODO 20250222 when enforcing, point boid away from obs
-                    Vec3 bp = b->position();
-//                    b->set_ls(b->ls().fromTo(bp, bp + o->normal(bp)));
-//                    b->set_ls(b->ls().fromTo(bp, bp + o->normal(bp) * fp().body_radius));
+                    // When enforcing, point boid away from obs (TODO does this help?)
+//                    Vec3 bp = b->position();
+//                    Vec3 to = bp + o->normal(bp) * fp().body_radius * 2;
+//                    b->set_ls(b->ls().fromTo(bp, to));
                     
-                    Vec3 to = bp + o->normal(bp) * fp().body_radius * 2;
-                    b->set_ls(b->ls().fromTo(bp, to));
+//                    Vec3 to = ec + o->normal(ec) * fp().body_radius * 2;
+//                    b->set_ls(b->ls().fromTo(ec, to));
 
-//                    selectedBoid()->speed() = 20
-//                    selectedBoid()->speed() = 20
-//                    24: obstacle collision boid_at_0x118158000, obstacle_at_0x60000328b660
-//                    selectedBoid()->speed() = 0
-//                    selectedBoid()->speed() = 0.960217
-//                    selectedBoid()->speed() = 1.94259
-//                    ...
-//                    selectedBoid()->speed() = 20
-//                    106: obstacle collision boid_at_0x118158000, obstacle_at_0x60000328b5c0
-//                    selectedBoid()->speed() = 0
-//                    selectedBoid()->speed() = 1.46068
-//                    108: obstacle collision boid_at_0x118158000, obstacle_at_0x60000328b5c0
-//                    selectedBoid()->speed() = 0
-//                    selectedBoid()->speed() = 1.02953
-//                    selectedBoid()->speed() = 1.91402
+//                    Vec3 to = ec + o->normal_toward_agent(ec, ec) * fp().body_radius * 2;
+                    
+                    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                    // TODO ok, this is not taking into account exclude-from
+                    // first: brute force it to work
+                    // second: reconsider modularity/support from Obstacle classes
+                    //
+                    // Oh, maybe we want three variants on Obstacle:
+                    //     normal()
+                    //     normal_toward_agent()
+                    //     normal_toward_agent_as_excluded() -- or something
+                    
+                    
+                    // OR since this already implied by the position returned by
+                    // enforceConstraint() should this adjust normal from that?
+//                    Vec3 normal = o->normal_toward_agent(ec, ec);
+//                    Vec3 normal = ec - o->nearest_point(ec);
+//                    Vec3 normal = (o->nearest_point(ec) - ec).normalize();
+                    Vec3 normal = (ec - o->nearest_point(ec)).normalize();
+//                    Vec3 normal = (o->nearest_point(ec) - ec).normalize();
 
                     
-// before braking:
-// step: 1357: obstacle collision #300: boid_at_0x1280d2c88, obstacle_at_0x6000005c7200
+                    
+//                    Vec3 to = ec + normal * fp().body_radius * 2;
+                    Vec3 to = ec + (normal * fp().body_radius * 2);
+                    b->set_ls(b->ls().fromTo(ec, to));
 
-// with 0.01 braking:
-// step: 1367: obstacle collision #300: boid_at_0x150099db0, obstacle_at_0x600001a2e490
+                    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-// with 0.1 braking:
-// step: 246: obstacle collision #300: boid_at_0x1200b5618, obstacle_at_0x60000238f2a0
-
-// with 0.05 braking:
-
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
                     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                     // TODO 20250221 tracking obstacle collisions
@@ -401,6 +515,9 @@ public:
                         std::cout << ", ";
                         std::cout << "obstacle_at_" << o;
                         std::cout << std::endl;
+                        
+                        b->impact_on_obstacle = o->nearest_point(ec);
+                        b->new_pos_after_impact = ec;
                     }
                     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                 }
@@ -412,6 +529,17 @@ public:
 //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         };
         for_all_boids(test_obs_constraint);
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        double sbpl = selectedBoid()->position().length();
+        if (sbpl > 50)
+        {
+            std::cout << "step: ";
+            std::cout << aTimer().frameCounter() << " ";
+            debugPrint(sbpl);
+        }
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         // TODO 20250221 tracking obstacle collisions
@@ -422,6 +550,9 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         collect_flock_metrics();
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240623 get rid of all multithreading for GP testing

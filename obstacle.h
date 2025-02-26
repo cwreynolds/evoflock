@@ -57,7 +57,7 @@ public:
         return Vec3();
     }
     
-    // Normal for a given position. Points toward side agent is on..
+    // Normal for a given position. Points toward side agent is on.
     virtual Vec3 normal_toward_agent(const Vec3& poi,
                                      const Vec3& agent_position) const
     {
@@ -316,14 +316,14 @@ public:
     }
 
     
-    //    // Normal for a given position. Points toward side agent is on..
+    //    // Normal for a given position. Points toward side agent is on.
     //    virtual Vec3 normal_toward_agent(const Vec3& poi,
     //                                     const Vec3& agent_position) const
     //    {
     //        return Vec3();
     //    }
 
-//        // Normal for a given position. Points toward side agent is on..
+//        // Normal for a given position. Points toward side agent is on.
 //        Vec3 normal_toward_agent(const Vec3& poi,
 //                                 const Vec3& agent_position) const override
 //        {
@@ -340,7 +340,7 @@ public:
 //            return normal * signum(agent_sdf);
 //        }
 
-//    // Normal for a given position. Points toward side agent is on..
+//    // Normal for a given position. Points toward side agent is on.
 //    Vec3 normal_toward_agent(const Vec3& poi,
 //                             const Vec3& agent_position) const override
 //    {
@@ -349,7 +349,7 @@ public:
 //        return normal * signum(agent_sdf);
 //    }
 
-//        // Normal for a given position. Points toward side agent is on..
+//        // Normal for a given position. Points toward side agent is on.
 //        Vec3 normal_toward_agent(const Vec3& poi,
 //                                 const Vec3& agent_position) const override
 //        {
@@ -358,12 +358,18 @@ public:
 //            return normal(poi) * signum(signed_distance(agent_position));
 //        }
 
-    // Normal for a given position. Points toward side agent is on..
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250225 normal_toward_agent() ignoring exclude_from
+    
+    // Normal for a given position. Points toward side agent is on.
     Vec3 normal_toward_agent(const Vec3& poi,
                              const Vec3& agent_position) const override
     {
         return normal(poi) * signum(signed_distance(agent_position));
     }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -632,7 +638,7 @@ public:
     }
     
     
-    // Normal for a given position. Points toward side agent is on..
+    // Normal for a given position. Points toward side agent is on.
     // TODO -- this ignores the end caps of the cylinder
     Vec3 normal_toward_agent(const Vec3& poi,
                              const Vec3& agent_position) const override

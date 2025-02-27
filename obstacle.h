@@ -207,12 +207,27 @@ public:
         Vec3 result = agent_position;
         ExcludeFrom ef = getExcludeFrom();
         double sdf = signed_distance(agent_position);
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20250226 not talking ef into account for sign of normal
+
         // Is constraint violated?
         if (((sdf < +agent_radius) and (ef == inside)) or
             ((sdf > -agent_radius) and (ef == outside)))
+
+//        // Is constraint violated?
+//        if (((sdf < 0) and (ef == inside)) or
+//            ((sdf > 0) and (ef == outside)))
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         {
             Vec3 surface_point = nearest_point(agent_position);
             Vec3 nta = normal_toward_agent(agent_position, agent_position);
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250226 not talking ef into account for sign of normal
+
+            if (ef == outside) { nta *= -1; }
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             result = surface_point + (nta * -agent_radius);
         }
         return result;

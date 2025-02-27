@@ -447,10 +447,10 @@ public:
     // clearance, to avoid scraping along everted containment obstacles).
     Vec3 steer_to_avoid()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250225 how can boids escape big sphere despite constraint enforcement?
-        return {};
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20250225 how can boids escape big sphere despite constraint enforcement?
+//        return {};
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Vec3 avoid;
         avoid_obstacle_annotation(0, Vec3::none(), 0);
@@ -964,9 +964,12 @@ public:
         
         draw().addThickLineToAnimatedFrame(impact_on_obstacle,
                                            new_pos_after_impact,
-                                           Color::red());
+                                           Color::green());
         draw().addThickLineToAnimatedFrame(impact_on_obstacle,
                                            impact_on_obstacle + Vec3(0,1000,0),
+                                           Color::red());
+        draw().addThickLineToAnimatedFrame(impact_on_obstacle,
+                                           Vec3(),
                                            Color::red());
     }
 

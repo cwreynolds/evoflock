@@ -589,8 +589,24 @@ public:
             for (auto& collision : b->get_predicted_obstacle_collisions())
             {
                 Obstacle* o = collision.obstacle;
+                
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20250227 temp debug
+                if (b == selectedBoid() and
+                    o == b->get_predicted_obstacle_collisions().at(0).obstacle)
+                {
+                    Obstacle::verbose = true;
+                    std::cout << "step=" << aTimer().frameCounter() << " ";
+                }
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                 Vec3 ec = o->enforceConstraint(b->position(), fp().body_radius);
                 
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20250227 temp debug
+                Obstacle::verbose = false;
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                 if (ec != b->position())
                 {
                     b->setSpeed(0);
@@ -642,14 +658,14 @@ public:
             }
             
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            if (b->position().length() > 50)
-            {
-                std::cout << "step=";
-                std::cout << aTimer().frameCounter();
-                std::cout << " dist=" << b->position().length();
-                std::cout << " boid=" << b;
-                std::cout << std::endl;
-            }
+//            if (b->position().length() > 50)
+//            {
+//                std::cout << "step=";
+//                std::cout << aTimer().frameCounter();
+//                std::cout << " dist=" << b->position().length();
+//                std::cout << " boid=" << b;
+//                std::cout << std::endl;
+//            }
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         };

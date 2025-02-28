@@ -131,13 +131,13 @@ public:
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250219 experimental version to enforce constraint
-    
-    // Detects constraint violation. (For example being inside an Obstacle with
-    // ExcludeFrom::inside.) When found, computes a new agent position which
-    // does not violate the constraint. Caller should compare value passed into
-    // "agent_position" with the returned value. If equal, the agent is fine.
-    // Otherwise the agent's position should be set to the value returned, and
-    // its speed set to zero.
+
+//    // Detects constraint violation. (For example being inside an Obstacle with
+//    // ExcludeFrom::inside.) When found, computes a new agent position which
+//    // does not violate the constraint. Caller should compare value passed into
+//    // "agent_position" with the returned value. If equal, the agent is fine.
+//    // Otherwise the agent's position should be set to the value returned, and
+//    // its speed set to zero.
     
 //        virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
 //        {
@@ -202,32 +202,141 @@ public:
 //            return result;
 //        }
 
+//        virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
+//        {
+//            Vec3 result = agent_position;
+//            ExcludeFrom ef = getExcludeFrom();
+//            double sdf = signed_distance(agent_position);
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            // TODO 20250226 not talking ef into account for sign of normal
+//
+//            // Is constraint violated?
+//            if (((sdf < +agent_radius) and (ef == inside)) or
+//                ((sdf > -agent_radius) and (ef == outside)))
+//
+//    //        // Is constraint violated?
+//    //        if (((sdf < 0) and (ef == inside)) or
+//    //            ((sdf > 0) and (ef == outside)))
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            {
+//                Vec3 surface_point = nearest_point(agent_position);
+//                Vec3 nta = normal_toward_agent(agent_position, agent_position);
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                // TODO 20250226 not talking ef into account for sign of normal
+//
+//                if (ef == outside) { nta *= -1; }
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                result = surface_point + (nta * -agent_radius);
+//            }
+//            return result;
+//        }
+
+    
+    
+//    // Is constraint violated?
+//    if (((sdf < +agent_radius) and (ef == inside)) or
+//        ((sdf > -agent_radius) and (ef == outside)))
+//        
+//        // Is constraint violated?
+//        if (((sdf < 0) and (ef == inside)) or
+//            ((sdf > 0) and (ef == outside)))
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250227 temp debug
+    static inline bool verbose = false;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+    bool doesAgentViolateConstraint(Vec3 agent_position, double agent_radius) const
+    {
+        ExcludeFrom ef = getExcludeFrom();
+        double sdf = signed_distance(agent_position);
+        
+//        bool violate = (((sdf < +agent_radius) and (ef == inside)) or
+//                        ((sdf > -agent_radius) and (ef == outside)));
+//        bool violate = (((sdf < 0) and (ef == inside)) or
+//                        ((sdf > 0) and (ef == outside)));
+        bool violate = (((sdf < 2) and (ef == inside)) or
+                        ((sdf > -2) and (ef == outside)));
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20250227 temp debug
+        if (verbose)
+        {
+            std::cout << "ef=" << getExcludeFromAsString();
+            std::cout << " sdf=" << sdf;
+            std::cout << " violate=" << violate;
+            std::cout << std::endl;
+        }
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+        return violate;
+    }
+    
+//        // Detects constraint violation. (For example being inside an Obstacle with
+//        // ExcludeFrom::inside.) When found, computes a new agent position which
+//        // does not violate the constraint. Caller should compare value passed into
+//        // "agent_position" with the returned value. If equal, the agent is fine.
+//        // Otherwise the agent's position should be set to the value returned, and
+//        // its speed set to zero.
+//        //
+//        // Does this need to be virtual, or is it generic for all Obstacles?
+//        //
+//        virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
+//        {
+//            Vec3 result = agent_position;
+//            ExcludeFrom ef = getExcludeFrom();
+//            double sdf = signed_distance(agent_position);
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            // TODO 20250226 not talking ef into account for sign of normal
+//
+//    //        // Is constraint violated?
+//    //        if (((sdf < +agent_radius) and (ef == inside)) or
+//    //            ((sdf > -agent_radius) and (ef == outside)))
+//
+//    //        // Is constraint violated?
+//    //        if (((sdf < 0) and (ef == inside)) or
+//    //            ((sdf > 0) and (ef == outside)))
+//
+//            // Is constraint violated?
+//            if (doesAgentViolateConstraint(agent_position, agent_radius))
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            {
+//                Vec3 surface_point = nearest_point(agent_position);
+//                Vec3 nta = normal_toward_agent(agent_position, agent_position);
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                // TODO 20250226 not talking ef into account for sign of normal
+//
+//                if (ef == outside) { nta *= -1; }
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                result = surface_point + (nta * -agent_radius);
+//            }
+//            return result;
+//        }
+
+    // Detects constraint violation. (For example being inside an Obstacle with
+    // ExcludeFrom::inside.) When found, computes a new agent position which
+    // does not violate the constraint. Caller should compare value passed into
+    // "agent_position" with the returned value. If equal, the agent is fine.
+    // Otherwise the agent's position should be set to the value returned, and
+    // its speed set to zero.
+    //
+    // Does this need to be virtual, or is it generic for all Obstacles?
+    //
     virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
     {
         Vec3 result = agent_position;
         ExcludeFrom ef = getExcludeFrom();
         double sdf = signed_distance(agent_position);
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20250226 not talking ef into account for sign of normal
-
         // Is constraint violated?
-        if (((sdf < +agent_radius) and (ef == inside)) or
-            ((sdf > -agent_radius) and (ef == outside)))
-
-//        // Is constraint violated?
-//        if (((sdf < 0) and (ef == inside)) or
-//            ((sdf > 0) and (ef == outside)))
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        if (doesAgentViolateConstraint(agent_position, agent_radius))
         {
             Vec3 surface_point = nearest_point(agent_position);
             Vec3 nta = normal_toward_agent(agent_position, agent_position);
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250226 not talking ef into account for sign of normal
-
             if (ef == outside) { nta *= -1; }
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             result = surface_point + (nta * -agent_radius);
         }
         return result;

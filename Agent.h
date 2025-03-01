@@ -31,17 +31,10 @@ public:
     double max_force() const { return max_force_; }
 
     // Setters
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250225 old typos
-//    void setSide(Vec3 side) { ls_.setI(side); }
-//    void setUp(Vec3 side) { ls_.setJ(side); }
-//    void setForward(Vec3 side) { ls_.setK(side); }
-//    void setPosition(Vec3 side) { ls_.setP(side); }
     void setSide(Vec3 s) { ls_.setI(s); }
     void setUp(Vec3 u) { ls_.setJ(u); }
     void setForward(Vec3 f) { ls_.setK(f); }
     void setPosition(Vec3 p) { ls_.setP(p); }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     void setSpeed(double speed) { speed_ = speed; }
     void setMaxSpeed(double max_speed) { max_speed_ = max_speed; }
     void setMaxForce(double max_force) { max_force_ = max_force; }

@@ -670,10 +670,27 @@ public:
         
         // Add "S" command, to cycle selected boid through flock.
         rk('S', [&](vis* v) { selectNextBoid(); return rv; });
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250301 temp command to toggle obstacle avoidance
+        // Accessor for camera object, represented as a LocalSpace.
+        rk('A', [&](vis* v) { toggleAvoidingObstaclesMode(); return rv; });
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Set mouse move/scroll/button handlers.
         setMouseCallbacks();
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250301 temp command to toggle obstacle avoidance
+    bool avoiding_obstacles_mode_ = true;
+    bool& avoidingObstaclesMode() { return avoiding_obstacles_mode_; }
+    const bool& avoidingObstaclesMode() const { return avoiding_obstacles_mode_; }
+    void toggleAvoidingObstaclesMode()
+    {
+        avoiding_obstacles_mode_ = not avoiding_obstacles_mode_;
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Set a random per-vertex color brightness (grayscale) for given mesh.
     static void brightnessSpecklePerVertex(double min_brightness,

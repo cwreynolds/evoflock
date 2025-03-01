@@ -43,8 +43,7 @@ public:
     
     virtual Vec3 normal_at_poi(const Vec3& poi, const Vec3& agent_position) const
     {
-        unimplemented("normal_at_poi()");
-        return Vec3();
+        return unimplemented("normal_at_poi()", Vec3());
     }
     
     
@@ -53,16 +52,14 @@ public:
     // Abstract normal for a given position. Points toward the +SDF side.
     virtual Vec3 normal(const Vec3& poi) const
     {
-        unimplemented("normal()");
-        return Vec3();
+        return unimplemented("normal()", Vec3());
     }
     
     // Normal for a given position. Points toward side agent is on.
     virtual Vec3 normal_toward_agent(const Vec3& poi,
                                      const Vec3& agent_position) const
     {
-        unimplemented("normal_toward_agent()");
-        return Vec3();
+        return unimplemented("normal_toward_agent()", Vec3());
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -129,144 +126,19 @@ public:
         return violation;
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250219 experimental version to enforce constraint
-
-//    // Detects constraint violation. (For example being inside an Obstacle with
-//    // ExcludeFrom::inside.) When found, computes a new agent position which
-//    // does not violate the constraint. Caller should compare value passed into
-//    // "agent_position" with the returned value. If equal, the agent is fine.
-//    // Otherwise the agent's position should be set to the value returned, and
-//    // its speed set to zero.
-    
-//        virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
-//        {
-//            Vec3 result = agent_position;
-//            ExcludeFrom ef = getExcludeFrom();
-//            double sdf = signed_distance(agent_position);
-//            // Is constraint violated?
-//            if (((sdf < 0) and (ef == inside)) or
-//                ((sdf > 0) and (ef == outside)))
-//            {
-//                Vec3 surface_point = nearest_point(agent_position);
-//    //            Vec3 normal = normal_at_poi(agent_position, agent_position);
-//    //            Vec3 offset = normal * (signum(sdf) + agent_radius);
-//
-//    //            Vec3 offset = normal(agent_position) * -(signum(sdf) + agent_radius);
-//    //            Vec3 offset = (normal(agent_position) * (1 + agent_radius)
-//    //                           -(signum(sdf) + ));
-//
-//                Vec3 offset = (normal_toward_agent(agent_position, agent_position) *
-//                               -agent_radius);
-//
-//                result = surface_point + offset;
-//            }
-//            return result;
-//        }
-    
-//        virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
-//        {
-//            Vec3 result = agent_position;
-//            ExcludeFrom ef = getExcludeFrom();
-//            double sdf = signed_distance(agent_position);
-//            // Is constraint violated?
-//            if (((sdf < 0) and (ef == inside)) or
-//                ((sdf > 0) and (ef == outside)))
-//            {
-//                Vec3 surface_point = nearest_point(agent_position);
-//    //            Vec3 offset = (normal_toward_agent(agent_position, agent_position) *
-//    //                           -agent_radius);
-//    //            result = surface_point + offset;
-//
-//                Vec3 nta = normal_toward_agent(agent_position, agent_position);
-//                result = surface_point + (nta * -agent_radius);
-//            }
-//            return result;
-//        }
-
-//        virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
-//        {
-//            Vec3 result = agent_position;
-//            ExcludeFrom ef = getExcludeFrom();
-//            double sdf = signed_distance(agent_position);
-//            // Is constraint violated?
-//    //        if (((sdf < 0) and (ef == inside)) or
-//    //            ((sdf > 0) and (ef == outside)))
-//            if (((sdf < +agent_radius) and (ef == inside)) or
-//                ((sdf > -agent_radius) and (ef == outside)))
-//            {
-//                Vec3 surface_point = nearest_point(agent_position);
-//                Vec3 nta = normal_toward_agent(agent_position, agent_position);
-//                result = surface_point + (nta * -agent_radius);
-//            }
-//            return result;
-//        }
-
-//        virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
-//        {
-//            Vec3 result = agent_position;
-//            ExcludeFrom ef = getExcludeFrom();
-//            double sdf = signed_distance(agent_position);
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//            // TODO 20250226 not talking ef into account for sign of normal
-//
-//            // Is constraint violated?
-//            if (((sdf < +agent_radius) and (ef == inside)) or
-//                ((sdf > -agent_radius) and (ef == outside)))
-//
-//    //        // Is constraint violated?
-//    //        if (((sdf < 0) and (ef == inside)) or
-//    //            ((sdf > 0) and (ef == outside)))
-//
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//            {
-//                Vec3 surface_point = nearest_point(agent_position);
-//                Vec3 nta = normal_toward_agent(agent_position, agent_position);
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                // TODO 20250226 not talking ef into account for sign of normal
-//
-//                if (ef == outside) { nta *= -1; }
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                result = surface_point + (nta * -agent_radius);
-//            }
-//            return result;
-//        }
-
-    
-    
-//    // Is constraint violated?
-//    if (((sdf < +agent_radius) and (ef == inside)) or
-//        ((sdf > -agent_radius) and (ef == outside)))
-//        
-//        // Is constraint violated?
-//        if (((sdf < 0) and (ef == inside)) or
-//            ((sdf > 0) and (ef == outside)))
-    
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20250227 temp debug
     static inline bool verbose = false;
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
+    // Does the given agent state violate this obstacle's ExcludeFrom?
     bool doesAgentViolateConstraint(Vec3 agent_position, double agent_radius) const
     {
         ExcludeFrom ef = getExcludeFrom();
         double sdf = signed_distance(agent_position);
-        
-//        bool violate = (((sdf < +agent_radius) and (ef == inside)) or
-//                        ((sdf > -agent_radius) and (ef == outside)));
-//        bool violate = (((sdf < 0) and (ef == inside)) or
-//                        ((sdf > 0) and (ef == outside)));
-//        bool violate = (((sdf < 2) and (ef == inside)) or
-//                        ((sdf > -2) and (ef == outside)));
-//        bool violate = (((sdf < +agent_radius) and (ef == inside)) or
-//                        ((sdf > -agent_radius) and (ef == outside)));
-//        bool violate = (((sdf < 0) and (ef == inside)) or
-//                        ((sdf > 0) and (ef == outside)));
-        bool violate = (((sdf < 0.1) and (ef == inside)) or
-                        ((sdf > 0.1) and (ef == outside)));
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        bool violate = (((sdf < 0) and (ef == inside)) or
+                        ((sdf > 0) and (ef == outside)));
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         // TODO 20250227 temp debug
         if (verbose)
         {
@@ -275,53 +147,9 @@ public:
             std::cout << " violate=" << violate;
             std::cout << std::endl;
         }
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         return violate;
     }
-    
-//        // Detects constraint violation. (For example being inside an Obstacle with
-//        // ExcludeFrom::inside.) When found, computes a new agent position which
-//        // does not violate the constraint. Caller should compare value passed into
-//        // "agent_position" with the returned value. If equal, the agent is fine.
-//        // Otherwise the agent's position should be set to the value returned, and
-//        // its speed set to zero.
-//        //
-//        // Does this need to be virtual, or is it generic for all Obstacles?
-//        //
-//        virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
-//        {
-//            Vec3 result = agent_position;
-//            ExcludeFrom ef = getExcludeFrom();
-//            double sdf = signed_distance(agent_position);
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//            // TODO 20250226 not talking ef into account for sign of normal
-//
-//    //        // Is constraint violated?
-//    //        if (((sdf < +agent_radius) and (ef == inside)) or
-//    //            ((sdf > -agent_radius) and (ef == outside)))
-//
-//    //        // Is constraint violated?
-//    //        if (((sdf < 0) and (ef == inside)) or
-//    //            ((sdf > 0) and (ef == outside)))
-//
-//            // Is constraint violated?
-//            if (doesAgentViolateConstraint(agent_position, agent_radius))
-//
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//            {
-//                Vec3 surface_point = nearest_point(agent_position);
-//                Vec3 nta = normal_toward_agent(agent_position, agent_position);
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                // TODO 20250226 not talking ef into account for sign of normal
-//
-//                if (ef == outside) { nta *= -1; }
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                result = surface_point + (nta * -agent_radius);
-//            }
-//            return result;
-//        }
 
     // Detects constraint violation. (For example being inside an Obstacle with
     // ExcludeFrom::inside.) When found, computes a new agent position which
@@ -334,33 +162,12 @@ public:
     //
     virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
     {
-        Vec3 result = agent_position;
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20250228 after switching to checking ALL obstacles...
-//        ExcludeFrom ef = getExcludeFrom();
-//        double sdf = signed_distance(agent_position);
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // Is constraint violated?
+        Vec3 result = agent_position;  // Default result is current agent pos.
         if (doesAgentViolateConstraint(agent_position, agent_radius))
         {
             Vec3 surface_point = nearest_point(agent_position);
-//            Vec3 nta = normal_toward_agent(agent_position, agent_position);
             Vec3 nta = normal_toward_agent(surface_point, agent_position);
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-            // TODO 20250228 after switching to checking ALL obstacles, not just
-            // collisions this seemed to be making boids get stuck on the outer
-            // sphere, so took it out as a test.
-            //
-            // but now I see huge displacements after colliding with one of the
-            // smaller EF=inside sphere
-
-//            if (ef == outside) { nta *= -1; }
-//            nta *= -1;
-
-            // TODO 20250228 feels more readable:
-//            result = surface_point + (nta * -agent_radius);
             result = surface_point - (nta * agent_radius);
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
         }
         return result;
     }
@@ -368,17 +175,17 @@ public:
     // Historical signum function for local use in this class. (Move to util?)
     static double signum(double x) { return x > 0 ? 1 : (x < 0 ? -1 : 0); }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250220 update normal(), etc., API for CylinderObstacle
-    
+    // Maybe temp? used while refactoring API.
     void unimplemented(const std::string& name) const
     {
         std::cout << "unimplemented " << name << std::endl;
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+    template<typename T>
+    T unimplemented(const std::string& name, const T& default_value) const
+    {
+        unimplemented(name);
+        return default_value;
+    }
 
 private:
     ExcludeFrom exclude_from_ = neither;
@@ -418,7 +225,6 @@ public:
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250219 experimental version to enforce constraint
-        
     // TODO this is the "legacy API"
 
     // Normal to the obstacle at a given point of interest.
@@ -432,29 +238,7 @@ public:
         return perp_direction * sign;
     }
     
-    
     // TODO these are the "new API"
-
-    //
-    //    // Abstract normal for a given position. Points toward the +SDF side.
-    //    virtual Vec3 normal(const Vec3& poi) const { return Vec3(); }
-    //
-
-//        Vec3 normal(const Vec3& poi) const override
-//        {
-//            Vec3 perp_direction = (center() - poi).normalize();
-//    //        double agent_to_surface_signed_dist = signed_distance(agent_position);
-//    //        // TODO clean up, with signum? ~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //        double sign = agent_to_surface_signed_dist < 0 ? 1 : -1;
-//            return perp_direction;
-//        }
-
-//        Vec3 normal(const Vec3& poi) const override
-//        {
-//    //        Vec3 perp_direction = (center() - poi).normalize();
-//    //        return perp_direction;
-//            return (center() - poi).normalize();
-//        }
 
     // Abstract normal for a given position. Points toward the +SDF side.
     Vec3 normal(const Vec3& poi) const override
@@ -462,53 +246,6 @@ public:
         return (poi - center()).normalize();
     }
 
-    
-    //    // Normal for a given position. Points toward side agent is on.
-    //    virtual Vec3 normal_toward_agent(const Vec3& poi,
-    //                                     const Vec3& agent_position) const
-    //    {
-    //        return Vec3();
-    //    }
-
-//        // Normal for a given position. Points toward side agent is on.
-//        Vec3 normal_toward_agent(const Vec3& poi,
-//                                 const Vec3& agent_position) const override
-//        {
-//    //        Vec3 perp_direction = (center() - poi).normalize();
-//    //        double agent_to_surface_signed_dist = signed_distance(agent_position);
-//    //        // TODO clean up, with signum? ~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //        double sign = agent_to_surface_signed_dist < 0 ? 1 : -1;
-//    //        return perp_direction * sign;
-//
-//            Vec3 normal = normal(poi);
-//
-//            double agent_sdf = signed_distance(agent_position);
-//
-//            return normal * signum(agent_sdf);
-//        }
-
-//    // Normal for a given position. Points toward side agent is on.
-//    Vec3 normal_toward_agent(const Vec3& poi,
-//                             const Vec3& agent_position) const override
-//    {
-//        Vec3 normal = normal(poi);
-//        double agent_sdf = signed_distance(agent_position);
-//        return normal * signum(agent_sdf);
-//    }
-
-//        // Normal for a given position. Points toward side agent is on.
-//        Vec3 normal_toward_agent(const Vec3& poi,
-//                                 const Vec3& agent_position) const override
-//        {
-//    //        Vec3 normal = normal(poi);
-//    //        double agent_sdf = signed_distance(agent_position);
-//            return normal(poi) * signum(signed_distance(agent_position));
-//        }
-
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250225 normal_toward_agent() ignoring exclude_from
-    
     // Normal for a given position. Points toward side agent is on.
     Vec3 normal_toward_agent(const Vec3& poi,
                              const Vec3& agent_position) const override
@@ -516,19 +253,13 @@ public:
         return normal(poi) * signum(signed_distance(agent_position));
     }
 
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
     // Point on surface of obstacle nearest the given query_point.
     Vec3 nearest_point(const Vec3& query_point) const override
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250228 wait, what?! this half-ignores center
-//        return (query_point - center()).normalize() * radius();
         return ((query_point - center()).normalize() * radius()) + center();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // Compute direction for agent's static avoidance of nearby obstacles.
@@ -935,61 +666,6 @@ inline void Obstacle::unit_test()
     double e = util::epsilon * 10;
     assert(Vec3::is_equal_within_epsilon(tso_ri, tso_ri_expected, e));
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250228 SphereObstacle::nearest_point() half-ignores center!!
-
-//    // Point on surface of obstacle nearest the given query_point.
-//    Vec3 nearest_point(const Vec3& query_point) const override
-//    {
-//        //        return (query_point - center()).normalize() * radius();
-//        return ((query_point - center()).normalize() * radius()) + center();
-//    }
-    
-//        // Found bug in SphereObstacle::nearest_point(), this would have caught it.
-//        {
-//            double so_no_radius = 1;
-//            Vec3 so_np_center{1, 2, 3};
-//            Vec3 so_np_test_point{5.1, 5.2, 5.3};
-//            Vec3 so_np_offset{10, 11, 12};
-//            SphereObstacle so_np_1(so_no_radius, so_np_center);
-//            SphereObstacle so_np_2(so_no_radius, so_np_center + so_np_offset);
-//
-//            //    assert(SphereObstacle(1, Vec3(0, 0, 0)));
-//
-//            Vec3 so_np_test_offset = so_np_test_point + so_np_offset;
-//
-//    //        Vec3 a = so_np_test_point -  so_np_1.nearest_point(so_np_test_point);
-//    //        Vec3 b = so_np_test_offset - so_np_2.nearest_point(so_np_test_offset);
-//    //
-//    //        debugPrint(a.length());
-//    //        debugPrint(b.length());
-//    //
-//    //        assert(a.length() == b.length());
-//
-//            Vec3 tp = so_np_test_point;
-//            Vec3 to = so_np_test_offset;
-//
-//
-//    //        Vec3 a = tp -  so_np_1.nearest_point(tp);
-//    //        Vec3 b = to - so_np_2.nearest_point(to);
-//    //
-//    //        debugPrint(a.length());
-//    //        debugPrint(b.length());
-//    //
-//    //        assert(a.length() == b.length());
-//
-//    //        Vec3 a = tp -  so_np_1.nearest_point(tp);
-//    //        Vec3 b = to - so_np_2.nearest_point(to);
-//    //
-//    //
-//    //        assert(a.length() == b.length());
-//
-//
-//            assert((tp - so_np_1.nearest_point(tp)).length() ==
-//                   (to - so_np_2.nearest_point(to)).length());
-//
-//        }
-
     // Found bug in SphereObstacle::nearest_point() where it was assuming that
     // every sphere was centered at the origin, this would have caught it.
     {
@@ -1004,9 +680,6 @@ inline void Obstacle::unit_test()
         assert((tp - s1.nearest_point(tp)).length() ==
                (to - s2.nearest_point(to)).length());
     }
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Test ExcludeFrom testing with constraintViolation().
     Vec3 poop(0, 0.1, 0);

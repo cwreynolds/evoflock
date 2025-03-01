@@ -16,13 +16,6 @@
 namespace shape
 {
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
-Vec3 rsi_p1;
-Vec3 rsi_p2;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 // Simple class to represent an abstract geometrical sphere.
 class Sphere
 {
@@ -46,17 +39,12 @@ public:
 // a std::vector of intersections, and then a ray_sphere_intersection() wrapper
 // that handles the ray logic?
 //
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20250223 add overload of shape::ray_sphere_intersection() for Sphere.
-
 Vec3 ray_sphere_intersection(const Vec3& ray_origin,
                              const Vec3& ray_tangent,
                              const Sphere& sphere)
 {
     Vec3 intersection = Vec3::none();
     assert(ray_tangent.is_unit_length());  // TODO 20240120 new, copy to python?
-//    Vec3 c = sphere_center;
-//    double r = sphere_radius;
     Vec3 c = sphere.center;
     double r = sphere.radius;
     // Origin/endpoint and tangent (basis) of ray.
@@ -77,19 +65,6 @@ Vec3 ray_sphere_intersection(const Vec3& ray_origin,
         // Select point on ("forward") ray, if both, use one nearer origin.
         if (d1 >= 0) { intersection = p1; }
         if (d2 >= 0 and d2 < d1) { intersection = p2; }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
-        rsi_p1 = p1;
-        rsi_p2 = p2;
-        
-        // AH HA?! I think this shows there IS a tall vertical annotation line
-        // from both of the intersection points, and the BLACK one is the FIRST
-        // one along the ray, verifying this routine is working correctly. I think.
-        //
-        // This suggests the bug may be in SphereObstacle::normal_at_poi() which
-        // -- indeed -- does not consider the signed_distance.
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     return intersection;
 }

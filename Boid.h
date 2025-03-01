@@ -422,216 +422,26 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250222 put on the "brakes" when avoiding head-on collision.
-    //               If kept needs adjustment for time to impact.
-
-//    // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
-//    // (I will collide with obstacle within min_time_to_collide seconds)
-//    // and "static" avoidance (I should fly away from this obstacle to add
-//    // clearance, to avoid scraping along everted containment obstacles).
-//    Vec3 steer_to_avoid()
-//    {
-//        Vec3 avoid;
-//        avoid_obstacle_annotation(0, Vec3::none(), 0);
-//        Vec3 predict_avoid = steer_for_predictive_avoidance();
-//        Vec3 static_avoid = fly_away_from_obstacles();
-//        avoid = static_avoid + predict_avoid;
-//        avoid_obstacle_annotation(3, Vec3::none(), 0);
-//        return avoid;
-//    }
-
     // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
     // (I will collide with obstacle within min_time_to_collide seconds)
     // and "static" avoidance (I should fly away from this obstacle to add
     // clearance, to avoid scraping along everted containment obstacles).
     Vec3 steer_to_avoid()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250225 how can boids escape big sphere despite constraint enforcement?
-        return {};
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250301 temp command to toggle obstacle avoidance
+        if (not draw().avoidingObstaclesMode()) { return {}; }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Vec3 avoid;
         avoid_obstacle_annotation(0, Vec3::none(), 0);
         Vec3 predict_avoid = steer_for_predictive_avoidance();
-        
-//        predict_avoid -= forward() * max_force() * 0.5;  // very ad hoc.
-//        debugPrint(predict_avoid.length());
-//        predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250224 put back distance weighting for predictive avoidance.
-
-//            if (predict_avoid.length() > 0.5)
-//            {
-//    //            predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
-//    //            predict_avoid -= forward() * max_force() * 0.01;  // very ad hoc.
-//    //            predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
-//    //            predict_avoid -= forward() * max_force() * 0.05;  // very ad hoc.
-//    //            predict_avoid -= forward() * max_force() * 0.1;  // very ad hoc.
-//                predict_avoid -= forward() * max_force() * 0.01;  // very ad hoc.
-//            }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//        Vec3 static_avoid = fly_away_from_obstacles();
-//        avoid = static_avoid + predict_avoid;
-
-//        if (predict_avoid.length() > 0.5)
-//        {
-//            avoid = predict_avoid;
-//        }
-//        else
-//        {
-//            Vec3 static_avoid = fly_away_from_obstacles();
-//            avoid = static_avoid ;
-//        }
-
-//        Vec3 static_avoid = fly_away_from_obstacles();
-//        avoid = static_avoid + predict_avoid;
-
         Vec3 static_avoid = fly_away_from_obstacles();
-//        avoid = ((predict_avoid.length() > static_avoid.length()) ?
-//                 predict_avoid :
-//                 static_avoid + predict_avoid);
-//        avoid = ((predict_avoid.length() > static_avoid.length()) ?
-//                 predict_avoid :
-//                 static_avoid + predict_avoid);
-
-//        avoid = ((predict_avoid.length() > 0.2) ?
-//                 predict_avoid :
-//                 predict_avoid + static_avoid);
-
         avoid = static_avoid + predict_avoid;
-        
         avoid_obstacle_annotation(3, Vec3::none(), 0);
         return avoid;
     }
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250224 put back distance weighting for predictive avoidance.
-    //
-    // TODO 20241219 reconsider avoid_blend_mode
-    
-//        // Steering force component for predictive obstacles avoidance.
-//        Vec3 steer_for_predictive_avoidance()
-//        {
-//            double weight = 0;
-//            Vec3 avoidance;
-//            CollisionList collisions = get_predicted_obstacle_collisions();
-//            if (not collisions.empty())
-//            {
-//                const Collision& first_collision = collisions.front();
-//                Vec3 poi = first_collision.point_of_impact;
-//                Vec3 normal = first_collision.normal_at_poi;
-//                Vec3 pure_steering = pure_lateral_steering(normal);
-//                avoidance = pure_steering.normalize();
-//                double min_dist = speed() * fp().min_time_to_collide;
-//    //            // Near enough to require avoidance steering?
-//    //            bool near = min_dist > first_collision.dist_to_collision;
-//    //            if (fp().avoid_blend_mode)
-//    //            {
-//    //                // Smooth weight transition from 80% to 120% of min dist.
-//    //                double d = util::remap_interval(first_collision.dist_to_collision,
-//    //                                                min_dist * 0.8, min_dist * 1.2,
-//    //                                                1, 0);
-//    //                weight = util::unit_sigmoid_on_01(d);
-//    //            }
-//    //            else
-//                {
-//                    // Near enough to require avoidance steering?
-//                    bool near = min_dist > first_collision.dist_to_collision;
-//
-//                    weight = near ? 1 : 0;
-//                }
-//                avoid_obstacle_annotation(1, poi, weight);
-//            }
-//            return avoidance * weight;
-//        }
-
-    
-//        // Steering force component for predictive obstacles avoidance.
-//        Vec3 steer_for_predictive_avoidance()
-//        {
-//            double weight = 0;
-//            Vec3 avoidance;
-//            CollisionList collisions = get_predicted_obstacle_collisions();
-//            if (not collisions.empty())
-//            {
-//                const Collision& first_collision = collisions.front();
-//                Vec3 poi = first_collision.point_of_impact;
-//                Vec3 normal = first_collision.normal_at_poi;
-//                Vec3 pure_steering = pure_lateral_steering(normal);
-//                avoidance = pure_steering.normalize();
-//                double min_dist = speed() * fp().min_time_to_collide;
-//
-//    //    //            // Near enough to require avoidance steering?
-//    //    //            bool near = min_dist > first_collision.dist_to_collision;
-//    //    //            if (fp().avoid_blend_mode)
-//    //    //            {
-//    //    //                // Smooth weight transition from 80% to 120% of min dist.
-//    //    //                double d = util::remap_interval(first_collision.dist_to_collision,
-//    //    //                                                min_dist * 0.8, min_dist * 1.2,
-//    //    //                                                1, 0);
-//    //    //                weight = util::unit_sigmoid_on_01(d);
-//    //    //            }
-//    //    //            else
-//    //                {
-//    //                    // Near enough to require avoidance steering?
-//    //                    bool near = min_dist > first_collision.dist_to_collision;
-//    //
-//    //                    weight = near ? 1 : 0;
-//    //                }
-//
-//    //            // Near enough to require avoidance steering?
-//    //            bool near = min_dist > first_collision.dist_to_collision;
-//
-//    //            if (fp().avoid_blend_mode)
-//    //            {
-//
-//    //            // Smooth weight transition from 80% to 120% of min dist.
-//    //            double d = util::remap_interval(first_collision.dist_to_collision,
-//    //                                            min_dist * 0.8, min_dist * 1.2,
-//    //                                            1, 0);
-//    //            weight = util::unit_sigmoid_on_01(d);
-//
-//    //            // Smooth weight transition
-//    //            double dtc =
-//    //            weight = util::remap_interval(first_collision.dist_to_collision,
-//    //                                          0, min_dist,
-//    //                                          1, 0);
-//
-//                // Smooth weight transition
-//                double dtc = first_collision.dist_to_collision;
-//    //            weight = util::remap_interval(dtc,  0, min_dist,  1, 0);
-//                weight = util::remap_interval(dtc,  0, min_dist,  1, 0.5);
-//
-//
-//    //            }
-//    //                else
-//    //                {
-//    //    //                // Near enough to require avoidance steering?
-//    //    //                bool near = min_dist > first_collision.dist_to_collision;
-//    //
-//    //                    weight = near ? 1 : 0;
-//    //                }
-//
-//                avoid_obstacle_annotation(1, poi, weight);
-//            }
-//    //        return avoidance * weight;
-//
-//
-//            //                predict_avoid -= forward() * max_force() * 0.01;  // very ad hoc.
-//
-//    //        return (avoidance - (forward() * -0.5)) * weight;
-//            return (avoidance - (forward() * -0.2)) * weight;
-//        }
-
-    
-    
+        
     // Steering force component for predictive obstacles avoidance.
     Vec3 steer_for_predictive_avoidance()
     {
@@ -655,8 +465,6 @@ public:
         return (avoidance - (forward() * 0.2)) * weight;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Computes static obstacle avoidance: steering AWAY from nearby obstacle.
     // Non-predictive "repulsion" from "large" obstacles like walls.
     Vec3 fly_away_from_obstacles()
@@ -672,11 +480,7 @@ public:
             avoid_obstacle_annotation(2, obstacle->nearest_point(p), weight);
             avoidance += oa;
         }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250224 put back distance weighting for predictive avoidance.
-//        return avoidance;
         return pure_lateral_steering(avoidance);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -920,40 +724,11 @@ public:
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250225 how can boids escape big sphere despite constraint enforcement?
-
-//        // Called from Flock to draw annotation for selected Boid and its neighbors.
-//        void drawAnnotationForBoidAndNeighbors()
-//        {
-//            drawAnnotation();
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
-//
-//    //        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
-//
-//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//            // TODO 20250203 back to debugging avoidance of spheres from outside
-//    //        {
-//    //            Vec3 f = position() + annote_forward_temp_ * 100;
-//    //            draw().addThickLineToAnimatedFrame(position(), f, Color::black());
-//    //            auto an = [&](Vec3 p)
-//    //            {
-//    //                Color c = (p == rsi_p0) ? Color::black() : Color::red();
-//    //                draw().addThickLineToAnimatedFrame(p, p + Vec3(0, 100, 0), c);
-//    //            };
-//    //            an(rsi_p1);
-//    //            an(rsi_p2);
-//    //        }
-//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        }
-
     
-    // TODO 20250225 very temp
     // temporary variables on Boid for annotation
     Vec3 impact_on_obstacle;
     Vec3 new_pos_after_impact;
 
-    
     // Called from Flock to draw annotation for selected Boid and its neighbors.
     void drawAnnotationForBoidAndNeighbors()
     {
@@ -1034,34 +809,6 @@ public:
             Vec3 poi = obstacle->ray_intersection(position(),
                                                   forward(),
                                                   fp().body_radius);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
-//            if (isSelected() and (poi != Vec3::none())) { debugPrint(poi); }
-            if (isSelected() and not poi.is_none())
-            {
-//                debugPrint(poi);
-                rsi_p0 = poi;
-                rsi_p1 = shape::rsi_p1;
-                rsi_p2 = shape::rsi_p2;
-                
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                // TODO 20251029 treats "outside" spheres same as "inside"
-                
-                // normal_at_poi(const Vec3 &poi, const Vec3 &agent_position)
-                
-//                debugPrint(obstacle->signed_distance(position()))
-                
-                // OK: plus is outside, minus is inside, as the comment before
-                // signed_distance() says.
-                
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            }
-            else
-            {
-                rsi_p1 = Vec3::none();
-                rsi_p2 = Vec3::none();
-            }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (not poi.is_none())
             {
                 double dist_to_collision = (poi - position()).length();
@@ -1082,13 +829,6 @@ public:
         };
         std::ranges::sort(predicted_obstacle_collisions_, sorted);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
-    Vec3 rsi_p0;
-    Vec3 rsi_p1;
-    Vec3 rsi_p2;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     bool detectObstacleViolations()
     {

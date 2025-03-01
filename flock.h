@@ -567,6 +567,245 @@ public:
 
 
 
+//        // Fly each boid in flock for one simulation step. Consists of two sequential
+//        // steps to avoid artifacts from order of boids. First a "sense/plan" phase
+//        // which computes the desired steering based on current state. Then an "act"
+//        // phase which actually moves the boids. Finally statistics are collected.
+//        // (20240605 renamed  Flock::fly_flock() to Flock::fly_boids())
+//        void fly_boids(double time_step)
+//        {
+//            for_all_boids([&](Boid* b){ b->plan_next_steer();});
+//            for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20250219 experimental version to enforce constraint
+//
+//            auto test_obs_constraint = [&](Boid* b)
+//            {
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                // TODO 20250222 when enforcing, point boid away from obs
+//                static int collision_counter = 0;
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                for (auto& collision : b->get_predicted_obstacle_collisions())
+//                {
+//                    Obstacle* o = collision.obstacle;
+//
+//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                    // TODO 20250227 temp debug
+//                    if (b == selectedBoid() and
+//                        o == b->get_predicted_obstacle_collisions().at(0).obstacle)
+//                    {
+//                        Obstacle::verbose = true;
+//                        std::cout << "step=" << aTimer().frameCounter() << " ";
+//                    }
+//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                    Vec3 ec = o->enforceConstraint(b->position(), fp().body_radius);
+//
+//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                    // TODO 20250227 temp debug
+//                    Obstacle::verbose = false;
+//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                    if (ec != b->position())
+//                    {
+//                        b->setSpeed(0);
+//                        b->setPosition(ec);
+//
+//                        // When enforcing, point boid away from obs (TODO does this help?)
+//
+//                        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//                        // TODO ok, this is not taking into account exclude-from
+//                        // first: brute force it to work
+//                        // second: reconsider modularity/support from Obstacle classes
+//                        //
+//                        // Oh, maybe we want three variants on Obstacle:
+//                        //     normal()
+//                        //     normal_toward_agent()
+//                        //     normal_toward_agent_as_excluded() -- or something
+//
+//
+//                        // OR since this already implied by the position returned by
+//                        // enforceConstraint() should this adjust normal from that?
+//                        Vec3 normal = (ec - o->nearest_point(ec)).normalize();
+//
+//                        Vec3 to = ec + (normal * fp().body_radius * 2);
+//                        b->set_ls(b->ls().fromTo(ec, to));
+//
+//                        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                        // TODO 20250221 tracking obstacle collisions
+//                        if (b == selectedBoid())
+//                        {
+//                            collision_counter++;
+//
+//                            std::cout << "step: ";
+//                            std::cout << aTimer().frameCounter() << ": ";
+//                            std::cout << "obstacle collision ";
+//                            std::cout << "#" << collision_counter << ": ";
+//                            std::cout << "boid_at_" << b;
+//                            std::cout << ", ";
+//                            std::cout << "obstacle_at_" << o;
+//                            std::cout << std::endl;
+//
+//                            b->impact_on_obstacle = o->nearest_point(ec);
+//                            b->new_pos_after_impact = ec;
+//                        }
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                    }
+//                }
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//    //            if (b->position().length() > 50)
+//    //            {
+//    //                std::cout << "step=";
+//    //                std::cout << aTimer().frameCounter();
+//    //                std::cout << " dist=" << b->position().length();
+//    //                std::cout << " boid=" << b;
+//    //                std::cout << std::endl;
+//    //            }
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//            };
+//            for_all_boids(test_obs_constraint);
+//
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            collect_flock_metrics();
+//        }
+
+    
+    
+//        // Fly each boid in flock for one simulation step. Consists of two sequential
+//        // steps to avoid artifacts from order of boids. First a "sense/plan" phase
+//        // which computes the desired steering based on current state. Then an "act"
+//        // phase which actually moves the boids. Finally statistics are collected.
+//        // (20240605 renamed  Flock::fly_flock() to Flock::fly_boids())
+//        void fly_boids(double time_step)
+//        {
+//            for_all_boids([&](Boid* b){ b->plan_next_steer();});
+//            for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20250219 experimental version to enforce constraint
+//
+//            auto test_obs_constraint = [&](Boid* b)
+//            {
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                // TODO 20250222 when enforcing, point boid away from obs
+//                static int collision_counter = 0;
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//                // TODO 20250228
+//    //            if (b == selectedBoid()){std::cout << "in test_obs_constraint()" << std::endl;}
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//
+//                // TODO 20250228 AHA this should not be based on predicted collisions since
+//                // that misses (eg) having already passed through the surrounding big sphere.
+//
+//    //            for (auto& collision : b->get_predicted_obstacle_collisions())
+//    //            {
+//    //                Obstacle* o = collision.obstacle;
+//
+//                for (auto& o : b->flock_obstacles())
+//                {
+//
+//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                    // TODO 20250227 temp debug
+//    //                if (b == selectedBoid() and
+//    //                    o == b->get_predicted_obstacle_collisions().at(0).obstacle)
+//    //                if (b == selectedBoid() and o == b->flock_obstacles().at(0))
+//    //                {
+//    //                    Obstacle::verbose = true;
+//    //                    std::cout << "step=" << aTimer().frameCounter() << " ";
+//    //                }
+//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                    Vec3 ec = o->enforceConstraint(b->position(), fp().body_radius);
+//
+//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                    // TODO 20250227 temp debug
+//                    Obstacle::verbose = false;
+//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                    if (ec != b->position())
+//                    {
+//                        b->setSpeed(0);
+//                        b->setPosition(ec);
+//
+//                        // When enforcing, point boid away from obs (TODO does this help?)
+//
+//                        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//                        // TODO ok, this is not taking into account exclude-from
+//                        // first: brute force it to work
+//                        // second: reconsider modularity/support from Obstacle classes
+//                        //
+//                        // Oh, maybe we want three variants on Obstacle:
+//                        //     normal()
+//                        //     normal_toward_agent()
+//                        //     normal_toward_agent_as_excluded() -- or something
+//
+//
+//                        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//
+//                        // OR since this already implied by the position returned by
+//                        // enforceConstraint() should this adjust normal from that?
+//                        Vec3 normal = (ec - o->nearest_point(ec)).normalize();
+//
+//                        Vec3 to = ec + (normal * fp().body_radius * 2);
+//                        b->set_ls(b->ls().fromTo(ec, to));
+//
+//                        //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+//
+//                        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                        // TODO 20250221 tracking obstacle collisions
+//                        if (b == selectedBoid())
+//                        {
+//                            collision_counter++;
+//
+//                            std::cout << "step: ";
+//                            std::cout << aTimer().frameCounter() << ": ";
+//                            std::cout << "obstacle collision ";
+//                            std::cout << "#" << collision_counter << ": ";
+//    //                        std::cout << "boid_at_" << b;
+//    //                        std::cout << ", ";
+//    //                        std::cout << "obstacle_at_" << o;
+//
+//                            std::cout << o->getExcludeFromAsString();
+//
+//                            // set these temporary variables on Boid for annotation
+//                            b->impact_on_obstacle = o->nearest_point(ec);
+//                            b->new_pos_after_impact = ec;
+//
+//                            std::cout << ", offset distance=";
+//                            std::cout << (b->impact_on_obstacle -
+//                                          b->new_pos_after_impact).length();
+//
+//                            std::cout << std::endl;
+//                        }
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                    }
+//                }
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//    //            if (b->position().length() > 50)
+//    //            {
+//    //                std::cout << "step=";
+//    //                std::cout << aTimer().frameCounter();
+//    //                std::cout << " dist=" << b->position().length();
+//    //                std::cout << " boid=" << b;
+//    //                std::cout << std::endl;
+//    //            }
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//            };
+
+    
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
     // which computes the desired steering based on current state. Then an "act"
@@ -586,31 +825,13 @@ public:
             static int collision_counter = 0;
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             
-            for (auto& collision : b->get_predicted_obstacle_collisions())
+            for (auto& o : b->flock_obstacles())
             {
-                Obstacle* o = collision.obstacle;
-                
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                // TODO 20250227 temp debug
-                if (b == selectedBoid() and
-                    o == b->get_predicted_obstacle_collisions().at(0).obstacle)
-                {
-                    Obstacle::verbose = true;
-                    std::cout << "step=" << aTimer().frameCounter() << " ";
-                }
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
                 Vec3 ec = o->enforceConstraint(b->position(), fp().body_radius);
-                
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                // TODO 20250227 temp debug
-                Obstacle::verbose = false;
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
                 if (ec != b->position())
                 {
                     b->setSpeed(0);
-                    b->setPosition(ec);
+//                    b->setPosition(ec);
                     
                     // When enforcing, point boid away from obs (TODO does this help?)
                     
@@ -625,12 +846,25 @@ public:
                     //     normal_toward_agent_as_excluded() -- or something
                     
                     
+                    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                    
                     // OR since this already implied by the position returned by
                     // enforceConstraint() should this adjust normal from that?
-                    Vec3 normal = (ec - o->nearest_point(ec)).normalize();
                     
-                    Vec3 to = ec + (normal * fp().body_radius * 2);
-                    b->set_ls(b->ls().fromTo(ec, to));
+                    {
+//                        Vec3 normal = (ec - o->nearest_point(ec)).normalize();
+//                        Vec3 to = ec + (normal * fp().body_radius * 2);
+//                        b->set_ls(b->ls().fromTo(ec, to));
+
+//                        Vec3 normal = (ec - o->nearest_point(ec)).normalize();
+//                        Vec3 to = ec + (normal * fp().body_radius * 2);
+                        Vec3 normal = o->normal_toward_agent(ec, b->position());
+                        Vec3 to = ec + (normal * fp().body_radius * -2);
+//                        b->setPosition(ec);
+                        b->set_ls(b->ls().fromTo(ec, to));
+                    }
+                    
+                    //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
                     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -645,13 +879,21 @@ public:
                         std::cout << aTimer().frameCounter() << ": ";
                         std::cout << "obstacle collision ";
                         std::cout << "#" << collision_counter << ": ";
-                        std::cout << "boid_at_" << b;
-                        std::cout << ", ";
-                        std::cout << "obstacle_at_" << o;
-                        std::cout << std::endl;
+//                        std::cout << "boid_at_" << b;
+//                        std::cout << ", ";
+//                        std::cout << "obstacle_at_" << o;
                         
+                        std::cout << o->getExcludeFromAsString();
+                        
+                        // set these temporary variables on Boid for annotation
                         b->impact_on_obstacle = o->nearest_point(ec);
                         b->new_pos_after_impact = ec;
+
+                        std::cout << ", offset distance=";
+                        std::cout << (b->impact_on_obstacle -
+                                      b->new_pos_after_impact).length();
+
+                        std::cout << std::endl;
                     }
                     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                 }
@@ -669,7 +911,9 @@ public:
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         };
-        for_all_boids(test_obs_constraint);
+
+    
+    for_all_boids(test_obs_constraint);
         
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

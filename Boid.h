@@ -949,6 +949,7 @@ public:
 
     
     // TODO 20250225 very temp
+    // temporary variables on Boid for annotation
     Vec3 impact_on_obstacle;
     Vec3 new_pos_after_impact;
 

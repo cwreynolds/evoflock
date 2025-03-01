@@ -257,8 +257,14 @@ public:
 //                        ((sdf > -agent_radius) and (ef == outside)));
 //        bool violate = (((sdf < 0) and (ef == inside)) or
 //                        ((sdf > 0) and (ef == outside)));
-        bool violate = (((sdf < 2) and (ef == inside)) or
-                        ((sdf > -2) and (ef == outside)));
+//        bool violate = (((sdf < 2) and (ef == inside)) or
+//                        ((sdf > -2) and (ef == outside)));
+//        bool violate = (((sdf < +agent_radius) and (ef == inside)) or
+//                        ((sdf > -agent_radius) and (ef == outside)));
+//        bool violate = (((sdf < 0) and (ef == inside)) or
+//                        ((sdf > 0) and (ef == outside)));
+        bool violate = (((sdf < 0.1) and (ef == inside)) or
+                        ((sdf > 0.1) and (ef == outside)));
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         // TODO 20250227 temp debug
@@ -329,15 +335,32 @@ public:
     virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
     {
         Vec3 result = agent_position;
-        ExcludeFrom ef = getExcludeFrom();
-        double sdf = signed_distance(agent_position);
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20250228 after switching to checking ALL obstacles...
+//        ExcludeFrom ef = getExcludeFrom();
+//        double sdf = signed_distance(agent_position);
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // Is constraint violated?
         if (doesAgentViolateConstraint(agent_position, agent_radius))
         {
             Vec3 surface_point = nearest_point(agent_position);
-            Vec3 nta = normal_toward_agent(agent_position, agent_position);
-            if (ef == outside) { nta *= -1; }
-            result = surface_point + (nta * -agent_radius);
+//            Vec3 nta = normal_toward_agent(agent_position, agent_position);
+            Vec3 nta = normal_toward_agent(surface_point, agent_position);
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+            // TODO 20250228 after switching to checking ALL obstacles, not just
+            // collisions this seemed to be making boids get stuck on the outer
+            // sphere, so took it out as a test.
+            //
+            // but now I see huge displacements after colliding with one of the
+            // smaller EF=inside sphere
+
+//            if (ef == outside) { nta *= -1; }
+//            nta *= -1;
+
+            // TODO 20250228 feels more readable:
+//            result = surface_point + (nta * -agent_radius);
+            result = surface_point - (nta * agent_radius);
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
         }
         return result;
     }
@@ -501,7 +524,11 @@ public:
     // Point on surface of obstacle nearest the given query_point.
     Vec3 nearest_point(const Vec3& query_point) const override
     {
-        return (query_point - center()).normalize() * radius();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250228 wait, what?! this half-ignores center
+//        return (query_point - center()).normalize() * radius();
+        return ((query_point - center()).normalize() * radius()) + center();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // Compute direction for agent's static avoidance of nearby obstacles.
@@ -907,6 +934,79 @@ inline void Obstacle::unit_test()
                          -5.94424294496012);
     double e = util::epsilon * 10;
     assert(Vec3::is_equal_within_epsilon(tso_ri, tso_ri_expected, e));
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250228 SphereObstacle::nearest_point() half-ignores center!!
+
+//    // Point on surface of obstacle nearest the given query_point.
+//    Vec3 nearest_point(const Vec3& query_point) const override
+//    {
+//        //        return (query_point - center()).normalize() * radius();
+//        return ((query_point - center()).normalize() * radius()) + center();
+//    }
+    
+//        // Found bug in SphereObstacle::nearest_point(), this would have caught it.
+//        {
+//            double so_no_radius = 1;
+//            Vec3 so_np_center{1, 2, 3};
+//            Vec3 so_np_test_point{5.1, 5.2, 5.3};
+//            Vec3 so_np_offset{10, 11, 12};
+//            SphereObstacle so_np_1(so_no_radius, so_np_center);
+//            SphereObstacle so_np_2(so_no_radius, so_np_center + so_np_offset);
+//
+//            //    assert(SphereObstacle(1, Vec3(0, 0, 0)));
+//
+//            Vec3 so_np_test_offset = so_np_test_point + so_np_offset;
+//
+//    //        Vec3 a = so_np_test_point -  so_np_1.nearest_point(so_np_test_point);
+//    //        Vec3 b = so_np_test_offset - so_np_2.nearest_point(so_np_test_offset);
+//    //
+//    //        debugPrint(a.length());
+//    //        debugPrint(b.length());
+//    //
+//    //        assert(a.length() == b.length());
+//
+//            Vec3 tp = so_np_test_point;
+//            Vec3 to = so_np_test_offset;
+//
+//
+//    //        Vec3 a = tp -  so_np_1.nearest_point(tp);
+//    //        Vec3 b = to - so_np_2.nearest_point(to);
+//    //
+//    //        debugPrint(a.length());
+//    //        debugPrint(b.length());
+//    //
+//    //        assert(a.length() == b.length());
+//
+//    //        Vec3 a = tp -  so_np_1.nearest_point(tp);
+//    //        Vec3 b = to - so_np_2.nearest_point(to);
+//    //
+//    //
+//    //        assert(a.length() == b.length());
+//
+//
+//            assert((tp - so_np_1.nearest_point(tp)).length() ==
+//                   (to - so_np_2.nearest_point(to)).length());
+//
+//        }
+
+    // Found bug in SphereObstacle::nearest_point() where it was assuming that
+    // every sphere was centered at the origin, this would have caught it.
+    {
+        double radius = 1;
+        Vec3 center(1, 2, 3);
+        Vec3 test_point(5.1, 5.2, 5.3);
+        Vec3 offset(10, 11, 12);
+        SphereObstacle s1(radius, center);
+        SphereObstacle s2(radius, center + offset);
+        Vec3 tp = test_point;
+        Vec3 to = test_point + offset;
+        assert((tp - s1.nearest_point(tp)).length() ==
+               (to - s2.nearest_point(to)).length());
+    }
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Test ExcludeFrom testing with constraintViolation().
     Vec3 poop(0, 0.1, 0);

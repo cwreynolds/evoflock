@@ -437,7 +437,15 @@ public:
         avoid_obstacle_annotation(0, Vec3::none(), 0);
         Vec3 predict_avoid = steer_for_predictive_avoidance();
         Vec3 static_avoid = fly_away_from_obstacles();
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+        // TODO 20250302 use normalTowardAllowedSide()
+
         avoid = static_avoid + predict_avoid;
+        
+//        avoid = predict_avoid;
+//        if (predict_avoid.length() < 0.1) ( avoid += static_avoid);
+
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
         avoid_obstacle_annotation(3, Vec3::none(), 0);
         return avoid;
     }
@@ -480,7 +488,26 @@ public:
             avoid_obstacle_annotation(2, obstacle->nearest_point(p), weight);
             avoidance += oa;
         }
-        return pure_lateral_steering(avoidance);
+        
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+        // TODO 20250302 use normalTowardAllowedSide()
+
+//        // Surprising number of collisions:
+//        return pure_lateral_steering(avoidance);
+        
+//        // Better:
+//        return avoidance;
+        
+        // More better:
+        return avoidance.normalize_or_0();
+        
+//        // worse
+//        return pure_lateral_steering(avoidance).normalize_or_0();
+        
+        // bad
+//        return avoidance - (forward() * 0.2 * avoidance.length());
+        
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

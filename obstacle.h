@@ -62,6 +62,19 @@ public:
         return unimplemented("normal_toward_agent()", Vec3());
     }
     
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250301 prototype Obstacle::normalTowardAllowedSide(poi)
+    
+    // Normal for a given position. Points toward non-exclided side.
+    // (Not tested for, nor well-defined for, the ExcludeFrom::neither case.)
+    Vec3 normalTowardAllowedSide(const Vec3& poi) const
+    {
+        return normal(poi) * ((getExcludeFrom() == outside) ? -1 : 1);
+    }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Point on surface of obstacle nearest the given query_point.
@@ -136,8 +149,18 @@ public:
     {
         ExcludeFrom ef = getExcludeFrom();
         double sdf = signed_distance(agent_position);
-        bool violate = (((sdf < 0) and (ef == inside)) or
-                        ((sdf > 0) and (ef == outside)));
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+        // TODO 20250302 use normalTowardAllowedSide()
+
+//        bool violate = (((sdf < 0) and (ef == inside)) or
+//                        ((sdf > 0) and (ef == outside)));
+        
+        bool violate = (((sdf < +agent_radius) and (ef == inside)) or
+                        ((sdf > -agent_radius) and (ef == outside)));
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         // TODO 20250227 temp debug
         if (verbose)
@@ -166,8 +189,17 @@ public:
         if (doesAgentViolateConstraint(agent_position, agent_radius))
         {
             Vec3 surface_point = nearest_point(agent_position);
-            Vec3 nta = normal_toward_agent(surface_point, agent_position);
-            result = surface_point - (nta * agent_radius);
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+            // TODO 20250302 use normalTowardAllowedSide()
+
+//            Vec3 nta = normal_toward_agent(surface_point, agent_position);
+//            result = surface_point - (nta * agent_radius);
+
+            Vec3 ntas = normalTowardAllowedSide(agent_position);
+            result = surface_point + (ntas * agent_radius);
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
         }
         return result;
     }
@@ -680,6 +712,39 @@ inline void Obstacle::unit_test()
         assert((tp - s1.nearest_point(tp)).length() ==
                (to - s2.nearest_point(to)).length());
     }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250301 does SphereObstacle::normal() always “point toward +SDF side”?
+    
+    // Verify SphereObstacle::normal() gets same value for inside/outside point
+    {
+        double radius = 2;
+        Vec3 center(2, 4, 8);
+        Vec3 test_dir = Vec3(-5, 3, -2).normalize();
+        SphereObstacle sphere(radius, center);
+        Vec3 inside = sphere.normal(center + test_dir);
+        Vec3 outside = sphere.normal(center + (test_dir * (radius + 1)));
+        assert(Vec3::is_equal_within_epsilon(inside, outside));
+    }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250301 prototype Obstacle::normalTowardAllowedSide(poi)
+    
+    // Verify normalTowardAllowedSide() points toward non-excluded side.
+    {
+        double radius = 2;
+        Vec3 center(-6, -4, -2);
+        SphereObstacle sphere_exclude_inside(radius, center, inside);
+        SphereObstacle sphere_exclude_outside(radius, center, outside);
+        Vec3 poi(1, 2, 3);
+        Vec3 outside_norm = sphere_exclude_inside.normalTowardAllowedSide(poi);
+        Vec3 inside_norm = sphere_exclude_outside.normalTowardAllowedSide(poi);
+        assert(Vec3::is_equal_within_epsilon(outside_norm, -inside_norm));
+    }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
     // Test ExcludeFrom testing with constraintViolation().
     Vec3 poop(0, 0.1, 0);

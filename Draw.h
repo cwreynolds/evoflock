@@ -689,6 +689,8 @@ public:
     void toggleAvoidingObstaclesMode()
     {
         avoiding_obstacles_mode_ = not avoiding_obstacles_mode_;
+        std::cout << "avoidingObstaclesMode() = ";
+        std::cout << (avoidingObstaclesMode() ? "true" : "false") << std::endl;
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

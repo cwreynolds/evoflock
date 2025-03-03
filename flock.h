@@ -336,9 +336,18 @@ public:
                 if (ec != b->position())
                 {
                     b->setSpeed(0);
-                    // Orient boid away from (normal to) obstacle.
-                    Vec3 normal = o->normal_toward_agent(ec, b->position());
-                    Vec3 to = ec + (normal * fp().body_radius * -2);
+                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                    // TODO 20250302 use normalTowardAllowedSide()
+                    
+//                    // Orient boid away from (normal to) obstacle.
+//                    Vec3 normal = o->normal_toward_agent(ec, b->position());
+//                    Vec3 to = ec + (normal * fp().body_radius * -2);
+
+                    // Orient boid away from obstacle.
+                    Vec3 normal = o->normalTowardAllowedSide(ec);
+                    Vec3 to = ec + (normal * fp().body_radius * 2);
+                    
+                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                     b->set_ls(b->ls().fromTo(ec, to));
                     if (b == selectedBoid())
                     {

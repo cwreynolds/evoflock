@@ -156,8 +156,12 @@ public:
 //        bool violate = (((sdf < 0) and (ef == inside)) or
 //                        ((sdf > 0) and (ef == outside)));
         
-        bool violate = (((sdf < +agent_radius) and (ef == inside)) or
-                        ((sdf > -agent_radius) and (ef == outside)));
+//        bool violate = (((sdf < +agent_radius) and (ef == inside)) or
+//                        ((sdf > -agent_radius) and (ef == outside)));
+
+        // TODO 20250303
+        bool violate = (((sdf < 0) and (ef == inside)) or
+                        ((sdf > 0) and (ef == outside)));
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 

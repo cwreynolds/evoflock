@@ -91,6 +91,19 @@ private:  // move to bottom of class later
     // Low pass filter for roll control ("up" target).
     util::Blender<Vec3> up_memory_;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250303 obstacle constraints now work, crank down collision rate.
+    
+public:
+    void resetSteerUpMemories()
+    {
+        steer_memory_.clear();
+        up_memory_.clear();
+    }
+private:
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Cache of nearest neighbors.
     BoidPtrList cached_nearest_neighbors_;
     int neighbors_count = 7;
@@ -108,6 +121,8 @@ private:  // move to bottom of class later
     
     Color color_;
 
+public:  // temp 20250303
+
     // Save this Boid's steering forces for drawing annotation later.
     Vec3 annote_separation_;
     Vec3 annote_alignment_;
@@ -117,7 +132,7 @@ private:  // move to bottom of class later
     Vec3 annote_avoid_poi_ = Vec3();
     double annote_avoid_weight_ = 0;
 
-public:
+//public:  // temp 20250303
     // Accessors
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240617 revisit incremental_sort()
@@ -440,12 +455,26 @@ public:
         //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
         // TODO 20250302 use normalTowardAllowedSide()
 
-        avoid = static_avoid + predict_avoid;
+//        avoid = static_avoid + predict_avoid;
         
 //        avoid = predict_avoid;
 //        if (predict_avoid.length() < 0.1) ( avoid += static_avoid);
 
+//        avoid = util::interpolate(0.3, static_avoid, predict_avoid);
+
+//        avoid = (static_avoid * 2) + predict_avoid;
+
+        avoid = static_avoid + (predict_avoid * 2);
+
         //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20250303 obstacle constraints now work, crank down collision rate.
+        
+        predict_avoid_save = predict_avoid;
+        static_avoid_save = static_avoid;
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        
         avoid_obstacle_annotation(3, Vec3::none(), 0);
         return avoid;
     }
@@ -752,9 +781,23 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250225 how can boids escape big sphere despite constraint enforcement?
     
+//    // Called from Flock to draw annotation for selected Boid and its neighbors.
+//    void drawAnnotationForBoidAndNeighbors()
+//    {
+//        drawAnnotation();
+//        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
+//    }
+
     // temporary variables on Boid for annotation
     Vec3 impact_on_obstacle;
     Vec3 new_pos_after_impact;
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20250303 obstacle constraints now work, crank down collision rate.
+
+    // temporary variables on Boid for annotation
+    Vec3 predict_avoid_save;
+    Vec3 static_avoid_save;
 
     // Called from Flock to draw annotation for selected Boid and its neighbors.
     void drawAnnotationForBoidAndNeighbors()
@@ -768,14 +811,25 @@ public:
         draw().addThickLineToAnimatedFrame(impact_on_obstacle,
                                            new_pos_after_impact,
                                            Color::green());
-        draw().addThickLineToAnimatedFrame(impact_on_obstacle,
-                                           impact_on_obstacle + Vec3(0,1000,0),
-                                           Color::red());
-        draw().addThickLineToAnimatedFrame(impact_on_obstacle,
-                                           Vec3(),
-                                           Color::red());
+//        draw().addThickLineToAnimatedFrame(impact_on_obstacle,
+//                                           impact_on_obstacle + Vec3(0,1000,0),
+//                                           Color::red());
+//        draw().addThickLineToAnimatedFrame(impact_on_obstacle,
+//                                           Vec3(),
+//                                           Color::red());
+
+        draw().addThickLineToAnimatedFrame(position(),
+                                           position() + predict_avoid_save,
+                                           Color::yellow());
+        draw().addThickLineToAnimatedFrame(position(),
+                                           position() + static_avoid_save,
+                                           Color::cyan());
+        draw().addThickLineToAnimatedFrame(position(),
+                                           position() + annote_avoidance_,
+                                           Color::magenta());
     }
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //    def is_neighbor(self, other_boid):

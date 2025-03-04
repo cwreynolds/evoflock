@@ -336,6 +336,12 @@ public:
                 if (ec != b->position())
                 {
                     b->setSpeed(0);
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20250303 obstacle constraints now work,
+                    //               crank down collision rate.
+                    b->resetSteerUpMemories();
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                     // TODO 20250302 use normalTowardAllowedSide()
                     
@@ -343,15 +349,16 @@ public:
 //                    Vec3 normal = o->normal_toward_agent(ec, b->position());
 //                    Vec3 to = ec + (normal * fp().body_radius * -2);
 
-                    // Orient boid away from obstacle.
+                    // Orient boid to point directly away from obstacle.
                     Vec3 normal = o->normalTowardAllowedSide(ec);
                     Vec3 to = ec + (normal * fp().body_radius * 2);
                     
                     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                     b->set_ls(b->ls().fromTo(ec, to));
+                    collision_counter++; // TODO 20250303 now for all boids
                     if (b == selectedBoid())
                     {
-                        collision_counter++;
+//                        collision_counter++; // TODO 20250303 now for all boids
                         std::cout << "step: ";
                         std::cout << aTimer().frameCounter() << ": ";
                         std::cout << "obstacle collision ";
@@ -367,6 +374,32 @@ public:
                     }
                 }
             }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250303 obstacle constraints now work,
+            //               crank down collision rate.
+//            if (b == selectedBoid())
+//            {
+//                int fc = aTimer().frameCounter();
+//                if (fc % 100 == 0) { std::cout << "step: " << fc << std::endl; }
+//                if (fc > 5000) { exit(EXIT_SUCCESS); }
+//            }
+            if (b == selectedBoid())
+            {
+//                if (aTimer().frameCounter() % 100 == 0)
+                {
+//                    std::cout << "step " << aTimer().frameCounter() << ", ";
+//                    std::cout << " collision #" << collision_counter << std::endl;
+
+                    std::cout << "step " << aTimer().frameCounter();
+                    std::cout << ", collision #" << collision_counter;
+                    std::cout << ", predict length " << b->predict_avoid_save.length();
+                    std::cout << ", static length " << b->static_avoid_save.length();
+                    std::cout << ", avoid length " << b->annote_avoidance_.length();
+                    std::cout << std::endl;
+                }
+                if (aTimer().frameCounter() > 2000) { exit(EXIT_SUCCESS); }
+            }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         };
         for_all_boids(test_obs_constraint);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

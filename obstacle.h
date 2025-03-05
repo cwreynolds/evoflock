@@ -39,13 +39,17 @@ public:
     // TODO 20250219 experimental version to enforce constraint
     // Maybe these should be called normal(poi) and normal_toward_agent(poi, p)
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
+
     // TODO this is the "legacy API"
     
-    virtual Vec3 normal_at_poi(const Vec3& poi, const Vec3& agent_position) const
-    {
-        return unimplemented("normal_at_poi()", Vec3());
-    }
-    
+//    virtual Vec3 normal_at_poi(const Vec3& poi, const Vec3& agent_position) const
+//    {
+//        return unimplemented("normal_at_poi()", Vec3());
+//    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     
     // TODO these are the "new API"
     
@@ -55,12 +59,40 @@ public:
         return unimplemented("normal()", Vec3());
     }
     
-    // Normal for a given position. Points toward side agent is on.
-    virtual Vec3 normal_toward_agent(const Vec3& poi,
-                                     const Vec3& agent_position) const
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250304 make Obstacle::normal_at_poi() generic -- no overloads.
+    
+//    // Normal for a given position. Points toward side agent is on.
+//    virtual Vec3 normal_toward_agent(const Vec3& poi,
+//                                     const Vec3& agent_position) const
+//    {
+//        return unimplemented("normal_toward_agent()", Vec3());
+//    }
+
+//    // Normal for a given position. Points toward side agent is on.
+//    // TODO -- this ignores the end caps of the cylinder
+//    Vec3 normal_toward_agent(const Vec3& poi,
+//                             const Vec3& agent_position) const
+//    {
+//        // This is a copy of the implementation from SphereObstacle
+//        // Can this be a generic definition in the base class?
+//        return normal(poi) * signum(signed_distance(agent_position));
+//    }
+
+//    // Normal for a given position. Points toward the side agent is on.
+//    Vec3 normal_toward_agent(const Vec3& poi, const Vec3& agent_position) const
+//    {
+//        return normal(poi) * signum(signed_distance(agent_position));
+//    }
+
+    // Normal for a given position. Points toward the side agent is on.
+    Vec3 normalTowardAgent(const Vec3& poi, const Vec3& agent_position) const
     {
-        return unimplemented("normal_toward_agent()", Vec3());
+        return normal(poi) * signum(signed_distance(agent_position));
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
@@ -261,19 +293,23 @@ public:
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250219 experimental version to enforce constraint
-    // TODO this is the "legacy API"
 
-    // Normal to the obstacle at a given point of interest.
-    Vec3 normal_at_poi(const Vec3& poi,
-                       const Vec3& agent_position) const override
-    {
-        Vec3 perp_direction = (center() - poi).normalize();
-        double agent_to_surface_signed_dist = signed_distance(agent_position);
-        // TODO clean up, with signum? ~~~~~~~~~~~~~~~~~~~~~~~~~
-        double sign = agent_to_surface_signed_dist < 0 ? 1 : -1;
-        return perp_direction * sign;
-    }
-    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
+
+//    // TODO this is the "legacy API"
+//    // Normal to the obstacle at a given point of interest.
+//    Vec3 normal_at_poi(const Vec3& poi,
+//                       const Vec3& agent_position) const override
+//    {
+//        Vec3 perp_direction = (center() - poi).normalize();
+//        double agent_to_surface_signed_dist = signed_distance(agent_position);
+//        // TODO clean up, with signum? ~~~~~~~~~~~~~~~~~~~~~~~~~
+//        double sign = agent_to_surface_signed_dist < 0 ? 1 : -1;
+//        return perp_direction * sign;
+//    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     // TODO these are the "new API"
 
     // Abstract normal for a given position. Points toward the +SDF side.
@@ -282,12 +318,16 @@ public:
         return (poi - center()).normalize();
     }
 
-    // Normal for a given position. Points toward side agent is on.
-    Vec3 normal_toward_agent(const Vec3& poi,
-                             const Vec3& agent_position) const override
-    {
-        return normal(poi) * signum(signed_distance(agent_position));
-    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250304 make Obstacle::normal_at_poi() generic -- no overloads.
+
+//    // Normal for a given position. Points toward side agent is on.
+//    Vec3 normal_toward_agent(const Vec3& poi,
+//                             const Vec3& agent_position) const override
+//    {
+//        return normal(poi) * signum(signed_distance(agent_position));
+//    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -394,21 +434,33 @@ public:
         return shape::ray_plane_intersection(origin, tangent, center_, normal_);
     }
 
-    // Normal to the obstacle at a given point of interest.
-    Vec3 normal_at_poi(const Vec3& poi,
-                       const Vec3& agent_position) const override
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
+
+//    // Normal to the obstacle at a given point of interest.
+//    Vec3 normal_at_poi(const Vec3& poi,
+//                       const Vec3& agent_position) const override
+//    {
+//        Vec3 normal = normal_;
+//        // If a reference position is given.
+//        if (agent_position != Vec3::none())
+//        {
+//            // Project it to obstacle surface.
+//            Vec3 on_obstacle = nearest_point(agent_position);
+//            // Normalized vector FROM obstacle surface TOWARD agent.
+//            normal = (agent_position - on_obstacle).normalize();
+//        }
+//        return normal;
+//    }
+    
+    // Abstract normal for a given position. Points toward the +SDF side.
+    Vec3 normal(const Vec3& poi) const override
     {
-        Vec3 normal = normal_;
-        // If a reference position is given.
-        if (agent_position != Vec3::none())
-        {
-            // Project it to obstacle surface.
-            Vec3 on_obstacle = nearest_point(agent_position);
-            // Normalized vector FROM obstacle surface TOWARD agent.
-            normal = (agent_position - on_obstacle).normalize();
-        }
-        return normal;
+        return normal_;
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 
     // Point on surface of obstacle nearest the given query_point.
     Vec3 nearest_point(const Vec3& query_point) const override
@@ -436,7 +488,12 @@ public:
         // Close enough to obstacle surface to use static replusion.
         if (dist_from_obstacle < max_distance)
         {
-            Vec3 normal = normal_at_poi(on_obstacle, agent_position);
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
+//            Vec3 normal = normal_at_poi(on_obstacle, agent_position);
+//            Vec3 normal = normal_toward_agent(on_obstacle, agent_position);
+            Vec3 normal = normalTowardAgent(on_obstacle, agent_position);
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             // Unless agent is already facing away from obstacle.
             if (normal.dot(agent_forward) < 0.9)
             {
@@ -538,12 +595,16 @@ public:
 
     // OLD API ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     
-    // Normal to the obstacle at a given point of interest.
-    Vec3 normal_at_poi(const Vec3& poi,
-                       const Vec3& agent_position) const override
-    {
-        return normal(poi);
-    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
+
+//    // Normal to the obstacle at a given point of interest.
+//    Vec3 normal_at_poi(const Vec3& poi,
+//                       const Vec3& agent_position) const override
+//    {
+//        return normal(poi);
+//    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // NEW API ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
@@ -556,15 +617,19 @@ public:
     }
     
     
-    // Normal for a given position. Points toward side agent is on.
-    // TODO -- this ignores the end caps of the cylinder
-    Vec3 normal_toward_agent(const Vec3& poi,
-                             const Vec3& agent_position) const override
-    {
-        // This is a copy of the implementation from SphereObstacle
-        // Can this be a generic definition in the base class?
-        return normal(poi) * signum(signed_distance(agent_position));
-    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250304 make Obstacle::normal_at_poi() generic -- no overloads.
+
+//    // Normal for a given position. Points toward side agent is on.
+//    // TODO -- this ignores the end caps of the cylinder
+//    Vec3 normal_toward_agent(const Vec3& poi,
+//                             const Vec3& agent_position) const override
+//    {
+//        // This is a copy of the implementation from SphereObstacle
+//        // Can this be a generic definition in the base class?
+//        return normal(poi) * signum(signed_distance(agent_position));
+//    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -595,7 +660,12 @@ public:
             Vec3 on_surface = nearest_point(agent_position);
             if ((on_surface - agent_position).length_squared() < sq(margin))
             {
-                avoidance = normal_at_poi(agent_position, agent_position);
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
+//                avoidance = normal_at_poi(agent_position, agent_position);
+//                avoidance = normal_toward_agent(agent_position, agent_position);
+                avoidance = normalTowardAgent(agent_position, agent_position);
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             }
         }
         return avoidance;

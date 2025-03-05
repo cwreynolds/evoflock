@@ -464,6 +464,9 @@ public:  // temp 20250303
 
 //        avoid = (static_avoid * 2) + predict_avoid;
 
+//        avoid = static_avoid + (predict_avoid * 2);
+//        avoid = static_avoid + (predict_avoid * 3);
+//        avoid = static_avoid + (predict_avoid * 1.6);
         avoid = static_avoid + (predict_avoid * 2);
 
         //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
@@ -894,7 +897,12 @@ public:  // temp 20250303
             {
                 double dist_to_collision = (poi - position()).length();
                 double time_to_collision = dist_to_collision / speed();
-                Vec3 normal_at_poi = obstacle->normal_at_poi(poi, position());
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
+//                Vec3 normal_at_poi = obstacle->normal_at_poi(poi, position());
+//                Vec3 normal_at_poi = obstacle->normal_toward_agent(poi, position());
+                Vec3 normal_at_poi = obstacle->normalTowardAgent(poi, position());
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 predicted_obstacle_collisions_.push_back({*obstacle,
                                                           time_to_collision,
                                                           dist_to_collision,

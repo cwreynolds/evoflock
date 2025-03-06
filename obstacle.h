@@ -31,24 +31,16 @@ public:
     }
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
-    virtual Vec3 ray_intersection(const Vec3& origin,
+    virtual Vec3 rayIntersection(const Vec3& origin,
                                   const Vec3& tangent,
-                                  double body_radius) const {return Vec3();}
+                                  double body_radius) const
+    {
+        return unimplemented("rayIntersection()", Vec3());
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250219 experimental version to enforce constraint
     // Maybe these should be called normal(poi) and normal_toward_agent(poi, p)
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
-
-    // TODO this is the "legacy API"
-    
-//    virtual Vec3 normal_at_poi(const Vec3& poi, const Vec3& agent_position) const
-//    {
-//        return unimplemented("normal_at_poi()", Vec3());
-//    }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     
     // TODO these are the "new API"
@@ -59,40 +51,12 @@ public:
         return unimplemented("normal()", Vec3());
     }
     
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250304 make Obstacle::normal_at_poi() generic -- no overloads.
-    
-//    // Normal for a given position. Points toward side agent is on.
-//    virtual Vec3 normal_toward_agent(const Vec3& poi,
-//                                     const Vec3& agent_position) const
-//    {
-//        return unimplemented("normal_toward_agent()", Vec3());
-//    }
-
-//    // Normal for a given position. Points toward side agent is on.
-//    // TODO -- this ignores the end caps of the cylinder
-//    Vec3 normal_toward_agent(const Vec3& poi,
-//                             const Vec3& agent_position) const
-//    {
-//        // This is a copy of the implementation from SphereObstacle
-//        // Can this be a generic definition in the base class?
-//        return normal(poi) * signum(signed_distance(agent_position));
-//    }
-
-//    // Normal for a given position. Points toward the side agent is on.
-//    Vec3 normal_toward_agent(const Vec3& poi, const Vec3& agent_position) const
-//    {
-//        return normal(poi) * signum(signed_distance(agent_position));
-//    }
 
     // Normal for a given position. Points toward the side agent is on.
     Vec3 normalTowardAgent(const Vec3& poi, const Vec3& agent_position) const
     {
         return normal(poi) * signum(signed_distance(agent_position));
     }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
     
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
@@ -110,14 +74,20 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Point on surface of obstacle nearest the given query_point.
-    virtual Vec3 nearest_point(const Vec3& query_point) const { return Vec3(); }
-
+    virtual Vec3 nearest_point(const Vec3& query_point) const
+    {
+        return unimplemented("nearest_point()", Vec3());
+    }
+    
     // Compute direction for agent's static avoidance of nearby obstacles.
     virtual Vec3 fly_away(const Vec3& agent_position,
                           const Vec3& agent_forward,
                           double max_distance,
-                          double body_radius) const { return Vec3(); }
-    
+                          double body_radius) const
+    {
+        return unimplemented("fly_away()", Vec3());
+    }
+
     // Signed distance function.
     // (From a query point to the nearest point on Obstacle's surface: negative
     // inside, positive outside, zero at surface. Very similar to nearest_point(),
@@ -171,75 +141,34 @@ public:
         return violation;
     }
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250227 temp debug
-    static inline bool verbose = false;
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    // Does the given agent state violate this obstacle's ExcludeFrom?
-    bool doesAgentViolateConstraint(Vec3 agent_position, double agent_radius) const
-    {
-        ExcludeFrom ef = getExcludeFrom();
-        double sdf = signed_distance(agent_position);
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-        // TODO 20250302 use normalTowardAllowedSide()
-
-//        bool violate = (((sdf < 0) and (ef == inside)) or
-//                        ((sdf > 0) and (ef == outside)));
-        
-//        bool violate = (((sdf < +agent_radius) and (ef == inside)) or
-//                        ((sdf > -agent_radius) and (ef == outside)));
-
-        // TODO 20250303
-        bool violate = (((sdf < 0) and (ef == inside)) or
-                        ((sdf > 0) and (ef == outside)));
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20250227 temp debug
-        if (verbose)
-        {
-            std::cout << "ef=" << getExcludeFromAsString();
-            std::cout << " sdf=" << sdf;
-            std::cout << " violate=" << violate;
-            std::cout << std::endl;
-        }
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        return violate;
-    }
-
     // Detects constraint violation. (For example being inside an Obstacle with
     // ExcludeFrom::inside.) When found, computes a new agent position which
     // does not violate the constraint. Caller should compare value passed into
     // "agent_position" with the returned value. If equal, the agent is fine.
     // Otherwise the agent's position should be set to the value returned, and
     // its speed set to zero.
-    //
-    // Does this need to be virtual, or is it generic for all Obstacles?
-    //
-    virtual Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
+    Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
     {
         Vec3 result = agent_position;  // Default result is current agent pos.
         if (doesAgentViolateConstraint(agent_position, agent_radius))
         {
             Vec3 surface_point = nearest_point(agent_position);
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-            // TODO 20250302 use normalTowardAllowedSide()
-
-//            Vec3 nta = normal_toward_agent(surface_point, agent_position);
-//            result = surface_point - (nta * agent_radius);
-
             Vec3 ntas = normalTowardAllowedSide(agent_position);
             result = surface_point + (ntas * agent_radius);
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
         }
         return result;
     }
 
+    // Does the given agent state violate this obstacle's ExcludeFrom?
+    bool doesAgentViolateConstraint(Vec3 agent_position, double agent_radius) const
+    {
+        ExcludeFrom ef = getExcludeFrom();
+        double sdf = signed_distance(agent_position);
+        bool violate = (((sdf < 0) and (ef == inside)) or
+                        ((sdf > 0) and (ef == outside)));
+        return violate;
+    }
+    
     // Historical signum function for local use in this class. (Move to util?)
     static double signum(double x) { return x > 0 ? 1 : (x < 0 ? -1 : 0); }
 
@@ -283,55 +212,19 @@ public:
     }
     
     // Where a ray (Agent's path) will intersect the obstacle, or None.
-    Vec3 ray_intersection(const Vec3& origin,
-                          const Vec3& tangent,
-                          double body_radius) const override
+    Vec3 rayIntersection(const Vec3& origin,
+                         const Vec3& tangent,
+                         double body_radius) const override
     {
         return shape::ray_sphere_intersection(origin, tangent, sphere());
     }
     
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250219 experimental version to enforce constraint
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
-
-//    // TODO this is the "legacy API"
-//    // Normal to the obstacle at a given point of interest.
-//    Vec3 normal_at_poi(const Vec3& poi,
-//                       const Vec3& agent_position) const override
-//    {
-//        Vec3 perp_direction = (center() - poi).normalize();
-//        double agent_to_surface_signed_dist = signed_distance(agent_position);
-//        // TODO clean up, with signum? ~~~~~~~~~~~~~~~~~~~~~~~~~
-//        double sign = agent_to_surface_signed_dist < 0 ? 1 : -1;
-//        return perp_direction * sign;
-//    }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    // TODO these are the "new API"
-
     // Abstract normal for a given position. Points toward the +SDF side.
     Vec3 normal(const Vec3& poi) const override
     {
         return (poi - center()).normalize();
     }
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250304 make Obstacle::normal_at_poi() generic -- no overloads.
-
-//    // Normal for a given position. Points toward side agent is on.
-//    Vec3 normal_toward_agent(const Vec3& poi,
-//                             const Vec3& agent_position) const override
-//    {
-//        return normal(poi) * signum(signed_distance(agent_position));
-//    }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
     // Point on surface of obstacle nearest the given query_point.
     Vec3 nearest_point(const Vec3& query_point) const override
     {
@@ -427,40 +320,18 @@ public:
         visible_thickness_(visible_thickness) {}
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
-    Vec3 ray_intersection(const Vec3& origin,
-                          const Vec3& tangent,
-                          double body_radius) const override
+    Vec3 rayIntersection(const Vec3& origin,
+                         const Vec3& tangent,
+                         double body_radius) const override
     {
         return shape::ray_plane_intersection(origin, tangent, center_, normal_);
     }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
-
-//    // Normal to the obstacle at a given point of interest.
-//    Vec3 normal_at_poi(const Vec3& poi,
-//                       const Vec3& agent_position) const override
-//    {
-//        Vec3 normal = normal_;
-//        // If a reference position is given.
-//        if (agent_position != Vec3::none())
-//        {
-//            // Project it to obstacle surface.
-//            Vec3 on_obstacle = nearest_point(agent_position);
-//            // Normalized vector FROM obstacle surface TOWARD agent.
-//            normal = (agent_position - on_obstacle).normalize();
-//        }
-//        return normal;
-//    }
     
     // Abstract normal for a given position. Points toward the +SDF side.
     Vec3 normal(const Vec3& poi) const override
     {
         return normal_;
     }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
 
     // Point on surface of obstacle nearest the given query_point.
     Vec3 nearest_point(const Vec3& query_point) const override
@@ -488,12 +359,7 @@ public:
         // Close enough to obstacle surface to use static replusion.
         if (dist_from_obstacle < max_distance)
         {
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
-//            Vec3 normal = normal_at_poi(on_obstacle, agent_position);
-//            Vec3 normal = normal_toward_agent(on_obstacle, agent_position);
             Vec3 normal = normalTowardAgent(on_obstacle, agent_position);
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             // Unless agent is already facing away from obstacle.
             if (normal.dot(agent_forward) < 0.9)
             {
@@ -572,41 +438,15 @@ public:
     }
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
-    Vec3 ray_intersection(const Vec3& origin,
-                          const Vec3& tangent,
-                          double body_radius) const override
+    Vec3 rayIntersection(const Vec3& origin,
+                         const Vec3& tangent,
+                         double body_radius) const override
     {
         return shape::ray_cylinder_intersection(origin, tangent,
                                                 endpoint_, tangent_,
                                                 radius_ + 2 * body_radius,
                                                 length_);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250220 update normal(), etc., API for CylinderObstacle
-
-//    // Normal to the obstacle at a given point of interest.
-//    Vec3 normal_at_poi(const Vec3& poi,
-//                       const Vec3& agent_position) const override
-//    {
-//        Vec3 on_axis = nearest_point_on_axis(poi);
-//        return (poi - on_axis).normalize();
-//    }
-
-    // OLD API ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
-
-//    // Normal to the obstacle at a given point of interest.
-//    Vec3 normal_at_poi(const Vec3& poi,
-//                       const Vec3& agent_position) const override
-//    {
-//        return normal(poi);
-//    }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    // NEW API ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
     // Abstract normal for a given position. Points toward the +SDF side.
     // TODO -- this ignores the end caps of the cylinder
@@ -615,24 +455,6 @@ public:
         Vec3 on_axis = nearest_point_on_axis(poi);
         return (poi - on_axis).normalize();
     }
-    
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250304 make Obstacle::normal_at_poi() generic -- no overloads.
-
-//    // Normal for a given position. Points toward side agent is on.
-//    // TODO -- this ignores the end caps of the cylinder
-//    Vec3 normal_toward_agent(const Vec3& poi,
-//                             const Vec3& agent_position) const override
-//    {
-//        // This is a copy of the implementation from SphereObstacle
-//        // Can this be a generic definition in the base class?
-//        return normal(poi) * signum(signed_distance(agent_position));
-//    }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Point on surface of obstacle nearest the given query_point.
     Vec3 nearest_point(const Vec3& query_point) const override
@@ -660,12 +482,7 @@ public:
             Vec3 on_surface = nearest_point(agent_position);
             if ((on_surface - agent_position).length_squared() < sq(margin))
             {
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
-//                avoidance = normal_at_poi(agent_position, agent_position);
-//                avoidance = normal_toward_agent(agent_position, agent_position);
                 avoidance = normalTowardAgent(agent_position, agent_position);
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             }
         }
         return avoidance;
@@ -763,9 +580,9 @@ inline void Obstacle::unit_test()
 
     // WIP prototype, slightly more testing, at least “historical repeatability”.
     SphereObstacle tso(10, Vec3(1, 2, 3));
-    Vec3 tso_ri = tso.ray_intersection(Vec3(-2, 4, -3),           // ray origin
-                                       Vec3(1, 3, -5).normalize(),// ray tangent
-                                       0.5);
+    Vec3 tso_ri = tso.rayIntersection(Vec3(-2, 4, -3),            // ray origin
+                                      Vec3(1, 3, -5).normalize(), // ray tangent
+                                      0.5);
     Vec3 tso_ri_expected(-1.41115141100798,  // Recorded 20240127
                          5.76654576697607,
                          -5.94424294496012);

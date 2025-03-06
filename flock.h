@@ -325,8 +325,6 @@ public:
     {
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250219 experimental version to enforce constraint
         auto test_obs_constraint = [&](Boid* b)
         {
             static int collision_counter = 0;
@@ -335,74 +333,27 @@ public:
                 Vec3 ec = o->enforceConstraint(b->position(), fp().body_radius);
                 if (ec != b->position())
                 {
+                    collision_counter++;
                     b->setSpeed(0);
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    // TODO 20250303 obstacle constraints now work,
-                    //               crank down collision rate.
                     b->resetSteerUpMemories();
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                    // TODO 20250302 use normalTowardAllowedSide()
-                    
-//                    // Orient boid away from (normal to) obstacle.
-//                    Vec3 normal = o->normal_toward_agent(ec, b->position());
-//                    Vec3 to = ec + (normal * fp().body_radius * -2);
 
                     // Orient boid to point directly away from obstacle.
                     Vec3 normal = o->normalTowardAllowedSide(ec);
                     Vec3 to = ec + (normal * fp().body_radius * 2);
-                    
-                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                     b->set_ls(b->ls().fromTo(ec, to));
-                    collision_counter++; // TODO 20250303 now for all boids
                     if (b == selectedBoid())
                     {
-//                        collision_counter++; // TODO 20250303 now for all boids
                         std::cout << "step: ";
                         std::cout << aTimer().frameCounter() << ": ";
                         std::cout << "obstacle collision ";
                         std::cout << "#" << collision_counter << ": ";
                         std::cout << o->getExcludeFromAsString();
-                        // set these temporary variables on Boid for annotation
-                        b->impact_on_obstacle = o->nearest_point(ec);
-                        b->new_pos_after_impact = ec;
-                        std::cout << ", offset distance=";
-                        std::cout << (b->impact_on_obstacle -
-                                      b->new_pos_after_impact).length();
                         std::cout << std::endl;
                     }
                 }
             }
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250303 obstacle constraints now work,
-            //               crank down collision rate.
-//            if (b == selectedBoid())
-//            {
-//                int fc = aTimer().frameCounter();
-//                if (fc % 100 == 0) { std::cout << "step: " << fc << std::endl; }
-//                if (fc > 5000) { exit(EXIT_SUCCESS); }
-//            }
-            if (b == selectedBoid())
-            {
-//                if (aTimer().frameCounter() % 100 == 0)
-                {
-//                    std::cout << "step " << aTimer().frameCounter() << ", ";
-//                    std::cout << " collision #" << collision_counter << std::endl;
-
-                    std::cout << "step " << aTimer().frameCounter();
-                    std::cout << ", collision #" << collision_counter;
-                    std::cout << ", predict length " << b->predict_avoid_save.length();
-                    std::cout << ", static length " << b->static_avoid_save.length();
-                    std::cout << ", avoid length " << b->annote_avoidance_.length();
-                    std::cout << std::endl;
-                }
-                if (aTimer().frameCounter() > 2000) { exit(EXIT_SUCCESS); }
-            }
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         };
         for_all_boids(test_obs_constraint);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         collect_flock_metrics();
     }
     

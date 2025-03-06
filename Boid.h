@@ -91,19 +91,6 @@ private:  // move to bottom of class later
     // Low pass filter for roll control ("up" target).
     util::Blender<Vec3> up_memory_;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250303 obstacle constraints now work, crank down collision rate.
-    
-public:
-    void resetSteerUpMemories()
-    {
-        steer_memory_.clear();
-        up_memory_.clear();
-    }
-private:
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Cache of nearest neighbors.
     BoidPtrList cached_nearest_neighbors_;
     int neighbors_count = 7;
@@ -121,8 +108,6 @@ private:
     
     Color color_;
 
-public:  // temp 20250303
-
     // Save this Boid's steering forces for drawing annotation later.
     Vec3 annote_separation_;
     Vec3 annote_alignment_;
@@ -132,7 +117,8 @@ public:  // temp 20250303
     Vec3 annote_avoid_poi_ = Vec3();
     double annote_avoid_weight_ = 0;
 
-//public:  // temp 20250303
+public:
+    
     // Accessors
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240617 revisit incremental_sort()
@@ -429,10 +415,8 @@ public:  // temp 20250303
         // TODO 20241231 new ad hoc global pointer to selected Boid.
         //               intended just for debugging
         
-//        return direction.normalize_or_0();
         
         Vec3 direction_normalized = direction.normalize_or_0();
-//        if (isSelected()) { debugPrint(total_weight); }
         return direction_normalized;
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
@@ -452,32 +436,10 @@ public:  // temp 20250303
         avoid_obstacle_annotation(0, Vec3::none(), 0);
         Vec3 predict_avoid = steer_for_predictive_avoidance();
         Vec3 static_avoid = fly_away_from_obstacles();
-        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-        // TODO 20250302 use normalTowardAllowedSide()
-
-//        avoid = static_avoid + predict_avoid;
-        
-//        avoid = predict_avoid;
-//        if (predict_avoid.length() < 0.1) ( avoid += static_avoid);
-
-//        avoid = util::interpolate(0.3, static_avoid, predict_avoid);
-
-//        avoid = (static_avoid * 2) + predict_avoid;
-
-//        avoid = static_avoid + (predict_avoid * 2);
-//        avoid = static_avoid + (predict_avoid * 3);
-//        avoid = static_avoid + (predict_avoid * 1.6);
+        // Based on March 4, 2025 experiments: weighting predict_avoid twice as
+        // much as static_avoid seems to produce lowest number of collisions:
+        // 79 per 400,000 boid steps.
         avoid = static_avoid + (predict_avoid * 2);
-
-        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20250303 obstacle constraints now work, crank down collision rate.
-        
-        predict_avoid_save = predict_avoid;
-        static_avoid_save = static_avoid;
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        
         avoid_obstacle_annotation(3, Vec3::none(), 0);
         return avoid;
     }
@@ -506,7 +468,7 @@ public:  // temp 20250303
     }
 
     // Computes static obstacle avoidance: steering AWAY from nearby obstacle.
-    // Non-predictive "repulsion" from "large" obstacles like walls.
+    // Non-predictive "repulsion" to avoid scraping "large" obstacles like walls.
     Vec3 fly_away_from_obstacles()
     {
         Vec3 avoidance;
@@ -520,26 +482,7 @@ public:  // temp 20250303
             avoid_obstacle_annotation(2, obstacle->nearest_point(p), weight);
             avoidance += oa;
         }
-        
-        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-        // TODO 20250302 use normalTowardAllowedSide()
-
-//        // Surprising number of collisions:
-//        return pure_lateral_steering(avoidance);
-        
-//        // Better:
-//        return avoidance;
-        
-        // More better:
         return avoidance.normalize_or_0();
-        
-//        // worse
-//        return pure_lateral_steering(avoidance).normalize_or_0();
-        
-        // bad
-//        return avoidance - (forward() * 0.2 * avoidance.length());
-        
-        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -728,12 +671,7 @@ public:  // temp 20250303
                                          // color
                                          color());
     }
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250203 back to debugging avoidance of spheres from outside
-    
-    Vec3 annote_forward_temp_; // TEMP
-
+        
     // Save this Boid's steering forces for drawing annotation later.
     void saveAnnotation(const Vec3& separation,
                         const Vec3& alignment,
@@ -746,8 +684,6 @@ public:  // temp 20250303
         annote_cohesion_ = cohesion;
         annote_avoidance_ = avoidance;
         annote_combined_ = combined;
-        
-        annote_forward_temp_ = forward(); // TEMP
     }
 
     // Draw optional annotation of this Boid's current steering forces
@@ -764,80 +700,21 @@ public:  // temp 20250303
         relative_force_annotation(annote_alignment_,  Color::green());
         relative_force_annotation(annote_cohesion_,   Color::blue());
         relative_force_annotation(annote_avoidance_,  Color::magenta());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20241219 reconsider avoid_blend_mode
         relative_force_annotation(annote_combined_,   Color::yellow());
-                    
-        if (annote_avoid_weight_ > 0.01)
+        if (annote_avoid_weight_ > 0.1)
         {
-            Color c = util::interpolate(annote_avoid_weight_,
-                                        Color(0.4),
-                                        Color::magenta());
+            double a = annote_avoid_weight_;
+            Color c = util::interpolate(a, Color(0.5), Color(0.8, 0.5, 0.8));
             draw().addThickLineToAnimatedFrame(position(), annote_avoid_poi_, c);
         }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
     
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250225 how can boids escape big sphere despite constraint enforcement?
-    
-//    // Called from Flock to draw annotation for selected Boid and its neighbors.
-//    void drawAnnotationForBoidAndNeighbors()
-//    {
-//        drawAnnotation();
-//        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
-//    }
-
-    // temporary variables on Boid for annotation
-    Vec3 impact_on_obstacle;
-    Vec3 new_pos_after_impact;
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20250303 obstacle constraints now work, crank down collision rate.
-
-    // temporary variables on Boid for annotation
-    Vec3 predict_avoid_save;
-    Vec3 static_avoid_save;
-
     // Called from Flock to draw annotation for selected Boid and its neighbors.
     void drawAnnotationForBoidAndNeighbors()
     {
-//        drawAnnotation();
-//        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
-        
-        Vec3 f = position() + annote_forward_temp_ * 100;
-        draw().addThickLineToAnimatedFrame(position(), f, Color::black());
-        
-        draw().addThickLineToAnimatedFrame(impact_on_obstacle,
-                                           new_pos_after_impact,
-                                           Color::green());
-//        draw().addThickLineToAnimatedFrame(impact_on_obstacle,
-//                                           impact_on_obstacle + Vec3(0,1000,0),
-//                                           Color::red());
-//        draw().addThickLineToAnimatedFrame(impact_on_obstacle,
-//                                           Vec3(),
-//                                           Color::red());
-
-        draw().addThickLineToAnimatedFrame(position(),
-                                           position() + predict_avoid_save,
-                                           Color::yellow());
-        draw().addThickLineToAnimatedFrame(position(),
-                                           position() + static_avoid_save,
-                                           Color::cyan());
-        draw().addThickLineToAnimatedFrame(position(),
-                                           position() + annote_avoidance_,
-                                           Color::magenta());
+        drawAnnotation();
+        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
     }
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //    def is_neighbor(self, other_boid):
-    //        return other_boid in self.flock.selected_boid().cached_nearest_neighbors
-
     
     // Bird-like roll control: blends vector toward path curvature center with
     // global up. Overrides method in base class Agent
@@ -852,17 +729,11 @@ public:  // temp 20250303
 
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
-    
-    // This ad hoc global value is used only for debugging.
-    // Do not use this in "real" production code.
+    // This ad hoc global value is provided only for temporary debugging.
+    // Do not use this in "real" production code. Probably not thread safe.
     static inline Boid* selected_boid_ = nullptr;
-//    bool isSelected() const { return selected_boid_ == this; }
-    bool isSelected() { return selected_boid_ == this; }
+    bool isSelected() const { return selected_boid_ == this; }
     static void setSelected(Boid* b) { selected_boid_ = b; }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void flush_cache_of_predicted_obstacle_collisions()
     {
@@ -882,27 +753,18 @@ public:  // temp 20250303
     // Build a list of future collisions sorted by time, with soonest first.
     void cache_predicted_obstacle_collisions()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
-//        if (isSelected()) { std::cout << std::endl; }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         predicted_obstacle_collisions_.clear();
         for (Obstacle* obstacle : flock_obstacles())
         {
             // Compute predicted point of impact, if any.
-            Vec3 poi = obstacle->ray_intersection(position(),
-                                                  forward(),
-                                                  fp().body_radius);
+            Vec3 poi = obstacle->rayIntersection(position(),
+                                                 forward(),
+                                                 fp().body_radius);
             if (not poi.is_none())
             {
                 double dist_to_collision = (poi - position()).length();
                 double time_to_collision = dist_to_collision / speed();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250304 remove "legacy" api Obstacle::normal_at_poi()
-//                Vec3 normal_at_poi = obstacle->normal_at_poi(poi, position());
-//                Vec3 normal_at_poi = obstacle->normal_toward_agent(poi, position());
                 Vec3 normal_at_poi = obstacle->normalTowardAgent(poi, position());
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 predicted_obstacle_collisions_.push_back({*obstacle,
                                                           time_to_collision,
                                                           dist_to_collision,
@@ -945,6 +807,12 @@ public:  // temp 20250303
                 true);
     }
     void assert_valid() const { assert(is_valid()); }
+    
+    void resetSteerUpMemories()
+    {
+        steer_memory_.clear();
+        up_memory_.clear();
+    }
 
     static void unit_test()
     {

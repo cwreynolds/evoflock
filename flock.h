@@ -325,35 +325,24 @@ public:
     {
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
-        auto test_obs_constraint = [&](Boid* b)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250306 move "enforce obstacle constraints" to Boid
+        
+        for_all_boids([&](Boid* b){ b->enforceObstacleConstraint(); });
+        
+        // TODO 20250305 TEMP, should be moved to Flock::log_stats() or etc.
+        if (0 == (aTimer().frameCounter() % 100))
         {
-            static int collision_counter = 0;
-            for (auto& o : b->flock_obstacles())
-            {
-                Vec3 ec = o->enforceConstraint(b->position(), fp().body_radius);
-                if (ec != b->position())
-                {
-                    collision_counter++;
-                    b->setSpeed(0);
-                    b->resetSteerUpMemories();
-
-                    // Orient boid to point directly away from obstacle.
-                    Vec3 normal = o->normalTowardAllowedSide(ec);
-                    Vec3 to = ec + (normal * fp().body_radius * 2);
-                    b->set_ls(b->ls().fromTo(ec, to));
-                    if (b == selectedBoid())
-                    {
-                        std::cout << "step: ";
-                        std::cout << aTimer().frameCounter() << ": ";
-                        std::cout << "obstacle collision ";
-                        std::cout << "#" << collision_counter << ": ";
-                        std::cout << o->getExcludeFromAsString();
-                        std::cout << std::endl;
-                    }
-                }
-            }
-        };
-        for_all_boids(test_obs_constraint);
+            int collision_counter = 0;
+            auto t=[&](Boid* b){collision_counter+=b->temp_obs_collision_count;};
+            for_all_boids(t);
+            std::cout << "step: ";
+            std::cout << aTimer().frameCounter() << ", ";
+            std::cout << "obstacle collision: ";
+            std::cout << collision_counter << ": ";
+            std::cout << std::endl;
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         collect_flock_metrics();
     }
     
@@ -367,7 +356,7 @@ public:
 //    //  thread launching overhead. Now creates ONE thread and splits the load
 //    //  between it and this main thread. On 20240527 I tried adjusting the load
 //    //  ratio between the threads. (Used util::Timer and averaged over all calls
-//    //  in an evelotion run.) I got maybe 1-2% improvement but didn't think it
+//    //  in an evolution run.) I got maybe 1-2% improvement but didn't think it
 //    //  was worth the extra code complexity. Verified that two threads are
 //    //  better than one.)
 //    //

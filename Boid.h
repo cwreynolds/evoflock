@@ -780,6 +780,11 @@ public:
         };
         std::ranges::sort(predicted_obstacle_collisions_, sorted);
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250306 move "enforce obstacle constraints" to Boid
+    // detectObstacleViolations() is conceptually obsolete, needs refactoring.
+    // new enforceObstacleConstraint()
 
     bool detectObstacleViolations()
     {
@@ -795,7 +800,35 @@ public:
         previous_position_ = position();
         return violation;
     }
+
+    int temp_obs_collision_count = 0;  // TODO / TEMP? / rename?
     
+    // Test this Boid against each Obstacle in the scene. If it has violated the
+    // Obstacle's constraint -- for example crashed through the surface into the
+    // interior of an Obstacle with an ExcludeFrom of "inside" -- then it is
+    // moved outside, its speed is set to zero, and it is oriented to point away
+    // from the obstacle surface.
+    void enforceObstacleConstraint()
+    {
+        for (auto& o : flock_obstacles())
+        {
+            Vec3 ec = o->enforceConstraint(position(), fp().body_radius);
+            if (ec != position())
+            {
+                // Count collision, set speed to zero, clear smoothing history.
+                temp_obs_collision_count++;
+                setSpeed(0);
+                resetSteerUpMemories();
+                // Orient boid to point directly away from obstacle.
+                Vec3 normal = o->normalTowardAllowedSide(ec);
+                Vec3 to = ec + (normal * fp().body_radius * 2);
+                set_ls(ls().fromTo(ec, to));
+            }
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Only used for debugging, to to pick out one boid to track/log/whatever.
     bool is_first_boid() const { return this == flock_boids().at(0); }
     

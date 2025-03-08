@@ -37,13 +37,6 @@ public:
     {
         return unimplemented("rayIntersection()", Vec3());
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250219 experimental version to enforce constraint
-    // Maybe these should be called normal(poi) and normal_toward_agent(poi, p)
-
-    
-    // TODO these are the "new API"
     
     // Abstract normal for a given position. Points toward the +SDF side.
     virtual Vec3 normal(const Vec3& poi) const
@@ -51,16 +44,11 @@ public:
         return unimplemented("normal()", Vec3());
     }
     
-
     // Normal for a given position. Points toward the side agent is on.
     Vec3 normalTowardAgent(const Vec3& poi, const Vec3& agent_position) const
     {
         return normal(poi) * signum(signed_distance(agent_position));
     }
-    
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250301 prototype Obstacle::normalTowardAllowedSide(poi)
     
     // Normal for a given position. Points toward non-exclided side.
     // (Not tested for, nor well-defined for, the ExcludeFrom::neither case.)
@@ -69,10 +57,6 @@ public:
         return normal(poi) * ((getExcludeFrom() == outside) ? -1 : 1);
     }
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Point on surface of obstacle nearest the given query_point.
     virtual Vec3 nearest_point(const Vec3& query_point) const
     {
@@ -604,9 +588,6 @@ inline void Obstacle::unit_test()
                (to - s2.nearest_point(to)).length());
     }
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250301 does SphereObstacle::normal() always “point toward +SDF side”?
-    
     // Verify SphereObstacle::normal() gets same value for inside/outside point
     {
         double radius = 2;
@@ -617,10 +598,6 @@ inline void Obstacle::unit_test()
         Vec3 outside = sphere.normal(center + (test_dir * (radius + 1)));
         assert(Vec3::is_equal_within_epsilon(inside, outside));
     }
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250301 prototype Obstacle::normalTowardAllowedSide(poi)
     
     // Verify normalTowardAllowedSide() points toward non-excluded side.
     {
@@ -633,9 +610,6 @@ inline void Obstacle::unit_test()
         Vec3 inside_norm = sphere_exclude_outside.normalTowardAllowedSide(poi);
         assert(Vec3::is_equal_within_epsilon(outside_norm, -inside_norm));
     }
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
 
     // Test ExcludeFrom testing with constraintViolation().
     Vec3 poop(0, 0.1, 0);

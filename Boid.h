@@ -773,27 +773,9 @@ public:
         std::ranges::sort(predicted_obstacle_collisions_, sorted);
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250306 move "enforce obstacle constraints" to Boid
-    // detectObstacleViolations() is conceptually obsolete, needs refactoring.
-    // new enforceObstacleConstraint()
-
-    bool detectObstacleViolations()
-    {
-        bool violation = false;
-        for (Obstacle* obstacle : flock_obstacles())
-        {
-            if (obstacle->constraintViolation(position(), previous_position_))
-            {
-                avoidance_failure_counter_ += 1;
-                violation = true;
-            }
-        }
-        previous_position_ = position();
-        return violation;
-    }
-
-    int temp_obs_collision_count = 0;  // TODO / TEMP? / rename?
+    // TODO / TEMP? / rename?
+    // Total count of all obstacle collisions during the lifetime of this Boid.
+    int temp_obs_collision_count = 0;
     
     // Test this Boid against each Obstacle in the scene. If it has violated the
     // Obstacle's constraint -- for example crashed through the surface into the
@@ -818,8 +800,6 @@ public:
             }
         }
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Only used for debugging, to to pick out one boid to track/log/whatever.
     bool is_first_boid() const { return this == flock_boids().at(0); }

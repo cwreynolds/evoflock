@@ -183,6 +183,11 @@ public:
         RandomSequence& rs = EF::RS();
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
         useObstacleSet();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250307 no count obstacle collisions on frame 0 or change obs set.
+        enforceObsBoidConstraintsDoNotCount();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -325,11 +330,9 @@ public:
     {
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250306 move "enforce obstacle constraints" to Boid
-        
-        for_all_boids([&](Boid* b){ b->enforceObstacleConstraint(); });
-        
+//        for_all_boids([&](Boid* b){ b->enforceObstacleConstraint(); });
+        enforceObsBoidConstraints();
+
         // TODO 20250305 TEMP, should be moved to Flock::log_stats() or etc.
         if (0 == (aTimer().frameCounter() % 100))
         {
@@ -342,10 +345,37 @@ public:
             std::cout << collision_counter << ": ";
             std::cout << std::endl;
         }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         collect_flock_metrics();
     }
     
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250307 no count obstacle collisions on frame 0 or change obs set.
+    
+    // Test all Boids against each Obstacle. Enforce constraint if necessary by
+    // moving Boid to the not-ExcludedFrom side of Obstacle surface.
+    void enforceObsBoidConstraints()
+    {
+        for_all_boids([&](Boid* b){ b->enforceObstacleConstraint(); });
+    }
+    
+    // Just like enforceObsBoidConstraints() but does not count constraint
+    // violation due to initial Boid position or switching obstacle set.
+    void enforceObsBoidConstraintsDoNotCount()
+    {
+        auto enforce_one_boid_do_not_count = [&](Boid* b)
+        {
+            int preserve_collision_count = b->temp_obs_collision_count;
+            b->enforceObstacleConstraint();
+            b->temp_obs_collision_count = preserve_collision_count;
+            b->setSpeed(0);
+        };
+        for_all_boids(enforce_one_boid_do_not_count);
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240623 get rid of all multithreading for GP testing
     
@@ -1003,7 +1033,15 @@ public:
     void updateObstacleSetForGUI()
     {
         int o = draw().obstacleSetIndex() % preDefinedObstacleSets().size();
-        if (o != obstacle_selection_counter_) { useObstacleSet(o); }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250307 no count obstacle collisions on frame 0 or change obs set.
+//        if (o != obstacle_selection_counter_) { useObstacleSet(o); }
+        if (o != obstacle_selection_counter_)
+        {
+            useObstacleSet(o);
+            enforceObsBoidConstraintsDoNotCount();
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     //

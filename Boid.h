@@ -750,37 +750,29 @@ public:
         return predicted_obstacle_collisions_;
     }
 
-    // Build a list of future collisions sorted by time, with soonest first.
+    // Build list of future Obstacle collisions, sorted with soonest first.
     void cache_predicted_obstacle_collisions()
     {
         predicted_obstacle_collisions_.clear();
-        for (Obstacle* obstacle : flock_obstacles())
+        for (Obstacle* o : flock_obstacles())
         {
             // Compute predicted point of impact, if any.
-            Vec3 poi = obstacle->rayIntersection(position(),
-                                                 forward(),
-                                                 fp().body_radius);
+            Vec3 poi = o->rayIntersection(position(), forward(), fp().body_radius);
             if (not poi.is_none())
             {
-                double dist_to_collision = (poi - position()).length();
-                double time_to_collision = dist_to_collision / speed();
-                Vec3 normal_at_poi = obstacle->normalTowardAgent(poi, position());
-                predicted_obstacle_collisions_.push_back({*obstacle,
-                                                          time_to_collision,
-                                                          dist_to_collision,
-                                                          poi,
-                                                          normal_at_poi});
+                // Make a Collision object, add it to collection of collisions.
+                double dist = (poi - position()).length(); // dist_to_collision
+                Vec3 normal = o->normalTowardAgent(poi, position());
+                Collision c(*o, dist / speed(), dist, poi, normal);
+                predicted_obstacle_collisions_.push_back(c);
             }
         }
-        // This would have caught the bug I spent days tracking down (20240617):
-        assert(predicted_obstacle_collisions_.size()<=flock_obstacles().size());
+        // Sort collisions by time_to_collision.
         auto sorted = [&](const Collision& a, const Collision& b)
-        { 
-            return a.time_to_collision < b.time_to_collision;
-        };
+                      { return a.time_to_collision < b.time_to_collision; };
         std::ranges::sort(predicted_obstacle_collisions_, sorted);
     }
-    
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250306 move "enforce obstacle constraints" to Boid
     // detectObstacleViolations() is conceptually obsolete, needs refactoring.

@@ -573,6 +573,13 @@ inline void Obstacle::unit_test()
     double e = util::epsilon * 10;
     assert(Vec3::is_equal_within_epsilon(tso_ri, tso_ri_expected, e));
     
+    // Test local def of classic signum(). Could move to Utilities.h if needed.
+    assert(signum( 5.0) ==  1.0);
+    assert(signum( 0.5) ==  1.0);
+    assert(signum( 0.0) ==  0.0);
+    assert(signum(-0.5) == -1.0);
+    assert(signum(-5.0) == -1.0);
+
     // Found bug in SphereObstacle::nearest_point() where it was assuming that
     // every sphere was centered at the origin, this would have caught it.
     {
@@ -611,26 +618,77 @@ inline void Obstacle::unit_test()
         assert(Vec3::is_equal_within_epsilon(outside_norm, -inside_norm));
     }
 
-    // Test ExcludeFrom testing with constraintViolation().
-    Vec3 poop(0, 0.1, 0);
-    Vec3 poip = -poop;
-    assert(po.constraintViolation(poip, poop));
-    assert(po.constraintViolation(poop, poip));
-    PlaneObstacle po_ef_inside(Vec3(0, 1, 0), Vec3(), ExcludeFrom::inside);
-    PlaneObstacle po_ef_outside(Vec3(0, 1, 0), Vec3(), ExcludeFrom::outside);
-    assert(po_ef_inside.constraintViolation(poip, Vec3::none()));
-    assert(not po_ef_outside.constraintViolation(poip, Vec3::none()));
-    assert(not po_ef_inside.constraintViolation(poop, Vec3::none()));
-    assert(po_ef_outside.constraintViolation(poop, Vec3::none()));
-    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250219 experimental version to enforce constraint
+    // TODO 20250308 replace constraintViolation() with enforceConstraint().
+    
+//    // Test ExcludeFrom testing with constraintViolation().
+//    Vec3 poop(0, 0.1, 0);
+//    Vec3 poip = -poop;
+//    assert(po.constraintViolation(poip, poop));
+//    assert(po.constraintViolation(poop, poip));
+//    PlaneObstacle po_ef_inside(Vec3(0, 1, 0), Vec3(), ExcludeFrom::inside);
+//    PlaneObstacle po_ef_outside(Vec3(0, 1, 0), Vec3(), ExcludeFrom::outside);
+//    assert(po_ef_inside.constraintViolation(poip, Vec3::none()));
+//    assert(not po_ef_outside.constraintViolation(poip, Vec3::none()));
+//    assert(not po_ef_inside.constraintViolation(poop, Vec3::none()));
+//    assert(po_ef_outside.constraintViolation(poop, Vec3::none()));
+    
+    
+    // Test enforceConstraint() for various shapes and ExcludeFrom combinations.
+    {
+        double agent_radius = 1;
+        Vec3 arb_pos(1, -3, 5);
+        Vec3 arb_norm = Vec3(8, 4, 2).normalize();
+        debugPrint(arb_pos)
+        debugPrint(arb_norm)
         
-    assert(signum( 5.0) ==  1.0);
-    assert(signum( 0.5) ==  1.0);
-    assert(signum( 0.0) ==  0.0);
-    assert(signum(-0.5) == -1.0);
-    assert(signum(-5.0) == -1.0);
+        double sphere_radius = 10;
+        SphereObstacle so_i(sphere_radius, arb_pos, ExcludeFrom::inside);
+        SphereObstacle so_o(sphere_radius, arb_pos, ExcludeFrom::outside);
+        
+        Vec3 so_i_point = arb_pos + (arb_norm * (sphere_radius - agent_radius));
+        Vec3 so_o_point = arb_pos - (arb_norm * (sphere_radius + agent_radius));
+        
+        debugPrint(so_i_point)
+        debugPrint(so_o_point)
+        
+        std::cout << std::endl;
+
+        // Simple aligned case:
+        PlaneObstacle sapi(Vec3(0, 1, 0), Vec3(), ExcludeFrom::inside);
+        PlaneObstacle sapo(Vec3(0, 1, 0), Vec3(), ExcludeFrom::outside);
+        PlaneObstacle sapn(Vec3(0, 1, 0), Vec3(), ExcludeFrom::neither);
+        debugPrint(sapi.enforceConstraint(Vec3(0, +1, 0), agent_radius))
+        debugPrint(sapi.enforceConstraint(Vec3(0, -1, 0), agent_radius))
+        debugPrint(sapo.enforceConstraint(Vec3(0, +1, 0), agent_radius))
+        debugPrint(sapo.enforceConstraint(Vec3(0, -1, 0), agent_radius))
+        debugPrint(sapn.enforceConstraint(Vec3(0, +1, 0), agent_radius))
+        debugPrint(sapn.enforceConstraint(Vec3(0, -1, 0), agent_radius))
+
+        std::cout << std::endl;
+
+        PlaneObstacle po_i(arb_norm, arb_pos, ExcludeFrom::inside);
+        PlaneObstacle po_o(arb_norm, arb_pos, ExcludeFrom::outside);
+        
+        Vec3 po_i_point = arb_pos + arb_norm;
+        Vec3 po_o_point = arb_pos - arb_norm;
+        
+        debugPrint(po_i_point)
+        debugPrint(po_o_point)
+        debugPrint(po_i.enforceConstraint(po_i_point, agent_radius))
+        debugPrint(po_i.enforceConstraint(po_o_point, agent_radius))
+        debugPrint(po_o.enforceConstraint(po_i_point, agent_radius))
+        debugPrint(po_o.enforceConstraint(po_o_point, agent_radius))
+
+        // TODO wait -- yesterday I assumed this was the bug I was trying to
+        // track down, but that was for the ExcludeFrom::neither case, which is
+        // not used in any of these eaxmples so far.
+        
+//        assert(po_i.enforceConstraint(po_i_point, agent_radius) !=
+//               po_i.enforceConstraint(po_o_point, agent_radius));
+        
+    }
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

@@ -101,48 +101,77 @@ public:
         return "unknown";
     }
     
-    virtual bool constraintViolation(const Vec3& current_point,
-                                     const Vec3& previous_point) const
-    {
-        bool violation = false;
-        ExcludeFrom ef = getExcludeFrom();
-        double sdf = signed_distance(current_point);
-        // Static violation? EG: inside of an Obstacle with ExcludeFrom inside.
-        if (((sdf < 0) and (ef == inside)) or
-            ((sdf > 0) and (ef == outside)))
-        {
-            violation = true;
-        }
-        else
-        {
-            // Or dynamic: agent crossed the surface since previous step.
-            if ((not previous_point.is_none()) and
-                util::zero_crossing(sdf, signed_distance(previous_point)))
-            {
-                violation = true;
-            }
-        }
-        return violation;
-    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
     
+//    virtual bool constraintViolation(const Vec3& current_point,
+//                                     const Vec3& previous_point) const
+//    {
+//        bool violation = false;
+//        ExcludeFrom ef = getExcludeFrom();
+//        double sdf = signed_distance(current_point);
+//        // Static violation? EG: inside of an Obstacle with ExcludeFrom inside.
+//        if (((sdf < 0) and (ef == inside)) or
+//            ((sdf > 0) and (ef == outside)))
+//        {
+//            violation = true;
+//        }
+//        else
+//        {
+//            // Or dynamic: agent crossed the surface since previous step.
+//            if ((not previous_point.is_none()) and
+//                util::zero_crossing(sdf, signed_distance(previous_point)))
+//            {
+//                violation = true;
+//            }
+//        }
+//        return violation;
+//    }
+    
+//    // Detects constraint violation. (For example being inside an Obstacle with
+//    // ExcludeFrom::inside.) When found, computes a new agent position which
+//    // does not violate the constraint. Caller should compare value passed into
+//    // "agent_position" with the returned value. If equal, the agent is fine.
+//    // Otherwise the agent's position should be set to the value returned, and
+//    // its speed set to zero.
+//    Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
+//    {
+//        Vec3 result = agent_position;  // Default result is current agent pos.
+//        if (doesAgentViolateConstraint(agent_position, agent_radius))
+//        {
+//            Vec3 surface_point = nearest_point(agent_position);
+//            Vec3 ntas = normalTowardAllowedSide(agent_position);
+//            result = surface_point + (ntas * agent_radius);
+//        }
+//        return result;
+//    }
+
     // Detects constraint violation. (For example being inside an Obstacle with
     // ExcludeFrom::inside.) When found, computes a new agent position which
     // does not violate the constraint. Caller should compare value passed into
     // "agent_position" with the returned value. If equal, the agent is fine.
     // Otherwise the agent's position should be set to the value returned, and
     // its speed set to zero.
-    Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
+//    Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
+    Vec3 enforceConstraint(Vec3 now_position, Vec3 prev_position) const
     {
-        Vec3 result = agent_position;  // Default result is current agent pos.
-        if (doesAgentViolateConstraint(agent_position, agent_radius))
+//        Vec3 result = agent_position;  // Default result is current agent pos.
+        Vec3 result = now_position;  // Default result is current agent pos.
+//        if (doesAgentViolateConstraint(agent_position, agent_radius))
+        if (isAgentViolatingConstraint(now_position, prev_position))
         {
-            Vec3 surface_point = nearest_point(agent_position);
-            Vec3 ntas = normalTowardAllowedSide(agent_position);
-            result = surface_point + (ntas * agent_radius);
+//            Vec3 surface_point = nearest_point(agent_position);
+            Vec3 surface_point = nearest_point(now_position);
+//            Vec3 ntas = normalTowardAllowedSide(agent_position);
+            Vec3 ntas = normalTowardAllowedSide(now_position);
+//            result = surface_point + (ntas * agent_radius);
+            result = surface_point + ntas;
         }
         return result;
     }
 
+    // TODO OLD VERSION that cannot handle ExcludeFrom::neither ~ ~ ~ ~ ~ ~ ~ ~
+    
     // Does the given agent state violate this obstacle's ExcludeFrom?
     bool doesAgentViolateConstraint(Vec3 agent_position, double agent_radius) const
     {
@@ -153,6 +182,35 @@ public:
         return violate;
     }
     
+    // TODO NEW VERSION to handle ExcludeFrom::neither ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    
+    // Tests for violations of an Obstacle's position constraint by an Agent.
+    // The agent is represented by a current and previous position. The Obstacle
+    // surface shape is represented by its signed distance function and its
+    // ExcludeFrom mode.
+    bool isAgentViolatingConstraint(Vec3 now_position, Vec3 prev_position) const
+    {
+        bool violate = false;
+        double now_sdf = signed_distance(now_position);
+        switch (getExcludeFrom())
+        {
+            // Current position on the "excluded" side of the surface.
+            case inside:  if (now_sdf < 0) { violate = true; } break;
+            case outside: if (now_sdf > 0) { violate = true; } break;
+            case neither:
+                if ((not violate) and (not prev_position.is_none()))
+                {
+                    // Not allowed to cross from inside to outside or vice versa
+                    double prev_sdf = signed_distance(prev_position);
+                    violate = util::zero_crossing(now_sdf, prev_sdf);
+                }
+                break;
+        }
+        return violate;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Historical signum function for local use in this class. (Move to util?)
     static double signum(double x) { return x > 0 ? 1 : (x < 0 ? -1 : 0); }
 
@@ -658,12 +716,16 @@ inline void Obstacle::unit_test()
         PlaneObstacle sapi(Vec3(0, 1, 0), Vec3(), ExcludeFrom::inside);
         PlaneObstacle sapo(Vec3(0, 1, 0), Vec3(), ExcludeFrom::outside);
         PlaneObstacle sapn(Vec3(0, 1, 0), Vec3(), ExcludeFrom::neither);
-        debugPrint(sapi.enforceConstraint(Vec3(0, +1, 0), agent_radius))
-        debugPrint(sapi.enforceConstraint(Vec3(0, -1, 0), agent_radius))
-        debugPrint(sapo.enforceConstraint(Vec3(0, +1, 0), agent_radius))
-        debugPrint(sapo.enforceConstraint(Vec3(0, -1, 0), agent_radius))
-        debugPrint(sapn.enforceConstraint(Vec3(0, +1, 0), agent_radius))
-        debugPrint(sapn.enforceConstraint(Vec3(0, -1, 0), agent_radius))
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
+
+//        debugPrint(sapi.enforceConstraint(Vec3(0, +1, 0), agent_radius))
+//        debugPrint(sapi.enforceConstraint(Vec3(0, -1, 0), agent_radius))
+//        debugPrint(sapo.enforceConstraint(Vec3(0, +1, 0), agent_radius))
+//        debugPrint(sapo.enforceConstraint(Vec3(0, -1, 0), agent_radius))
+//        debugPrint(sapn.enforceConstraint(Vec3(0, +1, 0), agent_radius))
+//        debugPrint(sapn.enforceConstraint(Vec3(0, -1, 0), agent_radius))
 
         std::cout << std::endl;
 
@@ -675,10 +737,12 @@ inline void Obstacle::unit_test()
         
         debugPrint(po_i_point)
         debugPrint(po_o_point)
-        debugPrint(po_i.enforceConstraint(po_i_point, agent_radius))
-        debugPrint(po_i.enforceConstraint(po_o_point, agent_radius))
-        debugPrint(po_o.enforceConstraint(po_i_point, agent_radius))
-        debugPrint(po_o.enforceConstraint(po_o_point, agent_radius))
+//        debugPrint(po_i.enforceConstraint(po_i_point, agent_radius))
+//        debugPrint(po_i.enforceConstraint(po_o_point, agent_radius))
+//        debugPrint(po_o.enforceConstraint(po_i_point, agent_radius))
+//        debugPrint(po_o.enforceConstraint(po_o_point, agent_radius))
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         // TODO wait -- yesterday I assumed this was the bug I was trying to
         // track down, but that was for the ExcludeFrom::neither case, which is

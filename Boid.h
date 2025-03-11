@@ -97,7 +97,12 @@ private:  // move to bottom of class later
 
     // Used to detect agent crossing Obstacle surface.
     Vec3 previous_position_ = Vec3::none();
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
+    Vec3 getPreviousPosition() const { return previous_position_; }
+    void setPreviousPosition(Vec3 prev_pos) { previous_position_ = prev_pos; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Per step cache of predicted obstacle collisions.
     CollisionList predicted_obstacle_collisions_;
     bool predicted_obstacle_collisions_cached_this_step_ = false;
@@ -185,6 +190,10 @@ public:
     // during a separate pass -- to this Boid's geometric state.
     void apply_next_steer(double time_step)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
+        setPreviousPosition(position());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         steer(next_steer_, time_step);
     }
 
@@ -786,9 +795,26 @@ public:
     {
         for (auto& o : flock_obstacles())
         {
-            Vec3 ec = o->enforceConstraint(position(), fp().body_radius);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
+//            Vec3 ec = o->enforceConstraint(position(), fp().body_radius);
+//            Vec3 ec = o->enforceConstraint(position(), previous_position_);
+            Vec3 ec = o->enforceConstraint(position(), getPreviousPosition());
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (ec != position())
             {
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
+                
+                if (util::zero_crossing(position().y(), ec.y()))
+                {
+//                    std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+                    std::cout << "before pos: " << position() << std::endl;
+                    std::cout << "after pos:  " << ec << std::endl << std::endl;
+                }
+                
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // Count collision, set speed to zero, clear smoothing history.
                 temp_obs_collision_count++;
                 setSpeed(0);

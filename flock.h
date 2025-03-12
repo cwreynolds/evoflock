@@ -354,6 +354,43 @@ public:
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.
     void enforceObsBoidConstraints()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250311 WIP ExcludeFrom::neither
+//        debugPrint(selectedBoid()->position().y());
+//        debugPrint(selectedBoid()->getPreviousPosition().y());
+        
+        // TODO 20250311 WIP ExcludeFrom::neither
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250311 WIP ExcludeFrom::neither
+        if (aTimer().frameCounter() == 0)
+        {
+            draw().avoidingObstaclesMode() = false;
+            boids().at(0)->position() = Vec3(0, 25, 0);
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+
+
+//        if (std::abs(selectedBoid()->position().y()) < 3)
+        if (std::abs(selectedBoid()->position().y()) < 1)
+        {
+            std::cout << "previous y=" << selectedBoid()->getPreviousPosition().y();
+            std::cout << ", this y=" << selectedBoid()->position().y();
+            std::cout << std::endl;
+        }
+        
+        if (selectedBoid()->position().y() < -1)
+        {
+            std::cout << std::endl;
+            
+            debugPrint(selectedBoid()->position().y());
+            debugPrint(boids().at(0)->position().y());
+            std::cout << "selected boid well below PlaneObstacle!!" << std::endl;
+            std::cout << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for_all_boids([&](Boid* b){ b->enforceObstacleConstraint(); });
     }
     

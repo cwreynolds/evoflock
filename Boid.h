@@ -99,7 +99,9 @@ private:  // move to bottom of class later
     Vec3 previous_position_ = Vec3::none();
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
+public:
     Vec3 getPreviousPosition() const { return previous_position_; }
+private:
     void setPreviousPosition(Vec3 prev_pos) { previous_position_ = prev_pos; }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -805,10 +807,11 @@ public:
             {
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
-                
-                if (util::zero_crossing(position().y(), ec.y()))
+                // TODO 20250311 WIP ExcludeFrom::neither
+
+                if (isSelected() and util::zero_crossing(position().y(), ec.y()))
                 {
-//                    std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+                    std::cout << std::endl;
                     std::cout << "before pos: " << position() << std::endl;
                     std::cout << "after pos:  " << ec << std::endl << std::endl;
                 }

@@ -101,8 +101,8 @@ private:  // move to bottom of class later
     // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
 public:
     Vec3 getPreviousPosition() const { return previous_position_; }
-private:
     void setPreviousPosition(Vec3 prev_pos) { previous_position_ = prev_pos; }
+private:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Per step cache of predicted obstacle collisions.
@@ -440,7 +440,13 @@ public:
     {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250301 temp command to toggle obstacle avoidance
-        if (not draw().avoidingObstaclesMode()) { return {}; }
+//        if (not draw().avoidingObstaclesMode()) { return {}; }
+        if (not draw().avoidingObstaclesMode())
+        {
+            annote_avoid_poi_ = Vec3();
+            annote_avoid_weight_ = 0;
+            return {};
+        }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Vec3 avoid;
@@ -718,6 +724,17 @@ public:
             Color c = util::interpolate(a, Color(0.5), Color(0.8, 0.5, 0.8));
             draw().addThickLineToAnimatedFrame(position(), annote_avoid_poi_, c);
         }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
+        
+//        if (isSelected())
+//        {
+//            draw().addThickLineToAnimatedFrame(position(),
+//                                               (position() + Vec3(0,100,0)),
+//                                               Color::magenta());
+//        }
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }
     
     // Called from Flock to draw annotation for selected Boid and its neighbors.
@@ -801,8 +818,25 @@ public:
             // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
 //            Vec3 ec = o->enforceConstraint(position(), fp().body_radius);
 //            Vec3 ec = o->enforceConstraint(position(), previous_position_);
-            Vec3 ec = o->enforceConstraint(position(), getPreviousPosition());
+            
+//            assert(not getPreviousPosition().is_none());
+            
+            
+//            debugPrint(getPreviousPosition().is_none());
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
+
+//            Vec3 ec = o->enforceConstraint(position(), getPreviousPosition());
+            
+            Vec3 prev_position = getPreviousPosition();
+            if (prev_position.is_none()) { prev_position = position(); }
+            Vec3 ec = o->enforceConstraint(position(), prev_position);
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             if (ec != position())
             {
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -823,7 +857,11 @@ public:
                 setSpeed(0);
                 resetSteerUpMemories();
                 // Orient boid to point directly away from obstacle.
-                Vec3 normal = o->normalTowardAllowedSide(ec);
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
+//                Vec3 normal = o->normalTowardAllowedSide(ec);
+                Vec3 normal = o->normalTowardAllowedSide(ec, prev_position);
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 Vec3 to = ec + (normal * fp().body_radius * 2);
                 set_ls(ls().fromTo(ec, to));
             }

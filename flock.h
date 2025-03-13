@@ -189,6 +189,7 @@ public:
         RandomSequence& rs = EF::RS();
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
         useObstacleSet();
+        // TODO 20250311
         enforceObsBoidConstraintsDoNotCount();
     }
 
@@ -366,7 +367,22 @@ public:
         if (aTimer().frameCounter() == 0)
         {
             draw().avoidingObstaclesMode() = false;
-            boids().at(0)->position() = Vec3(0, 25, 0);
+//            boids().at(0)->position() = Vec3(0, 25, 0);
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
+//            boids().at(0)->setPosition(Vec3(0, 25, 0));
+            boids().at(0)->setPosition(Vec3(0, -25, 0));
+
+            boids().at(0)->setPreviousPosition(Vec3(0, -25, 0));
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+            std::cout << "Force selected boid to upper hemisphere." << std::endl;
+            
+//            debugPrint(boids().at(0)->position());
+            
+            
+            debugPrint(selectedBoid()->getPreviousPosition());
+            debugPrint(selectedBoid()->position());
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
@@ -380,16 +396,30 @@ public:
             std::cout << std::endl;
         }
         
-        if (selectedBoid()->position().y() < -1)
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
+//        if (selectedBoid()->position().y() < -1)
+        if (selectedBoid()->position().y() > 1)
         {
             std::cout << std::endl;
             
             debugPrint(selectedBoid()->position().y());
-            debugPrint(boids().at(0)->position().y());
-            std::cout << "selected boid well below PlaneObstacle!!" << std::endl;
+//            debugPrint(boids().at(0)->position().y());
+//            std::cout << "selected boid well below PlaneObstacle!!" << std::endl;
+            std::cout << "selected boid well ABOVE PlaneObstacle!!" << std::endl;
             std::cout << std::endl;
-            exit(EXIT_FAILURE);
+//            exit(EXIT_FAILURE);
+            
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
+//            draw().addThickLineToAnimatedFrame(selectedBoid()->position(),
+//                                               (selectedBoid()->position() +
+//                                                Vec3(0,100,0)),
+//                                               Color::magenta());
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for_all_boids([&](Boid* b){ b->enforceObstacleConstraint(); });
     }

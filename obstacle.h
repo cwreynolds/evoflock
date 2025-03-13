@@ -50,6 +50,11 @@ public:
         return normal(poi) * signum(signed_distance(agent_position));
     }
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
+
+    // TODO OLD version -- called from 3 places
+    
     // Normal for a given position. Points toward non-exclided side.
     // (Not tested for, nor well-defined for, the ExcludeFrom::neither case.)
     Vec3 normalTowardAllowedSide(const Vec3& poi) const
@@ -57,6 +62,24 @@ public:
         return normal(poi) * ((getExcludeFrom() == outside) ? -1 : 1);
     }
     
+    // TODO NEW version
+
+    // Normal for a given position. Points toward non-exclided side.
+    // (Not tested for, nor well-defined for, the ExcludeFrom::neither case.)
+    Vec3 normalTowardAllowedSide(Vec3 now_position, Vec3 prev_position) const
+    {
+        int sign = 1;
+        if (getExcludeFrom() == outside) { sign = -1; }
+        if (getExcludeFrom() == neither)
+        {
+            sign = signum(signed_distance(prev_position));
+        }
+        return normal(now_position) * sign;
+    }
+
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     // Point on surface of obstacle nearest the given query_point.
     virtual Vec3 nearest_point(const Vec3& query_point) const
     {
@@ -146,29 +169,54 @@ public:
 //        return result;
 //    }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
+
+//        // Detects constraint violation. (For example being inside an Obstacle with
+//        // ExcludeFrom::inside.) When found, computes a new agent position which
+//        // does not violate the constraint. Caller should compare value passed into
+//        // "agent_position" with the returned value. If equal, the agent is fine.
+//        // Otherwise the agent's position should be set to the value returned, and
+//        // its speed set to zero.
+//    //    Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
+//        Vec3 enforceConstraint(Vec3 now_position, Vec3 prev_position) const
+//        {
+//    //        Vec3 result = agent_position;  // Default result is current agent pos.
+//            Vec3 result = now_position;  // Default result is current agent pos.
+//    //        if (doesAgentViolateConstraint(agent_position, agent_radius))
+//            if (isAgentViolatingConstraint(now_position, prev_position))
+//            {
+//    //            Vec3 surface_point = nearest_point(agent_position);
+//                Vec3 surface_point = nearest_point(now_position);
+//    //            Vec3 ntas = normalTowardAllowedSide(agent_position);
+//                Vec3 ntas = normalTowardAllowedSide(now_position);
+//    //            result = surface_point + (ntas * agent_radius);
+//                result = surface_point + ntas;
+//            }
+//            return result;
+//        }
+    
     // Detects constraint violation. (For example being inside an Obstacle with
     // ExcludeFrom::inside.) When found, computes a new agent position which
     // does not violate the constraint. Caller should compare value passed into
     // "agent_position" with the returned value. If equal, the agent is fine.
     // Otherwise the agent's position should be set to the value returned, and
     // its speed set to zero.
-//    Vec3 enforceConstraint(Vec3 agent_position, double agent_radius) const
     Vec3 enforceConstraint(Vec3 now_position, Vec3 prev_position) const
     {
-//        Vec3 result = agent_position;  // Default result is current agent pos.
         Vec3 result = now_position;  // Default result is current agent pos.
-//        if (doesAgentViolateConstraint(agent_position, agent_radius))
         if (isAgentViolatingConstraint(now_position, prev_position))
         {
-//            Vec3 surface_point = nearest_point(agent_position);
             Vec3 surface_point = nearest_point(now_position);
-//            Vec3 ntas = normalTowardAllowedSide(agent_position);
-            Vec3 ntas = normalTowardAllowedSide(now_position);
-//            result = surface_point + (ntas * agent_radius);
+//            Vec3 ntas = normalTowardAllowedSide(now_position);
+            Vec3 ntas = normalTowardAllowedSide(now_position, prev_position);
             result = surface_point + ntas;
         }
         return result;
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 
     // TODO OLD VERSION that cannot handle ExcludeFrom::neither ~ ~ ~ ~ ~ ~ ~ ~
     
@@ -678,6 +726,7 @@ inline void Obstacle::unit_test()
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250308 replace constraintViolation() with enforceConstraint().
+    // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
     
 //    // Test ExcludeFrom testing with constraintViolation().
 //    Vec3 poop(0, 0.1, 0);
@@ -719,6 +768,7 @@ inline void Obstacle::unit_test()
         
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
+        // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
 
 //        debugPrint(sapi.enforceConstraint(Vec3(0, +1, 0), agent_radius))
 //        debugPrint(sapi.enforceConstraint(Vec3(0, -1, 0), agent_radius))
@@ -726,6 +776,16 @@ inline void Obstacle::unit_test()
 //        debugPrint(sapo.enforceConstraint(Vec3(0, -1, 0), agent_radius))
 //        debugPrint(sapn.enforceConstraint(Vec3(0, +1, 0), agent_radius))
 //        debugPrint(sapn.enforceConstraint(Vec3(0, -1, 0), agent_radius))
+
+//        Vec3 enforceConstraint(Vec3 now_position, Vec3 prev_position) const
+
+        
+        debugPrint(sapi.enforceConstraint(Vec3(0, +1, 0), Vec3(0, +2, 0)))
+        debugPrint(sapi.enforceConstraint(Vec3(0, -1, 0), Vec3(0, +2, 0)))
+        debugPrint(sapo.enforceConstraint(Vec3(0, +1, 0), Vec3(0, -2, 0)))
+        debugPrint(sapo.enforceConstraint(Vec3(0, -1, 0), Vec3(0, -2, 0)))
+        debugPrint(sapn.enforceConstraint(Vec3(0, +1, 0), Vec3(0, -2, 0)))
+        debugPrint(sapn.enforceConstraint(Vec3(0, -1, 0), Vec3(0, +2, 0)))
 
         std::cout << std::endl;
 

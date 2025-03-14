@@ -366,7 +366,7 @@ public:
         // TODO 20250311 WIP ExcludeFrom::neither
         if (aTimer().frameCounter() == 0)
         {
-            draw().avoidingObstaclesMode() = false;
+//            draw().avoidingObstaclesMode() = false;
 //            boids().at(0)->position() = Vec3(0, 25, 0);
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
@@ -401,14 +401,14 @@ public:
 //        if (selectedBoid()->position().y() < -1)
         if (selectedBoid()->position().y() > 1)
         {
-            std::cout << std::endl;
-            
-            debugPrint(selectedBoid()->position().y());
-//            debugPrint(boids().at(0)->position().y());
-//            std::cout << "selected boid well below PlaneObstacle!!" << std::endl;
-            std::cout << "selected boid well ABOVE PlaneObstacle!!" << std::endl;
-            std::cout << std::endl;
-//            exit(EXIT_FAILURE);
+//                std::cout << std::endl;
+//                
+//                debugPrint(selectedBoid()->position().y());
+//    //            debugPrint(boids().at(0)->position().y());
+//    //            std::cout << "selected boid well below PlaneObstacle!!" << std::endl;
+//                std::cout << "selected boid well ABOVE PlaneObstacle!!" << std::endl;
+//                std::cout << std::endl;
+//    //            exit(EXIT_FAILURE);
             
 //            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 //            // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.

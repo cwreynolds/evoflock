@@ -61,9 +61,9 @@ private:
     // Index of the initial/default obstacle set.
     //int default_obstacle_set_index_ = 0;  // Sphere and vertical cylinder.
     //int default_obstacle_set_index_ = 1;  // Sphere and 6 cylinders.
-    int default_obstacle_set_index_ = 2;  // Sphere and plane.
+    //int default_obstacle_set_index_ = 2;  // Sphere and plane.
     //int default_obstacle_set_index_ = 3;  // Sphere only.
-    //int default_obstacle_set_index_ = 4;  // Sphere and many little spheres.
+    int default_obstacle_set_index_ = 4;  // Sphere and many little spheres.
     //int default_obstacle_set_index_ = 5;  // Sphere with smaller sphere inside.
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -225,6 +225,19 @@ public:
         Vec3 offset_in_clump = (rs.random_point_in_unit_radius_sphere() *
                                 radius * 0.33);
         boid->setPosition(center_of_clump + offset_in_clump);
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250314 start at zero speed to reduce early obs collisions
+        
+        // Did not seem to have any effect on the number of obstacle collisions
+        // in 2000 steps. Maybe this IS the default initial speed?
+        boid->setSpeed(0);
+        
+        // Similarly did not seem to have any effect.
+        boid->setPreviousPosition(boid->position());
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
     }
 
     //        # Draw each boid in flock.
@@ -344,9 +357,15 @@ public:
             std::cout << "step: ";
             std::cout << aTimer().frameCounter() << ", ";
             std::cout << "obstacle collision: ";
-            std::cout << collision_counter << ": ";
+//            std::cout << collision_counter << ": ";
+            std::cout << collision_counter;
             std::cout << std::endl;
         }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250314 terminate run at 2000 steps: counting obstacle collisions
+        if (2000 == aTimer().frameCounter()) { exit(EXIT_SUCCESS); }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         collect_flock_metrics();
     }
@@ -389,12 +408,12 @@ public:
 
 
 //        if (std::abs(selectedBoid()->position().y()) < 3)
-        if (std::abs(selectedBoid()->position().y()) < 1)
-        {
-            std::cout << "previous y=" << selectedBoid()->getPreviousPosition().y();
-            std::cout << ", this y=" << selectedBoid()->position().y();
-            std::cout << std::endl;
-        }
+//        if (std::abs(selectedBoid()->position().y()) < 1)
+//        {
+//            std::cout << "previous y=" << selectedBoid()->getPreviousPosition().y();
+//            std::cout << ", this y=" << selectedBoid()->position().y();
+//            std::cout << std::endl;
+//        }
         
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.

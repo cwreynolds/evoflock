@@ -481,7 +481,17 @@ public:
             weight = util::remap_interval(dtc,  0, min_dist,  1, 0.5);
             avoid_obstacle_annotation(1, poi, weight);
         }
-        return (avoidance - (forward() * 0.2)) * weight;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250314 more braking for predictive obstacle avoidance
+        
+//        return (avoidance - (forward() * 0.2)) * weight;
+        
+//        Vec3 braking = forward() * -0.2;
+        Vec3 braking = forward() * -0.4;
+//        Vec3 braking = forward() * -0.6;
+        return (avoidance + braking) * weight;
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Computes static obstacle avoidance: steering AWAY from nearby obstacle.

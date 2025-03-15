@@ -482,6 +482,16 @@ public:
     {
         setCameraByFromAtUp();
     }
+
+    // Reset camera to aligned view of whole scene.
+    void resetCameraView()
+    {
+        double d = 100;  // TODO this assumes the scene bounds, should measure.
+        cameraLookUp()   = Vec3(0, 1, 0);
+        cameraLookAt()   = Vec3(0, 0, 0);
+        cameraLookFrom() = Vec3(0, 0, d);
+        cameraDesiredOffsetDistance() = d;
+    };
     
     // Adjust "static camera" model according to mouse input.
     void setCameraByFromAtUp()
@@ -673,9 +683,11 @@ public:
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250301 temp command to toggle obstacle avoidance
-        // Accessor for camera object, represented as a LocalSpace.
         rk('A', [&](vis* v) { toggleAvoidingObstaclesMode(); return rv; });
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        // Add "R" command, reset camera to aligned view of whole scene.
+        rk('R', [&](vis* v) { resetCameraView(); return rv; });
 
         // Set mouse move/scroll/button handlers.
         setMouseCallbacks();

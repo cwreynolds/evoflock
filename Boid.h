@@ -453,10 +453,58 @@ public:
         avoid_obstacle_annotation(0, Vec3::none(), 0);
         Vec3 predict_avoid = steer_for_predictive_avoidance();
         Vec3 static_avoid = fly_away_from_obstacles();
+        
+        
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20250317 maybe try to select boid about to collide?
+        
+//        static_avoid -= forward() * (static_avoid.length() * 0.1);
+        
+
         // Based on March 4, 2025 experiments: weighting predict_avoid twice as
         // much as static_avoid seems to produce lowest number of collisions:
         // 79 per 400,000 boid steps.
-        avoid = static_avoid + (predict_avoid * 2);
+        
+//        avoid = static_avoid + (predict_avoid * 2);
+//        avoid = static_avoid + (predict_avoid * 1);
+//        avoid = static_avoid + (predict_avoid * 4);
+
+//        avoid = ((predict_avoid.length() > static_avoid.length()) ?
+//                 predict_avoid :
+//                 static_avoid + (predict_avoid * 4));
+
+//        double a = ((predict_avoid.length() > static_avoid.length()) ? 0.9 : 0.7);
+//        avoid = util::interpolate(a, predict_avoid, static_avoid);
+        
+//        avoid = ((predict_avoid.length() > static_avoid.length()) ?
+//                 static_avoid + (predict_avoid * 8) :
+//                 static_avoid + (predict_avoid * 2));
+
+//        avoid = ((predict_avoid.length() > static_avoid.length()) ?
+//                 predict_avoid :
+//                 static_avoid + (predict_avoid * 4));
+
+//        avoid = static_avoid + (predict_avoid * 2);
+        
+        
+        
+//        if (isSelected())
+//        {
+//            std::cout << "predict_avoid.length()=" << predict_avoid.length();
+//            std::cout << ", static_avoid.length()=" << static_avoid.length();
+//            std::cout << std::endl;
+//        }
+
+//        avoid = static_avoid + (predict_avoid * 4);
+//        avoid = static_avoid + (predict_avoid * 3);
+//        avoid = static_avoid + (predict_avoid * 2);
+
+//        avoid = static_avoid + (predict_avoid * 1.5);
+//        avoid = static_avoid + (predict_avoid * 1);
+//        avoid = static_avoid + (predict_avoid * 2);
+        avoid = static_avoid + (predict_avoid * 3);
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         avoid_obstacle_annotation(3, Vec3::none(), 0);
         return avoid;
     }
@@ -478,7 +526,20 @@ public:
             
             // Smooth weight transition
             double dtc = first_collision.dist_to_collision;
-            weight = util::remap_interval(dtc,  0, min_dist,  1, 0.5);
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250317 maybe try to select boid about to collide?
+
+//            weight = util::remap_interval(dtc,  0, min_dist,  1, 0.5);
+            
+//            assert(dtc > 0 and dtc < min_dist);
+//            weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0.5);
+//            weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0.1);
+//            weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0.4);
+//            weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0.5);
+//            weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0.6);
+            weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0.3);
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             avoid_obstacle_annotation(1, poi, weight);
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -486,10 +547,42 @@ public:
         
 //        return (avoidance - (forward() * 0.2)) * weight;
         
-//        Vec3 braking = forward() * -0.2;
-        Vec3 braking = forward() * -0.4;
-//        Vec3 braking = forward() * -0.6;
+//        if (isSelected()) { debugPrint(weight); }
+        
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20250317 maybe try to select boid about to collide?
+
+//    //        Vec3 braking = forward() * -0.2;
+//            Vec3 braking = forward() * -0.4;
+//    //        Vec3 braking = forward() * -0.6;
+
+//    //        Vec3 braking = forward() * -0.2;
+//    //        Vec3 braking = forward() * -0.4;
+//            Vec3 braking = forward() * -0.6;
+
+//    //        Vec3 braking = forward() * -0.2;
+//    //        Vec3 braking = forward() * -0.4;
+//            Vec3 braking = forward() * -0.6;
+//    //        Vec3 braking = forward() * -0.8;
+
+
+//        return (avoidance + braking) * weight;
+
+        
+//        Vec3 braking = forward() * -avoidance.length();
+        Vec3 braking = forward() * (avoidance.length() * -0.5);
+
+        
+//        if (isSelected())
+//        {
+//            debugPrint(avoidance.length());
+//            debugPrint(braking.length());
+//        }
+        
         return (avoidance + braking) * weight;
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
@@ -815,68 +908,123 @@ public:
     // Total count of all obstacle collisions during the lifetime of this Boid.
     int temp_obs_collision_count = 0;
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250317 maybe try to select boid about to collide?
+
+//        // Test this Boid against each Obstacle in the scene. If it has violated the
+//        // Obstacle's constraint -- for example crashed through the surface into the
+//        // interior of an Obstacle with an ExcludeFrom of "inside" -- then it is
+//        // moved outside, its speed is set to zero, and it is oriented to point away
+//        // from the obstacle surface.
+//        void enforceObstacleConstraint()
+//        {
+//            for (auto& o : flock_obstacles())
+//            {
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
+//    //            Vec3 ec = o->enforceConstraint(position(), fp().body_radius);
+//    //            Vec3 ec = o->enforceConstraint(position(), previous_position_);
+//
+//    //            assert(not getPreviousPosition().is_none());
+//
+//
+//    //            debugPrint(getPreviousPosition().is_none());
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
+//
+//    //            Vec3 ec = o->enforceConstraint(position(), getPreviousPosition());
+//
+//                Vec3 prev_position = getPreviousPosition();
+//                if (prev_position.is_none()) { prev_position = position(); }
+//                Vec3 ec = o->enforceConstraint(position(), prev_position);
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                if (ec != position())
+//                {
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
+//                    // TODO 20250311 WIP ExcludeFrom::neither
+//
+//                    if (isSelected() and util::zero_crossing(position().y(), ec.y()))
+//                    {
+//                        std::cout << std::endl;
+//                        std::cout << "before pos: " << position() << std::endl;
+//                        std::cout << "after pos:  " << ec << std::endl << std::endl;
+//                    }
+//
+//
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // Count collision, set speed to zero, clear smoothing history.
+//                    temp_obs_collision_count++;
+//                    setSpeed(0);
+//                    resetSteerUpMemories();
+//                    // Orient boid to point directly away from obstacle.
+//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                    // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
+//    //                Vec3 normal = o->normalTowardAllowedSide(ec);
+//                    Vec3 normal = o->normalTowardAllowedSide(ec, prev_position);
+//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                    Vec3 to = ec + (normal * fp().body_radius * 2);
+//                    set_ls(ls().fromTo(ec, to));
+//                }
+//            }
+//        }
+    
     // Test this Boid against each Obstacle in the scene. If it has violated the
     // Obstacle's constraint -- for example crashed through the surface into the
     // interior of an Obstacle with an ExcludeFrom of "inside" -- then it is
     // moved outside, its speed is set to zero, and it is oriented to point away
     // from the obstacle surface.
-    void enforceObstacleConstraint()
+    
+//    void enforceObstacleConstraint()  // TEMP 20250317
+    bool enforceObstacleConstraint()
     {
+        bool enforced = false;  // TEMP 20250317
+        
         for (auto& o : flock_obstacles())
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
-//            Vec3 ec = o->enforceConstraint(position(), fp().body_radius);
-//            Vec3 ec = o->enforceConstraint(position(), previous_position_);
-            
-//            assert(not getPreviousPosition().is_none());
-            
-            
-//            debugPrint(getPreviousPosition().is_none());
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
-
-//            Vec3 ec = o->enforceConstraint(position(), getPreviousPosition());
-            
             Vec3 prev_position = getPreviousPosition();
             if (prev_position.is_none()) { prev_position = position(); }
             Vec3 ec = o->enforceConstraint(position(), prev_position);
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
             if (ec != position())
             {
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
-                // TODO 20250311 WIP ExcludeFrom::neither
-
-                if (isSelected() and util::zero_crossing(position().y(), ec.y()))
-                {
-                    std::cout << std::endl;
-                    std::cout << "before pos: " << position() << std::endl;
-                    std::cout << "after pos:  " << ec << std::endl << std::endl;
-                }
-                
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // Count collision, set speed to zero, clear smoothing history.
                 temp_obs_collision_count++;
                 setSpeed(0);
                 resetSteerUpMemories();
                 // Orient boid to point directly away from obstacle.
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
-//                Vec3 normal = o->normalTowardAllowedSide(ec);
                 Vec3 normal = o->normalTowardAllowedSide(ec, prev_position);
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 Vec3 to = ec + (normal * fp().body_radius * 2);
                 set_ls(ls().fromTo(ec, to));
+                
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+                // TODO 20250317 maybe try to select boid about to collide?
+                enforced = true;
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             }
         }
+        return enforced;  // TEMP 20250317
     }
+
+    bool super_temp_checker()
+    {
+        bool near = false;
+        for (auto& o : flock_obstacles())
+        {
+            if (util::between(o->signed_distance(position()), -1, 1))
+            {
+                near = true;
+            }
+        }
+        return near;
+    }
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 
     // Only used for debugging, to to pick out one boid to track/log/whatever.
     bool is_first_boid() const { return this == flock_boids().at(0); }

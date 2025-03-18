@@ -655,8 +655,13 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
 //            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
 //            { "min_time_to_collide",              0.8,    0.8,   0.0 },
 
+//            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
+//            { "min_time_to_collide",              0.4,    0.4,   0.0 },
+            
+            // TODO 20250317
+
             { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
-            { "min_time_to_collide",              0.4,    0.4,   0.0 },
+            { "min_time_to_collide",              0.8,    0.8,   0.0 },
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

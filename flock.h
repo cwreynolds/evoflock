@@ -55,8 +55,6 @@ private:
     // The static collection of various obstacle set, selectable gtom GUI.
     static inline std::vector<ObstaclePtrList> obstacle_presets_;
     static inline int obstacle_selection_counter_ = -1;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250310 refactor enforceConstraint for ExcludeFrom::neither.
     
     // Index of the initial/default obstacle set.
     //int default_obstacle_set_index_ = 0;  // Sphere and vertical cylinder.
@@ -65,9 +63,6 @@ private:
     //int default_obstacle_set_index_ = 3;  // Sphere only.
     int default_obstacle_set_index_ = 4;  // Sphere and many little spheres.
     //int default_obstacle_set_index_ = 5;  // Sphere with smaller sphere inside.
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
 
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
@@ -189,7 +184,6 @@ public:
         RandomSequence& rs = EF::RS();
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
         useObstacleSet();
-        // TODO 20250311
         enforceObsBoidConstraintsDoNotCount();
     }
 
@@ -225,33 +219,9 @@ public:
         Vec3 offset_in_clump = (rs.random_point_in_unit_radius_sphere() *
                                 radius * 0.33);
         boid->setPosition(center_of_clump + offset_in_clump);
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250314 start at zero speed to reduce early obs collisions
-        
-        // Did not seem to have any effect on the number of obstacle collisions
-        // in 2000 steps. Maybe this IS the default initial speed?
-        boid->setSpeed(0);
-        
-        // Similarly did not seem to have any effect.
+        // Probably unneeded since initial speed is zero, nevertheless:
         boid->setPreviousPosition(boid->position());
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
     }
-
-    //        # Draw each boid in flock.
-    //        def draw(self):
-    //            if Draw.enable:
-    //                Draw.update_camera(self.selected_boid().position if
-    //                                   self.tracking_camera else Vec3())
-    //                for o in self.obstacles:
-    //                    o.draw()
-    //                for boid in self.boids:
-    //                    boid.draw(color=(Vec3(0, 1, 0) if
-    //                                     self.is_neighbor_of_selected(boid) else None))
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO for simplicity, change get/setSaveBoidCenters() to be static
@@ -348,9 +318,6 @@ public:
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();
         
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20250317 maybe try to select boid about to collide?
-
         // TODO 20250305 TEMP, should be moved to Flock::log_stats() or etc.
         if (0 == (aTimer().frameCounter() % 100))
         {
@@ -369,163 +336,15 @@ public:
         if (2000 == aTimer().frameCounter()) { exit(EXIT_SUCCESS); }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
         collect_flock_metrics();
     }
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250317 maybe try to select boid about to collide?
-
-//        // Test all Boids against each Obstacle. Enforce constraint if necessary by
-//        // moving Boid to the not-ExcludedFrom side of Obstacle surface.
-//        void enforceObsBoidConstraints()
-//        {
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20250311 WIP ExcludeFrom::neither
-//    //        debugPrint(selectedBoid()->position().y());
-//    //        debugPrint(selectedBoid()->getPreviousPosition().y());
-//
-//            // TODO 20250311 WIP ExcludeFrom::neither
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20250311 WIP ExcludeFrom::neither
-//            if (aTimer().frameCounter() == 0)
-//            {
-//    //            draw().avoidingObstaclesMode() = false;
-//    //            boids().at(0)->position() = Vec3(0, 25, 0);
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//                // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
-//    //            boids().at(0)->setPosition(Vec3(0, 25, 0));
-//                boids().at(0)->setPosition(Vec3(0, -25, 0));
-//
-//                boids().at(0)->setPreviousPosition(Vec3(0, -25, 0));
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//
-//                std::cout << "Force selected boid to upper hemisphere." << std::endl;
-//
-//    //            debugPrint(boids().at(0)->position());
-//
-//
-//                debugPrint(selectedBoid()->getPreviousPosition());
-//                debugPrint(selectedBoid()->position());
-//            }
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//
-//
-//    //        if (std::abs(selectedBoid()->position().y()) < 3)
-//    //        if (std::abs(selectedBoid()->position().y()) < 1)
-//    //        {
-//    //            std::cout << "previous y=" << selectedBoid()->getPreviousPosition().y();
-//    //            std::cout << ", this y=" << selectedBoid()->position().y();
-//    //            std::cout << std::endl;
-//    //        }
-//
-//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//            // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
-//    //        if (selectedBoid()->position().y() < -1)
-//            if (selectedBoid()->position().y() > 1)
-//            {
-//    //                std::cout << std::endl;
-//    //
-//    //                debugPrint(selectedBoid()->position().y());
-//    //    //            debugPrint(boids().at(0)->position().y());
-//    //    //            std::cout << "selected boid well below PlaneObstacle!!" << std::endl;
-//    //                std::cout << "selected boid well ABOVE PlaneObstacle!!" << std::endl;
-//    //                std::cout << std::endl;
-//    //    //            exit(EXIT_FAILURE);
-//
-//    //            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//    //            // TODO 20250312 finalize enforceConstraint() / ExcludeFrom::neither tests.
-//    //            draw().addThickLineToAnimatedFrame(selectedBoid()->position(),
-//    //                                               (selectedBoid()->position() +
-//    //                                                Vec3(0,100,0)),
-//    //                                               Color::magenta());
-//    //            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//            }
-//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            for_all_boids([&](Boid* b){ b->enforceObstacleConstraint(); });
-//        }
-    
+        
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.
     void enforceObsBoidConstraints()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250311 WIP ExcludeFrom::neither
-//        if (aTimer().frameCounter() == 0)
-//        {
-//            // boids().at(0)->setPosition(Vec3(0, 25, 0));
-//            boids().at(0)->setPosition(Vec3(0, -25, 0));
-//            boids().at(0)->setPreviousPosition(Vec3(0, -25, 0));
-//            std::cout << "Force selected boid to upper hemisphere." << std::endl;
-//            debugPrint(selectedBoid()->getPreviousPosition());
-//            debugPrint(selectedBoid()->position());
-//        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20250317 maybe try to select boid about to collide?
-        
         for_all_boids([&](Boid* b){ b->enforceObstacleConstraint(); });
-
-//        auto enforcer = [&](Boid* b)
-//        {
-//            if (b->enforceObstacleConstraint())
-//            {
-//                setSelectedBoid(b);
-//                draw().simPause() = true;
-//            }
-//        };
-//        for_all_boids(enforcer);
-        
-
-//        int boid_index = 0;
-//        auto check_select_pause = [&](Boid* b)
-//        {
-//            for (auto& o : b->flock_obstacles())
-//            {
-//                if (util::between(o->signed_distance(b->position()), -1, 1))
-//                {
-//                    setSelectedBoid(boid_index);
-//                    draw().simPause() = true;
-//                }
-//            }
-//            boid_index++;
-//        };
-//        for_all_boids(check_select_pause);
-
-//        auto check_select_pause = [&](Boid* b)
-//        {
-//            for (auto& o : b->flock_obstacles())
-//            {
-//                if (util::between(o->signed_distance(b->position()), -1, 1))
-//                {
-//                    setSelectedBoid(b);
-//                    draw().simPause() = true;
-//                }
-//            }
-//        };
-//        for_all_boids(check_select_pause);
-
-//        auto check_select_pause = [&](Boid* b)
-//        {
-//            if (b->super_temp_checker())
-//            {
-//                setSelectedBoid(b);
-//                draw().simPause() = true;
-//            }
-//        };
-//        for_all_boids(check_select_pause);
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
     
     // Just like enforceObsBoidConstraints() but does not count constraint
     // violation due to initial Boid position or when switching obstacle set.
@@ -959,24 +778,15 @@ public:
         if (s != selected_boid_index_) { selected_boid_index_ = s; }
         Boid::setSelected(boids().at(selected_boid_index_));
     }
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20250317 maybe try to select boid about to collide?
     
     void setSelectedBoid(int index_into_boids)
     {
-        
-//        int s = draw().selectedBoidIndex() % boids().size();
-//        if (s != selected_boid_index_) { selected_boid_index_ = s; }
-//        Boid::setSelected(boids().at(selected_boid_index_));
-
         assert(index_into_boids >= 0 and index_into_boids < boids().size());
         
         selected_boid_index_ = index_into_boids;
         draw().selectedBoidIndex() = index_into_boids;
         Boid::setSelected(boids().at(index_into_boids));
     }
-    
     
     void setSelectedBoid(Boid* boid)
     {
@@ -987,9 +797,6 @@ public:
         }
 
     }
-    
-    
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     
     //        # Register single key commands with the Open3D visualizer GUI.

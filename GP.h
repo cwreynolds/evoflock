@@ -636,7 +636,11 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
             { "weight_separate",                 23.0,   23.0,   0.0 },
             { "weight_align",                    12.0,   12.0,   0.0 },
             { "weight_cohere",                   18.0,   18.0,   0.0 },
-            { "weight_avoid",                    40.0,   40.0,   0.0 },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250319 look into weightings for dynamic/static avoidance
+//            { "weight_avoid",                    40.0,   40.0,   0.0 },
+            { "weight_avoid",                    25.0,   25.0,   0.0 },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             { "max_dist_separate_in_body_radii", 15.0,   15.0,   0.0 },
             { "exponent",                         1.0,    1.0,   0.0 },
             { "angle_separate",                  -0.707, -0.707, 0.0 },
@@ -660,7 +664,14 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
             
             // TODO 20250317
 
-            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
+//            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
+//            { "min_time_to_collide",              0.8,    0.8,   0.0 },
+            
+            // TODO 20250319
+
+//            { "fly_away_max_dist_in_br",         20.0,   20.0,   0.0 },
+//            { "min_time_to_collide",              0.8,    0.8,   0.0 },
+            { "fly_away_max_dist_in_br",         15.0,   15.0,   0.0 },
             { "min_time_to_collide",              0.8,    0.8,   0.0 },
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -369,48 +369,147 @@ public:
     // Steering force component to move away from neighbors.
     Vec3 steer_to_separate(const BoidPtrList& neighbors)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250320 back to: why aren't boids flocking
+        if (isSelected()) { std::cout << std::endl << "steer_to_separate" << std::endl; }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 direction;
         for (Boid* neighbor : neighbors)
         {
             assert(neighbor);
             
             Vec3 offset = position() - neighbor->position();
-            double dist = offset.length();
-            double weight = 1 / std::pow(dist, fp().exponent_separate);
-            weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_separate);
-            weight *= angle_weight(neighbor, fp().angle_separate);
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250320 back to: why aren't boids flocking
+
+//            double dist = offset.length();
+//            double weight = 1 / std::pow(dist, fp().exponent_separate);
+//            weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_separate);
+//            weight *= angle_weight(neighbor, fp().angle_separate);
+
+            double weight = neighborWeight(neighbor,
+                                           fp().max_dist_separate,
+                                           fp().exponent_separate,
+                                           fp().angle_separate);
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             direction += offset * weight;
         }
         return direction.normalize_or_0();
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250320 back to: why aren't boids flocking
+    
+    // Ought to be moved elsewhere in file. Near angle_weight()?
+    double neighborWeight(Boid* neighbor,
+                          double max_dist,
+                          double exponent,
+                          double cos_angle_threshold)
+    {
+        double dist = (neighbor->position() - position()).length();
+
+//        double w0 = 1 / pow(dist, fp().exponent_align);
+        double w0 = 1 / pow(dist, exponent);
+
+//        double w1 = w0 * (1 - util::unit_sigmoid_on_01(dist / fp().max_dist_align));
+//        double w1 = w0 * (1 - util::unit_sigmoid_on_01(dist / max_dist));
+        double w1 = w0 * (1 - util::clip01(dist / max_dist));
+
+//        double weight = w1 * angle_weight(neighbor, fp().angle_align);
+        double weight = w1 * angle_weight(neighbor, cos_angle_threshold);
+
+        
+        if (isSelected())
+        {
+            std::cout << " distance = " << dist;
+            std::cout << ", weight = " << weight;
+            std::cout << " (w0 = " << w0;
+            std::cout << ", w1 = " << w1;
+            std::cout << ")" << std::endl;
+        }
+
+        
+        
+        return weight;
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Steering force component to align path with neighbors.
     Vec3 steer_to_align(const BoidPtrList& neighbors)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250320 back to: why aren't boids flocking
+//        int count = 0;
+        if (isSelected()) { std::cout << std::endl << "steer_to_align" << std::endl; }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 direction;
         for (Boid* neighbor : neighbors)
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250320 back to: why aren't boids flocking
+
             Vec3 heading_offset = neighbor->forward() - forward();
-            double dist = (neighbor->position() - position()).length();
-            double weight = 1 / pow(dist, fp().exponent_align);
-            weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_align);
-            weight *= angle_weight(neighbor, fp().angle_align);
+            
+//                double dist = (neighbor->position() - position()).length();
+//
+//    //            double weight = 1 / pow(dist, fp().exponent_align);
+//    //            weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_align);
+//    //            weight *= angle_weight(neighbor, fp().angle_align);
+//
+//                double w0 = 1 / pow(dist, fp().exponent_align);
+//                double w1 = w0 * (1 - util::unit_sigmoid_on_01(dist / fp().max_dist_align));
+//                double weight = w1 * angle_weight(neighbor, fp().angle_align);
+
+            double weight = neighborWeight(neighbor,
+                                           fp().max_dist_align,
+                                           fp().exponent_align,
+                                           fp().angle_align);
+
+            
             direction += heading_offset.normalize_or_0() * weight;
+//            if (isSelected())
+//            {
+//                std::cout << "steer_to_align neighbor " << count++;
+//                std::cout << " distance = " << dist;
+////                std::cout << ", weight = " << weight << std::endl;
+//
+//                std::cout << ", weight = " << weight;
+//                std::cout << " (w0 = " << w0;
+//                std::cout << ", w1 = " << w1;
+//                std::cout << ")" << std::endl;
+//            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         return direction.normalize_or_0();
     }
 
     Vec3 steer_to_cohere(const BoidPtrList& neighbors)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250320 back to: why aren't boids flocking
+        if (isSelected()) { std::cout << std::endl << "steer_to_cohere" << std::endl; }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 direction;
         Vec3 neighbor_center;
         double total_weight = 0;
         for (Boid* neighbor : neighbors)
         {
-            double dist = (neighbor->position() - position()).length();
-            double weight = 1 / pow(dist, fp().exponent_cohere);
-            weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_cohere);
-            weight *= angle_weight(neighbor, fp().angle_cohere);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250320 back to: why aren't boids flocking
+
+//            double dist = (neighbor->position() - position()).length();
+//            double weight = 1 / pow(dist, fp().exponent_cohere);
+//            weight *= 1 - util::unit_sigmoid_on_01(dist / fp().max_dist_cohere);
+//            weight *= angle_weight(neighbor, fp().angle_cohere);
+
+            double weight = neighborWeight(neighbor,
+                                           fp().max_dist_cohere,
+                                           fp().exponent_cohere,
+                                           fp().angle_cohere);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             neighbor_center += neighbor->position() * weight;
             total_weight += weight;
         }
@@ -675,16 +774,35 @@ public:
         }
         return adjusted;
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250320 back to: why aren't boids flocking
+    
+//    // Return weight related to neighbor's position relative to my forward axis.
+//    double angle_weight(Boid* neighbor, double cos_angle_threshold)
+//    {
+//        Vec3 offset = neighbor->position() - position();
+//        double projection_onto_forward = offset.normalize().dot(forward());
+//        return (projection_onto_forward > cos_angle_threshold) ? 1 : 0;
+//    }
 
-    // Wander aimlessly via slowly varying steering force. Remove unused method.
 
-    // Return weight related to neighbor's position relative to my forward axis.
+    
+    // Binary weight: 1 if neighbor's angular offset from my forward axis is
+    // smaller than cos_angle_threshold, and 0 otherwise (say, behind me).
     double angle_weight(Boid* neighbor, double cos_angle_threshold)
     {
+        // Offset from my position to neighbor's position, and unit direction.
         Vec3 offset = neighbor->position() - position();
-        double projection_onto_forward = offset.normalize().dot(forward());
+        Vec3 unit_offset = offset.normalize();
+        // Project unit offset onto forward axis.
+        double projection_onto_forward = unit_offset.dot(forward());
+        // Weight is 1 if projection is bigger than threshold. (So more parallel
+        // with forward axis.)
         return (projection_onto_forward > cos_angle_threshold) ? 1 : 0;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Returns a list of the "neighbors_count" Boids nearest this one.
     BoidPtrList nearest_neighbors() {return nearest_neighbors(neighbors_count);}
@@ -791,13 +909,29 @@ public:
         }
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250320 back to: why aren't boids flocking
+    
+//    // Called from Flock to draw annotation for selected Boid and its neighbors.
+//    void drawAnnotationForBoidAndNeighbors()
+//    {
+//        drawAnnotation();
+//        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
+//    }
+    
     // Called from Flock to draw annotation for selected Boid and its neighbors.
     void drawAnnotationForBoidAndNeighbors()
     {
         drawAnnotation();
-        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
+//        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
+        for (Boid* b : cached_nearest_neighbors())
+        {
+            draw().addThickLineToAnimatedFrame(position(), b->position(), Vec3());
+        }
     }
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Bird-like roll control: blends vector toward path curvature center with
     // global up. Overrides method in base class Agent
     Vec3 up_reference(const Vec3& acceleration) override

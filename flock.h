@@ -56,13 +56,18 @@ private:
     static inline std::vector<ObstaclePtrList> obstacle_presets_;
     static inline int obstacle_selection_counter_ = -1;
     
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250321 remove exponent parameter for separate, align, and cohere.
+
     // Index of the initial/default obstacle set.
     //int default_obstacle_set_index_ = 0;  // Sphere and vertical cylinder.
     //int default_obstacle_set_index_ = 1;  // Sphere and 6 cylinders.
     //int default_obstacle_set_index_ = 2;  // Sphere and plane.
-    //int default_obstacle_set_index_ = 3;  // Sphere only.
-    int default_obstacle_set_index_ = 4;  // Sphere and many little spheres.
+    int default_obstacle_set_index_ = 3;  // Sphere only.
+    //int default_obstacle_set_index_ = 4;  // Sphere and many little spheres.
     //int default_obstacle_set_index_ = 5;  // Sphere with smaller sphere inside.
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;

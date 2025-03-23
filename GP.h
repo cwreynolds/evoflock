@@ -631,6 +631,10 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
             { "max_force",                      100.0,  100.0,   0.0 },
             { "max_speed",                       20.0,   20.0,   0.0 },
             { "min_speed",                       20.0,   20.0,   0.0 },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
+            // So this is probably being ignored.
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             { "speed",                           20.0,   20.0,   0.0 },
             { "weight_forward",                   4.0,    4.0,   0.0 },
             { "weight_separate",                 23.0,   23.0,   0.0 },
@@ -641,14 +645,20 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
 //            { "weight_avoid",                    40.0,   40.0,   0.0 },
             { "weight_avoid",                    25.0,   25.0,   0.0 },
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250322 BUG!! missing max_dist for align and cohere.
             { "max_dist_separate_in_body_radii", 15.0,   15.0,   0.0 },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
             { "exponent",                         1.0,    1.0,   0.0 },
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250320 back to: why aren't boids flocking
             
-            { "angle_separate",                  -0.707, -0.707, 0.0 },
-            
+//            { "angle_separate",                  -0.707, -0.707, 0.0 },
+            { "angle_separate",                  0.0, 0.0, 0.0 },
+
 //            { "angle_align",                      0.940,  0.940, 0.0 },
 //            { "angle_align",                      0.8,  0.8, 0.0 },
             { "angle_align",                      0.0,  0.0, 0.0 },

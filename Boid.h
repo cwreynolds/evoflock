@@ -690,11 +690,16 @@ public:
         double weight = unit_nearness * angular_cutoff;
         if (isSelected())
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
+            std::cout << std::setw(5) << std::fixed;
             std::cout << " distance = " << dist;
             std::cout << ", weight = " << weight;
             std::cout << " (unit_nearness = " << unit_nearness;
             std::cout << ", angular_cutoff = " << angular_cutoff;
+            std::cout << ", max_dist = " << max_dist;
             std::cout << ")" << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         return weight;
     }

@@ -222,14 +222,22 @@ inline FlockParameters init_fp(double max_force,
     fp.weight_align = weight_align;
     fp.weight_cohere = weight_cohere;
     fp.weight_avoid = weight_avoid;
-    fp.max_dist_separate = max_dist_separate_in_body_radii * fp.body_radius;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
+//    fp.max_dist_separate = max_dist_separate_in_body_radii * fp.body_radius;
+    fp.max_dist_separate = max_dist_separate_in_body_radii * fp.body_diameter / 2;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //fp.exponent_separate = exponent_separate;  // stay at 1 like in hand-tuned
     //fp.exponent_align = exponent_align;        // stay at 1 like in hand-tuned
     //fp.exponent_cohere = exponent_cohere;      // stay at 1 like in hand-tuned
     fp.angle_separate = angle_separate;
     fp.angle_align = angle_align;
     fp.angle_cohere = angle_cohere;
-    fp.fly_away_max_dist_in_br = fly_away_max_dist_in_br;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
+//    fp.fly_away_max_dist_in_br = fly_away_max_dist_in_br;
+    fp.fly_away_max_dist = fly_away_max_dist_in_br * fp.body_diameter / 2;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     fp.min_time_to_collide = min_time_to_collide;
     return fp;
 }

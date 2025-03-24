@@ -107,6 +107,7 @@
 		841F3D632B4A1C8D00483276 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		841F3D642B4C73A500483276 /* Utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
 		843278062B50594E00CF4AEC /* LocalSpace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalSpace.h; sourceTree = "<group>"; };
+		845F845D2D90E397000BF13C /* FlockParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FlockParameters.h; sourceTree = "<group>"; };
 		847454BE2B6195F000214306 /* obstacle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = obstacle.h; sourceTree = "<group>"; };
 		847454BF2B65BE9C00214306 /* Boid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Boid.h; sourceTree = "<group>"; };
 		848101F62C7666CA00433168 /* libOpen3D.0.18.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpen3D.0.18.0.dylib; path = "../open3d-devel-darwin-arm64-0.18.0+c219d82/lib/libOpen3D.0.18.0.dylib"; sourceTree = "<group>"; };
@@ -265,6 +266,7 @@
 				84A248392BE076450062EB95 /* dbscan.h */,
 				849C92062C8F525F007DFBDE /* Draw.h */,
 				848BC33C2B69856700509CE5 /* flock.h */,
+				845F845D2D90E397000BF13C /* FlockParameters.h */,
 				8413ADFB2B89626F006693A1 /* GP.h */,
 				841F3D622B4A1C8100483276 /* LICENSE */,
 				843278062B50594E00CF4AEC /* LocalSpace.h */,

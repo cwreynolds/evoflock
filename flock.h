@@ -476,7 +476,11 @@ public:
         {
             Boid* n = b->cached_nearest_neighbors().at(0);
             double  dist = (b->position() - n->position()).length();
-            double br = fp().body_radius;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
+//            double br = fp().body_radius;
+            double br = fp().body_diameter / 2;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             bool nn_sep_ok = (dist / br) > min_sep_allowed;
             
             double cs = util::remap_interval_clip(dist/br,min_sep_allowed,20,1,0);
@@ -731,7 +735,11 @@ public:
                 if (min_sep > dist) { min_sep = dist; }
                 ave_sep += dist;
                 pair_count += 1;
-                if (dist < (2 * fp().body_radius)){ cumulative_sep_fail_ += 1; }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
+//                if (dist < (2 * fp().body_radius)){ cumulative_sep_fail_ += 1; }
+                if (dist < fp().body_diameter) { cumulative_sep_fail_ += 1; }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             };
             util::apply_to_pairwise_combinations(examine_pair, boids());
             ave_sep /= pair_count;

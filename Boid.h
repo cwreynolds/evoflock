@@ -17,6 +17,7 @@
 #pragma once
 #include "Agent.h"
 #include "Draw.h"
+#include "FlockParameters.h"
 #include "obstacle.h"
 #include "Utilities.h"
 #include "Vec3.h"
@@ -26,44 +27,47 @@ class Boid;
 typedef std::vector<Boid*> BoidPtrList;
 typedef std::vector<Boid> BoidInstanceList;
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
 
-// Basically a container for all flocking parameters relevant to optimization.
-class FlockParameters
-{
-public:
-    double max_speed = 20.0;                          // Speed upper limit (m/s)
-    double max_force = 100.0;                         // Max acceleration (m/s²)
-//    double min_speed = max_speed * 0.3;  // TODO 20231225 ad hoc factor.
-    double min_speed_factor = 0.3;
-    double min_speed = max_speed * min_speed_factor;  // Speed lower limit (m/s)
-    double speed = min_speed;                         // init speed is min
-    double body_radius = 0.5;      // "assume a spherical boid" -- unit diameter
-    
-    double sphere_radius = 50;
-    Vec3 sphere_center;
-    
-    // Tuning parameters
-    double weight_forward  = 4;
-    double weight_separate = 23;
-    double weight_align    = 12;
-    double weight_cohere   = 18;
-    double weight_avoid    = 40;
-    // TODO 20240318 should this (or all 3) be "_in_br" ?
-    double max_dist_separate = 15 * body_radius;
-    double max_dist_align    = 100;
-    double max_dist_cohere   = 100;  // TODO 20231017 should this be ∞ or
-                                     // should the behavior just ignore it?
-    
-    double exponent_separate = 1;  // TODO 20231019 are these useful? Or should
-    double exponent_align    = 1;  // it just assume 1/dist is used to weight
-    double exponent_cohere   = 1;  // all neighbors in all three behaviors?
-    // Cosine of threshold angle (max angle from forward to be seen)
-    double angle_separate = -0.707;  // 135°
-    double angle_align    =  0.940;  // 20°
-    double angle_cohere   =  0;      // 90°
-    double fly_away_max_dist_in_br = 20;  // max fly-away dist from obs surface
-    double min_time_to_collide = 0.8;     // react to predicted impact (seconds)
-};
+//    // Basically a container for all flocking parameters relevant to optimization.
+//    class FlockParameters
+//    {
+//    public:
+//        double max_speed = 20.0;                          // Speed upper limit (m/s)
+//        double max_force = 100.0;                         // Max acceleration (m/s²)
+//    //    double min_speed = max_speed * 0.3;  // TODO 20231225 ad hoc factor.
+//        double min_speed_factor = 0.3;
+//        double min_speed = max_speed * min_speed_factor;  // Speed lower limit (m/s)
+//        double speed = min_speed;                         // init speed is min
+//        double body_radius = 0.5;      // "assume a spherical boid" -- unit diameter
+//
+//        double sphere_radius = 50;
+//        Vec3 sphere_center;
+//
+//        // Tuning parameters
+//        double weight_forward  = 4;
+//        double weight_separate = 23;
+//        double weight_align    = 12;
+//        double weight_cohere   = 18;
+//        double weight_avoid    = 40;
+//        // TODO 20240318 should this (or all 3) be "_in_br" ?
+//        double max_dist_separate = 15 * body_radius;
+//        double max_dist_align    = 100;
+//        double max_dist_cohere   = 100;  // TODO 20231017 should this be ∞ or
+//                                         // should the behavior just ignore it?
+//
+//        double exponent_separate = 1;  // TODO 20231019 are these useful? Or should
+//        double exponent_align    = 1;  // it just assume 1/dist is used to weight
+//        double exponent_cohere   = 1;  // all neighbors in all three behaviors?
+//        // Cosine of threshold angle (max angle from forward to be seen)
+//        double angle_separate = -0.707;  // 135°
+//        double angle_align    =  0.940;  // 20°
+//        double angle_cohere   =  0;      // 90°
+//        double fly_away_max_dist_in_br = 20;  // max fly-away dist from obs surface
+//        double min_time_to_collide = 0.8;     // react to predicted impact (seconds)
+//    };
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class Flock;
 
@@ -543,13 +547,21 @@ public:
         Vec3 avoidance;
         Vec3 p = position();
         Vec3 f = forward();
-        double max_distance = fp().body_radius * fp().fly_away_max_dist_in_br;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
+//        double max_distance = fp().body_radius * fp().fly_away_max_dist_in_br;
+        double max_distance = fp().fly_away_max_dist;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 //        if (isSelected()) { std::cout << std::endl; }
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         for (Obstacle* obstacle : flock_obstacles())
         {
-            Vec3 oa = obstacle->fly_away(p, f, max_distance, fp().body_radius);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
+//            Vec3 oa = obstacle->fly_away(p, f, max_distance, fp().body_radius);
+            Vec3 oa = obstacle->fly_away(p, f, max_distance, fp().body_diameter / 2);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             double weight = oa.length();
             
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -770,8 +782,13 @@ public:
     // Use Draw api to draw this Boid's “body” -- an irregular tetrahedron.
     void draw_body()
     {
-        double br = fp().body_radius;  // body radius (defaults to 0.5)
-        double bd = br * 2;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
+//        double br = fp().body_radius;  // body radius (defaults to 0.5)
+//        double bd = br * 2;
+        double bd = fp().body_diameter;  // body diameter (defaults to 1)
+        double br = bd / 2;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 center = position();
         Vec3 nose = center + forward() * br;
         Vec3 tail = center - forward() * br;
@@ -887,7 +904,11 @@ public:
         for (Obstacle* o : flock_obstacles())
         {
             // Compute predicted point of impact, if any.
-            Vec3 poi = o->rayIntersection(position(), forward(), fp().body_radius);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
+//            Vec3 poi = o->rayIntersection(position(), forward(), fp().body_radius);
+            Vec3 poi = o->rayIntersection(position(), forward(), fp().body_diameter / 2);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (not poi.is_none())
             {
                 // Make a Collision object, add it to collection of collisions.
@@ -931,7 +952,11 @@ public:
 
                 // Orient boid to point directly away from obstacle.
                 Vec3 normal = o->normalTowardAllowedSide(ec, prev_position);
-                Vec3 to = ec + (normal * fp().body_radius * 2);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
+//                Vec3 to = ec + (normal * fp().body_radius * 2);
+                Vec3 to = ec + (normal * fp().body_diameter);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 set_ls(ls().fromTo(ec, to));
 
 //                setPosition(ec);

@@ -199,8 +199,12 @@ inline FlockParameters init_fp(double max_force,
                                double weight_cohere,
                                double weight_avoid,
                                
-                               double max_dist_separate_in_body_radii,
-                               
+                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                               // TODO 20250324 dist not diamater-relative
+//                               double max_dist_separate_in_body_radii,
+                               double max_dist_separate,
+                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                                double exponent_separate,
                                double exponent_align,
                                double exponent_cohere,
@@ -225,7 +229,7 @@ inline FlockParameters init_fp(double max_force,
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
 //    fp.max_dist_separate = max_dist_separate_in_body_radii * fp.body_radius;
-    fp.max_dist_separate = max_dist_separate_in_body_radii * fp.body_diameter / 2;
+    fp.max_dist_separate = max_dist_separate;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //fp.exponent_separate = exponent_separate;  // stay at 1 like in hand-tuned
     //fp.exponent_align = exponent_align;        // stay at 1 like in hand-tuned
@@ -569,12 +573,21 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                     "Real_0_100",  // weight_cohere
                     "Real_0_100",  // weight_avoid
                     
-                    "Real_0_200",  // max_dist_separate_in_body_radii
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20250322 BUG!! missing max_dist for align and cohere.
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20250324 dist not diamater-relative
+
+//                    "Real_0_200",  // max_dist_separate_in_body_radii
+                    "Real_0_100",  // max_dist_separate
+
                     // TODO set to 100, essentially infinity, in the FlockParameters
                     // class. Keep them that way for now but needs to be revisited.
                     //"Real_0_200",  // max_dist_align_in_body_radii
                     //"Real_0_200",  // max_dist_cohere_in_body_radii
-                    
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                     "Real_0_10",   // exponent_separate
                     "Real_0_10",   // exponent_align
                     "Real_0_10",   // exponent_cohere
@@ -656,7 +669,11 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
             
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250322 BUG!! missing max_dist for align and cohere.
-            { "max_dist_separate_in_body_radii", 15.0,   15.0,   0.0 },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250324 dist not diamater-relative
+//            { "max_dist_separate_in_body_radii", 15.0,   15.0,   0.0 },
+            { "max_dist_separate", 15.0,   15.0,   0.0 },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
             { "exponent",                         1.0,    1.0,   0.0 },
@@ -728,7 +745,15 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
                     "weight_align",                   // weight_align
                     "weight_cohere",                  // weight_cohere
                     "weight_avoid",                   // weight_avoid
-                    "max_dist_separate_in_body_radii",// max_dist_separate_in_body_radii
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20250322 BUG!! missing max_dist for align and cohere.
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20250324 dist not diamater-relative
+//                    "max_dist_separate_in_body_radii",// max_dist_separate_in_body_radii
+                    "max_dist_separate",  // max_dist_separate
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                     "exponent",                       // exponent_separate
                     "exponent",                       // exponent_align
                     "exponent",                       // exponent_cohere

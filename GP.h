@@ -258,6 +258,13 @@ inline FlockParameters init_fp(double max_force,
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     fp.min_time_to_collide = min_time_to_collide;
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250326 refactor GpTypes in evoflock_ga_function_set_handmade()
+    fp.print();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     return fp;
 }
 
@@ -658,88 +665,151 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
 {
     return
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250326 refactor GpTypes in evoflock_ga_function_set_handmade()
+
+        
+//            // GpTypes
+//            {
+//                { "Multi_Objective_Fitness" },
+//                { "max_force",                      100.0,  100.0,   0.0 },
+//                { "max_speed",                       20.0,   20.0,   0.0 },
+//                { "min_speed",                       20.0,   20.0,   0.0 },
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
+//                // So this is probably being ignored.
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                { "speed",                           20.0,   20.0,   0.0 },
+//                { "weight_forward",                   4.0,    4.0,   0.0 },
+//                { "weight_separate",                 23.0,   23.0,   0.0 },
+//                { "weight_align",                    12.0,   12.0,   0.0 },
+//                { "weight_cohere",                   18.0,   18.0,   0.0 },
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20250319 look into weightings for dynamic/static avoidance
+//    //            { "weight_avoid",                    40.0,   40.0,   0.0 },
+//                { "weight_avoid",                    25.0,   25.0,   0.0 },
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                { "max_dist_separate",               10.0,   10.0,   0.0 },
+//                { "max_dist_align",                 100.0,  100.0,   0.0 },
+//                { "max_dist_cohere",                100.0,  100.0,   0.0 },
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                // TODO 20250325
+//    //            { "exponent",                         1.0,    1.0,   0.0 },
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20250320 back to: why aren't boids flocking
+//
+//    //            { "angle_separate",                  -0.707, -0.707, 0.0 },
+//                { "angle_separate",                  0.0, 0.0, 0.0 },
+//
+//    //            { "angle_align",                      0.940,  0.940, 0.0 },
+//    //            { "angle_align",                      0.8,  0.8, 0.0 },
+//                { "angle_align",                      0.0,  0.0, 0.0 },
+//
+//                { "angle_cohere",                     0.0,    0.0,   0.0 },
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20250316 adjust min_time_to_collide (/ fly_away_max_dist_in_br)
+//
+//    //            { "fly_away_max_dist_in_br",         20.0,   20.0,   0.0 },
+//    //            { "min_time_to_collide",              0.8,    0.8,   0.0 },
+//
+//    //            { "fly_away_max_dist_in_br",         20.0,   20.0,   0.0 },
+//    //            { "min_time_to_collide",              0.4,    0.4,   0.0 },
+//
+//    //            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
+//    //            { "min_time_to_collide",              0.8,    0.8,   0.0 },
+//
+//    //            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
+//    //            { "min_time_to_collide",              0.4,    0.4,   0.0 },
+//
+//                // TODO 20250317
+//
+//    //            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
+//    //            { "min_time_to_collide",              0.8,    0.8,   0.0 },
+//
+//                // TODO 20250319
+//
+//    //            { "fly_away_max_dist_in_br",         20.0,   20.0,   0.0 },
+//    //            { "min_time_to_collide",              0.8,    0.8,   0.0 },
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                // TODO 20250325
+//
+//    //            { "fly_away_max_dist_in_br",         15.0,   15.0,   0.0 },
+//    //            { "fly_away_max_dist",          15.0,   15.0,   0.0 },
+//                { "fly_away_max_dist",               10.0,   10.0,   0.0 },
+//                { "min_time_to_collide",              0.8,    0.8,   0.0 },
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            },
+      
+//        // 20250326 CLEAN COPY
+//        
+//        // GpTypes
+//        {
+//            { "Multi_Objective_Fitness" },
+//            { "max_force",                      100.0,  100.0,   0.0 },
+//            { "max_speed",                       20.0,   20.0,   0.0 },
+//            { "min_speed",                       20.0,   20.0,   0.0 },
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
+//            // So this is probably being ignored.
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            { "speed",                           20.0,   20.0,   0.0 },
+//            { "weight_forward",                   4.0,    4.0,   0.0 },
+//            { "weight_separate",                 23.0,   23.0,   0.0 },
+//            { "weight_align",                    12.0,   12.0,   0.0 },
+//            { "weight_cohere",                   18.0,   18.0,   0.0 },
+//            { "weight_avoid",                    25.0,   25.0,   0.0 },
+//            { "max_dist_separate",               10.0,   10.0,   0.0 },
+//            { "max_dist_align",                 100.0,  100.0,   0.0 },
+//            { "max_dist_cohere",                100.0,  100.0,   0.0 },
+//            { "angle_separate",                   0.0,    0.0,   0.0 },
+//            { "angle_align",                      0.0,    0.0,   0.0 },
+//            { "angle_cohere",                     0.0,    0.0,   0.0 },
+//            { "fly_away_max_dist",               10.0,   10.0,   0.0 },
+//            { "min_time_to_collide",              0.8,    0.8,   0.0 },
+//        },
+        
+        // 20250326 DUMMY COPY just to test right data getting to right FP slots
+        
         // GpTypes
         {
             { "Multi_Objective_Fitness" },
-            { "max_force",                      100.0,  100.0,   0.0 },
-            { "max_speed",                       20.0,   20.0,   0.0 },
-            { "min_speed",                       20.0,   20.0,   0.0 },
+            { "max_force",                        1.0,    1.0,   0.0 },
+            { "max_speed",                        2.0,    2.0,   0.0 },
+            { "min_speed",                        3.0,    3.0,   0.0 },
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
             // So this is probably being ignored.
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            { "speed",                           20.0,   20.0,   0.0 },
-            { "weight_forward",                   4.0,    4.0,   0.0 },
-            { "weight_separate",                 23.0,   23.0,   0.0 },
-            { "weight_align",                    12.0,   12.0,   0.0 },
-            { "weight_cohere",                   18.0,   18.0,   0.0 },
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250319 look into weightings for dynamic/static avoidance
-//            { "weight_avoid",                    40.0,   40.0,   0.0 },
-            { "weight_avoid",                    25.0,   25.0,   0.0 },
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
+            { "speed",                            4.0,    4.0,   0.0 },
+            { "weight_forward",                   5.0,    5.0,   0.0 },
+            { "weight_separate",                  6.0,    6.0,   0.0 },
+            { "weight_align",                     7.0,    7.0,   0.0 },
+            { "weight_cohere",                    8.0,    8.0,   0.0 },
+            { "weight_avoid",                     9.0,    9.0,   0.0 },
             { "max_dist_separate",               10.0,   10.0,   0.0 },
-            { "max_dist_align",                 100.0,  100.0,   0.0 },
-            { "max_dist_cohere",                100.0,  100.0,   0.0 },
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250325
-//            { "exponent",                         1.0,    1.0,   0.0 },
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250320 back to: why aren't boids flocking
-            
-//            { "angle_separate",                  -0.707, -0.707, 0.0 },
-            { "angle_separate",                  0.0, 0.0, 0.0 },
-
-//            { "angle_align",                      0.940,  0.940, 0.0 },
-//            { "angle_align",                      0.8,  0.8, 0.0 },
-            { "angle_align",                      0.0,  0.0, 0.0 },
-
-            { "angle_cohere",                     0.0,    0.0,   0.0 },
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250316 adjust min_time_to_collide (/ fly_away_max_dist_in_br)
-            
-//            { "fly_away_max_dist_in_br",         20.0,   20.0,   0.0 },
-//            { "min_time_to_collide",              0.8,    0.8,   0.0 },
-
-//            { "fly_away_max_dist_in_br",         20.0,   20.0,   0.0 },
-//            { "min_time_to_collide",              0.4,    0.4,   0.0 },
-
-//            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
-//            { "min_time_to_collide",              0.8,    0.8,   0.0 },
-
-//            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
-//            { "min_time_to_collide",              0.4,    0.4,   0.0 },
-            
-            // TODO 20250317
-
-//            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
-//            { "min_time_to_collide",              0.8,    0.8,   0.0 },
-            
-            // TODO 20250319
-
-//            { "fly_away_max_dist_in_br",         20.0,   20.0,   0.0 },
-//            { "min_time_to_collide",              0.8,    0.8,   0.0 },
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250325
-
-//            { "fly_away_max_dist_in_br",         15.0,   15.0,   0.0 },
-//            { "fly_away_max_dist",          15.0,   15.0,   0.0 },
-            { "fly_away_max_dist",               10.0,   10.0,   0.0 },
-            { "min_time_to_collide",              0.8,    0.8,   0.0 },
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+            { "max_dist_align",                  11.0,   11.0,   0.0 },
+            { "max_dist_cohere",                 12.0,   12.0,   0.0 },
+            { "angle_separate",                  13.0,   13.0,   0.0 },
+            { "angle_align",                     14.0,   14.0,   0.0 },
+            { "angle_cohere",                    15.0,   15.0,   0.0 },
+            { "fly_away_max_dist",               16.0,   16.0,   0.0 },
+            { "min_time_to_collide",             17.0,   17.0,   0.0 },
         },
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         // GpFunctions
         {
             {
@@ -764,33 +834,16 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
                     "weight_cohere",                  // weight_cohere
                     "weight_avoid",                   // weight_avoid
                     
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-                    // TODO 20250325
-
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20250322 BUG!! missing max_dist for align and cohere.
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20250324 dist not diamater-relative
-//                    "max_dist_separate_in_body_radii",// max_dist_separate_in_body_radii
                     "max_dist_separate",              // max_dist_separate
                     "max_dist_align",                 // max_dist_align
                     "max_dist_cohere",                // max_dist_cohere
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//                    "exponent",                       // exponent_separate
-//                    "exponent",                       // exponent_align
-//                    "exponent",                       // exponent_cohere
 
                     // Cosine of threshold angle (max angle from forward to be seen)
                     "angle_separate",                 // angle_separate
                     "angle_align",                    // angle_align
                     "angle_cohere",                   // angle_cohere
-//                    "fly_away_max_dist_in_br",        // fly_away_max_dist_in_br
                     "fly_away_max_dist",        // fly_away_max_dist
                     "min_time_to_collide",            // min_time_to_collide
-
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
                 },
                 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

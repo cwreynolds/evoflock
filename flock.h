@@ -962,24 +962,39 @@ public:
             obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
             obstacle_presets_.push_back(obs);
 
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250326 WIP FlockParameters, multisphere obstacle broken?
+
             // Set 4 -- 35 random spheres
             obs.clear();
             obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
-            int count = 35;
+//            int count = 35;
+//            int count = 32;
+            int count = 30;
             std::vector<double> radii;
             for (int i = 0; i < count; i++)
             {
                 radii.push_back(EF::RS().random2(4, 13));
             }
-            double margin = 3;
-            auto centers = shape::arrangeNonOverlappingSpheres(radii, margin, sr);
+//            double margin = 3;
+//            double margin = 5;
+            double margin = 4;
+//            debugPrint(util::vec_to_string(radii))
+//            debugPrint(margin)
+//            debugPrint(sr)
+//            int retries = 2000;
+            int retries = 4000;
+//            auto centers = shape::arrangeNonOverlappingSpheres(radii, margin, sr);
+            auto centers = shape::arrangeNonOverlappingSpheres(radii, margin,
+                                                               sr, retries);
             auto ins = Obstacle::inside;
             for (int i = 0; i < count; i++)
             {
                 obs.push_back(new SphereObstacle(radii[i], centers[i], ins));
             }
             obstacle_presets_.push_back(obs);
-            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250125 debugging "non-everted" sphere obstacle.
             

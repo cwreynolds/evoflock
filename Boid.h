@@ -388,64 +388,6 @@ public:
         return direction_normalized;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250319 look into weightings for dynamic/static avoidance
-
-//        // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
-//        // (I will collide with obstacle within min_time_to_collide seconds)
-//        // and "static" avoidance (I should fly away from this obstacle to add
-//        // clearance, to avoid scraping along everted containment obstacles).
-//        Vec3 steer_to_avoid()
-//        {
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//            // TODO 20250301 temp command to toggle obstacle avoidance
-//    //        if (not draw().avoidingObstaclesMode()) { return {}; }
-//            if (not draw().avoidingObstaclesMode())
-//            {
-//                annote_avoid_poi_ = Vec3();
-//                annote_avoid_weight_ = 0;
-//                return {};
-//            }
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//            Vec3 avoid;
-//            avoid_obstacle_annotation(0, Vec3::none(), 0);
-//            Vec3 predict_avoid = steer_for_predictive_avoidance();
-//            Vec3 static_avoid = fly_away_from_obstacles();
-//
-//            avoid = static_avoid + (predict_avoid * 3);
-//            avoid_obstacle_annotation(3, Vec3::none(), 0);
-//            return avoid;
-//        }
-      
-//        // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
-//        // (I will collide with obstacle within min_time_to_collide seconds)
-//        // and "static" avoidance (I should fly away from this obstacle to add
-//        // clearance, to avoid scraping along everted containment obstacles).
-//        Vec3 steer_to_avoid()
-//        {
-//            avoid_obstacle_annotation(0, Vec3::none(), 0);
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//            // TODO 20250301 temp command to toggle obstacle avoidance
-//            if (not draw().avoidingObstaclesMode()) { return {}; }
-//    //        if (not draw().avoidingObstaclesMode())
-//    //        {
-//    //            annote_avoid_poi_ = Vec3();
-//    //            annote_avoid_weight_ = 0;
-//    //            return {};
-//    //        }
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//            Vec3 avoid;
-//    //        avoid_obstacle_annotation(0, Vec3::none(), 0);
-//            Vec3 predict_avoid = steer_for_predictive_avoidance();
-//            Vec3 static_avoid = fly_away_from_obstacles();
-//
-//            avoid = static_avoid + (predict_avoid * 3);
-//            avoid_obstacle_annotation(3, Vec3::none(), 0);
-//            return avoid;
-//        }
-
     // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
     // (I will collide with obstacle within min_time_to_collide seconds)
     // and "static" avoidance (I should fly away from this obstacle to add
@@ -501,41 +443,19 @@ public:
     Vec3 fly_away_from_obstacles()
     {
         Vec3 avoidance;
-        Vec3 p = position();
         Vec3 f = forward();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
-//        double max_distance = fp().body_radius * fp().fly_away_max_dist_in_br;
+        Vec3 p = position();
+        double br = fp().body_diameter / 2;
         double max_distance = fp().fly_away_max_dist;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//        if (isSelected()) { std::cout << std::endl; }
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         for (Obstacle* obstacle : flock_obstacles())
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
-//            Vec3 oa = obstacle->fly_away(p, f, max_distance, fp().body_radius);
-            Vec3 oa = obstacle->fly_away(p, f, max_distance, fp().body_diameter / 2);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            Vec3 oa = obstacle->fly_away(p, f, max_distance, br);
             double weight = oa.length();
-            
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//            if (isSelected()) { debugPrint(weight); }
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
             avoid_obstacle_annotation(2, obstacle->nearest_point(p), weight);
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             avoidance += oa;
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         }
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//        return avoidance.normalize_or_0();
         return avoidance;
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241219 reconsider avoid_blend_mode

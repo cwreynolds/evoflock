@@ -199,22 +199,27 @@ inline FlockParameters init_fp(double max_force,
                                double weight_cohere,
                                double weight_avoid,
                                
-                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                               // TODO 20250324 dist not diamater-relative
-//                               double max_dist_separate_in_body_radii,
-                               double max_dist_separate,
-                               //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                               //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                               // TODO 20250325
 
-                               double exponent_separate,
-                               double exponent_align,
-                               double exponent_cohere,
+                               double max_dist_separate,
                                
+                               double max_dist_align,
+                               double max_dist_cohere,
+
+//                               double exponent_separate,
+//                               double exponent_align,
+//                               double exponent_cohere,
+
+
                                double angle_separate,
                                double angle_align,
                                double angle_cohere,
                                
-                               double fly_away_max_dist_in_br,
+//                               double fly_away_max_dist_in_br,
+                               double fly_away_max_dist,
                                double min_time_to_collide)
+                               //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 {
     FlockParameters fp;
     fp.max_force = max_force;
@@ -230,6 +235,11 @@ inline FlockParameters init_fp(double max_force,
     // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
 //    fp.max_dist_separate = max_dist_separate_in_body_radii * fp.body_radius;
     fp.max_dist_separate = max_dist_separate;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250325
+    fp.max_dist_align = max_dist_align;
+    fp.max_dist_cohere = max_dist_cohere;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //fp.exponent_separate = exponent_separate;  // stay at 1 like in hand-tuned
     //fp.exponent_align = exponent_align;        // stay at 1 like in hand-tuned
@@ -240,7 +250,12 @@ inline FlockParameters init_fp(double max_force,
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
 //    fp.fly_away_max_dist_in_br = fly_away_max_dist_in_br;
-    fp.fly_away_max_dist = fly_away_max_dist_in_br * fp.body_diameter / 2;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250325
+//    fp.fly_away_max_dist = fly_away_max_dist_in_br * fp.body_diameter / 2;
+    fp.fly_away_max_dist = fly_away_max_dist;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     fp.min_time_to_collide = min_time_to_collide;
     return fp;
@@ -465,8 +480,12 @@ inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
                                         t.evalSubtree<double>(13),
                                         t.evalSubtree<double>(14),
                                         t.evalSubtree<double>(15),
-                                        t.evalSubtree<double>(16),
-                                        t.evalSubtree<double>(17)),
+                                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                                        // TODO 20250325
+//                                        t.evalSubtree<double>(16),
+//                                        t.evalSubtree<double>(17)),
+                                        t.evalSubtree<double>(16)),
+                                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                                 true);  // write flock data file
 }
 
@@ -573,20 +592,9 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                     "Real_0_100",  // weight_cohere
                     "Real_0_100",  // weight_avoid
                     
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20250322 BUG!! missing max_dist for align and cohere.
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20250324 dist not diamater-relative
-
-//                    "Real_0_200",  // max_dist_separate_in_body_radii
                     "Real_0_100",  // max_dist_separate
-
-                    // TODO set to 100, essentially infinity, in the FlockParameters
-                    // class. Keep them that way for now but needs to be revisited.
-                    //"Real_0_200",  // max_dist_align_in_body_radii
-                    //"Real_0_200",  // max_dist_cohere_in_body_radii
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    "Real_0_100",  // max_dist_align
+                    "Real_0_100",  // max_dist_cohere
 
                     "Real_0_10",   // exponent_separate
                     "Real_0_10",   // exponent_align
@@ -597,7 +605,7 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                     "Real_m1_p1",  // angle_align
                     "Real_m1_p1",  // angle_cohere
                     
-                    "Real_0_100", // fly_away_max_dist_in_br
+                    "Real_0_100", // fly_away_max_dist
                     "Real_0_10",  // min_time_to_collide
                 },
                 
@@ -628,8 +636,12 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                                                  t.evalSubtree<double>(13),
                                                  t.evalSubtree<double>(14),
                                                  t.evalSubtree<double>(15),
-                                                 t.evalSubtree<double>(16),
-                                                 t.evalSubtree<double>(17));
+                                                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                                                 // TODO 20250325
+//                                                 t.evalSubtree<double>(16),
+//                                                 t.evalSubtree<double>(17));
+                                                 t.evalSubtree<double>(16));
+                                                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                     auto fitness = run_flock_simulation(fp);
                     return std::any(fitness);
                 }
@@ -667,16 +679,14 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
             { "weight_avoid",                    25.0,   25.0,   0.0 },
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250322 BUG!! missing max_dist for align and cohere.
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250324 dist not diamater-relative
-//            { "max_dist_separate_in_body_radii", 15.0,   15.0,   0.0 },
-            { "max_dist_separate", 15.0,   15.0,   0.0 },
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
-            { "exponent",                         1.0,    1.0,   0.0 },
+            { "max_dist_separate",               10.0,   10.0,   0.0 },
+            { "max_dist_align",                 100.0,  100.0,   0.0 },
+            { "max_dist_cohere",                100.0,  100.0,   0.0 },
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250325
+//            { "exponent",                         1.0,    1.0,   0.0 },
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250320 back to: why aren't boids flocking
@@ -716,8 +726,16 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
 
 //            { "fly_away_max_dist_in_br",         20.0,   20.0,   0.0 },
 //            { "min_time_to_collide",              0.8,    0.8,   0.0 },
-            { "fly_away_max_dist_in_br",         15.0,   15.0,   0.0 },
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250325
+
+//            { "fly_away_max_dist_in_br",         15.0,   15.0,   0.0 },
+//            { "fly_away_max_dist",          15.0,   15.0,   0.0 },
+            { "fly_away_max_dist",               10.0,   10.0,   0.0 },
             { "min_time_to_collide",              0.8,    0.8,   0.0 },
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -745,24 +763,34 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
                     "weight_align",                   // weight_align
                     "weight_cohere",                  // weight_cohere
                     "weight_avoid",                   // weight_avoid
+                    
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+                    // TODO 20250325
+
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     // TODO 20250322 BUG!! missing max_dist for align and cohere.
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     // TODO 20250324 dist not diamater-relative
 //                    "max_dist_separate_in_body_radii",// max_dist_separate_in_body_radii
-                    "max_dist_separate",  // max_dist_separate
+                    "max_dist_separate",              // max_dist_separate
+                    "max_dist_align",                 // max_dist_align
+                    "max_dist_cohere",                // max_dist_cohere
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-                    "exponent",                       // exponent_separate
-                    "exponent",                       // exponent_align
-                    "exponent",                       // exponent_cohere
+//                    "exponent",                       // exponent_separate
+//                    "exponent",                       // exponent_align
+//                    "exponent",                       // exponent_cohere
+
                     // Cosine of threshold angle (max angle from forward to be seen)
                     "angle_separate",                 // angle_separate
                     "angle_align",                    // angle_align
                     "angle_cohere",                   // angle_cohere
-                    "fly_away_max_dist_in_br",        // fly_away_max_dist_in_br
+//                    "fly_away_max_dist_in_br",        // fly_away_max_dist_in_br
+                    "fly_away_max_dist",        // fly_away_max_dist
                     "min_time_to_collide",            // min_time_to_collide
+
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
                 },
                 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -792,8 +820,12 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
                                                  t.evalSubtree<double>(13),
                                                  t.evalSubtree<double>(14),
                                                  t.evalSubtree<double>(15),
-                                                 t.evalSubtree<double>(16),
-                                                 t.evalSubtree<double>(17));
+                                                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                                                 // TODO 20250325
+//                                                 t.evalSubtree<double>(16),
+                                                 t.evalSubtree<double>(16));
+//                                                 t.evalSubtree<double>(17));
+                                                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                     auto fitness = run_flock_simulation(fp);
                     return std::any(fitness);
                 }

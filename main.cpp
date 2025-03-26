@@ -288,6 +288,11 @@ int main(int argc, const char * argv[])
 //                          GP::evoflock_ga_function_set);
                           GP::evoflock_ga_function_set());
 
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250325
+    fs.print();
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     {
         std::cout << "Create population." << std::endl;
         util::Timer t("Create population.");

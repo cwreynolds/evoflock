@@ -187,12 +187,22 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20250327 finalized(?) ordering of FlockParameters
+
+//// Return a FlockParameters object with all given parameter values
+//inline FlockParameters init_fp(double max_force,
+//                               double max_speed,
+//                               double min_speed,
+//                               double speed,
+
 // Return a FlockParameters object with all given parameter values
 inline FlockParameters init_fp(double max_force,
-                               double max_speed,
                                double min_speed,
                                double speed,
-                               
+                               double max_speed,
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                                double weight_forward,
                                double weight_separate,
                                double weight_align,
@@ -225,7 +235,8 @@ inline FlockParameters init_fp(double max_force,
     fp.max_force = max_force;
     fp.max_speed = std::max(min_speed, max_speed);
     fp.min_speed = std::min(min_speed, max_speed);
-    fp.speed = util::clip(speed, min_speed, max_speed);
+//    fp.speed = util::clip(speed, min_speed, max_speed);
+    fp.speed = util::clip(speed, fp.min_speed, fp.max_speed);
     fp.weight_forward = weight_forward;
     fp.weight_separate = weight_separate;
     fp.weight_align = weight_align;
@@ -589,10 +600,16 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                 {
                     "Real_0_100",  // max_force
                     // 20240427 Policy change: specify rather than optimize speed:
-                    "Real_20_20",  // max_speed
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20250327 finalized(?) ordering of FlockParameters
+//                    "Real_20_20",  // max_speed
+//                    "Real_20_20",  // min_speed
+//                    "Real_20_20",  // speed
                     "Real_20_20",  // min_speed
                     "Real_20_20",  // speed
-                    
+                    "Real_20_20",  // max_speed
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                     "Real_0_100",  // weight_forward
                     "Real_0_100",  // weight_separate
                     "Real_0_100",  // weight_align
@@ -782,30 +799,71 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
         
         // 20250326 DUMMY COPY just to test right data getting to right FP slots
         
+//            // GpTypes
+//            {
+//                { "Multi_Objective_Fitness" },
+//                { "max_force",                        1.0,    1.0,   0.0 },
+//                
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                // TODO 20250327 finalized(?) ordering of FlockParameters
+//                
+//    //            { "max_speed",                        2.0,    2.0,   0.0 },
+//    //            { "min_speed",                        3.0,    3.0,   0.0 },
+//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //            // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
+//    //            // So this is probably being ignored.
+//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //            { "speed",                            4.0,    4.0,   0.0 },
+//
+//                { "min_speed",                        2.0,    2.0,   0.0 },
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
+//                // So this is probably being ignored.
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                { "speed",                            3.0,    3.0,   0.0 },
+//                { "max_speed",                        4.0,    4.0,   0.0 },
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                
+//                { "weight_forward",                   5.0,    5.0,   0.0 },
+//                { "weight_separate",                  6.0,    6.0,   0.0 },
+//                { "weight_align",                     7.0,    7.0,   0.0 },
+//                { "weight_cohere",                    8.0,    8.0,   0.0 },
+//                { "weight_avoid",                     9.0,    9.0,   0.0 },
+//                { "max_dist_separate",               10.0,   10.0,   0.0 },
+//                { "max_dist_align",                  11.0,   11.0,   0.0 },
+//                { "max_dist_cohere",                 12.0,   12.0,   0.0 },
+//                { "angle_separate",                  13.0,   13.0,   0.0 },
+//                { "angle_align",                     14.0,   14.0,   0.0 },
+//                { "angle_cohere",                    15.0,   15.0,   0.0 },
+//                { "fly_away_max_dist",               16.0,   16.0,   0.0 },
+//                { "min_time_to_collide",             17.0,   17.0,   0.0 },
+//            },
+
         // GpTypes
         {
             { "Multi_Objective_Fitness" },
-            { "max_force",                        1.0,    1.0,   0.0 },
-            { "max_speed",                        2.0,    2.0,   0.0 },
-            { "min_speed",                        3.0,    3.0,   0.0 },
+            { "max_force",                      100.0,  100.0,   0.0 },
+            { "min_speed",                       20.0,   20.0,   0.0 },
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
             // So this is probably being ignored.
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            { "speed",                            4.0,    4.0,   0.0 },
-            { "weight_forward",                   5.0,    5.0,   0.0 },
-            { "weight_separate",                  6.0,    6.0,   0.0 },
-            { "weight_align",                     7.0,    7.0,   0.0 },
-            { "weight_cohere",                    8.0,    8.0,   0.0 },
-            { "weight_avoid",                     9.0,    9.0,   0.0 },
+            { "speed",                           20.0,   20.0,   0.0 },
+            { "max_speed",                       20.0,   20.0,   0.0 },
+            { "weight_forward",                   4.0,    4.0,   0.0 },
+            { "weight_separate",                 23.0,   23.0,   0.0 },
+            { "weight_align",                    12.0,   12.0,   0.0 },
+            { "weight_cohere",                   18.0,   18.0,   0.0 },
+            { "weight_avoid",                    25.0,   25.0,   0.0 },
             { "max_dist_separate",               10.0,   10.0,   0.0 },
-            { "max_dist_align",                  11.0,   11.0,   0.0 },
-            { "max_dist_cohere",                 12.0,   12.0,   0.0 },
-            { "angle_separate",                  13.0,   13.0,   0.0 },
-            { "angle_align",                     14.0,   14.0,   0.0 },
-            { "angle_cohere",                    15.0,   15.0,   0.0 },
-            { "fly_away_max_dist",               16.0,   16.0,   0.0 },
-            { "min_time_to_collide",             17.0,   17.0,   0.0 },
+            { "max_dist_align",                 100.0,  100.0,   0.0 },
+            { "max_dist_cohere",                100.0,  100.0,   0.0 },
+            { "angle_separate",                   0.0,    0.0,   0.0 },
+            { "angle_align",                      0.0,    0.0,   0.0 },
+            { "angle_cohere",                     0.0,    0.0,   0.0 },
+            { "fly_away_max_dist",               10.0,   10.0,   0.0 },
+            { "min_time_to_collide",              0.8,    0.8,   0.0 },
         },
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -825,9 +883,13 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
                 //     TODO should body_radius be held constant at 0.5?
                 {
                     "max_force",                      // max_force
-                    "max_speed",                      // max_speed
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+                    // TODO 20250327 finalized(?) ordering of FlockParameters
                     "min_speed",                      // min_speed
                     "speed",                          // speed
+                    "max_speed",                      // max_speed
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+                    // TODO 20250327 finalized(?) ordering of FlockParameters
                     "weight_forward",                 // weight_forward
                     "weight_separate",                // weight_separate
                     "weight_align",                   // weight_align

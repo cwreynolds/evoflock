@@ -183,50 +183,6 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
             );
 }
 
-
-// Return a FlockParameters object with all given parameter values
-inline FlockParameters init_fp(double max_force,
-                               double min_speed,
-                               double speed,
-                               double max_speed,
-
-                               double weight_forward,
-                               double weight_separate,
-                               double weight_align,
-                               double weight_cohere,
-                               double weight_avoid,
-                               
-                               double max_dist_separate,
-                               double max_dist_align,
-                               double max_dist_cohere,
-
-                               double angle_separate,
-                               double angle_align,
-                               double angle_cohere,
-                               
-                               double fly_away_max_dist,
-                               double min_time_to_collide)
-{
-    return FlockParameters(max_force,
-                           min_speed,
-                           speed,
-                           max_speed,
-                           weight_forward,
-                           weight_separate,
-                           weight_align,
-                           weight_cohere,
-                           weight_avoid,
-                           max_dist_separate,
-                           max_dist_align,
-                           max_dist_cohere,
-                           angle_separate,
-                           angle_align,
-                           angle_cohere,
-                           fly_away_max_dist,
-                           min_time_to_collide);
-}
-
-
 // Initialize basic run parameters of Flock object
 inline void init_flock(Flock& flock)
 {
@@ -422,6 +378,47 @@ inline MOF run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
     return run_flock_simulation(FlockParameters(), write_flock_data_file);
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240628 can we do an eval of a const tree?
+#ifdef eval_const_20240628
+FlockParameters fp_from_ga_tree(const LazyPredator::GpTree& tree)
+#else  // eval_const_20240628
+FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
+#endif // eval_const_20240628
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{
+    return FlockParameters(tree.evalSubtree<double>(0),
+                           tree.evalSubtree<double>(1),
+                           tree.evalSubtree<double>(2),
+                           tree.evalSubtree<double>(3),
+                           tree.evalSubtree<double>(4),
+                           tree.evalSubtree<double>(5),
+                           tree.evalSubtree<double>(6),
+                           tree.evalSubtree<double>(7),
+                           tree.evalSubtree<double>(8),
+                           tree.evalSubtree<double>(9),
+                           tree.evalSubtree<double>(10),
+                           tree.evalSubtree<double>(11),
+                           tree.evalSubtree<double>(12),
+                           tree.evalSubtree<double>(13),
+                           tree.evalSubtree<double>(14),
+                           tree.evalSubtree<double>(15),
+                           tree.evalSubtree<double>(16));
+    
+    // TODO 20250329 I assume there is a less verbose way to write this, but I
+    //               did not find it in my first several experiments:
+    //    std::vector<double> p;
+    //    TODO maybe "17" should be a static function on class FlockParameters?
+    //    for (int i = 0; i < 17; i++) { p.push_back(tree.evalSubtree<double>(i)); }
+    //    return std::apply(FlockParameters, p);
+    //    return std::make_from_tuple(FlockParameters, p);
+    //    return std::make_from_tuple<FlockParameters>(p);
+    //
+    // something with std::tuple_cat?
+    //
+    // Or, I guess I could move the inline unrolling into a new constructor for
+    // FlockParameters?
+}
 
 // Wrote this to run at the end of evolution on the top-10 fitness individuals
 // of population in order to record flock data for playback
@@ -429,24 +426,9 @@ inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
 {
     // Is this tree copy needed to avoid using the previous cached tree root?
     LazyPredator::GpTree t = individual->tree();
-    return run_flock_simulation(init_fp(t.evalSubtree<double>(0),
-                                        t.evalSubtree<double>(1),
-                                        t.evalSubtree<double>(2),
-                                        t.evalSubtree<double>(3),
-                                        t.evalSubtree<double>(4),
-                                        t.evalSubtree<double>(5),
-                                        t.evalSubtree<double>(6),
-                                        t.evalSubtree<double>(7),
-                                        t.evalSubtree<double>(8),
-                                        t.evalSubtree<double>(9),
-                                        t.evalSubtree<double>(10),
-                                        t.evalSubtree<double>(11),
-                                        t.evalSubtree<double>(12),
-                                        t.evalSubtree<double>(13),
-                                        t.evalSubtree<double>(14),
-                                        t.evalSubtree<double>(15),
-                                        t.evalSubtree<double>(16)),
-                                true);  // write flock data file
+    
+    // Run simulation and write flock data file (second arg == true).
+    return run_flock_simulation(fp_from_ga_tree(t), true);
 }
 
 
@@ -581,24 +563,7 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                 [](LazyPredator::GpTree& t)
 #endif // eval_const_20240628
                 {
-                    FlockParameters fp = init_fp(t.evalSubtree<double>(0),
-                                                 t.evalSubtree<double>(1),
-                                                 t.evalSubtree<double>(2),
-                                                 t.evalSubtree<double>(3),
-                                                 t.evalSubtree<double>(4),
-                                                 t.evalSubtree<double>(5),
-                                                 t.evalSubtree<double>(6),
-                                                 t.evalSubtree<double>(7),
-                                                 t.evalSubtree<double>(8),
-                                                 t.evalSubtree<double>(9),
-                                                 t.evalSubtree<double>(10),
-                                                 t.evalSubtree<double>(11),
-                                                 t.evalSubtree<double>(12),
-                                                 t.evalSubtree<double>(13),
-                                                 t.evalSubtree<double>(14),
-                                                 t.evalSubtree<double>(15),
-                                                 t.evalSubtree<double>(16));
-                    auto fitness = run_flock_simulation(fp);
+                    auto fitness = run_flock_simulation(fp_from_ga_tree(t));
                     return std::any(fitness);
                 }
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -688,24 +653,7 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
                 [](LazyPredator::GpTree& t)
 #endif // eval_const_20240628
                 {
-                    FlockParameters fp = init_fp(t.evalSubtree<double>(0),
-                                                 t.evalSubtree<double>(1),
-                                                 t.evalSubtree<double>(2),
-                                                 t.evalSubtree<double>(3),
-                                                 t.evalSubtree<double>(4),
-                                                 t.evalSubtree<double>(5),
-                                                 t.evalSubtree<double>(6),
-                                                 t.evalSubtree<double>(7),
-                                                 t.evalSubtree<double>(8),
-                                                 t.evalSubtree<double>(9),
-                                                 t.evalSubtree<double>(10),
-                                                 t.evalSubtree<double>(11),
-                                                 t.evalSubtree<double>(12),
-                                                 t.evalSubtree<double>(13),
-                                                 t.evalSubtree<double>(14),
-                                                 t.evalSubtree<double>(15),
-                                                 t.evalSubtree<double>(16));
-                    auto fitness = run_flock_simulation(fp);
+                    auto fitness = run_flock_simulation(fp_from_ga_tree(t));
                     return std::any(fitness);
                 }
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -713,7 +661,6 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
         }
     };
 }
-
 
 // This is a degenerate GP function set, for what is essentially a GA problem:
 // selecting a set of real number parameters for a flock simulation, via an

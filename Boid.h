@@ -658,13 +658,8 @@ public:
     // Use Draw api to draw this Boid's “body” -- an irregular tetrahedron.
     void draw_body()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
-//        double br = fp().body_radius;  // body radius (defaults to 0.5)
-//        double bd = br * 2;
         double bd = fp().body_diameter;  // body diameter (defaults to 1)
         double br = bd / 2;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 center = position();
         Vec3 nose = center + forward() * br;
         Vec3 tail = center - forward() * br;
@@ -780,11 +775,7 @@ public:
         for (Obstacle* o : flock_obstacles())
         {
             // Compute predicted point of impact, if any.
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
-//            Vec3 poi = o->rayIntersection(position(), forward(), fp().body_radius);
             Vec3 poi = o->rayIntersection(position(), forward(), fp().body_diameter / 2);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (not poi.is_none())
             {
                 // Make a Collision object, add it to collection of collisions.
@@ -828,11 +819,7 @@ public:
 
                 // Orient boid to point directly away from obstacle.
                 Vec3 normal = o->normalTowardAllowedSide(ec, prev_position);
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
-//                Vec3 to = ec + (normal * fp().body_radius * 2);
                 Vec3 to = ec + (normal * fp().body_diameter);
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 set_ls(ls().fromTo(ec, to));
 
 //                setPosition(ec);

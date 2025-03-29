@@ -184,24 +184,11 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 }
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20250327 finalized(?) ordering of FlockParameters
-
-//// Return a FlockParameters object with all given parameter values
-//inline FlockParameters init_fp(double max_force,
-//                               double max_speed,
-//                               double min_speed,
-//                               double speed,
-
 // Return a FlockParameters object with all given parameter values
 inline FlockParameters init_fp(double max_force,
                                double min_speed,
                                double speed,
                                double max_speed,
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
                                double weight_forward,
                                double weight_separate,
@@ -209,74 +196,34 @@ inline FlockParameters init_fp(double max_force,
                                double weight_cohere,
                                double weight_avoid,
                                
-                               //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                               // TODO 20250325
-
                                double max_dist_separate,
-                               
                                double max_dist_align,
                                double max_dist_cohere,
-
-//                               double exponent_separate,
-//                               double exponent_align,
-//                               double exponent_cohere,
-
 
                                double angle_separate,
                                double angle_align,
                                double angle_cohere,
                                
-//                               double fly_away_max_dist_in_br,
                                double fly_away_max_dist,
                                double min_time_to_collide)
-                               //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 {
-    FlockParameters fp;
-    fp.max_force = max_force;
-    fp.max_speed = std::max(min_speed, max_speed);
-    fp.min_speed = std::min(min_speed, max_speed);
-//    fp.speed = util::clip(speed, min_speed, max_speed);
-    fp.speed = util::clip(speed, fp.min_speed, fp.max_speed);
-    fp.weight_forward = weight_forward;
-    fp.weight_separate = weight_separate;
-    fp.weight_align = weight_align;
-    fp.weight_cohere = weight_cohere;
-    fp.weight_avoid = weight_avoid;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
-//    fp.max_dist_separate = max_dist_separate_in_body_radii * fp.body_radius;
-    fp.max_dist_separate = max_dist_separate;
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250325
-    fp.max_dist_align = max_dist_align;
-    fp.max_dist_cohere = max_dist_cohere;
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    //fp.exponent_separate = exponent_separate;  // stay at 1 like in hand-tuned
-    //fp.exponent_align = exponent_align;        // stay at 1 like in hand-tuned
-    //fp.exponent_cohere = exponent_cohere;      // stay at 1 like in hand-tuned
-    fp.angle_separate = angle_separate;
-    fp.angle_align = angle_align;
-    fp.angle_cohere = angle_cohere;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
-//    fp.fly_away_max_dist_in_br = fly_away_max_dist_in_br;
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250325
-//    fp.fly_away_max_dist = fly_away_max_dist_in_br * fp.body_diameter / 2;
-    fp.fly_away_max_dist = fly_away_max_dist;
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    fp.min_time_to_collide = min_time_to_collide;
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250326 refactor GpTypes in evoflock_ga_function_set_handmade()
-    fp.print();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    return fp;
+    return FlockParameters(max_force,
+                           min_speed,
+                           speed,
+                           max_speed,
+                           weight_forward,
+                           weight_separate,
+                           weight_align,
+                           weight_cohere,
+                           weight_avoid,
+                           max_dist_separate,
+                           max_dist_align,
+                           max_dist_cohere,
+                           angle_separate,
+                           angle_align,
+                           angle_cohere,
+                           fly_away_max_dist,
+                           min_time_to_collide);
 }
 
 
@@ -498,12 +445,7 @@ inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
                                         t.evalSubtree<double>(13),
                                         t.evalSubtree<double>(14),
                                         t.evalSubtree<double>(15),
-                                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                                        // TODO 20250325
-//                                        t.evalSubtree<double>(16),
-//                                        t.evalSubtree<double>(17)),
                                         t.evalSubtree<double>(16)),
-                                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                                 true);  // write flock data file
 }
 
@@ -599,16 +541,11 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                 //     TODO should body_radius be held constant at 0.5?
                 {
                     "Real_0_100",  // max_force
+
                     // 20240427 Policy change: specify rather than optimize speed:
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    // TODO 20250327 finalized(?) ordering of FlockParameters
-//                    "Real_20_20",  // max_speed
-//                    "Real_20_20",  // min_speed
-//                    "Real_20_20",  // speed
                     "Real_20_20",  // min_speed
                     "Real_20_20",  // speed
                     "Real_20_20",  // max_speed
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
                     "Real_0_100",  // weight_forward
                     "Real_0_100",  // weight_separate
@@ -660,12 +597,7 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                                                  t.evalSubtree<double>(13),
                                                  t.evalSubtree<double>(14),
                                                  t.evalSubtree<double>(15),
-                                                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                                                 // TODO 20250325
-//                                                 t.evalSubtree<double>(16),
-//                                                 t.evalSubtree<double>(17));
                                                  t.evalSubtree<double>(16));
-                                                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                     auto fitness = run_flock_simulation(fp);
                     return std::any(fitness);
                 }
@@ -675,6 +607,8 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
     };
 }
 
+#define handmade_helper(p) { #p, FlockParameters().p, FlockParameters().p, 0.0 }
+
 // This version of the GA function set is just for testing: every Individual in
 // the population will have a GpTree equivalent to the handmade model used in
 // the pre-evoflock python version.
@@ -682,191 +616,31 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
 {
     return
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250326 refactor GpTypes in evoflock_ga_function_set_handmade()
-
-        
-//            // GpTypes
-//            {
-//                { "Multi_Objective_Fitness" },
-//                { "max_force",                      100.0,  100.0,   0.0 },
-//                { "max_speed",                       20.0,   20.0,   0.0 },
-//                { "min_speed",                       20.0,   20.0,   0.0 },
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
-//                // So this is probably being ignored.
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                { "speed",                           20.0,   20.0,   0.0 },
-//                { "weight_forward",                   4.0,    4.0,   0.0 },
-//                { "weight_separate",                 23.0,   23.0,   0.0 },
-//                { "weight_align",                    12.0,   12.0,   0.0 },
-//                { "weight_cohere",                   18.0,   18.0,   0.0 },
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20250319 look into weightings for dynamic/static avoidance
-//    //            { "weight_avoid",                    40.0,   40.0,   0.0 },
-//                { "weight_avoid",                    25.0,   25.0,   0.0 },
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//                { "max_dist_separate",               10.0,   10.0,   0.0 },
-//                { "max_dist_align",                 100.0,  100.0,   0.0 },
-//                { "max_dist_cohere",                100.0,  100.0,   0.0 },
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                // TODO 20250325
-//    //            { "exponent",                         1.0,    1.0,   0.0 },
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20250320 back to: why aren't boids flocking
-//
-//    //            { "angle_separate",                  -0.707, -0.707, 0.0 },
-//                { "angle_separate",                  0.0, 0.0, 0.0 },
-//
-//    //            { "angle_align",                      0.940,  0.940, 0.0 },
-//    //            { "angle_align",                      0.8,  0.8, 0.0 },
-//                { "angle_align",                      0.0,  0.0, 0.0 },
-//
-//                { "angle_cohere",                     0.0,    0.0,   0.0 },
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20250316 adjust min_time_to_collide (/ fly_away_max_dist_in_br)
-//
-//    //            { "fly_away_max_dist_in_br",         20.0,   20.0,   0.0 },
-//    //            { "min_time_to_collide",              0.8,    0.8,   0.0 },
-//
-//    //            { "fly_away_max_dist_in_br",         20.0,   20.0,   0.0 },
-//    //            { "min_time_to_collide",              0.4,    0.4,   0.0 },
-//
-//    //            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
-//    //            { "min_time_to_collide",              0.8,    0.8,   0.0 },
-//
-//    //            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
-//    //            { "min_time_to_collide",              0.4,    0.4,   0.0 },
-//
-//                // TODO 20250317
-//
-//    //            { "fly_away_max_dist_in_br",         10.0,   10.0,   0.0 },
-//    //            { "min_time_to_collide",              0.8,    0.8,   0.0 },
-//
-//                // TODO 20250319
-//
-//    //            { "fly_away_max_dist_in_br",         20.0,   20.0,   0.0 },
-//    //            { "min_time_to_collide",              0.8,    0.8,   0.0 },
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                // TODO 20250325
-//
-//    //            { "fly_away_max_dist_in_br",         15.0,   15.0,   0.0 },
-//    //            { "fly_away_max_dist",          15.0,   15.0,   0.0 },
-//                { "fly_away_max_dist",               10.0,   10.0,   0.0 },
-//                { "min_time_to_collide",              0.8,    0.8,   0.0 },
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//            },
-      
-//        // 20250326 CLEAN COPY
-//        
-//        // GpTypes
-//        {
-//            { "Multi_Objective_Fitness" },
-//            { "max_force",                      100.0,  100.0,   0.0 },
-//            { "max_speed",                       20.0,   20.0,   0.0 },
-//            { "min_speed",                       20.0,   20.0,   0.0 },
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
-//            // So this is probably being ignored.
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            { "speed",                           20.0,   20.0,   0.0 },
-//            { "weight_forward",                   4.0,    4.0,   0.0 },
-//            { "weight_separate",                 23.0,   23.0,   0.0 },
-//            { "weight_align",                    12.0,   12.0,   0.0 },
-//            { "weight_cohere",                   18.0,   18.0,   0.0 },
-//            { "weight_avoid",                    25.0,   25.0,   0.0 },
-//            { "max_dist_separate",               10.0,   10.0,   0.0 },
-//            { "max_dist_align",                 100.0,  100.0,   0.0 },
-//            { "max_dist_cohere",                100.0,  100.0,   0.0 },
-//            { "angle_separate",                   0.0,    0.0,   0.0 },
-//            { "angle_align",                      0.0,    0.0,   0.0 },
-//            { "angle_cohere",                     0.0,    0.0,   0.0 },
-//            { "fly_away_max_dist",               10.0,   10.0,   0.0 },
-//            { "min_time_to_collide",              0.8,    0.8,   0.0 },
-//        },
-        
-        // 20250326 DUMMY COPY just to test right data getting to right FP slots
-        
-//            // GpTypes
-//            {
-//                { "Multi_Objective_Fitness" },
-//                { "max_force",                        1.0,    1.0,   0.0 },
-//                
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                // TODO 20250327 finalized(?) ordering of FlockParameters
-//                
-//    //            { "max_speed",                        2.0,    2.0,   0.0 },
-//    //            { "min_speed",                        3.0,    3.0,   0.0 },
-//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //            // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
-//    //            // So this is probably being ignored.
-//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //            { "speed",                            4.0,    4.0,   0.0 },
-//
-//                { "min_speed",                        2.0,    2.0,   0.0 },
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
-//                // So this is probably being ignored.
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                { "speed",                            3.0,    3.0,   0.0 },
-//                { "max_speed",                        4.0,    4.0,   0.0 },
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                
-//                { "weight_forward",                   5.0,    5.0,   0.0 },
-//                { "weight_separate",                  6.0,    6.0,   0.0 },
-//                { "weight_align",                     7.0,    7.0,   0.0 },
-//                { "weight_cohere",                    8.0,    8.0,   0.0 },
-//                { "weight_avoid",                     9.0,    9.0,   0.0 },
-//                { "max_dist_separate",               10.0,   10.0,   0.0 },
-//                { "max_dist_align",                  11.0,   11.0,   0.0 },
-//                { "max_dist_cohere",                 12.0,   12.0,   0.0 },
-//                { "angle_separate",                  13.0,   13.0,   0.0 },
-//                { "angle_align",                     14.0,   14.0,   0.0 },
-//                { "angle_cohere",                    15.0,   15.0,   0.0 },
-//                { "fly_away_max_dist",               16.0,   16.0,   0.0 },
-//                { "min_time_to_collide",             17.0,   17.0,   0.0 },
-//            },
-
         // GpTypes
         {
             { "Multi_Objective_Fitness" },
-            { "max_force",                      100.0,  100.0,   0.0 },
-            { "min_speed",                       20.0,   20.0,   0.0 },
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            handmade_helper(max_force),
+            handmade_helper(min_speed),
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
             // So this is probably being ignored.
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            { "speed",                           20.0,   20.0,   0.0 },
-            { "max_speed",                       20.0,   20.0,   0.0 },
-            { "weight_forward",                   4.0,    4.0,   0.0 },
-            { "weight_separate",                 23.0,   23.0,   0.0 },
-            { "weight_align",                    12.0,   12.0,   0.0 },
-            { "weight_cohere",                   18.0,   18.0,   0.0 },
-            { "weight_avoid",                    25.0,   25.0,   0.0 },
-            { "max_dist_separate",               10.0,   10.0,   0.0 },
-            { "max_dist_align",                 100.0,  100.0,   0.0 },
-            { "max_dist_cohere",                100.0,  100.0,   0.0 },
-            { "angle_separate",                   0.0,    0.0,   0.0 },
-            { "angle_align",                      0.0,    0.0,   0.0 },
-            { "angle_cohere",                     0.0,    0.0,   0.0 },
-            { "fly_away_max_dist",               10.0,   10.0,   0.0 },
-            { "min_time_to_collide",              0.8,    0.8,   0.0 },
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            handmade_helper(speed),
+            handmade_helper(max_speed),
+            handmade_helper(weight_forward),
+            handmade_helper(weight_separate),
+            handmade_helper(weight_align),
+            handmade_helper(weight_cohere),
+            handmade_helper(weight_avoid),
+            handmade_helper(max_dist_separate),
+            handmade_helper(max_dist_align),
+            handmade_helper(max_dist_cohere),
+            handmade_helper(angle_separate),
+            handmade_helper(angle_align),
+            handmade_helper(angle_cohere),
+            handmade_helper(fly_away_max_dist),
+            handmade_helper(min_time_to_collide),
         },
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // GpFunctions
         {
@@ -878,34 +652,29 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
                 "Multi_Objective_Fitness",
                 
                 // Function parameter type list:
-                //     TODO cf "FlockParameters" for details
-                //     TODO note that I slightly reordering / reparameterizing
-                //     TODO should body_radius be held constant at 0.5?
                 {
-                    "max_force",                      // max_force
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-                    // TODO 20250327 finalized(?) ordering of FlockParameters
-                    "min_speed",                      // min_speed
-                    "speed",                          // speed
-                    "max_speed",                      // max_speed
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-                    // TODO 20250327 finalized(?) ordering of FlockParameters
-                    "weight_forward",                 // weight_forward
-                    "weight_separate",                // weight_separate
-                    "weight_align",                   // weight_align
-                    "weight_cohere",                  // weight_cohere
-                    "weight_avoid",                   // weight_avoid
+                    "max_force",
+                    "min_speed",
+                    "speed",
+                    "max_speed",
                     
-                    "max_dist_separate",              // max_dist_separate
-                    "max_dist_align",                 // max_dist_align
-                    "max_dist_cohere",                // max_dist_cohere
+                    "weight_forward",
+                    "weight_separate",
+                    "weight_align",
+                    "weight_cohere",
+                    "weight_avoid",
+                    
+                    "max_dist_separate",
+                    "max_dist_align",
+                    "max_dist_cohere",
 
                     // Cosine of threshold angle (max angle from forward to be seen)
-                    "angle_separate",                 // angle_separate
-                    "angle_align",                    // angle_align
-                    "angle_cohere",                   // angle_cohere
-                    "fly_away_max_dist",        // fly_away_max_dist
-                    "min_time_to_collide",            // min_time_to_collide
+                    "angle_separate",
+                    "angle_align",
+                    "angle_cohere",
+                    
+                    "fly_away_max_dist",
+                    "min_time_to_collide"
                 },
                 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -935,12 +704,7 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
                                                  t.evalSubtree<double>(13),
                                                  t.evalSubtree<double>(14),
                                                  t.evalSubtree<double>(15),
-                                                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                                                 // TODO 20250325
-//                                                 t.evalSubtree<double>(16),
                                                  t.evalSubtree<double>(16));
-//                                                 t.evalSubtree<double>(17));
-                                                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                     auto fitness = run_flock_simulation(fp);
                     return std::any(fitness);
                 }

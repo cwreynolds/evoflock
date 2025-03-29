@@ -476,11 +476,7 @@ public:
         {
             Boid* n = b->cached_nearest_neighbors().at(0);
             double  dist = (b->position() - n->position()).length();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
-//            double br = fp().body_radius;
             double br = fp().body_diameter / 2;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             bool nn_sep_ok = (dist / br) > min_sep_allowed;
             
             double cs = util::remap_interval_clip(dist/br,min_sep_allowed,20,1,0);
@@ -735,11 +731,7 @@ public:
                 if (min_sep > dist) { min_sep = dist; }
                 ave_sep += dist;
                 pair_count += 1;
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250323 new file for FlockParameters, body_radius=0.5 to body_diameter=1
-//                if (dist < (2 * fp().body_radius)){ cumulative_sep_fail_ += 1; }
                 if (dist < fp().body_diameter) { cumulative_sep_fail_ += 1; }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             };
             util::apply_to_pairwise_combinations(examine_pair, boids());
             ave_sep /= pair_count;
@@ -962,38 +954,24 @@ public:
             obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
             obstacle_presets_.push_back(obs);
 
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250326 WIP FlockParameters, multisphere obstacle broken?
-
             // Set 4 -- 35 random spheres
             obs.clear();
             obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
-//            int count = 35;
-//            int count = 32;
-            int count = 30;
+            int count = 35;
             std::vector<double> radii;
             for (int i = 0; i < count; i++)
             {
-                radii.push_back(EF::RS().random2(4, 13));
+                radii.push_back(EF::RS().random2(4, 10));
             }
-//            double margin = 3;
-//            double margin = 5;
-            double margin = 4;
-//            debugPrint(util::vec_to_string(radii))
-//            debugPrint(margin)
-//            debugPrint(sr)
-//            int retries = 2000;
-            int retries = 4000;
-//            auto centers = shape::arrangeNonOverlappingSpheres(radii, margin, sr);
-            auto centers = shape::arrangeNonOverlappingSpheres(radii, margin,
-                                                               sr, retries);
+            double m = 4;  // margin between spheres.
+            int t = 4000;  // max retries.
+            auto centers = shape::arrangeNonOverlappingSpheres(radii, m, sr, t);
             auto ins = Obstacle::inside;
             for (int i = 0; i < count; i++)
             {
                 obs.push_back(new SphereObstacle(radii[i], centers[i], ins));
             }
             obstacle_presets_.push_back(obs);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250125 debugging "non-everted" sphere obstacle.

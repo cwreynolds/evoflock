@@ -129,7 +129,7 @@ public:
     // Run boids simulation.
     void run()
     {
-        make_boids(boid_count(), fp().sphere_radius, fp().sphere_center);
+        make_boids(boid_count(), fp().sphere_radius(), fp().sphere_center());
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
 //        draw().simPause() = true;
@@ -476,7 +476,7 @@ public:
         {
             Boid* n = b->cached_nearest_neighbors().at(0);
             double  dist = (b->position() - n->position()).length();
-            double br = fp().body_diameter / 2;
+            double br = fp().body_diameter() / 2;
             bool nn_sep_ok = (dist / br) > min_sep_allowed;
             
             double cs = util::remap_interval_clip(dist/br,min_sep_allowed,20,1,0);
@@ -731,7 +731,7 @@ public:
                 if (min_sep > dist) { min_sep = dist; }
                 ave_sep += dist;
                 pair_count += 1;
-                if (dist < fp().body_diameter) { cumulative_sep_fail_ += 1; }
+                if (dist < fp().body_diameter()) { cumulative_sep_fail_ += 1; }
             };
             util::apply_to_pairwise_combinations(examine_pair, boids());
             ave_sep /= pair_count;
@@ -913,9 +913,9 @@ public:
         if (obstacle_presets_.empty())
         {
             ObstaclePtrList obs;
-            double sr = fp().sphere_radius;
-            Vec3 sc = fp().sphere_center;
-            
+            double sr = fp().sphere_radius();
+            Vec3 sc = fp().sphere_center();
+
             // Set 0: sphere and right hand vertical cylinder.
             obs.clear();
             obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));

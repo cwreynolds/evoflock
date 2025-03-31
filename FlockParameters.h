@@ -26,11 +26,40 @@
 class FlockParameters
 {
 public:
-    // Shared read-only "input" parameters:
-    double body_diameter = 1;        // "assume a spherical boid" unit diameter
-    double sphere_radius = 50;       // Should this be called "world radius"?
-    Vec3 sphere_center;              // Should this be called "world center"?
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250330 try switching to storing parameters in vectors
+    
+    
+//    // Shared read-only "input" parameters:
+//    double body_diameter = 1;        // "assume a spherical boid" unit diameter
+//    double sphere_radius = 50;       // Should this be called "world radius"?
+//    Vec3 sphere_center;              // Should this be called "world center"?
+
+    
+    // Shared read-only "input" parameters:
+    std::vector<double> const_parameters = {1, 50};
+    // "assume a spherical boid" unit diameter
+    const double& body_diameter() const { return const_parameters[0]; }
+    // Should this be called "world radius"?
+    const double& sphere_radius() const { return const_parameters[1]; }
+    // Should this be called "world center"?
+    Vec3 sphere_center_;
+    const Vec3& sphere_center() const { return sphere_center_; }
+
+    // copy assignment operator
+    FlockParameters& operator=(const FlockParameters& other)
+    {
+        const_parameters = other.const_parameters;
+        sphere_center_ = other.sphere_center_;
+
+        // TODO copy all tuning parameters
+        
+        return *this;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Parameters for tuning:
     double max_force = 100;          // Max acceleration (m/s²)
     double min_speed = 20;           // Speed lower limit (m/s)
@@ -103,6 +132,41 @@ public:
         min_speed = std::min(a, b);
         speed = util::clip(speed, min_speed, max_speed);
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250329 move mess from GP to FlockParameters constructor.
+    
+    
+    FlockParameters(const std::vector<double>& tunable_parameters)
+      : FlockParameters(tunable_parameters.at(0),
+                        tunable_parameters.at(1),
+                        tunable_parameters.at(2),
+                        tunable_parameters.at(3),
+                        tunable_parameters.at(4),
+                        tunable_parameters.at(5),
+                        tunable_parameters.at(6),
+                        tunable_parameters.at(7),
+                        tunable_parameters.at(8),
+                        tunable_parameters.at(9),
+                        tunable_parameters.at(10),
+                        tunable_parameters.at(11),
+                        tunable_parameters.at(12),
+                        tunable_parameters.at(13),
+                        tunable_parameters.at(14),
+                        tunable_parameters.at(15),
+                        tunable_parameters.at(16))
+    {
+        assert(tunable_parameters.size() == tunableParameterCount());
+    }
+    
+    // The count(/size) of tunable parameters in this class.
+    static size_t tunableParameterCount() { return 17; }
+    
+    // The count(/size) of ALL parameters in this class.
+    static size_t parameterCount() { return 17 + 3; }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     bool operator==(const FlockParameters&) const = default;
     
@@ -111,9 +175,9 @@ public:
         auto indent = [](){ std::cout << "    "; };
         std::cout << "FlockParameters object contains these fields:";
         std::cout << std::endl << "  constant:" << std::endl;
-        indent(); debugPrint(body_diameter);
-        indent(); debugPrint(sphere_radius);
-        indent(); debugPrint(sphere_center);
+        indent(); debugPrint(body_diameter());
+        indent(); debugPrint(sphere_radius());
+        indent(); debugPrint(sphere_center());
 
         std::cout << "  parameters to be optimized:" << std::endl;
         indent(); debugPrint(max_force);

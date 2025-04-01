@@ -129,6 +129,8 @@ public:
     // Run boids simulation.
     void run()
     {
+        fp().print();
+        
         make_boids(boid_count(), fp().sphere_radius(), fp().sphere_center());
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
@@ -466,7 +468,8 @@ public:
     
     void collect_flock_metrics()
     {
-        double ts = fp().min_speed - util::epsilon;
+//        double ts = fp().min_speed - util::epsilon;
+        double ts = fp().min_speed() - util::epsilon;
         for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
         bool all_speed_good = true;
         bool all_seperation_good = true;

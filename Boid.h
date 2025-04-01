@@ -106,9 +106,12 @@ public:
     void set_fp(FlockParameters* fp)
     {
         fp_ = fp;
-        setSpeed(fp->speed);
-        setMaxSpeed(fp->max_speed);
-        setMaxForce(fp->max_force);
+//        setSpeed(fp->speed);
+//        setMaxSpeed(fp->max_speed);
+//        setMaxForce(fp->max_force);
+        setSpeed(fp->speed());
+        setMaxSpeed(fp->max_speed());
+        setMaxForce(fp->max_force());
     }
     
     Draw& draw() { return *draw_; }
@@ -289,11 +292,16 @@ public:
         }
         else
         {
-            Vec3 f = forward() * fp().weight_forward;
-            Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
-            Vec3 a = steer_to_align(neighbors) * fp().weight_align;
-            Vec3 c = steer_to_cohere(neighbors) * fp().weight_cohere;
-            Vec3 o = steer_to_avoid() * fp().weight_avoid;
+//            Vec3 f = forward() * fp().weight_forward;
+//            Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
+//            Vec3 a = steer_to_align(neighbors) * fp().weight_align;
+//            Vec3 c = steer_to_cohere(neighbors) * fp().weight_cohere;
+//            Vec3 o = steer_to_avoid() * fp().weight_avoid;
+            Vec3 f = forward() * fp().weight_forward();
+            Vec3 s = steer_to_separate(neighbors) * fp().weight_separate();
+            Vec3 a = steer_to_align(neighbors) * fp().weight_align();
+            Vec3 c = steer_to_cohere(neighbors) * fp().weight_cohere();
+            Vec3 o = steer_to_avoid() * fp().weight_avoid();
             Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
             combined_steering = anti_stall_adjustment(combined_steering);
             saveAnnotation(s, a, c, o, combined_steering);
@@ -310,11 +318,16 @@ public:
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
 
-        Vec3 f = forward() * fp().weight_forward;
-        Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
-        Vec3 a = steer_to_align(neighbors) * fp().weight_align;
-        Vec3 c = steer_to_cohere(neighbors) * fp().weight_cohere;
-        Vec3 o = steer_to_avoid() * fp().weight_avoid;
+//        Vec3 f = forward() * fp().weight_forward;
+//        Vec3 s = steer_to_separate(neighbors) * fp().weight_separate;
+//        Vec3 a = steer_to_align(neighbors) * fp().weight_align;
+//        Vec3 c = steer_to_cohere(neighbors) * fp().weight_cohere;
+//        Vec3 o = steer_to_avoid() * fp().weight_avoid;
+        Vec3 f = forward() * fp().weight_forward();
+        Vec3 s = steer_to_separate(neighbors) * fp().weight_separate();
+        Vec3 a = steer_to_align(neighbors) * fp().weight_align();
+        Vec3 c = steer_to_cohere(neighbors) * fp().weight_cohere();
+        Vec3 o = steer_to_avoid() * fp().weight_avoid();
         Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
         combined_steering = anti_stall_adjustment(combined_steering);
         saveAnnotation(s, a, c, o, combined_steering);
@@ -339,8 +352,10 @@ public:
             assert(neighbor);
             Vec3 offset = position() - neighbor->position();
             double weight = neighborWeight(neighbor,
-                                           fp().max_dist_separate,
-                                           fp().angle_separate);
+//                                           fp().max_dist_separate,
+//                                           fp().angle_separate);
+                                           fp().max_dist_separate(),
+                                           fp().angle_separate());
             direction += offset * weight;
         }
         return direction.normalize_or_0();
@@ -358,8 +373,10 @@ public:
         {
             Vec3 heading_offset = neighbor->forward() - forward();
             double weight = neighborWeight(neighbor,
-                                           fp().max_dist_align,
-                                           fp().angle_align);
+//                                           fp().max_dist_align,
+//                                           fp().angle_align);
+                                           fp().max_dist_align(),
+                                           fp().angle_align());
             direction += heading_offset.normalize_or_0() * weight;
         }
         return direction.normalize_or_0();
@@ -377,8 +394,10 @@ public:
         for (Boid* neighbor : neighbors)
         {
             double weight = neighborWeight(neighbor,
-                                           fp().max_dist_cohere,
-                                           fp().angle_cohere);
+//                                           fp().max_dist_cohere,
+//                                           fp().angle_cohere);
+                                           fp().max_dist_cohere(),
+                                           fp().angle_cohere());
             neighbor_center += neighbor->position() * weight;
             total_weight += weight;
         }
@@ -427,7 +446,8 @@ public:
             Vec3 normal = first_collision.normal_at_poi;
             Vec3 pure_steering = pure_lateral_steering(normal);
             avoidance = pure_steering.normalize();
-            double min_dist = speed() * fp().min_time_to_collide;
+//            double min_dist = speed() * fp().min_time_to_collide;
+            double min_dist = speed() * fp().min_time_to_collide();
             // Smooth weight transition
             double dtc = first_collision.dist_to_collision;
             weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0.3);
@@ -446,7 +466,8 @@ public:
         Vec3 f = forward();
         Vec3 p = position();
         double br = fp().body_diameter() / 2;
-        double max_distance = fp().fly_away_max_dist;
+//        double max_distance = fp().fly_away_max_dist;
+        double max_distance = fp().fly_away_max_dist();
         for (Obstacle* obstacle : flock_obstacles())
         {
             Vec3 oa = obstacle->fly_away(p, f, max_distance, br);
@@ -554,11 +575,13 @@ public:
     {
         Vec3 adjusted = raw_steering;
         double prevention_margin = 1.5;
-        if (speed() < (fp().min_speed * prevention_margin))
+//        if (speed() < (fp().min_speed * prevention_margin))
+        if (speed() < (fp().min_speed() * prevention_margin))
         {
             if (raw_steering.dot(forward()) < 0)
             {
-                Vec3 ahead = forward() * fp().max_force * 0.9;
+//                Vec3 ahead = forward() * fp().max_force * 0.9;
+                Vec3 ahead = forward() * fp().max_force() * 0.9;
                 Vec3 side = raw_steering.perpendicular_component(forward());
                 adjusted = ahead + side;
             }

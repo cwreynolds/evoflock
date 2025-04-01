@@ -650,7 +650,8 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
     };
 }
 
-#define handmade_helper(p) { #p, FlockParameters().p, FlockParameters().p, 0.0 }
+//#define handmade_helper(p) { #p, FlockParameters().p, FlockParameters().p, 0.0 }
+#define handmade_helper(p) { #p, FlockParameters().p(), FlockParameters().p(), 0.0 }
 
 // This version of the GA function set is just for testing: every Individual in
 // the population will have a GpTree equivalent to the handmade model used in
@@ -1414,7 +1415,8 @@ LP::FunctionSet test_gp_boid_function_set()
                     Boid& boid = *Boid::getGpPerThread();
                     
                     // Steer to avoid obstacles.
-                    double min_dist = boid.speed() * boid.fp().min_time_to_collide;
+//                    double min_dist = boid.speed() * boid.fp().min_time_to_collide;
+                    double min_dist = boid.speed() * boid.fp().min_time_to_collide();
                     auto collisions = boid.get_predicted_obstacle_collisions();
                     if (collisions.size() > 0)
                     {

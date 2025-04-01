@@ -663,27 +663,27 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
         // GpTypes
         {
             { "Multi_Objective_Fitness" },
-            handmade_helper(max_force),
-            handmade_helper(min_speed),
+            handmade_helper(maxForce),
+            handmade_helper(minSpeed),
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
             // So this is probably being ignored.
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            handmade_helper(speed),
-            handmade_helper(max_speed),
-            handmade_helper(weight_forward),
-            handmade_helper(weight_separate),
-            handmade_helper(weight_align),
-            handmade_helper(weight_cohere),
-            handmade_helper(weight_avoid),
-            handmade_helper(max_dist_separate),
-            handmade_helper(max_dist_align),
-            handmade_helper(max_dist_cohere),
-            handmade_helper(angle_separate),
-            handmade_helper(angle_align),
-            handmade_helper(angle_cohere),
-            handmade_helper(fly_away_max_dist),
-            handmade_helper(min_time_to_collide),
+            handmade_helper(initSpeed),
+            handmade_helper(maxSpeed),
+            handmade_helper(weightForward),
+            handmade_helper(weightSeparate),
+            handmade_helper(weightAlign),
+            handmade_helper(weightCohere),
+            handmade_helper(weightAvoid),
+            handmade_helper(maxDistSeparate),
+            handmade_helper(maxDistAlign),
+            handmade_helper(maxDistCohere),
+            handmade_helper(angleSeparate),
+            handmade_helper(angleAlign),
+            handmade_helper(angleCohere),
+            handmade_helper(flyAwayMaxDist),
+            handmade_helper(minTimeToCollide),
         },
 
         // GpFunctions
@@ -697,28 +697,28 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
                 
                 // Function parameter type list:
                 {
-                    "max_force",
-                    "min_speed",
-                    "speed",
-                    "max_speed",
-                    
-                    "weight_forward",
-                    "weight_separate",
-                    "weight_align",
-                    "weight_cohere",
-                    "weight_avoid",
-                    
-                    "max_dist_separate",
-                    "max_dist_align",
-                    "max_dist_cohere",
+                    "maxForce",
+                    "minSpeed",
+                    "initSpeed",
+                    "maxSpeed",
+
+                    "weightForward",
+                    "weightSeparate",
+                    "weightAlign",
+                    "weightCohere",
+                    "weightAvoid",
+
+                    "maxDistSeparate",
+                    "maxDistAlign",
+                    "maxDistCohere",
 
                     // Cosine of threshold angle (max angle from forward to be seen)
-                    "angle_separate",
-                    "angle_align",
-                    "angle_cohere",
-                    
-                    "fly_away_max_dist",
-                    "min_time_to_collide"
+                    "angleSeparate",
+                    "angleAlign",
+                    "angleCohere",
+
+                    "flyAwayMaxDist",
+                    "minTimeToCollide"
                 },
                 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1415,8 +1415,7 @@ LP::FunctionSet test_gp_boid_function_set()
                     Boid& boid = *Boid::getGpPerThread();
                     
                     // Steer to avoid obstacles.
-//                    double min_dist = boid.speed() * boid.fp().min_time_to_collide;
-                    double min_dist = boid.speed() * boid.fp().min_time_to_collide();
+                    double min_dist = boid.speed() * boid.fp().minTimeToCollide();
                     auto collisions = boid.get_predicted_obstacle_collisions();
                     if (collisions.size() > 0)
                     {

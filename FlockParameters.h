@@ -27,17 +27,8 @@ class FlockParameters
 {
 public:
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250330 try switching to storing parameters in vectors
-    
-    
-//    // Shared read-only "input" parameters:
-//    double body_diameter = 1;        // "assume a spherical boid" unit diameter
-//    double sphere_radius = 50;       // Should this be called "world radius"?
-//    Vec3 sphere_center;              // Should this be called "world center"?
-
-    
     // Shared read-only "input" parameters:
+    // Perhaps eventually include max sim steps, obstacle set, etc.?
     std::vector<double> const_parameters = {1, 50};
     // "assume a spherical boid" unit diameter
     const double& body_diameter() const { return const_parameters.at(0); }
@@ -46,315 +37,145 @@ public:
     // Should this be called "world center"?
     Vec3 sphere_center_;
     const Vec3& sphere_center() const { return sphere_center_; }
+    static size_t constParameterCount() { return 3; }
 
-    // copy assignment operator
-    FlockParameters& operator=(const FlockParameters& other)
-    {
-        const_parameters = other.const_parameters;
-        sphere_center_ = other.sphere_center_;
-
-        // TODO copy all tuning parameters
-        
-        tuning_parameters = other.tuning_parameters;
-        
-        return *this;
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//    // Parameters for tuning:
-//    double max_force = 100;          // Max acceleration (m/s²)
-//    double min_speed = 20;           // Speed lower limit (m/s)
-//    double speed = 0;                // Initial speed (m/s)
-//    double max_speed = 20;           // Speed upper limit (m/s)
-//    
-//    double weight_forward  = 4;
-//    double weight_separate = 23;
-//    double weight_align    = 12;
-//    double weight_cohere   = 18;
-//    double weight_avoid    = 25;
-//    
-//    double max_dist_separate = 10;
-//    double max_dist_align    = 100;  // TODO 20231017 should this be ∞ or
-//    double max_dist_cohere   = 100;  //      should the behavior just ignore it?
-//    
-//    // Cosine of threshold angle (max angle from forward to be seen)
-//    double angle_separate = 0;  // 90°
-//    double angle_align    = 0;  // 90°
-//    double angle_cohere   = 0;  // 90°
-//
-//    double fly_away_max_dist = 10;   // max fly-away dist from obstacle surface
-//    
-//    // ignore obstacle until predicted impact is in less than this many seconds.
-//    double min_time_to_collide = 0.8;
-    
-    
-    // Parameters for tuning:
-    std::vector<double> tuning_parameters =
+    // Hand-tuned parameters used as default.
+    static inline std::vector<double> hand_tuned_parameters =
     {
         100,  // max_force = ;          // Max acceleration (m/s²)
-        20,  // min_speed = ;           // Speed lower limit (m/s)
-        0,  //speed = 0;                // Initial speed (m/s)
-        20,  // max_speed = ;           // Speed upper limit (m/s)
+        20,   // min_speed = ;           // Speed lower limit (m/s)
+        0,    //speed = 0;                // Initial speed (m/s)
+        20,   // max_speed = ;           // Speed upper limit (m/s)
         
-        4,  // weight_forward  = ;
-        23,  // weight_separate = ;
-        12,  // weight_align    = ;
-        18,  // weight_cohere   = ;
-        25,  //weight_avoid    = ;
+        4,    // weight_forward  = ;
+        23,   // weight_separate = ;
+        12,   // weight_align    = ;
+        18,   // weight_cohere   = ;
+        25,   //weight_avoid    = ;
         
-        10,  // max_dist_separate = ;
+        10,   // max_dist_separate = ;
         100,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
         100,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
         
         // Cosine of threshold angle (max angle from forward to be seen)
-        0,  // angle_separate = 0;  // 90°
-        0,  // angle_align    = 0;  // 90°
-        0,  // angle_cohere   = 0;  // 90°
+        0,    // angle_separate = 0;  // 90°
+        0,    // angle_align    = 0;  // 90°
+        0,    // angle_cohere   = 0;  // 90°
         
-        10,  // fly_away_max_dist = ;   // max fly-away dist from obstacle surface
+        10,   // fly_away_max_dist = ;   // max fly-away dist from obstacle surface
         
         // ignore obstacle until predicted impact is in less than this many seconds.
         0.8,  // min_time_to_collide = ;
-
     };
 
-
-    
     // Parameters for tuning:
-//    double max_force = 100;          // Max acceleration (m/s²)
-//    double min_speed = 20;           // Speed lower limit (m/s)
-//    double speed = 0;                // Initial speed (m/s)
-//    double max_speed = 20;           // Speed upper limit (m/s)
+    std::vector<double> tuning_parameters = hand_tuned_parameters;
+
+    // Parameters for tuning:
+    const double& maxForce()       const { return tuning_parameters.at(0); }
+    const double& minSpeed()       const { return tuning_parameters.at(1); }
+    const double& initSpeed()      const { return tuning_parameters.at(2); }
+    const double& maxSpeed()       const { return tuning_parameters.at(3); }
+
+    void setMinSpeed(double s)      { tuning_parameters.at(1) = s; }
+    void setSpeed(double s)         { tuning_parameters.at(2) = s; }
+    void setMaxSpeed(double s)      { tuning_parameters.at(3) = s; }
+
+    const double& weightForward()  const { return tuning_parameters.at(4); }
+    const double& weightSeparate() const { return tuning_parameters.at(5); }
+    const double& weightAlign()    const { return tuning_parameters.at(6); }
+    const double& weightCohere()   const { return tuning_parameters.at(7); }
+    const double& weightAvoid()    const { return tuning_parameters.at(8); }
+
+    const double& maxDistSeparate() const { return tuning_parameters.at(9); }
+    const double& maxDistAlign()    const { return tuning_parameters.at(10); }
+    const double& maxDistCohere()   const { return tuning_parameters.at(11); }
     
-    const double& max_force() const { return tuning_parameters.at(0); }
-    const double& min_speed() const { return tuning_parameters.at(1); }
-    const double& speed()     const { return tuning_parameters.at(2); }
-    const double& max_speed() const { return tuning_parameters.at(3); }
-    
-    void setMinSpeed(double minspeed) { tuning_parameters.at(1) = minspeed; }
-    void setSpeed(double s)           { tuning_parameters.at(2) = s; }
-    void setMaxSpeed(double maxspeed) { tuning_parameters.at(3) = maxspeed; }
-
-
-//    double weight_forward  = 4;
-//    double weight_separate = 23;
-//    double weight_align    = 12;
-//    double weight_cohere   = 18;
-//    double weight_avoid    = 25;
-  
-    const double& weight_forward()  const { return tuning_parameters.at(4); }
-    const double& weight_separate() const { return tuning_parameters.at(5); }
-    const double& weight_align()    const { return tuning_parameters.at(6); }
-    const double& weight_cohere()   const { return tuning_parameters.at(7); }
-    const double& weight_avoid()    const { return tuning_parameters.at(8); }
-
-//    double max_dist_separate = 10;
-//    double max_dist_align    = 100;  // TODO 20231017 should this be ∞ or
-//    double max_dist_cohere   = 100;  //      should the behavior just ignore it?
-    
-    const double& max_dist_separate() const { return tuning_parameters.at(9); }
-    const double& max_dist_align()    const { return tuning_parameters.at(10); }
-    const double& max_dist_cohere()   const { return tuning_parameters.at(11); }
-
     // Cosine of threshold angle (max angle from forward to be seen)
-//    double angle_separate = 0;  // 90°
-//    double angle_align    = 0;  // 90°
-//    double angle_cohere   = 0;  // 90°
-    
-    const double& angle_separate() const { return tuning_parameters.at(12); }
-    const double& angle_align()    const { return tuning_parameters.at(13); }
-    const double& angle_cohere()   const { return tuning_parameters.at(14); }
+    const double& angleSeparate() const { return tuning_parameters.at(12); }
+    const double& angleAlign()    const { return tuning_parameters.at(13); }
+    const double& angleCohere()   const { return tuning_parameters.at(14); }
 
-//    double fly_away_max_dist = 10;   // max fly-away dist from obstacle surface
-    
+    const double& flyAwayMaxDist() const { return tuning_parameters.at(15); }
+
     // ignore obstacle until predicted impact is in less than this many seconds.
-//    double min_time_to_collide = 0.8;
+    const double& minTimeToCollide() const { return tuning_parameters.at(16); }
 
-    const double& fly_away_max_dist() const { return tuning_parameters.at(15); }
-    const double& min_time_to_collide() const { return tuning_parameters.at(16); }
-
-    
     // Default constructor
     FlockParameters() {}
-
-//    // Constructor for overwriting all of the tunable parameters.
-//    FlockParameters(double max_force_,
-//                    double min_speed_,
-//                    double speed_,
-//                    double max_speed_,
-//                    double weight_forward_,
-//                    double weight_separate_,
-//                    double weight_align_,
-//                    double weight_cohere_,
-//                    double weight_avoid_,
-//                    double max_dist_separate_,
-//                    double max_dist_align_,
-//                    double max_dist_cohere_,
-//                    double angle_separate_,
-//                    double angle_align_,
-//                    double angle_cohere_,
-//                    double fly_away_max_dist_,
-//                    double min_time_to_collide_)
-//      : max_force(max_force_),
-//        min_speed(min_speed_),
-//        speed(speed_),
-//        max_speed(max_speed_),
-//        weight_forward(weight_forward_),
-//        weight_separate(weight_separate_),
-//        weight_align(weight_align_),
-//        weight_cohere(weight_cohere_),
-//        weight_avoid(weight_avoid_),
-//        max_dist_separate(max_dist_separate_),
-//        max_dist_align(max_dist_align_),
-//        max_dist_cohere(max_dist_cohere_),
-//        angle_separate(angle_separate_),
-//        angle_align(angle_align_),
-//        angle_cohere(angle_cohere_),
-//        fly_away_max_dist(fly_away_max_dist_),
-//        min_time_to_collide(min_time_to_collide_)
-//    {
-//        // Enforce some constraints since values get randomized by evolutions.
-//        double a = min_speed;
-//        double b = max_speed;
-//        max_speed = std::max(a, b);
-//        min_speed = std::min(a, b);
-//        speed = util::clip(speed, min_speed, max_speed);
-//    }
     
     // Constructor for overwriting all of the tunable parameters.
-    FlockParameters(double max_force_,
-                    double min_speed_,
-                    double speed_,
-                    double max_speed_,
-                    double weight_forward_,
-                    double weight_separate_,
-                    double weight_align_,
-                    double weight_cohere_,
-                    double weight_avoid_,
-                    double max_dist_separate_,
-                    double max_dist_align_,
-                    double max_dist_cohere_,
-                    double angle_separate_,
-                    double angle_align_,
-                    double angle_cohere_,
-                    double fly_away_max_dist_,
-                    double min_time_to_collide_)
-//    : FlockParameters({
-//        max_force_,
-//        min_speed_,
-//        speed_,
-//        max_speed_,
-//        weight_forward_,
-//        weight_separate_,
-//        weight_align_,
-//        weight_cohere_,
-//        weight_avoid_,
-//        max_dist_separate_,
-//        max_dist_align_,
-//        max_dist_cohere_,
-//        angle_separate_,
-//        angle_align_,
-//        angle_cohere_,
-//        fly_away_max_dist_,
-//        min_time_to_collide_
-//    })
+    FlockParameters(double max_force,
+                    double min_speed,
+                    double speed,
+                    double max_speed,
+                    double weight_forward,
+                    double weight_separate,
+                    double weight_align,
+                    double weight_cohere,
+                    double weight_avoid,
+                    double max_dist_separate,
+                    double max_dist_align,
+                    double max_dist_cohere,
+                    double angle_separate,
+                    double angle_align,
+                    double angle_cohere,
+                    double fly_away_max_dist,
+                    double min_time_to_collide)
     {
-        std::vector<double> p =
+        // Set tuning parameter vector to given values.
+        this->tuning_parameters =
         {
-            max_force_,
-            min_speed_,
-            speed_,
-            max_speed_,
-            weight_forward_,
-            weight_separate_,
-            weight_align_,
-            weight_cohere_,
-            weight_avoid_,
-            max_dist_separate_,
-            max_dist_align_,
-            max_dist_cohere_,
-            angle_separate_,
-            angle_align_,
-            angle_cohere_,
-            fly_away_max_dist_,
-            min_time_to_collide_
+            max_force,
+            min_speed,
+            speed,
+            max_speed,
+            weight_forward,
+            weight_separate,
+            weight_align,
+            weight_cohere,
+            weight_avoid,
+            max_dist_separate,
+            max_dist_align,
+            max_dist_cohere,
+            angle_separate,
+            angle_align,
+            angle_cohere,
+            fly_away_max_dist,
+            min_time_to_collide
         };
-        
-        *this = p;
-        
-        
-//        // Enforce some constraints since values get randomized by evolutions.
-//        double a = min_speed;
-//        double b = max_speed;
-//        max_speed = std::max(a, b);
-//        min_speed = std::min(a, b);
-//        speed = util::clip(speed, min_speed, max_speed);
-        // Enforce some constraints since values get randomized by evolutions.
-        double a = min_speed();
-        double b = max_speed();
-//        max_speed = std::max(a, b);
-//        min_speed = std::min(a, b);
-//        speed = util::clip(speed, min_speed, max_speed);
-        setMinSpeed(std::min(a, b));
-        setMinSpeed(std::max(a, b));
-        setSpeed(util::clip(speed(), min_speed(), max_speed()));
+        enforceSpeedConstraints();
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250329 move mess from GP to FlockParameters constructor.
-    
-    
-//    FlockParameters(const std::vector<double>& tunable_parameters)
-//      : FlockParameters(tunable_parameters.at(0),
-//                        tunable_parameters.at(1),
-//                        tunable_parameters.at(2),
-//                        tunable_parameters.at(3),
-//                        tunable_parameters.at(4),
-//                        tunable_parameters.at(5),
-//                        tunable_parameters.at(6),
-//                        tunable_parameters.at(7),
-//                        tunable_parameters.at(8),
-//                        tunable_parameters.at(9),
-//                        tunable_parameters.at(10),
-//                        tunable_parameters.at(11),
-//                        tunable_parameters.at(12),
-//                        tunable_parameters.at(13),
-//                        tunable_parameters.at(14),
-//                        tunable_parameters.at(15),
-//                        tunable_parameters.at(16))
-//    {
-//        assert(tunable_parameters.size() == tunableParameterCount());
-//    }
-    
-//    FlockParameters(const std::vector<double>& tunable_parameters_)
-//      : tuning_parameters(tunable_parameters_)
-//    {
-//        assert(tuning_parameters.size() == tunableParameterCount());
-//    }
-
+        
     FlockParameters(const std::vector<double>& tunable_parameters_)
     {
         assert(tunable_parameters_.size() == tunableParameterCount());
         tuning_parameters = tunable_parameters_;
+        enforceSpeedConstraints();
     }
 
+    // Enforce some constraints since values get randomized by evolutions.
+    void enforceSpeedConstraints()
+    {
+        double a = minSpeed();
+        double b = maxSpeed();
+        setMinSpeed(std::min(a, b));
+        setMinSpeed(std::max(a, b));
+        setSpeed(util::clip(initSpeed(), minSpeed(), maxSpeed()));
+    }
     
     // The count(/size) of tunable parameters in this class.
-    static size_t tunableParameterCount() { return 17; }
-//    static size_t tunableParameterCount() { return tuning_parameters.size(); }
+    static size_t tunableParameterCount() {return hand_tuned_parameters.size();}
+    
 
     // The count(/size) of ALL parameters in this class.
-    static size_t parameterCount() { return 17 + 3; }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-    bool operator==(const FlockParameters&) const = default;
+    static size_t parameterCount()
+    {
+        return constParameterCount() + tunableParameterCount();
+    }
     
     void print() const
     {
-        
         assert(tuning_parameters.size() == tunableParameterCount());
 
         auto indent = [](){ std::cout << "    "; };
@@ -364,41 +185,23 @@ public:
         indent(); debugPrint(sphere_radius());
         indent(); debugPrint(sphere_center());
 
-//        std::cout << "  parameters to be optimized:" << std::endl;
-//        indent(); debugPrint(max_force);
-//        indent(); debugPrint(min_speed);
-//        indent(); debugPrint(speed);
-//        indent(); debugPrint(max_speed);
-//        indent(); debugPrint(weight_forward);
-//        indent(); debugPrint(weight_separate);
-//        indent(); debugPrint(weight_align);
-//        indent(); debugPrint(weight_cohere);
-//        indent(); debugPrint(weight_avoid);
-//        indent(); debugPrint(max_dist_separate);
-//        indent(); debugPrint(max_dist_align);
-//        indent(); debugPrint(max_dist_cohere);
-//        indent(); debugPrint(angle_separate);
-//        indent(); debugPrint(angle_align);
-//        indent(); debugPrint(angle_cohere);
-//        indent(); debugPrint(fly_away_max_dist);
-//        indent(); debugPrint(min_time_to_collide);
         std::cout << "  parameters to be optimized:" << std::endl;
-        indent(); debugPrint(max_force());
-        indent(); debugPrint(min_speed());
-        indent(); debugPrint(speed());
-        indent(); debugPrint(max_speed());
-        indent(); debugPrint(weight_forward());
-        indent(); debugPrint(weight_separate());
-        indent(); debugPrint(weight_align());
-        indent(); debugPrint(weight_cohere());
-        indent(); debugPrint(weight_avoid());
-        indent(); debugPrint(max_dist_separate());
-        indent(); debugPrint(max_dist_align());
-        indent(); debugPrint(max_dist_cohere());
-        indent(); debugPrint(angle_separate());
-        indent(); debugPrint(angle_align());
-        indent(); debugPrint(angle_cohere());
-        indent(); debugPrint(fly_away_max_dist());
-        indent(); debugPrint(min_time_to_collide());
+        indent(); debugPrint(maxForce());
+        indent(); debugPrint(minSpeed());
+        indent(); debugPrint(initSpeed());
+        indent(); debugPrint(maxSpeed());
+        indent(); debugPrint(weightForward());
+        indent(); debugPrint(weightSeparate());
+        indent(); debugPrint(weightAlign());
+        indent(); debugPrint(weightCohere());
+        indent(); debugPrint(weightAvoid());
+        indent(); debugPrint(maxDistSeparate());
+        indent(); debugPrint(maxDistAlign());
+        indent(); debugPrint(maxDistCohere());
+        indent(); debugPrint(angleSeparate());
+        indent(); debugPrint(angleAlign());
+        indent(); debugPrint(angleCohere());
+        indent(); debugPrint(flyAwayMaxDist());
+        indent(); debugPrint(minTimeToCollide());
     }
 };

@@ -468,8 +468,7 @@ public:
     
     void collect_flock_metrics()
     {
-//        double ts = fp().min_speed - util::epsilon;
-        double ts = fp().min_speed() - util::epsilon;
+        double ts = fp().minSpeed() - util::epsilon;
         for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
         bool all_speed_good = true;
         bool all_seperation_good = true;

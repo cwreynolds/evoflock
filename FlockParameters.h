@@ -26,21 +26,26 @@
 class FlockParameters
 {
 public:
-    
-    // Shared read-only "input" parameters:
-    // Perhaps eventually include max sim steps, obstacle set, etc.?
-    std::vector<double> const_parameters = {1, 50};
+    // Shared const/input parameters. Perhaps eventually include max sim steps,
+    // obstacle set, etc.? Be sure to update constParameterCount() when const
+    // parameters are added or removed.
+    static size_t constParameterCount() { return 6; }
     // "assume a spherical boid" unit diameter
-    const double& body_diameter() const { return const_parameters.at(0); }
+    double bodyDiameter() const { return body_diameter_; }
     // Should this be called "world radius"?
-    const double& sphere_radius() const { return const_parameters.at(1); }
+    const double& sphereRadius() const { return sphere_radius_; }
     // Should this be called "world center"?
-    Vec3 sphere_center_;
-    const Vec3& sphere_center() const { return sphere_center_; }
-    static size_t constParameterCount() { return 3; }
+    Vec3 sphereCenter() const { return sphere_center_; }
+    // A flock simulation will run for this many steps (if no exception occurs).
+    int maxSimulationSteps() const { return max_simulation_steps_; }
+    // Number of Boids in a flock.
+    int boidsPerFlock() const { return boids_per_flock_; }
+    // Name of Obstacle set to use.
+    std::string useObstacleSet() const { return use_obstacle_set; }
 
+    
     // Hand-tuned parameters used as default.
-    static inline std::vector<double> hand_tuned_parameters =
+    const static inline std::vector<double> hand_tuned_parameters =
     {
         100,  // max_force = ;          // Max acceleration (m/s²)
         20,   // min_speed = ;           // Speed lower limit (m/s)
@@ -67,44 +72,49 @@ public:
         // ignore obstacle until predicted impact is in less than this many seconds.
         0.8,  // min_time_to_collide = ;
     };
-
-    // Parameters for tuning:
-    std::vector<double> tuning_parameters = hand_tuned_parameters;
-
-    // Parameters for tuning:
-    const double& maxForce()       const { return tuning_parameters.at(0); }
-    const double& minSpeed()       const { return tuning_parameters.at(1); }
-    const double& initSpeed()      const { return tuning_parameters.at(2); }
-    const double& maxSpeed()       const { return tuning_parameters.at(3); }
-
+        
+    // Acessors for tuning parameters:
+    const double& maxForce()        const { return tuning_parameters.at(0); }
+    const double& minSpeed()        const { return tuning_parameters.at(1); }
+    const double& initSpeed()       const { return tuning_parameters.at(2); }
+    const double& maxSpeed()        const { return tuning_parameters.at(3); }
+    
     void setMinSpeed(double s)      { tuning_parameters.at(1) = s; }
     void setSpeed(double s)         { tuning_parameters.at(2) = s; }
     void setMaxSpeed(double s)      { tuning_parameters.at(3) = s; }
-
-    const double& weightForward()  const { return tuning_parameters.at(4); }
-    const double& weightSeparate() const { return tuning_parameters.at(5); }
-    const double& weightAlign()    const { return tuning_parameters.at(6); }
-    const double& weightCohere()   const { return tuning_parameters.at(7); }
-    const double& weightAvoid()    const { return tuning_parameters.at(8); }
-
+    
+    const double& weightForward()   const { return tuning_parameters.at(4); }
+    const double& weightSeparate()  const { return tuning_parameters.at(5); }
+    const double& weightAlign()     const { return tuning_parameters.at(6); }
+    const double& weightCohere()    const { return tuning_parameters.at(7); }
+    const double& weightAvoid()     const { return tuning_parameters.at(8); }
+    
     const double& maxDistSeparate() const { return tuning_parameters.at(9); }
     const double& maxDistAlign()    const { return tuning_parameters.at(10); }
     const double& maxDistCohere()   const { return tuning_parameters.at(11); }
     
     // Cosine of threshold angle (max angle from forward to be seen)
-    const double& angleSeparate() const { return tuning_parameters.at(12); }
-    const double& angleAlign()    const { return tuning_parameters.at(13); }
-    const double& angleCohere()   const { return tuning_parameters.at(14); }
-
-    const double& flyAwayMaxDist() const { return tuning_parameters.at(15); }
-
+    const double& angleSeparate()   const { return tuning_parameters.at(12); }
+    const double& angleAlign()      const { return tuning_parameters.at(13); }
+    const double& angleCohere()     const { return tuning_parameters.at(14); }
+    
+    const double& flyAwayMaxDist()  const { return tuning_parameters.at(15); }
+    
     // ignore obstacle until predicted impact is in less than this many seconds.
     const double& minTimeToCollide() const { return tuning_parameters.at(16); }
-
-    // Default constructor
-    FlockParameters() {}
     
-    // Constructor for overwriting all of the tunable parameters.
+    // Default constructor
+    FlockParameters() : FlockParameters(hand_tuned_parameters) {}
+    
+    // Constructor based on a vector of numeric parameters.
+    FlockParameters(const std::vector<double>& vector_of_parameters_)
+    {
+        assert(vector_of_parameters_.size() == tunableParameterCount());
+        tuning_parameters = vector_of_parameters_;
+        enforceSpeedConstraints();
+    }
+    
+    // Constructor for individual tunable parameters.
     FlockParameters(double max_force,
                     double min_speed,
                     double speed,
@@ -124,7 +134,7 @@ public:
                     double min_time_to_collide)
     {
         // Set tuning parameter vector to given values.
-        this->tuning_parameters =
+        tuning_parameters =
         {
             max_force,
             min_speed,
@@ -146,14 +156,7 @@ public:
         };
         enforceSpeedConstraints();
     }
-        
-    FlockParameters(const std::vector<double>& tunable_parameters_)
-    {
-        assert(tunable_parameters_.size() == tunableParameterCount());
-        tuning_parameters = tunable_parameters_;
-        enforceSpeedConstraints();
-    }
-
+    
     // Enforce some constraints since values get randomized by evolutions.
     void enforceSpeedConstraints()
     {
@@ -166,7 +169,6 @@ public:
     
     // The count(/size) of tunable parameters in this class.
     static size_t tunableParameterCount() {return hand_tuned_parameters.size();}
-    
 
     // The count(/size) of ALL parameters in this class.
     static size_t parameterCount()
@@ -177,15 +179,18 @@ public:
     void print() const
     {
         assert(tuning_parameters.size() == tunableParameterCount());
-
         auto indent = [](){ std::cout << "    "; };
-        std::cout << "FlockParameters object contains these fields:";
-        std::cout << std::endl << "  constant:" << std::endl;
-        indent(); debugPrint(body_diameter());
-        indent(); debugPrint(sphere_radius());
-        indent(); debugPrint(sphere_center());
-
-        std::cout << "  parameters to be optimized:" << std::endl;
+        std::cout << "FlockParameters object containing these values:";
+        std::cout << std::endl << "  " << constParameterCount();
+        std::cout << " constant parameters:" << std::endl;
+        indent(); debugPrint(bodyDiameter());
+        indent(); debugPrint(sphereRadius());
+        indent(); debugPrint(sphereCenter());
+        indent(); debugPrint(maxSimulationSteps());
+        indent(); debugPrint(boidsPerFlock());
+        indent(); debugPrint(useObstacleSet());
+        std::cout << "  " << tunableParameterCount();
+        std::cout << " parameters to be optimized:" << std::endl;
         indent(); debugPrint(maxForce());
         indent(); debugPrint(minSpeed());
         indent(); debugPrint(initSpeed());
@@ -204,4 +209,16 @@ public:
         indent(); debugPrint(flyAwayMaxDist());
         indent(); debugPrint(minTimeToCollide());
     }
+    
+private:
+    // Parameters for tuning:
+    std::vector<double> tuning_parameters = hand_tuned_parameters;
+
+    // const/input parameters:
+    double body_diameter_ = 1;
+    double sphere_radius_ = 50;
+    Vec3 sphere_center_;
+    int max_simulation_steps_ = 500;
+    int boids_per_flock_ = 200;
+    std::string use_obstacle_set = "Sphere";
 };

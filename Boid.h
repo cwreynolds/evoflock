@@ -445,7 +445,7 @@ public:
         Vec3 avoidance;
         Vec3 f = forward();
         Vec3 p = position();
-        double br = fp().body_diameter() / 2;
+        double br = fp().bodyDiameter() / 2;
         double max_distance = fp().flyAwayMaxDist();
         for (Obstacle* obstacle : flock_obstacles())
         {
@@ -658,7 +658,7 @@ public:
     // Use Draw api to draw this Boid's “body” -- an irregular tetrahedron.
     void draw_body()
     {
-        double bd = fp().body_diameter();  // body diameter (defaults to 1)
+        double bd = fp().bodyDiameter();  // body diameter (defaults to 1)
         double br = bd / 2;
         Vec3 center = position();
         Vec3 nose = center + forward() * br;
@@ -775,7 +775,7 @@ public:
         for (Obstacle* o : flock_obstacles())
         {
             // Compute predicted point of impact, if any.
-            double br = fp().body_diameter() / 2;
+            double br = fp().bodyDiameter() / 2;
             Vec3 poi = o->rayIntersection(position(), forward(), br);
             if (not poi.is_none())
             {
@@ -820,7 +820,7 @@ public:
 
                 // Orient boid to point directly away from obstacle.
                 Vec3 normal = o->normalTowardAllowedSide(ec, prev_position);
-                Vec3 to = ec + (normal * fp().body_diameter());
+                Vec3 to = ec + (normal * fp().bodyDiameter());
                 set_ls(ls().fromTo(ec, to));
 
 //                setPosition(ec);

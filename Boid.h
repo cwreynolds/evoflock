@@ -329,10 +329,6 @@ public:
     // Steering force component to move away from neighbors.
     Vec3 steer_to_separate(const BoidPtrList& neighbors)
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250320 back to: why aren't boids flocking
-        if (isSelected()) { std::cout << std::endl << "steer_to_separate" << std::endl; }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 direction;
         for (Boid* neighbor : neighbors)
         {
@@ -349,10 +345,6 @@ public:
     // Steering force component to align path with neighbors.
     Vec3 steer_to_align(const BoidPtrList& neighbors)
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250320 back to: why aren't boids flocking
-        if (isSelected()) { std::cout << "steer_to_align" << std::endl; }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 direction;
         for (Boid* neighbor : neighbors)
         {
@@ -367,10 +359,6 @@ public:
 
     Vec3 steer_to_cohere(const BoidPtrList& neighbors)
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250320 back to: why aren't boids flocking
-        if (isSelected()) { std::cout << "steer_to_cohere" << std::endl; }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 direction;
         Vec3 neighbor_center;
         double total_weight = 0;
@@ -430,7 +418,12 @@ public:
             double min_dist = speed() * fp().minTimeToCollide();
             // Smooth weight transition
             double dtc = first_collision.dist_to_collision;
-            weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0.3);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250402 why are boids being driven to center of sphere?
+//            weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0.3);
+//            weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0.01);
+            weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             avoid_obstacle_annotation(1, poi, weight);
         }
         // TODO should that constant (-0.5) be moved to FlockParameters?
@@ -576,19 +569,6 @@ public:
         double unit_nearness = 1 - util::clip01(dist / max_dist);
         double angular_cutoff = angle_weight(neighbor, cos_angle_threshold);
         double weight = unit_nearness * angular_cutoff;
-        if (isSelected())
-        {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
-            std::cout << std::setw(5) << std::fixed;
-            std::cout << " distance = " << dist;
-            std::cout << ", weight = " << weight;
-            std::cout << " (unit_nearness = " << unit_nearness;
-            std::cout << ", angular_cutoff = " << angular_cutoff;
-            std::cout << ", max_dist = " << max_dist;
-            std::cout << ")" << std::endl;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        }
         return weight;
     }
 

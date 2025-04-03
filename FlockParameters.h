@@ -69,8 +69,39 @@ public:
         
         10,   // fly_away_max_dist = ;   // max fly-away dist from obstacle surface
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250402 why are boids being driven to center of sphere?
+
         // ignore obstacle until predicted impact is in less than this many seconds.
-        0.8,  // min_time_to_collide = ;
+
+//        step: 2000, obstacle collision: 55
+//        0.8,  // min_time_to_collide = ;
+        
+//        step: 2000, obstacle collision: 0
+//        1.0,  // min_time_to_collide = ;
+        
+//        step: 2000, obstacle collision: 0
+//        2.0,  // min_time_to_collide = ;
+
+//        step: 2000, obstacle collision: 0
+//        1.5,  // min_time_to_collide = ;
+
+//        step: 2000, obstacle collision: 0
+//        1.2,  // min_time_to_collide = ;
+
+//        step: 2000, obstacle collision: 0
+//        1.1,  // min_time_to_collide = ;
+
+//        step: 2000, obstacle collision: 0
+//        1.0,  // min_time_to_collide = ;
+
+//        step: 2000, obstacle collision: 55
+//        0.8,  // min_time_to_collide = ;
+
+//        step: 2000, obstacle collision: 0
+        0.9,  // min_time_to_collide = ;
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     };
         
     // Acessors for tuning parameters:

@@ -43,7 +43,9 @@ public:
     // Name of Obstacle set to use.
     std::string useObstacleSet() const { return use_obstacle_set; }
 
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+
     // Hand-tuned parameters used as default.
     const static inline std::vector<double> hand_tuned_parameters =
     {
@@ -56,8 +58,11 @@ public:
         23,   // weight_separate = ;
         12,   // weight_align    = ;
         18,   // weight_cohere   = ;
-        25,   //weight_avoid    = ;
         
+//        25,   //weight_avoid    = ;
+        75,   // weightAvoidPredict
+        50,   // weightAvoidStatic
+
         10,   // max_dist_separate = ;
         100,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
         100,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
@@ -68,42 +73,14 @@ public:
         0,    // angle_cohere   = 0;  // 90°
         
         10,   // fly_away_max_dist = ;   // max fly-away dist from obstacle surface
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250402 why are boids being driven to center of sphere?
+                
+        // Ignore obstacle until predicted impact is less than this many seconds.
+        0.9,  // min_time_to_collide
 
-        // ignore obstacle until predicted impact is in less than this many seconds.
-
-//        step: 2000, obstacle collision: 55
-//        0.8,  // min_time_to_collide = ;
-        
-//        step: 2000, obstacle collision: 0
-//        1.0,  // min_time_to_collide = ;
-        
-//        step: 2000, obstacle collision: 0
-//        2.0,  // min_time_to_collide = ;
-
-//        step: 2000, obstacle collision: 0
-//        1.5,  // min_time_to_collide = ;
-
-//        step: 2000, obstacle collision: 0
-//        1.2,  // min_time_to_collide = ;
-
-//        step: 2000, obstacle collision: 0
-//        1.1,  // min_time_to_collide = ;
-
-//        step: 2000, obstacle collision: 0
-//        1.0,  // min_time_to_collide = ;
-
-//        step: 2000, obstacle collision: 55
-//        0.8,  // min_time_to_collide = ;
-
-//        step: 2000, obstacle collision: 0
-        0.9,  // min_time_to_collide = ;
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     };
-        
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Acessors for tuning parameters:
     const double& maxForce()        const { return tuning_parameters.at(0); }
     const double& minSpeed()        const { return tuning_parameters.at(1); }
@@ -111,29 +88,50 @@ public:
     const double& maxSpeed()        const { return tuning_parameters.at(3); }
     
     void setMinSpeed(double s)      { tuning_parameters.at(1) = s; }
-    void setSpeed(double s)         { tuning_parameters.at(2) = s; }
+//    void setSpeed(double s)         { tuning_parameters.at(2) = s; }
+    void setInitSpeed(double s)     { tuning_parameters.at(2) = s; }
     void setMaxSpeed(double s)      { tuning_parameters.at(3) = s; }
     
     const double& weightForward()   const { return tuning_parameters.at(4); }
     const double& weightSeparate()  const { return tuning_parameters.at(5); }
     const double& weightAlign()     const { return tuning_parameters.at(6); }
     const double& weightCohere()    const { return tuning_parameters.at(7); }
-    const double& weightAvoid()     const { return tuning_parameters.at(8); }
-    
-    const double& maxDistSeparate() const { return tuning_parameters.at(9); }
-    const double& maxDistAlign()    const { return tuning_parameters.at(10); }
-    const double& maxDistCohere()   const { return tuning_parameters.at(11); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+//    const double& weightAvoid()     const { return tuning_parameters.at(8); }
+    const double& weightAvoidPredict()const { return tuning_parameters.at(8); }
+    const double& weightAvoidStatic() const { return tuning_parameters.at(9); }
+
+//    const double& maxDistSeparate() const { return tuning_parameters.at(9); }
+//    const double& maxDistAlign()    const { return tuning_parameters.at(10); }
+//    const double& maxDistCohere()   const { return tuning_parameters.at(11); }
+//    
+//    // Cosine of threshold angle (max angle from forward to be seen)
+//    const double& angleSeparate()   const { return tuning_parameters.at(12); }
+//    const double& angleAlign()      const { return tuning_parameters.at(13); }
+//    const double& angleCohere()     const { return tuning_parameters.at(14); }
+//    
+//    const double& flyAwayMaxDist()  const { return tuning_parameters.at(15); }
+//    
+//    // ignore obstacle until predicted impact is in less than this many seconds.
+//    const double& minTimeToCollide() const { return tuning_parameters.at(16); }
+
+    const double& maxDistSeparate() const { return tuning_parameters.at(10); }
+    const double& maxDistAlign()    const { return tuning_parameters.at(11); }
+    const double& maxDistCohere()   const { return tuning_parameters.at(12); }
     
     // Cosine of threshold angle (max angle from forward to be seen)
-    const double& angleSeparate()   const { return tuning_parameters.at(12); }
-    const double& angleAlign()      const { return tuning_parameters.at(13); }
-    const double& angleCohere()     const { return tuning_parameters.at(14); }
+    const double& angleSeparate()   const { return tuning_parameters.at(13); }
+    const double& angleAlign()      const { return tuning_parameters.at(14); }
+    const double& angleCohere()     const { return tuning_parameters.at(15); }
     
-    const double& flyAwayMaxDist()  const { return tuning_parameters.at(15); }
+    const double& flyAwayMaxDist()  const { return tuning_parameters.at(16); }
     
     // ignore obstacle until predicted impact is in less than this many seconds.
-    const double& minTimeToCollide() const { return tuning_parameters.at(16); }
-    
+    const double& minTimeToCollide() const { return tuning_parameters.at(17); }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Default constructor
     FlockParameters() : FlockParameters(hand_tuned_parameters) {}
     
@@ -142,7 +140,8 @@ public:
     {
         assert(vector_of_parameters_.size() == tunableParameterCount());
         tuning_parameters = vector_of_parameters_;
-        enforceSpeedConstraints();
+//        enforceSpeedConstraints();
+        enforceConstraints();
     }
     
     // Constructor for individual tunable parameters.
@@ -154,7 +153,15 @@ public:
                     double weight_separate,
                     double weight_align,
                     double weight_cohere,
-                    double weight_avoid,
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+                    
+//                    double weight_avoid,
+                    
+                    double weight_avoid_predict,
+                    double weight_avoid_static,
+
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     double max_dist_separate,
                     double max_dist_align,
                     double max_dist_cohere,
@@ -175,7 +182,15 @@ public:
             weight_separate,
             weight_align,
             weight_cohere,
-            weight_avoid,
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+            
+//            weight_avoid,
+
+            weight_avoid_predict,
+            weight_avoid_static,
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             max_dist_separate,
             max_dist_align,
             max_dist_cohere,
@@ -185,17 +200,20 @@ public:
             fly_away_max_dist,
             min_time_to_collide
         };
-        enforceSpeedConstraints();
+//        enforceSpeedConstraints();
+        enforceConstraints();
     }
     
     // Enforce some constraints since values get randomized by evolutions.
-    void enforceSpeedConstraints()
+//    void enforceSpeedConstraints()
+    void enforceConstraints()
     {
         double a = minSpeed();
         double b = maxSpeed();
         setMinSpeed(std::min(a, b));
         setMinSpeed(std::max(a, b));
-        setSpeed(util::clip(initSpeed(), minSpeed(), maxSpeed()));
+//        setSpeed(util::clip(initSpeed(), minSpeed(), maxSpeed()));
+        setInitSpeed(util::clip(initSpeed(), minSpeed(), maxSpeed()));
     }
     
     // The count(/size) of tunable parameters in this class.
@@ -230,7 +248,12 @@ public:
         indent(); debugPrint(weightSeparate());
         indent(); debugPrint(weightAlign());
         indent(); debugPrint(weightCohere());
-        indent(); debugPrint(weightAvoid());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+//        indent(); debugPrint(weightAvoid());
+        indent(); debugPrint(weightAvoidPredict());
+        indent(); debugPrint(weightAvoidStatic());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         indent(); debugPrint(maxDistSeparate());
         indent(); debugPrint(maxDistAlign());
         indent(); debugPrint(maxDistCohere());

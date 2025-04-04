@@ -293,7 +293,11 @@ public:
             Vec3 s = steer_to_separate(neighbors) * fp().weightSeparate();
             Vec3 a = steer_to_align(neighbors) * fp().weightAlign();
             Vec3 c = steer_to_cohere(neighbors) * fp().weightCohere();
-            Vec3 o = steer_to_avoid() * fp().weightAvoid();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+//            Vec3 o = steer_to_avoid() * fp().weightAvoid();
+            Vec3 o = steer_to_avoid();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
             combined_steering = anti_stall_adjustment(combined_steering);
             saveAnnotation(s, a, c, o, combined_steering);
@@ -314,7 +318,11 @@ public:
         Vec3 s = steer_to_separate(neighbors) * fp().weightSeparate();
         Vec3 a = steer_to_align(neighbors) * fp().weightAlign();
         Vec3 c = steer_to_cohere(neighbors) * fp().weightCohere();
-        Vec3 o = steer_to_avoid() * fp().weightAvoid();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+//        Vec3 o = steer_to_avoid() * fp().weightAvoid();
+        Vec3 o = steer_to_avoid();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
         combined_steering = anti_stall_adjustment(combined_steering);
         saveAnnotation(s, a, c, o, combined_steering);
@@ -375,6 +383,9 @@ public:
         Vec3 direction_normalized = direction.normalize_or_0();
         return direction_normalized;
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
 
     // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
     // (I will collide with obstacle within min_time_to_collide seconds)
@@ -396,11 +407,40 @@ public:
 //        avoid = (static_avoid * 2) + (predict_avoid * 3);
 //        avoid = (static_avoid + predict_avoid) * 2;
 //        avoid = (static_avoid + predict_avoid) * 3;
-        avoid = (static_avoid * 2) + (predict_avoid * 3);
+        
+//            avoid = (static_avoid * 2) + (predict_avoid * 3);
+//
+//            if (isSelected())
+//            {
+//    //            std::cout << "now returned from steer_to_avoid(): ";
+//    //            std::cout << avoid << ", length: " << avoid.length() << std::endl;
+//
+//                Vec3 old = avoid * fp().weightAvoid();
+//                std::cout << "Current: weighted steer_to_avoid()"  << std::endl;
+//                std::cout << old << ", length: " << old.length() << std::endl;
+//
+//
+//    //            double ws = fp().weightAvoid() / 2;
+//    //            double wp = fp().weightAvoid() / 3;
+//                double ws = fp().weightAvoid() * 2;
+//                double wp = fp().weightAvoid() * 3;
+//
+//                Vec3 new_avoid = (static_avoid * ws) + (predict_avoid * wp);
+//
+//                std::cout << "proposed refactor:"  << std::endl;
+//                std::cout << new_avoid << ", length: " << new_avoid.length() << std::endl;
+//
+//            }
+        
+        avoid = ((static_avoid * fp().weightAvoidStatic()) +
+                 (predict_avoid * fp().weightAvoidPredict()));
+        
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         avoid_obstacle_annotation(3, Vec3::none(), 0);
         return avoid;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Steering force component for predictive obstacles avoidance.
     Vec3 steer_for_predictive_avoidance()

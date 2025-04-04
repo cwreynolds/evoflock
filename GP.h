@@ -611,8 +611,16 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                     "Real_0_100",  // weight_separate
                     "Real_0_100",  // weight_align
                     "Real_0_100",  // weight_cohere
-                    "Real_0_100",  // weight_avoid
-                    
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+
+//                    "Real_0_100",  // weight_avoid
+
+                    "Real_0_100",  // weightAvoidPredict
+                    "Real_0_100",  // weightAvoidStatic
+
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                     "Real_0_100",  // max_dist_separate
                     "Real_0_100",  // max_dist_align
                     "Real_0_100",  // max_dist_cohere
@@ -675,7 +683,12 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
             handmade_helper(weightSeparate),
             handmade_helper(weightAlign),
             handmade_helper(weightCohere),
-            handmade_helper(weightAvoid),
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+//            handmade_helper(weightAvoid),
+            handmade_helper(weightAvoidPredict),
+            handmade_helper(weightAvoidStatic),
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             handmade_helper(maxDistSeparate),
             handmade_helper(maxDistAlign),
             handmade_helper(maxDistCohere),
@@ -706,7 +719,12 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
                     "weightSeparate",
                     "weightAlign",
                     "weightCohere",
-                    "weightAvoid",
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+//                    "weightAvoid",
+                    "weightAvoidPredict",
+                    "weightAvoidStatic",
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                     "maxDistSeparate",
                     "maxDistAlign",

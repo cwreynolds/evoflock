@@ -72,10 +72,30 @@ private:  // move to bottom of class later
     Vec3 annote_separation_;
     Vec3 annote_alignment_;
     Vec3 annote_cohesion_;
-    Vec3 annote_avoidance_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250404 refactor for predictive/static avoid as top level behaviors
+
+//    Vec3 annote_avoidance_;
+
+    Vec3 annote_avoid_predict_;
+    Vec3 annote_avoid_static_;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Vec3 annote_combined_;
-    Vec3 annote_avoid_poi_ = Vec3();
-    double annote_avoid_weight_ = 0;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250405 handle poi and weight now for both kinds of avoidance
+
+//    Vec3 annote_avoid_poi_ = Vec3();
+//    double annote_avoid_weight_ = 0;
+
+    Vec3 annote_avoid_predict_poi_;
+    double annote_avoid_predict_weight_ = 0;
+
+    Vec3 annote_avoid_static_poi_;
+    double annote_avoid_static_weight_ = 0;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 public:
     
@@ -270,6 +290,42 @@ public:
 //        }
 //    }
 
+//        // Basic flocking behavior. Computes steering force for one simulation step
+//        // (an animation frame) for one boid in a flock.
+//        Vec3 steer_to_flock()
+//        {
+//            BoidPtrList neighbors = nearest_neighbors();
+//            flush_cache_of_predicted_obstacle_collisions();
+//
+//            if (GP_not_GA and override_steer_function)
+//            {
+//                // TODO seems redundant, both here and in the IF
+//                assert(override_steer_function);
+//
+//                setGpPerThread(this);
+//                Vec3 steering_from_evolved_function = override_steer_function();
+//                setGpPerThread(nullptr);
+//                return steering_from_evolved_function;
+//            }
+//            else
+//            {
+//                Vec3 f = forward() * fp().weightForward();
+//                Vec3 s = steer_to_separate(neighbors) * fp().weightSeparate();
+//                Vec3 a = steer_to_align(neighbors) * fp().weightAlign();
+//                Vec3 c = steer_to_cohere(neighbors) * fp().weightCohere();
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+//    //            Vec3 o = steer_to_avoid() * fp().weightAvoid();
+//                Vec3 o = steer_to_avoid();
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
+//                combined_steering = anti_stall_adjustment(combined_steering);
+//                saveAnnotation(s, a, c, o, combined_steering);
+//                return combined_steering;
+//            }
+//        }
+
+    
     // Basic flocking behavior. Computes steering force for one simulation step
     // (an animation frame) for one boid in a flock.
     Vec3 steer_to_flock()
@@ -289,26 +345,51 @@ public:
         }
         else
         {
-            Vec3 f = forward() * fp().weightForward();
-            Vec3 s = steer_to_separate(neighbors) * fp().weightSeparate();
-            Vec3 a = steer_to_align(neighbors) * fp().weightAlign();
-            Vec3 c = steer_to_cohere(neighbors) * fp().weightCohere();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
-//            Vec3 o = steer_to_avoid() * fp().weightAvoid();
-            Vec3 o = steer_to_avoid();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
-            combined_steering = anti_stall_adjustment(combined_steering);
-            saveAnnotation(s, a, c, o, combined_steering);
-            return combined_steering;
+//                Vec3 f = forward() * fp().weightForward();
+//                Vec3 s = steer_to_separate(neighbors) * fp().weightSeparate();
+//                Vec3 a = steer_to_align(neighbors) * fp().weightAlign();
+//                Vec3 c = steer_to_cohere(neighbors) * fp().weightCohere();
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+//    //            Vec3 o = steer_to_avoid() * fp().weightAvoid();
+//                Vec3 o = steer_to_avoid();
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
+//                combined_steering = anti_stall_adjustment(combined_steering);
+//                saveAnnotation(s, a, c, o, combined_steering);
+//                return combined_steering;
+
+            return pre_GP_steer_to_flock();
         }
     }
 
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20240816 VERY temp experiment
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250404 refactor for predictive/static avoid as top level behaviors
     
-    
+//        // TODO 20240816 temp experiment should be merged back into steer_to_flock()
+//        //               after GP is working.
+//        Vec3 pre_GP_steer_to_flock()
+//        {
+//            BoidPtrList neighbors = nearest_neighbors();
+//            flush_cache_of_predicted_obstacle_collisions();
+//
+//            Vec3 f = forward() * fp().weightForward();
+//            Vec3 s = steer_to_separate(neighbors) * fp().weightSeparate();
+//            Vec3 a = steer_to_align(neighbors) * fp().weightAlign();
+//            Vec3 c = steer_to_cohere(neighbors) * fp().weightCohere();
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//            // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+//    //        Vec3 o = steer_to_avoid() * fp().weightAvoid();
+//            Vec3 o = steer_to_avoid();
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//            Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
+//            combined_steering = anti_stall_adjustment(combined_steering);
+//            saveAnnotation(s, a, c, o, combined_steering);
+//            return combined_steering;
+//        }
+
+    // TODO 20240816 temp experiment should be merged back into steer_to_flock()
+    //               after GP is working.
     Vec3 pre_GP_steer_to_flock()
     {
         BoidPtrList neighbors = nearest_neighbors();
@@ -318,19 +399,25 @@ public:
         Vec3 s = steer_to_separate(neighbors) * fp().weightSeparate();
         Vec3 a = steer_to_align(neighbors) * fp().weightAlign();
         Vec3 c = steer_to_cohere(neighbors) * fp().weightCohere();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
+        
 //        Vec3 o = steer_to_avoid() * fp().weightAvoid();
-        Vec3 o = steer_to_avoid();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
+//        Vec3 o = steer_to_avoid();
+
+        Vec3 ap = steer_for_predictive_avoidance()  * fp().weightAvoidPredict();
+        Vec3 as = fly_away_from_obstacles() * fp().weightAvoidStatic();
+
+//        Vec3 combined_steering = smoothed_steering(f + s + a + c + o);
+        Vec3 combined_steering = smoothed_steering(f + s + a + c + ap + as);
+
         combined_steering = anti_stall_adjustment(combined_steering);
-        saveAnnotation(s, a, c, o, combined_steering);
+        
+//        saveAnnotation(s, a, c, o, combined_steering);
+        saveAnnotation(s, a, c, ap, as, combined_steering);
+
         return combined_steering;
+
     }
 
-    
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -387,58 +474,51 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
 
-    // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
-    // (I will collide with obstacle within min_time_to_collide seconds)
-    // and "static" avoidance (I should fly away from this obstacle to add
-    // clearance, to avoid scraping along everted containment obstacles).
-    Vec3 steer_to_avoid()
-    {
-        Vec3 avoid;
-        avoid_obstacle_annotation(0, Vec3::none(), 0);
-        if (not draw().avoidingObstaclesMode()) { return {}; }
+//    // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
+//    // (I will collide with obstacle within min_time_to_collide seconds)
+//    // and "static" avoidance (I should fly away from this obstacle to add
+//    // clearance, to avoid scraping along everted containment obstacles).
+//    Vec3 steer_to_avoid()
+//    {
+//        Vec3 avoid;
+//        avoid_obstacle_annotation(0, Vec3::none(), 0);
+//        if (not draw().avoidingObstaclesMode()) { return {}; }
+//
+//        Vec3 predict_avoid = steer_for_predictive_avoidance();
+//        Vec3 static_avoid = fly_away_from_obstacles();
+//        
+//        avoid = ((static_avoid * fp().weightAvoidStatic()) +
+//                 (predict_avoid * fp().weightAvoidPredict()));
+//        
+//        avoid_obstacle_annotation(3, Vec3::none(), 0);
+//        return avoid;
+//    }
 
-        Vec3 predict_avoid = steer_for_predictive_avoidance();
-        Vec3 static_avoid = fly_away_from_obstacles();
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250405 handle poi and weight now for both kinds of avoidance
 
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//        avoid = static_avoid + (predict_avoid * 3);
-//        avoid = static_avoid + (predict_avoid * 1.5);
-//        avoid = static_avoid + (predict_avoid * 3);
-//        avoid = (static_avoid * 2) + (predict_avoid * 3);
-//        avoid = (static_avoid + predict_avoid) * 2;
-//        avoid = (static_avoid + predict_avoid) * 3;
-        
-//            avoid = (static_avoid * 2) + (predict_avoid * 3);
+//        // Steering force to avoid obstacles. Takes the max of "predictive" avoidance
+//        // (I will collide with obstacle within min_time_to_collide seconds)
+//        // and "static" avoidance (I should fly away from this obstacle to add
+//        // clearance, to avoid scraping along everted containment obstacles).
+//        Vec3 steer_to_avoid()
+//        {
+//    //        Vec3 avoid;
+//    //        avoid_obstacle_annotation(0, Vec3::none(), 0);
+//            if (not draw().avoidingObstaclesMode()) { return {}; }
 //
-//            if (isSelected())
-//            {
-//    //            std::cout << "now returned from steer_to_avoid(): ";
-//    //            std::cout << avoid << ", length: " << avoid.length() << std::endl;
+//            Vec3 predict_avoid = steer_for_predictive_avoidance();
+//            Vec3 static_avoid = fly_away_from_obstacles();
 //
-//                Vec3 old = avoid * fp().weightAvoid();
-//                std::cout << "Current: weighted steer_to_avoid()"  << std::endl;
-//                std::cout << old << ", length: " << old.length() << std::endl;
+//            Vec3 avoid = ((static_avoid * fp().weightAvoidStatic()) +
+//                          (predict_avoid * fp().weightAvoidPredict()));
 //
-//
-//    //            double ws = fp().weightAvoid() / 2;
-//    //            double wp = fp().weightAvoid() / 3;
-//                double ws = fp().weightAvoid() * 2;
-//                double wp = fp().weightAvoid() * 3;
-//
-//                Vec3 new_avoid = (static_avoid * ws) + (predict_avoid * wp);
-//
-//                std::cout << "proposed refactor:"  << std::endl;
-//                std::cout << new_avoid << ", length: " << new_avoid.length() << std::endl;
-//
-//            }
-        
-        avoid = ((static_avoid * fp().weightAvoidStatic()) +
-                 (predict_avoid * fp().weightAvoidPredict()));
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        avoid_obstacle_annotation(3, Vec3::none(), 0);
-        return avoid;
-    }
+//    //        avoid_obstacle_annotation(3, Vec3::none(), 0);
+//            return avoid;
+//        }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -447,6 +527,15 @@ public:
     {
         double weight = 0;
         Vec3 avoidance;
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20250405 handle poi and weight now for both kinds of avoidance
+
+        annote_avoid_predict_poi_ = Vec3();
+        annote_avoid_predict_weight_ = 0;
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
         CollisionList collisions = get_predicted_obstacle_collisions();
         if (not collisions.empty())
         {
@@ -458,13 +547,17 @@ public:
             double min_dist = speed() * fp().minTimeToCollide();
             // Smooth weight transition
             double dtc = first_collision.dist_to_collision;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250402 why are boids being driven to center of sphere?
-//            weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0.3);
-//            weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0.01);
             weight = util::remap_interval_clip(dtc,  0, min_dist,  1, 0);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            avoid_obstacle_annotation(1, poi, weight);
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250405 handle poi and weight now for both kinds of avoidance
+
+//            avoid_obstacle_annotation(1, poi, weight);
+            
+            annote_avoid_predict_poi_ = poi;
+            annote_avoid_predict_weight_ = weight;
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }
         // TODO should that constant (-0.5) be moved to FlockParameters?
         Vec3 braking = forward() * (avoidance.length() * -0.5);
@@ -480,100 +573,123 @@ public:
         Vec3 p = position();
         double br = fp().bodyDiameter() / 2;
         double max_distance = fp().flyAwayMaxDist();
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20250405 handle poi and weight now for both kinds of avoidance
+        
+        annote_avoid_static_poi_ = Vec3();
+        annote_avoid_static_weight_ = 0;
+        
+        
+//        double max_weight =  std::numeric_limits<double>::infinity();
+        double max_weight = 0;
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
         for (Obstacle* obstacle : flock_obstacles())
         {
             Vec3 oa = obstacle->fly_away(p, f, max_distance, br);
             double weight = oa.length();
-            avoid_obstacle_annotation(2, obstacle->nearest_point(p), weight);
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250405 handle poi and weight now for both kinds of avoidance
+            
+//            avoid_obstacle_annotation(2, obstacle->nearest_point(p), weight);
+
+            // TODO why do I not see the cyan poi indicator?
+            
+
+//            annote_avoid_static_poi_ = obstacle->nearest_point(p);
+//            annote_avoid_static_weight_ = weight;
+//            
+//            if (isSelected())
+//            {
+//                std::cout << std::endl;
+//                debugPrint(oa)
+//                debugPrint(oa.length())
+//                debugPrint(obstacle->nearest_point(p))
+//            }
+  
+            if (max_weight < weight)
+            {
+                max_weight = weight;
+                
+                annote_avoid_static_poi_ = obstacle->nearest_point(p);
+                annote_avoid_static_weight_ = weight;
+                
+//                if (isSelected())
+//                {
+//                    std::cout << std::endl;
+//                    debugPrint(oa)
+//                    debugPrint(oa.length())
+//                    debugPrint(obstacle->nearest_point(p))
+//                }
+
+            }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
             avoidance += oa;
         }
         return avoidance;
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241219 reconsider avoid_blend_mode
+    // TODO 20250405 handle poi and weight now for both kinds of avoidance
 
-//    // Draw a ray from Boid to point of impact, or nearest point for fly-away.
-//    // Magenta for strong avoidance, shades to background gray (85%) for gentle
-//    // avoidance. "Phase" used to show strongest avodiance: predictive vs static.
-//    void avoid_obstacle_annotation(int phase, Vec3 poi, double weight)
-//    {
-//        //    if phase == 0:
-//        //        self.annote_avoid_poi = Vec3()  # This might be too elaborate: two vals
-//        //        self.annote_avoid_weight = 0    # per boid just for avoid annotation.
-//        //    # For predictive avoidance (phase 0) just store poi and weight.
-//        //    if phase == 1:
-//        //        self.annote_avoid_poi = poi
-//        //        self.annote_avoid_weight = weight
-//        //    # For static avoidance (phase 1) use values for max weight.
-//        //    if phase == 2:
-//        //        if weight > self.annote_avoid_weight:
-//        //            self.annote_avoid_poi = poi
-//        //            self.annote_avoid_weight = weight
-//        //    if phase == 3:
-//        //        if self.should_annotate() and self.annote_avoid_weight > 0.01:
-//        //            Draw.add_line_segment(self.position,
-//        //                                  self.annote_avoid_poi,
-//        //                                  # Interp color between gray and magenta.
-//        //                                  util.interpolate(self.annote_avoid_weight,
-//        //                                                   Vec3(0.85, 0.85, 0.85),
-//        //                                                   Vec3(1, 0, 1)))
-//    }
-
-    // Draw a ray from Boid to point of impact, or nearest point for fly-away.
-    // Magenta for strong avoidance, shades to background gray (85%) for gentle
-    // avoidance. "Phase" used to show strongest avoidance: predictive vs static.
-    void avoid_obstacle_annotation(int phase, Vec3 poi, double weight)
-    {
-        //    if phase == 0:
-        //        self.annote_avoid_poi = Vec3()  # This might be too elaborate: two vals
-        //        self.annote_avoid_weight = 0    # per boid just for avoid annotation.
-        
-        // TODO Phase 0 and 1 are identical?
-        
-        if (phase == 0)
-        {
-            annote_avoid_poi_ = Vec3();
-            annote_avoid_weight_ = 0;
-        }
-        
-        //    # For predictive avoidance (phase 0) just store poi and weight.
-        //    if phase == 1:
-        //        self.annote_avoid_poi = Vec3()  # This might be too elaborate: two vals
-        //        self.annote_avoid_weight = 0    # per boid just for avoid annotation.
-
-        if (phase == 1)
-        {
-//            annote_avoid_poi_ = Vec3();
-//            annote_avoid_weight_ = 0;
-            annote_avoid_poi_ = poi;
-            annote_avoid_weight_ = weight;
-        }
-        
-        //    # For static avoidance (phase 1) use values for max weight.
-        //    if phase == 2:
-        //        if weight > self.annote_avoid_weight:
-        //            self.annote_avoid_poi = poi
-        //            self.annote_avoid_weight = weight
-        
-        if (phase == 2)
-        {
-            if (weight > annote_avoid_weight_)
-            {
-                annote_avoid_poi_ = poi;
-                annote_avoid_weight_ = weight;
-            }
-        }
-        
-        //    if phase == 3:
-        //        if self.should_annotate() and self.annote_avoid_weight > 0.01:
-        //            Draw.add_line_segment(self.position,
-        //                                  self.annote_avoid_poi,
-        //                                  # Interp color between gray and magenta.
-        //                                  util.interpolate(self.annote_avoid_weight,
-        //                                                   Vec3(0.85, 0.85, 0.85),
-        //                                                   Vec3(1, 0, 1)))
-    }
+//        // Draw a ray from Boid to point of impact, or nearest point for fly-away.
+//        // Magenta for strong avoidance, shades to background gray (85%) for gentle
+//        // avoidance. "Phase" used to show strongest avoidance: predictive vs static.
+//        void avoid_obstacle_annotation(int phase, Vec3 poi, double weight)
+//        {
+//            //    if phase == 0:
+//            //        self.annote_avoid_poi = Vec3()  # This might be too elaborate: two vals
+//            //        self.annote_avoid_weight = 0    # per boid just for avoid annotation.
+//
+//            // TODO Phase 0 and 1 are identical?
+//
+//            if (phase == 0)
+//            {
+//                annote_avoid_poi_ = Vec3();
+//                annote_avoid_weight_ = 0;
+//            }
+//
+//            //    # For predictive avoidance (phase 0) just store poi and weight.
+//            //    if phase == 1:
+//            //        self.annote_avoid_poi = Vec3()  # This might be too elaborate: two vals
+//            //        self.annote_avoid_weight = 0    # per boid just for avoid annotation.
+//
+//            if (phase == 1)
+//            {
+//    //            annote_avoid_poi_ = Vec3();
+//    //            annote_avoid_weight_ = 0;
+//                annote_avoid_poi_ = poi;
+//                annote_avoid_weight_ = weight;
+//            }
+//
+//            //    # For static avoidance (phase 1) use values for max weight.
+//            //    if phase == 2:
+//            //        if weight > self.annote_avoid_weight:
+//            //            self.annote_avoid_poi = poi
+//            //            self.annote_avoid_weight = weight
+//
+//            if (phase == 2)
+//            {
+//                if (weight > annote_avoid_weight_)
+//                {
+//                    annote_avoid_poi_ = poi;
+//                    annote_avoid_weight_ = weight;
+//                }
+//            }
+//
+//            //    if phase == 3:
+//            //        if self.should_annotate() and self.annote_avoid_weight > 0.01:
+//            //            Draw.add_line_segment(self.position,
+//            //                                  self.annote_avoid_poi,
+//            //                                  # Interp color between gray and magenta.
+//            //                                  util.interpolate(self.annote_avoid_weight,
+//            //                                                   Vec3(0.85, 0.85, 0.85),
+//            //                                                   Vec3(1, 0, 1)))
+//        }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -693,18 +809,45 @@ public:
                                          // color
                                          color());
     }
-        
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250404 refactor for predictive/static avoid as top level behaviors
+
+//    // Save this Boid's steering forces for drawing annotation later.
+//    void saveAnnotation(const Vec3& separation,
+//                        const Vec3& alignment,
+//                        const Vec3& cohesion,
+//                        const Vec3& avoidance,
+//                        const Vec3& combined)
+//    {
+//        annote_separation_ = separation;
+//        annote_alignment_ = alignment;
+//        annote_cohesion_ = cohesion;
+//        annote_avoidance_ = avoidance;
+//        annote_combined_ = combined;
+//    }
+
     // Save this Boid's steering forces for drawing annotation later.
     void saveAnnotation(const Vec3& separation,
                         const Vec3& alignment,
                         const Vec3& cohesion,
-                        const Vec3& avoidance,
+                        
+//                        const Vec3& avoidance,
+
+                        const Vec3& avoid_predict,
+                        const Vec3& avoid_static,
+
                         const Vec3& combined)
     {
         annote_separation_ = separation;
         annote_alignment_ = alignment;
         annote_cohesion_ = cohesion;
-        annote_avoidance_ = avoidance;
+        
+//        annote_avoidance_ = avoidance;
+        
+        annote_avoid_predict_ = avoid_predict;
+        annote_avoid_static_ = avoid_static;
+
         annote_combined_ = combined;
     }
 
@@ -721,15 +864,90 @@ public:
         relative_force_annotation(annote_separation_, Color::red());
         relative_force_annotation(annote_alignment_,  Color::green());
         relative_force_annotation(annote_cohesion_,   Color::blue());
-        relative_force_annotation(annote_avoidance_,  Color::magenta());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250404 refactor for predictive/static avoid as top level behaviors
+        
+//        relative_force_annotation(annote_avoidance_,  Color::magenta());
+
+        relative_force_annotation(annote_avoid_predict_,  Color::magenta());
+        relative_force_annotation(annote_avoid_static_,  Color::cyan());
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         relative_force_annotation(annote_combined_,   Color::yellow());
-        if (annote_avoid_weight_ > 0.1)
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250405 handle poi and weight now for both kinds of avoidance
+
+//        if (annote_avoid_weight_ > 0.1)
+//        {
+//            double a = annote_avoid_weight_;
+//            Color c = util::interpolate(a, Color(0.5), Color(0.8, 0.5, 0.8));
+//            draw().addThickLineToAnimatedFrame(position(), annote_avoid_poi_, c);
+//        }
+
+//            if (annote_avoid_predict_weight_ > 0.1)
+//            {
+//                double a = annote_avoid_predict_weight_;
+//                Color c = util::interpolate(a, Color(0.5), Color(0.8, 0.5, 0.8));
+//                draw().addThickLineToAnimatedFrame(position(), annote_avoid_predict_poi_, c);
+//            }
+//
+//            if (annote_avoid_static_weight_ > 0.1)
+//            {
+//                double a = annote_avoid_static_weight_;
+//    //            Color c = util::interpolate(a, Color(0.5), Color(0.8, 0.5, 0.8));
+//                Color c = util::interpolate(a, Color(0.5), Color(0.5, 0.8, 0.8));
+//                draw().addThickLineToAnimatedFrame(position(), annote_avoid_static_poi_, c);
+//            }
+
+//            if (annote_avoid_predict_weight_ > 0.1)
+//            {
+//                double a = annote_avoid_predict_weight_;
+//    //            Color c = util::interpolate(a, Color(0.5), Color(0.8, 0.5, 0.8));
+//    //            Color c = util::interpolate(a, Color(0.6), Color(0.7, 0.6, 0.7));
+//    //            Color c = util::interpolate(a, Color(0.6), Color(0.8, 0.6, 0.8));
+//                Color c = util::interpolate(a, Color(0.5), Color(0.9, 0.5, 0.9));
+//                draw().addThickLineToAnimatedFrame(position(),
+//                                                   annote_avoid_predict_poi_,
+//                                                   c,
+//                                                   0.01);
+//            }
+//
+//            if (annote_avoid_static_weight_ > 0.1)
+//            {
+//                double a = annote_avoid_static_weight_;
+//    //            Color c = util::interpolate(a, Color(0.5), Color(0.5, 0.8, 0.8));
+//    //            Color c = util::interpolate(a, Color(0.6), Color(0.6, 0.7, 0.7));
+//    //            Color c = util::interpolate(a, Color(0.6), Color(0.6, 0.8, 0.8));
+//                Color c = util::interpolate(a, Color(0.5), Color(0.5, 0.9, 0.9));
+//                draw().addThickLineToAnimatedFrame(position(),
+//                                                   annote_avoid_static_poi_,
+//                                                   c,
+//                                                   0.01);
+//            }
+
+        if (annote_avoid_predict_weight_ > 0.1)
         {
-            double a = annote_avoid_weight_;
-            Color c = util::interpolate(a, Color(0.5), Color(0.8, 0.5, 0.8));
-            draw().addThickLineToAnimatedFrame(position(), annote_avoid_poi_, c);
+            Vec3 poi = annote_avoid_predict_poi_;
+            double w = annote_avoid_predict_weight_;
+            Color c = util::interpolate(w, Color(0.5), Color(0.9, 0.5, 0.9));
+            draw().addThickLineToAnimatedFrame(position(), poi, c, 0.01);
         }
+
+        if (annote_avoid_static_weight_ > 0.1)
+        {
+            Vec3 poi = annote_avoid_static_poi_;
+            double w = annote_avoid_static_weight_;
+            Color c = util::interpolate(w, Color(0.5), Color(0.5, 0.9, 0.9));
+            draw().addThickLineToAnimatedFrame(position(), poi, c, 0.01);
+        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250320 back to: why aren't boids flocking
@@ -746,10 +964,19 @@ public:
     {
         drawAnnotation();
 //        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
-        for (Boid* b : cached_nearest_neighbors())
-        {
-            draw().addThickLineToAnimatedFrame(position(), b->position(), Vec3());
-        }
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20250405 handle poi and weight now for both kinds of avoidance
+
+//        for (Boid* b : cached_nearest_neighbors())
+//        {
+//            draw().addThickLineToAnimatedFrame(position(),
+//                                               b->position(),
+//                                               Color::black());
+//        }
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -43,9 +43,6 @@ public:
     // Name of Obstacle set to use.
     std::string useObstacleSet() const { return use_obstacle_set; }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
-
     // Hand-tuned parameters used as default.
     const static inline std::vector<double> hand_tuned_parameters =
     {
@@ -54,32 +51,62 @@ public:
         0,    //speed = 0;                // Initial speed (m/s)
         20,   // max_speed = ;           // Speed upper limit (m/s)
         
-        4,    // weight_forward  = ;
-        23,   // weight_separate = ;
-        12,   // weight_align    = ;
-        18,   // weight_cohere   = ;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250406 new angle_weight(): continuous and parameter free.
         
-//        25,   //weight_avoid    = ;
+//        4,    // weight_forward  = ;
+//        23,   // weight_separate = ;
+//        12,   // weight_align    = ;
+//        18,   // weight_cohere   = ;
+
+        4,    // weight_forward
+//        23,   // weight_separate
+//        30,   // weight_separate
+//        40,   // weight_separate
+        45,   // weight_separate
+//        12,   // weight_align
+        20,   // weight_align
+//        18,   // weight_cohere
+        27,   // weight_cohere
+
         75,   // weightAvoidPredict
         50,   // weightAvoidStatic
 
-        10,   // max_dist_separate = ;
+//        10,   // max_dist_separate = ;
+        100,   // max_dist_separate = ;
         100,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
         100,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
         
+//        // Cosine of threshold angle (max angle from forward to be seen)
+//        0,    // angle_separate = 0;  // 90°
+//        0,    // angle_align    = 0;  // 90°
+//        0,    // angle_cohere   = 0;  // 90°
+
+//        // Cosine of threshold angle (max angle from forward to be seen)
+//        -0.3,    // angle_separate = 0;  // 90°
+//        -0.3,    // angle_align    = 0;  // 90°
+//        -0.3,    // angle_cohere   = 0;  // 90°
+
+//        // Cosine of threshold angle (max angle from forward to be seen)
+//        -0.707,    // angle_separate = 0;  // 90°
+//        -0.707,    // angle_align    = 0;  // 90°
+//        -0.707,    // angle_cohere   = 0;  // 90°
+
         // Cosine of threshold angle (max angle from forward to be seen)
-        0,    // angle_separate = 0;  // 90°
-        0,    // angle_align    = 0;  // 90°
-        0,    // angle_cohere   = 0;  // 90°
+        -0.15,    // angle_separate = ~100°
+        -0.15,    // angle_align    = ~100°
+        -0.15,    // angle_cohere   = ~100°
+
         
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         10,   // fly_away_max_dist = ;   // max fly-away dist from obstacle surface
                 
         // Ignore obstacle until predicted impact is less than this many seconds.
         0.9,  // min_time_to_collide
 
     };
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Acessors for tuning parameters:
     const double& maxForce()        const { return tuning_parameters.at(0); }

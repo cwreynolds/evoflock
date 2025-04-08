@@ -486,7 +486,12 @@ public:
                                                    endpoint1(),
                                                    getColor(),
                                                    true,
-                                                   getExcludeFrom() == outside,
+                                                   //~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                                   // TODO 20250407 boids get
+                                                   //      stuck inside cylinder
+//                                                   getExcludeFrom() == outside,
+                                                   true,
+                                                   //~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                                    500);
         Draw::brightnessSpecklePerVertex(0.7, 1.0, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);

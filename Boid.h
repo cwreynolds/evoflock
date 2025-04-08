@@ -296,6 +296,18 @@ public:
         if (not collisions.empty())
         {
             const Collision& first_collision = collisions.front();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250407 boids get stuck inside cylinder
+            if (isSelected())
+            {
+                Obstacle* o = first_collision.obstacle;
+                double sdf = o->signed_distance(position());
+                if ((sdf < 0) and (o->to_string() == "CylinderObstacle"))
+                {
+                    debugPrint(sdf);
+                }
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             Vec3 poi = first_collision.point_of_impact;
             Vec3 normal = first_collision.normal_at_poi;
             Vec3 pure_steering = pure_lateral_steering(normal);

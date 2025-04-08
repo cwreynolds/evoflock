@@ -54,51 +54,99 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250406 new angle_weight(): continuous and parameter free.
         
-//        4,    // weight_forward  = ;
-//        23,   // weight_separate = ;
-//        12,   // weight_align    = ;
-//        18,   // weight_cohere   = ;
+//    //        4,    // weight_forward  = ;
+//    //        23,   // weight_separate = ;
+//    //        12,   // weight_align    = ;
+//    //        18,   // weight_cohere   = ;
+//
+//            4,    // weight_forward
+//    //        23,   // weight_separate
+//    //        30,   // weight_separate
+//    //        40,   // weight_separate
+//            45,   // weight_separate
+//    //        12,   // weight_align
+//            20,   // weight_align
+//    //        18,   // weight_cohere
+//            27,   // weight_cohere
+//
+//            75,   // weightAvoidPredict
+//            50,   // weightAvoidStatic
+//
+//    //        10,   // max_dist_separate = ;
+//            100,   // max_dist_separate = ;
+//            100,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
+//            100,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
+//
+//    //        // Cosine of threshold angle (max angle from forward to be seen)
+//    //        0,    // angle_separate = 0;  // 90°
+//    //        0,    // angle_align    = 0;  // 90°
+//    //        0,    // angle_cohere   = 0;  // 90°
+//
+//    //        // Cosine of threshold angle (max angle from forward to be seen)
+//    //        -0.3,    // angle_separate = 0;  // 90°
+//    //        -0.3,    // angle_align    = 0;  // 90°
+//    //        -0.3,    // angle_cohere   = 0;  // 90°
+//
+//    //        // Cosine of threshold angle (max angle from forward to be seen)
+//    //        -0.707,    // angle_separate = 0;  // 90°
+//    //        -0.707,    // angle_align    = 0;  // 90°
+//    //        -0.707,    // angle_cohere   = 0;  // 90°
+//
+//            // Cosine of threshold angle (max angle from forward to be seen)
+//            -0.15,    // angle_separate = ~100°
+//            -0.15,    // angle_align    = ~100°
+//            -0.15,    // angle_cohere   = ~100°
 
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20250407 boids get stuck inside cylinder
+
+        
         4,    // weight_forward
-//        23,   // weight_separate
+//        45,   // weight_separate
 //        30,   // weight_separate
-//        40,   // weight_separate
-        45,   // weight_separate
-//        12,   // weight_align
-        20,   // weight_align
-//        18,   // weight_cohere
-        27,   // weight_cohere
+        35,   // weight_separate
+//        20,   // weight_align
+        30,   // weight_align
+//        27,   // weight_cohere
+        32,   // weight_cohere
 
         75,   // weightAvoidPredict
         50,   // weightAvoidStatic
 
-//        10,   // max_dist_separate = ;
-        100,   // max_dist_separate = ;
-        100,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
-        100,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
-        
-//        // Cosine of threshold angle (max angle from forward to be seen)
-//        0,    // angle_separate = 0;  // 90°
-//        0,    // angle_align    = 0;  // 90°
-//        0,    // angle_cohere   = 0;  // 90°
+//        100,   // max_dist_separate = ;
+//        100,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
+//        100,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
+//        20,   // max_dist_separate = ;
+//        20,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
+//        20,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
+        20,   // max_dist_separate = ;
+        40,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
+        40,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
 
 //        // Cosine of threshold angle (max angle from forward to be seen)
-//        -0.3,    // angle_separate = 0;  // 90°
-//        -0.3,    // angle_align    = 0;  // 90°
-//        -0.3,    // angle_cohere   = 0;  // 90°
+//        -0.15,    // angle_separate = ~100°
+//        -0.15,    // angle_align    = ~100°
+//        -0.15,    // angle_cohere   = ~100°
 
 //        // Cosine of threshold angle (max angle from forward to be seen)
-//        -0.707,    // angle_separate = 0;  // 90°
-//        -0.707,    // angle_align    = 0;  // 90°
-//        -0.707,    // angle_cohere   = 0;  // 90°
+//        0,    // angle_separate = ~100°
+//        0.707,    // angle_align    = ~100°
+//        -0.707,    // angle_cohere   = ~100°
+
+//        // Cosine of threshold angle (max angle from forward to be seen)
+//        -0.15,    // angle_separate = ~°
+//        +0.8,    // angle_align    = ~°
+//        -0.7,    // angle_cohere   = ~°
 
         // Cosine of threshold angle (max angle from forward to be seen)
-        -0.15,    // angle_separate = ~100°
-        -0.15,    // angle_align    = ~100°
-        -0.15,    // angle_cohere   = ~100°
+        -0.7,    // angle_separate = ~°
+//        +0.8,    // angle_align    = ~°
+        +0.6,    // angle_align    = ~°
+//        -0.7,    // angle_cohere   = ~°
+        -0.1,    // angle_cohere   = ~°
 
-        
-        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         10,   // fly_away_max_dist = ;   // max fly-away dist from obstacle surface

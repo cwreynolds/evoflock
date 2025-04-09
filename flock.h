@@ -805,107 +805,6 @@ public:
 
     }
 
-    
-    //        # Register single key commands with the Open3D visualizer GUI.
-    //        def register_single_key_commands(self):
-    //            Draw.register_key_callback(ord(' '), Flock.toggle_paused_mode)
-    //            Draw.register_key_callback(ord('1'), Flock.set_single_step_mode)
-    //            Draw.register_key_callback(ord('S'), Flock.select_next_boid)
-    //            Draw.register_key_callback(ord('A'), Flock.toggle_annotation)
-    //            Draw.register_key_callback(ord('C'), Flock.toggle_tracking_camera)
-    //            Draw.register_key_callback(ord('W'), Flock.toggle_wrap_vs_avoid)
-    //            Draw.register_key_callback(ord('E'), Flock.toggle_dynamic_erase)
-    //            Draw.register_key_callback(ord('F'), Flock.toggle_fixed_time_step)
-    //            Draw.register_key_callback(ord('B'), Flock.toggle_avoid_blend_mode)
-    //            Draw.register_key_callback(ord('O'), Flock.cycle_obstacle_selection)
-    //            Draw.register_key_callback(ord('H'), Flock.print_help)
-    //
-    //        # Toggle simulation pause mode.
-    //        def toggle_paused_mode(self):
-    //            self = Flock.convert_to_flock(self)
-    //            if self.simulation_paused:
-    //                Draw.reset_timer()
-    //            self.simulation_paused = not self.simulation_paused
-    //
-    //        # Take single simulation step then enter pause mode.
-    //        def set_single_step_mode(self):
-    //            self = Flock.convert_to_flock(self)
-    //            self.single_step = True
-    //            self.simulation_paused = True
-    //
-    //        # Select the "next" boid. This gets bound to the "s" key in the interactive
-    //        # visualizer. So typing s s s will cycle through the boids of a flock.
-    //        def select_next_boid(self):
-    //            self = Flock.convert_to_flock(self)
-    //            self.selected_boid_index = ((self.selected_boid_index + 1) %
-    //                                        len(self.boids))
-    //            self.single_step_if_paused()
-    //
-    //        # Toggle drawing of annotation (lines to represent vectors) in the GUI.
-    //        def toggle_annotation(self):
-    //            self = Flock.convert_to_flock(self)
-    //            self.enable_annotation = not self.enable_annotation
-    //
-    //        # Toggle between static camera and boid-tracking camera mode.
-    //        def toggle_tracking_camera(self):
-    //            self = Flock.convert_to_flock(self)
-    //            self.tracking_camera = not self.tracking_camera
-    //            self.single_step_if_paused()
-    //
-    //        # Toggle mode for sphere-wrap-around versus sphere-avoidance.
-    //        def toggle_wrap_vs_avoid(self):
-    //            self = Flock.convert_to_flock(self)
-    //            self.wrap_vs_avoid = not self.wrap_vs_avoid
-    //
-    //        # Toggle mode for erasing dynamic graphics ("spacetime boid worms").
-    //        def toggle_dynamic_erase(self):
-    //            self = Flock.convert_to_flock(self)
-    //            Draw.clear_dynamic_mesh = not Draw.clear_dynamic_mesh
-    //            if self.tracking_camera and not Draw.clear_dynamic_mesh:
-    //                print('!!! "spacetime boid worms" do not work correctly with ' +
-    //                      'boid tracking camera mode ("C" key). Awaiting fix for ' +
-    //                      'Open3D bug 6009.')
-    //
-    //        # Toggle between realtime/as-fast-as-possible versus fixed time step of 1/60
-    //        def toggle_fixed_time_step(self):
-    //            self = Flock.convert_to_flock(self)
-    //            self.fixed_time_step = not self.fixed_time_step
-    //
-    //        # Toggle between blend/hard-switch for obstacle avoidance.
-    //        def toggle_avoid_blend_mode(self):
-    //            self = Flock.convert_to_flock(self)
-    //            self.avoid_blend_mode = not self.avoid_blend_mode
-    //            print('    Flock.avoid_blend_mode =', self.avoid_blend_mode)
-    //
-    //        # Cycle through various pre-defined combinations of Obstacle types.
-    //        def cycle_obstacle_selection(self):
-    //            self = Flock.convert_to_flock(self)
-    //            # Remove geometry of current Obstacles from Open3D scene.
-    //            if Draw.enable:
-    //                for o in self.obstacles:
-    //                    Draw.vis.remove_geometry(o.tri_mesh, False)
-    //            # Set Obstacle list to next preset combination.
-    //            next_set = self.obstacle_selection_counter % len(self.obstacle_presets)
-    //            self.obstacle_selection_counter += 1
-    //            self.obstacles = self.obstacle_presets[next_set]
-    //            # Add geometry of current obstacles to Open3D scene.
-    //            if Draw.enable:
-    //                for o in self.obstacles:
-    //                    o.draw()
-    //                    if o.tri_mesh: # TODO only need until all Obstacles draw themselves.
-    //                        Draw.vis.add_geometry(o.tri_mesh, False)
-    //            # Print description of current Obstacle set.
-    //            description = '\n  obstacles: '
-    //            if self.obstacles:
-    //                seperator = ''
-    //                for o in self.obstacles:
-    //                    description += seperator + str(o)
-    //                    seperator = ', '
-    //            else:
-    //                description += 'none'
-    //            print(description + '\n')
-
-
     // Define several sets of obstacles, to allow interactively switching
     // between them, and making one active.
     // TODO this architecture is left over from the Python version and may need
@@ -917,18 +816,20 @@ public:
             ObstaclePtrList obs;
             double sr = fp().sphereRadius();
             Vec3 sc = fp().sphereCenter();
+            auto iside = Obstacle::inside;
+            auto oside = Obstacle::outside;
 
             // Set 0: sphere and right hand vertical cylinder.
             obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
+            obs.push_back(new SphereObstacle(sr, sc, oside));
             Vec3 ect = sc + Vec3(sr * 0.6, sr, 0);
             Vec3 ecb = sc + Vec3(sr * 0.6, -sr, 0);
-            obs.push_back(new CylinderObstacle(sr * 0.2, ect, ecb, Obstacle::inside));
+            obs.push_back(new CylinderObstacle(sr * 0.2, ect, ecb, iside));
             obstacle_presets_.push_back(obs);
             
             // Set 1: sphere and 6 cylinders.
             obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
+            obs.push_back(new SphereObstacle(sr, sc, oside));
             // 6 symmetric cylinders parallel to main axes.
             double c6r = sr *  4 / 30;
             double c6o = sr * 15 / 30;
@@ -936,7 +837,7 @@ public:
             auto add_3_cyl = [&](double c6o)
             {
                 auto add_cyl = [&](double r, Vec3 t, Vec3 b)
-                    { obs.push_back(new CylinderObstacle(r, t, b)); };
+                    { obs.push_back(new CylinderObstacle(r, t, b, iside)); };
                 add_cyl(c6r, Vec3(-c6h, 0, c6o), Vec3(c6h, 0, c6o));
                 add_cyl(c6r, Vec3(c6o, -c6h, 0), Vec3(c6o, c6h, 0));
                 add_cyl(c6r, Vec3(0, c6o, -c6h), Vec3(0, c6o, c6h));
@@ -947,18 +848,18 @@ public:
             
             // Set 2 sphere and horizontal plane
             obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
+            obs.push_back(new SphereObstacle(sr, sc, oside));
             obs.push_back(new PlaneObstacle(Vec3(0, 1, 0), sc, sr, sr * 0.001));
             obstacle_presets_.push_back(obs);
             
             // Set 3 just the big sphere.
             obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
+            obs.push_back(new SphereObstacle(sr, sc, oside));
             obstacle_presets_.push_back(obs);
 
             // Set 4 -- 35 random spheres
             obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
+            obs.push_back(new SphereObstacle(sr, sc, oside));
             int count = 35;
             std::vector<double> radii;
             for (int i = 0; i < count; i++)
@@ -968,26 +869,17 @@ public:
             double m = 4;  // margin between spheres.
             int t = 4000;  // max retries.
             auto centers = shape::arrangeNonOverlappingSpheres(radii, m, sr, t);
-            auto ins = Obstacle::inside;
             for (int i = 0; i < count; i++)
             {
-                obs.push_back(new SphereObstacle(radii[i], centers[i], ins));
+                obs.push_back(new SphereObstacle(radii[i], centers[i], iside));
             }
             obstacle_presets_.push_back(obs);
 
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250125 debugging "non-everted" sphere obstacle.
-            
             // Set 5 -- one sphere inside another
-            //
-            // The boids should be inside the big sphere and outside the little
-            // one. Instead they are all inside the little one.
-
             obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, Obstacle::outside));
-            obs.push_back(new SphereObstacle(12, sc, Obstacle::inside));
+            obs.push_back(new SphereObstacle(sr, sc, oside));
+            obs.push_back(new SphereObstacle(12, sc, iside));
             obstacle_presets_.push_back(obs);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             // Set initial obstacle set to the default.
             draw().obstacleSetIndex() = default_obstacle_set_index_;

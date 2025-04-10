@@ -100,59 +100,148 @@ public:
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20250407 boids get stuck inside cylinder
 
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20250409 adjust hand_tuned_parameters after fixing ExcludeFrom.
+
+//            4,    // weight_forward
+//    //        45,   // weight_separate
+//    //        30,   // weight_separate
+//            35,   // weight_separate
+//    //        20,   // weight_align
+//            30,   // weight_align
+//    //        27,   // weight_cohere
+//            32,   // weight_cohere
+//
+//            75,   // weightAvoidPredict
+//            50,   // weightAvoidStatic
+//
+//    //        100,   // max_dist_separate = ;
+//    //        100,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
+//    //        100,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
+//    //        20,   // max_dist_separate = ;
+//    //        20,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
+//    //        20,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
+//            20,   // max_dist_separate = ;
+//            40,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
+//            40,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
+//
+//    //        // Cosine of threshold angle (max angle from forward to be seen)
+//    //        -0.15,    // angle_separate = ~100°
+//    //        -0.15,    // angle_align    = ~100°
+//    //        -0.15,    // angle_cohere   = ~100°
+//
+//    //        // Cosine of threshold angle (max angle from forward to be seen)
+//    //        0,    // angle_separate = ~100°
+//    //        0.707,    // angle_align    = ~100°
+//    //        -0.707,    // angle_cohere   = ~100°
+//
+//    //        // Cosine of threshold angle (max angle from forward to be seen)
+//    //        -0.15,    // angle_separate = ~°
+//    //        +0.8,    // angle_align    = ~°
+//    //        -0.7,    // angle_cohere   = ~°
+//
+//            // Cosine of threshold angle (max angle from forward to be seen)
+//            -0.7,    // angle_separate = ~°
+//    //        +0.8,    // angle_align    = ~°
+//            +0.6,    // angle_align    = ~°
+//    //        -0.7,    // angle_cohere   = ~°
+//            -0.1,    // angle_cohere   = ~°
+
+//            4,    // weight_forward
+//    //        35,   // weight_separate
+//            40,   // weight_separate
+//    //        30,   // weight_align
+//            45,   // weight_align
+//    //        32,   // weight_cohere
+//    //        40,   // weight_cohere
+//    //        35,   // weight_cohere
+//    //        40,   // weight_cohere
+//            35,   // weight_cohere
+//
+//    //        75,   // weightAvoidPredict
+//    //        50,   // weightAvoidStatic
+//            85,   // weightAvoidPredict
+//            50,   // weightAvoidStatic
+//
+//    //        20,   // max_dist_separate = ;
+//            15,   // max_dist_separate = ;
+//            40,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
+//            40,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
+//
+//            // Cosine of threshold angle (max angle from forward to be seen)
+//    //        -0.7,    // angle_separate = ~°
+//            -1,    // angle_separate = ~°
+//            +0.6,    // angle_align    = ~°
+//    //        -0.1,    // angle_cohere   = ~°
+//    //        -0.7,    // angle_cohere   = ~°
+//            -0.4,    // angle_cohere   = ~°
+//
+//
+//            10,   // fly_away_max_dist = ;   // max fly-away dist from obstacle surface
+//
+//            // Ignore obstacle until predicted impact is less than this many seconds.
+//    //        0.9,  // min_time_to_collide
+//            1.2,  // min_time_to_collide
+
         
+        
+//            4,    // weight_forward
+//            40,   // weight_separate
+//            45,   // weight_align
+//            35,   // weight_cohere
+//
+//            85,   // weightAvoidPredict
+//    //        50,   // weightAvoidStatic
+//            55,   // weightAvoidStatic
+//
+//            15,   // max_dist_separate = ;
+//            40,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
+//            40,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
+//
+//            // Cosine of threshold angle (max angle from forward to be seen)
+//            -1,    // angle_separate = ~°
+//            +0.6,    // angle_align    = ~°
+//            -0.4,    // angle_cohere   = ~°
+//
+//            10,   // fly_away_max_dist = ;   // max fly-away dist from obstacle surface
+//
+//            // Ignore obstacle until predicted impact is less than this many seconds.
+//    //        1.2,  // min_time_to_collide
+//            1.4,  // min_time_to_collide
+
+        // Weights for component steering behaviors.
         4,    // weight_forward
-//        45,   // weight_separate
-//        30,   // weight_separate
-        35,   // weight_separate
-//        20,   // weight_align
-        30,   // weight_align
-//        27,   // weight_cohere
-        32,   // weight_cohere
+        40,   // weight_separate
+        45,   // weight_align
+        35,   // weight_cohere
 
-        75,   // weightAvoidPredict
-        50,   // weightAvoidStatic
+        85,   // weightAvoidPredict
+        55,   // weightAvoidStatic
 
-//        100,   // max_dist_separate = ;
-//        100,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
-//        100,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
-//        20,   // max_dist_separate = ;
-//        20,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
-//        20,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
-        20,   // max_dist_separate = ;
-        40,  // max_dist_align    = ;  // TODO 20231017 should this be ∞ or
-        40,  // max_dist_cohere   = ;  //      should the behavior just ignore it?
-
-//        // Cosine of threshold angle (max angle from forward to be seen)
-//        -0.15,    // angle_separate = ~100°
-//        -0.15,    // angle_align    = ~100°
-//        -0.15,    // angle_cohere   = ~100°
-
-//        // Cosine of threshold angle (max angle from forward to be seen)
-//        0,    // angle_separate = ~100°
-//        0.707,    // angle_align    = ~100°
-//        -0.707,    // angle_cohere   = ~100°
-
-//        // Cosine of threshold angle (max angle from forward to be seen)
-//        -0.15,    // angle_separate = ~°
-//        +0.8,    // angle_align    = ~°
-//        -0.7,    // angle_cohere   = ~°
+        // Max distance at which a neighbor Boid influences a steering behavior.
+        // (TODO would prefer parameterization with infinite support (1/d^n ?))
+        15,   // max_dist_separate
+        40,   // max_dist_align
+        40,   // max_dist_cohere
 
         // Cosine of threshold angle (max angle from forward to be seen)
-        -0.7,    // angle_separate = ~°
-//        +0.8,    // angle_align    = ~°
-        +0.6,    // angle_align    = ~°
-//        -0.7,    // angle_cohere   = ~°
-        -0.1,    // angle_cohere   = ~°
+        -1,    // angle_separate = ~°
+        +0.6,  // angle_align    = ~°
+        -0.4,  // angle_cohere   = ~°
 
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        10,   // fly_away_max_dist = ;   // max fly-away dist from obstacle surface
+        // Max distance at which a boid flies away from an obstacle's surface.
+        10,    // fly_away_max_dist = ;
                 
         // Ignore obstacle until predicted impact is less than this many seconds.
-        0.9,  // min_time_to_collide
+        // Predict obstacle collisions only...
+        // ...should this be renamed
+        1.4,   // min_time_to_collide
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     };
 

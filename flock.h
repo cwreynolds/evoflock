@@ -57,14 +57,14 @@ private:
     static inline int obstacle_selection_counter_ = -1;
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250407 boids get stuck inside cylinder
+    // TODO 20250409 adjust hand_tuned_parameters after fixing ExcludeFrom.
 
     // Index of the initial/default obstacle set.
     //int default_obstacle_set_index_ = 0;  // Sphere and vertical cylinder.
-    int default_obstacle_set_index_ = 1;  // Sphere and 6 cylinders.
+    //int default_obstacle_set_index_ = 1;  // Sphere and 6 cylinders.
     //int default_obstacle_set_index_ = 2;  // Sphere and plane.
     //int default_obstacle_set_index_ = 3;  // Sphere only.
-    //int default_obstacle_set_index_ = 4;  // Sphere and many little spheres.
+    int default_obstacle_set_index_ = 4;  // Sphere and many little spheres.
     //int default_obstacle_set_index_ = 5;  // Sphere with smaller sphere inside.
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
@@ -833,7 +833,13 @@ public:
             // 6 symmetric cylinders parallel to main axes.
             double c6r = sr *  4 / 30;
             double c6o = sr * 15 / 30;
-            double c6h = sr * 20 / 30;
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20250409 adjust hand_tuned_parameters after fixing ExcludeFrom.
+//            double c6h = sr * 20 / 30;
+            double c6h = 50;
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
             auto add_3_cyl = [&](double c6o)
             {
                 auto add_cyl = [&](double r, Vec3 t, Vec3 b)

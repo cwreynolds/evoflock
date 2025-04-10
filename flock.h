@@ -338,11 +338,6 @@ public:
             std::cout << std::endl;
         }
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250314 terminate run at 2000 steps: counting obstacle collisions
-        if (2000 == aTimer().frameCounter()) { exit(EXIT_SUCCESS); }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         collect_flock_metrics();
     }
         

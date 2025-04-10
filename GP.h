@@ -186,15 +186,11 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 // Initialize basic run parameters of Flock object
 inline void init_flock(Flock& flock)
 {
-    flock.set_boid_count(200);
     flock.set_fixed_fps(30);
     flock.set_fixed_time_step(true);
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250221 tracking obstacle collisions
-//    flock.set_max_simulation_steps(500);  // 20240513: was 1000 before.
-    flock.set_max_simulation_steps(10000);  // keep running, for demo
-    debugPrint(flock.max_simulation_steps());
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    flock.set_boid_count(flock.fp().boidsPerFlock());
+    flock.set_max_simulation_steps(flock.fp().maxSimulationSteps());
+    debugPrint(flock.max_simulation_steps());  // TODO remove
     flock.setLogStatInterval(flock.max_simulation_steps());
     flock.log_prefix = "    ";
 }
@@ -611,15 +607,9 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                     "Real_0_100",  // weight_separate
                     "Real_0_100",  // weight_align
                     "Real_0_100",  // weight_cohere
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
-
-//                    "Real_0_100",  // weight_avoid
 
                     "Real_0_100",  // weightAvoidPredict
                     "Real_0_100",  // weightAvoidStatic
-
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                     "Real_0_100",  // max_dist_separate
                     "Real_0_100",  // max_dist_align
@@ -683,12 +673,8 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
             handmade_helper(weightSeparate),
             handmade_helper(weightAlign),
             handmade_helper(weightCohere),
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
-//            handmade_helper(weightAvoid),
             handmade_helper(weightAvoidPredict),
             handmade_helper(weightAvoidStatic),
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             handmade_helper(maxDistSeparate),
             handmade_helper(maxDistAlign),
             handmade_helper(maxDistCohere),
@@ -719,12 +705,8 @@ LP::FunctionSet evoflock_ga_function_set_handmade()
                     "weightSeparate",
                     "weightAlign",
                     "weightCohere",
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20250403 FlockParameters explicit static_avoid/predict_avoid weights
-//                    "weightAvoid",
                     "weightAvoidPredict",
                     "weightAvoidStatic",
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                     "maxDistSeparate",
                     "maxDistAlign",

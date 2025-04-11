@@ -615,10 +615,13 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                     "Real_0_100",  // max_dist_align
                     "Real_0_100",  // max_dist_cohere
 
-                    "Real_0_10",   // exponent_separate
-                    "Real_0_10",   // exponent_align
-                    "Real_0_10",   // exponent_cohere
-                    
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+                    // TODO 20250411 stop using only hand-tuned function set.
+//                    "Real_0_10",   // exponent_separate
+//                    "Real_0_10",   // exponent_align
+//                    "Real_0_10",   // exponent_cohere
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
                     // Cosine of threshold angle (max angle from forward to be seen)
                     "Real_m1_p1",  // angle_separate
                     "Real_m1_p1",  // angle_align

@@ -346,7 +346,7 @@ public:
             std::cout << "No function or ephemeral constant found for GpType ";
             std::cout << return_type.name() << " remaining size: " << max_size;
             std::cout << std::endl;
-            exit(EXIT_FAILURE);
+            assert(false);
         }
     }
 

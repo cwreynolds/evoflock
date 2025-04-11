@@ -11,10 +11,10 @@
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20241203 use default FlockParameters for testing
-#define    USE_DEFAULT_FP
-#ifdef     USE_DEFAULT_FP
-#else   // USE_DEFAULT_FP
-#endif  // USE_DEFAULT_FP
+//#define    USE_DEFAULT_FP
+//#ifdef     USE_DEFAULT_FP
+//#else   // USE_DEFAULT_FP
+//#endif  // USE_DEFAULT_FP
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -219,8 +219,16 @@ int main(int argc, const char * argv[])
     //    int min_tree_size = Boid::GP_not_GA ? 20  :  2;
     //    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
     
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250411 stop using only hand-tuned function set.
+    
+    int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
+    debugPrint(ga_tree_size);
+
     int min_crossover_tree_size = Boid::GP_not_GA ? 20 :  2;
-    int max_crossover_tree_size = Boid::GP_not_GA ? 60 : 20;
+    int max_crossover_tree_size = Boid::GP_not_GA ? 60 : ga_tree_size;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240720 did I make this too large?
     
@@ -235,11 +243,22 @@ int main(int argc, const char * argv[])
 //    // 20240722
 //    int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
     
-    // TODO 20240805 testing with Be_The_Boid
-    int max_initial_tree_size   = Boid::GP_not_GA ? 2 : 20;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250411 stop using only hand-tuned function set.
 
+//    // TODO 20240805 testing with Be_The_Boid
+//    int max_initial_tree_size   = Boid::GP_not_GA ? 2 : 20;
+    
+    // TODO 20250411 stop using only hand-tuned function set.
+    // use of 2 for Boid::GP_not_GA seems oddly small, but I'll leave it for now
+    // Also the GA size should not be an inline constant that needs to be
+    // tracked down, as now, when the FlockParameters set gets larger.
+    int max_initial_tree_size   = Boid::GP_not_GA ? 2 : ga_tree_size;
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 

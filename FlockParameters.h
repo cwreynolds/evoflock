@@ -29,7 +29,11 @@ public:
     // Shared const/input parameters. Perhaps eventually include max sim steps,
     // obstacle set, etc.? Be sure to update constParameterCount() when const
     // parameters are added or removed.
-    static size_t constParameterCount() { return 6; }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250411 stop using only hand-tuned function set.
+//    static size_t constParameterCount() { return 6; }
+    static int constParameterCount() { return 6; }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // "assume a spherical boid" unit diameter
     double bodyDiameter() const { return body_diameter_; }
     // Should this be called "world radius"?
@@ -177,15 +181,29 @@ public:
         setInitSpeed(util::clip(initSpeed(), minSpeed(), maxSpeed()));
     }
     
-    // The count(/size) of tunable parameters in this class.
-    static size_t tunableParameterCount() {return hand_tuned_parameters.size();}
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250411 stop using only hand-tuned function set.
 
+//    // The count(/size) of tunable parameters in this class.
+//    static size_t tunableParameterCount() {return hand_tuned_parameters.size();}
+//
+//    // The count(/size) of ALL parameters in this class.
+//    static size_t parameterCount()
+//    {
+//        return constParameterCount() + tunableParameterCount();
+//    }
+
+    // The count(/size) of tunable parameters in this class.
+    static int tunableParameterCount(){return int(hand_tuned_parameters.size());}
+    
     // The count(/size) of ALL parameters in this class.
-    static size_t parameterCount()
+    static int parameterCount()
     {
         return constParameterCount() + tunableParameterCount();
     }
-    
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     void print() const
     {
         assert(tuning_parameters.size() == tunableParameterCount());
@@ -229,8 +247,9 @@ private:
     double body_diameter_ = 1;
     double sphere_radius_ = 50;
     Vec3 sphere_center_;
-//    int max_simulation_steps_ = 500;
-    int max_simulation_steps_ = 2000;
+    int max_simulation_steps_ = 500;    // ~8 seconds: for evolution run
+//    int max_simulation_steps_ = 2000;   // ~33 seconds: for obs collision test
+//    int max_simulation_steps_ = 18000;  // 5 minutes for demo mode
     int boids_per_flock_ = 200;
     std::string use_obstacle_set = "Sphere";
 };

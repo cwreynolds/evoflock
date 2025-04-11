@@ -103,7 +103,8 @@ public:
     void print() const
     {
         std::cout << "GpFunction: " << name() << ", return_type: ";
-        std::cout << returnTypeName() << ", parameters: (";
+        std::cout << returnTypeName() << ", ";
+        std::cout << parameterTypes().size() << " parameters: (";
         bool comma = false;
         for (int i = 0; i < parameterTypes().size(); i ++)
         {

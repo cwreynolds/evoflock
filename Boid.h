@@ -635,9 +635,18 @@ public:
         std::ranges::sort(predicted_obstacle_collisions_, sorted);
     }
 
-    // TODO / TEMP? / rename?
-    // Total count of all obstacle collisions during the lifetime of this Boid.
-    int temp_obs_collision_count = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250412 update GA fitness function
+
+private:
+    // Count of all obstacle collisions during the lifetime of this Boid.
+    int obs_collision_count_ = 0;
+public:
+    int getObsCollisionCount() const { return obs_collision_count_; }
+    void setObsCollisionCount(int occ) { obs_collision_count_ = occ; }
+    void incObsCollisionCount() { obs_collision_count_++; }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Test this Boid against each Obstacle in the scene. If it has violated the
     // Obstacle's constraint -- for example crashed through the surface into the
@@ -654,7 +663,10 @@ public:
             if (ec != position())
             {
                 // Count collision, set speed to zero, clear smoothing history.
-                temp_obs_collision_count++;
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250412 update GA fitness function
+                incObsCollisionCount();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 setSpeed(0);
                 resetSteerUpMemories();
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -671,6 +683,18 @@ public:
             }
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250412 update GA fitness function
+    
+    // Returns distance from this Boid to its nearest neighbor, center to center.
+    double distanceToNearestNeighbor() const
+    {
+        Boid* nearest_neighbor = cached_nearest_neighbors().at(0);
+        return (position() - nearest_neighbor->position()).length();
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Only used for debugging, to to pick out one boid to track/log/whatever.
     bool is_first_boid() const { return this == flock_boids().at(0); }

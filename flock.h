@@ -328,19 +328,82 @@ public:
         // TODO 20250305 TEMP, should be moved to Flock::log_stats() or etc.
         if (0 == (aTimer().frameCounter() % 100))
         {
-            int collision_counter = 0;
-            auto t=[&](Boid* b){collision_counter+=b->temp_obs_collision_count;};
-            for_all_boids(t);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250412 update GA fitness function
             std::cout << "step: ";
             std::cout << aTimer().frameCounter() << ", ";
             std::cout << "obstacle collision: ";
-            std::cout << collision_counter;
+            std::cout << countTotalObstacleCollisions();
             std::cout << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         
         collect_flock_metrics();
-    }
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250412 update GA fitness function
+        recordSeparationScorePerStep();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250412 update GA fitness function
+    
+    // Count all recorded obstacle collisions, summing over all Boids.
+    int countTotalObstacleCollisions() const
+    {
+        int sum = 0;
+        for (auto b : boids()) { sum += b->getObsCollisionCount(); }
+        return sum;
+    }
+    
+    // Return a unit fitness component: quality of obstacle avoidance.
+    double obstacleCollisionsScore() const
+    {
+        double count = countTotalObstacleCollisions();
+        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+        return util::remap_interval_clip(count,  0, boid_steps / 100,  1, 0);
+    }
+    
+private:
+    double separation_score_sum_ = 0;
+public:
+    
+    // Called each simulation step, records stats for the separation score.
+    void recordSeparationScorePerStep()
+    {
+        for (auto b : boids())
+        {
+            double distance = b->distanceToNearestNeighbor();
+            double score = 0;
+            
+            if (util::between(distance, 1, 3))
+            {
+                score = util::remap_interval(distance, 1, 3, 0, 1);
+            }
+            else if (util::between(distance, 3, 5))
+            {
+                score = 1;
+            }
+            else if (util::between(distance, 5, 10))
+            {
+                score = util::remap_interval(distance, 5, 10, 1, 0);
+            }
+
+            separation_score_sum_ += score;
+        }
+    }
+    
+    // Return a unit fitness component: maintaining proper separation distance.
+    double separationScore() const
+    {
+        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+        return separation_score_sum_ / boid_steps;
+    }
+
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.
     void enforceObsBoidConstraints()
@@ -354,10 +417,15 @@ public:
     {
         auto enforce_one_boid_do_not_count = [&](Boid* b)
         {
-            int preserve_collision_count = b->temp_obs_collision_count;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250412 update GA fitness function
+            
+            int preserve_collision_count = b->getObsCollisionCount();
             b->enforceObstacleConstraint();
-            b->temp_obs_collision_count = preserve_collision_count;
+            b->setObsCollisionCount(preserve_collision_count);
             b->setSpeed(0);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         };
         for_all_boids(enforce_one_boid_do_not_count);
     }

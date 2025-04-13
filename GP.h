@@ -67,21 +67,24 @@ inline double scalarize_fitness_length(MOF mof)
     return (std::sqrt(length_sq) / std::sqrt(mof.size()));
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250412 update GA fitness function
+
+
 // Take the hypervolume of MultiObjectiveFitness elements (basically product).
 inline double scalarize_fitness_hyperVolume(MOF mof)
 {
-    return mof.hyperVolume();
+//    return mof.hyperVolume();
+    return util::clip01(mof.hyperVolume() + (EF::RS().frandom01() * 0.01));
 }
 
 // Map a MultiObjectiveFitness to a scalar. Used as the FitnessScalarizeFunction
 // for Population::evolutionStep(). Usually one of scalarize_fitness_min(),
 // scalarize_fitness_prod(), or scalarize_fitness_length();
+//inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
+inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
 
-inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 
-//inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
-
-// 20240802
 inline std::vector<std::string> mof_names()
 {
     return (Boid::GP_not_GA ?
@@ -96,92 +99,22 @@ inline std::vector<std::string> mof_names()
                                      }) :
             std::vector<std::string>(
                                      {
-                                         // 20240813:
-                                         //                                         "separate",
-                                         //                                         "avoid",
-                                         //                                         "cohere",
                                          "avoid",
                                          "separate",
-                                         "cohere",
-                                         "cluster",
-                                         "occupied",
                                      }));
 }
 
+
+// After a Flock's simulation has been run, it is passed here to build its multi
+// objective fitness object from metrics saved inside the Flock object.
 inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 {
-    double separate = flock.get_separation_score();
-    double avoid = flock.get_avoid_obstacle_score();
-    double cohere = flock.get_cohere_score();
-    double cluster = flock.get_cluster_score();
-    // double curvature = flock.get_curvature_score();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240710 change speed fitness back to fraction of speed-ok chunks.
-    // double speed = flock.get_gp_speed_score();
-    // double speed = flock.get_speed_score();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    auto ignore_function = [](Vec3 p) { return p.length() > 50;};
-    double occupy = flock.occupancy_map.fractionOccupied(ignore_function);
-    
-    return (Boid::GP_not_GA ?
-            MOF(
-                {
-                    // 20240802
-                    avoid,
-                    separate,
-                    cohere,
-                    cluster,
-                    occupy,
-                    
-                }) :
-            MOF(
-                {
-                    //                    // 20240723
-                    //                    separate,
-                    //                    avoid,
-                    //                    cohere,
-                    //                    // cluster,
-                    //                    // curvature,
-                    //                    // occupy,
-                    
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20241204 why are all GP fitnesses {0, 0, 0, 0, 0}?
-                    
-#ifdef     PREVENT_0_FITNESS
-                    
-                    // 20241204:
-                    //                    util::clip01(avoid    + EF::RS().random2(0.0, 0.01)),
-                    //                    util::clip01(separate + EF::RS().random2(0.0, 0.01)),
-                    //                    util::clip01(cohere   + EF::RS().random2(0.0, 0.01)),
-                    //                    util::clip01(cluster  + EF::RS().random2(0.0, 0.01)),
-                    //                    util::clip01(occupy   + EF::RS().random2(0.0, 0.01)),
-                    
-                    //                    std::max(0.01, avoid),
-                    //                    std::max(0.01, separate),
-                    //                    std::max(0.01, cohere),
-                    //                    std::max(0.01, cluster),
-                    //                    std::max(0.01, occupy),
-                    
-                    std::max(EF::RS().random2(0.001, 0.01), avoid),
-                    std::max(EF::RS().random2(0.001, 0.01), separate),
-                    std::max(EF::RS().random2(0.001, 0.01), cohere),
-                    std::max(EF::RS().random2(0.001, 0.01), cluster),
-                    std::max(EF::RS().random2(0.001, 0.01), occupy),
-                    
-#else   // PREVENT_0_FITNESS
-                    
-                    // 20240813:
-                    avoid,
-                    separate,
-                    cohere,
-                    cluster,
-                    occupy,
-                    
-#endif  // PREVENT_0_FITNESS
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                })
-            );
+    MOF mof({ flock.obstacleCollisionsScore(), flock.separationScore() });
+    return mof;
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 // Initialize basic run parameters of Flock object
 inline void init_flock(Flock& flock)
@@ -614,13 +547,6 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                     "Real_0_100",  // max_dist_separate
                     "Real_0_100",  // max_dist_align
                     "Real_0_100",  // max_dist_cohere
-
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-                    // TODO 20250411 stop using only hand-tuned function set.
-//                    "Real_0_10",   // exponent_separate
-//                    "Real_0_10",   // exponent_align
-//                    "Real_0_10",   // exponent_cohere
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
                     // Cosine of threshold angle (max angle from forward to be seen)
                     "Real_m1_p1",  // angle_separate

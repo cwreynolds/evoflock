@@ -26,14 +26,10 @@
 class FlockParameters
 {
 public:
-    // Shared const/input parameters. Perhaps eventually include max sim steps,
-    // obstacle set, etc.? Be sure to update constParameterCount() when const
-    // parameters are added or removed.
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250411 stop using only hand-tuned function set.
-//    static size_t constParameterCount() { return 6; }
+    // Shared const/input parameters. These are not subject to optimization and
+    // remain fixed during evolution run. MUST update constParameterCount() when
+    // const parameters are added or removed.
     static int constParameterCount() { return 6; }
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // "assume a spherical boid" unit diameter
     double bodyDiameter() const { return body_diameter_; }
     // Should this be called "world radius"?
@@ -180,18 +176,6 @@ public:
         setMinSpeed(std::max(a, b));
         setInitSpeed(util::clip(initSpeed(), minSpeed(), maxSpeed()));
     }
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250411 stop using only hand-tuned function set.
-
-//    // The count(/size) of tunable parameters in this class.
-//    static size_t tunableParameterCount() {return hand_tuned_parameters.size();}
-//
-//    // The count(/size) of ALL parameters in this class.
-//    static size_t parameterCount()
-//    {
-//        return constParameterCount() + tunableParameterCount();
-//    }
 
     // The count(/size) of tunable parameters in this class.
     static int tunableParameterCount(){return int(hand_tuned_parameters.size());}
@@ -201,8 +185,6 @@ public:
     {
         return constParameterCount() + tunableParameterCount();
     }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     void print() const
     {

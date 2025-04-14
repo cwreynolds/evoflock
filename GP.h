@@ -67,15 +67,15 @@ inline double scalarize_fitness_length(MOF mof)
     return (std::sqrt(length_sq) / std::sqrt(mof.size()));
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250412 update GA fitness function
-
-
 // Take the hypervolume of MultiObjectiveFitness elements (basically product).
 inline double scalarize_fitness_hyperVolume(MOF mof)
 {
-//    return mof.hyperVolume();
-    return util::clip01(mof.hyperVolume() + (EF::RS().frandom01() * 0.01));
+    // Changed 20250412 to never give zero result
+    //return mof.hyperVolume();
+    //return util::clip01(mof.hyperVolume() + (EF::RS().frandom01() * 0.01));
+    
+    double random_floor = EF::RS().frandom01() * 0.01;
+    return std::max(mof.hyperVolume(), random_floor);
 }
 
 // Map a MultiObjectiveFitness to a scalar. Used as the FitnessScalarizeFunction
@@ -113,9 +113,6 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
     return mof;
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 // Initialize basic run parameters of Flock object
 inline void init_flock(Flock& flock)
 {
@@ -123,7 +120,6 @@ inline void init_flock(Flock& flock)
     flock.set_fixed_time_step(true);
     flock.set_boid_count(flock.fp().boidsPerFlock());
     flock.set_max_simulation_steps(flock.fp().maxSimulationSteps());
-    debugPrint(flock.max_simulation_steps());  // TODO remove
     flock.setLogStatInterval(flock.max_simulation_steps());
     flock.log_prefix = "    ";
 }

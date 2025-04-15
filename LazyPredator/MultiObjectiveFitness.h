@@ -44,39 +44,26 @@ public:
     std::string to_string() const { return vec_to_string(mof_); }
     const std::vector<double> as_vector() const { return mof_; }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240718 experiment using "hypervolume" as metric for TG
-    //               try to refactor like product()
+    // TODO 20250414 refactor/simplify evolutionStep() for MultiObjectiveFitness
+
+//    double hyperVolume() const
+//    {
+//        double volume = 1;
+//        double min = 0.01;
+//        for (auto& o : mof_) { assert(util::between(o, 0.0, 1.0)); }
+//        for (auto& o : mof_) { volume *= std::max(o, min); }
+//        return volume;
+//    }
+
     double hyperVolume() const
     {
         double volume = 1;
-        double min = 0.01;
+        double min = LPRS().frandom01() * 0.01;
         for (auto& o : mof_) { assert(util::between(o, 0.0, 1.0)); }
         for (auto& o : mof_) { volume *= std::max(o, min); }
         return volume;
     }
-    
 
-//    // TODO 20240719 experimental variation of hyperVolume()
-//    // This did not seem to fix the run of failed sims, so probably not worth keeping
-//    
-//    // Like hyperVolume() (floored product) but occasionally sets the max MOF
-//    // element to zero.
-//    double hyperVolumeDropout() const
-//    {
-//        double volume = hyperVolume();
-//        if (LPRS().randomBool(0.25))
-//        {
-//            MultiObjectiveFitness mof = *this;
-//            for (int i = 0; i < mof.size(); i++)
-//            {
-//                if(mof.at(i) == mof.max()){ mof.at(i) = 0; }
-//            }
-//            volume = mof.hyperVolume();
-//        }
-//        return volume;
-//    }
-//
-    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Are all scalar fitness components on the range [0,1]?

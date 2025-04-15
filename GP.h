@@ -67,16 +67,27 @@ inline double scalarize_fitness_length(MOF mof)
     return (std::sqrt(length_sq) / std::sqrt(mof.size()));
 }
 
-// Take the hypervolume of MultiObjectiveFitness elements (basically product).
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250414 refactor/simplify evolutionStep() for MultiObjectiveFitness
+
+//    // Take the hypervolume of MultiObjectiveFitness elements (basically product).
+//    inline double scalarize_fitness_hyperVolume(MOF mof)
+//    {
+//        // Changed 20250412 to never give zero result
+//        //return mof.hyperVolume();
+//        //return util::clip01(mof.hyperVolume() + (EF::RS().frandom01() * 0.01));
+//
+//        double random_floor = EF::RS().frandom01() * 0.01;
+//        return std::max(mof.hyperVolume(), random_floor);
+//    }
+
+// Take hypervolume (basically the product) of MultiObjectiveFitness elements.
 inline double scalarize_fitness_hyperVolume(MOF mof)
 {
-    // Changed 20250412 to never give zero result
-    //return mof.hyperVolume();
-    //return util::clip01(mof.hyperVolume() + (EF::RS().frandom01() * 0.01));
-    
-    double random_floor = EF::RS().frandom01() * 0.01;
-    return std::max(mof.hyperVolume(), random_floor);
+    return mof.hyperVolume();
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Map a MultiObjectiveFitness to a scalar. Used as the FitnessScalarizeFunction
 // for Population::evolutionStep(). Usually one of scalarize_fitness_min(),
@@ -468,9 +479,9 @@ inline void evoflock_ga_crossover(const LP::GpTree& parent0,
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241203 use default FlockParameters for testing
-    std::cout << "parent0:   " << parent0.to_string()   << std::endl;
-    std::cout << "parent1:   " << parent1.to_string()   << std::endl;
-    std::cout << "offspring: " << offspring.to_string() << std::endl;
+    //std::cout << "parent0:   " << parent0.to_string()   << std::endl;
+    //std::cout << "parent1:   " << parent1.to_string()   << std::endl;
+    //std::cout << "offspring: " << offspring.to_string() << std::endl;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 

@@ -190,18 +190,27 @@ int main(int argc, const char * argv[])
 //    int subpops = 22;
 //    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
 
-    // 20240810
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241203 use default FlockParameters for testing
-//    int individuals = 500;
-//    int subpops = 22;
-    
-//    int individuals = 10;
-    int individuals = 20;
+//        // 20240810
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20241203 use default FlockParameters for testing
+//    //    int individuals = 500;
+//    //    int subpops = 22;
+//
+//    //    int individuals = 10;
+//        int individuals = 20;
+//
+//    //    int subpops = 1;
+//        int subpops = 3;
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//    int subpops = 1;
-    int subpops = 3;
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250414 refactor/simplify evolutionStep() for MultiObjectiveFitness
+    int individuals = 500;
+    int subpops = 25;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
 //    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
     int max_evolution_steps = Boid::GP_not_GA ? 20 : 30000;
 
@@ -380,16 +389,6 @@ int main(int argc, const char * argv[])
             LazyPredator::MultiObjectiveFitness fitness;
             if (Boid::GP_not_GA)
             {
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO for simplicity, change get/setSaveBoidCenters() to be static
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250413 day 2 of restarting GA optimization runs.
-//                Flock::setSaveBoidCenters(true);
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
                 fitness = GP::evoflock_gp_fitness_function(individual);
             }
             else

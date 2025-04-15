@@ -132,11 +132,8 @@ public:
     // Run boids simulation.
     void run()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250413 day 2 of restarting GA optimization runs.
-//        fp().print();
+        // Log the FlockParameters object, but only for interactive drawing mode
         if (draw().enable()) { fp().print(); }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         make_boids(boid_count(), fp().sphereRadius(), fp().sphereCenter());
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -331,22 +328,6 @@ public:
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();
-        
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250413 day 2 of restarting GA optimization runs.
-
-//        // TODO 20250305 TEMP, should be moved to Flock::log_stats() or etc.
-//        if (0 == (aTimer().frameCounter() % 100))
-//        {
-//            std::cout << "step: ";
-//            std::cout << aTimer().frameCounter() << ", ";
-//            std::cout << "obstacle collision: ";
-//            std::cout << getTotalObstacleCollisions();
-//            std::cout << std::endl;
-//        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         collect_flock_metrics();
         recordSeparationScorePerStep();
     }
@@ -358,55 +339,17 @@ public:
         for (auto b : boids()) { sum += b->getObsCollisionCount(); }
         return sum;
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250413 day 2 of restarting GA optimization runs.
-    
-//    // Return a unit fitness component: quality of obstacle avoidance.
-//    double obstacleCollisionsScore() const
-//    {
-//        double count = getTotalObstacleCollisions();
-//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//        return util::remap_interval_clip(count,  0, boid_steps / 100,  1, 0);
-//    }
-    
-    
+
     // Return a unit fitness component: quality of obstacle avoidance.
     double obstacleCollisionsScore() const
     {
         double count = getTotalObstacleCollisions();
         double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//        double f = boid_steps / 100;
         double f = boid_steps / 1000;  // So f = 100 for normal evolution run.
         return util::remap_interval_clip(count,  0, f,  1, 0);
     }
 
     
-//    // Called each simulation step, records stats for the separation score.
-//    void recordSeparationScorePerStep()
-//    {
-//        for (auto b : boids())
-//        {
-//            double distance = b->distanceToNearestNeighbor();
-//            double score = 0;
-//            
-//            if (util::between(distance, 1, 3))
-//            {
-//                score = util::remap_interval(distance, 1, 3, 0, 1);
-//            }
-//            else if (util::between(distance, 3, 5))
-//            {
-//                score = 1;
-//            }
-//            else if (util::between(distance, 5, 10))
-//            {
-//                score = util::remap_interval(distance, 5, 10, 1, 0);
-//            }
-//
-//            separation_score_sum_ += score;
-//        }
-//    }
-
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
@@ -414,31 +357,21 @@ public:
         {
             double score = 0;
             double distance = b->distanceToNearestNeighbor();
-            
-//            if (util::between(distance, 1, 3))
             if (util::between(distance, 1.5, 3))
             {
-//                score = util::remap_interval(distance, 1, 3, 0, 1);
                 score = util::remap_interval(distance, 1.5, 3, 0, 1);
             }
-//            else if (util::between(distance, 3, 5))
             else if (util::between(distance, 3, 6))
             {
                 score = 1;
             }
-//            else if (util::between(distance, 5, 10))
             else if (util::between(distance, 6, 20))
             {
-//                score = util::remap_interval(distance, 5, 10, 1, 0);
                 score = util::remap_interval(distance, 6, 20, 1, 0);
             }
-
             separation_score_sum_ += score;
         }
     }
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const

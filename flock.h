@@ -141,7 +141,10 @@ public:
 //        draw().simPause() = true;
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         draw().beginAnimatedScene();
-        save_centers_to_file_start();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250415 fix separation score / visualize parameter set in run
+//        save_centers_to_file_start();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         while (still_running())
         {
             aTimer().setFrameStartTime();
@@ -159,7 +162,10 @@ public:
             if (run_sim_this_frame)
             {
                 fly_boids(step_duration);
-                save_centers_to_file_1_step();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250415 fix separation score / visualize parameter set in run
+//                save_centers_to_file_1_step();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 log_stats();
                 update_fps();
             }
@@ -171,7 +177,10 @@ public:
             aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
             if (not draw().simPause()) { aTimer().measureFrameDuration(); }
         }
-        save_centers_to_file_end();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250415 fix separation score / visualize parameter set in run
+//        save_centers_to_file_end();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         draw().endAnimatedScene();
         if (max_simulation_steps() == std::numeric_limits<double>::infinity())
         {
@@ -235,20 +244,23 @@ public:
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250415 fix separation score / visualize parameter set in run
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO for simplicity, change get/setSaveBoidCenters() to be static
 
-    // TODO just WIP for prototyping
-//    std::ofstream* boid_center_data_stream_;
-//    bool save_boid_centers_ = true;
-//    void setSaveBoidCenters(bool save) { save_boid_centers_ = save; }
-//    bool getSaveBoidCenters() const { return save_boid_centers_; }
+//        // TODO just WIP for prototyping
+//    //    std::ofstream* boid_center_data_stream_;
+//    //    bool save_boid_centers_ = true;
+//    //    void setSaveBoidCenters(bool save) { save_boid_centers_ = save; }
+//    //    bool getSaveBoidCenters() const { return save_boid_centers_; }
+//
+//        std::ofstream* boid_center_data_stream_;
+//        static inline bool save_boid_centers_ = false;
+//        void static setSaveBoidCenters(bool save) { save_boid_centers_ = save; }
+//        bool static getSaveBoidCenters() { return save_boid_centers_; }
 
-    std::ofstream* boid_center_data_stream_;
-    static inline bool save_boid_centers_ = false;
-    void static setSaveBoidCenters(bool save) { save_boid_centers_ = save; }
-    bool static getSaveBoidCenters() { return save_boid_centers_; }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 //    void save_centers_to_file_start()
 //    {
@@ -261,56 +273,58 @@ public:
 //    }
     
     
-    static inline int save_boid_centers_count_ = 0;
+//    static inline int save_boid_centers_count_ = 0;
+//
+//    std::string save_centers_to_file_pathname()
+//    {
+//        return ("/Users/cwr/Desktop/flock_data/boid_centers_" +
+//                std::to_string(save_boid_centers_count_++) +
+//                ".py");
+//    }
+//    
+//    
+//    void save_centers_to_file_start()
+//    {
+//        if (save_boid_centers_)
+//        {
+//            std::string file_name = save_centers_to_file_pathname();
+//            std::cout << "Opening " << file_name << std::endl;
+//            boid_center_data_stream_ = new std::ofstream{file_name};
+//            (*boid_center_data_stream_) << "boid_centers = [" << std::endl;
+//        }
+//    }
 
-    std::string save_centers_to_file_pathname()
-    {
-        return ("/Users/cwr/Desktop/flock_data/boid_centers_" +
-                std::to_string(save_boid_centers_count_++) +
-                ".py");
-    }
-    
-    
-    void save_centers_to_file_start()
-    {
-        if (save_boid_centers_)
-        {
-            std::string file_name = save_centers_to_file_pathname();
-            std::cout << "Opening " << file_name << std::endl;
-            boid_center_data_stream_ = new std::ofstream{file_name};
-            (*boid_center_data_stream_) << "boid_centers = [" << std::endl;
-        }
-    }
+
+
+//    void save_centers_to_file_end() const
+//    {
+//        if (save_boid_centers_)
+//        {
+//            (*boid_center_data_stream_) << "]" << std::endl;
+//            boid_center_data_stream_->close();
+//            delete boid_center_data_stream_;
+//        }
+//    }
+//
+//    // Write Boid center positions to file.
+//    void save_centers_to_file_1_step() const
+//    {
+//        if (save_boid_centers_)
+//        {
+//            std::ofstream& output = *boid_center_data_stream_;
+//            output << "[";
+//            for (Boid* boid : boids())
+//            {
+//                Vec3 p = boid->position();
+//                output << "[";
+//                output << p.x() << "," << p.y() << "," << p.z();
+//                output << "],";
+//            }
+//            output << "]," << std::endl;
+//        }
+//    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    void save_centers_to_file_end() const
-    {
-        if (save_boid_centers_)
-        {
-            (*boid_center_data_stream_) << "]" << std::endl;
-            boid_center_data_stream_->close();
-            delete boid_center_data_stream_;
-        }
-    }
-
-    // Write Boid center positions to file.
-    void save_centers_to_file_1_step() const
-    {
-        if (save_boid_centers_)
-        {
-            std::ofstream& output = *boid_center_data_stream_;
-            output << "[";
-            for (Boid* boid : boids())
-            {
-                Vec3 p = boid->position();
-                output << "[";
-                output << p.x() << "," << p.y() << "," << p.z();
-                output << "],";
-            }
-            output << "]," << std::endl;
-        }
-    }
 
     //        def is_neighbor_of_selected(self, boid):
     //            return (self.enable_annotation and
@@ -349,7 +363,129 @@ public:
         return util::remap_interval_clip(count,  0, f,  1, 0);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250415 fix separation score / visualize parameter set in run
     
+//    // Called each simulation step, records stats for the separation score.
+//    void recordSeparationScorePerStep()
+//    {
+//        for (auto b : boids())
+//        {
+//            double score = 0;
+//            double distance = b->distanceToNearestNeighbor();
+//            if (util::between(distance, 1.5, 3))
+//            {
+//                score = util::remap_interval(distance, 1.5, 3, 0, 1);
+//            }
+//            else if (util::between(distance, 3, 6))
+//            {
+//                score = 1;
+//            }
+//            else if (util::between(distance, 6, 20))
+//            {
+//                score = util::remap_interval(distance, 6, 20, 1, 0);
+//            }
+//            separation_score_sum_ += score;
+//        }
+//    }
+    
+//        // Called each simulation step, records stats for the separation score.
+//        void recordSeparationScorePerStep()
+//        {
+//            for (auto b : boids())
+//            {
+//                double distance = b->distanceToNearestNeighbor();
+//
+//                double score = 0;
+//                if (util::between(distance, 1.5, 3))
+//                {
+//                    score = util::remap_interval(distance, 1.5, 3, 0, 1);
+//                }
+//                else if (util::between(distance, 3, 6))
+//                {
+//                    score = 1;
+//                }
+//                else if (util::between(distance, 6, 20))
+//                {
+//                    score = util::remap_interval(distance, 6, 20, 1, 0);
+//                }
+//
+//                double score2 = 0;
+//                std::vector<double> d = {0.0, 1.5, 3.0, 6.0, 20.0};
+//                std::vector<double> s = {0.0, 0.0, 1.0, 1.0,  0.0};
+//
+//    //            if (util::between(distance, 1.5, 3))
+//                if (util::between(distance, d[1], d[2]))
+//                {
+//    //                score2 = util::remap_interval(distance, 1.5, 3, 0, 1);
+//                    score2 = util::remap_interval(distance, d[1], d[2], s[1], s[2]);
+//                }
+//    //            else if (util::between(distance, 3, 6))
+//                else if (util::between(distance, d[2], d[3]))
+//                {
+//    //                score2 = 1;
+//                    score2 = s[3];
+//                }
+//    //            else if (util::between(distance, 6, 20))
+//                else if (util::between(distance, d[3], d[4]))
+//                {
+//    //                score2 = util::remap_interval(distance, 6, 20, 1, 0);
+//                    score2 = util::remap_interval(distance, d[3], d[4], s[3], s[4]);
+//                }
+//
+//                assert(score == score2);
+//
+//                separation_score_sum_ += score;
+//            }
+//        }
+
+//        // Called each simulation step, records stats for the separation score.
+//        void recordSeparationScorePerStep()
+//        {
+//            for (auto b : boids())
+//            {
+//                double distance = b->distanceToNearestNeighbor();
+//
+//    //            double score = 0;
+//    //            if (util::between(distance, 1.5, 3))
+//    //            {
+//    //                score = util::remap_interval(distance, 1.5, 3, 0, 1);
+//    //            }
+//    //            else if (util::between(distance, 3, 6))
+//    //            {
+//    //                score = 1;
+//    //            }
+//    //            else if (util::between(distance, 6, 20))
+//    //            {
+//    //                score = util::remap_interval(distance, 6, 20, 1, 0);
+//    //            }
+//
+//    //            double score2 = 0;
+//                double score = 0;
+//    //            std::vector<double> d = {0.0, 1.5, 3.0, 6.0, 20.0};
+//                std::vector<double> d = {0.0, 1.5, 3.0, 6.0, 9.0, 20.0};
+//                std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
+//                if (util::between(distance, d[1], d[2]))
+//                {
+//                    score = util::remap_interval(distance, d[1], d[2], s[1], s[2]);
+//                }
+//                else if (util::between(distance, d[2], d[3]))
+//                {
+//                    score = s[3];
+//                }
+//                else if (util::between(distance, d[3], d[4]))
+//                {
+//                    score = util::remap_interval(distance, d[3], d[4], s[3], s[4]);
+//                }
+//                else if (util::between(distance, d[4], d[5]))
+//                {
+//                    score = util::remap_interval(distance, d[4], d[5], s[4], s[5]);
+//                }
+//
+//                separation_score_sum_ += score;
+//            }
+//        }
+
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
@@ -357,21 +493,30 @@ public:
         {
             double score = 0;
             double distance = b->distanceToNearestNeighbor();
-            if (util::between(distance, 1.5, 3))
+            std::vector<double> d = {0.0, 1.5, 3.0, 6.0, 9.0, 20.0};
+            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
+            if (util::between(distance, d[1], d[2]))
             {
-                score = util::remap_interval(distance, 1.5, 3, 0, 1);
+                score = util::remap_interval(distance, d[1], d[2], s[1], s[2]);
             }
-            else if (util::between(distance, 3, 6))
+            else if (util::between(distance, d[2], d[3]))
             {
-                score = 1;
+                score = s[3];
             }
-            else if (util::between(distance, 6, 20))
+            else if (util::between(distance, d[3], d[4]))
             {
-                score = util::remap_interval(distance, 6, 20, 1, 0);
+                score = util::remap_interval(distance, d[3], d[4], s[3], s[4]);
             }
+            else if (util::between(distance, d[4], d[5]))
+            {
+                score = util::remap_interval(distance, d[4], d[5], s[4], s[5]);
+            }
+
             separation_score_sum_ += score;
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const

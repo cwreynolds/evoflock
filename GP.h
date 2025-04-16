@@ -193,7 +193,10 @@ inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = fal
         // These steps can happen in parallel threads:
         Flock flock;
         init_flock(flock);
-        flock.setSaveBoidCenters(write_file);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250415 fix separation score / visualize parameter set in run
+//        flock.setSaveBoidCenters(write_file);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         flock.fp() = fp;
         flock.run();
         MOF mof = multiObjectiveFitnessOfFlock(flock);

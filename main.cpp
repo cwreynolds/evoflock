@@ -36,6 +36,32 @@
 
 #include "evoflock.h"
 
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250416 GUI cmd to visualize "best" Individual.
+
+//void visualize_best_if_requested(LP::Population* population)
+//{
+//    Draw& draw = Draw::getInstance();
+//    if (draw.getVisBestMode())
+//    {
+//        bool enable_saved = draw.enable();
+//        draw.setEnable(true);
+//        LP::Individual* individual = population->bestFitness();
+//        LP::GpTree tree = individual->tree();
+//        FlockParameters fp = GP::fp_from_ga_tree(tree);
+//        GP::run_flock_simulation(fp, 1);
+//        draw.setEnable(enable_saved);
+//        draw.clearVisBestMode();
+//    }
+//}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
 int main(int argc, const char * argv[])
 {
     EF::setRS(LP::LPRS());
@@ -369,6 +395,28 @@ int main(int argc, const char * argv[])
                 std::cout << individual->tree().to_string(true) << std::endl;
             }
             std::cout << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250416 GUI cmd to visualize "best" Individual.
+                        
+            auto visualize_best_if_requested = [](LP::Population* population)
+            {
+                Draw& draw = Draw::getInstance();
+                if (draw.getVisBestMode())
+                {
+                    bool enable_saved = draw.enable();
+                    draw.setEnable(true);
+                    LP::Individual* individual = population->bestFitness();
+                    LP::GpTree tree = individual->tree();
+                    FlockParameters fp = GP::fp_from_ga_tree(tree);
+                    GP::run_flock_simulation(fp, 1);
+                    draw.setEnable(enable_saved);
+                    draw.clearVisBestMode();
+                }
+            };
+            
+            visualize_best_if_requested(population);
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
     }
     

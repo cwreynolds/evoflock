@@ -649,6 +649,16 @@ public:
     int& selectedBoidIndex() { return selected_boid_index_; }
     int selectedBoidIndex() const { return selected_boid_index_; }
     void selectNextBoid() { selected_boid_index_ += 1; }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250416 GUI cmd to visualize "best" Individual.
+
+    // "B" cmd runs a sim, with best individual & graphics, then reset.
+    bool getVisBestMode() const { return vis_best_mode_; }
+    void setVisBestMode() { vis_best_mode_ = true; }
+    void clearVisBestMode() { vis_best_mode_ = false; }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Called in constructor to set up the various key cmd and mouse callbacks.
     void setupGuiCallbacks()
@@ -688,6 +698,14 @@ public:
 
         // Add "R" command, reset camera to aligned view of whole scene.
         rk('R', [&](vis* v) { resetCameraView(); return rv; });
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250416 GUI cmd to visualize "best" Individual.
+        
+        // Add "B" cmd runs a sim, with best individual & graphics, then reset.
+        rk('B', [&](vis* v) { setVisBestMode(); return rv; });
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Set mouse move/scroll/button handlers.
         setMouseCallbacks();
@@ -776,6 +794,13 @@ private:
 
     // True when the left mouse button currently depressed.
     bool left_mouse_button_down_ = false;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250416 GUI cmd to visualize "best" Individual.
+    
+    // "B" command means to run a sim, with graphics, then reset, based on this.
+    bool vis_best_mode_ = false;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #ifdef USE_OPEN3D
     

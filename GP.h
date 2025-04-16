@@ -180,9 +180,17 @@ inline void fitness_logger(const MOF& mof)
 // Run flock simulation with given parameters "runs" times and returns the MOF
 // with the LEAST scalar fitness score.
 // TODO 20240515 maybe the name should be measure_fitness_of_fp() ?
-inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250416 GUI cmd to visualize "best" Individual.
+
+//inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
+//inline MOF run_flock_simulation(const FlockParameters& fp)
+inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
+
 {
-    int runs = 4;
+//    int runs = 4;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     MOF least_mof;
     double least_scalar_fitness = std::numeric_limits<double>::infinity();
     std::vector<double> scalar_fits;
@@ -311,11 +319,25 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
     
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250416 GUI cmd to visualize "best" Individual.
+
+//    // Run flock simulation with given parameters, return a MultiObjectiveFitness.
+//    inline MOF run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
+//    {
+//        return run_flock_simulation(FlockParameters(), write_flock_data_file);
+//    }
+
+
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
-inline MOF run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
+inline MOF run_hand_tuned_flock_simulation()
 {
-    return run_flock_simulation(FlockParameters(), write_flock_data_file);
+    return run_flock_simulation(FlockParameters());
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20250329 move mess from GP to FlockParameters constructor.
@@ -432,10 +454,36 @@ FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
     return FlockParameters(parameters);
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250416 GUI cmd to visualize "best" Individual.
 
+//    // Wrote this to run at the end of evolution on the top-10 fitness individuals
+//    // of population in order to record flock data for playback
+//    inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
+//    {
+//        // Is this tree copy needed to avoid using the previous cached tree root?
+//        LazyPredator::GpTree t = individual->tree();
+//
+//        // Run simulation and write flock data file (second arg == true).
+//        return run_flock_simulation(fp_from_ga_tree(t), true);
+//    }
+
+//    // Wrote this to run at the end of evolution on the top-10 fitness individuals
+//    // of population in order to record flock data for playback
+//    inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
+//    {
+//        // Is this tree copy needed to avoid using the previous cached tree root?
+//        LazyPredator::GpTree t = individual->tree();
+//
+//    //    // Run simulation and write flock data file (second arg == true).
+//    //    return run_flock_simulation(fp_from_ga_tree(t), true);
+//
+//        // Run simulation.
+//        return run_flock_simulation(fp_from_ga_tree(t));
+//    }
 
 // Wrote this to run at the end of evolution on the top-10 fitness individuals
 // of population in order to record flock data for playback
@@ -443,10 +491,11 @@ inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
 {
     // Is this tree copy needed to avoid using the previous cached tree root?
     LazyPredator::GpTree t = individual->tree();
-    
-    // Run simulation and write flock data file (second arg == true).
-    return run_flock_simulation(fp_from_ga_tree(t), true);
+    // Run simulation.
+    return run_flock_simulation(fp_from_ga_tree(t));
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 

@@ -486,44 +486,110 @@ public:
 //            }
 //        }
 
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    
+//    // Called each simulation step, records stats for the separation score.
+//    void recordSeparationScorePerStep()
+//    {
+//        for (auto b : boids())
+//        {
+//            double score = 0;
+//            double distance = b->distanceToNearestNeighbor();
+//            std::vector<double> d = {0.0, 1.5, 3.0, 6.0, 9.0, 20.0};
+//            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
+//            if (util::between(distance, d[1], d[2]))
+//            {
+//                score = util::remap_interval(distance, d[1], d[2], s[1], s[2]);
+//            }
+//            else if (util::between(distance, d[2], d[3]))
+//            {
+//                score = s[3];
+//            }
+//            else if (util::between(distance, d[3], d[4]))
+//            {
+//                score = util::remap_interval(distance, d[3], d[4], s[3], s[4]);
+//            }
+//            else if (util::between(distance, d[4], d[5]))
+//            {
+//                score = util::remap_interval(distance, d[4], d[5], s[4], s[5]);
+//            }
+//
+//            separation_score_sum_ += score;
+//        }
+//    }
+
+//    // Called each simulation step, records stats for the separation score.
+//    void recordSeparationScorePerStep()
+//    {
+//        for (auto b : boids())
+//        {
+//            double distance = b->distanceToNearestNeighbor();
+//            
+//            double score = ((distance < 1.5) or (distance > 8)) ? 1 : 0;
+//
+//            separation_score_sum_ += score;
+//        }
+//    }
+
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
         for (auto b : boids())
         {
-            double score = 0;
             double distance = b->distanceToNearestNeighbor();
-            std::vector<double> d = {0.0, 1.5, 3.0, 6.0, 9.0, 20.0};
-            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
-            if (util::between(distance, d[1], d[2]))
-            {
-                score = util::remap_interval(distance, d[1], d[2], s[1], s[2]);
-            }
-            else if (util::between(distance, d[2], d[3]))
-            {
-                score = s[3];
-            }
-            else if (util::between(distance, d[3], d[4]))
-            {
-                score = util::remap_interval(distance, d[3], d[4], s[3], s[4]);
-            }
-            else if (util::between(distance, d[4], d[5]))
-            {
-                score = util::remap_interval(distance, d[4], d[5], s[4], s[5]);
-            }
+            
+//            double score = ((distance < 1.5) or (distance > 8)) ? 1 : 0;
+            // Count the cases where the distance is in the correct range.
+            double score = util::between(distance, 1.5, 8) ? 1 : 0;
 
             separation_score_sum_ += score;
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+//    // Return a unit fitness component: quality of obstacle avoidance.
+//    double obstacleCollisionsScore() const
+//    {
+//        double count = getTotalObstacleCollisions();
+//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//        double f = boid_steps / 1000;  // So f = 100 for normal evolution run.
+//        return util::remap_interval_clip(count,  0, f,  1, 0);
+//    }
+
+
+//    // Return a unit fitness component: maintaining proper separation distance.
+//    double separationScore() const
+//    {
+//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//        return separation_score_sum_ / boid_steps;
+//    }
+
+//        // Return a unit fitness component: maintaining proper separation distance.
+//        double separationScore() const
+//        {
+//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//    //        double f = boid_steps / 100;  // So f = 1000 for normal evolution run.
+//    //        double f = boid_steps * 0.01;  // So f = 1000 for normal evolution run.
+//            double f = boid_steps * 0.1;  // So f = 10000 for normal evolution run.
+//
+//    //        return separation_score_sum_ / boid_steps;
+//
+//            return util::remap_interval_clip(separation_score_sum_,  0, f,  1, 0);
+//        }
 
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
     {
         double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-        return separation_score_sum_ / boid_steps;
+        double normalized_good = separation_score_sum_ / boid_steps;
+//        return std::pow(normalized_good, 2);
+        return std::pow(normalized_good, 4);
     }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.

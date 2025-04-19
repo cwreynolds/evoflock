@@ -35,7 +35,15 @@ private:
     // TODO move to bottom of class definition.
     FlockParameters fp_;
     BoidPtrList boids_;
-    ObstaclePtrList obstacles_;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250418 try turning multithreading back on.
+
+//    ObstaclePtrList obstacles_;
+    static inline ObstaclePtrList obstacles_;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     BoidInstanceList boid_instance_list_;
 //    util::AnimationTimer animation_timer;
     util::AnimationTimer animation_timer_;
@@ -56,18 +64,28 @@ private:
     static inline std::vector<ObstaclePtrList> obstacle_presets_;
     static inline int obstacle_selection_counter_ = -1;
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250409 adjust hand_tuned_parameters after fixing ExcludeFrom.
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250418 try turning multithreading back on.
+
+//    // Index of the initial/default obstacle set.
+//    //int default_obstacle_set_index_ = 0;  // Sphere and vertical cylinder.
+//    //int default_obstacle_set_index_ = 1;  // Sphere and 6 cylinders.
+//    //int default_obstacle_set_index_ = 2;  // Sphere and plane.
+//    //int default_obstacle_set_index_ = 3;  // Sphere only.
+//    int default_obstacle_set_index_ = 4;  // Sphere and many little spheres.
+//    //int default_obstacle_set_index_ = 5;  // Sphere with smaller sphere inside.
 
     // Index of the initial/default obstacle set.
-    //int default_obstacle_set_index_ = 0;  // Sphere and vertical cylinder.
-    //int default_obstacle_set_index_ = 1;  // Sphere and 6 cylinders.
-    //int default_obstacle_set_index_ = 2;  // Sphere and plane.
-    //int default_obstacle_set_index_ = 3;  // Sphere only.
-    int default_obstacle_set_index_ = 4;  // Sphere and many little spheres.
-    //int default_obstacle_set_index_ = 5;  // Sphere with smaller sphere inside.
+    static inline int default_obstacle_set_index_ =
+    
+    // 0;  // Sphere and vertical cylinder.
+    // 1;  // Sphere and 6 cylinders.
+    // 2;  // Sphere and plane.
+    // 3;  // Sphere only.
+    4;  // Sphere and many little spheres.
+    // 5;  // Sphere with smaller sphere inside.
 
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
@@ -86,12 +104,26 @@ public:
     BoidPtrList& boids() { return boids_; }
     const BoidPtrList& boids() const { return boids_; }
     
-    ObstaclePtrList& obstacles() { return obstacles_; }
-    const ObstaclePtrList& obstacles() const { return obstacles_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250418 try turning multithreading back on.
     
-    Draw& draw() { return Draw::getInstance(); }
-    const Draw& draw() const { return Draw::getInstance(); }
+    
 
+//    ObstaclePtrList& obstacles() { return obstacles_; }
+//    const ObstaclePtrList& obstacles() const { return obstacles_; }
+//    
+//    Draw& draw() { return Draw::getInstance(); }
+//    const Draw& draw() const { return Draw::getInstance(); }
+
+    static ObstaclePtrList& obstacles() { return obstacles_; }
+//    static const ObstaclePtrList& obstacles() const { return obstacles_; }
+    
+    static Draw& draw() { return Draw::getInstance(); }
+//    const Draw& draw() const { return Draw::getInstance(); }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
 //    util::AnimationTimer& aTimer() { return animation_timer; }
 //    const util::AnimationTimer& aTimer() const { return animation_timer; }
     util::AnimationTimer& aTimer() { return animation_timer_; }
@@ -127,6 +159,11 @@ public:
         animation_timer_(fixed_fps())
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250418 try turning multithreading back on.
+        updateObstacleSetForGUI();
+        useObstacleSet();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Run boids simulation.
@@ -353,16 +390,100 @@ public:
         for (auto b : boids()) { sum += b->getObsCollisionCount(); }
         return sum;
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250417 use exponential weighting for obstacleCollisionsScore()
 
+
+//    // Return a unit fitness component: quality of obstacle avoidance.
+//    double obstacleCollisionsScore() const
+//    {
+//        double count = getTotalObstacleCollisions();
+//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//        double f = boid_steps / 1000;  // So f = 100 for normal evolution run.
+//        return util::remap_interval_clip(count,  0, f,  1, 0);
+//    }
+    
+//        // To de-emphasize low (normalized) scores.
+//        double score_exponent_ = 8;
+//
+//        // Return a unit fitness component: quality of obstacle avoidance.
+//        double obstacleCollisionsScore() const
+//        {
+//            double count = getTotalObstacleCollisions();
+//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//
+//            double collisions_per_boid_step = count / boid_steps;
+//
+//            double non_collision_per_boid_step = 1 - collisions_per_boid_step;
+//
+//    //        double f = boid_steps / 1000;  // So f = 100 for normal evolution run.
+//    //        return util::remap_interval_clip(count,  0, f,  1, 0);
+//
+//            return std::pow(non_collision_per_boid_step, score_exponent_);
+//
+//        }
+
+    // Used to de-emphasize low scores. (Normalized scores on [0,1])
+    // To visualize, see plot on this page: https://tinyurl.com/236bh58h
+    double score_exponent_ = 8;
+
+//    // Return a unit fitness component: quality of obstacle avoidance.
+//    double obstacleCollisionsScore() const
+//    {
+//        double count = getTotalObstacleCollisions();
+//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//        double collisions_per_boid_step = count / boid_steps;
+//        double non_collision_per_boid_step = 1 - collisions_per_boid_step;
+//        return std::pow(non_collision_per_boid_step, score_exponent_);
+//    }
+
+//        // Return a unit fitness component: quality of obstacle avoidance.
+//        double obstacleCollisionsScore() const
+//        {
+//
+//
+//            double count = getTotalObstacleCollisions();
+//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//
+//
+//
+//    //        double collisions_per_boid_step = count / boid_steps;
+//    //        double non_collision_per_boid_step = 1 - collisions_per_boid_step;
+//
+//    //        double non_collision_steps = boid_steps - count;
+//    //        double normalized_non_collision = 1 - collisions_per_boid_step;
+//
+//            double r = util::remap_interval_clip(count,  0, boid_steps,  1, 0);
+//
+//
+//            debugPrint(count)
+//            debugPrint(boid_steps)
+//            debugPrint(r)
+//    //        debugPrint(std::pow(r, score_exponent_ * 10))
+//            debugPrint(std::pow(r, score_exponent_ * 100))
+//
+//    //        return std::pow(r, score_exponent_);
+//    //        return std::pow(r, score_exponent_ * 10);
+//            return std::pow(r, score_exponent_ * 100);
+//        }
+
+    
     // Return a unit fitness component: quality of obstacle avoidance.
     double obstacleCollisionsScore() const
     {
         double count = getTotalObstacleCollisions();
         double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
         double f = boid_steps / 1000;  // So f = 100 for normal evolution run.
-        return util::remap_interval_clip(count,  0, f,  1, 0);
+        double r = util::remap_interval_clip(count,  0, f,  1, 0);
+        return std::pow(r, score_exponent_);
     }
 
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250415 fix separation score / visualize parameter set in run
     
@@ -578,14 +699,31 @@ public:
 //            return util::remap_interval_clip(separation_score_sum_,  0, f,  1, 0);
 //        }
 
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250417 use exponential weighting for obstacleCollisionsScore()
+
+//        // Return a unit fitness component: maintaining proper separation distance.
+//        double separationScore() const
+//        {
+//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//            double normalized_good = separation_score_sum_ / boid_steps;
+//    //        return std::pow(normalized_good, 2);
+//            return std::pow(normalized_good, 4);
+//        }
+
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
     {
         double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
         double normalized_good = separation_score_sum_ / boid_steps;
 //        return std::pow(normalized_good, 2);
-        return std::pow(normalized_good, 4);
+//        return std::pow(normalized_good, 4);
+        return std::pow(normalized_good, score_exponent_);
     }
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -1054,13 +1192,30 @@ public:
     // between them, and making one active.
     // TODO this architecture is left over from the Python version and may need
     // to be refactored in the evoflock environment.
-    const std::vector<ObstaclePtrList>& preDefinedObstacleSets()
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250418 try turning multithreading back on.
+
+//    const std::vector<ObstaclePtrList>& preDefinedObstacleSets()
+    static const std::vector<ObstaclePtrList>& preDefinedObstacleSets()
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
         if (obstacle_presets_.empty())
         {
             ObstaclePtrList obs;
-            double sr = fp().sphereRadius();
-            Vec3 sc = fp().sphereCenter();
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250418 try turning multithreading back on.
+            
+//            double sr = fp().sphereRadius();
+//            Vec3 sc = fp().sphereCenter();
+            
+            double sr = FlockParameters().sphereRadius();
+            Vec3 sc = FlockParameters().sphereCenter();
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             auto iside = Obstacle::inside;
             auto oside = Obstacle::outside;
 
@@ -1132,9 +1287,14 @@ public:
             obs.push_back(new SphereObstacle(12, sc, iside));
             obstacle_presets_.push_back(obs);
 
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250418 try turning multithreading back on.
+
             // Set initial obstacle set to the default.
             draw().obstacleSetIndex() = default_obstacle_set_index_;
-            useObstacleSet(default_obstacle_set_index_);
+//            useObstacleSet(default_obstacle_set_index_);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         return obstacle_presets_;
     }

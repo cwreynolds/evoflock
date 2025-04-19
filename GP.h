@@ -195,6 +195,12 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
     double least_scalar_fitness = std::numeric_limits<double>::infinity();
     std::vector<double> scalar_fits;
     std::mutex save_mof_mutex;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250418 try turning multithreading back on.
+    Flock::preDefinedObstacleSets();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Perform one simulation run, and record results.
     auto do_1_run = [&]()
     {

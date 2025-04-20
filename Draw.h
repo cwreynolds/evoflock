@@ -693,7 +693,23 @@ public:
 
     // "B" cmd runs a sim, with best individual & graphics, then reset.
     bool getVisBestMode() const { return vis_best_mode_; }
-    void setVisBestMode() { vis_best_mode_ = true; }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250420 make tiny flock just to pop up Open3D's window.
+
+    void setVisBestMode()
+    {
+        std::cout                                                  << std::endl;
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+        std::cout << "Inside setVisBestMode()"                     << std::endl;
+        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+        std::cout                                                  << std::endl;
+
+        vis_best_mode_ = true;
+    }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     void clearVisBestMode() { vis_best_mode_ = false; }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

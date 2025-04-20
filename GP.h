@@ -176,35 +176,99 @@ inline void fitness_logger(const MOF& mof)
     std::cout.precision(old_precision);
 }
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20250420 make tiny flock just to pop up Open3D's window.
+
+//x
+//    // Run flock simulation with given parameters "runs" times and returns the MOF
+//    // with the LEAST scalar fitness score.
+//    // TODO 20240515 maybe the name should be measure_fitness_of_fp() ?
+//
+//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    // TODO 20250416 GUI cmd to visualize "best" Individual.
+//
+//    //inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
+//    //inline MOF run_flock_simulation(const FlockParameters& fp)
+//    inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
+//
+//    {
+//    //    int runs = 4;
+//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        MOF least_mof;
+//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
+//        std::vector<double> scalar_fits;
+//        std::mutex save_mof_mutex;
+//
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20250418 try turning multithreading back on.
+//        // TODO 20250419 conflicts between multithreading and draw.
+//
+//    //    Flock::preDefinedObstacleSets();
+//
+//        Draw::getInstance().setEnable(false);
+//        debugPrint(Draw::getInstance().enable())
+//
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//        // Perform one simulation run, and record results.
+//        auto do_1_run = [&]()
+//        {
+//            // These steps can happen in parallel threads:
+//            Flock flock;
+//            init_flock(flock);
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20250415 fix separation score / visualize parameter set in run
+//    //        flock.setSaveBoidCenters(write_file);
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            flock.fp() = fp;
+//            flock.run();
+//            MOF mof = multiObjectiveFitnessOfFlock(flock);
+//            // These steps happen in the single thread with lock on save_mof_mutex.
+//            {
+//                std::lock_guard<std::mutex> smm(save_mof_mutex);
+//                assert(mof.size() == mof_names().size());
+//                scalar_fits.push_back(scalarize_fitness(mof));
+//                if (least_scalar_fitness > scalar_fits.back())
+//                {
+//                    least_scalar_fitness = scalar_fits.back();
+//                    least_mof = mof;
+//                }
+//            }
+//        };
+//
+//        if (EF::enable_multithreading)
+//        {
+//            // Do each simulation run in a parallel thread.
+//            std::vector<std::thread> threads;
+//            for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
+//            // Wait for helper threads to finish, join them with this thread.
+//            for (auto& t : threads) { t.join(); }
+//        }
+//        else
+//        {
+//            // Do simulation runs sequentially.
+//            for (int r = 0; r < runs; r++) { do_1_run(); }
+//        }
+//
+//        assert(scalar_fits.size() == runs);
+//        fitness_logger(least_mof);
+//        std::cout << "    min composite "<< least_scalar_fitness;
+//        std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
+//        std::cout << std::endl << std::endl;
+//        return least_mof;
+//    }
+
 
 // Run flock simulation with given parameters "runs" times and returns the MOF
 // with the LEAST scalar fitness score.
 // TODO 20240515 maybe the name should be measure_fitness_of_fp() ?
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250416 GUI cmd to visualize "best" Individual.
-
-//inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
-//inline MOF run_flock_simulation(const FlockParameters& fp)
 inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
-
 {
-//    int runs = 4;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     MOF least_mof;
     double least_scalar_fitness = std::numeric_limits<double>::infinity();
     std::vector<double> scalar_fits;
     std::mutex save_mof_mutex;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250418 try turning multithreading back on.
-    // TODO 20250419 conflicts between multithreading and draw.
-
-//    Flock::preDefinedObstacleSets();
-    
-    Draw::getInstance().setEnable(false);
-    debugPrint(Draw::getInstance().enable())
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Perform one simulation run, and record results.
     auto do_1_run = [&]()
@@ -212,10 +276,6 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
         // These steps can happen in parallel threads:
         Flock flock;
         init_flock(flock);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250415 fix separation score / visualize parameter set in run
-//        flock.setSaveBoidCenters(write_file);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         flock.fp() = fp;
         flock.run();
         MOF mof = multiObjectiveFitnessOfFlock(flock);
@@ -234,11 +294,16 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
     
     if (EF::enable_multithreading)
     {
+        bool previous_enable_state = Draw::getInstance().enable();
+        Draw::getInstance().setEnable(false);
+        
         // Do each simulation run in a parallel thread.
         std::vector<std::thread> threads;
         for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
         // Wait for helper threads to finish, join them with this thread.
         for (auto& t : threads) { t.join(); }
+        
+        Draw::getInstance().setEnable(previous_enable_state);
     }
     else
     {
@@ -253,6 +318,9 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
     std::cout << std::endl << std::endl;
     return least_mof;
 }
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
 // TODO 20240622 just temporary for debugging
 std::map<LP::Individual*, Vec3> values_of_individuals;

@@ -163,13 +163,24 @@ int main(int argc, const char * argv[])
 //    //    Flock::preDefinedObstacleSets();
 //        Draw::getInstance(false);
 
-    // 20250419
+//    // 20250419
+//    EF::enable_multithreading = true;
+//    Flock::preDefinedObstacleSets();
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250420 make tiny flock just to pop up Open3D's window.
+
     EF::enable_multithreading = true;
-    Flock::preDefinedObstacleSets();
-//    Draw::getInstance(false);
+//    EF::enable_multithreading = false;
+
     {
-        
+        Flock flock;
+        flock.set_boid_count(10);
+        flock.set_max_simulation_steps(1);
+        flock.fp() = FlockParameters();
     }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
@@ -412,6 +423,14 @@ int main(int argc, const char * argv[])
         
         for (int i = 0; i < max_evolution_steps; i++)
         {
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250420 make tiny flock just to pop up Open3D's window.
+
+            Draw::getInstance().setEnable(true);
+            Draw::getInstance().pollEvents();
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
             // Exit if user interactively exits run.
             if (Draw::getInstance().exitFromRun()) { break; }
             GP::save_fitness_time_series(*population);
@@ -428,17 +447,61 @@ int main(int argc, const char * argv[])
             auto visualize_best_if_requested = [](LP::Population* population)
             {
                 Draw& draw = Draw::getInstance();
+                
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20250420 make tiny flock just to pop up Open3D's window.
+                
+                std::cout << std::endl;
+                std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+                debugPrint(draw.getVisBestMode());
+                debugPrint(draw.enable());
+                std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+                std::cout << std::endl;
+
+                
+
+//                if (draw.getVisBestMode())
+//                {
+//                    // TODO 20250420 probably not needed anymore now that enable
+//                    // is being restored in GP::run_flock_simulation()
+//                    bool enable_saved = draw.enable();
+//                    draw.setEnable(true);
+//                    
+//                    LP::Individual* individual = population->bestFitness();
+//                    LP::GpTree tree = individual->tree();
+//                    FlockParameters fp = GP::fp_from_ga_tree(tree);
+//                    GP::run_flock_simulation(fp, 1);
+//                    draw.setEnable(enable_saved);
+//                    draw.clearVisBestMode();
+//                }
+                
+                
                 if (draw.getVisBestMode())
                 {
-                    bool enable_saved = draw.enable();
-                    draw.setEnable(true);
+//                    // TODO 20250420 probably not needed anymore now that enable
+//                    // is being restored in GP::run_flock_simulation()
+//                    bool enable_saved = draw.enable();
+//                    draw.setEnable(true);
+                    
+                    bool previous_emt_state = EF::enable_multithreading;
+                    EF::enable_multithreading = false;
+
+                    
                     LP::Individual* individual = population->bestFitness();
                     LP::GpTree tree = individual->tree();
                     FlockParameters fp = GP::fp_from_ga_tree(tree);
                     GP::run_flock_simulation(fp, 1);
-                    draw.setEnable(enable_saved);
+  
+//                    draw.setEnable(enable_saved);
+                    
+                    EF::enable_multithreading = previous_emt_state;
+
+                    
                     draw.clearVisBestMode();
                 }
+
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
             };
             
             visualize_best_if_requested(population);

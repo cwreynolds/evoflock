@@ -198,7 +198,12 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250418 try turning multithreading back on.
-    Flock::preDefinedObstacleSets();
+    // TODO 20250419 conflicts between multithreading and draw.
+
+//    Flock::preDefinedObstacleSets();
+    
+    Draw::getInstance().setEnable(false);
+    debugPrint(Draw::getInstance().enable())
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Perform one simulation run, and record results.

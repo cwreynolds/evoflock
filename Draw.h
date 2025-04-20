@@ -286,15 +286,33 @@ public:
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250419 conflicts between multithreading and draw.
+    
+//    // Clear all previous TriangleMesh objects from static scene.
+//    void clearStaticScene()
+//    {
+//        for (sp_tri_mesh_t tm : static_tri_meshes_)
+//        {
+//            visualizer().RemoveGeometry(tm, false);
+//        }
+//        static_tri_meshes_.clear();
+//    }
+    
     // Clear all previous TriangleMesh objects from static scene.
     void clearStaticScene()
     {
-        for (sp_tri_mesh_t tm : static_tri_meshes_)
+        if (enable())
         {
-            visualizer().RemoveGeometry(tm, false);
+            for (sp_tri_mesh_t tm : static_tri_meshes_)
+            {
+                visualizer().RemoveGeometry(tm, false);
+            }
+            static_tri_meshes_.clear();
         }
-        static_tri_meshes_.clear();
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Add a TriangleMesh objects to the static (non-animating) scene.
     void addTriMeshToStaticScene(const sp_tri_mesh_t tri_mesh)
@@ -616,15 +634,35 @@ public:
         return camera_desired_offset_dist_;
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250419 conflicts between multithreading and draw.
+
+//    // Based on pause/play and single step. Called once per frame from main loop.
+//    bool runSimulationThisFrame()
+//    {
+//        setExitFromRun(! pollEvents());
+//        bool ok_to_run = getSingleStepMode() or not simPause();
+//        setSingleStepMode(false);
+//        return ok_to_run;
+//    }
+  
     // Based on pause/play and single step. Called once per frame from main loop.
     bool runSimulationThisFrame()
     {
-        setExitFromRun(! pollEvents());
-        bool ok_to_run = getSingleStepMode() or not simPause();
-        setSingleStepMode(false);
+        bool ok_to_run = true;
+        if (enable())
+        {
+            
+            setExitFromRun(! pollEvents());
+//            bool ok_to_run = getSingleStepMode() or not simPause();
+            ok_to_run = getSingleStepMode() or not simPause();
+            setSingleStepMode(false);
+        }
         return ok_to_run;
     }
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Single step mode means simulation should take one step, then pause again.
     bool& getSingleStepMode() { return single_step_mode_; }
     bool getSingleStepMode() const { return single_step_mode_; }

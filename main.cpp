@@ -151,10 +151,27 @@ int main(int argc, const char * argv[])
 //    // 20240919
 //    EF::enable_multithreading = false;
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250419 conflicts between multithreading and draw.
+
     // 20250418
 //    EF::enable_multithreading = true;
-    EF::enable_multithreading = false;
+//    EF::enable_multithreading = false;
 
+//        // 20250419
+//        EF::enable_multithreading = true;
+//    //    Flock::preDefinedObstacleSets();
+//        Draw::getInstance(false);
+
+    // 20250419
+    EF::enable_multithreading = true;
+    Flock::preDefinedObstacleSets();
+//    Draw::getInstance(false);
+    {
+        
+    }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

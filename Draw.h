@@ -286,19 +286,6 @@ public:
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250419 conflicts between multithreading and draw.
-    
-//    // Clear all previous TriangleMesh objects from static scene.
-//    void clearStaticScene()
-//    {
-//        for (sp_tri_mesh_t tm : static_tri_meshes_)
-//        {
-//            visualizer().RemoveGeometry(tm, false);
-//        }
-//        static_tri_meshes_.clear();
-//    }
-    
     // Clear all previous TriangleMesh objects from static scene.
     void clearStaticScene()
     {
@@ -311,8 +298,6 @@ public:
             static_tri_meshes_.clear();
         }
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Add a TriangleMesh objects to the static (non-animating) scene.
     void addTriMeshToStaticScene(const sp_tri_mesh_t tri_mesh)
@@ -633,18 +618,6 @@ public:
     {
         return camera_desired_offset_dist_;
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250419 conflicts between multithreading and draw.
-
-//    // Based on pause/play and single step. Called once per frame from main loop.
-//    bool runSimulationThisFrame()
-//    {
-//        setExitFromRun(! pollEvents());
-//        bool ok_to_run = getSingleStepMode() or not simPause();
-//        setSingleStepMode(false);
-//        return ok_to_run;
-//    }
   
     // Based on pause/play and single step. Called once per frame from main loop.
     bool runSimulationThisFrame()
@@ -652,16 +625,12 @@ public:
         bool ok_to_run = true;
         if (enable())
         {
-            
             setExitFromRun(! pollEvents());
-//            bool ok_to_run = getSingleStepMode() or not simPause();
             ok_to_run = getSingleStepMode() or not simPause();
             setSingleStepMode(false);
         }
         return ok_to_run;
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Single step mode means simulation should take one step, then pause again.
     bool& getSingleStepMode() { return single_step_mode_; }
@@ -688,31 +657,10 @@ public:
     int selectedBoidIndex() const { return selected_boid_index_; }
     void selectNextBoid() { selected_boid_index_ += 1; }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250416 GUI cmd to visualize "best" Individual.
-
     // "B" cmd runs a sim, with best individual & graphics, then reset.
     bool getVisBestMode() const { return vis_best_mode_; }
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250420 make tiny flock just to pop up Open3D's window.
-
-    void setVisBestMode()
-    {
-        std::cout                                                  << std::endl;
-        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-        std::cout << "Inside setVisBestMode()"                     << std::endl;
-        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-        std::cout                                                  << std::endl;
-
-        vis_best_mode_ = true;
-    }
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
+    void setVisBestMode() { vis_best_mode_ = true; }
     void clearVisBestMode() { vis_best_mode_ = false; }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Called in constructor to set up the various key cmd and mouse callbacks.
     void setupGuiCallbacks()
@@ -753,13 +701,8 @@ public:
         // Add "R" command, reset camera to aligned view of whole scene.
         rk('R', [&](vis* v) { resetCameraView(); return rv; });
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250416 GUI cmd to visualize "best" Individual.
-        
         // Add "B" cmd runs a sim, with best individual & graphics, then reset.
         rk('B', [&](vis* v) { setVisBestMode(); return rv; });
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Set mouse move/scroll/button handlers.
         setMouseCallbacks();
@@ -849,12 +792,8 @@ private:
     // True when the left mouse button currently depressed.
     bool left_mouse_button_down_ = false;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250416 GUI cmd to visualize "best" Individual.
-    
     // "B" command means to run a sim, with graphics, then reset, based on this.
     bool vis_best_mode_ = false;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #ifdef USE_OPEN3D
     

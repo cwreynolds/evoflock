@@ -35,17 +35,8 @@ private:
     // TODO move to bottom of class definition.
     FlockParameters fp_;
     BoidPtrList boids_;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250418 try turning multithreading back on.
-
-//    ObstaclePtrList obstacles_;
-    static inline ObstaclePtrList obstacles_;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     BoidInstanceList boid_instance_list_;
-//    util::AnimationTimer animation_timer;
     util::AnimationTimer animation_timer_;
 
     // TODO Parameters that may (or may not?) be better kept separate from FP.
@@ -60,32 +51,18 @@ private:
 
     util::Blender<double> fps_;
     
-    // The static collection of various obstacle set, selectable gtom GUI.
+    // The static collection of various obstacle set, selectable from GUI.
     static inline std::vector<ObstaclePtrList> obstacle_presets_;
     static inline int obstacle_selection_counter_ = -1;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250418 try turning multithreading back on.
-
-//    // Index of the initial/default obstacle set.
-//    //int default_obstacle_set_index_ = 0;  // Sphere and vertical cylinder.
-//    //int default_obstacle_set_index_ = 1;  // Sphere and 6 cylinders.
-//    //int default_obstacle_set_index_ = 2;  // Sphere and plane.
-//    //int default_obstacle_set_index_ = 3;  // Sphere only.
-//    int default_obstacle_set_index_ = 4;  // Sphere and many little spheres.
-//    //int default_obstacle_set_index_ = 5;  // Sphere with smaller sphere inside.
-
+    static inline ObstaclePtrList obstacles_;
     // Index of the initial/default obstacle set.
     static inline int default_obstacle_set_index_ =
-    
     // 0;  // Sphere and vertical cylinder.
     // 1;  // Sphere and 6 cylinders.
     // 2;  // Sphere and plane.
     // 3;  // Sphere only.
     4;  // Sphere and many little spheres.
     // 5;  // Sphere with smaller sphere inside.
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
@@ -103,26 +80,8 @@ public:
 
     BoidPtrList& boids() { return boids_; }
     const BoidPtrList& boids() const { return boids_; }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250418 try turning multithreading back on.
-    
-    
-
-//    ObstaclePtrList& obstacles() { return obstacles_; }
-//    const ObstaclePtrList& obstacles() const { return obstacles_; }
-//    
-//    Draw& draw() { return Draw::getInstance(); }
-//    const Draw& draw() const { return Draw::getInstance(); }
-
     static ObstaclePtrList& obstacles() { return obstacles_; }
-//    static const ObstaclePtrList& obstacles() const { return obstacles_; }
-    
     static Draw& draw() { return Draw::getInstance(); }
-//    const Draw& draw() const { return Draw::getInstance(); }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     
 //    util::AnimationTimer& aTimer() { return animation_timer; }
 //    const util::AnimationTimer& aTimer() const { return animation_timer; }
@@ -159,11 +118,8 @@ public:
         animation_timer_(fixed_fps())
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250418 try turning multithreading back on.
         updateObstacleSetForGUI();
         useObstacleSet();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Run boids simulation.
@@ -178,10 +134,6 @@ public:
 //        draw().simPause() = true;
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         draw().beginAnimatedScene();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250415 fix separation score / visualize parameter set in run
-//        save_centers_to_file_start();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         while (still_running())
         {
             aTimer().setFrameStartTime();
@@ -199,10 +151,6 @@ public:
             if (run_sim_this_frame)
             {
                 fly_boids(step_duration);
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250415 fix separation score / visualize parameter set in run
-//                save_centers_to_file_1_step();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 log_stats();
                 update_fps();
             }
@@ -214,10 +162,6 @@ public:
             aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
             if (not draw().simPause()) { aTimer().measureFrameDuration(); }
         }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250415 fix separation score / visualize parameter set in run
-//        save_centers_to_file_end();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         draw().endAnimatedScene();
         if (max_simulation_steps() == std::numeric_limits<double>::infinity())
         {
@@ -279,95 +223,6 @@ public:
         // Probably unneeded since initial speed is zero, nevertheless:
         boid->setPreviousPosition(boid->position());
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250415 fix separation score / visualize parameter set in run
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO for simplicity, change get/setSaveBoidCenters() to be static
-
-//        // TODO just WIP for prototyping
-//    //    std::ofstream* boid_center_data_stream_;
-//    //    bool save_boid_centers_ = true;
-//    //    void setSaveBoidCenters(bool save) { save_boid_centers_ = save; }
-//    //    bool getSaveBoidCenters() const { return save_boid_centers_; }
-//
-//        std::ofstream* boid_center_data_stream_;
-//        static inline bool save_boid_centers_ = false;
-//        void static setSaveBoidCenters(bool save) { save_boid_centers_ = save; }
-//        bool static getSaveBoidCenters() { return save_boid_centers_; }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-//    void save_centers_to_file_start()
-//    {
-//        if (save_boid_centers_)
-//        {
-//            std::string file_name = "/Users/cwr/Desktop/boid_centers.py";
-//            boid_center_data_stream_ = new std::ofstream{file_name};
-//            (*boid_center_data_stream_) << "boid_centers = [" << std::endl;
-//        }
-//    }
-    
-    
-//    static inline int save_boid_centers_count_ = 0;
-//
-//    std::string save_centers_to_file_pathname()
-//    {
-//        return ("/Users/cwr/Desktop/flock_data/boid_centers_" +
-//                std::to_string(save_boid_centers_count_++) +
-//                ".py");
-//    }
-//    
-//    
-//    void save_centers_to_file_start()
-//    {
-//        if (save_boid_centers_)
-//        {
-//            std::string file_name = save_centers_to_file_pathname();
-//            std::cout << "Opening " << file_name << std::endl;
-//            boid_center_data_stream_ = new std::ofstream{file_name};
-//            (*boid_center_data_stream_) << "boid_centers = [" << std::endl;
-//        }
-//    }
-
-
-
-//    void save_centers_to_file_end() const
-//    {
-//        if (save_boid_centers_)
-//        {
-//            (*boid_center_data_stream_) << "]" << std::endl;
-//            boid_center_data_stream_->close();
-//            delete boid_center_data_stream_;
-//        }
-//    }
-//
-//    // Write Boid center positions to file.
-//    void save_centers_to_file_1_step() const
-//    {
-//        if (save_boid_centers_)
-//        {
-//            std::ofstream& output = *boid_center_data_stream_;
-//            output << "[";
-//            for (Boid* boid : boids())
-//            {
-//                Vec3 p = boid->position();
-//                output << "[";
-//                output << p.x() << "," << p.y() << "," << p.z();
-//                output << "],";
-//            }
-//            output << "]," << std::endl;
-//        }
-//    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //        def is_neighbor_of_selected(self, boid):
-    //            return (self.enable_annotation and
-    //                    self.tracking_camera and
-    //                    self.selected_boid().is_neighbor(boid))
-    
         
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
@@ -482,130 +337,6 @@ public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250415 fix separation score / visualize parameter set in run
-    
-//    // Called each simulation step, records stats for the separation score.
-//    void recordSeparationScorePerStep()
-//    {
-//        for (auto b : boids())
-//        {
-//            double score = 0;
-//            double distance = b->distanceToNearestNeighbor();
-//            if (util::between(distance, 1.5, 3))
-//            {
-//                score = util::remap_interval(distance, 1.5, 3, 0, 1);
-//            }
-//            else if (util::between(distance, 3, 6))
-//            {
-//                score = 1;
-//            }
-//            else if (util::between(distance, 6, 20))
-//            {
-//                score = util::remap_interval(distance, 6, 20, 1, 0);
-//            }
-//            separation_score_sum_ += score;
-//        }
-//    }
-    
-//        // Called each simulation step, records stats for the separation score.
-//        void recordSeparationScorePerStep()
-//        {
-//            for (auto b : boids())
-//            {
-//                double distance = b->distanceToNearestNeighbor();
-//
-//                double score = 0;
-//                if (util::between(distance, 1.5, 3))
-//                {
-//                    score = util::remap_interval(distance, 1.5, 3, 0, 1);
-//                }
-//                else if (util::between(distance, 3, 6))
-//                {
-//                    score = 1;
-//                }
-//                else if (util::between(distance, 6, 20))
-//                {
-//                    score = util::remap_interval(distance, 6, 20, 1, 0);
-//                }
-//
-//                double score2 = 0;
-//                std::vector<double> d = {0.0, 1.5, 3.0, 6.0, 20.0};
-//                std::vector<double> s = {0.0, 0.0, 1.0, 1.0,  0.0};
-//
-//    //            if (util::between(distance, 1.5, 3))
-//                if (util::between(distance, d[1], d[2]))
-//                {
-//    //                score2 = util::remap_interval(distance, 1.5, 3, 0, 1);
-//                    score2 = util::remap_interval(distance, d[1], d[2], s[1], s[2]);
-//                }
-//    //            else if (util::between(distance, 3, 6))
-//                else if (util::between(distance, d[2], d[3]))
-//                {
-//    //                score2 = 1;
-//                    score2 = s[3];
-//                }
-//    //            else if (util::between(distance, 6, 20))
-//                else if (util::between(distance, d[3], d[4]))
-//                {
-//    //                score2 = util::remap_interval(distance, 6, 20, 1, 0);
-//                    score2 = util::remap_interval(distance, d[3], d[4], s[3], s[4]);
-//                }
-//
-//                assert(score == score2);
-//
-//                separation_score_sum_ += score;
-//            }
-//        }
-
-//        // Called each simulation step, records stats for the separation score.
-//        void recordSeparationScorePerStep()
-//        {
-//            for (auto b : boids())
-//            {
-//                double distance = b->distanceToNearestNeighbor();
-//
-//    //            double score = 0;
-//    //            if (util::between(distance, 1.5, 3))
-//    //            {
-//    //                score = util::remap_interval(distance, 1.5, 3, 0, 1);
-//    //            }
-//    //            else if (util::between(distance, 3, 6))
-//    //            {
-//    //                score = 1;
-//    //            }
-//    //            else if (util::between(distance, 6, 20))
-//    //            {
-//    //                score = util::remap_interval(distance, 6, 20, 1, 0);
-//    //            }
-//
-//    //            double score2 = 0;
-//                double score = 0;
-//    //            std::vector<double> d = {0.0, 1.5, 3.0, 6.0, 20.0};
-//                std::vector<double> d = {0.0, 1.5, 3.0, 6.0, 9.0, 20.0};
-//                std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
-//                if (util::between(distance, d[1], d[2]))
-//                {
-//                    score = util::remap_interval(distance, d[1], d[2], s[1], s[2]);
-//                }
-//                else if (util::between(distance, d[2], d[3]))
-//                {
-//                    score = s[3];
-//                }
-//                else if (util::between(distance, d[3], d[4]))
-//                {
-//                    score = util::remap_interval(distance, d[3], d[4], s[3], s[4]);
-//                }
-//                else if (util::between(distance, d[4], d[5]))
-//                {
-//                    score = util::remap_interval(distance, d[4], d[5], s[4], s[5]);
-//                }
-//
-//                separation_score_sum_ += score;
-//            }
-//        }
 
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
@@ -1192,32 +923,15 @@ public:
     // between them, and making one active.
     // TODO this architecture is left over from the Python version and may need
     // to be refactored in the evoflock environment.
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250418 try turning multithreading back on.
-
-//    const std::vector<ObstaclePtrList>& preDefinedObstacleSets()
     static const std::vector<ObstaclePtrList>& preDefinedObstacleSets()
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
         if (obstacle_presets_.empty())
         {
             ObstaclePtrList obs;
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250418 try turning multithreading back on.
-            
-//            double sr = fp().sphereRadius();
-//            Vec3 sc = fp().sphereCenter();
-            
-            double sr = FlockParameters().sphereRadius();
-            Vec3 sc = FlockParameters().sphereCenter();
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
             auto iside = Obstacle::inside;
             auto oside = Obstacle::outside;
+            Vec3 sc = FlockParameters().sphereCenter();
+            double sr = FlockParameters().sphereRadius();
 
             // Set 0: sphere and right hand vertical cylinder.
             obs.clear();
@@ -1233,12 +947,7 @@ public:
             // 6 symmetric cylinders parallel to main axes.
             double c6r = sr *  4 / 30;
             double c6o = sr * 15 / 30;
-            
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20250409 adjust hand_tuned_parameters after fixing ExcludeFrom.
-//            double c6h = sr * 20 / 30;
             double c6h = 50;
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             auto add_3_cyl = [&](double c6o)
             {
@@ -1287,14 +996,8 @@ public:
             obs.push_back(new SphereObstacle(12, sc, iside));
             obstacle_presets_.push_back(obs);
 
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250418 try turning multithreading back on.
-
             // Set initial obstacle set to the default.
             draw().obstacleSetIndex() = default_obstacle_set_index_;
-//            useObstacleSet(default_obstacle_set_index_);
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         return obstacle_presets_;
     }

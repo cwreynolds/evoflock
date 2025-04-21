@@ -67,27 +67,8 @@ inline double scalarize_fitness_length(MOF mof)
     return (std::sqrt(length_sq) / std::sqrt(mof.size()));
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250414 refactor/simplify evolutionStep() for MultiObjectiveFitness
-
-//    // Take the hypervolume of MultiObjectiveFitness elements (basically product).
-//    inline double scalarize_fitness_hyperVolume(MOF mof)
-//    {
-//        // Changed 20250412 to never give zero result
-//        //return mof.hyperVolume();
-//        //return util::clip01(mof.hyperVolume() + (EF::RS().frandom01() * 0.01));
-//
-//        double random_floor = EF::RS().frandom01() * 0.01;
-//        return std::max(mof.hyperVolume(), random_floor);
-//    }
-
 // Take hypervolume (basically the product) of MultiObjectiveFitness elements.
-inline double scalarize_fitness_hyperVolume(MOF mof)
-{
-    return mof.hyperVolume();
-}
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+inline double scalarize_fitness_hyperVolume(MOF mof) {return mof.hyperVolume();}
 
 // Map a MultiObjectiveFitness to a scalar. Used as the FitnessScalarizeFunction
 // for Population::evolutionStep(). Usually one of scalarize_fitness_min(),
@@ -176,93 +157,8 @@ inline void fitness_logger(const MOF& mof)
     std::cout.precision(old_precision);
 }
 
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20250420 make tiny flock just to pop up Open3D's window.
-
-//x
-//    // Run flock simulation with given parameters "runs" times and returns the MOF
-//    // with the LEAST scalar fitness score.
-//    // TODO 20240515 maybe the name should be measure_fitness_of_fp() ?
-//
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    // TODO 20250416 GUI cmd to visualize "best" Individual.
-//
-//    //inline MOF run_flock_simulation(const FlockParameters& fp, bool write_file = false)
-//    //inline MOF run_flock_simulation(const FlockParameters& fp)
-//    inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
-//
-//    {
-//    //    int runs = 4;
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        MOF least_mof;
-//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
-//        std::vector<double> scalar_fits;
-//        std::mutex save_mof_mutex;
-//
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20250418 try turning multithreading back on.
-//        // TODO 20250419 conflicts between multithreading and draw.
-//
-//    //    Flock::preDefinedObstacleSets();
-//
-//        Draw::getInstance().setEnable(false);
-//        debugPrint(Draw::getInstance().enable())
-//
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//        // Perform one simulation run, and record results.
-//        auto do_1_run = [&]()
-//        {
-//            // These steps can happen in parallel threads:
-//            Flock flock;
-//            init_flock(flock);
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20250415 fix separation score / visualize parameter set in run
-//    //        flock.setSaveBoidCenters(write_file);
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            flock.fp() = fp;
-//            flock.run();
-//            MOF mof = multiObjectiveFitnessOfFlock(flock);
-//            // These steps happen in the single thread with lock on save_mof_mutex.
-//            {
-//                std::lock_guard<std::mutex> smm(save_mof_mutex);
-//                assert(mof.size() == mof_names().size());
-//                scalar_fits.push_back(scalarize_fitness(mof));
-//                if (least_scalar_fitness > scalar_fits.back())
-//                {
-//                    least_scalar_fitness = scalar_fits.back();
-//                    least_mof = mof;
-//                }
-//            }
-//        };
-//
-//        if (EF::enable_multithreading)
-//        {
-//            // Do each simulation run in a parallel thread.
-//            std::vector<std::thread> threads;
-//            for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
-//            // Wait for helper threads to finish, join them with this thread.
-//            for (auto& t : threads) { t.join(); }
-//        }
-//        else
-//        {
-//            // Do simulation runs sequentially.
-//            for (int r = 0; r < runs; r++) { do_1_run(); }
-//        }
-//
-//        assert(scalar_fits.size() == runs);
-//        fitness_logger(least_mof);
-//        std::cout << "    min composite "<< least_scalar_fitness;
-//        std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
-//        std::cout << std::endl << std::endl;
-//        return least_mof;
-//    }
-
-
 // Run flock simulation with given parameters "runs" times and returns the MOF
 // with the LEAST scalar fitness score.
-// TODO 20240515 maybe the name should be measure_fitness_of_fp() ?
-
 inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
 {
     MOF least_mof;
@@ -292,6 +188,9 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
         }
     };
     
+    // Occasionally poll the Draw GUI to check for events esp the "B" command.
+    Draw::getInstance().pollEvents();
+
     if (EF::enable_multithreading)
     {
         bool previous_enable_state = Draw::getInstance().enable();
@@ -307,7 +206,7 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
     }
     else
     {
-        // Do simulation runs sequentially.
+        // Do each simulation run sequentially.
         for (int r = 0; r < runs; r++) { do_1_run(); }
     }
     
@@ -318,9 +217,6 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
     std::cout << std::endl << std::endl;
     return least_mof;
 }
-
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
 
 // TODO 20240622 just temporary for debugging
 std::map<LP::Individual*, Vec3> values_of_individuals;
@@ -398,23 +294,11 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
     
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250416 GUI cmd to visualize "best" Individual.
-
-//    // Run flock simulation with given parameters, return a MultiObjectiveFitness.
-//    inline MOF run_hand_tuned_flock_simulation(bool write_flock_data_file = false)
-//    {
-//        return run_flock_simulation(FlockParameters(), write_flock_data_file);
-//    }
-
-
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
 inline MOF run_hand_tuned_flock_simulation()
 {
     return run_flock_simulation(FlockParameters());
 }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 
@@ -536,34 +420,6 @@ FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250416 GUI cmd to visualize "best" Individual.
-
-//    // Wrote this to run at the end of evolution on the top-10 fitness individuals
-//    // of population in order to record flock data for playback
-//    inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
-//    {
-//        // Is this tree copy needed to avoid using the previous cached tree root?
-//        LazyPredator::GpTree t = individual->tree();
-//
-//        // Run simulation and write flock data file (second arg == true).
-//        return run_flock_simulation(fp_from_ga_tree(t), true);
-//    }
-
-//    // Wrote this to run at the end of evolution on the top-10 fitness individuals
-//    // of population in order to record flock data for playback
-//    inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
-//    {
-//        // Is this tree copy needed to avoid using the previous cached tree root?
-//        LazyPredator::GpTree t = individual->tree();
-//
-//    //    // Run simulation and write flock data file (second arg == true).
-//    //    return run_flock_simulation(fp_from_ga_tree(t), true);
-//
-//        // Run simulation.
-//        return run_flock_simulation(fp_from_ga_tree(t));
-//    }
-
 // Wrote this to run at the end of evolution on the top-10 fitness individuals
 // of population in order to record flock data for playback
 inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
@@ -573,22 +429,6 @@ inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
     // Run simulation.
     return run_flock_simulation(fp_from_ga_tree(t));
 }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-// So for example, here is the first random tree from:
-//
-//     int max_tree_size = 20;
-//     std::string root_type = "Fitness_0_1";
-//     FunctionSet::makeRandomTree(max_tree_size, root_type, tree):
-//
-//     Run_Flock(57.4155, 35.5876, 95.5118, 92.8331,           // speeds
-//               78.8442, 13.9993, 97.2554, 37.0498, 39.6934,  // weights
-//               90.704,                                       // max dist sep
-//               5.53134, 9.07756, 1.08763,                    // exponents
-//               0.534839, 0.0996812, 0.405398)                // angle
 
 
 // A custom “GA style” crossover for this degenerate GP function set.

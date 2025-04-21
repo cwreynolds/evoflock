@@ -214,516 +214,43 @@ public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240708 WIP for MOF elitism
-private:
-    MultiObjectiveFitness elite_mof_;
-public:
-    
-    void updateEliteMOF(const MultiObjectiveFitness& mof)
-    {
-        if (elite_mof_.empty()) { elite_mof_ = mof; }  // First update.
-        assert(mof.size() == elite_mof_.size());
-        for (int i = 0; i < mof.size(); i++)
-        {
-            elite_mof_.at(i) = std::max(mof.at(i), elite_mof_.at(i));
-        }
-    }
-
-    bool isEliteMOF(const MultiObjectiveFitness& mof) const
-    {
-        bool elite = false;
-        assert(mof.size() == elite_mof_.size());
-        for (int i = 0; i < mof.size(); i++)
-        {
-            double mo = mof.at(i);
-            double eo = elite_mof_.at(i);
-            if (util::between(mo, 0.05, 0.95) and (mo >= eo)) { elite = true; }
-        }
-        return elite;
-    }
+//    private:
+//        MultiObjectiveFitness elite_mof_;
+//    public:
+//        
+//        void updateEliteMOF(const MultiObjectiveFitness& mof)
+//        {
+//            if (elite_mof_.empty()) { elite_mof_ = mof; }  // First update.
+//            assert(mof.size() == elite_mof_.size());
+//            for (int i = 0; i < mof.size(); i++)
+//            {
+//                elite_mof_.at(i) = std::max(mof.at(i), elite_mof_.at(i));
+//            }
+//        }
+//
+//        bool isEliteMOF(const MultiObjectiveFitness& mof) const
+//        {
+//            bool elite = false;
+//            assert(mof.size() == elite_mof_.size());
+//            for (int i = 0; i < mof.size(); i++)
+//            {
+//                double mo = mof.at(i);
+//                double eo = elite_mof_.at(i);
+//                if (util::between(mo, 0.05, 0.95) and (mo >= eo)) { elite = true; }
+//            }
+//            return elite;
+//        }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240718 experiment using "hypervolume" as metric for TG
-
-//        // Perform one step of the "steady state" evolutionary computation using
-//        // "multi objective fitness" -- basically a vector of scalar fitness values
-//        // each for an independent, potentially conflicting measure of fitness. It
-//        // is given a MultiObjectiveFitnessFunction (which maps an individual to a
-//        // MultiObjectiveFitness) and a FitnessScalarizeFunction (which maps a
-//        // MultiObjectiveFitness to a summary scalar, used to rank Individuals in
-//        // the Population by quality). It creates a TournamentFunction from those,
-//        // which is passed to a different version of evolutionStep(). Each evolution
-//        // step this chooses one of the N objectives (the one with most potential
-//        // for improvement) and treats that as a scalar fitness for this step.
-//        void evolutionStep(MultiObjectiveFitnessFunction mo_fitness_function,
-//                           FitnessScalarizeFunction fitness_scalarize_function)
-//        {
-//            // State shared between lambdas below.
-//            double prev_best_pop_fitness = bestFitness()->getFitness();
-//            bool found_new_best = false;
-//            // Customized function to perform MOF evaluation of individual.
-//            auto mof_eval = [&](Individual* individual)
-//            {
-//                if (not individual->hasMultiObjectiveFitness())
-//                {
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    // TODO 20240625 will it work without this? its before the
-//                    //       mo_fitness_function which is where it is value to eval.
-//
-//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                    // TODO 20240630 OH!! taking this out made Boid::GP_not_GA=true
-//                    // work, but BROKE "Boid::GP_not_GA=false" (and all previous FS)
-//                    // Apparently I want to make this optional, default ON but have
-//                    // a way to set it to OFF for the Boid::GP_not_GA=true case
-//
-//                    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                    // TODO 20240701 external switch -- temporary?
-//
-//    //                individual->treeValue();
-//
-//                    if (explicit_treeValue_in_evolutionStep)
-//                    {
-//                        individual->treeValue();
-//                    }
-//                    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    MultiObjectiveFitness mof = mo_fitness_function(individual);
-//                    individual->setMultiObjectiveFitness(mof);
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    // TODO 20240708 WIP for MOF elitism
-//                    updateEliteMOF(mof);
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    double scalar = fitness_scalarize_function(mof);
-//                    individual->setFitness(scalar);
-//                    if (scalar > prev_best_pop_fitness) { found_new_best = true;}
-//                    sort_cache_invalid_ = true;
-//                }
-//            };
-//            // Create TournamentFunction from given fitness and scalarizer functions.
-//            auto tournament_function = [&](TournamentGroup group)
-//            {
-//                // Make sure each group Individual has cached MultiObjectiveFitness.
-//                for (auto& m : group.members()) { mof_eval(m.individual); }
-//    //            // Store customized evaluation function on TournamentGroup.
-//    //            group.custom_eval = mof_eval;
-//                // Select best of the multiple fitnesses to use for this step.
-//                size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
-//                // Set the "metric" of each TournamentGroup member to that
-//                // "best_mof_index" of the member's MultiObjectiveFitness.
-//                for (auto& m : group.members())
-//                {
-//                    const auto& mof = m.individual->getMultiObjectiveFitness();
-//                    m.metric =  mof.at(best_mof_index);
-//                }
-//                // Sort the TournamentGroup by metric, least first.
-//                group.sort();
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20240710 WIP for MOF elitism
-//
-//    //            // Preserve population best fitness regardless of MOF metrics.
-//    //            if (found_new_best) { group.setValid(false); }
-//
-//                protectEliteMOF(group);
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//                return group;
-//            };
-//            // Finally, do a tournament-based evolution step.
-//            evolutionStep(tournament_function);
-//        }
-
-//        // Perform one step of the "steady state" evolutionary computation using
-//        // "multi objective fitness" -- basically a vector of scalar fitness values
-//        // each for an independent, potentially conflicting measure of fitness. It
-//        // is given a MultiObjectiveFitnessFunction (which maps an individual to a
-//        // MultiObjectiveFitness) and a FitnessScalarizeFunction (which maps a
-//        // MultiObjectiveFitness to a summary scalar, used to rank Individuals in
-//        // the Population by quality). It creates a TournamentFunction from those,
-//        // which is passed to a different version of evolutionStep(). Each evolution
-//        // step this chooses one of the N objectives (the one with most potential
-//        // for improvement) and treats that as a scalar fitness for this step.
-//        void evolutionStep(MultiObjectiveFitnessFunction mo_fitness_function,
-//                           FitnessScalarizeFunction fitness_scalarize_function)
-//        {
-//            // State shared between lambdas below.
-//            double prev_best_pop_fitness = bestFitness()->getFitness();
-//            bool found_new_best = false;
-//            // Customized function to perform MOF evaluation of individual.
-//            auto mof_eval = [&](Individual* individual)
-//            {
-//                if (not individual->hasMultiObjectiveFitness())
-//                {
-//                    if (explicit_treeValue_in_evolutionStep)
-//                    {
-//                        individual->treeValue();
-//                    }
-//                    MultiObjectiveFitness mof = mo_fitness_function(individual);
-//                    individual->setMultiObjectiveFitness(mof);
-//                    updateEliteMOF(mof);
-//                    double scalar = fitness_scalarize_function(mof);
-//                    individual->setFitness(scalar);
-//                    if (scalar > prev_best_pop_fitness) { found_new_best = true;}
-//                    sort_cache_invalid_ = true;
-//                }
-//            };
-//            // Create TournamentFunction from given fitness and scalarizer functions.
-//            auto tournament_function = [&](TournamentGroup group)
-//            {
-//                // Make sure each group Individual has cached MultiObjectiveFitness.
-//                for (auto& m : group.members()) { mof_eval(m.individual); }
-//
-//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//                // TODO 20240718 experiment using "hypervolume" as metric for TG
-//
-//                // Select best of the multiple fitnesses to use for this step.
-//                size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
-//                // Set the "metric" of each TournamentGroup member to that
-//                // "best_mof_index" of the member's MultiObjectiveFitness.
-//                for (auto& m : group.members())
-//                {
-//                    const auto& mof = m.individual->getMultiObjectiveFitness();
-//                    m.metric =  mof.at(best_mof_index);
-//                }
-//
-//    //                // Set each TournamentGroup member's "metric" to its MOF hypervolume.
-//    //                for (auto& m : group.members())
-//    //                {
-//    //                    const auto& mof = m.individual->getMultiObjectiveFitness();
-//    //                    m.metric =  mof.hyperVolume();
-//    //                    std::cout << "    #### hyperVolume = " << mof.hyperVolume();
-//    //                    std::cout << ", mof = " << mof << std::endl;
-//    //
-//    //    //                const auto& mof = m.individual->getMultiObjectiveFitness();
-//    //    //                m.metric =  mof.hyperVolumeDropout();
-//    //    //                std::cout << "    #### hyperVolume = " << m.metric;
-//    //    //                std::cout << ", mof = " << mof << std::endl;
-//    //                }
-//    //                std::cout << std::endl;
-//
-//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//
-//                // Sort the TournamentGroup by metric, least first.
-//                group.sort();
-//                protectEliteMOF(group);
-//                return group;
-//            };
-//            // Finally, do a tournament-based evolution step.
-//            evolutionStep(tournament_function);
-//        }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250414 refactor/simplify evolutionStep() for MultiObjectiveFitness
-    
-//        // Perform one step of the "steady state" evolutionary computation using
-//        // "multi objective fitness" -- basically a vector of scalar fitness values
-//        // each for an independent, potentially conflicting measure of fitness. It
-//        // is given a MultiObjectiveFitnessFunction (which maps an individual to a
-//        // MultiObjectiveFitness) and a FitnessScalarizeFunction (which maps a
-//        // MultiObjectiveFitness to a summary scalar, used to rank Individuals in
-//        // the Population by quality). It creates a TournamentFunction from those,
-//        // which is passed to a different version of evolutionStep(). Each evolution
-//        // step this chooses one of the N objectives (the one with most potential
-//        // for improvement) and treats that as a scalar fitness for this step.
-//        void evolutionStep(MultiObjectiveFitnessFunction mo_fitness_function,
-//                           FitnessScalarizeFunction fitness_scalarize_function)
-//        {
-//            // State shared between lambdas below.
-//            double prev_best_pop_fitness = bestFitness()->getFitness();
-//            bool found_new_best = false;
-//            // Customized function to perform MOF evaluation of individual.
-//            auto mof_eval = [&](Individual* individual)
-//            {
-//                if (not individual->hasMultiObjectiveFitness())
-//                {
-//                    if (explicit_treeValue_in_evolutionStep)
-//                    {
-//                        individual->treeValue();
-//                    }
-//                    MultiObjectiveFitness mof = mo_fitness_function(individual);
-//                    individual->setMultiObjectiveFitness(mof);
-//                    updateEliteMOF(mof);
-//                    double scalar = fitness_scalarize_function(mof);
-//                    individual->setFitness(scalar);
-//                    if (scalar > prev_best_pop_fitness) { found_new_best = true;}
-//                    sort_cache_invalid_ = true;
-//                }
-//            };
-//            // Create TournamentFunction from given fitness and scalarizer functions.
-//            auto tournament_function = [&](TournamentGroup group)
-//            {
-//                // Make sure each group Individual has cached MultiObjectiveFitness.
-//                for (auto& m : group.members()) { mof_eval(m.individual); }
-//
-//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//                // TODO 20240720 experiment using "dominate per MOF dimension" count
-//
-//    //            // Select best of the multiple fitnesses to use for this step.
-//    //            size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
-//    //            // Set the "metric" of each TournamentGroup member to that
-//    //            // "best_mof_index" of the member's MultiObjectiveFitness.
-//    //            for (auto& m : group.members())
-//    //            {
-//    //                const auto& mof = m.individual->getMultiObjectiveFitness();
-//    //                m.metric =  mof.at(best_mof_index);
-//    //            }
-//
-//                // Set the "metric" of each TournamentGroup member to count of MOF
-//                // dimensions its Individual dominates.
-//    //                for (int i = 0; i < group.members().size(); i++)
-//    //                {
-//    //                    auto& gm = group.members().at(i);
-//    //                    const auto& mof = gm.individual->getMultiObjectiveFitness();
-//    //                    int dominate_count = 0;
-//    //                    for (int j = 0; j < mof.size(); j++)
-//    //                    {
-//    //    //                    bool dominate = false;
-//    //                        double my_j_value = mof.at(j);
-//    //                        double max_j_value = -1; // QQQQ use -inf?
-//    //                        for (int k = 0; k < group.members().size(); k++)
-//    //                        {
-//    //                            const auto& gm2 = group.members().at(k);
-//    //                            const auto& mof2 = gm2.individual->getMultiObjectiveFitness();
-//    //    //                        if (my_j_value > mof2.at(j)) { dominate = true; }
-//    //                            if (max_j_value < mof2.at(j)) { max_j_value = mof2.at(j); }
-//    //                        }
-//    //    //                    if (my_j_value == max_j_value) { dominate = true; }
-//    //    //                    if (dominate) { dominate_count++; }
-//    //                        if (my_j_value == max_j_value) { dominate_count++; }
-//    //                    }
-//    //                    gm.metric = dominate_count;
-//    //                }
-//
-//                //~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~
-//
-//    //                for (int i = 0; i < group.members().size(); i++)
-//    //                {
-//    //                    auto& gm = group.members().at(i);
-//    //                    const auto& mof = gm.individual->getMultiObjectiveFitness();
-//    //                    int dominate_count = 0;
-//    //                    for (int j = 0; j < mof.size(); j++)
-//    //                    {
-//    //    //                    double my_j_value = mof.at(j);
-//    //                        double max_j_value = -1; // QQQQ use -inf?
-//    //                        for (int k = 0; k < group.members().size(); k++)
-//    //                        {
-//    //                            const auto& gm2 = group.members().at(k);
-//    //                            const auto& mof2 = gm2.individual->getMultiObjectiveFitness();
-//    //    //                        if (max_j_value < mof2.at(j)) { max_j_value = mof2.at(j); }
-//    //
-//    //                            if (i != k)
-//    //                            {
-//    //                                if (max_j_value < mof2.at(j))
-//    //                                {
-//    //                                    max_j_value = mof2.at(j);
-//    //                                }
-//    //                            }
-//    //                        }
-//    //                        if (mof.at(j) > max_j_value) { dominate_count++; }
-//    //                    }
-//    //                    gm.metric = dominate_count;
-//    //                }
-//    //
-//    //                std::cout << std::endl << "**************************" << std::endl;
-//    //    //            group.print();
-//    //                for (auto& m : group.members())
-//    //                {
-//    //                    std::cout << "metric = " << m.metric << ", mof = ";
-//    //                    std::cout << m.individual->getMultiObjectiveFitness().to_string();
-//    //                    std::cout << std::endl;
-//    //                }
-//    //                std::cout << "**************************" << std::endl << std::endl;
-//
-//                //~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~
-//
-//
-//    //            count_objectives_dominated(group);
-//
-//                //~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~    ~~
-//
-//
-//                //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
-//                // TODO 20240726_for_GA_compare_3_TG_metrics
-//
-//    //                // Randomly combine COD with the two versions of best_mof_index.
-//    //    //            if (LPRS().randomBool(0.33))
-//    //    //            {
-//    //    //                countObjectivesDominated(group);
-//    //    //            }
-//    //    //            else
-//    //                {
-//    //                    // Select best of the multiple fitnesses to use for this step.
-//    //                    size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
-//    //                    // Set the "metric" of each TournamentGroup member to that
-//    //                    // "best_mof_index" of the member's MultiObjectiveFitness.
-//    //                    for (auto& m : group.members())
-//    //                    {
-//    //                        const auto& mof = m.individual->getMultiObjectiveFitness();
-//    //                        m.metric =  mof.at(best_mof_index);
-//    //                    }
-//    //                }
-//
-//    //    //            // Randomly combine COD with the two versions of best_mof_index.
-//    //    //            if (LPRS().randomBool(0.33))
-//    //    //            {
-//    //                    countObjectivesDominated(group);
-//    //    //            }
-//    //    //            else
-//    //    //            {
-//    //    //                // Select best of the multiple fitnesses to use for this step.
-//    //    //                size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
-//    //    //                // Set the "metric" of each TournamentGroup member to that
-//    //    //                // "best_mof_index" of the member's MultiObjectiveFitness.
-//    //    //                for (auto& m : group.members())
-//    //    //                {
-//    //    //                    const auto& mof = m.individual->getMultiObjectiveFitness();
-//    //    //                    m.metric =  mof.at(best_mof_index);
-//    //    //                }
-//    //    //            }
-//
-//    //            // Randomly combine COD with the two versions of best_mof_index.
-//    //            if (LPRS().randomBool(0.33))
-//    //            {
-//    //                countObjectivesDominated(group);
-//    //            }
-//    //            else
-//                {
-//                    // Select best of the multiple fitnesses to use for this step.
-//                    size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
-//                    // Set the "metric" of each TournamentGroup member to that
-//                    // "best_mof_index" of the member's MultiObjectiveFitness.
-//                    for (auto& m : group.members())
-//                    {
-//                        const auto& mof = m.individual->getMultiObjectiveFitness();
-//                        m.metric =  mof.at(best_mof_index);
-//                    }
-//                }
-//
-//                //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
-//
-//
-//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//
-//                // Sort the TournamentGroup by metric, least first.
-//                group.sort();
-//                protectEliteMOF(group);
-//                return group;
-//            };
-//            // Finally, do a tournament-based evolution step.
-//            evolutionStep(tournament_function);
-//        }
-
-    
-//        // Perform one step of the "steady state" evolutionary computation using
-//        // "multi objective fitness" -- basically a vector of scalar fitness values
-//        // each for an independent, potentially conflicting measure of fitness. It
-//        // is given a MultiObjectiveFitnessFunction (which maps an individual to a
-//        // MultiObjectiveFitness) and a FitnessScalarizeFunction (which maps a
-//        // MultiObjectiveFitness to a summary scalar, used to rank Individuals in
-//        // the Population by quality). It creates a TournamentFunction from those,
-//        // which is passed to a different version of evolutionStep(). Each evolution
-//        // step this chooses one of the N objectives (the one with most potential
-//        // for improvement) and treats that as a scalar fitness for this step.
-//        void evolutionStep(MultiObjectiveFitnessFunction mo_fitness_function,
-//                           FitnessScalarizeFunction fitness_scalarize_function)
-//        {
-//            // State shared between lambdas below.
-//            double prev_best_pop_fitness = bestFitness()->getFitness();
-//            bool found_new_best = false;
-//            // Customized function to perform MOF evaluation of individual.
-//            auto mof_eval = [&](Individual* individual)
-//            {
-//                if (not individual->hasMultiObjectiveFitness())
-//                {
-//                    if (explicit_treeValue_in_evolutionStep)
-//                    {
-//                        individual->treeValue();
-//                    }
-//                    MultiObjectiveFitness mof = mo_fitness_function(individual);
-//                    individual->setMultiObjectiveFitness(mof);
-//
-//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                    // TODO 20250414 refactor/simplify evolutionStep() for MultiObjectiveFitness
-//                    // I think I want to avoid this in the new version:
-//                    updateEliteMOF(mof);
-//                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//
-//                    double scalar = fitness_scalarize_function(mof);
-//                    individual->setFitness(scalar);
-//                    if (scalar > prev_best_pop_fitness) { found_new_best = true;}
-//                    sort_cache_invalid_ = true;
-//                }
-//            };
-//            // Create TournamentFunction from given fitness and scalarizer functions.
-//            auto tournament_function = [&](TournamentGroup group)
-//            {
-//                // Make sure each group Individual has cached MultiObjectiveFitness.
-//                for (auto& m : group.members()) { mof_eval(m.individual); }
-//
-//    //            {
-//    //                // Select best of the multiple fitnesses to use for this step.
-//    //                size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
-//    //                // Set the "metric" of each TournamentGroup member to that
-//    //                // "best_mof_index" of the member's MultiObjectiveFitness.
-//    //                for (auto& m : group.members())
-//    //                {
-//    //                    const auto& mof = m.individual->getMultiObjectiveFitness();
-//    //                    m.metric =  mof.at(best_mof_index);
-//    //                }
-//    //            }
-//
-//    //            // Select best of the multiple fitnesses to use for this step.
-//    //            size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
-//    //            // Set the "metric" of each TournamentGroup member to that
-//    //            // "best_mof_index" of the member's MultiObjectiveFitness.
-//    //            for (auto& m : group.members())
-//    //            {
-//    //                const auto& mof = m.individual->getMultiObjectiveFitness();
-//    //                m.metric =  mof.at(best_mof_index);
-//    //            }
-//
-//    //            // Select best of the multiple fitnesses to use for this step.
-//    //            size_t best_mof_index = group.pickMultiObjectiveFitnessIndex();
-//
-//                // Set each TG member's "metric" to the scalarized MOF fitness.
-//                for (auto& m : group.members())
-//                {
-//    //                const auto& mof = m.individual->getMultiObjectiveFitness();
-//    //                m.metric =  mof.at(best_mof_index);
-//                    m.metric = m.individual->getFitness();
-//                }
-//
-//                // Sort the TournamentGroup by metric, least first.
-//                group.sort();
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                // TODO 20250414 refactor/simplify evolutionStep() for MultiObjectiveFitness
-//                // I think I want to avoid this in the new version:
-//    //            protectEliteMOF(group);
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//
-//                return group;
-//            };
-//            // Finally, do a tournament-based evolution step.
-//            evolutionStep(tournament_function);
-//        }
-    
-    // TODO 20250414 -- rewrite this doc-comment if this implementation is kept.
-    //
     // Perform one step of the "steady state" evolutionary computation using
     // "multi objective fitness" -- basically a vector of scalar fitness values
     // each for an independent, potentially conflicting measure of fitness. It
     // is given a MultiObjectiveFitnessFunction (which maps an individual to a
     // MultiObjectiveFitness) and a FitnessScalarizeFunction (which maps a
-    // MultiObjectiveFitness to a summary scalar, used to rank Individuals in
-    // the Population by quality). It creates a TournamentFunction from those,
-    // which is passed to a different version of evolutionStep(). Each evolution
-    // step this chooses one of the N objectives (the one with most potential
-    // for improvement) and treats that as a scalar fitness for this step.
+    // MultiObjectiveFitness to a scalar fitness by hypervolume). This function
+    // creates a TournamentFunction from those parameters, which is passed to
+    // an overload version of evolutionStep().
     void evolutionStep(MultiObjectiveFitnessFunction mo_fitness_function,
                        FitnessScalarizeFunction fitness_scalarize_function)
     {
@@ -765,10 +292,6 @@ public:
         // Finally, do a tournament-based evolution step.
         evolutionStep(tournament_function);
     }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -780,43 +303,43 @@ public:
     // Use this to set TournamentGroupMembers::metric
     
     
-    void countObjectivesDominated(TournamentGroup& group)
-    {
-        for (int i = 0; i < group.members().size(); i++)
-        {
-            auto& gm = group.members().at(i);
-            const auto& mof = gm.individual->getMultiObjectiveFitness();
-            int dominate_count = 0;
-            for (int j = 0; j < mof.size(); j++)
-            {
-                double max_j_value = -1; // QQQQ use -inf?
-                for (int k = 0; k < group.members().size(); k++)
-                {
-                    const auto& gm2 = group.members().at(k);
-                    const auto& mof2 = gm2.individual->getMultiObjectiveFitness();
-                    if (i != k)
-                    {
-                        double mof2_j = mof2.at(j);
-                        if (max_j_value < mof2_j) { max_j_value = mof2_j; }
-                    }
-                }
-                if (mof.at(j) > max_j_value) { dominate_count++; }
-            }
-            gm.metric = dominate_count;
-        }
-        
-        std::string sep = "****************************************************";
-        std::cout << std::endl;
-        std::cout << sep << std::endl;
-        for (auto& m : group.members())
-        {
-            auto mof = m.individual->getMultiObjectiveFitness();
-            std::cout << "metric = " << m.metric << ", mof = {";
-            std::cout << vec_to_string(mof.as_vector(), 4) << "}" << std::endl;
-        }
-        std::cout << sep << std::endl;
-        std::cout << std::endl;
-    }
+//    void countObjectivesDominated(TournamentGroup& group)
+//    {
+//        for (int i = 0; i < group.members().size(); i++)
+//        {
+//            auto& gm = group.members().at(i);
+//            const auto& mof = gm.individual->getMultiObjectiveFitness();
+//            int dominate_count = 0;
+//            for (int j = 0; j < mof.size(); j++)
+//            {
+//                double max_j_value = -1; // QQQQ use -inf?
+//                for (int k = 0; k < group.members().size(); k++)
+//                {
+//                    const auto& gm2 = group.members().at(k);
+//                    const auto& mof2 = gm2.individual->getMultiObjectiveFitness();
+//                    if (i != k)
+//                    {
+//                        double mof2_j = mof2.at(j);
+//                        if (max_j_value < mof2_j) { max_j_value = mof2_j; }
+//                    }
+//                }
+//                if (mof.at(j) > max_j_value) { dominate_count++; }
+//            }
+//            gm.metric = dominate_count;
+//        }
+//        
+//        std::string sep = "****************************************************";
+//        std::cout << std::endl;
+//        std::cout << sep << std::endl;
+//        for (auto& m : group.members())
+//        {
+//            auto mof = m.individual->getMultiObjectiveFitness();
+//            std::cout << "metric = " << m.metric << ", mof = {";
+//            std::cout << vec_to_string(mof.as_vector(), 4) << "}" << std::endl;
+//        }
+//        std::cout << sep << std::endl;
+//        std::cout << std::endl;
+//    }
     
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -832,48 +355,48 @@ public:
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     
-    // rethink name
-    
-    // Inspect Individuals in TournamentGroup. Determine if any are "elite": by
-    // dominating any one of the MOF objectives, or by having best of population
-    // scalar fitness. If elites are found, then set the TournamentGroup to be
-    // invalid, so to prevent "death".
-//    void protectEliteMOF(TournamentGroup group)
-    void protectEliteMOF(TournamentGroup& group)
-    {
-        for (auto& m : group.members())
-        {
-            Individual* individual = m.individual;
-            MultiObjectiveFitness mof = individual->getMultiObjectiveFitness();
-            double prev_best_pop_fitness = bestFitness()->getFitness();
-            double fitness = individual->getFitness();
-            if (fitness >= prev_best_pop_fitness)
-            {
-//                std::cout << "QQQQ protect best scalarized fitness" << std::endl;
-                group.setValid(false);
-            }
-            
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-            // TODO 20240717 add global switch: protect_elite_mof
-
-//            if (isEliteMOF(mof))
-            if (isEliteMOF(mof) and protect_elite_mof)
-
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-            {
-//                std::cout << std::endl <<
-//                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-//                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-//                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-//                    << std::endl;
-//                debugPrint(elite_mof_)
-//                std::cout << "       ";
-//                debugPrint(mof)
-//                std::cout << std::endl;
-                group.setValid(false);
-            }
-        }
-    }
+//        // rethink name
+//
+//        // Inspect Individuals in TournamentGroup. Determine if any are "elite": by
+//        // dominating any one of the MOF objectives, or by having best of population
+//        // scalar fitness. If elites are found, then set the TournamentGroup to be
+//        // invalid, so to prevent "death".
+//    //    void protectEliteMOF(TournamentGroup group)
+//        void protectEliteMOF(TournamentGroup& group)
+//        {
+//            for (auto& m : group.members())
+//            {
+//                Individual* individual = m.individual;
+//                MultiObjectiveFitness mof = individual->getMultiObjectiveFitness();
+//                double prev_best_pop_fitness = bestFitness()->getFitness();
+//                double fitness = individual->getFitness();
+//                if (fitness >= prev_best_pop_fitness)
+//                {
+//    //                std::cout << "QQQQ protect best scalarized fitness" << std::endl;
+//                    group.setValid(false);
+//                }
+//
+//                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//                // TODO 20240717 add global switch: protect_elite_mof
+//
+//    //            if (isEliteMOF(mof))
+//                if (isEliteMOF(mof) and protect_elite_mof)
+//
+//                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//                {
+//    //                std::cout << std::endl <<
+//    //                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+//    //                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+//    //                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+//    //                    << std::endl;
+//    //                debugPrint(elite_mof_)
+//    //                std::cout << "       ";
+//    //                debugPrint(mof)
+//    //                std::cout << std::endl;
+//                    group.setValid(false);
+//                }
+//            }
+//        }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

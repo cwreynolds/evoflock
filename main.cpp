@@ -18,15 +18,6 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20241204 why are all GP fitnesses {0, 0, 0, 0, 0}?
-#define    PREVENT_0_FITNESS
-#ifdef     PREVENT_0_FITNESS
-#else   // PREVENT_0_FITNESS
-#endif  // PREVENT_0_FITNESS
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240628 can we do an eval of a const tree?
 //#define eval_const_20240628
 #ifdef eval_const_20240628
@@ -36,29 +27,24 @@
 
 #include "evoflock.h"
 
-
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20250416 GUI cmd to visualize "best" Individual.
-
-//void visualize_best_if_requested(LP::Population* population)
-//{
-//    Draw& draw = Draw::getInstance();
-//    if (draw.getVisBestMode())
+//    void visualize_best_if_requested(LP::Population* population)
 //    {
-//        bool enable_saved = draw.enable();
-//        draw.setEnable(true);
-//        LP::Individual* individual = population->bestFitness();
-//        LP::GpTree tree = individual->tree();
-//        FlockParameters fp = GP::fp_from_ga_tree(tree);
-//        GP::run_flock_simulation(fp, 1);
-//        draw.setEnable(enable_saved);
-//        draw.clearVisBestMode();
+//        Draw& draw = Draw::getInstance();
+//        if (draw.getVisBestMode())
+//        {
+//            bool previous_emt_state = EF::enable_multithreading;
+//            EF::enable_multithreading = false;
+//            LP::Individual* individual = population->bestFitness();
+//            LP::GpTree tree = individual->tree();
+//            FlockParameters fp = GP::fp_from_ga_tree(tree);
+//            GP::run_flock_simulation(fp, 1);
+//            EF::enable_multithreading = previous_emt_state;
+//            draw.clearVisBestMode();
+//        }
 //    }
-//}
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 
@@ -66,113 +52,17 @@ int main(int argc, const char * argv[])
 {
     EF::setRS(LP::LPRS());
     EF::unit_test();
-
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20250111 arrange non-intersecting hollow spheres
-//        
-//        shape::arrangeNonOverlappingSpheres({1,2,3,4,5}, 5, 50);
-//    //    auto centers = shape::arrangeNonOverlappingSpheres({1,2,3,4,5}, 5, 50);
-//        auto centers = shape::arrangeNonOverlappingSpheres({5,10,15,20,25}, 5, 50);
-//
-//        std::cout << util::vec_to_string(centers, 4) << std::endl;
-//    //    return EXIT_SUCCESS;
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-    // TODO 20241109 2-point cylinder demo
-//    Draw::cylinders_on_tri_mesh_edges();
-//    return EXIT_SUCCESS;
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-
-    //--------------------------------------------------------------------------
     
-//        // TODO 20240715 WIP new approach to tree generation.
-//
-//        {
-//            LP::FunctionSet fs =  GP::evoflock_gp_function_set();
-//            fs.print();
-//            
-//    //        for (int i = 0; i < 10000; i++)
-//            for (int i = 0; i < 1000000; i++)
-//            {
-//                std::cout << i << ":" << std::endl;
-//    //            LP::GpTree gp_tree = fs.newMakeRandomTree(5, 50);
-//    //            LP::GpTree gp_tree = fs.newMakeRandomTree(90, 100);
-//    //            LP::GpTree gp_tree = fs.newMakeRandomTree(80, 100);
-//                LP::GpTree gp_tree = fs.newMakeRandomTree(20, 60);
-//                debugPrint(gp_tree.size());
-//                std::cout << gp_tree.to_string(true) << std::endl;
-//                std::cout << std::endl << std::endl;
-//            }
-//        }
-//        return EXIT_SUCCESS;
+    // TODO experimental_GP_stub
+    Boid::GP_not_GA = false;
 
-    //--------------------------------------------------------------------------
-    
-//    GP::evoflock_gp_function_set().print_typical_trees(10, 30, 50);
-//    return EXIT_SUCCESS;
-    
-    //--------------------------------------------------------------------------
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20240723 going back to GA to make sure that still works.
-//    Boid::GP_not_GA = false;
-//    Boid::GP_not_GA = true;
-//    Boid::GP_not_GA = false;
-//    Boid::GP_not_GA = true;
-//    Boid::GP_not_GA = false;  // 20240813
-//    Boid::GP_not_GA = true;  // 20240814
-    Boid::GP_not_GA = false;  // 20240913
-//    Boid::GP_not_GA = true;  // 20241021
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 202400807 why are obstacles ignored?
-    
-//    EF::enable_multithreading = false;
-
-//    // 20240813
-//    EF::enable_multithreading = true;
-
-//    // 20240814
-//    EF::enable_multithreading = false;
-
-//    // 20240822
-//    EF::enable_multithreading = true;
-
-    // 20240915
-//    EF::enable_multithreading = false;
-//    EF::enable_multithreading = true;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250418 try turning multithreading back on.
-
-//    // 20240919
-//    EF::enable_multithreading = false;
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250419 conflicts between multithreading and draw.
-
-    // 20250418
-//    EF::enable_multithreading = true;
-//    EF::enable_multithreading = false;
-
-//        // 20250419
-//        EF::enable_multithreading = true;
-//    //    Flock::preDefinedObstacleSets();
-//        Draw::getInstance(false);
-
-//    // 20250419
-//    EF::enable_multithreading = true;
-//    Flock::preDefinedObstacleSets();
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250420 make tiny flock just to pop up Open3D's window.
-
+    // Enable multiprocessing (run 4 Flock simulations in parallel, process
+    // Flock's boids in parallel).
     EF::enable_multithreading = true;
-//    EF::enable_multithreading = false;
 
+    // But first here in the main thread, build (then delete) one Flock object to
+    // set up static state, such as defining Obstacle sets, making one active,
+    // then uploading it to GPU.
     {
         Flock flock;
         flock.set_boid_count(10);
@@ -180,231 +70,46 @@ int main(int argc, const char * argv[])
         flock.fp() = FlockParameters();
     }
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20240713 experiment with increasing initial tree size.
-    //               LP::Individual::increasing_initial_tree_size = true;
-    
-//    int individuals = 500;
-//    int subpops = 25;
-//    int max_evolution_steps = Boid::GP_not_GA ? 15000 : 30000;
-    
-
-//    int individuals = 2000;
-//    int subpops = 50;
-//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
-
-//    int individuals = 300;
-//    int subpops = 17;
-//    int max_evolution_steps = Boid::GP_not_GA ? 50000 : 30000;
-
-//    int individuals = 600;
-//    int subpops = 25;
-//    int max_evolution_steps = Boid::GP_not_GA ? 50000 : 30000;
-
-//    // 20240718
-//    int individuals = 500;
-//    int subpops = 22;
-//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
-
-//    // 20240718
-//    int individuals = 1000;
-//    int subpops = 32;
-//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
-
-//    // 20240719
-//    int individuals = 250;
-//    int subpops = 16;
-//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
-
-//    // 20240719
-//    int individuals = 500;
-//    int subpops = 22;
-//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
-
-//    // 20240721
-//    int individuals = 2000;
-//    int subpops = 100;
-//    int max_evolution_steps = Boid::GP_not_GA ? 120000 : 30000;
-
-//    // 20240721
-//    int individuals = 500;
-//    int subpops = 22;
-//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
-
-//    // 20240724
-//    int individuals = 1000;
-//    int subpops = 32;
-//    int max_evolution_steps = Boid::GP_not_GA ? 60000 : 30000;
-
-//    // 20240729 4X
-//    int individuals = 2000;
-//    int subpops = 45;
-//    int max_evolution_steps = Boid::GP_not_GA ? 120000 : 30000;
-
-//    // 20240730
-//    int individuals = 500;
-//    int subpops = 22;
-//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
-
-//        // 20240810
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20241203 use default FlockParameters for testing
-//    //    int individuals = 500;
-//    //    int subpops = 22;
-//
-//    //    int individuals = 10;
-//        int individuals = 20;
-//
-//    //    int subpops = 1;
-//        int subpops = 3;
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250414 refactor/simplify evolutionStep() for MultiObjectiveFitness
     int individuals = 500;
     int subpops = 25;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-//    int max_evolution_steps = Boid::GP_not_GA ? 30000 : 30000;
     int max_evolution_steps = Boid::GP_not_GA ? 20 : 30000;
 
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        
-    //    int min_tree_size = 2;
-    //    int max_tree_size = 20;
-    
-    //    int min_tree_size = Boid::GP_not_GA ? 10  :  2;
-    //    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
-    
-    //    int min_tree_size = Boid::GP_not_GA ? 20 :  2;
-    //    int max_tree_size = Boid::GP_not_GA ? 50 : 20;
-    
-    //    int min_tree_size = Boid::GP_not_GA ? 20  :  2;
-    //    int max_tree_size = Boid::GP_not_GA ? 100 : 20;
-    
-    // 20250411 stop using only hand-tuned function set.
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
     debugPrint(ga_tree_size);
+    
     int min_crossover_tree_size = Boid::GP_not_GA ? 20 :  2;
     int max_crossover_tree_size = Boid::GP_not_GA ? 60 : ga_tree_size;
+    int max_initial_tree_size   = Boid::GP_not_GA ? 60 : ga_tree_size;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240720 did I make this too large?
-    
-//    int max_initial_tree_size   = Boid::GP_not_GA ? 60 : 20;
-    
-//    // 20240720
-//    int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
-    
-//    // 20240721
-//    int max_initial_tree_size   = Boid::GP_not_GA ? 15 : 20;
-  
-//    // 20240722
-//    int max_initial_tree_size   = Boid::GP_not_GA ? 20 : 20;
-        
-    // TODO 20250411 stop using only hand-tuned function set.
-    // use of 2 for Boid::GP_not_GA seems oddly small, but I'll leave it for now
-    // Also the GA size should not be an inline constant that needs to be
-    // tracked down, as now, when the FlockParameters set gets larger.
-    int max_initial_tree_size   = Boid::GP_not_GA ? 2 : ga_tree_size;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-
-//    lp::LPRS().setSeed(20240408);
-//    lp::LPRS().setSeed(20240409);
-//    lp::LPRS().setSeed(202404091);
-//    lp::LPRS().setSeed(20240410);
-//    lp::LPRS().setSeed(2024041015);
-//    lp::LPRS().setSeed(2024041114);
-//    lp::LPRS().setSeed(2024041416);
-//    lp::LPRS().setSeed(2024041716);
-//    lp::LPRS().setSeed(2024041916);
-//    lp::LPRS().setSeed(20240424);
-//    lp::LPRS().setSeed(20240427);
-//    lp::LPRS().setSeed(20240504);
-//    lp::LPRS().setSeed(20240505);
-//    lp::LPRS().setSeed(20240506);
-//    lp::LPRS().setSeed(20240508);
-//    lp::LPRS().setSeed(20240509);
-//    lp::LPRS().setSeed(20240512);
-//    LP::LPRS().setSeed(20240606);
-//    LP::LPRS().setSeed(20240708);
-//    LP::LPRS().setSeed(20240710);
-//    LP::LPRS().setSeed(20240713);
-//    LP::LPRS().setSeed(20240714);
-//    LP::LPRS().setSeed(20240718);
-//    LP::LPRS().setSeed(20240721);
     LP::LPRS().setSeed(20240722);
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240619 WIP first GP_not_GA run
-        
-
+    // TODO experimental_GP_stub
     auto fitness_function = (Boid::GP_not_GA ?
                              GP::evoflock_gp_fitness_function :
                              GP::evoflock_ga_fitness_function);
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     LP::Population* population = nullptr;
 
+    // TODO experimental_GP_stub
     LP::FunctionSet fs = (Boid::GP_not_GA ?
-                          //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                          GP::evoflock_gp_function_set() :
                           GP::test_gp_boid_function_set() :
-                          //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                          GP::evoflock_ga_function_set);
                           GP::evoflock_ga_function_set());
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250325
     fs.print();
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     {
         std::cout << "Create population." << std::endl;
         util::Timer t("Create population.");
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240710 fiddling with hyperparameters
-
-//        population = new LazyPredator::Population (individuals,
-//                                                   subpops,
-//                                                   max_tree_size,
-//                                                   min_tree_size,
-//                                                   max_tree_size,
-//                                                   fs);
-
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         // TODO 20240713 experiment with increasing initial tree size.
         LP::Individual::increasing_initial_tree_size = true;
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
         population = new LazyPredator::Population(individuals,
                                                   subpops,
                                                   max_initial_tree_size,
                                                   min_crossover_tree_size,
                                                   max_crossover_tree_size,
                                                   fs);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20240702 try using that new switch
-                
+        // TODO experimental_GP_stub
         if (Boid::GP_not_GA)
         {
             population->explicit_treeValue_in_evolutionStep = false;
@@ -413,8 +118,6 @@ int main(int argc, const char * argv[])
         {
             fs.setCrossoverFunction(GP::evoflock_ga_crossover);
         }
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
 
     {
@@ -423,14 +126,6 @@ int main(int argc, const char * argv[])
         
         for (int i = 0; i < max_evolution_steps; i++)
         {
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250420 make tiny flock just to pop up Open3D's window.
-
-            Draw::getInstance().setEnable(true);
-            Draw::getInstance().pollEvents();
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
             // Exit if user interactively exits run.
             if (Draw::getInstance().exitFromRun()) { break; }
             GP::save_fitness_time_series(*population);
@@ -441,72 +136,22 @@ int main(int argc, const char * argv[])
                 std::cout << individual->tree().to_string(true) << std::endl;
             }
             std::cout << std::endl;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250416 GUI cmd to visualize "best" Individual.
-                        
             auto visualize_best_if_requested = [](LP::Population* population)
             {
                 Draw& draw = Draw::getInstance();
-                
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                // TODO 20250420 make tiny flock just to pop up Open3D's window.
-                
-                std::cout << std::endl;
-                std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-                debugPrint(draw.getVisBestMode());
-                debugPrint(draw.enable());
-                std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-                std::cout << std::endl;
-
-                
-
-//                if (draw.getVisBestMode())
-//                {
-//                    // TODO 20250420 probably not needed anymore now that enable
-//                    // is being restored in GP::run_flock_simulation()
-//                    bool enable_saved = draw.enable();
-//                    draw.setEnable(true);
-//                    
-//                    LP::Individual* individual = population->bestFitness();
-//                    LP::GpTree tree = individual->tree();
-//                    FlockParameters fp = GP::fp_from_ga_tree(tree);
-//                    GP::run_flock_simulation(fp, 1);
-//                    draw.setEnable(enable_saved);
-//                    draw.clearVisBestMode();
-//                }
-                
-                
                 if (draw.getVisBestMode())
                 {
-//                    // TODO 20250420 probably not needed anymore now that enable
-//                    // is being restored in GP::run_flock_simulation()
-//                    bool enable_saved = draw.enable();
-//                    draw.setEnable(true);
-                    
                     bool previous_emt_state = EF::enable_multithreading;
                     EF::enable_multithreading = false;
-
-                    
                     LP::Individual* individual = population->bestFitness();
                     LP::GpTree tree = individual->tree();
                     FlockParameters fp = GP::fp_from_ga_tree(tree);
                     GP::run_flock_simulation(fp, 1);
-  
-//                    draw.setEnable(enable_saved);
-                    
                     EF::enable_multithreading = previous_emt_state;
-
-                    
                     draw.clearVisBestMode();
                 }
-
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
             };
-            
             visualize_best_if_requested(population);
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
     }
     
@@ -519,6 +164,7 @@ int main(int argc, const char * argv[])
         {
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20240703 fix end of run logging for GP
+            // TODO experimental_GP_stub
 //            const LP::Individual* individual = population->nthBestFitness(i);
             LP::Individual* individual = population->nthBestFitness(i);
 //            std::cout << individual->tree().to_string() << std::endl;

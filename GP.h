@@ -25,12 +25,41 @@ namespace GP
 // Abbreviated name for this overly-long class name.
 typedef LazyPredator::MultiObjectiveFitness MOF;
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250422 track collision stats (in fitness_data.csv?)
+//
+// very temp ad-hoc recording of fitness scores
+
+//    // Fitness function, simply returns Individual's tree's value (computing it and
+//    // caching it on first call).
+//    inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
+//    {
+//        return std::any_cast<MOF>(individual->tree().getRootValue());
+//    }
+
+
+double temp_save_flock_obs_collisions = 0;
+double temp_save_flock_bad_boid_nn_dist = 0;
+
+
 // Fitness function, simply returns Individual's tree's value (computing it and
 // caching it on first call).
 inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
 {
-    return std::any_cast<MOF>(individual->tree().getRootValue());
+//    return std::any_cast<MOF>(individual->tree().getRootValue());
+
+//    temp_save_flock_obs_collisions = 0;
+//    temp_save_flock_bad_boid_nn_dist = 0;
+
+    MOF mof = std::any_cast<MOF>(individual->tree().getRootValue());
+    
+    individual->temp_save_flock_obs_collisions = temp_save_flock_obs_collisions;
+    individual->temp_save_flock_bad_boid_nn_dist = temp_save_flock_bad_boid_nn_dist;
+
+    return mof;
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 inline MOF run_gp_flock_simulation(LP::Individual* individual,
                                    bool write_file);
@@ -185,6 +214,14 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
                 least_scalar_fitness = scalar_fits.back();
                 least_mof = mof;
             }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250422 track collision stats (in fitness_data.csv?)
+            //
+            // very temp ad-hoc recording of fitness scores
+            
+            temp_save_flock_obs_collisions = flock.getTotalObstacleCollisions();
+            temp_save_flock_bad_boid_nn_dist = flock.temp_count_bad_boid_nn_dist;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
     };
     
@@ -676,13 +713,32 @@ void save_fitness_time_series(LP::Population& population)
         {
             pathname = "/Users/cwr/Desktop/flock_data/fitness_data.csv";
             std::ofstream stream(pathname);
-            stream << "step,average,best" << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250422 track collision stats (in fitness_data.csv?)
+//            stream << "step,average,best" << std::endl;
+            stream << "step,average,best,obs_coll,bad_nn_dist" << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             stream.close();
         }
         std::ofstream stream(pathname, std::ios_base::app);
         stream << (count == 0 ? 0 : count + 1) << ",";
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250422 track collision stats (in fitness_data.csv?)
+
+//        stream << population.averageFitness() << ",";
+//        stream << population.bestFitness()->getFitness() << std::endl;
+  
         stream << population.averageFitness() << ",";
-        stream << population.bestFitness()->getFitness() << std::endl;
+        stream << population.bestFitness()->getFitness() << ",";
+        stream << population.averageObsColl() << ",";
+        stream << population.averageBadNnDist();
+
+        
+        stream << std::endl;
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
         stream.close();
     }
 }

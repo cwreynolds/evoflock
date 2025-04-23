@@ -151,7 +151,10 @@ public:
             if (run_sim_this_frame)
             {
                 fly_boids(step_duration);
-                log_stats();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250422 track collision stats (in fitness_data.csv?)
+//                log_stats();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 update_fps();
             }
             // Draw all Boid bodies, whether sim was paused or not.
@@ -168,6 +171,49 @@ public:
             std::cout << log_prefix << "Exit at step: ";
             std::cout << aTimer().frameCounter() << std::endl;
         }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250422 track collision stats (in fitness_data.csv?)
+        
+        // see recordSeparationScorePerStep() / separationScore()
+        // see obstacleCollisionsScore()
+        
+        // VERY TEMP IMPLEMENTATION
+        
+        {
+//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//            double obs_count = getTotalObstacleCollisions();
+//
+//            grabPrintLock_evoflock();
+//            std::cout << log_prefix;
+//            std::cout << "obs_collisisons_per_boid_step = ";
+//            std::cout << obs_count / boid_steps;
+//            std::cout << ", boid_collisisons_per_boid_step = ";
+//            std::cout << temp_count_boid_collisions / boid_steps;
+//            std::cout << std::endl;
+
+
+//            double obs_count = getTotalObstacleCollisions();
+//            
+//            grabPrintLock_evoflock();
+//            std::cout << log_prefix;
+//            std::cout << "obs_collisions = ";
+//            std::cout << obs_count;
+//            std::cout << ", boid_collisions = ";
+//            std::cout << temp_count_boid_collisions;
+//            std::cout << std::endl;
+
+            
+            grabPrintLock_evoflock();
+            std::cout << log_prefix;
+            std::cout << "obs_collisions = ";
+            std::cout << getTotalObstacleCollisions();
+            std::cout << ", bad_boid_nn_dist = ";
+            std::cout << temp_count_bad_boid_nn_dist;
+            std::cout << std::endl;
+
+        }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Populate this flock by creating "count" boids with uniformly distributed
@@ -383,6 +429,28 @@ public:
 //            separation_score_sum_ += score;
 //        }
 //    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250422 track collision stats (in fitness_data.csv?)
+
+//    double temp_count_boid_collisions = 0;
+
+//        // Called each simulation step, records stats for the separation score.
+//        void recordSeparationScorePerStep()
+//        {
+//            for (auto b : boids())
+//            {
+//                double distance = b->distanceToNearestNeighbor();
+//
+//    //            double score = ((distance < 1.5) or (distance > 8)) ? 1 : 0;
+//                // Count the cases where the distance is in the correct range.
+//                double score = util::between(distance, 1.5, 8) ? 1 : 0;
+//
+//                separation_score_sum_ += score;
+//            }
+//        }
+
+    double temp_count_bad_boid_nn_dist = 0;
 
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
@@ -390,14 +458,17 @@ public:
         for (auto b : boids())
         {
             double distance = b->distanceToNearestNeighbor();
-            
-//            double score = ((distance < 1.5) or (distance > 8)) ? 1 : 0;
             // Count the cases where the distance is in the correct range.
             double score = util::between(distance, 1.5, 8) ? 1 : 0;
-
             separation_score_sum_ += score;
+            
+//            if (distance < 1.5) { temp_count_boid_collisions += 0.5; }
+
+            if (score == 0) { temp_count_bad_boid_nn_dist += 1; }
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
 //    // Return a unit fitness component: quality of obstacle avoidance.

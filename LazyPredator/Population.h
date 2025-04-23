@@ -512,7 +512,27 @@ public:
         applyToAllIndividuals(f);
         return total / getIndividualCount();
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250422 track collision stats (in fitness_data.csv?)
     
+    float averageObsColl() const
+    {
+        float total = 0;
+        auto f = [&](Individual* i){ total += i->temp_save_flock_obs_collisions; };
+        applyToAllIndividuals(f);
+        return total / getIndividualCount();
+    }
+    
+    float averageBadNnDist() const
+    {
+        float total = 0;
+        auto f = [&](Individual* i){ total += i->temp_save_flock_bad_boid_nn_dist; };
+        applyToAllIndividuals(f);
+        return total / getIndividualCount();
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Occasionally migrate (swap) Individuals between current and random SubPop.
     void subpopulationMigration()
     {

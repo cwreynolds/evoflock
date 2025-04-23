@@ -180,6 +180,17 @@ private:
     // Leak check. Count constructor/destructor calls. Must match at end of run.
     static inline int constructor_count_ = 0;
     static inline int destructor_count_ = 0;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250422 track collision stats (in fitness_data.csv?)
+    //
+    // very temp ad-hoc recording of fitness scores
+
+public:
+    double temp_save_flock_obs_collisions = 0;
+    double temp_save_flock_bad_boid_nn_dist = 0;
+private:
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 }  // end of namespace LazyPredator

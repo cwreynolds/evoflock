@@ -219,8 +219,19 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
             //
             // very temp ad-hoc recording of fitness scores
             
-            temp_save_flock_obs_collisions = flock.getTotalObstacleCollisions();
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250423 maybe invert collision stats?
+
+//            temp_save_flock_obs_collisions = flock.getTotalObstacleCollisions();
+//            temp_save_flock_bad_boid_nn_dist = flock.temp_count_bad_boid_nn_dist;
+
+            temp_save_flock_obs_collisions = ((flock.fp().boidsPerFlock() *
+                                               flock.fp().maxSimulationSteps()) -
+                                              flock.getTotalObstacleCollisions());
             temp_save_flock_bad_boid_nn_dist = flock.temp_count_bad_boid_nn_dist;
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
     };
@@ -704,7 +715,11 @@ LP::FunctionSet evoflock_ga_function_set()
 // Called each step to handle writing log file with fitness over time data.
 void save_fitness_time_series(LP::Population& population)
 {
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250423 maybe invert collision stats?
     int step_frequency = 300;
+//    int step_frequency = 10;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     static std::string pathname;
     int count = population.getStepCount();
     if ((0 == count) or (0 == (count + 1) % step_frequency))
@@ -716,7 +731,15 @@ void save_fitness_time_series(LP::Population& population)
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250422 track collision stats (in fitness_data.csv?)
 //            stream << "step,average,best" << std::endl;
-            stream << "step,average,best,obs_coll,bad_nn_dist" << std::endl;
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250423 maybe invert collision stats?
+
+//            stream << "step,average,best,obs_coll,bad_nn_dist" << std::endl;
+            stream << "step,average,best,non_obs_coll,good_nn_dist" << std::endl;
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             stream.close();
         }

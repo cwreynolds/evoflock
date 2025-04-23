@@ -450,6 +450,27 @@ public:
 //            }
 //        }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250423 maybe invert collision stats?
+
+//        double temp_count_bad_boid_nn_dist = 0;
+//
+//        // Called each simulation step, records stats for the separation score.
+//        void recordSeparationScorePerStep()
+//        {
+//            for (auto b : boids())
+//            {
+//                double distance = b->distanceToNearestNeighbor();
+//                // Count the cases where the distance is in the correct range.
+//                double score = util::between(distance, 1.5, 8) ? 1 : 0;
+//                separation_score_sum_ += score;
+//
+//    //            if (distance < 1.5) { temp_count_boid_collisions += 0.5; }
+//
+//                if (score == 0) { temp_count_bad_boid_nn_dist += 1; }
+//            }
+//        }
+    
     double temp_count_bad_boid_nn_dist = 0;
 
     // Called each simulation step, records stats for the separation score.
@@ -462,11 +483,13 @@ public:
             double score = util::between(distance, 1.5, 8) ? 1 : 0;
             separation_score_sum_ += score;
             
-//            if (distance < 1.5) { temp_count_boid_collisions += 0.5; }
-
-            if (score == 0) { temp_count_bad_boid_nn_dist += 1; }
+//            if (score == 0) { temp_count_bad_boid_nn_dist += 1; }
+            if (score == 1) { temp_count_bad_boid_nn_dist += 1; }
         }
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

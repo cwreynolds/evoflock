@@ -187,8 +187,17 @@ private:
     // very temp ad-hoc recording of fitness scores
 
 public:
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250424 clean up per-Individual storage of plotting data
+    
     double temp_save_flock_obs_collisions = 0;
     double temp_save_flock_bad_boid_nn_dist = 0;
+    
+    // Per-Individual storage for application-specific data, eg for plotting.
+    std::vector<double> user_data_for_plotting;
+    
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 private:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };

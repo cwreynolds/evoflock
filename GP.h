@@ -38,26 +38,53 @@ typedef LazyPredator::MultiObjectiveFitness MOF;
 //    }
 
 
-double temp_save_flock_obs_collisions = 0;
-double temp_save_flock_bad_boid_nn_dist = 0;
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20250424 clean up per-Individual storage of plotting data
+
+
+//    double temp_save_flock_obs_collisions = 0;
+//    double temp_save_flock_bad_boid_nn_dist = 0;
+//
+//
+//    // Fitness function, simply returns Individual's tree's value (computing it and
+//    // caching it on first call).
+//    inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
+//    {
+//    //    return std::any_cast<MOF>(individual->tree().getRootValue());
+//
+//    //    temp_save_flock_obs_collisions = 0;
+//    //    temp_save_flock_bad_boid_nn_dist = 0;
+//
+//        MOF mof = std::any_cast<MOF>(individual->tree().getRootValue());
+//
+//        individual->temp_save_flock_obs_collisions = temp_save_flock_obs_collisions;
+//        individual->temp_save_flock_bad_boid_nn_dist = temp_save_flock_bad_boid_nn_dist;
+//
+//        return mof;
+//    }
+
+//double temp_save_flock_obs_collisions = 0;
+//double temp_save_flock_bad_boid_nn_dist = 0;
 
 
 // Fitness function, simply returns Individual's tree's value (computing it and
 // caching it on first call).
 inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
 {
-//    return std::any_cast<MOF>(individual->tree().getRootValue());
-
-//    temp_save_flock_obs_collisions = 0;
-//    temp_save_flock_bad_boid_nn_dist = 0;
-
+//    std::cout << "@@@@@@@@ before tree eval" << std::endl;
+    
     MOF mof = std::any_cast<MOF>(individual->tree().getRootValue());
     
-    individual->temp_save_flock_obs_collisions = temp_save_flock_obs_collisions;
-    individual->temp_save_flock_bad_boid_nn_dist = temp_save_flock_bad_boid_nn_dist;
+//    std::cout << "@@@@@@@@ after tree eval" << std::endl;
+
+//    individual->temp_save_flock_obs_collisions = temp_save_flock_obs_collisions;
+//    individual->temp_save_flock_bad_boid_nn_dist = temp_save_flock_bad_boid_nn_dist;
 
     return mof;
 }
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -219,18 +246,44 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
             //
             // very temp ad-hoc recording of fitness scores
             
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // TODO 20250423 maybe invert collision stats?
 
 //            temp_save_flock_obs_collisions = flock.getTotalObstacleCollisions();
 //            temp_save_flock_bad_boid_nn_dist = flock.temp_count_bad_boid_nn_dist;
 
-            temp_save_flock_obs_collisions = ((flock.fp().boidsPerFlock() *
-                                               flock.fp().maxSimulationSteps()) -
-                                              flock.getTotalObstacleCollisions());
-            temp_save_flock_bad_boid_nn_dist = flock.temp_count_bad_boid_nn_dist;
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250424 clean up per-Individual storage of plotting data
 
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            temp_save_flock_obs_collisions = ((flock.fp().boidsPerFlock() *
+//                                               flock.fp().maxSimulationSteps()) -
+//                                              flock.getTotalObstacleCollisions());
+//            temp_save_flock_bad_boid_nn_dist = flock.temp_count_bad_boid_nn_dist;
+            
+//            std::cout << "@@@@@@@@ inside do_1_run" << std::endl;
+
+            
+//            // TODO store these stats on the "current individual"
+//            auto i = LP::Population::evolution_step_individual;
+//            i->temp_save_flock_obs_collisions = ((flock.fp().boidsPerFlock() *
+//                                                  flock.fp().maxSimulationSteps()) -
+//                                                 flock.getTotalObstacleCollisions());
+//            i->temp_save_flock_bad_boid_nn_dist = flock.temp_count_bad_boid_nn_dist;
+
+            
+            // TODO store these stats on the "current individual"
+            double boid_steps = (flock.fp().boidsPerFlock() *
+                                 flock.fp().maxSimulationSteps());
+            auto i = LP::Population::evolution_step_individual;
+            i->temp_save_flock_obs_collisions =
+                (boid_steps - flock.getTotalObstacleCollisions()) / boid_steps;
+            i->temp_save_flock_bad_boid_nn_dist =
+                flock.temp_count_bad_boid_nn_dist / boid_steps;
+
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
@@ -712,14 +765,77 @@ LP::FunctionSet evoflock_ga_function_set()
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20250424 clean up per-Individual storage of plotting data
+
+
+//    double averageObsColl(LP::Population& population)
+//    {
+//        float total = 0;
+//        auto f = [&](LP::Individual* i){ total += i->temp_save_flock_obs_collisions; };
+//        population.applyToAllIndividuals(f);
+//        return total / population.getIndividualCount();
+//    }
+//
+//    double averageBadNnDist(LP::Population& population)
+//    {
+//        float total = 0;
+//        auto f = [&](LP::Individual* i){ total += i->temp_save_flock_bad_boid_nn_dist; };
+//        population.applyToAllIndividuals(f);
+//        return total / population.getIndividualCount();
+//    }
+
+double averageNonObsCol(LP::Population& population)
+{
+    float total = 0;
+    auto f = [&](LP::Individual* i){ total += i->temp_save_flock_obs_collisions; };
+    population.applyToAllIndividuals(f);
+    return total / population.getIndividualCount();
+}
+
+double averageGoodNnDist(LP::Population& population)
+{
+    float total = 0;
+    auto f = [&](LP::Individual* i){ total += i->temp_save_flock_bad_boid_nn_dist; };
+    population.applyToAllIndividuals(f);
+    return total / population.getIndividualCount();
+}
+
+double bestNonObsCol(LP::Population& population)
+{
+    double best = - std::numeric_limits<double>::infinity();
+    auto f = [&](LP::Individual* i)
+    {
+        best = std::max(best, i->temp_save_flock_obs_collisions);
+    };
+    population.applyToAllIndividuals(f);
+    return best;
+}
+
+double bestGoodNnDist(LP::Population& population)
+{
+    double best = - std::numeric_limits<double>::infinity();
+    auto f = [&](LP::Individual* i)
+    {
+        best = std::max(best, i->temp_save_flock_bad_boid_nn_dist);
+    };
+    population.applyToAllIndividuals(f);
+    return best;
+}
+
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+
 // Called each step to handle writing log file with fitness over time data.
 void save_fitness_time_series(LP::Population& population)
 {
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250423 maybe invert collision stats?
-    int step_frequency = 300;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250424 clean up per-Individual storage of plotting data
+//    int step_frequency = 300;
 //    int step_frequency = 10;
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    int step_frequency = 300;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     static std::string pathname;
     int count = population.getStepCount();
     if ((0 == count) or (0 == (count + 1) % step_frequency))
@@ -736,7 +852,13 @@ void save_fitness_time_series(LP::Population& population)
             // TODO 20250423 maybe invert collision stats?
 
 //            stream << "step,average,best,obs_coll,bad_nn_dist" << std::endl;
-            stream << "step,average,best,non_obs_coll,good_nn_dist" << std::endl;
+//            stream << "step,average,best,non_obs_coll,good_nn_dist" << std::endl;
+//            stream << "step,average,best,ave_non_obs_coll,best_non_obs_coll,ave_good_nn_dist,best_good_nn_dist" << std::endl;
+
+            std::string labels = ("step,average,best,"
+                                  "ave_non_obs_coll,best_non_obs_coll,"
+                                  "ave_good_nn_dist,best_good_nn_dist");
+            stream << labels << std::endl;
 
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
@@ -754,8 +876,22 @@ void save_fitness_time_series(LP::Population& population)
   
         stream << population.averageFitness() << ",";
         stream << population.bestFitness()->getFitness() << ",";
-        stream << population.averageObsColl() << ",";
-        stream << population.averageBadNnDist();
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20250424 clean up per-Individual storage of plotting data
+
+//        stream << population.averageObsColl() << ",";
+//        stream << population.averageBadNnDist();
+
+//        stream << averageNonObsCol(population) << ",";
+//        stream << averageGoodNnDist(population);
+
+        stream << averageNonObsCol(population) << ",";
+        stream << bestNonObsCol(population) << ",";
+        stream << averageGoodNnDist(population) << ",";
+        stream << bestGoodNnDist(population);
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         
         stream << std::endl;

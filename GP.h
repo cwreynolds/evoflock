@@ -270,16 +270,47 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
 //                                                 flock.getTotalObstacleCollisions());
 //            i->temp_save_flock_bad_boid_nn_dist = flock.temp_count_bad_boid_nn_dist;
 
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250425 user_data_for_plotting, prevent segmentation fault.
+
+//            // TODO store these stats on the "current individual"
+//            double boid_steps = (flock.fp().boidsPerFlock() *
+//                                 flock.fp().maxSimulationSteps());
+//            auto i = LP::Population::evolution_step_individual;
+//            i->temp_save_flock_obs_collisions =
+//                (boid_steps - flock.getTotalObstacleCollisions()) / boid_steps;
+//            i->temp_save_flock_bad_boid_nn_dist =
+//                flock.temp_count_bad_boid_nn_dist / boid_steps;
+
             
             // TODO store these stats on the "current individual"
-            double boid_steps = (flock.fp().boidsPerFlock() *
-                                 flock.fp().maxSimulationSteps());
-            auto i = LP::Population::evolution_step_individual;
-            i->temp_save_flock_obs_collisions =
-                (boid_steps - flock.getTotalObstacleCollisions()) / boid_steps;
-            i->temp_save_flock_bad_boid_nn_dist =
-                flock.temp_count_bad_boid_nn_dist / boid_steps;
+            LP::Individual* i = LP::Population::evolution_step_individual;
+            if (i)
+            {
+                double boid_steps = (flock.fp().boidsPerFlock() *
+                                     flock.fp().maxSimulationSteps());
+                double good_coll = (boid_steps - flock.getTotalObstacleCollisions());
+                double norm_good_coll =  good_coll / boid_steps;
+                double norm_good_nn_dist = flock.temp_count_bad_boid_nn_dist / boid_steps;
+                
+//                i->temp_save_flock_obs_collisions = norm_good_coll;
+//                i->temp_save_flock_bad_boid_nn_dist = norm_good_nn_dist;
 
+//                // TEMP
+//                assert(i->user_data_for_plotting.empty());
+//                
+//                i->user_data_for_plotting.push_back(norm_good_coll);
+//                i->user_data_for_plotting.push_back(norm_good_nn_dist);
+
+
+                // TEMP
+                std::vector<double>& udfp = i->user_data_for_plotting;
+                if (! udfp.empty()) { udfp.clear(); }
+                udfp.push_back(norm_good_coll);
+                udfp.push_back(norm_good_nn_dist);
+            }
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
@@ -785,10 +816,90 @@ LP::FunctionSet evoflock_ga_function_set()
 //        return total / population.getIndividualCount();
 //    }
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20250425 user_data_for_plotting, prevent segmentation fault.
+
+
+//    double getUserDataAtOrZero(int index, LP::Individual* individual)
+//    {
+//    //    std::cout << "in getUserDataAtOrZero" << std::endl;
+//
+//        double data = 0;
+//        std::vector<double>& udfp = individual->user_data_for_plotting;
+//
+//    //    debugPrint(index)
+//    //    debugPrint(udfp.size())
+//
+//    //    if (udfp.size() >= index) { data = udfp.at(index); }
+//        if (udfp.size() > index) { data = udfp.at(index); }
+//        return data;
+//    }
+//
+//    double averageNonObsCol(LP::Population& population)
+//    {
+//        float total = 0;
+//        auto f = [&](LP::Individual* i)
+//        {
+//    //        total += i->temp_save_flock_obs_collisions;
+//    //        total += i->user_data_for_plotting.at(0);
+//            total += getUserDataAtOrZero(0, i);
+//        };
+//        population.applyToAllIndividuals(f);
+//        return total / population.getIndividualCount();
+//    }
+//
+//    double averageGoodNnDist(LP::Population& population)
+//    {
+//        float total = 0;
+//        auto f = [&](LP::Individual* i)
+//        {
+//    //        total += i->temp_save_flock_bad_boid_nn_dist;
+//    //        total += i->user_data_for_plotting.at(1);
+//            total += getUserDataAtOrZero(1, i);
+//        };
+//        population.applyToAllIndividuals(f);
+//        return total / population.getIndividualCount();
+//    }
+//
+//    double bestNonObsCol(LP::Population& population)
+//    {
+//        double best = - std::numeric_limits<double>::infinity();
+//        auto f = [&](LP::Individual* i)
+//        {
+//    //        best = std::max(best, i->temp_save_flock_obs_collisions);
+//    //        best = std::max(best, i->user_data_for_plotting.at(0));
+//            best = std::max(best, getUserDataAtOrZero(0, i));
+//        };
+//        population.applyToAllIndividuals(f);
+//        return best;
+//    }
+//
+//    double bestGoodNnDist(LP::Population& population)
+//    {
+//        double best = - std::numeric_limits<double>::infinity();
+//        auto f = [&](LP::Individual* i)
+//        {
+//    //        best = std::max(best, i->temp_save_flock_bad_boid_nn_dist);
+//    //        best = std::max(best, i->user_data_for_plotting.at(1));
+//            best = std::max(best, getUserDataAtOrZero(1, i));
+//        };
+//        population.applyToAllIndividuals(f);
+//        return best;
+//    }
+
+
+double getUserData(int index, LP::Individual* individual)
+{
+    double data = 0;
+    std::vector<double>& udfp = individual->user_data_for_plotting;
+    if (udfp.size() > index) { data = udfp.at(index); }
+    return data;
+}
+
 double averageNonObsCol(LP::Population& population)
 {
     float total = 0;
-    auto f = [&](LP::Individual* i){ total += i->temp_save_flock_obs_collisions; };
+    auto f = [&](LP::Individual* i) { total += getUserData(0, i); };
     population.applyToAllIndividuals(f);
     return total / population.getIndividualCount();
 }
@@ -796,7 +907,7 @@ double averageNonObsCol(LP::Population& population)
 double averageGoodNnDist(LP::Population& population)
 {
     float total = 0;
-    auto f = [&](LP::Individual* i){ total += i->temp_save_flock_bad_boid_nn_dist; };
+    auto f = [&](LP::Individual* i) { total += getUserData(1, i); };
     population.applyToAllIndividuals(f);
     return total / population.getIndividualCount();
 }
@@ -804,10 +915,7 @@ double averageGoodNnDist(LP::Population& population)
 double bestNonObsCol(LP::Population& population)
 {
     double best = - std::numeric_limits<double>::infinity();
-    auto f = [&](LP::Individual* i)
-    {
-        best = std::max(best, i->temp_save_flock_obs_collisions);
-    };
+    auto f = [&](LP::Individual* i) { best = std::max(best, getUserData(0, i)); };
     population.applyToAllIndividuals(f);
     return best;
 }
@@ -815,13 +923,12 @@ double bestNonObsCol(LP::Population& population)
 double bestGoodNnDist(LP::Population& population)
 {
     double best = - std::numeric_limits<double>::infinity();
-    auto f = [&](LP::Individual* i)
-    {
-        best = std::max(best, i->temp_save_flock_bad_boid_nn_dist);
-    };
+    auto f = [&](LP::Individual* i) { best = std::max(best, getUserData(1, i)); };
     population.applyToAllIndividuals(f);
     return best;
 }
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 
 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~

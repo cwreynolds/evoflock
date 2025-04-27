@@ -47,6 +47,24 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250426 WIP tool for visualizing a logged FlockParameters
+// eg:
+// Run_Flock(87.4777, 20, 20, 20, 84.9358, 98.4413, 26.6924, 1.90821, 53.2896,
+// 94.8003, 2.77889, 37.8503, 42.3571, -0.787644, -0.401251, 0.575284, 9.87024,
+// 8.99761)
+
+void visualizePreviouslyLoggedFlockParameters()
+{
+    FlockParameters fp(87.4777, 20, 20, 20, 84.9358, 98.4413, 26.6924, 1.90821,
+                       53.2896, 94.8003, 2.77889, 37.8503, 42.3571, -0.787644,
+                       -0.401251, 0.575284, 9.87024, 8.99761);
+    EF::enable_multithreading = false;
+    for (int i = 0; i < 5; i++) { GP::run_flock_simulation(fp, 1); }
+    exit(EXIT_SUCCESS);
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 int main(int argc, const char * argv[])
 {
@@ -60,15 +78,34 @@ int main(int argc, const char * argv[])
     // Flock's boids in parallel).
     EF::enable_multithreading = true;
 
-    // But first here in the main thread, build (then delete) one Flock object to
-    // set up static state, such as defining Obstacle sets, making one active,
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250426 WIP tool for visualizing a logged FlockParameters
+
+//        // But first, here in the main thread, build (then delete) one Flock object
+//        // to set up static state, such as defining Obstacle sets, making one active,
+//        // then uploading it to GPU.
+//        {
+//            Flock flock;
+//    //        flock.set_boid_count(10);
+//    //        flock.set_max_simulation_steps(1);
+//    //        flock.fp() = FlockParameters();
+//        }
+    
+    // But first, here in the main thread, build (then delete) one Flock object
+    // to set up static state, such as defining Obstacle sets, making one active,
     // then uploading it to GPU.
+    //
+    // 20250426 When I tried removing this, the Open3D window showed the default
+    // Obstacle set plus "Set 0: sphere and right hand vertical cylinder."
     {
         Flock flock;
-        flock.set_boid_count(10);
-        flock.set_max_simulation_steps(1);
-        flock.fp() = FlockParameters();
     }
+
+    // WIP/HACK runs flock sim, with graphics, for the FlockParameters written
+    // inline in this function's source code, above.
+    // visualizePreviouslyLoggedFlockParameters();
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     int individuals = 500;
     int subpops = 25;

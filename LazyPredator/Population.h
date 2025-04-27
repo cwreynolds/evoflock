@@ -241,16 +241,10 @@ public:
 //            return elite;
 //        }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250424 clean up per-Individual storage of plotting data
-    
+
     // Global pointer to Individual currently being evaluated (fitness tested).
     // LazyPredator ignores this variable. Application software can reference it.
     static inline Individual* evolution_step_individual = nullptr;
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // Perform one step of the "steady state" evolutionary computation using
     // "multi objective fitness" -- basically a vector of scalar fitness values
@@ -269,12 +263,7 @@ public:
         // Customized function to perform MOF evaluation of individual.
         auto mof_eval = [&](Individual* individual)
         {
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250424 clean up per-Individual storage of plotting data
             evolution_step_individual = individual;
-//            std::cout << "@@@@@@@@ before tree eval" << std::endl;
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
             if (not individual->hasMultiObjectiveFitness())
             {
                 if (explicit_treeValue_in_evolutionStep)
@@ -288,12 +277,7 @@ public:
                 if (scalar > prev_best_pop_fitness) { found_new_best = true;}
                 sort_cache_invalid_ = true;
             }
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250424 clean up per-Individual storage of plotting data
-//            std::cout << "@@@@@@@@ after tree eval" << std::endl;
             evolution_step_individual = nullptr;
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         };
         // Create TournamentFunction from given fitness and scalarizer functions.
         auto tournament_function = [&](TournamentGroup group)
@@ -533,26 +517,6 @@ public:
         applyToAllIndividuals(f);
         return total / getIndividualCount();
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250422 track collision stats (in fitness_data.csv?)
-    
-//    float averageObsColl() const
-//    {
-//        float total = 0;
-//        auto f = [&](Individual* i){ total += i->temp_save_flock_obs_collisions; };
-//        applyToAllIndividuals(f);
-//        return total / getIndividualCount();
-//    }
-//    
-//    float averageBadNnDist() const
-//    {
-//        float total = 0;
-//        auto f = [&](Individual* i){ total += i->temp_save_flock_bad_boid_nn_dist; };
-//        applyToAllIndividuals(f);
-//        return total / getIndividualCount();
-//    }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Occasionally migrate (swap) Individuals between current and random SubPop.
     void subpopulationMigration()

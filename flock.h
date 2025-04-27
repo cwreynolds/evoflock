@@ -58,10 +58,10 @@ private:
     // Index of the initial/default obstacle set.
     static inline int default_obstacle_set_index_ =
     // 0;  // Sphere and vertical cylinder.
-    // 1;  // Sphere and 6 cylinders.
+    1;  // Sphere and 6 cylinders.
     // 2;  // Sphere and plane.
     // 3;  // Sphere only.
-    4;  // Sphere and many little spheres.
+    // 4;  // Sphere and many little spheres.
     // 5;  // Sphere with smaller sphere inside.
 
     // Currently selected boid's index in boids().
@@ -129,10 +129,6 @@ public:
         if (draw().enable()) { fp().print(); }
 
         make_boids(boid_count(), fp().sphereRadius(), fp().sphereCenter());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250127 update selected_boid_ / are "non-everted" spheres seen?
-//        draw().simPause() = true;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         draw().beginAnimatedScene();
         while (still_running())
         {
@@ -151,10 +147,7 @@ public:
             if (run_sim_this_frame)
             {
                 fly_boids(step_duration);
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250422 track collision stats (in fitness_data.csv?)
-//                log_stats();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // log_stats();
                 update_fps();
             }
             // Draw all Boid bodies, whether sim was paused or not.
@@ -171,38 +164,8 @@ public:
             std::cout << log_prefix << "Exit at step: ";
             std::cout << aTimer().frameCounter() << std::endl;
         }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250422 track collision stats (in fitness_data.csv?)
-        
-        // see recordSeparationScorePerStep() / separationScore()
-        // see obstacleCollisionsScore()
-        
-        // VERY TEMP IMPLEMENTATION
-        
+        // Log fitness stats for this run. (Maybe put in func like log_stats()?)
         {
-//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//            double obs_count = getTotalObstacleCollisions();
-//
-//            grabPrintLock_evoflock();
-//            std::cout << log_prefix;
-//            std::cout << "obs_collisisons_per_boid_step = ";
-//            std::cout << obs_count / boid_steps;
-//            std::cout << ", boid_collisisons_per_boid_step = ";
-//            std::cout << temp_count_boid_collisions / boid_steps;
-//            std::cout << std::endl;
-
-
-//            double obs_count = getTotalObstacleCollisions();
-//            
-//            grabPrintLock_evoflock();
-//            std::cout << log_prefix;
-//            std::cout << "obs_collisions = ";
-//            std::cout << obs_count;
-//            std::cout << ", boid_collisions = ";
-//            std::cout << temp_count_boid_collisions;
-//            std::cout << std::endl;
-
-            
             grabPrintLock_evoflock();
             std::cout << log_prefix;
             std::cout << "obs_collisions = ";
@@ -210,10 +173,7 @@ public:
             std::cout << ", bad_boid_nn_dist = ";
             std::cout << temp_count_bad_boid_nn_dist;
             std::cout << std::endl;
-
         }
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Populate this flock by creating "count" boids with uniformly distributed
@@ -430,46 +390,6 @@ public:
 //        }
 //    }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250422 track collision stats (in fitness_data.csv?)
-
-//    double temp_count_boid_collisions = 0;
-
-//        // Called each simulation step, records stats for the separation score.
-//        void recordSeparationScorePerStep()
-//        {
-//            for (auto b : boids())
-//            {
-//                double distance = b->distanceToNearestNeighbor();
-//
-//    //            double score = ((distance < 1.5) or (distance > 8)) ? 1 : 0;
-//                // Count the cases where the distance is in the correct range.
-//                double score = util::between(distance, 1.5, 8) ? 1 : 0;
-//
-//                separation_score_sum_ += score;
-//            }
-//        }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250423 maybe invert collision stats?
-
-//        double temp_count_bad_boid_nn_dist = 0;
-//
-//        // Called each simulation step, records stats for the separation score.
-//        void recordSeparationScorePerStep()
-//        {
-//            for (auto b : boids())
-//            {
-//                double distance = b->distanceToNearestNeighbor();
-//                // Count the cases where the distance is in the correct range.
-//                double score = util::between(distance, 1.5, 8) ? 1 : 0;
-//                separation_score_sum_ += score;
-//
-//    //            if (distance < 1.5) { temp_count_boid_collisions += 0.5; }
-//
-//                if (score == 0) { temp_count_bad_boid_nn_dist += 1; }
-//            }
-//        }
     
     double temp_count_bad_boid_nn_dist = 0;
 
@@ -482,16 +402,10 @@ public:
             // Count the cases where the distance is in the correct range.
             double score = util::between(distance, 1.5, 8) ? 1 : 0;
             separation_score_sum_ += score;
-            
-//            if (score == 0) { temp_count_bad_boid_nn_dist += 1; }
             if (score == 1) { temp_count_bad_boid_nn_dist += 1; }
         }
     }
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
 //    // Return a unit fitness component: quality of obstacle avoidance.

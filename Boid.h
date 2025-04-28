@@ -296,18 +296,6 @@ public:
         if (not collisions.empty())
         {
             const Collision& first_collision = collisions.front();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250407 boids get stuck inside cylinder
-            if (isSelected())
-            {
-                Obstacle* o = first_collision.obstacle;
-                double sdf = o->signed_distance(position());
-                if ((sdf < 0) and (o->to_string() == "CylinderObstacle"))
-                {
-                    debugPrint(sdf);
-                }
-            }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             Vec3 poi = first_collision.point_of_impact;
             Vec3 normal = first_collision.normal_at_poi;
             Vec3 pure_steering = pure_lateral_steering(normal);
@@ -385,54 +373,19 @@ public:
         double weight = unit_nearness * angular_cutoff;
         return weight;
     }
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250406 new angle_weight(): continuous and parameter free.
-    
-//    // Binary weight: 1 if neighbor's angular offset from my forward axis is
-//    // smaller than cos_angle_threshold, and 0 otherwise (say, if behind me).
-//    double angle_weight(Boid* neighbor, double cos_angle_threshold)
-//    {
-//        // Offset from my position to neighbor's position, and unit direction.
-//        Vec3 offset = neighbor->position() - position();
-//        Vec3 unit_offset = offset.normalize();
-//        // Project unit offset onto forward axis.
-//        double projection_onto_forward = unit_offset.dot(forward());
-//        // Weight is 1 if projection is bigger than threshold. (So more parallel
-//        // with forward axis.)
-//        return (projection_onto_forward > cos_angle_threshold) ? 1 : 0;
-//    }
 
-    // ... REFACTORED ...
+    // Weighting for a neighbor Boid based on how close its position is to "my"
+    // forward axis. Dots/projects the normal from my center toward its, onto my
+    // forward axis. Then remaps that from 1 at directly ahead, to 0 when angle
+    // of normal from forward is cos_angle_threshold.
     double angle_weight(Boid* neighbor, double cos_angle_threshold)
     {
-        // Offset from my position to neighbor's position, and unit direction.
-        Vec3 offset = neighbor->position() - position();
-        Vec3 unit_offset = offset.normalize();
+        // Normalized offset from my position to neighbor's position
+        Vec3 unit_offset = (neighbor->position() - position()).normalize();
         // Project unit offset onto forward axis.
-        double projection_onto_forward = unit_offset.dot(forward());
-        
-//        // Weight is 1 if projection is bigger than threshold. (So more parallel
-//        // with forward axis.)
-//        return (projection_onto_forward > cos_angle_threshold) ? 1 : 0;
-
-//        // Re-range projection from [-1, +1] to [0, 1]
-//        return util::remap_interval_clip(projection_onto_forward, -1, +1, 0, 1);
-
-//        return util::clip01(projection_onto_forward);
-
-//        return util::remap_interval_clip(projection_onto_forward, -0.3, +1, 0, 1);
-
-
-        return util::remap_interval_clip(projection_onto_forward,
-                                         cos_angle_threshold, +1,
-                                         0, 1);
-
+        double projection = unit_offset.dot(forward());
+        return util::remap_interval_clip(projection, cos_angle_threshold, 1, 0, 1);
     }
-
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Returns a list of the "neighbors_count" Boids nearest this one.
     BoidPtrList nearest_neighbors() {return nearest_neighbors(neighbors_count);}

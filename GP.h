@@ -185,7 +185,7 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
                 least_scalar_fitness = scalar_fits.back();
                 least_mof = mof;
             }
-            // TODO store these stats on the "current individual"
+            // Store these stats on the "current individual"
             LP::Individual* i = LP::Population::evolution_step_individual;
             if (i)
             {
@@ -193,21 +193,9 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
                                      flock.fp().maxSimulationSteps());
                 double good_coll = (boid_steps - flock.getTotalObstacleCollisions());
                 double norm_good_coll =  good_coll / boid_steps;
-                
-                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                // TODO 20250427 refactor the 2 new fitness scores
-                
-//                double norm_good_nn_dist =
-//                    flock.good_nn_dist_sum_all_boid_steps_ / boid_steps;
-
-                // NOTE this is almost what we get from Flock::separationScore()
-                double norm_good_nn_dist = flock.separation_score_sum_ / boid_steps;
-
-                
-                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
+                double norm_good_nn_dist = flock.separationScorePerBoidStep();
                 std::vector<double>& udfp = i->user_data_for_plotting;
-                if (! udfp.empty()) { udfp.clear(); }
+                udfp.clear();
                 udfp.push_back(norm_good_coll);
                 udfp.push_back(norm_good_nn_dist);
             }
@@ -326,106 +314,6 @@ inline MOF run_hand_tuned_flock_simulation()
     return run_flock_simulation(FlockParameters());
 }
 
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250329 move mess from GP to FlockParameters constructor.
-
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    // TODO 20240628 can we do an eval of a const tree?
-//    #ifdef eval_const_20240628
-//    FlockParameters fp_from_ga_tree(const LazyPredator::GpTree& tree)
-//    #else  // eval_const_20240628
-//    FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
-//    #endif // eval_const_20240628
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    {
-//        return FlockParameters(tree.evalSubtree<double>(0),
-//                               tree.evalSubtree<double>(1),
-//                               tree.evalSubtree<double>(2),
-//                               tree.evalSubtree<double>(3),
-//                               tree.evalSubtree<double>(4),
-//                               tree.evalSubtree<double>(5),
-//                               tree.evalSubtree<double>(6),
-//                               tree.evalSubtree<double>(7),
-//                               tree.evalSubtree<double>(8),
-//                               tree.evalSubtree<double>(9),
-//                               tree.evalSubtree<double>(10),
-//                               tree.evalSubtree<double>(11),
-//                               tree.evalSubtree<double>(12),
-//                               tree.evalSubtree<double>(13),
-//                               tree.evalSubtree<double>(14),
-//                               tree.evalSubtree<double>(15),
-//                               tree.evalSubtree<double>(16));
-//
-//        // TODO 20250329 I assume there is a less verbose way to write this, but I
-//        //               did not find it in my first several experiments:
-//        //    std::vector<double> p;
-//        //    TODO maybe "17" should be a static function on class FlockParameters?
-//        //    for (int i = 0; i < 17; i++) { p.push_back(tree.evalSubtree<double>(i)); }
-//        //    return std::apply(FlockParameters, p);
-//        //    return std::make_from_tuple(FlockParameters, p);
-//        //    return std::make_from_tuple<FlockParameters>(p);
-//        //
-//        // something with std::tuple_cat?
-//        //
-//        // Or, I guess I could move the inline unrolling into a new constructor for
-//        // FlockParameters?
-//    }
-
-
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    // TODO 20240628 can we do an eval of a const tree?
-//    #ifdef eval_const_20240628
-//    FlockParameters fp_from_ga_tree(const LazyPredator::GpTree& tree)
-//    #else  // eval_const_20240628
-//    FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
-//    #endif // eval_const_20240628
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    {
-//    //    return FlockParameters(tree.evalSubtree<double>(0),
-//    //                           tree.evalSubtree<double>(1),
-//    //                           tree.evalSubtree<double>(2),
-//    //                           tree.evalSubtree<double>(3),
-//    //                           tree.evalSubtree<double>(4),
-//    //                           tree.evalSubtree<double>(5),
-//    //                           tree.evalSubtree<double>(6),
-//    //                           tree.evalSubtree<double>(7),
-//    //                           tree.evalSubtree<double>(8),
-//    //                           tree.evalSubtree<double>(9),
-//    //                           tree.evalSubtree<double>(10),
-//    //                           tree.evalSubtree<double>(11),
-//    //                           tree.evalSubtree<double>(12),
-//    //                           tree.evalSubtree<double>(13),
-//    //                           tree.evalSubtree<double>(14),
-//    //                           tree.evalSubtree<double>(15),
-//    //                           tree.evalSubtree<double>(16));
-//
-//        // TODO 20250329 I assume there is a less verbose way to write this, but I
-//        //               did not find it in my first several experiments:
-//        //    std::vector<double> p;
-//        //    TODO maybe "17" should be a static function on class FlockParameters?
-//        //    for (int i = 0; i < 17; i++) { p.push_back(tree.evalSubtree<double>(i)); }
-//        //    return std::apply(FlockParameters, p);
-//        //    return std::make_from_tuple(FlockParameters, p);
-//        //    return std::make_from_tuple<FlockParameters>(p);
-//        //
-//        // something with std::tuple_cat?
-//        //
-//        // Or, I guess I could move the inline unrolling into a new constructor for
-//        // FlockParameters?
-//
-//        std::vector<double> parameters;
-//        // TODO maybe "17" should be a static function on class FlockParameters?
-//        for (int i = 0; i < FlockParameters::tunableParameterCount(); i++)
-//        {
-//            parameters.push_back(tree.evalSubtree<double>(i));
-//        }
-//        return FlockParameters(parameters);
-//
-//    }
-
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240628 can we do an eval of a const tree?
 #ifdef eval_const_20240628
@@ -442,9 +330,6 @@ FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
     }
     return FlockParameters(parameters);
 }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 // Wrote this to run at the end of evolution on the top-10 fitness individuals
 // of population in order to record flock data for playback

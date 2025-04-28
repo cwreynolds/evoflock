@@ -57,8 +57,8 @@ private:
     static inline ObstaclePtrList obstacles_;
     // Index of the initial/default obstacle set.
     static inline int default_obstacle_set_index_ =
-    0;  // Sphere and vertical cylinder.
-    // 1;  // Sphere and 6 cylinders.
+    // 0;  // Sphere and vertical cylinder.
+    1;  // Sphere and 6 cylinders.
     // 2;  // Sphere and plane.
     // 3;  // Sphere only.
     // 4;  // Sphere and many little spheres.
@@ -67,15 +67,11 @@ private:
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
     
-public:
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250427 refactor the 2 new fitness scores
-    
     // Accumulator for separation score of each Boid on each simulation step.
     double separation_score_sum_ = 0;
+
+public:
     
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     
     FlockParameters& fp() { return fp_; }
     const FlockParameters& fp() const { return fp_; }
@@ -105,7 +101,20 @@ public:
     // Number of boids in Flock.
     int boid_count() const { return boid_count_; }
     void set_boid_count(int bc) { boid_count_ = bc; }
-
+    
+    // Total number of boid steps per completed flock sim.
+    // (Getting the number SO FAR in an ongoing sim requires a different calc.)
+    double boidStepPerSim() const
+    {
+        return fp().boidsPerFlock() * fp().maxSimulationSteps();
+    }
+    
+    // Accumulator for separation score of each Boid on each simulation step.
+    double separationScorePerBoidStep() const
+    {
+        return separation_score_sum_ / boidStepPerSim();
+    }
+    
     // TODO 20240131 since c++ has no keyword syntax, perhaps move to creating a
     // default Flock then using (eg) set_boid_count(500) to change things? Or
     // just list all of them in the call?!
@@ -175,17 +184,8 @@ public:
             std::cout << log_prefix;
             std::cout << "obs_collisions = ";
             std::cout << getTotalObstacleCollisions();
-            
-            
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20250427 refactor the 2 new fitness scores
-            
-//            std::cout << ", bad_boid_nn_dist = ";
             std::cout << ", separation_score_sum_ = ";
             std::cout << separation_score_sum_;
-            
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
             std::cout << std::endl;
         }
     }
@@ -265,103 +265,11 @@ public:
         for (auto b : boids()) { sum += b->getObsCollisionCount(); }
         return sum;
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250417 use exponential weighting for obstacleCollisionsScore()
-
-
-//    // Return a unit fitness component: quality of obstacle avoidance.
-//    double obstacleCollisionsScore() const
-//    {
-//        double count = getTotalObstacleCollisions();
-//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//        double f = boid_steps / 1000;  // So f = 100 for normal evolution run.
-//        return util::remap_interval_clip(count,  0, f,  1, 0);
-//    }
-    
-//        // To de-emphasize low (normalized) scores.
-//        double score_exponent_ = 8;
-//
-//        // Return a unit fitness component: quality of obstacle avoidance.
-//        double obstacleCollisionsScore() const
-//        {
-//            double count = getTotalObstacleCollisions();
-//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//
-//            double collisions_per_boid_step = count / boid_steps;
-//
-//            double non_collision_per_boid_step = 1 - collisions_per_boid_step;
-//
-//    //        double f = boid_steps / 1000;  // So f = 100 for normal evolution run.
-//    //        return util::remap_interval_clip(count,  0, f,  1, 0);
-//
-//            return std::pow(non_collision_per_boid_step, score_exponent_);
-//
-//        }
-
-//    // Used to de-emphasize low scores. (Normalized scores on [0,1])
-//    // To visualize, see plot on this page: https://tinyurl.com/236bh58h
-//    double score_exponent_ = 8;
-
-//    // Return a unit fitness component: quality of obstacle avoidance.
-//    double obstacleCollisionsScore() const
-//    {
-//        double count = getTotalObstacleCollisions();
-//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//        double collisions_per_boid_step = count / boid_steps;
-//        double non_collision_per_boid_step = 1 - collisions_per_boid_step;
-//        return std::pow(non_collision_per_boid_step, score_exponent_);
-//    }
-
-//        // Return a unit fitness component: quality of obstacle avoidance.
-//        double obstacleCollisionsScore() const
-//        {
-//
-//
-//            double count = getTotalObstacleCollisions();
-//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//
-//
-//
-//    //        double collisions_per_boid_step = count / boid_steps;
-//    //        double non_collision_per_boid_step = 1 - collisions_per_boid_step;
-//
-//    //        double non_collision_steps = boid_steps - count;
-//    //        double normalized_non_collision = 1 - collisions_per_boid_step;
-//
-//            double r = util::remap_interval_clip(count,  0, boid_steps,  1, 0);
-//
-//
-//            debugPrint(count)
-//            debugPrint(boid_steps)
-//            debugPrint(r)
-//    //        debugPrint(std::pow(r, score_exponent_ * 10))
-//            debugPrint(std::pow(r, score_exponent_ * 100))
-//
-//    //        return std::pow(r, score_exponent_);
-//    //        return std::pow(r, score_exponent_ * 10);
-//            return std::pow(r, score_exponent_ * 100);
-//        }
-
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250427 refactor the 2 new fitness scores
-    
-//    // Return a unit fitness component: quality of obstacle avoidance.
-//    double obstacleCollisionsScore() const
-//    {
-//        double count = getTotalObstacleCollisions();
-//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//        double f = boid_steps / 1000;  // So f = 100 for normal evolution run.
-//        double r = util::remap_interval_clip(count,  0, f,  1, 0);
-//        return std::pow(r, score_exponent_);
-//    }
 
     // Given a unit fitness scores (on [0,1]), and an emphasis factor (also on
-    // [0,1]), push down low and mid range scores. Something like exponentiating:
-    // 0→0, 1→1, but 0.5 goes to less than 0.5. Uses a piecewise linear "knee"
-    // curve.
-    // TODO 20250427 shoudl this be in Utilities?
+    // [0,1]), push down low and mid range scores. Uses a piecewise linear "knee"
+    // curve, something like exponentiating:0→0, 1→1, but 0.5 goes to something
+    // less than 0.5.  TODO 20250427 should this be in Utilities?
     static double emphasizeHighScores(double unit_score, double emphasis)
     {
         assert(util::between(unit_score, 0, 1));
@@ -372,258 +280,47 @@ public:
                 util::remap_interval(unit_score, 0, x, 0, y) :
                 util::remap_interval(unit_score, x, 1, y, 1));
     }
-    
-    
+
     // Return a unit fitness component: quality of obstacle avoidance.
     double obstacleCollisionsScore() const
     {
         double count = getTotalObstacleCollisions();
-        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-        double non_coll_steps = boid_steps - count;
-        double norm_non_coll_steps = non_coll_steps / boid_steps;
-        return emphasizeHighScores(norm_non_coll_steps, 0.9);
+        double non_coll_steps = boidStepPerSim() - count;
+        double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
+        return emphasizeHighScores(norm_non_coll_steps, 0.995);
     }
 
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    
-//    // Called each simulation step, records stats for the separation score.
-//    void recordSeparationScorePerStep()
-//    {
-//        for (auto b : boids())
-//        {
-//            double score = 0;
-//            double distance = b->distanceToNearestNeighbor();
-//            std::vector<double> d = {0.0, 1.5, 3.0, 6.0, 9.0, 20.0};
-//            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
-//            if (util::between(distance, d[1], d[2]))
-//            {
-//                score = util::remap_interval(distance, d[1], d[2], s[1], s[2]);
-//            }
-//            else if (util::between(distance, d[2], d[3]))
-//            {
-//                score = s[3];
-//            }
-//            else if (util::between(distance, d[3], d[4]))
-//            {
-//                score = util::remap_interval(distance, d[3], d[4], s[3], s[4]);
-//            }
-//            else if (util::between(distance, d[4], d[5]))
-//            {
-//                score = util::remap_interval(distance, d[4], d[5], s[4], s[5]);
-//            }
-//
-//            separation_score_sum_ += score;
-//        }
-//    }
-
-//    // Called each simulation step, records stats for the separation score.
-//    void recordSeparationScorePerStep()
-//    {
-//        for (auto b : boids())
-//        {
-//            double distance = b->distanceToNearestNeighbor();
-//            
-//            double score = ((distance < 1.5) or (distance > 8)) ? 1 : 0;
-//
-//            separation_score_sum_ += score;
-//        }
-//    }
-    
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250427 refactor the 2 new fitness scores
-    
-//    double temp_count_bad_boid_nn_dist = 0;
-//
-//    // Called each simulation step, records stats for the separation score.
-//    void recordSeparationScorePerStep()
-//    {
-//        for (auto b : boids())
-//        {
-//            double distance = b->distanceToNearestNeighbor();
-//            // Count the cases where the distance is in the correct range.
-//            double score = util::between(distance, 1.5, 8) ? 1 : 0;
-//            separation_score_sum_ += score;
-//            if (score == 1) { temp_count_bad_boid_nn_dist += 1; }
-//        }
-//    }
-
-    
-//    double good_nn_dist_sum_all_boid_steps_ = 0;
-    
-//        // Called each simulation step, records stats for the separation score.
-//        void recordSeparationScorePerStep()
-//        {
-//            for (auto b : boids())
-//            {
-//                double distance = b->distanceToNearestNeighbor();
-//                // Count the cases where the distance is in the correct range.
-//
-//    //            double score = util::between(distance, 1.5, 8) ? 1 : 0;
-//    //            separation_score_sum_ += score;
-//    //            if (score == 1) { temp_count_bad_boid_nn_dist += 1; }
-//
-//    //            double score = util::between(distance, 1.5, 4) ? 1 : 0;
-//    //            if (score == 1) { good_nn_dist_sum_all_boid_steps_ += 1; }
-//
-//                double score = util::between(distance, 1.5, 4) ? 1 : 0;
-//                if (score == 1) { separation_score_sum_ += 1; }
-//
-//
-//            }
-//        }
-
-//    // Called each simulation step, records stats for the separation score.
-//    void recordSeparationScorePerStep()
-//    {
-//        for (auto b : boids())
-//        {
-//            double distance = b->distanceToNearestNeighbor();
-//            // Count the cases where the distance is in the correct range.
-//            double score = util::between(distance, 1.5, 4) ? 1 : 0;
-//            if (score == 1) { separation_score_sum_ += 1; }
-//        }
-//    }
-
-    
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
+        // Piecewise linear function of distance to score
+        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0, 10.0};
+        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
         for (auto b : boids())
         {
             double score = 0;
             double distance = b->distanceToNearestNeighbor();
-            
-//            std::vector<double> d = {0.0, 1.5, 3.0, 6.0, 9.0, 20.0};
-//            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
-
-            std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 8.0, 16.0};
-            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
-
-            if (util::between(distance, d[1], d[2]))
+            for (int i = 1; i < d.size(); i++)
             {
-                score = util::remap_interval(distance, d[1], d[2], s[1], s[2]);
+                int j = i - 1;
+                if (util::between(distance, d[j], d[i]))
+                {
+                    score = util::remap_interval(distance, d[j], d[i], s[j], s[i]);
+                }
             }
-            else if (util::between(distance, d[2], d[3]))
-            {
-                score = s[3];
-            }
-            else if (util::between(distance, d[3], d[4]))
-            {
-                score = util::remap_interval(distance, d[3], d[4], s[3], s[4]);
-            }
-            else if (util::between(distance, d[4], d[5]))
-            {
-                score = util::remap_interval(distance, d[4], d[5], s[4], s[5]);
-            }
-
             separation_score_sum_ += score;
         }
     }
 
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-
-    
-//    // Return a unit fitness component: quality of obstacle avoidance.
-//    double obstacleCollisionsScore() const
-//    {
-//        double count = getTotalObstacleCollisions();
-//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//        double f = boid_steps / 1000;  // So f = 100 for normal evolution run.
-//        return util::remap_interval_clip(count,  0, f,  1, 0);
-//    }
-
-
-//    // Return a unit fitness component: maintaining proper separation distance.
-//    double separationScore() const
-//    {
-//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//        return separation_score_sum_ / boid_steps;
-//    }
-
-//        // Return a unit fitness component: maintaining proper separation distance.
-//        double separationScore() const
-//        {
-//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//    //        double f = boid_steps / 100;  // So f = 1000 for normal evolution run.
-//    //        double f = boid_steps * 0.01;  // So f = 1000 for normal evolution run.
-//            double f = boid_steps * 0.1;  // So f = 10000 for normal evolution run.
-//
-//    //        return separation_score_sum_ / boid_steps;
-//
-//            return util::remap_interval_clip(separation_score_sum_,  0, f,  1, 0);
-//        }
-
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250417 use exponential weighting for obstacleCollisionsScore()
-
-//        // Return a unit fitness component: maintaining proper separation distance.
-//        double separationScore() const
-//        {
-//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//            double normalized_good = separation_score_sum_ / boid_steps;
-//    //        return std::pow(normalized_good, 2);
-//            return std::pow(normalized_good, 4);
-//        }
-
-    
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20250427 refactor the 2 new fitness scores
-
-//        // Return a unit fitness component: maintaining proper separation distance.
-//        double separationScore() const
-//        {
-//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//            double normalized_good = separation_score_sum_ / boid_steps;
-//    //        return std::pow(normalized_good, 2);
-//    //        return std::pow(normalized_good, 4);
-//            return std::pow(normalized_good, score_exponent_);
-//        }
-    
-    
-//        // Return a unit fitness component: maintaining proper separation distance.
-//        double separationScore() const
-//        {
-//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//    //        double normalized_good = separation_score_sum_ / boid_steps;
-//            double normalized_good = good_nn_dist_sum_all_boid_steps_ / boid_steps;
-//    //        return std::pow(normalized_good, score_exponent_);
-//            return emphasizeHighScores(normalized_good, 0.7);
-//        }
-
-//    // Return a unit fitness component: maintaining proper separation distance.
-//    double separationScore() const
-//    {
-//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-//        double normalized_good = good_nn_dist_sum_all_boid_steps_ / boid_steps;
-//        return emphasizeHighScores(normalized_good, 0.7);
-//    }
-
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
     {
-        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-        double normalized_good = separation_score_sum_ / boid_steps;
-        return emphasizeHighScores(normalized_good, 0.7);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250428 tighten up flocking requirement.
+//        return emphasizeHighScores(separationScorePerBoidStep(), 0.7);
+        return emphasizeHighScores(separationScorePerBoidStep(), 0.9);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
-
-    
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.
@@ -646,36 +343,6 @@ public:
         for_all_boids(enforce_one_boid_do_not_count);
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240623 get rid of all multithreading for GP testing
-    
-//    // Apply the given function to all Boids using two parallel threads.
-//    //
-//    // (At first this spun up N(=3) new threads to run in parallel. But that
-//    //  provided almost no benefit. Probably the savings being canceled out by
-//    //  thread launching overhead. Now creates ONE thread and splits the load
-//    //  between it and this main thread. On 20240527 I tried adjusting the load
-//    //  ratio between the threads. (Used util::Timer and averaged over all calls
-//    //  in an evolution run.) I got maybe 1-2% improvement but didn't think it
-//    //  was worth the extra code complexity. Verified that two threads are
-//    //  better than one.)
-//    //
-//    void for_all_boids(std::function<void(Boid* b)> boid_func)
-//    {
-//        // Apply "boid_func" to boids between indices "first" and "last"
-//        auto chunk_func = [&](int first, int last)
-//        {
-//            int end = std::min(last, int(boids().size()));
-//            for (int i = first; i < end; i++) { boid_func(boids().at(i)); }
-//        };
-//        int boid_count = int(boids().size());
-//        int boids_per_thread = 1 + (boid_count * 0.5);
-//        std::thread helper(chunk_func, 0, boids_per_thread);
-//        chunk_func(boids_per_thread, boid_count);
-//        helper.join();
-//    };
-
-    
     // Apply the given function to all Boids using two parallel threads.
     //
     // (At first this spun up N(=3) new threads to run in parallel. But that
@@ -683,7 +350,7 @@ public:
     //  thread launching overhead. Now creates ONE thread and splits the load
     //  between it and this main thread. On 20240527 I tried adjusting the load
     //  ratio between the threads. (Used util::Timer and averaged over all calls
-    //  in an evelotion run.) I got maybe 1-2% improvement but didn't think it
+    //  in an evolution run.) I got maybe 1-2% improvement but didn't think it
     //  was worth the extra code complexity. Verified that two threads are
     //  better than one.)
     //
@@ -697,36 +364,7 @@ public:
         };
         int boid_count = int(boids().size());
         int boids_per_thread = 1 + (boid_count * 0.5);
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240627 trying to reenable multi threading
-
-//        if (Boid::GP_not_GA)
-//        {
-//            // TODO 20240625 when we switch back to multithreading, need to make
-//            // sure new thread gets same Boid::getGpPerThread() as main thread.
-//            chunk_func(0, boid_count);
-//        }
-//        else
-//        {
-//            std::thread helper(chunk_func, 0, boids_per_thread);
-//            chunk_func(boids_per_thread, boid_count);
-//            helper.join();
-//        }
-
-//        std::thread helper(chunk_func, 0, boids_per_thread);
-//        chunk_func(boids_per_thread, boid_count);
-//        helper.join();
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20240707 global switch to enable threads EF::enable_multithreading
-
-//    //        bool multithreading = not Boid::GP_not_GA;
-//            bool multithreading = true;
-//            if (multithreading)
-
         if (EF::enable_multithreading)
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         {
             std::thread helper(chunk_func, 0, boids_per_thread);
             chunk_func(boids_per_thread, boid_count);
@@ -738,13 +376,8 @@ public:
             // sure new thread gets same Boid::getGpPerThread() as main thread.
             chunk_func(0, boid_count);
         }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     };
 
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
     void collect_flock_metrics()
     {
         double ts = fp().minSpeed() - util::epsilon;

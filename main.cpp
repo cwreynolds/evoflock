@@ -53,9 +53,9 @@
 // 8.99761)
 void visualizePreviouslyLoggedFlockParameters()
 {
-//    FlockParameters fp(96.7746, 20, 20, 20, 76.4095, 77.1692, 22.219,
-//                       17.0537, 15.8248, 46.8697, 3.08164, 32.3397, 62.1726,
-//                       -0.865539, 0.404324, 0.813752, 79.2677, 9.26611);
+//    FlockParameters fp(98.3189, 20, 20, 20, 64.7629, 86.5623, 58.8861,
+//                       1.355, 20.7512, 19.6769, 2.84049, 12.7799, 14.7595,
+//                       -0.768735, 0.502768, -0.809657, 77.0844, 1.43123);
 //    EF::enable_multithreading = false;
 //    for (int i = 0; i < 5; i++) { GP::run_flock_simulation(fp, 1); }
 //    exit(EXIT_SUCCESS);

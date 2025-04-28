@@ -57,8 +57,8 @@ private:
     static inline ObstaclePtrList obstacles_;
     // Index of the initial/default obstacle set.
     static inline int default_obstacle_set_index_ =
-    // 0;  // Sphere and vertical cylinder.
-    1;  // Sphere and 6 cylinders.
+    0;  // Sphere and vertical cylinder.
+    // 1;  // Sphere and 6 cylinders.
     // 2;  // Sphere and plane.
     // 3;  // Sphere only.
     // 4;  // Sphere and many little spheres.
@@ -67,10 +67,15 @@ private:
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
     
+public:
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250427 refactor the 2 new fitness scores
+    
     // Accumulator for separation score of each Boid on each simulation step.
     double separation_score_sum_ = 0;
-
-public:
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     
     FlockParameters& fp() { return fp_; }
     const FlockParameters& fp() const { return fp_; }
@@ -170,8 +175,17 @@ public:
             std::cout << log_prefix;
             std::cout << "obs_collisions = ";
             std::cout << getTotalObstacleCollisions();
-            std::cout << ", bad_boid_nn_dist = ";
-            std::cout << temp_count_bad_boid_nn_dist;
+            
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20250427 refactor the 2 new fitness scores
+            
+//            std::cout << ", bad_boid_nn_dist = ";
+            std::cout << ", separation_score_sum_ = ";
+            std::cout << separation_score_sum_;
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
             std::cout << std::endl;
         }
     }
@@ -285,9 +299,9 @@ public:
 //
 //        }
 
-    // Used to de-emphasize low scores. (Normalized scores on [0,1])
-    // To visualize, see plot on this page: https://tinyurl.com/236bh58h
-    double score_exponent_ = 8;
+//    // Used to de-emphasize low scores. (Normalized scores on [0,1])
+//    // To visualize, see plot on this page: https://tinyurl.com/236bh58h
+//    double score_exponent_ = 8;
 
 //    // Return a unit fitness component: quality of obstacle avoidance.
 //    double obstacleCollisionsScore() const
@@ -330,16 +344,47 @@ public:
 //        }
 
     
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250427 refactor the 2 new fitness scores
+    
+//    // Return a unit fitness component: quality of obstacle avoidance.
+//    double obstacleCollisionsScore() const
+//    {
+//        double count = getTotalObstacleCollisions();
+//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//        double f = boid_steps / 1000;  // So f = 100 for normal evolution run.
+//        double r = util::remap_interval_clip(count,  0, f,  1, 0);
+//        return std::pow(r, score_exponent_);
+//    }
+
+    // Given a unit fitness scores (on [0,1]), and an emphasis factor (also on
+    // [0,1]), push down low and mid range scores. Something like exponentiating:
+    // 0→0, 1→1, but 0.5 goes to less than 0.5. Uses a piecewise linear "knee"
+    // curve.
+    // TODO 20250427 shoudl this be in Utilities?
+    static double emphasizeHighScores(double unit_score, double emphasis)
+    {
+        assert(util::between(unit_score, 0, 1));
+        assert(util::between(emphasis, 0, 1));
+        double x = util::interpolate(emphasis, 0.5, 1.0);  // knee x
+        double y = util::interpolate(emphasis, 0.5, 0.0);  // knee y
+        return (unit_score < x ?
+                util::remap_interval(unit_score, 0, x, 0, y) :
+                util::remap_interval(unit_score, x, 1, y, 1));
+    }
+    
+    
     // Return a unit fitness component: quality of obstacle avoidance.
     double obstacleCollisionsScore() const
     {
         double count = getTotalObstacleCollisions();
         double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
-        double f = boid_steps / 1000;  // So f = 100 for normal evolution run.
-        double r = util::remap_interval_clip(count,  0, f,  1, 0);
-        return std::pow(r, score_exponent_);
+        double non_coll_steps = boid_steps - count;
+        double norm_non_coll_steps = non_coll_steps / boid_steps;
+        return emphasizeHighScores(norm_non_coll_steps, 0.9);
     }
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -391,20 +436,99 @@ public:
 //    }
     
     
-    double temp_count_bad_boid_nn_dist = 0;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250427 refactor the 2 new fitness scores
+    
+//    double temp_count_bad_boid_nn_dist = 0;
+//
+//    // Called each simulation step, records stats for the separation score.
+//    void recordSeparationScorePerStep()
+//    {
+//        for (auto b : boids())
+//        {
+//            double distance = b->distanceToNearestNeighbor();
+//            // Count the cases where the distance is in the correct range.
+//            double score = util::between(distance, 1.5, 8) ? 1 : 0;
+//            separation_score_sum_ += score;
+//            if (score == 1) { temp_count_bad_boid_nn_dist += 1; }
+//        }
+//    }
 
+    
+//    double good_nn_dist_sum_all_boid_steps_ = 0;
+    
+//        // Called each simulation step, records stats for the separation score.
+//        void recordSeparationScorePerStep()
+//        {
+//            for (auto b : boids())
+//            {
+//                double distance = b->distanceToNearestNeighbor();
+//                // Count the cases where the distance is in the correct range.
+//
+//    //            double score = util::between(distance, 1.5, 8) ? 1 : 0;
+//    //            separation_score_sum_ += score;
+//    //            if (score == 1) { temp_count_bad_boid_nn_dist += 1; }
+//
+//    //            double score = util::between(distance, 1.5, 4) ? 1 : 0;
+//    //            if (score == 1) { good_nn_dist_sum_all_boid_steps_ += 1; }
+//
+//                double score = util::between(distance, 1.5, 4) ? 1 : 0;
+//                if (score == 1) { separation_score_sum_ += 1; }
+//
+//
+//            }
+//        }
+
+//    // Called each simulation step, records stats for the separation score.
+//    void recordSeparationScorePerStep()
+//    {
+//        for (auto b : boids())
+//        {
+//            double distance = b->distanceToNearestNeighbor();
+//            // Count the cases where the distance is in the correct range.
+//            double score = util::between(distance, 1.5, 4) ? 1 : 0;
+//            if (score == 1) { separation_score_sum_ += 1; }
+//        }
+//    }
+
+    
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
         for (auto b : boids())
         {
+            double score = 0;
             double distance = b->distanceToNearestNeighbor();
-            // Count the cases where the distance is in the correct range.
-            double score = util::between(distance, 1.5, 8) ? 1 : 0;
+            
+//            std::vector<double> d = {0.0, 1.5, 3.0, 6.0, 9.0, 20.0};
+//            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
+
+            std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 8.0, 16.0};
+            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
+
+            if (util::between(distance, d[1], d[2]))
+            {
+                score = util::remap_interval(distance, d[1], d[2], s[1], s[2]);
+            }
+            else if (util::between(distance, d[2], d[3]))
+            {
+                score = s[3];
+            }
+            else if (util::between(distance, d[3], d[4]))
+            {
+                score = util::remap_interval(distance, d[3], d[4], s[3], s[4]);
+            }
+            else if (util::between(distance, d[4], d[5]))
+            {
+                score = util::remap_interval(distance, d[4], d[5], s[4], s[5]);
+            }
+
             separation_score_sum_ += score;
-            if (score == 1) { temp_count_bad_boid_nn_dist += 1; }
         }
     }
+
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 
     
@@ -451,18 +575,51 @@ public:
 //            return std::pow(normalized_good, 4);
 //        }
 
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20250427 refactor the 2 new fitness scores
+
+//        // Return a unit fitness component: maintaining proper separation distance.
+//        double separationScore() const
+//        {
+//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//            double normalized_good = separation_score_sum_ / boid_steps;
+//    //        return std::pow(normalized_good, 2);
+//    //        return std::pow(normalized_good, 4);
+//            return std::pow(normalized_good, score_exponent_);
+//        }
+    
+    
+//        // Return a unit fitness component: maintaining proper separation distance.
+//        double separationScore() const
+//        {
+//            double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//    //        double normalized_good = separation_score_sum_ / boid_steps;
+//            double normalized_good = good_nn_dist_sum_all_boid_steps_ / boid_steps;
+//    //        return std::pow(normalized_good, score_exponent_);
+//            return emphasizeHighScores(normalized_good, 0.7);
+//        }
+
+//    // Return a unit fitness component: maintaining proper separation distance.
+//    double separationScore() const
+//    {
+//        double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
+//        double normalized_good = good_nn_dist_sum_all_boid_steps_ / boid_steps;
+//        return emphasizeHighScores(normalized_good, 0.7);
+//    }
+
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
     {
         double boid_steps = fp().boidsPerFlock() * fp().maxSimulationSteps();
         double normalized_good = separation_score_sum_ / boid_steps;
-//        return std::pow(normalized_good, 2);
-//        return std::pow(normalized_good, 4);
-        return std::pow(normalized_good, score_exponent_);
+        return emphasizeHighScores(normalized_good, 0.7);
     }
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

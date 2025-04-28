@@ -47,23 +47,19 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250426 WIP tool for visualizing a logged FlockParameters
-// eg:
+// WIP tool for visualizing a logged FlockParameters, eg:
 // Run_Flock(87.4777, 20, 20, 20, 84.9358, 98.4413, 26.6924, 1.90821, 53.2896,
 // 94.8003, 2.77889, 37.8503, 42.3571, -0.787644, -0.401251, 0.575284, 9.87024,
 // 8.99761)
-
 void visualizePreviouslyLoggedFlockParameters()
 {
-    FlockParameters fp(87.4777, 20, 20, 20, 84.9358, 98.4413, 26.6924, 1.90821,
-                       53.2896, 94.8003, 2.77889, 37.8503, 42.3571, -0.787644,
-                       -0.401251, 0.575284, 9.87024, 8.99761);
-    EF::enable_multithreading = false;
-    for (int i = 0; i < 5; i++) { GP::run_flock_simulation(fp, 1); }
-    exit(EXIT_SUCCESS);
+//    FlockParameters fp(96.7746, 20, 20, 20, 76.4095, 77.1692, 22.219,
+//                       17.0537, 15.8248, 46.8697, 3.08164, 32.3397, 62.1726,
+//                       -0.865539, 0.404324, 0.813752, 79.2677, 9.26611);
+//    EF::enable_multithreading = false;
+//    for (int i = 0; i < 5; i++) { GP::run_flock_simulation(fp, 1); }
+//    exit(EXIT_SUCCESS);
 }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 int main(int argc, const char * argv[])
@@ -77,19 +73,6 @@ int main(int argc, const char * argv[])
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
     EF::enable_multithreading = true;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250426 WIP tool for visualizing a logged FlockParameters
-
-//        // But first, here in the main thread, build (then delete) one Flock object
-//        // to set up static state, such as defining Obstacle sets, making one active,
-//        // then uploading it to GPU.
-//        {
-//            Flock flock;
-//    //        flock.set_boid_count(10);
-//    //        flock.set_max_simulation_steps(1);
-//    //        flock.fp() = FlockParameters();
-//        }
     
     // But first, here in the main thread, build (then delete) one Flock object
     // to set up static state, such as defining Obstacle sets, making one active,
@@ -103,9 +86,7 @@ int main(int argc, const char * argv[])
 
     // WIP/HACK runs flock sim, with graphics, for the FlockParameters written
     // inline in this function's source code, above.
-    // visualizePreviouslyLoggedFlockParameters();
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    visualizePreviouslyLoggedFlockParameters();
     
     int individuals = 500;
     int subpops = 25;

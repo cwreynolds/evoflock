@@ -193,8 +193,19 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
                                      flock.fp().maxSimulationSteps());
                 double good_coll = (boid_steps - flock.getTotalObstacleCollisions());
                 double norm_good_coll =  good_coll / boid_steps;
-                double norm_good_nn_dist = flock.temp_count_bad_boid_nn_dist / boid_steps;
                 
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                // TODO 20250427 refactor the 2 new fitness scores
+                
+//                double norm_good_nn_dist =
+//                    flock.good_nn_dist_sum_all_boid_steps_ / boid_steps;
+
+                // NOTE this is almost what we get from Flock::separationScore()
+                double norm_good_nn_dist = flock.separation_score_sum_ / boid_steps;
+
+                
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
                 std::vector<double>& udfp = i->user_data_for_plotting;
                 if (! udfp.empty()) { udfp.clear(); }
                 udfp.push_back(norm_good_coll);

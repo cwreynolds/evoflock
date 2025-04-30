@@ -287,7 +287,9 @@ public:
         double count = getTotalObstacleCollisions();
         double non_coll_steps = boidStepPerSim() - count;
         double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
-        return emphasizeHighScores(norm_non_coll_steps, 0.995);
+//        return emphasizeHighScores(norm_non_coll_steps, 0.995);
+//        return emphasizeHighScores(norm_non_coll_steps, 0.9);
+        return emphasizeHighScores(norm_non_coll_steps, 0.999);
     }
 
     // Called each simulation step, records stats for the separation score.
@@ -318,7 +320,9 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250428 tighten up flocking requirement.
 //        return emphasizeHighScores(separationScorePerBoidStep(), 0.7);
-        return emphasizeHighScores(separationScorePerBoidStep(), 0.9);
+//        return emphasizeHighScores(separationScorePerBoidStep(), 0.9);
+//        return emphasizeHighScores(separationScorePerBoidStep(), 0.6);
+        return emphasizeHighScores(separationScorePerBoidStep(), 0.0);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 

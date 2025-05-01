@@ -314,10 +314,11 @@ private:
 class AnimationTimer
 {
 public:
-//    AnimationTimer()
-//      : frame_start_time_(TimeClock::now()), frame_duration_history_(5) {}
-
-    AnimationTimer() : AnimationTimer(60) {}
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250501 30vs60 what is wrong with Timer hour display?
+//    AnimationTimer() : AnimationTimer(60) {}
+    AnimationTimer() : AnimationTimer(30) {}
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     AnimationTimer(int frames_per_second)
       : frame_start_time_(TimeClock::now()),
@@ -410,6 +411,12 @@ public:
     }
     
     double frameDurationTarget() const { return 1.0 / frames_per_second_; }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250501 30vs60 what is wrong with Timer hour display?
+    int getFPS() const { return frames_per_second_; }
+    void setFPS(int fps) { frames_per_second_ = fps; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 private:
     TimePoint frame_start_time_;

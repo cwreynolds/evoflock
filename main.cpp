@@ -53,12 +53,19 @@
 // 8.99761)
 void visualizePreviouslyLoggedFlockParameters()
 {
-//    FlockParameters fp(71.36, 20, 20, 20, 68.5391, 89.999, 30.7682, 2.43901,
-//                       80.9778, 59.9018, 2.27834, 78.4835, 69.2377, -0.904158,
-//                       0.646362, -0.436147, 0.372518, 8.23237);
-//    EF::enable_multithreading = false;
+    return;
+//    FlockParameters fp(74.9862, 20, 20, 20, 67.0252, 84.8714, 62.7244, 22.7056,
+//                       86.5221, 44.7315, 2.83921, 21.7268, 29.732, -0.950642,
+//                       -0.105853, -0.645544, 3.34439, 0.441305);
+    FlockParameters fp; // this gets the hand-tuned parameters.
+    EF::enable_multithreading = false;
 //    for (int i = 0; i < 5; i++) { GP::run_flock_simulation(fp, 1); }
-//    exit(EXIT_SUCCESS);
+    for (int i = 0; i < 5; i++)
+    {
+        util::Timer t("one flock sim run");
+        GP::run_flock_simulation(fp, 1);
+    }
+    exit(EXIT_SUCCESS);
 }
 
 

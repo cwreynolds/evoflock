@@ -108,7 +108,11 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 // Initialize basic run parameters of Flock object
 inline void init_flock(Flock& flock)
 {
-    flock.set_fixed_fps(30);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250501 30vs60 what is wrong with Timer hour display?
+//    flock.set_fixed_fps(30);
+    flock.set_fixed_fps(flock.fp().getFPS());
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     flock.set_fixed_time_step(true);
     flock.set_boid_count(flock.fp().boidsPerFlock());
     flock.set_max_simulation_steps(flock.fp().maxSimulationSteps());

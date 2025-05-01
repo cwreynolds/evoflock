@@ -43,7 +43,12 @@ private:
     int boid_count_ = 200;
     double max_simulation_steps_ = std::numeric_limits<double>::infinity();
     bool fixed_time_step_ = false;
-    int fixed_fps_ = 60;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250501 30vs60 what is wrong with Timer hour display?
+//    int fixed_fps_ = 60;
+//    int fixed_fps_ = 30;
+    int fixed_fps_ = 30;  // Should always be overwritten, should this be NaN?
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int seed_ = 1234567890;
 
     int total_stalls_ = 0;
@@ -84,8 +89,6 @@ public:
     static ObstaclePtrList& obstacles() { return obstacles_; }
     static Draw& draw() { return Draw::getInstance(); }
     
-//    util::AnimationTimer& aTimer() { return animation_timer; }
-//    const util::AnimationTimer& aTimer() const { return animation_timer; }
     util::AnimationTimer& aTimer() { return animation_timer_; }
     const util::AnimationTimer& aTimer() const { return animation_timer_; }
 
@@ -128,12 +131,23 @@ public:
     //               should probably be constructed much later, perhaps in run()
     shape::OccupancyMap occupancy_map;
     Flock()
-      : occupancy_map(Vec3(25, 25, 25), Vec3(100, 100, 100), Vec3()),
-        animation_timer_(fixed_fps())
+//      : occupancy_map(Vec3(25, 25, 25), Vec3(100, 100, 100), Vec3()),
+//        animation_timer_(fixed_fps())
+      : occupancy_map(Vec3(25, 25, 25), Vec3(100, 100, 100), Vec3())
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
         updateObstacleSetForGUI();
         useObstacleSet();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250501 30vs60 what is wrong with Timer hour display?
+        
+        // This will normally be overwritten, but this is the default default.
+        aTimer().setFPS(fixed_fps());
+        
+//        grabPrintLock_evoflock();
+//        debugPrint(fixed_fps());
+//        debugPrint(aTimer().getFPS());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Run boids simulation.
@@ -142,6 +156,16 @@ public:
         // Log the FlockParameters object, but only for interactive drawing mode
         if (draw().enable()) { fp().print(); }
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250501 30vs60 what is wrong with Timer hour display?
+        set_fixed_fps(fp().getFPS());
+        aTimer().setFPS(fp().getFPS());
+        
+        // TEMP!!!!!!!!!!!!!!!!!
+        assert(fixed_fps() == 30);
+        assert(fp().getFPS() == 30);
+        assert(aTimer().getFPS() == 30);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         make_boids(boid_count(), fp().sphereRadius(), fp().sphereCenter());
         draw().beginAnimatedScene();
         while (still_running())
@@ -151,9 +175,13 @@ public:
             updateSelectedBoidForGUI();
             // Run simulation steps "as fast as possible" or at fixed rate?
             bool afap = not (fixed_time_step() and draw().enable());
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250501 30vs60 what is wrong with Timer hour display?
             double step_duration = (afap ?
                                     aTimer().frameDuration() :
-                                    1.0 / fixed_fps());
+//                                    1.0 / fixed_fps());
+                                    aTimer().frameDurationTarget());
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // Unclear why must be called before beginOneAnimatedFrame() but I
             // was unable to find a work around. (Otherwise no boids drawn.)
             bool run_sim_this_frame = draw().runSimulationThisFrame();
@@ -845,58 +873,6 @@ public:
             enforceObsBoidConstraintsDoNotCount();
         }
     }
-
-    //
-    //        # Print mini-help on shell.
-    //        def print_help(self):
-    //            self = Flock.convert_to_flock(self)
-    //            print()
-    //            print('  flock single key commands:')
-    //            print('    space: toggle simulation run/pause')
-    //            print('    1:     single simulation step, then pause')
-    //            print('    c:     toggle camera between static and boid tracking')
-    //            print('    s:     select next boid for camera tracking')
-    //            print('    a:     toggle drawing of steering annotation')
-    //            print('    w:     toggle between sphere wrap-around or avoidance')
-    //            print('    e:     toggle erase mode (spacetime boid worms)')
-    //            print('    f:     toggle realtime versus fixed time step of 1/60sec')
-    //            print('    b:     toggle blend vs hard switch for obstacle avoidance')
-    //            print('    o:     cycle through obstacle selections')
-    //            print('    h:     print this message')
-    //            print('    esc:   exit simulation.')
-    //            print()
-    //            print('  mouse view controls:')
-    //            print('    Left button + drag         : Rotate.')
-    //            print('    Ctrl + left button + drag  : Translate.')
-    //            print('    Wheel button + drag        : Translate.')
-    //            print('    Shift + left button + drag : Roll.')
-    //            print('    Wheel                      : Zoom in/out.')
-    //            print()
-    //            print('  annotation (in camera tracking mode, “c” to toggle):')
-    //            print('    red:     separation force.')
-    //            print('    green:   alignment force.')
-    //            print('    blue:    cohesion force.')
-    //            print('    gray:    combined steering force.')
-    //            print('    magenta: ray for obstacle avoidance.')
-    //            print()
-    //
-    //        # Allows writing global key command handlers as methods on a Flock instance.
-    //        # If the given "self" value is not a Flock instance, this assumes it it a
-    //        # Visualizer instance (passed to key handlers) and looks up the Flock
-    //        # instance associated with that Vis. (Normally only one of each exists.)
-    //        vis_pairs = util.Pairings()
-    //        def convert_to_flock(self):
-    //            if not isinstance(self, Flock):
-    //                self = Flock.vis_pairs.get_peer(self)
-    //            return self
-    //
-    //        # Some mode-change key commands need a redraw to show their effect. Ideally
-    //        # it would do just a redraw without simulation, but that turned out to be a
-    //        # little more complicated (since Boid annotation state is not saved) so this
-    //        # is good enough.
-    //        def single_step_if_paused(self):
-    //            if self.simulation_paused:
-    //                self.set_single_step_mode()
     
     // Simulation continues running until this returns false.
     bool still_running()
@@ -905,42 +881,6 @@ public:
         bool b = aTimer().frameCounter() < max_simulation_steps();
         return a and b;
     }
-    
-    
-    //        # Perform "before simulation" tasks: log versions, run unit tests.
-    //        def setup(self):
-    //            # Log versions.
-    //            print('Python', sys.version)
-    //            print('Open3D', o3d.__version__)
-    //            # Run unit tests.
-    //            Vec3.unit_test()
-    //            LocalSpace.unit_test()
-    //            Agent.unit_test()
-    //            util.unit_test()
-    //            shape.unit_test()
-    //            print('All unit tests OK.')
-    //
-    //
-    //    if __name__ == "__main__":
-    //
-    //        # TODO 20230530 runs OK (if slow) but something wrong in center offset case
-    //    #    Flock(400).run()                       # OK
-    //    #    Flock(400, 100).run()                  # OK
-    //    #    Flock(400, 100, Vec3(100, 0, 0)).run() # containment sphere still at origin
-    //    #
-    //    #    Flock(200, 60, Vec3(), 200).run()      # Test max_simulation_steps
-    //    #    Flock(max_simulation_steps=200, fixed_time_step=True, fixed_fps=30).run()
-    //    #    Flock(max_simulation_steps=200, fixed_time_step=True, seed=438538457).run()
-    //
-    //        ############################################################################
-    //
-    //    #    util.executions_per_second(Vec3.unit_test)
-    //
-    //        ############################################################################
-    //
-    //        Flock().run()
-    
-    
     
     static void unit_test()
     {

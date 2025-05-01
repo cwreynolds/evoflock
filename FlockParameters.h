@@ -26,10 +26,14 @@
 class FlockParameters
 {
 public:
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250501 30vs60 what is wrong with Timer hour display?
+
     // Shared const/input parameters. These are not subject to optimization and
     // remain fixed during evolution run. MUST update constParameterCount() when
     // const parameters are added or removed.
-    static int constParameterCount() { return 6; }
+//    static int constParameterCount() { return 6; }
+    static int constParameterCount() { return 7; }
     // "assume a spherical boid" unit diameter
     double bodyDiameter() const { return body_diameter_; }
     // Should this be called "world radius"?
@@ -42,6 +46,11 @@ public:
     int boidsPerFlock() const { return boids_per_flock_; }
     // Name of Obstacle set to use.
     std::string useObstacleSet() const { return use_obstacle_set; }
+
+    // Simulation step frequency -- frames per second.
+    int getFPS() const { return fps_; }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Hand-tuned parameters used as default.
     const static inline std::vector<double> hand_tuned_parameters =
@@ -199,6 +208,10 @@ public:
         indent(); debugPrint(maxSimulationSteps());
         indent(); debugPrint(boidsPerFlock());
         indent(); debugPrint(useObstacleSet());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250501 30vs60 what is wrong with Timer hour display?
+        indent(); debugPrint(getFPS());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         std::cout << "  " << tunableParameterCount();
         std::cout << " parameters to be optimized:" << std::endl;
         indent(); debugPrint(maxForce());
@@ -234,4 +247,8 @@ private:
 //    int max_simulation_steps_ = 18000;  // 5 minutes for demo mode
     int boids_per_flock_ = 200;
     std::string use_obstacle_set = "Sphere";
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250501 30vs60 what is wrong with Timer hour display?
+    int fps_ = 30;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };

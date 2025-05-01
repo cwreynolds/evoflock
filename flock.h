@@ -58,10 +58,10 @@ private:
     // Index of the initial/default obstacle set.
     static inline int default_obstacle_set_index_ =
     // 0;  // Sphere and vertical cylinder.
-    1;  // Sphere and 6 cylinders.
+    // 1;  // Sphere and 6 cylinders.
     // 2;  // Sphere and plane.
     // 3;  // Sphere only.
-    // 4;  // Sphere and many little spheres.
+    4;  // Sphere and many little spheres.
     // 5;  // Sphere with smaller sphere inside.
 
     // Currently selected boid's index in boids().
@@ -295,9 +295,18 @@ public:
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250430 reduce separation dist
+
+//        // Piecewise linear function of distance to score
+//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0, 10.0};
+//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
+
         // Piecewise linear function of distance to score
-        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0, 10.0};
-        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
+        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
+        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for (auto b : boids())
         {
             double score = 0;

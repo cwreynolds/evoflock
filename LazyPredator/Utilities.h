@@ -266,8 +266,20 @@ public:
     {
         if (!description_.empty())
         {
-            std::cout << description_ << " elapsed time: "
-            << elapsedSeconds() << " seconds" << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250430 add time in hours to util::Timer
+            
+//            std::cout << description_ << " elapsed time: "
+//            << elapsedSeconds() << " seconds" << std::endl;
+            
+            float es = elapsedSeconds();
+            
+            std::cout << description_ << " elapsed time: ";
+            std::cout << es << " seconds";
+            if (es > 3600) { std::cout << " (" << es / 3600 << " hours)"; }
+            std::cout << std::endl;
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
     }
     float elapsedSeconds() const

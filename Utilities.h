@@ -258,8 +258,18 @@ public:
     {
         if (!description_.empty())
         {
-            std::cout << description_ << " elapsed time: "
-            << elapsedSeconds() << " seconds" << std::endl;
+            double es = elapsedSeconds();
+            std::cout << description_ << " elapsed time: ";
+            std::cout << es << " seconds";
+            double minute = 60;
+            double hour = 60 * 60;
+            if (es > minute)
+            {
+                std::cout << " (" << es / minute << " minutes";
+                if (es > hour) { std::cout << ", " << es / hour << " hours"; }
+                std::cout << ")";
+            }
+            std::cout << std::endl;
         }
     }
     double elapsedSeconds() const
@@ -309,16 +319,12 @@ private:
 
 // Timer/clock class for animation. Originally misplaced in Draw in the earlier
 // Python "flock" project. Now split off because in evoflock the lifetime of
-// Draw is unrelated to the lifetime of an animation clock. Perhaps this should
-// eventually be merged into Timer class (just above in this file)?
+// Draw is unrelated to the lifetime of an animation clock. TODO: should this
+// be renamed AnimationClock?
 class AnimationTimer
 {
 public:
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250501 30vs60 what is wrong with Timer hour display?
-//    AnimationTimer() : AnimationTimer(60) {}
     AnimationTimer() : AnimationTimer(30) {}
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     AnimationTimer(int frames_per_second)
       : frame_start_time_(TimeClock::now()),
@@ -373,34 +379,8 @@ public:
         frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
         frame_counter_ += 1;
         frame_duration_history_.insert(frame_duration_);
-        
-//        // TODO something like if the frame time is > 200%, clear history.
-//        double duration_target = 1.0 / frames_per_second_;
-//        if (frame_duration_ > (2 * duration_target))
-//        {
-//            std::cout << "frame_duration_history_.average() = ";
-//            std::cout << frame_duration_history_.average() << std::endl;
-//            frame_duration_history_.fill(duration_target);
-//        }
-        
-//            // TODO something like if the frame time is > 200%, clear history.
-//            double frame_duration_target = 1.0 / frames_per_second_;
-//            if (frame_duration_ > (2 * frame_duration_target))
-//            {
-//    //            std::cout << "frame_duration_history_.average() = ";
-//    //            std::cout << frame_duration_history_.average() << std::endl;
-//    //            frame_duration_history_.fill(frame_duration_target);
-//                resetHistory();
-//            }
-
         // If frame time is twice the target duration, reset smoothing history.
         if (frame_duration_ > (2 * frameDurationTarget())) { resetHistory(); }
-
-        //if (0 == (frame_counter_ % 100))
-        //{
-        //    std::cout << "Recent average frame duration = ";
-        //    std::cout << frame_duration_history_.average() << std::endl;
-        //}
     }
     
     void resetHistory()
@@ -412,11 +392,8 @@ public:
     
     double frameDurationTarget() const { return 1.0 / frames_per_second_; }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250501 30vs60 what is wrong with Timer hour display?
     int getFPS() const { return frames_per_second_; }
     void setFPS(int fps) { frames_per_second_ = fps; }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 private:
     TimePoint frame_start_time_;

@@ -43,12 +43,7 @@ private:
     int boid_count_ = 200;
     double max_simulation_steps_ = std::numeric_limits<double>::infinity();
     bool fixed_time_step_ = false;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250501 30vs60 what is wrong with Timer hour display?
-//    int fixed_fps_ = 60;
-//    int fixed_fps_ = 30;
     int fixed_fps_ = 30;  // Should always be overwritten, should this be NaN?
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int seed_ = 1234567890;
 
     int total_stalls_ = 0;
@@ -138,16 +133,8 @@ public:
     {
         updateObstacleSetForGUI();
         useObstacleSet();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250501 30vs60 what is wrong with Timer hour display?
-        
         // This will normally be overwritten, but this is the default default.
         aTimer().setFPS(fixed_fps());
-        
-//        grabPrintLock_evoflock();
-//        debugPrint(fixed_fps());
-//        debugPrint(aTimer().getFPS());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Run boids simulation.
@@ -155,17 +142,8 @@ public:
     {
         // Log the FlockParameters object, but only for interactive drawing mode
         if (draw().enable()) { fp().print(); }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250501 30vs60 what is wrong with Timer hour display?
         set_fixed_fps(fp().getFPS());
         aTimer().setFPS(fp().getFPS());
-        
-        // TEMP!!!!!!!!!!!!!!!!!
-        assert(fixed_fps() == 30);
-        assert(fp().getFPS() == 30);
-        assert(aTimer().getFPS() == 30);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         make_boids(boid_count(), fp().sphereRadius(), fp().sphereCenter());
         draw().beginAnimatedScene();
         while (still_running())
@@ -175,13 +153,9 @@ public:
             updateSelectedBoidForGUI();
             // Run simulation steps "as fast as possible" or at fixed rate?
             bool afap = not (fixed_time_step() and draw().enable());
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250501 30vs60 what is wrong with Timer hour display?
             double step_duration = (afap ?
                                     aTimer().frameDuration() :
-//                                    1.0 / fixed_fps());
                                     aTimer().frameDurationTarget());
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // Unclear why must be called before beginOneAnimatedFrame() but I
             // was unable to find a work around. (Otherwise no boids drawn.)
             bool run_sim_this_frame = draw().runSimulationThisFrame();
@@ -315,26 +289,15 @@ public:
         double count = getTotalObstacleCollisions();
         double non_coll_steps = boidStepPerSim() - count;
         double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
-//        return emphasizeHighScores(norm_non_coll_steps, 0.995);
-//        return emphasizeHighScores(norm_non_coll_steps, 0.9);
-        return emphasizeHighScores(norm_non_coll_steps, 0.999);
+        return emphasizeHighScores(norm_non_coll_steps, 0.995);
     }
 
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250430 reduce separation dist
-
-//        // Piecewise linear function of distance to score
-//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0, 10.0};
-//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.5,  0.0};
-
         // Piecewise linear function of distance to score
         std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
         std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for (auto b : boids())
         {
             double score = 0;
@@ -354,13 +317,7 @@ public:
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250428 tighten up flocking requirement.
-//        return emphasizeHighScores(separationScorePerBoidStep(), 0.7);
-//        return emphasizeHighScores(separationScorePerBoidStep(), 0.9);
-//        return emphasizeHighScores(separationScorePerBoidStep(), 0.6);
         return emphasizeHighScores(separationScorePerBoidStep(), 0.0);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Test all Boids against each Obstacle. Enforce constraint if necessary by

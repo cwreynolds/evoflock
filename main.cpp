@@ -27,25 +27,22 @@
 
 #include "evoflock.h"
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250416 GUI cmd to visualize "best" Individual.
-//    void visualize_best_if_requested(LP::Population* population)
-//    {
-//        Draw& draw = Draw::getInstance();
-//        if (draw.getVisBestMode())
-//        {
-//            bool previous_emt_state = EF::enable_multithreading;
-//            EF::enable_multithreading = false;
-//            LP::Individual* individual = population->bestFitness();
-//            LP::GpTree tree = individual->tree();
-//            FlockParameters fp = GP::fp_from_ga_tree(tree);
-//            GP::run_flock_simulation(fp, 1);
-//            EF::enable_multithreading = previous_emt_state;
-//            draw.clearVisBestMode();
-//        }
-//    }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+// Handler for GUI's B key command to visualize "best" Individual.
+void visualize_best_if_requested(LP::Population* population)
+{
+    Draw& draw = Draw::getInstance();
+    if (draw.getVisBestMode())
+    {
+        bool previous_emt_state = EF::enable_multithreading;
+        EF::enable_multithreading = false;
+        LP::Individual* individual = population->bestFitness();
+        LP::GpTree tree = individual->tree();
+        FlockParameters fp = GP::fp_from_ga_tree(tree);
+        GP::run_flock_simulation(fp, 1);
+        EF::enable_multithreading = previous_emt_state;
+        draw.clearVisBestMode();
+    }
+}
 
 // WIP tool for visualizing a logged FlockParameters, eg:
 // Run_Flock(87.4777, 20, 20, 20, 84.9358, 98.4413, 26.6924, 1.90821, 53.2896,
@@ -53,19 +50,15 @@
 // 8.99761)
 void visualizePreviouslyLoggedFlockParameters()
 {
-    return;
-//    FlockParameters fp(74.9862, 20, 20, 20, 67.0252, 84.8714, 62.7244, 22.7056,
-//                       86.5221, 44.7315, 2.83921, 21.7268, 29.732, -0.950642,
-//                       -0.105853, -0.645544, 3.34439, 0.441305);
-    FlockParameters fp; // this gets the hand-tuned parameters.
-    EF::enable_multithreading = false;
+//    // To use the hand-tuned parameters:
+//    // FlockParameters fp;
+//    // To visualize a given set of FlockParameters. Cut/paste from log, compile.
+//    FlockParameters fp(88.8884, 20, 20, 20, 27.5447, 85.5556, 15.7524, 10.4351,
+//                       71.9298, 68.5798, 2.84135, 44.9671, 44.6122, -0.750929,
+//                       0.258413, 0.901923, 6.38259, 9.81219);
+//    EF::enable_multithreading = false;
 //    for (int i = 0; i < 5; i++) { GP::run_flock_simulation(fp, 1); }
-    for (int i = 0; i < 5; i++)
-    {
-        util::Timer t("one flock sim run");
-        GP::run_flock_simulation(fp, 1);
-    }
-    exit(EXIT_SUCCESS);
+//    exit(EXIT_SUCCESS);
 }
 
 
@@ -161,21 +154,6 @@ int main(int argc, const char * argv[])
                 std::cout << individual->tree().to_string(true) << std::endl;
             }
             std::cout << std::endl;
-            auto visualize_best_if_requested = [](LP::Population* population)
-            {
-                Draw& draw = Draw::getInstance();
-                if (draw.getVisBestMode())
-                {
-                    bool previous_emt_state = EF::enable_multithreading;
-                    EF::enable_multithreading = false;
-                    LP::Individual* individual = population->bestFitness();
-                    LP::GpTree tree = individual->tree();
-                    FlockParameters fp = GP::fp_from_ga_tree(tree);
-                    GP::run_flock_simulation(fp, 1);
-                    EF::enable_multithreading = previous_emt_state;
-                    draw.clearVisBestMode();
-                }
-            };
             visualize_best_if_requested(population);
         }
     }

@@ -26,9 +26,6 @@
 #include "Utilities.h"
 #include "Vec3.h"
 
-#include <fstream>  // for logging simulation data to file.
-
-
 class Flock
 {
 private:
@@ -71,8 +68,7 @@ private:
     double separation_score_sum_ = 0;
 
 public:
-    
-    
+
     FlockParameters& fp() { return fp_; }
     const FlockParameters& fp() const { return fp_; }
 
@@ -119,21 +115,13 @@ public:
     //
     // Yes for now, lets just skip args to the constructor to avoid worrying
     // about which parameters are or aren't included there. New answer: none are.
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240324 very ad hoc since these OccupancyMap parameters depend on
-    //               the enclosing EvertedSphereObstacle. The OccupancyMap
-    //               should probably be constructed much later, perhaps in run()
-    shape::OccupancyMap occupancy_map;
+    //
     Flock()
-//      : occupancy_map(Vec3(25, 25, 25), Vec3(100, 100, 100), Vec3()),
-//        animation_timer_(fixed_fps())
-      : occupancy_map(Vec3(25, 25, 25), Vec3(100, 100, 100), Vec3())
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
         updateObstacleSetForGUI();
         useObstacleSet();
-        // This will normally be overwritten, but this is the default default.
+        // This will normally be overwritten, but set a default default.
+        set_fixed_fps(30);
         aTimer().setFPS(fixed_fps());
     }
 
@@ -256,7 +244,6 @@ public:
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();
-        collect_flock_metrics();
         recordSeparationScorePerStep();
     }
         
@@ -376,305 +363,6 @@ public:
         }
     };
 
-    void collect_flock_metrics()
-    {
-        double ts = fp().minSpeed() - util::epsilon;
-        for (Boid* b : boids()) { if (b->speed() < ts) { total_stalls_ += 1; } }
-        bool all_speed_good = true;
-        bool all_seperation_good = true;
-        bool all_avoidance_good = true;
-        double min_sep_allowed = 3;  // in units of body radius
-        for (Boid* b : boids())
-        {
-            Boid* n = b->cached_nearest_neighbors().at(0);
-            double  dist = (b->position() - n->position()).length();
-            double br = fp().bodyDiameter() / 2;
-            bool nn_sep_ok = (dist / br) > min_sep_allowed;
-            
-            double cs = util::remap_interval_clip(dist/br,min_sep_allowed,20,1,0);
-            sum_of_all_cohesion_scores_ += cs;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240710 change speed fitness back to speed-ok frame count.
-            
-//            bool speed_ok = b->speed() > 15;
-            
-            bool speed_ok = util::between(b->speed(),
-                                          speed_target - speed_support_width / 2,
-                                          speed_target + speed_support_width / 2);
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            if (not nn_sep_ok) { all_seperation_good = false; }
-            if (not speed_ok) { all_speed_good = false; }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250308 Needs modern reimplementation. Removing this since
-            // Boid::detectObstacleViolations() is obsolete and new removed. See
-            // modern Boid::enforceObstacleConstraint(), temp collision counting
-            // code in Flock::fly_boids()
-            
-//            if (b->detectObstacleViolations())
-//            {
-//                all_avoidance_good = false;
-//            }
-//            else
-//            {
-//                per_boid_avoid_count++;
-//            }
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // Add this boid's position to occupancy_map, ignore if outside ESO.
-            occupancy_map.add(b->position(), [](Vec3 p){return p.length()>50;});
-            if (not all_avoidance_good)
-            {
-                all_boids_avoid_obs_for_whole_chunk_ = false;
-            }
-            if (not nn_sep_ok) { all_separation_good_for_whole_chunk_ = false; }
-            if (start_new_chunk())
-            {
-                if (all_boids_avoid_obs_for_whole_chunk_)
-                {
-                    count_chunked_avoid_obstacle_++;
-                }
-                all_boids_avoid_obs_for_whole_chunk_ = true;
-                if (all_separation_good_for_whole_chunk_)
-                {
-                    count_chunked_separation_++;
-                }
-                all_separation_good_for_whole_chunk_ = true;
-            }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240511 support path curvature metric.
-            curvature_sum_for_all_boid_updates_ += b->getPathCurvature();
-            
-//            if (temp_max_curvature_ < b->getPathCurvature())
-//            {
-//                temp_max_curvature_ = b->getPathCurvature();
-//                std::cout << "    ---- ";
-//                debugPrint(temp_max_curvature_)
-//            }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240706 make global variable GP::mof_names into a function.
-            speed_score_sum_for_all_boid_updates_ += boid_speed_score(b);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            increment_boid_update_counter();
-        }
-        if (all_speed_good) { count_steps_good_speed++; }
-        if (0 == (aTimer().frameCounter() % cluster_score_stride_))
-        {
-            double cs = util::remap_interval_clip(count_clusters(), 0, 5, 0, 1);
-            cluster_score_sum_ += cs;
-            cluster_score_count_++;
-        }
-    }
-    
-    // Score for average path curvature for all boids on all steps.
-    double curvature_sum_for_all_boid_updates_ = 0;
-    double get_curvature_score() const
-    {
-        assert(boid_update_counter_ > 0);
-        double ave = curvature_sum_for_all_boid_updates_ / boid_update_counter_;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240625 in evoflock GP mode this was triggering
-
-//        assert(!std::isnan(ave));
-
-        if (std::isnan(ave)) { ave = 0; }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        double ad_hoc_max_curvature = 0.17;
-        double ad_hoc_high_curvature = ad_hoc_max_curvature / 2;
-        return util::clip01(ave / ad_hoc_high_curvature);
-    }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240706 make global variable GP::mof_names into a function.
-    double speed_score_sum_for_all_boid_updates_ = 0;
-    double speed_target = 20; // m/s
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20240710 change speed fitness back to speed-ok frame count.
-//    double speed_support_width = 10;
-    double speed_support_width = 6;  // That is +/- 3m/s is good enough.
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    double boid_speed_score(Boid* boid)
-    {
-        double score = 0;
-        double speed = boid->speed();
-        double low  = speed_target - (speed_support_width / 2);
-        double high = speed_target + (speed_support_width / 2);
-        // Per boid score is zero outside a "speed_support_width" interval
-        // centered on "speed_target". There the score is 1 and it falls
-        // off to 0 (at "low" and "high") with a cosine kernel shape.
-        if (util::between(speed, low, speed_target))
-        {
-            score = util::sinusoid(util::remap_interval(speed,
-                                                        low, speed_target,
-                                                        0, 1));
-        }
-        if (util::between(speed, speed_target, high))
-        {
-            
-            score = util::sinusoid(util::remap_interval(speed,
-                                                        speed_target, high,
-                                                        1, 0));
-        }
-        return score;
-    }
-    double get_gp_speed_score() const
-    {
-        return speed_score_sum_for_all_boid_updates_ / boid_update_counter_;
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-    int count_clusters() const
-    {
-        // Clustering parameters.
-        int dbscan_min_points = 5;
-        double dbscan_epsilon = 8;
-        // Copy Boid positions into a vector of DBSCAN::Point.
-        size_t boid_count = boids().size();
-        std::vector<DBSCAN::Point> points(boid_count);
-        for (int i = 0; i < boid_count; i++)
-        {
-            const Vec3& bp = boids()[i]->position();
-            points[i].x = bp.x();
-            points[i].y = bp.y();
-            points[i].z = bp.z();
-        }
-        // Run DBSCAN clustering algorithm.
-        DBSCAN dbscan(dbscan_min_points, dbscan_epsilon, points);
-        // Return number of clusters found.
-        return dbscan.getClusterCount();
-    }
-    
-    double cluster_score_sum_ = 0;
-    int cluster_score_count_ = 0;
-    int cluster_score_stride_ = 10;
-    double get_cluster_score() const
-    {
-        return cluster_score_sum_ / cluster_score_count_;
-    }
-
-    // Records if all obstacle avoidance is successful for whole chunk.
-    // (Initialize to false so not to count chunk that ends on first update.)
-    bool all_boids_avoid_obs_for_whole_chunk_ = false;
-    int count_chunked_avoid_obstacle_ = 0;
-
-    bool all_separation_good_for_whole_chunk_ = false;
-    int count_chunked_separation_ = 0;
-    int chunk_count_ = 200;
-
-    // Count each boid update across all simulation steps.
-    int boid_update_counter_ = 0;
-    
-    void increment_boid_update_counter() { boid_update_counter_++; }
-
-    // For each boid update, returns true if this is the end of a fitness chunk.
-    bool start_new_chunk()
-    {
-        int boid_update_max = max_simulation_steps() * boids().size();
-        int chunk_steps = boid_update_max / chunk_count_;
-        return 0 == (boid_update_counter_ % chunk_steps);
-    }
-
-    // TODO 20240329 Maybe these should be private with accessors
-    int count_steps_good_separation = 0;
-    int count_steps_good_speed = 0;
-    // int count_steps_avoid_obstacle = 0;
-
-    double get_separation_score() const
-    {
-        return count_chunked_separation_ / double(chunk_count_);
-    }
-    double get_speed_score() const
-    {
-        return count_steps_good_speed / double(aTimer().frameCounter());
-    }
-    double get_avoid_obstacle_score() const
-    {
-        return count_chunked_avoid_obstacle_ / double(chunk_count_);
-    }
-    double get_occupied_score() const
-    {
-        auto ignore_function = [](Vec3 p) { return p.length() > 50;};
-        return occupancy_map.fractionOccupied(ignore_function);
-    }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240724 try GP using "per-boid avoid count"
-    double per_boid_avoid_count = 0;
-    double get_per_boid_avoid_score() const
-    {
-        return per_boid_avoid_count / boid_update_counter_;
-    }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    double sum_of_all_cohesion_scores_ = 0;
-    double get_cohere_score() const
-    {
-        return sum_of_all_cohesion_scores_ / boid_update_counter_;
-    }
-
-    int log_stat_interval_ = 100;
-    int getLogStatInterval() const { return log_stat_interval_; }
-    void setLogStatInterval(int steps) { log_stat_interval_ = steps; }
-
-    // Calculate and log various statistics for flock.
-    void log_stats()
-    {
-        if ((not draw().simPause()) and
-            (aTimer().frameCounter() % getLogStatInterval() == 0))
-        {
-            double average_speed = 0;
-            for (Boid* b : boids()) { average_speed += b->speed(); }
-            average_speed /= boid_count();
-            
-            // Loop over all unique pairs of distinct boids (ab==ba, not aa)
-            double min_sep = std::numeric_limits<double>::infinity();
-            double ave_sep = 0;
-            int pair_count = 0;
-            auto examine_pair = [&](const Boid* p, const Boid* q)
-            {
-                double dist = (p->position() - q->position()).length();
-                if (min_sep > dist) { min_sep = dist; }
-                ave_sep += dist;
-                pair_count += 1;
-                if (dist < fp().bodyDiameter()) { cumulative_sep_fail_ += 1; }
-            };
-            util::apply_to_pairwise_combinations(examine_pair, boids());
-            ave_sep /= pair_count;
-            
-            double max_nn_dist = 0;
-            int total_avoid_fail = 0;
-            for (Boid* b : boids())
-            {
-                Boid* n = b->cached_nearest_neighbors().at(0);
-                double  dist = (b->position() - n->position()).length();
-                if (max_nn_dist < dist) { max_nn_dist = dist; }
-                total_avoid_fail += b->avoidance_failure_counter();
-            }
-            
-            grabPrintLock_evoflock();
-            std::cout << log_prefix;
-            std::cout << aTimer().frameCounter();
-            // std::cout << " fps=" << 0; // round(self.fps.value));
-            std::cout << " fps=" << fps_.value;
-            std::cout << ", ave_speed=" << average_speed;
-            std::cout << ", min_sep=" << min_sep;
-            std::cout << ", ave_sep=" << ave_sep;
-            std::cout << ", max_nn_dist=" << max_nn_dist;
-            std::cout << ", cumulative_sep_fail/boid="
-                      << cumulative_sep_fail_ / float(boid_count());
-            std::cout << ", avoid_fail=" << total_avoid_fail;
-            std::cout << ", stalls=" << + total_stalls_;
-            std::cout << std::endl;
-        }
-    }
-    
     std::string log_prefix;
 
     // Keep track of a smoothed (LPF) version of frames per second metric.

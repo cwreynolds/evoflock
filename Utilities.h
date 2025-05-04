@@ -467,46 +467,13 @@ static void unit_test()
     assert (!std::isnan(remap_interval(1, 1, 1, 2, 3)));
     assert (!std::isnan(remap_interval_clip(1, 1, 1, 2, 3)));
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250503 disable all Blenders.
-//    Blender<double> b;
-//    b.blend(1.2, 0);
-//    assert (within_epsilon(b.value, 1.2));
-//    b.blend(3.4, 0.9);
-//    assert (within_epsilon(b.value, 1.42));
-//    b.blend(5.6, 0.5);
-//    assert (within_epsilon(b.value, 3.51));
-    
-    
-//    std::cout << "Blender<double>::global_enable = " << Blender<double>::global_enable << std::endl;
-//
-//    Blender<double> b;
-//    b.blend(1.2, 0);
-//    std::cout << "b.value = " << b.value << std::endl;
-//    assert (within_epsilon(b.value, 1.2));
-//    b.blend(3.4, 0.9);
-//    std::cout << "b.value = " << b.value << std::endl;
-//    assert (within_epsilon(b.value, 1.42));
-//    b.blend(5.6, 0.5);
-//    std::cout << "b.value = " << b.value << std::endl;
-//    assert (within_epsilon(b.value, 3.51));
-
-    
-//    b.value = 1.2
-//    b.value = 1.42
-//    b.value = 3.51
-
-    
     Blender<double> b;
     b.blend(1.2, 0);
-    assert (within_epsilon(b.value, b.global_enable ? 1.2 : 1.2));
+    assert (within_epsilon(b.value, b.global_enable ? 1.2  : 1.2));
     b.blend(3.4, 0.9);
     assert (within_epsilon(b.value, b.global_enable ? 1.42 : 3.4));
     b.blend(5.6, 0.5);
     assert (within_epsilon(b.value, b.global_enable ? 3.51 : 5.6));
-    
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20241116 reality check for time utils

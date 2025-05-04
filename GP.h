@@ -112,7 +112,6 @@ inline void init_flock(Flock& flock)
     flock.set_fixed_fps(flock.fp().getFPS());
     flock.set_boid_count(flock.fp().boidsPerFlock());
     flock.set_max_simulation_steps(flock.fp().maxSimulationSteps());
-    flock.setLogStatInterval(flock.max_simulation_steps());
     flock.log_prefix = "    ";
 }
 
@@ -126,10 +125,6 @@ double fitness_product_weight_01(double fitness, double weight)
 {
     return util::remap_interval_clip(fitness, 0, 1, 1 - weight, 1);
 };
-
-
-inline bool print_occupancy_map = false;  // Just for debugging.
-
 
 inline void fitness_logger(const MOF& mof)
 {

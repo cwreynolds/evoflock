@@ -102,11 +102,8 @@ public:
         TournamentGroup random_group = randomTournamentGroup(subpop);
         // Run tournament among the three, return ranked group.
         TournamentGroup ranked_group = tournament_function(random_group);
-        double prev_best_fitness = bestFitness()->getFitness();
         // Complete the step based on this ranked group, if it is valid.
         if (ranked_group.getValid()) { evolutionStep(ranked_group, subpop); }
-        double new_best_fitness = bestFitness()->getFitness();
-        if (protect_elite_mof) { assert(new_best_fitness >= prev_best_fitness); }
         // Increment step count (before logger() call for 1 based step numbers).
         incrementStepCount();
         logger();
@@ -212,36 +209,6 @@ public:
     bool explicit_treeValue_in_evolutionStep = true;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240708 WIP for MOF elitism
-//    private:
-//        MultiObjectiveFitness elite_mof_;
-//    public:
-//        
-//        void updateEliteMOF(const MultiObjectiveFitness& mof)
-//        {
-//            if (elite_mof_.empty()) { elite_mof_ = mof; }  // First update.
-//            assert(mof.size() == elite_mof_.size());
-//            for (int i = 0; i < mof.size(); i++)
-//            {
-//                elite_mof_.at(i) = std::max(mof.at(i), elite_mof_.at(i));
-//            }
-//        }
-//
-//        bool isEliteMOF(const MultiObjectiveFitness& mof) const
-//        {
-//            bool elite = false;
-//            assert(mof.size() == elite_mof_.size());
-//            for (int i = 0; i < mof.size(); i++)
-//            {
-//                double mo = mof.at(i);
-//                double eo = elite_mof_.at(i);
-//                if (util::between(mo, 0.05, 0.95) and (mo >= eo)) { elite = true; }
-//            }
-//            return elite;
-//        }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Global pointer to Individual currently being evaluated (fitness tested).
     // LazyPredator ignores this variable. Application software can reference it.
     static inline Individual* evolution_step_individual = nullptr;
@@ -297,113 +264,6 @@ public:
         // Finally, do a tournament-based evolution step.
         evolutionStep(tournament_function);
     }
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240721 break off countObjectivesDominated() into its own function
-    //     had been inline in evolutionStep(MultiObjectiveFitnessFunction...)
-    
-    // Wrote new experimental code to count how many objectives (dimensions of a
-    // MOF) are dominated by a given Individual.
-    // Use this to set TournamentGroupMembers::metric
-    
-    
-//    void countObjectivesDominated(TournamentGroup& group)
-//    {
-//        for (int i = 0; i < group.members().size(); i++)
-//        {
-//            auto& gm = group.members().at(i);
-//            const auto& mof = gm.individual->getMultiObjectiveFitness();
-//            int dominate_count = 0;
-//            for (int j = 0; j < mof.size(); j++)
-//            {
-//                double max_j_value = -1; // QQQQ use -inf?
-//                for (int k = 0; k < group.members().size(); k++)
-//                {
-//                    const auto& gm2 = group.members().at(k);
-//                    const auto& mof2 = gm2.individual->getMultiObjectiveFitness();
-//                    if (i != k)
-//                    {
-//                        double mof2_j = mof2.at(j);
-//                        if (max_j_value < mof2_j) { max_j_value = mof2_j; }
-//                    }
-//                }
-//                if (mof.at(j) > max_j_value) { dominate_count++; }
-//            }
-//            gm.metric = dominate_count;
-//        }
-//        
-//        std::string sep = "****************************************************";
-//        std::cout << std::endl;
-//        std::cout << sep << std::endl;
-//        for (auto& m : group.members())
-//        {
-//            auto mof = m.individual->getMultiObjectiveFitness();
-//            std::cout << "metric = " << m.metric << ", mof = {";
-//            std::cout << vec_to_string(mof.as_vector(), 4) << "}" << std::endl;
-//        }
-//        std::cout << sep << std::endl;
-//        std::cout << std::endl;
-//    }
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240710 WIP for MOF elitism
-    
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20240717 add global switch: protect_elite_mof
-//    static inline bool protect_elite_mof = true;
-    static inline bool protect_elite_mof = false;
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-    
-//        // rethink name
-//
-//        // Inspect Individuals in TournamentGroup. Determine if any are "elite": by
-//        // dominating any one of the MOF objectives, or by having best of population
-//        // scalar fitness. If elites are found, then set the TournamentGroup to be
-//        // invalid, so to prevent "death".
-//    //    void protectEliteMOF(TournamentGroup group)
-//        void protectEliteMOF(TournamentGroup& group)
-//        {
-//            for (auto& m : group.members())
-//            {
-//                Individual* individual = m.individual;
-//                MultiObjectiveFitness mof = individual->getMultiObjectiveFitness();
-//                double prev_best_pop_fitness = bestFitness()->getFitness();
-//                double fitness = individual->getFitness();
-//                if (fitness >= prev_best_pop_fitness)
-//                {
-//    //                std::cout << "QQQQ protect best scalarized fitness" << std::endl;
-//                    group.setValid(false);
-//                }
-//
-//                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//                // TODO 20240717 add global switch: protect_elite_mof
-//
-//    //            if (isEliteMOF(mof))
-//                if (isEliteMOF(mof) and protect_elite_mof)
-//
-//                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//                {
-//    //                std::cout << std::endl <<
-//    //                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-//    //                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-//    //                    "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-//    //                    << std::endl;
-//    //                debugPrint(elite_mof_)
-//    //                std::cout << "       ";
-//    //                debugPrint(mof)
-//    //                std::cout << std::endl;
-//                    group.setValid(false);
-//                }
-//            }
-//        }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
     // Delete Individual at index i, then overwrite pointer with replacement.

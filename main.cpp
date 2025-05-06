@@ -28,7 +28,7 @@
 #include "evoflock.h"
 
 // Handler for GUI's B key command to visualize "best" Individual.
-void visualize_best_if_requested(LP::Population* population)
+void visualizeBestIfRequested(LP::Population* population)
 {
     Draw& draw = Draw::getInstance();
     if (draw.getVisBestMode())
@@ -154,7 +154,7 @@ int main(int argc, const char * argv[])
                 std::cout << individual->tree().to_string(true) << std::endl;
             }
             std::cout << std::endl;
-            visualize_best_if_requested(population);
+            visualizeBestIfRequested(population);
         }
     }
     

@@ -167,7 +167,12 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
         // These steps can happen in parallel threads:
         Flock flock;
         init_flock(flock);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250505 more collisions in visualizePreviouslyLoggedFlockParameters()
         flock.fp() = fp;
+        debugPrint(flock.obstacles().size())
+        flock.fp() = FlockParameters();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         flock.run();
         MOF mof = multiObjectiveFitnessOfFlock(flock);
         // These steps happen in the single thread with lock on save_mof_mutex.

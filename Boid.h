@@ -43,8 +43,11 @@ private:  // move to bottom of class later
     // Set during sense/plan phase, saved for steer phase.
     Vec3 next_steer_;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250505 more collisions in visualizePreviouslyLoggedFlockParameters()
     // Cumulative count: how many avoidance failures (collisions) has it had?
-    int avoidance_failure_counter_ = 0;
+//    int avoidance_failure_counter_ = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Low pass filter for steering vector.
     util::Blender<Vec3> steer_memory_;
@@ -124,7 +127,10 @@ public:
         return cached_nearest_neighbors_;
     }
 
-    int avoidance_failure_counter() const {return avoidance_failure_counter_;};
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250505 more collisions in visualizePreviouslyLoggedFlockParameters()
+//    int avoidance_failure_counter() const {return avoidance_failure_counter_;};
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     const Color& color() const { return color_; }
     void setColor(Color c) { color_ = c; }
@@ -567,6 +573,10 @@ public:
     // Build list of future Obstacle collisions, sorted with soonest first.
     void cache_predicted_obstacle_collisions()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250505 more collisions in visualizePreviouslyLoggedFlockParameters()
+//        debugPrint(flock_obstacles().size())
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         predicted_obstacle_collisions_.clear();
         for (Obstacle* o : flock_obstacles())
         {

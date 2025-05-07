@@ -47,14 +47,51 @@ public:
     template <typename T>
     GpType(const std::string& name, T range_min, T range_max)
       : GpType(name, range_min, range_max, defaultJiggleScale()) {}
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250506 are GA values being jiggled?
+
+//    // Constructor for ranged numeric types, plus custom jiggle scale.
+//    template <typename T>
+//    GpType(const std::string& name, T range_min, T range_max, double jiggle_scale)
+//      : GpType(name,
+//               [=](){ return std::any(T(LPRS().random2(range_min, range_max))); },
+//               any_to_string<T>,
+//               [=](std::any x) { return jiggle(std::any_cast<T>(x), range_min,
+//                                               range_max, jiggle_scale); }){}
+
+    
     // Constructor for ranged numeric types, plus custom jiggle scale.
     template <typename T>
     GpType(const std::string& name, T range_min, T range_max, double jiggle_scale)
       : GpType(name,
                [=](){ return std::any(T(LPRS().random2(range_min, range_max))); },
                any_to_string<T>,
-               [=](std::any x) { return jiggle(std::any_cast<T>(x), range_min,
-                                               range_max, jiggle_scale); }){}
+               
+//               [=](std::any x) { return jiggle(std::any_cast<T>(x), range_min,
+//                                               range_max, jiggle_scale); }){}
+
+               [=](std::any x)
+               {
+          T xx = std::any_cast<T>(x);
+          T jj = std::any_cast<T>(jiggle(xx, range_min,
+                                         range_max, jiggle_scale));
+
+//          debugPrint(xx)
+//          debugPrint(range_min)
+//          debugPrint(range_max)
+//          debugPrint(jiggle_scale)
+//          debugPrint(jj)
+
+          return jj;
+          
+          
+          
+      }){}
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Accessor for name.
     const std::string& name() const { return name_; }
     // Does this type have an ephemeral generator?

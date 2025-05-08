@@ -161,6 +161,17 @@ public:
             draw().endOneAnimatedFrame();
             aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
             if (not draw().simPause()) { aTimer().measureFrameDuration(); }
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250507 temporarily restart RandomSequence(s) for each sim
+            int fc = aTimer().frameCounter();
+//            if (fc % 100 == 99)
+            if (fc % 100 == 0)
+            {
+                std::cout << fc << ": " << selectedBoid()->position().x();
+                std::cout << std::endl;
+            }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }
         draw().endAnimatedScene();
         if (max_simulation_steps() == std::numeric_limits<double>::infinity())

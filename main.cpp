@@ -72,8 +72,15 @@ int main(int argc, const char * argv[])
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
-    EF::enable_multithreading = true;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250507 temporarily restart RandomSequence(s) for each sim
+//    EF::enable_multithreading = true;
+    EF::enable_multithreading = false;
     
+    Draw::getInstance().setEnable(false);
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     // But first, here in the main thread, build (then delete) one Flock object
     // to set up static state, such as defining Obstacle sets, making one active,
     // then uploading it to GPU.

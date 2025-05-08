@@ -172,6 +172,15 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
         flock.fp() = fp;
         debugPrint(flock.obstacles().size())
         flock.fp() = FlockParameters();
+        
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20250507 temporarily restart RandomSequence(s) for each sim
+        int seed = 20250507;
+        EF::RS().setSeed(seed);
+        LP::LPRS().setSeed(seed);
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         flock.run();
         MOF mof = multiObjectiveFitnessOfFlock(flock);

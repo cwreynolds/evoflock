@@ -164,13 +164,40 @@ public:
 
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             // TODO 20250507 temporarily restart RandomSequence(s) for each sim
-            int fc = aTimer().frameCounter();
+            
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20250508 more testing for repeatability
+
+//            int fc = aTimer().frameCounter();
 //            if (fc % 100 == 99)
-            if (fc % 100 == 0)
+
+//    //            if (fc % 100 == 0)
+//                if (fc % 50 == 0)
+//                {
+//    //                std::cout << fc << ": " << selectedBoid()->position().x();
+//                    std::cout << fc << ": " << selectedBoid()->position();
+//                    std::cout << std::endl;
+//                }
+            
+            int fc = aTimer().frameCounter();
+
+            if (fc % 50 == 0)
             {
-                std::cout << fc << ": " << selectedBoid()->position().x();
+//                std::cout << fc << ": ";
+                std::cout << fc << ", ";
+
+                std::cout << aTimer().frameDuration() << ", ";
+                
+                std::cout << aTimer().frameDurationTarget() << ": ";
+
+                
+                std::cout << selectedBoid()->position();
                 std::cout << std::endl;
             }
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }
         draw().endAnimatedScene();

@@ -139,20 +139,63 @@ public:
             aTimer().setFrameStartTime();
             updateObstacleSetForGUI();
             updateSelectedBoidForGUI();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250509 use correct step_duration when graphics are off.
+
+//                // Run simulation steps "as fast as possible" or at fixed rate?
+//                bool afap = not (fixed_time_step() and draw().enable());
+//
+//    //            double step_duration = (afap ?
+//    //                                    aTimer().frameDuration() :
+//    //                                    aTimer().frameDurationTarget());
+//
+//                double fd = aTimer().frameDuration();
+//                double fdt = aTimer().frameDurationTarget();
+//                double step_duration = afap ? fd : fdt;
+//
+//
+//                debugPrint(afap);
+//                debugPrint(draw().enable());
+//                debugPrint(fixed_time_step());
+//                debugPrint(step_duration);
+//    //            debugPrint(aTimer().frameDurationTarget());
+//                debugPrint(fdt);
+//
+//    //            assert(step_duration == 1.0 / 30.0);
+//    //            assert((step_duration == 0) or (step_duration == 1.0 / 30.0));
+
             // Run simulation steps "as fast as possible" or at fixed rate?
             bool afap = not (fixed_time_step() and draw().enable());
-            double step_duration = (afap ?
-                                    aTimer().frameDuration() :
-                                    aTimer().frameDurationTarget());
+            double fd = aTimer().frameDuration();
+            double fdt = aTimer().frameDurationTarget();
+            double step_duration = afap ? fd : fdt;
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             // Unclear why must be called before beginOneAnimatedFrame() but I
             // was unable to find a work around. (Otherwise no boids drawn.)
             bool run_sim_this_frame = draw().runSimulationThisFrame();
             draw().beginOneAnimatedFrame();
             if (run_sim_this_frame)
             {
-                fly_boids(step_duration);
-                // log_stats();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250509 use correct step_duration when graphics are off.
+
+//                fly_boids(step_duration);
+//                // log_stats();
+//                update_fps();
+
+//                fly_boids(step_duration);
+                
+                // TODO 20250509 this used to be "step_duration" which caused
+                // the runs-slow-when-draw-is-turned-off bug. Have not tested
+                // but it seems "if (not fixed_time_step() and draw().enable())"
+                // then this should again be "step_duration", so the sim frame
+                // time matched the draw frame time.
+                fly_boids(fdt);
                 update_fps();
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
             // Draw all Boid bodies, whether sim was paused or not.
             for_all_boids([&](Boid* b){ b->draw_body();});
@@ -180,21 +223,27 @@ public:
 //                    std::cout << std::endl;
 //                }
             
-            int fc = aTimer().frameCounter();
+//                int fc = aTimer().frameCounter();
+//
+//                if (fc % 50 == 0)
+//                {
+//    //    //                std::cout << fc << ": ";
+//    //                    std::cout << fc << ", ";
+//    //                    std::cout << aTimer().frameDuration() << ", ";
+//    //                    std::cout << aTimer().frameDurationTarget() << ": ";
+//    //                    std::cout << selectedBoid()->position();
+//    //                    std::cout << std::endl;
+//
+//                    std::cout << fc << ", " << fd << ", " << fdt << ": ";
+//                    std::cout << selectedBoid()->position() << std::endl;
+//                }
 
-            if (fc % 50 == 0)
-            {
-//                std::cout << fc << ": ";
-                std::cout << fc << ", ";
-
-                std::cout << aTimer().frameDuration() << ", ";
-                
-                std::cout << aTimer().frameDurationTarget() << ": ";
-
-                
-                std::cout << selectedBoid()->position();
-                std::cout << std::endl;
-            }
+//            int fc = aTimer().frameCounter();
+//            if (fc % 50 == 0)
+//            {
+//                std::cout << fc << ", " << fd << ", " << fdt << ": ";
+//                std::cout << selectedBoid()->position() << std::endl;
+//            }
 
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

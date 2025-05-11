@@ -61,7 +61,14 @@ public:
     {
         Vec3 new_velocity = velocity() + (acceleration * time_step);
         double new_speed = new_velocity.length();
-        setSpeed(util::clip(new_speed, 0, max_speed()));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250510 temp global switch for controlling speed with fitness.
+//        setSpeed(util::clip(new_speed, 0, max_speed()));
+        if (not EF::fitness_speed_control)
+        {
+            setSpeed(util::clip(new_speed, 0, max_speed()));
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         setPathCurvature(new_velocity);
         setAcceleration(new_velocity, time_step);
         // Update geometric state when moving.

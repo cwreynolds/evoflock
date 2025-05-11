@@ -167,21 +167,7 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
         // These steps can happen in parallel threads:
         Flock flock;
         init_flock(flock);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250505 more collisions in visualizePreviouslyLoggedFlockParameters()
         flock.fp() = fp;
-//        debugPrint(flock.obstacles().size())
-//        flock.fp() = FlockParameters();
-        
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20250507 temporarily restart RandomSequence(s) for each sim
-//        int seed = 20250507;
-//        EF::RS().setSeed(seed);
-//        LP::LPRS().setSeed(seed);
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         flock.run();
         MOF mof = multiObjectiveFitnessOfFlock(flock);
         // These steps happen in the single thread with lock on save_mof_mutex.
@@ -394,8 +380,7 @@ void replace_scalar_fitness_metric(LP::Population& population,
 }
 
 // The default (in GpType::defaultJiggleScale()) is 0.05
-double jiggle_scale = 0.1;
-
+double jiggle_scale = 0.05;
 
 // This is a degenerate GP function set, for what is essentially a GA problem:
 // selecting a set of real number parameters for a flock simulation, via an
@@ -410,7 +395,12 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
             { "Real_0_1",    0.0,   1.0, jiggle_scale },
             { "Real_0_10",   0.0,  10.0, jiggle_scale },
             { "Real_0_100",  0.0, 100.0, jiggle_scale },
-            { "Real_0_200",  0.0, 200.0, jiggle_scale },  // TODO keep?
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250509 ad hoc fix for FPs with tiny max_force
+            { "Real_50_100", 50.0, 100.0, jiggle_scale },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
             { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
             { "Real_20_20",  20.0,  20.0, 0 },            // for boid speed values
         },
@@ -427,7 +417,11 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                 //     TODO note that I slightly reordering / reparameterizing
                 //     TODO should body_radius be held constant at 0.5?
                 {
-                    "Real_0_100",  // max_force
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20250509 ad hoc fix for FPs with tiny max_force
+//                    "Real_0_100",  // max_force
+                    "Real_50_100",  // max_force
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                     // 20240427 Policy change: specify rather than optimize speed:
                     "Real_20_20",  // min_speed
@@ -475,114 +469,133 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
     };
 }
 
-//#define handmade_helper(p) { #p, FlockParameters().p, FlockParameters().p, 0.0 }
-#define handmade_helper(p) { #p, FlockParameters().p(), FlockParameters().p(), 0.0 }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250510 temp global switch for controlling speed with fitness.
 
-// This version of the GA function set is just for testing: every Individual in
-// the population will have a GpTree equivalent to the handmade model used in
-// the pre-evoflock python version.
-LP::FunctionSet evoflock_ga_function_set_handmade()
-{
-    return
-    {
-        // GpTypes
-        {
-            { "Multi_Objective_Fitness" },
-            handmade_helper(maxForce),
-            handmade_helper(minSpeed),
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
-            // So this is probably being ignored.
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            handmade_helper(initSpeed),
-            handmade_helper(maxSpeed),
-            handmade_helper(weightForward),
-            handmade_helper(weightSeparate),
-            handmade_helper(weightAlign),
-            handmade_helper(weightCohere),
-            handmade_helper(weightAvoidPredict),
-            handmade_helper(weightAvoidStatic),
-            handmade_helper(maxDistSeparate),
-            handmade_helper(maxDistAlign),
-            handmade_helper(maxDistCohere),
-            handmade_helper(angleSeparate),
-            handmade_helper(angleAlign),
-            handmade_helper(angleCohere),
-            handmade_helper(flyAwayMaxDist),
-            handmade_helper(minTimeToCollide),
-        },
 
-        // GpFunctions
-        {
-            {
-                // GP function name:
-                "Run_Flock",
-                
-                // Return type (in this case it returns a MultiObjectiveFitness):
-                "Multi_Objective_Fitness",
-                
-                // Function parameter type list:
-                {
-                    "maxForce",
-                    "minSpeed",
-                    "initSpeed",
-                    "maxSpeed",
+//    #define handmade_helper(p) { #p, FlockParameters().p(), FlockParameters().p(), 0.0 }
+//
+//    // This version of the GA function set is just for testing: every Individual in
+//    // the population will have a GpTree equivalent to the handmade model used in
+//    // the pre-evoflock python version.
+//    LP::FunctionSet evoflock_ga_function_set_handmade()
+//    {
+//        return
+//        {
+//            // GpTypes
+//            {
+//                { "Multi_Objective_Fitness" },
+//                handmade_helper(maxForce),
+//                handmade_helper(minSpeed),
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                // TODO 20250322 just a FYI (FMI?) I think boids start at speed 0.
+//                // So this is probably being ignored.
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                handmade_helper(initSpeed),
+//                handmade_helper(maxSpeed),
+//                handmade_helper(weightForward),
+//                handmade_helper(weightSeparate),
+//                handmade_helper(weightAlign),
+//                handmade_helper(weightCohere),
+//                handmade_helper(weightAvoidPredict),
+//                handmade_helper(weightAvoidStatic),
+//                handmade_helper(maxDistSeparate),
+//                handmade_helper(maxDistAlign),
+//                handmade_helper(maxDistCohere),
+//                handmade_helper(angleSeparate),
+//                handmade_helper(angleAlign),
+//                handmade_helper(angleCohere),
+//                handmade_helper(flyAwayMaxDist),
+//                handmade_helper(minTimeToCollide),
+//            },
+//
+//            // GpFunctions
+//            {
+//                {
+//                    // GP function name:
+//                    "Run_Flock",
+//                    
+//                    // Return type (in this case it returns a MultiObjectiveFitness):
+//                    "Multi_Objective_Fitness",
+//                    
+//                    // Function parameter type list:
+//                    {
+//                        "maxForce",
+//                        "minSpeed",
+//                        "initSpeed",
+//                        "maxSpeed",
+//
+//                        "weightForward",
+//                        "weightSeparate",
+//                        "weightAlign",
+//                        "weightCohere",
+//                        "weightAvoidPredict",
+//                        "weightAvoidStatic",
+//
+//                        "maxDistSeparate",
+//                        "maxDistAlign",
+//                        "maxDistCohere",
+//
+//                        // Cosine of threshold angle (max angle from forward to be seen)
+//                        "angleSeparate",
+//                        "angleAlign",
+//                        "angleCohere",
+//
+//                        "flyAwayMaxDist",
+//                        "minTimeToCollide"
+//                    },
+//                    
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // TODO 20240628 can we do an eval of a const tree?
+//                    
+//                    // Evaluation function, which runs a flock simulation with the
+//                    // given parameters and returns the fitness.
+//    #ifdef eval_const_20240628
+//                    [](const LazyPredator::GpTree& t)
+//    #else  // eval_const_20240628
+//                    [](LazyPredator::GpTree& t)
+//    #endif // eval_const_20240628
+//                    {
+//                        auto fitness = run_flock_simulation(fp_from_ga_tree(t));
+//                        return std::any(fitness);
+//                    }
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                }
+//            }
+//        };
+//    }
 
-                    "weightForward",
-                    "weightSeparate",
-                    "weightAlign",
-                    "weightCohere",
-                    "weightAvoidPredict",
-                    "weightAvoidStatic",
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-                    "maxDistSeparate",
-                    "maxDistAlign",
-                    "maxDistCohere",
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250510 temp global switch for controlling speed with fitness.
 
-                    // Cosine of threshold angle (max angle from forward to be seen)
-                    "angleSeparate",
-                    "angleAlign",
-                    "angleCohere",
-
-                    "flyAwayMaxDist",
-                    "minTimeToCollide"
-                },
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240628 can we do an eval of a const tree?
-                
-                // Evaluation function, which runs a flock simulation with the
-                // given parameters and returns the fitness.
-#ifdef eval_const_20240628
-                [](const LazyPredator::GpTree& t)
-#else  // eval_const_20240628
-                [](LazyPredator::GpTree& t)
-#endif // eval_const_20240628
-                {
-                    auto fitness = run_flock_simulation(fp_from_ga_tree(t));
-                    return std::any(fitness);
-                }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            }
-        }
-    };
-}
+//    // This is a degenerate GP function set, for what is essentially a GA problem:
+//    // selecting a set of real number parameters for a flock simulation, via an
+//    // absolute and fixed fitness metric. There is only one function, all GpTrees
+//    // are exactly one function deep, differing only in their parameter values.
+//    LP::FunctionSet evoflock_ga_function_set()
+//    {
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20241203 use default FlockParameters for testing
+//    #ifdef     USE_DEFAULT_FP
+//        return evoflock_ga_function_set_handmade();
+//    #else   // USE_DEFAULT_FP
+//        return evoflock_ga_function_set_normal();
+//    #endif  // USE_DEFAULT_FP
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    }
 
 // This is a degenerate GP function set, for what is essentially a GA problem:
 // selecting a set of real number parameters for a flock simulation, via an
-// absolute and fixed fitness metric. There is only one function, all GpTrees
+// absolute and fixed fitness metric. There is only one GpFunc, all GpTrees
 // are exactly one function deep, differing only in their parameter values.
 LP::FunctionSet evoflock_ga_function_set()
 {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241203 use default FlockParameters for testing
-#ifdef     USE_DEFAULT_FP
-    return evoflock_ga_function_set_handmade();
-#else   // USE_DEFAULT_FP
     return evoflock_ga_function_set_normal();
-#endif  // USE_DEFAULT_FP
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 // The five functions below are "accessors" to retrieve fitness component time

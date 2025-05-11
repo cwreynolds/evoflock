@@ -334,6 +334,31 @@ public:
         return avoidance;
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250510 temp global switch for controlling speed with fitness.
+
+//    // Prevent "stalls" -- when a Boid's speed drops so low that it looks like
+//    // it is floating rather than flying. Tries to keep the boid's speed above
+//    // min_speed() (currently (20231227) self.max_speed * 0.3). It starts to
+//    // adjust when self.speed get within 1.5 times the min speed (which is about
+//    // self.max_speed * 0.5 now). This is done by extracting the lateral turning
+//    // component of steering and adding that to a moderate forward acceleration.
+//    Vec3 anti_stall_adjustment(const Vec3& raw_steering)
+//    {
+//        Vec3 adjusted = raw_steering;
+//        double prevention_margin = 1.5;
+//        if (speed() < (fp().minSpeed() * prevention_margin))
+//        {
+//            if (raw_steering.dot(forward()) < 0)
+//            {
+//                Vec3 ahead = forward() * fp().maxForce() * 0.9;
+//                Vec3 side = raw_steering.perpendicular_component(forward());
+//                adjusted = ahead + side;
+//            }
+//        }
+//        return adjusted;
+//    }
+
     // Prevent "stalls" -- when a Boid's speed drops so low that it looks like
     // it is floating rather than flying. Tries to keep the boid's speed above
     // min_speed() (currently (20231227) self.max_speed * 0.3). It starts to
@@ -343,18 +368,23 @@ public:
     Vec3 anti_stall_adjustment(const Vec3& raw_steering)
     {
         Vec3 adjusted = raw_steering;
-        double prevention_margin = 1.5;
-        if (speed() < (fp().minSpeed() * prevention_margin))
+        if (not EF::fitness_speed_control)
         {
-            if (raw_steering.dot(forward()) < 0)
+            double prevention_margin = 1.5;
+            if (speed() < (fp().minSpeed() * prevention_margin))
             {
-                Vec3 ahead = forward() * fp().maxForce() * 0.9;
-                Vec3 side = raw_steering.perpendicular_component(forward());
-                adjusted = ahead + side;
+                if (raw_steering.dot(forward()) < 0)
+                {
+                    Vec3 ahead = forward() * fp().maxForce() * 0.9;
+                    Vec3 side = raw_steering.perpendicular_component(forward());
+                    adjusted = ahead + side;
+                }
             }
         }
         return adjusted;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Compute a behavioral weight (on [0, 1]) for a neighbor of this Boid.
     // Shared by separate, align, and cohere steering behaviors

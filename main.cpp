@@ -10,14 +10,6 @@
 #define USE_OPEN3D
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20241203 use default FlockParameters for testing
-//#define    USE_DEFAULT_FP
-//#ifdef     USE_DEFAULT_FP
-//#else   // USE_DEFAULT_FP
-//#endif  // USE_DEFAULT_FP
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240628 can we do an eval of a const tree?
 //#define eval_const_20240628
 #ifdef eval_const_20240628
@@ -38,19 +30,7 @@ void visualizeBestIfRequested(LP::Population* population)
         LP::Individual* individual = population->bestFitness();
         LP::GpTree tree = individual->tree();
         FlockParameters fp = GP::fp_from_ga_tree(tree);
-        
-//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-//        // TODO 20250508 more testing for repeatability
-//        draw.setEnable(true);
-//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
         GP::run_flock_simulation(fp, 1);
-        
-//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-//        // TODO 20250508 more testing for repeatability
-//        draw.setEnable(false);
-//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
         EF::enable_multithreading = previous_emt_state;
         draw.clearVisBestMode();
     }
@@ -65,9 +45,10 @@ void visualizePreviouslyLoggedFlockParameters()
 //    // To use the hand-tuned parameters:
 //    // FlockParameters fp;
 //    // To visualize a given set of FlockParameters. Cut/paste from log, compile.
-//    FlockParameters fp(88.8884, 20, 20, 20, 27.5447, 85.5556, 15.7524, 10.4351,
-//                       71.9298, 68.5798, 2.84135, 44.9671, 44.6122, -0.750929,
-//                       0.258413, 0.901923, 6.38259, 9.81219);
+//    // (These values from 20250509b_max_force_from_0-100_to_50-100)
+//    FlockParameters fp(72.2403, 20, 20, 20, 36.627, 54.8258, 40.763,
+//                       16.4157, 93.536, 78.067, 2.55629, 23.093, 57.0483,
+//                       -0.896944, -0.701424, -0.0155244, 5.83935, 1.39229);
 //    EF::enable_multithreading = false;
 //    for (int i = 0; i < 5; i++) { GP::run_flock_simulation(fp, 1); }
 //    exit(EXIT_SUCCESS);
@@ -79,20 +60,26 @@ int main(int argc, const char * argv[])
     EF::setRS(LP::LPRS());
     EF::unit_test();
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250510 temp global switch for controlling speed with fitness.
+    //
+    // I added this global switch to help with switching over to a regime where
+    // there are no kinematic constraints on boid speed. Instead a target speed
+    // range becomes one of the input parameters to a flock evolution run. A new
+    // fitness objective is added which gives a "point" for every boid-step when
+    // its speed is in the desired range.
+    
+//    EF::fitness_speed_control = true;
+    EF::fitness_speed_control = false;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     // TODO experimental_GP_stub
     Boid::GP_not_GA = false;
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250507 temporarily restart RandomSequence(s) for each sim
     EF::enable_multithreading = true;
-    
-//    EF::enable_multithreading = false;
-//    
-//    Draw::getInstance().setEnable(false);
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     // But first, here in the main thread, build (then delete) one Flock object
     // to set up static state, such as defining Obstacle sets, making one active,
@@ -103,13 +90,6 @@ int main(int argc, const char * argv[])
     {
         Flock flock;
     }
-    
-//    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//    // TODO 20250508 more testing for repeatability
-//    Draw::getInstance().setEnable(false);
-//    EF::enable_multithreading = false;
-//    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
 
     // WIP/HACK runs flock sim, with graphics, for the FlockParameters written
     // inline in this function's source code, above.

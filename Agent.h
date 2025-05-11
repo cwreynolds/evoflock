@@ -63,11 +63,25 @@ public:
         double new_speed = new_velocity.length();
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250510 temp global switch for controlling speed with fitness.
+
 //        setSpeed(util::clip(new_speed, 0, max_speed()));
-        if (not EF::fitness_speed_control)
-        {
-            setSpeed(util::clip(new_speed, 0, max_speed()));
-        }
+                
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20250511 temp global switch for controlling speed with fitness.
+
+//        if (not EF::fitness_speed_control)
+//        {
+//            setSpeed(util::clip(new_speed, 0, max_speed()));
+//        }
+
+        
+        setSpeed(EF::fitness_speed_control ?
+                 new_speed :
+                 util::clip(new_speed, 0, max_speed()));
+
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         setPathCurvature(new_velocity);
         setAcceleration(new_velocity, time_step);
@@ -82,6 +96,19 @@ public:
             setPosition(position() + (new_forward * speed() * time_step));
             assert (ls().is_orthonormal());
         }
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20250511 temp global switch for controlling speed with fitness.
+        
+//        if (std::isnan(speed()))
+//        {
+//            debugPrint(speed())
+//            debugPrint(acceleration)
+//            debugPrint(time_step)
+//        }
+        
+//        assert(not std::isnan(speed()));
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
     
     // TODO 20240611 added for sake of GP, not certain this is correct.

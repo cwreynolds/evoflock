@@ -77,6 +77,48 @@ inline double scalarize_fitness_hyperVolume(MOF mof) {return mof.hyperVolume();}
 inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
 
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20250511 temp global switch for controlling speed with fitness.
+
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (Boid::GP_not_GA ?
+//                std::vector<std::string>(
+//                                         {
+//                                             "avoid",
+//                                             "separate",
+//                                             "cohere",
+//                                             "cluster",
+//                                             "occupied",
+//
+//                                         }) :
+//                std::vector<std::string>(
+//                                         {
+//                                             "avoid",
+//                                             "separate",
+//                                         }));
+//    }
+
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (Boid::GP_not_GA ?
+//                std::vector<std::string>(
+//                                         {
+//                                             "avoid",
+//                                             "separate",
+//                                             "cohere",
+//                                             "cluster",
+//                                             "occupied",
+//
+//                                         }) :
+//                std::vector<std::string>(
+//                                         {
+//                                             "avoid",
+//                                             "separate",
+//                                             "speed"
+//                                         }));
+//    }
+
 inline std::vector<std::string> mof_names()
 {
     return (Boid::GP_not_GA ?
@@ -89,21 +131,63 @@ inline std::vector<std::string> mof_names()
                                          "occupied",
                                          
                                      }) :
-            std::vector<std::string>(
-                                     {
-                                         "avoid",
-                                         "separate",
-                                     }));
+            (EF::fitness_speed_control ?
+             std::vector<std::string>(
+                                      {
+                                          "avoid",
+                                          "separate",
+                                          "speed"
+                                      }) :
+             std::vector<std::string>(
+                                      {
+                                          "avoid",
+                                          "separate",
+                                      })
+             ));
 }
 
+
+//    // After a Flock's simulation has been run, it is passed here to build its multi
+//    // objective fitness object from metrics saved inside the Flock object.
+//    inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
+//    {
+//        MOF mof({ flock.obstacleCollisionsScore(), flock.separationScore() });
+//        return mof;
+//    }
+
+//    // After a Flock's simulation has been run, it is passed here to build its multi
+//    // objective fitness object from metrics saved inside the Flock object.
+//    inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
+//    {
+//        MOF mof(
+//                {
+//                    flock.obstacleCollisionsScore(),
+//                    flock.separationScore(),
+//                    flock.speedScore()
+//                });
+//        return mof;
+//    }
 
 // After a Flock's simulation has been run, it is passed here to build its multi
 // objective fitness object from metrics saved inside the Flock object.
 inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 {
-    MOF mof({ flock.obstacleCollisionsScore(), flock.separationScore() });
-    return mof;
+    return (EF::fitness_speed_control ?
+            MOF(
+                {
+                    flock.obstacleCollisionsScore(),
+                    flock.separationScore(),
+                    flock.speedScore()
+                }) :
+            MOF(
+                {
+                    flock.obstacleCollisionsScore(),
+                    flock.separationScore(),
+                }));
 }
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
 // Initialize basic run parameters of Flock object
 inline void init_flock(Flock& flock)
@@ -398,7 +482,7 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
             
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250509 ad hoc fix for FPs with tiny max_force
-            { "Real_50_100", 50.0, 100.0, jiggle_scale },
+//            { "Real_50_100", 50.0, 100.0, jiggle_scale },
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
             { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
@@ -419,8 +503,8 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                 {
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     // TODO 20250509 ad hoc fix for FPs with tiny max_force
-//                    "Real_0_100",  // max_force
-                    "Real_50_100",  // max_force
+                    "Real_0_100",  // max_force
+//                    "Real_50_100",  // max_force
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                     // 20240427 Policy change: specify rather than optimize speed:

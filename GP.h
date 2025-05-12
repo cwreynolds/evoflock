@@ -146,6 +146,35 @@ inline std::vector<std::string> mof_names()
              ));
 }
 
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (Boid::GP_not_GA ?
+//                std::vector<std::string>(
+//                                         {
+//                                             "avoid",
+//                                             "separate",
+//                                             "cohere",
+//                                             "cluster",
+//                                             "occupied",
+//
+//                                         }) :
+//    //            (EF::fitness_speed_control ?
+//    //             std::vector<std::string>(
+//    //                                      {
+//    //                                          "avoid",
+//    //                                          "separate",
+//    //                                          "speed"
+//    //                                      }) :
+//
+//                 std::vector<std::string>(
+//                                          {
+//                                              "avoid",
+//                                              "separate",
+//                                          })
+//    //             ));
+//                );
+//    }
+
 
 //    // After a Flock's simulation has been run, it is passed here to build its multi
 //    // objective fitness object from metrics saved inside the Flock object.
@@ -185,6 +214,26 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
                     flock.separationScore(),
                 }));
 }
+
+//    // After a Flock's simulation has been run, it is passed here to build its multi
+//    // objective fitness object from metrics saved inside the Flock object.
+//    inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
+//    {
+//    //    return (EF::fitness_speed_control ?
+//    //            MOF(
+//    //                {
+//    //                    flock.obstacleCollisionsScore(),
+//    //                    flock.separationScore(),
+//    //                    flock.speedScore()
+//    //                }) :
+//
+//        return MOF(
+//                    {
+//                        flock.obstacleCollisionsScore(),
+//                        flock.separationScore(),
+//                    })
+//        ;
+//    }
 
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

@@ -218,7 +218,19 @@ public:
     {
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
-        Vec3 f = forward()                         * fp().weightForward();
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20250511 temp global switch for controlling speed with fitness.
+
+//        Vec3 f = forward()                         * fp().weightForward();
+        
+//        Vec3 f = steerForSpeedControl()            * fp().weightForward();
+        
+        Vec3 f = (EF::fitness_speed_control ?
+                  steerForSpeedControl():
+                  forward())                       * fp().weightForward();
+
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         Vec3 s = steer_to_separate(neighbors)      * fp().weightSeparate();
         Vec3 a = steer_to_align(neighbors)         * fp().weightAlign();
         Vec3 c = steer_to_cohere(neighbors)        * fp().weightCohere();
@@ -229,6 +241,22 @@ public:
         saveAnnotation(s, a, c, ap, as, combined_steering);
         return combined_steering;
     }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250511 temp global switch for controlling speed with fitness.
+    
+    Vec3 steerForSpeedControl()
+    {
+        // TODO TEMP WARNING FIX -- raw inline constants.
+        double target_speed = 20;
+
+        double adjust_speed = 0;
+        if (speed() < (target_speed * 0.9)) { adjust_speed = +1; }
+        if (speed() > (target_speed * 1.1)) { adjust_speed = -1; }
+        return forward() * adjust_speed;
+    }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     // Steering force component to move away from neighbors.
     Vec3 steer_to_separate(const BoidPtrList& neighbors)

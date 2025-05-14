@@ -218,19 +218,9 @@ public:
     {
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20250511 temp global switch for controlling speed with fitness.
-
-//        Vec3 f = forward()                         * fp().weightForward();
-        
-//        Vec3 f = steerForSpeedControl()            * fp().weightForward();
-        
         Vec3 f = (EF::fitness_speed_control ?
                   steerForSpeedControl():
                   forward())                       * fp().weightForward();
-
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         Vec3 s = steer_to_separate(neighbors)      * fp().weightSeparate();
         Vec3 a = steer_to_align(neighbors)         * fp().weightAlign();
         Vec3 c = steer_to_cohere(neighbors)        * fp().weightCohere();
@@ -241,42 +231,7 @@ public:
         saveAnnotation(s, a, c, ap, as, combined_steering);
         return combined_steering;
     }
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250511 temp global switch for controlling speed with fitness.
-    
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250512 reshape response curve in Boid::steerForSpeedControl()
-    
-//    Vec3 steerForSpeedControl()
-//    {
-//        // TODO TEMP WARNING FIX -- raw inline constants.
-//        double target_speed = 20;
-//
-//        double adjust_speed = 0;
-//        if (speed() < (target_speed * 0.9)) { adjust_speed = +1; }
-//        if (speed() > (target_speed * 1.1)) { adjust_speed = -1; }
-//        return forward() * adjust_speed;
-//    }
 
-//        Vec3 steerForSpeedControl()
-//        {
-//            // TODO TEMP WARNING FIX -- raw inline constants.
-//            double target_speed = 20;
-//
-//    //        double adjust_speed = 0;
-//    //        if (speed() < (target_speed * 0.9)) { adjust_speed = +1; }
-//    //        if (speed() > (target_speed * 1.1)) { adjust_speed = -1; }
-//
-//            double fast = target_speed * 1.1;
-//            double slow = target_speed * 0.9;
-//            double adjust_speed = util::remap_interval_clip(speed(),
-//                                                            slow, fast, 1, -1);
-//
-//
-//            return forward() * adjust_speed;
-    
     Vec3 steerForSpeedControl()
     {
         // TODO TEMP WARNING FIX -- raw inline constants.
@@ -286,11 +241,6 @@ public:
         double slow = target_speed * 0.9;
         return forward() * util::remap_interval_clip(speed(), slow, fast, 1, -1);
     }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     // Steering force component to move away from neighbors.
     Vec3 steer_to_separate(const BoidPtrList& neighbors)
@@ -395,31 +345,6 @@ public:
         }
         return avoidance;
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250510 temp global switch for controlling speed with fitness.
-
-//    // Prevent "stalls" -- when a Boid's speed drops so low that it looks like
-//    // it is floating rather than flying. Tries to keep the boid's speed above
-//    // min_speed() (currently (20231227) self.max_speed * 0.3). It starts to
-//    // adjust when self.speed get within 1.5 times the min speed (which is about
-//    // self.max_speed * 0.5 now). This is done by extracting the lateral turning
-//    // component of steering and adding that to a moderate forward acceleration.
-//    Vec3 anti_stall_adjustment(const Vec3& raw_steering)
-//    {
-//        Vec3 adjusted = raw_steering;
-//        double prevention_margin = 1.5;
-//        if (speed() < (fp().minSpeed() * prevention_margin))
-//        {
-//            if (raw_steering.dot(forward()) < 0)
-//            {
-//                Vec3 ahead = forward() * fp().maxForce() * 0.9;
-//                Vec3 side = raw_steering.perpendicular_component(forward());
-//                adjusted = ahead + side;
-//            }
-//        }
-//        return adjusted;
-//    }
 
     // Prevent "stalls" -- when a Boid's speed drops so low that it looks like
     // it is floating rather than flying. Tries to keep the boid's speed above
@@ -446,8 +371,6 @@ public:
         return adjusted;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
     // Compute a behavioral weight (on [0, 1]) for a neighbor of this Boid.
     // Shared by separate, align, and cohere steering behaviors
     double neighborWeight(Boid* neighbor,

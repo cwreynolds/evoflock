@@ -151,7 +151,7 @@ public:
             if (run_sim_this_frame)
             {
                 // TODO 20250509 this used to be "step_duration" which caused
-                // the runs-slow-when-draw-is-turned-off bug. Have not tested
+                // the fly-slow-when-draw-is-turned-off bug. Have not tested
                 // but it seems "if (not fixed_time_step() and draw().enable())"
                 // then this should again be "step_duration", so the sim frame
                 // time matched the draw frame time.
@@ -180,16 +180,13 @@ public:
             std::cout << getTotalObstacleCollisions();
             std::cout << ", separation_score_sum_ = ";
             std::cout << separation_score_sum_;
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250511 temp global switch for controlling speed with fitness.
-            
-            std::cout << ", average speed = ";
-            std::cout << averageSpeedPerBoidStep();
-            
-            std::cout << ", speedScore() = ";
-            std::cout << speedScore();
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            if (EF::fitness_speed_control)
+            {
+                std::cout << ", average speed = ";
+                std::cout << averageSpeedPerBoidStep();
+                std::cout << ", speedScore() = ";
+                std::cout << speedScore();
+            }
             std::cout << std::endl;
         }
     }
@@ -259,10 +256,7 @@ public:
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();
         recordSeparationScorePerStep();
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20250511 temp global switch for controlling speed with fitness.
         recordSpeedScorePerStep();
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
         
     // Get total of all recorded obstacle collisions: sum all Boid's counts.
@@ -299,25 +293,15 @@ public:
     
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250511 temp global switch for controlling speed with fitness.
-    
-    // utility maybe move to utility.h if kept
-    
+    // TODO 20250511 maybe move to utility.h if kept
     // rename args and vars, this version parrots recordSeparationScorePerStep()
+    // would it be any better to pass in a vector of Pair(x,y)s?
     
     double parameterToWeightWithRamps(double parameter,
                                       const std::vector<double>& d,
                                       const std::vector<double>& s)
     {
-        
-        // Piecewise linear function of distance to score
-//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
-//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
-//        for (auto b : boids())
-//        {
-        
         double score = 0;
-//        double distance = b->distanceToNearestNeighbor();
         for (int i = 1; i < d.size(); i++)
         {
             int j = i - 1;
@@ -326,60 +310,10 @@ public:
                 score = util::remap_interval(parameter, d[j], d[i], s[j], s[i]);
             }
         }
-        
-//            separation_score_sum_ += score;
-//        }
-
         return score;
     }
     
-//    // Called each simulation step, records stats for the separation score.
-//    void recordSeparationScorePerStep()
-//    {
-//        // Piecewise linear function of distance to score
-//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
-//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
-//        for (auto b : boids())
-//        {
-//            double score = 0;
-//            double distance = b->distanceToNearestNeighbor();
-//            for (int i = 1; i < d.size(); i++)
-//            {
-//                int j = i - 1;
-//                if (util::between(distance, d[j], d[i]))
-//                {
-//                    score = util::remap_interval(distance, d[j], d[i], s[j], s[i]);
-//                }
-//            }
-//            separation_score_sum_ += score;
-//        }
-//    }
-  
-//        // Called each simulation step, records stats for the separation score.
-//        void recordSeparationScorePerStep()
-//        {
-//            // Piecewise linear function of distance to score
-//            std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
-//            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
-//            for (auto b : boids())
-//            {
-//    //            double score = 0;
-//                double distance = b->distanceToNearestNeighbor();
-//    //            for (int i = 1; i < d.size(); i++)
-//    //            {
-//    //                int j = i - 1;
-//    //                if (util::between(distance, d[j], d[i]))
-//    //                {
-//    //                    score = util::remap_interval(distance, d[j], d[i], s[j], s[i]);
-//    //                }
-//    //            }
-//
-//    //            double score =           parameterToWeightWithRamps(distance, d, s);
-//    //            separation_score_sum_ += score;
-//
-//                separation_score_sum_ += parameterToWeightWithRamps(distance, d, s);
-//            }
-//        }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
@@ -394,127 +328,16 @@ public:
         }
     }
 
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
     {
         return emphasizeHighScores(separationScorePerBoidStep(), 0.0);
     }
 
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250511 temp global switch for controlling speed with fitness.
-    //
-    // TODO maybe just temp, relocate in file if kept
-    
+    // Accumulators for speed score.
+    // TODO Relocate in file?
     double sum_of_speeds_over_all_boid_steps_ = 0;
     double sum_of_speed_scores_over_all_boid_steps_ = 0;
-
-//        // Called each simulation step, records stats for the speed score.
-//        void recordSpeedScorePerStep()
-//        {
-//            for (auto b : boids())
-//            {
-//                if (std::isnan(b->speed()))
-//                {
-//                    if (b == selectedBoid())
-//                    {
-//                        std::cout << "selected boid speed == NaN" << std::endl;
-//                    }
-//                }
-//                else
-//                {
-//                    // Sum used for run average speed.
-//                    sum_of_speeds_over_all_boid_steps_ += b->speed();
-//
-//    //                // Sum scores for "speed is in correct range".
-//    //                int score = util::between(b->speed(), 18, 22) ? 1 : 0;
-//    //                sum_of_speed_scores_over_all_boid_steps_ += score;
-//
-//                    // Sum scores for "speed is in correct range".
-//                    // TODO TEMP WARNING FIX -- raw inline constants.
-//                    auto speed_ok = util::between(b->speed(), 18, 22);
-//                    sum_of_speed_scores_over_all_boid_steps_ += speed_ok ? 1 : 0;
-//                }
-//            }
-//        }
-
-//        // Called each simulation step, records stats for the speed score.
-//        void recordSpeedScorePerStep()
-//        {
-//            // TODO TEMP WARNING FIX -- raw inline constants.
-//            std::vector<double> d = {17, 19, 21, 23};
-//            std::vector<double> s = { 0,  1,  1,  0};
-//
-//            for (auto b : boids())
-//            {
-//                if (std::isnan(b->speed()))
-//                {
-//                    if (b == selectedBoid())
-//                    {
-//                        std::cout << "selected boid speed == NaN" << std::endl;
-//                    }
-//                }
-//                else
-//                {
-//                    // Sum used for run average speed.
-//                    sum_of_speeds_over_all_boid_steps_ += b->speed();
-//
-//    //                // Sum scores for "speed is in correct range".
-//    //                auto speed_ok = util::between(b->speed(), 18, 22);
-//    //                sum_of_speed_scores_over_all_boid_steps_ += speed_ok ? 1 : 0;
-//
-//                    // Sum scores for "speed is in correct range".
-//                    double score = parameterToWeightWithRamps(b->speed(), d, s);
-//                    sum_of_speed_scores_over_all_boid_steps_ += score;
-//                }
-//            }
-//        }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250512 reshape response curve in Boid::steerForSpeedControl()
-
-    // 20250511 4:15 version
-    
-//        // Called each simulation step, records stats for the speed score.
-//        void recordSpeedScorePerStep()
-//        {
-//
-//    //        // TODO TEMP WARNING FIX -- raw inline constants.
-//    //        std::vector<double> d = {10, 20, 30};
-//    //        std::vector<double> s = { 0,  1,  0};
-//
-//            for (auto b : boids())
-//            {
-//                if (std::isnan(b->speed()))
-//                {
-//                    if (b == selectedBoid())
-//                    {
-//                        std::cout << "selected boid speed == NaN" << std::endl;
-//                    }
-//                }
-//                else
-//                {
-//                    // Sum used for run average speed.
-//                    sum_of_speeds_over_all_boid_steps_ += b->speed();
-//
-//    //                double score = parameterToWeightWithRamps(b->speed(), d, s);
-//
-//                    // Sum scores for "speed is in correct range".
-//                    // TODO TEMP WARNING FIX -- raw inline constants.
-//    //                double score = parameterToWeightWithRamps(b->speed(),
-//    //                                                          {10, 20, 30},
-//    //                                                          { 0,  1,  0});
-//                    double score = parameterToWeightWithRamps(b->speed(),
-//                                                              {15, 19, 21, 25},
-//                                                              { 0,  1,  1,  0});
-//
-//                    sum_of_speed_scores_over_all_boid_steps_ += score;
-//                }
-//            }
-//        }
-
     
     // Called each simulation step, records stats for the speed score.
     void recordSpeedScorePerStep()
@@ -543,8 +366,6 @@ public:
         }
     }
 
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
     // Average speed for each Boid on each simulation step.
     double averageSpeedPerBoidStep() const
     {
@@ -557,8 +378,6 @@ public:
         return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
     }
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.
     void enforceObsBoidConstraints()

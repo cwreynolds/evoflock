@@ -245,17 +245,51 @@ public:
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20250511 temp global switch for controlling speed with fitness.
     
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250512 reshape response curve in Boid::steerForSpeedControl()
+    
+//    Vec3 steerForSpeedControl()
+//    {
+//        // TODO TEMP WARNING FIX -- raw inline constants.
+//        double target_speed = 20;
+//
+//        double adjust_speed = 0;
+//        if (speed() < (target_speed * 0.9)) { adjust_speed = +1; }
+//        if (speed() > (target_speed * 1.1)) { adjust_speed = -1; }
+//        return forward() * adjust_speed;
+//    }
+
+//        Vec3 steerForSpeedControl()
+//        {
+//            // TODO TEMP WARNING FIX -- raw inline constants.
+//            double target_speed = 20;
+//
+//    //        double adjust_speed = 0;
+//    //        if (speed() < (target_speed * 0.9)) { adjust_speed = +1; }
+//    //        if (speed() > (target_speed * 1.1)) { adjust_speed = -1; }
+//
+//            double fast = target_speed * 1.1;
+//            double slow = target_speed * 0.9;
+//            double adjust_speed = util::remap_interval_clip(speed(),
+//                                                            slow, fast, 1, -1);
+//
+//
+//            return forward() * adjust_speed;
+    
     Vec3 steerForSpeedControl()
     {
         // TODO TEMP WARNING FIX -- raw inline constants.
         double target_speed = 20;
-
-        double adjust_speed = 0;
-        if (speed() < (target_speed * 0.9)) { adjust_speed = +1; }
-        if (speed() > (target_speed * 1.1)) { adjust_speed = -1; }
-        return forward() * adjust_speed;
+                
+        double fast = target_speed * 1.1;
+        double slow = target_speed * 0.9;
+        return forward() * util::remap_interval_clip(speed(), slow, fast, 1, -1);
     }
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     // Steering force component to move away from neighbors.

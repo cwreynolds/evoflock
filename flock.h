@@ -472,19 +472,53 @@ public:
 //            }
 //        }
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250512 reshape response curve in Boid::steerForSpeedControl()
+
     // 20250511 4:15 version
+    
+//        // Called each simulation step, records stats for the speed score.
+//        void recordSpeedScorePerStep()
+//        {
+//
+//    //        // TODO TEMP WARNING FIX -- raw inline constants.
+//    //        std::vector<double> d = {10, 20, 30};
+//    //        std::vector<double> s = { 0,  1,  0};
+//
+//            for (auto b : boids())
+//            {
+//                if (std::isnan(b->speed()))
+//                {
+//                    if (b == selectedBoid())
+//                    {
+//                        std::cout << "selected boid speed == NaN" << std::endl;
+//                    }
+//                }
+//                else
+//                {
+//                    // Sum used for run average speed.
+//                    sum_of_speeds_over_all_boid_steps_ += b->speed();
+//
+//    //                double score = parameterToWeightWithRamps(b->speed(), d, s);
+//
+//                    // Sum scores for "speed is in correct range".
+//                    // TODO TEMP WARNING FIX -- raw inline constants.
+//    //                double score = parameterToWeightWithRamps(b->speed(),
+//    //                                                          {10, 20, 30},
+//    //                                                          { 0,  1,  0});
+//                    double score = parameterToWeightWithRamps(b->speed(),
+//                                                              {15, 19, 21, 25},
+//                                                              { 0,  1,  1,  0});
+//
+//                    sum_of_speed_scores_over_all_boid_steps_ += score;
+//                }
+//            }
+//        }
+
     
     // Called each simulation step, records stats for the speed score.
     void recordSpeedScorePerStep()
     {
-//        // TODO TEMP WARNING FIX -- raw inline constants.
-//        std::vector<double> d = {17, 19, 21, 23};
-//        std::vector<double> s = { 0,  1,  1,  0};
-
-        // TODO TEMP WARNING FIX -- raw inline constants.
-        std::vector<double> d = {10, 20, 30};
-        std::vector<double> s = { 0,  1,  0};
-
         for (auto b : boids())
         {
             if (std::isnan(b->speed()))
@@ -496,18 +530,21 @@ public:
             }
             else
             {
-                // Sum used for run average speed.
+                // Sum used for average speed over entire run.
                 sum_of_speeds_over_all_boid_steps_ += b->speed();
-                                
+                
                 // Sum scores for "speed is in correct range".
-                double score = parameterToWeightWithRamps(b->speed(), d, s);
+                // TODO TEMP WARNING FIX -- raw inline constants.
+                double score = parameterToWeightWithRamps(b->speed(),
+                                                          {15, 19, 21, 25},
+                                                          { 0,  1,  1,  0});
                 sum_of_speed_scores_over_all_boid_steps_ += score;
             }
         }
     }
 
-    
-    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     // Average speed for each Boid on each simulation step.
     double averageSpeedPerBoidStep() const
     {

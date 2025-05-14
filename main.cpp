@@ -45,13 +45,12 @@ void visualizePreviouslyLoggedFlockParameters()
 //    // To use the hand-tuned parameters:
 //    // FlockParameters fp;
 //    // To visualize a given set of FlockParameters. Cut/paste from log, compile.
-//    // (These values from 20250511d_speed_fitness_bad_2_mof)
-//    FlockParameters fp(43.9881, 20, 20, 20, 5.18348, 95.1321, 80.5062, 11.486,
-//                       76.0264, 55.7938, 2.81495, 6.8703, 60.3496, -0.202288,
-//                       -0.729094, -0.730302, 2.72819, 9.40683);
+//    // (These values from 20250512b_speed_fitness_and_behavior_2)
+//    FlockParameters fp(97.7718, 20, 20, 20, 84.3119, 43.5768, 40.2244, 21.9284,
+//                       94.5713, 92.2122, 3.63056, 90.7065, 15.8748, -0.952392,
+//                       -0.582004, -0.241387, 2.23295, 1.22763);
 //    EF::enable_multithreading = false;
-//    for (int i = 0; i < 5; i++) { GP::run_flock_simulation(fp, 1); }
-//    exit(EXIT_SUCCESS);
+//    while (true) { GP::run_flock_simulation(fp, 1); }
 }
 
 

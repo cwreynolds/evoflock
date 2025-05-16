@@ -235,7 +235,7 @@ public:
                                        const Color& color)
     {
 #ifdef USE_OPEN3D
-        if (enable())
+        if (enable() and enableAnnotation())
         {
             auto s = animated_line_set_->points_.size();
             animated_line_set_->points_.push_back(vec3ToEv3d(endpoint0));
@@ -252,7 +252,10 @@ public:
                                      const Color& color,
                                      double radius = 0.02)
     {
-        addCylinderToAnimatedFrame(endpoint0, endpoint1, color, radius);
+        if (enable() and enableAnnotation())
+        {
+            addCylinderToAnimatedFrame(endpoint0, endpoint1, color, radius);
+        }
     }
     
     // This is a "thick" version of addLineSegmentToAnimatedFrame().
@@ -604,10 +607,11 @@ public:
 
     // Settable accessor for  camera mode. Now cycles between follow and global.
     int& cameraMode() { return camera_mode_; }
+    int cameraMode() const { return camera_mode_; }
     void nextCameraMode() { camera_mode_ = (camera_mode_ + 1) % camera_mode_max_; }
-    bool isStaticCameraMode() { return (cameraMode() == 0); }
-    bool isFollowCameraMode() { return (cameraMode() == 1); }
-    bool isWingmanCameraMode() { return (cameraMode() == 2); }
+    bool isStaticCameraMode() const { return (cameraMode() == 0); }
+    bool isFollowCameraMode() const { return (cameraMode() == 1); }
+    bool isWingmanCameraMode() const { return (cameraMode() == 2); }
 
     // Set to true when user types ESC or closes Visualizer window.
     bool exitFromRun() const { return exit_from_run_; }
@@ -661,6 +665,13 @@ public:
     bool getVisBestMode() const { return vis_best_mode_; }
     void setVisBestMode() { vis_best_mode_ = true; }
     void clearVisBestMode() { vis_best_mode_ = false; }
+    
+    // "A" command toggles drawing of annotation lines, etc.
+    void toggleAnnotation() { enable_annotation_ = not enable_annotation_; }
+    bool enableAnnotation() const
+    {
+        return enable_annotation_ and not isStaticCameraMode();
+    }
 
     // Called in constructor to set up the various key cmd and mouse callbacks.
     void setupGuiCallbacks()
@@ -693,10 +704,8 @@ public:
         // Add "S" command, to cycle selected boid through flock.
         rk('S', [&](vis* v) { selectNextBoid(); return rv; });
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250301 temp command to toggle obstacle avoidance
-        rk('A', [&](vis* v) { toggleAvoidingObstaclesMode(); return rv; });
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // "A" command toggles drawing of annotation lines, etc.
+        rk('A', [&](vis* v) { toggleAnnotation(); return rv; });
 
         // Add "R" command, reset camera to aligned view of whole scene.
         rk('R', [&](vis* v) { resetCameraView(); return rv; });
@@ -707,19 +716,6 @@ public:
         // Set mouse move/scroll/button handlers.
         setMouseCallbacks();
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250301 temp command to toggle obstacle avoidance
-    bool avoiding_obstacles_mode_ = true;
-    bool& avoidingObstaclesMode() { return avoiding_obstacles_mode_; }
-    const bool& avoidingObstaclesMode() const { return avoiding_obstacles_mode_; }
-    void toggleAvoidingObstaclesMode()
-    {
-        avoiding_obstacles_mode_ = not avoiding_obstacles_mode_;
-        std::cout << "avoidingObstaclesMode() = ";
-        std::cout << (avoidingObstaclesMode() ? "true" : "false") << std::endl;
-    }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Set a random per-vertex color brightness (grayscale) for given mesh.
     static void brightnessSpecklePerVertex(double min_brightness,
@@ -794,6 +790,9 @@ private:
     
     // "B" command means to run a sim, with graphics, then reset, based on this.
     bool vis_best_mode_ = false;
+    
+    // "A" command toggles drawing of annotation lines, etc.
+    bool enable_annotation_ = true;
 
 #ifdef USE_OPEN3D
     

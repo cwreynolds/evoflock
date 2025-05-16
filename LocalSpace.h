@@ -112,6 +112,21 @@ public:
         {
             ls.setP(from_position);
             Vec3 new_forward = (to_position - from_position).normalize();
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250516 assert fail after mouse drag before "B"
+            
+            if (new_forward.is_none())
+            {
+                debugPrint(new_forward);
+                debugPrint(to_position);
+                debugPrint(from_position);
+                
+                // from_position = Vec3(nan, nan, nan)
+
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             Vec3 new_ref_up = new_forward.ensure_not_parallel(reference_up);
             ls = ls.rotate_to_new_forward(new_forward, new_ref_up);
         }

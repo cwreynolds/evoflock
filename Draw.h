@@ -502,9 +502,20 @@ public:
     // Adjust "static camera" model according to mouse input.
     void setCameraByFromAtUp()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250516 assert fail after mouse drag before "B"
+        debugPrint(cameraLookFrom()) // cameraLookFrom() = Vec3(nan, nan, nan)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
                                                  cameraLookAt(),
                                                  cameraDesiredOffsetDistance());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250516 assert fail after mouse drag before "B"
+        debugPrint(cameraLookFrom()) // cameraLookFrom() = Vec3(nan, nan, nan)
+        debugPrint(cameraLookAt())
+        debugPrint(cameraLookUp())
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
@@ -532,6 +543,29 @@ public:
         {
             mmcb = [&](base_vis_t* vis, double x, double y)
             {
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250516 assert fail after mouse drag before "B"
+                //
+                //    enter setMouseMoveCallback()
+                //    cameraLookFrom() = Vec3(0, 0, 0)
+                //    cameraLookAt() = Vec3(0, 0, 0)
+                //    cameraLookUp() = Vec3(0, 0, 0)
+                //
+                //    exit setMouseMoveCallback()
+                //    cameraLookFrom() = Vec3(nan, nan, nan)
+                //    cameraLookAt() = Vec3(0, 0, 0)
+                //    cameraLookUp() = Vec3(0, 1, 0)
+
+                
+                std::cout << std::endl;
+                std::cout << "enter setMouseMoveCallback()" << std::endl;
+                debugPrint(cameraLookFrom())
+                debugPrint(cameraLookAt())
+                debugPrint(cameraLookUp())
+                std::cout << std::endl;
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                 Vec3 new_pos_pixels(x, y, 0);
                 Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
                 double mouse_move_pixels = offset_pixels.length();
@@ -557,6 +591,17 @@ public:
                     wingman_cam_local_offset_ = local_cam;
                 }
                 mouse_pos_pixels_ = new_pos_pixels;
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250516 assert fail after mouse drag before "B"
+                
+                std::cout << "exit setMouseMoveCallback()" << std::endl;
+                debugPrint(cameraLookFrom())
+                debugPrint(cameraLookAt())
+                debugPrint(cameraLookUp())
+                std::cout << std::endl;
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                 return false;
             };
         }

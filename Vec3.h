@@ -167,14 +167,6 @@ public:
     {
         // TODO 20230430 Should it check for unit length, or normalize? For now,
         // assert that given vectors are unit length to see if it ever comes up.
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250516 assert fail after mouse drag before "B"
-        if (not is_unit_length())
-        {
-            debugPrint(this->to_string())
-            debugPrint(this->length())
-        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         assert (is_unit_length());
         assert (other.is_unit_length());
         return util::within_epsilon(abs(dot(other)), 1);

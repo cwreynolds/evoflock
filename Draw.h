@@ -126,8 +126,10 @@ private:
         // (See also replacement/work-around: addThickLineToAnimatedFrame())
         visualizer().GetRenderOption().line_width_ = line_width;
         visualizer().GetRenderOption().point_size_ = point_size;
-        
+        // Callbacks for mouse gestures and single key commands.
         setupGuiCallbacks();
+        // Initialize camera parameters with default offset distance
+        resetCameraView();
 #endif  // USE_OPEN3D
     }
 
@@ -492,30 +494,24 @@ public:
     // Reset camera to aligned view of whole scene.
     void resetCameraView()
     {
-        double d = 100;  // TODO this assumes the scene bounds, should measure.
-        cameraLookUp()   = Vec3(0, 1, 0);
-        cameraLookAt()   = Vec3(0, 0, 0);
-        cameraLookFrom() = Vec3(0, 0, d);
-        cameraDesiredOffsetDistance() = d;
+        resetCameraView(camera_desired_offset_dist_default_);
     };
     
+    // Reset camera to aligned view of whole scene from given offset distance.
+    void resetCameraView(double offset_distance)
+    {
+        cameraLookUp()   = Vec3(0, 1, 0);
+        cameraLookAt()   = Vec3(0, 0, 0);
+        cameraLookFrom() = Vec3(0, 0, offset_distance);
+        cameraDesiredOffsetDistance() = offset_distance;
+    };
+
     // Adjust "static camera" model according to mouse input.
     void setCameraByFromAtUp()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250516 assert fail after mouse drag before "B"
-        debugPrint(cameraLookFrom()) // cameraLookFrom() = Vec3(nan, nan, nan)
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         cameraLookFrom() = Vec3::adjustSegLength(cameraLookFrom(),
                                                  cameraLookAt(),
                                                  cameraDesiredOffsetDistance());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250516 assert fail after mouse drag before "B"
-        debugPrint(cameraLookFrom()) // cameraLookFrom() = Vec3(nan, nan, nan)
-        debugPrint(cameraLookAt())
-        debugPrint(cameraLookUp())
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         camera() = LocalSpace::fromTo(cameraLookFrom(),
                                       cameraLookAt(),
                                       cameraLookUp());
@@ -543,29 +539,6 @@ public:
         {
             mmcb = [&](base_vis_t* vis, double x, double y)
             {
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250516 assert fail after mouse drag before "B"
-                //
-                //    enter setMouseMoveCallback()
-                //    cameraLookFrom() = Vec3(0, 0, 0)
-                //    cameraLookAt() = Vec3(0, 0, 0)
-                //    cameraLookUp() = Vec3(0, 0, 0)
-                //
-                //    exit setMouseMoveCallback()
-                //    cameraLookFrom() = Vec3(nan, nan, nan)
-                //    cameraLookAt() = Vec3(0, 0, 0)
-                //    cameraLookUp() = Vec3(0, 1, 0)
-
-                
-                std::cout << std::endl;
-                std::cout << "enter setMouseMoveCallback()" << std::endl;
-                debugPrint(cameraLookFrom())
-                debugPrint(cameraLookAt())
-                debugPrint(cameraLookUp())
-                std::cout << std::endl;
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
                 Vec3 new_pos_pixels(x, y, 0);
                 Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
                 double mouse_move_pixels = offset_pixels.length();
@@ -591,17 +564,6 @@ public:
                     wingman_cam_local_offset_ = local_cam;
                 }
                 mouse_pos_pixels_ = new_pos_pixels;
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250516 assert fail after mouse drag before "B"
-                
-                std::cout << "exit setMouseMoveCallback()" << std::endl;
-                debugPrint(cameraLookFrom())
-                debugPrint(cameraLookAt())
-                debugPrint(cameraLookUp())
-                std::cout << std::endl;
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
                 return false;
             };
         }
@@ -753,7 +715,7 @@ public:
         rk('A', [&](vis* v) { toggleAnnotation(); return rv; });
 
         // Add "R" command, reset camera to aligned view of whole scene.
-        rk('R', [&](vis* v) { resetCameraView(); return rv; });
+        rk('R', [&](vis* v) { resetCameraView(100); return rv; });
 
         // Add "B" cmd runs a sim, with best individual & graphics, then reset.
         rk('B', [&](vis* v) { setVisBestMode(); return rv; });
@@ -798,8 +760,9 @@ private:
     // Aim agent for camera tracking modes. Set externally, eg to selected boid.
     Agent aim_agent_;
 
-    // Desired offset distance in follow camera mode.
-    double camera_desired_offset_dist_ = 15;
+    // Desired offset distance between camera and "look at" (target/aim) point.
+    double camera_desired_offset_dist_default_ = 15;
+    double camera_desired_offset_dist_ = camera_desired_offset_dist_default_;
 
     // Store global camera look from/to/up vectors.
     Vec3 camera_look_from_;

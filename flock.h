@@ -167,27 +167,11 @@ public:
             if (not draw().simPause()) { aTimer().measureFrameDuration(); }
         }
         draw().endAnimatedScene();
+        printRunStats();
         if (max_simulation_steps() == std::numeric_limits<double>::infinity())
         {
             std::cout << log_prefix << "Exit at step: ";
             std::cout << aTimer().frameCounter() << std::endl;
-        }
-        // Log fitness stats for this run. (Maybe put in func like log_stats()?)
-        {
-            grabPrintLock_evoflock();
-            std::cout << log_prefix;
-            std::cout << "obs_collisions = ";
-            std::cout << getTotalObstacleCollisions();
-            std::cout << ", separation_score_sum_ = ";
-            std::cout << separation_score_sum_;
-            if (EF::fitness_speed_control)
-            {
-                std::cout << ", average speed = ";
-                std::cout << averageSpeedPerBoidStep();
-                std::cout << ", speedScore() = ";
-                std::cout << speedScore();
-            }
-            std::cout << std::endl;
         }
     }
 
@@ -258,7 +242,27 @@ public:
         recordSeparationScorePerStep();
         recordSpeedScorePerStep();
     }
-        
+
+    // Print a one line summary of metrics from this flock simulation.
+    void printRunStats() const
+    {
+        grabPrintLock_evoflock();
+        std::cout << log_prefix;
+        std::cout << "obs_collisions = ";
+        std::cout << getTotalObstacleCollisions();
+        std::cout << ", separation_score_sum_ = ";
+        std::cout << int(separation_score_sum_);
+        if (EF::fitness_speed_control)
+        {
+            std::cout << std::fixed << std::setprecision(2);
+            std::cout << ", average speed = ";
+            std::cout << averageSpeedPerBoidStep();
+            std::cout << ", speedScore() = ";
+            std::cout << speedScore();
+        }
+        std::cout << std::endl;
+    }
+
     // Get total of all recorded obstacle collisions: sum all Boid's counts.
     int getTotalObstacleCollisions() const
     {

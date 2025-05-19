@@ -354,6 +354,15 @@ public:
                 {
                     std::cout << "selected boid speed == NaN" << std::endl;
                 }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250519 why NaNs with EF::fitness_speed_control ?
+                std::cout << std::endl;
+                debugPrint(aTimer().frameCounter())
+                debugPrint(b->speed())
+                debugPrint(b->position())
+                std::cout << std::endl;
+                assert(false);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
             else
             {

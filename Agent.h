@@ -52,6 +52,19 @@ public:
         Vec3 limit_steering_force = steering_force.truncate(max_force());
         // Adjust force by mass to get acceleration.
         Vec3 acceleration = limit_steering_force / mass();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250519 why NaNs with EF::fitness_speed_control ?
+        if (acceleration.is_none())
+        {
+            std::cout << std::endl;
+            debugPrint(steering_force)
+            debugPrint(limit_steering_force)
+            debugPrint(acceleration)
+            std::cout << std::endl;
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         // Update dynamic and geometric state...
         update_speed_and_local_space(acceleration, time_step);
     }
@@ -61,6 +74,20 @@ public:
     {
         Vec3 new_velocity = velocity() + (acceleration * time_step);
         double new_speed = new_velocity.length();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250519 why NaNs with EF::fitness_speed_control ?
+        if (acceleration.is_none())
+        {
+            std::cout << std::endl;
+            debugPrint(acceleration)
+            debugPrint(time_step)
+            debugPrint(new_velocity)
+            debugPrint(new_speed)
+            std::cout << std::endl;
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         setSpeed(EF::fitness_speed_control ?
                  new_speed :
                  util::clip(new_speed, 0, max_speed()));

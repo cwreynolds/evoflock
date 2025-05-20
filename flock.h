@@ -348,34 +348,15 @@ public:
     {
         for (auto b : boids())
         {
-            if (std::isnan(b->speed()))
-            {
-                if (b == selectedBoid())
-                {
-                    std::cout << "selected boid speed == NaN" << std::endl;
-                }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250519 why NaNs with EF::fitness_speed_control ?
-                std::cout << std::endl;
-                debugPrint(aTimer().frameCounter())
-                debugPrint(b->speed())
-                debugPrint(b->position())
-                std::cout << std::endl;
-                assert(false);
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            }
-            else
-            {
-                // Sum used for average speed over entire run.
-                sum_of_speeds_over_all_boid_steps_ += b->speed();
-                
-                // Sum scores for "speed is in correct range".
-                // TODO TEMP WARNING FIX -- raw inline constants.
-                double score = parameterToWeightWithRamps(b->speed(),
-                                                          {15, 19, 21, 25},
-                                                          { 0,  1,  1,  0});
-                sum_of_speed_scores_over_all_boid_steps_ += score;
-            }
+            // Sum used for average speed over entire run.
+            sum_of_speeds_over_all_boid_steps_ += b->speed();
+            
+            // Sum scores for "speed is in correct range".
+            // TODO TEMP WARNING FIX -- raw inline constants.
+            double score = parameterToWeightWithRamps(b->speed(),
+                                                      {15, 19, 21, 25},
+                                                      { 0,  1,  1,  0});
+            sum_of_speed_scores_over_all_boid_steps_ += score;
         }
     }
 

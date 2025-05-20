@@ -141,30 +141,12 @@ public:
     void plan_next_steer()
     {
         next_steer_ = steer_to_flock();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250519 why NaNs with EF::fitness_speed_control ?
-        if (next_steer_.is_none())
-        {
-            std::cout << std::endl;
-            debugPrint(next_steer_)
-            std::cout << std::endl;
-        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
   
     // Apply the "steering force" -- previously computed in plan_next_steer()
     // during a separate pass -- to this Boid's geometric state.
     void apply_next_steer(double time_step)
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250519 why NaNs with EF::fitness_speed_control ?
-        if (next_steer_.is_none())
-        {
-            std::cout << std::endl;
-            debugPrint(next_steer_)
-            std::cout << std::endl;
-        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         setPreviousPosition(position());
         steer(next_steer_, time_step);
     }
@@ -247,23 +229,6 @@ public:
         Vec3 combined_steering = smoothed_steering(f + s + a + c + ap + as);
         combined_steering = anti_stall_adjustment(combined_steering);
         saveAnnotation(s, a, c, ap, as, combined_steering);
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250519 why NaNs with EF::fitness_speed_control ?
-        if (combined_steering.is_none())
-        {
-            std::cout << std::endl;
-            debugPrint(f)
-            debugPrint(s)
-            debugPrint(a)
-            debugPrint(c)
-            debugPrint(ap)  // ap = Vec3(nan, nan, nan) !!
-            debugPrint(as)
-            debugPrint(combined_steering)
-            std::cout << std::endl;
-        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         return combined_steering;
     }
 
@@ -341,22 +306,7 @@ public:
             Vec3 poi = first_collision.point_of_impact;
             Vec3 normal = first_collision.normal_at_poi;
             Vec3 pure_steering = pure_lateral_steering(normal);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250519 why NaNs with EF::fitness_speed_control ?
-//            avoidance = pure_steering.normalize();
             avoidance = pure_steering.normalize_or_0();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250519 why NaNs with EF::fitness_speed_control ?
-            if (avoidance.is_none())
-            {
-                std::cout << std::endl;
-                debugPrint(pure_steering.normalize())
-                debugPrint(pure_steering.normalize_or_0())
-                std::cout << std::endl;
-            }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             double min_dist = speed() * fp().minTimeToCollide();
             // Smooth weight transition
             double dtc = first_collision.dist_to_collision;
@@ -366,18 +316,6 @@ public:
         }
         // TODO should that constant (-0.5) be moved to FlockParameters?
         Vec3 braking = forward() * (avoidance.length() * -0.5);
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250519 why NaNs with EF::fitness_speed_control ?
-        Vec3 predictive_avoidance = (avoidance + braking) * weight;
-        if (predictive_avoidance.is_none())
-        {
-            std::cout << std::endl;
-            debugPrint(predictive_avoidance)
-            std::cout << std::endl;
-        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
         return (avoidance + braking) * weight;
     }
 

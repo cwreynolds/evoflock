@@ -204,11 +204,19 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
                                      flock.fp().maxSimulationSteps());
                 double good_coll = (boid_steps - flock.getTotalObstacleCollisions());
                 double norm_good_coll =  good_coll / boid_steps;
-                double norm_good_nn_dist = flock.separationScorePerBoidStep();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250522 save best/average speed score to fitness_data.csv
+//                double norm_good_nn_dist = flock.separationScorePerBoidStep();
+//                double norm_speed_score = flock.speedScore();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 std::vector<double>& udfp = i->user_data_for_plotting;
                 udfp.clear();
                 udfp.push_back(norm_good_coll);
-                udfp.push_back(norm_good_nn_dist);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250522 save best/average speed score to fitness_data.csv
+                udfp.push_back(flock.separationScorePerBoidStep());
+                udfp.push_back(flock.speedScore());
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
     };
@@ -510,7 +518,13 @@ double averageGoodNnDist(LP::Population& population)
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20250521 save best/average speed score to fitness_data.csv
-double averageSpeedScore(LP::Population& population) { return 0; }
+double averageSpeedScore(LP::Population& population)
+{
+    float total = 0;
+    auto f = [&](LP::Individual* i) { total += getUserData(2, i); };
+    population.applyToAllIndividuals(f);
+    return total / population.getIndividualCount();
+}
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 double bestNonObsCol(LP::Population& population)
 {
@@ -528,7 +542,15 @@ double bestGoodNnDist(LP::Population& population)
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20250521 save best/average speed score to fitness_data.csv
-double bestSpeedScore(LP::Population& population) { return 0; }
+
+double bestSpeedScore(LP::Population& population)
+{
+    double best = - std::numeric_limits<double>::infinity();
+    auto f = [&](LP::Individual* i) { best = std::max(best, getUserData(2, i)); };
+    population.applyToAllIndividuals(f);
+    return best;
+}
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Called each step to handle writing log file with fitness over time data.
 void save_fitness_time_series(LP::Population& population)
@@ -545,9 +567,10 @@ void save_fitness_time_series(LP::Population& population)
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250521 save best/average speed score to fitness_data.csv
             std::string labels = ("step,average,best,"
-                                  "ave_non_obs_coll,best_non_obs_coll,"
+//                                  "ave_non_obs_coll,best_non_obs_coll,"
 //                                  "ave_good_nn_dist,best_good_nn_dist");
-                                  "ave_good_nn_dist,best_good_nn_dist"
+                                  "ave_obs_avoid,best_obs_avoid,"
+                                  "ave_good_nn_dist,best_good_nn_dist,"
                                   "ave_speed_score,best_speed_score");
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             stream << labels << std::endl;

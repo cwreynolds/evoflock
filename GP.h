@@ -204,19 +204,11 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
                                      flock.fp().maxSimulationSteps());
                 double good_coll = (boid_steps - flock.getTotalObstacleCollisions());
                 double norm_good_coll =  good_coll / boid_steps;
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250522 save best/average speed score to fitness_data.csv
-//                double norm_good_nn_dist = flock.separationScorePerBoidStep();
-//                double norm_speed_score = flock.speedScore();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 std::vector<double>& udfp = i->user_data_for_plotting;
                 udfp.clear();
                 udfp.push_back(norm_good_coll);
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250522 save best/average speed score to fitness_data.csv
                 udfp.push_back(flock.separationScorePerBoidStep());
                 udfp.push_back(flock.speedScore());
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
     };
@@ -516,8 +508,6 @@ double averageGoodNnDist(LP::Population& population)
     population.applyToAllIndividuals(f);
     return total / population.getIndividualCount();
 }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250521 save best/average speed score to fitness_data.csv
 double averageSpeedScore(LP::Population& population)
 {
     float total = 0;
@@ -525,7 +515,6 @@ double averageSpeedScore(LP::Population& population)
     population.applyToAllIndividuals(f);
     return total / population.getIndividualCount();
 }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 double bestNonObsCol(LP::Population& population)
 {
     double best = - std::numeric_limits<double>::infinity();
@@ -540,9 +529,6 @@ double bestGoodNnDist(LP::Population& population)
     population.applyToAllIndividuals(f);
     return best;
 }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250521 save best/average speed score to fitness_data.csv
-
 double bestSpeedScore(LP::Population& population)
 {
     double best = - std::numeric_limits<double>::infinity();
@@ -551,7 +537,6 @@ double bestSpeedScore(LP::Population& population)
     return best;
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // Called each step to handle writing log file with fitness over time data.
 void save_fitness_time_series(LP::Population& population)
 {
@@ -564,15 +549,14 @@ void save_fitness_time_series(LP::Population& population)
         {
             pathname = "/Users/cwr/Desktop/flock_data/fitness_data.csv";
             std::ofstream stream(pathname);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250521 save best/average speed score to fitness_data.csv
-            std::string labels = ("step,average,best,"
-//                                  "ave_non_obs_coll,best_non_obs_coll,"
-//                                  "ave_good_nn_dist,best_good_nn_dist");
-                                  "ave_obs_avoid,best_obs_avoid,"
-                                  "ave_good_nn_dist,best_good_nn_dist,"
-                                  "ave_speed_score,best_speed_score");
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            std::string labels = (EF::fitness_speed_control ?
+                                  ("step,average,best,"
+                                   "ave_obs_avoid,best_obs_avoid,"
+                                   "ave_good_nn_dist,best_good_nn_dist,"
+                                   "ave_speed_score,best_speed_score") :
+                                  ("step,average,best,"
+                                   "ave_obs_avoid,best_obs_avoid,"
+                                   "ave_good_nn_dist,best_good_nn_dist,"));
             stream << labels << std::endl;
             stream.close();
         }
@@ -584,15 +568,12 @@ void save_fitness_time_series(LP::Population& population)
         stream << bestNonObsCol(population) << ",";
         stream << averageGoodNnDist(population) << ",";
         stream << bestGoodNnDist(population);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250521 save best/average speed score to fitness_data.csv
         if (EF::fitness_speed_control)
         {
             stream << ",";
             stream << averageSpeedScore(population) << ",";
             stream << bestSpeedScore(population);
         }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         stream << std::endl;
         stream.close();
     }

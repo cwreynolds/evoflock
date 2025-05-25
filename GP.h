@@ -200,14 +200,10 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
             LP::Individual* i = LP::Population::evolution_step_individual;
             if (i)
             {
-                double boid_steps = (flock.fp().boidsPerFlock() *
-                                     flock.fp().maxSimulationSteps());
-                double good_coll = (boid_steps - flock.getTotalObstacleCollisions());
-                double norm_good_coll =  good_coll / boid_steps;
                 std::vector<double>& udfp = i->user_data_for_plotting;
                 udfp.clear();
-                udfp.push_back(norm_good_coll);
-                udfp.push_back(flock.separationScorePerBoidStep());
+                udfp.push_back(flock.obstacleCollisionsScore());
+                udfp.push_back(flock.separationScore());
                 udfp.push_back(flock.speedScore());
             }
         }

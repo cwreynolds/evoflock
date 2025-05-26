@@ -37,18 +37,18 @@ void visualizeBestIfRequested(LP::Population* population)
 }
 
 // WIP tool for visualizing a logged FlockParameters, eg:
-// Run_Flock(87.4777, 20, 20, 20, 84.9358, 98.4413, 26.6924, 1.90821, 53.2896,
-// 94.8003, 2.77889, 37.8503, 42.3571, -0.787644, -0.401251, 0.575284, 9.87024,
-// 8.99761)
+//     Run_Flock(87.4777, 20, 20, 20, 84.9358, 98.4413, 26.6924, 1.90821,
+//               53.2896, 94.8003, 2.77889, 37.8503, 42.3571, -0.787644,
+//               -0.401251, 0.575284, 9.87024, 8.99761)
 void visualizePreviouslyLoggedFlockParameters()
 {
 //    // To use the hand-tuned parameters:
 //    // FlockParameters fp;
 //    // To visualize a given set of FlockParameters. Cut/paste from log, compile.
-//    // (These values from 20250519_fixed_NaN_speeds)
-//    FlockParameters fp(83.5102, 20, 20, 20, 84.0908, 43.3934, 41.7201, 24.8548,
-//                       96.2355, 62.9057, 2.75731, 92.5116, 17.6287, -0.633894,
-//                       0.399396, 0.356121, 2.38655, 2.67807);
+//    // (These values from run 20250524_test_use_scores_in_flock_data)
+//    FlockParameters fp(90.3889, 20, 20, 20, 75.3918, 41.8466, 27.8009, 0.685528,
+//                       90.1786, 73.3035, 2.34728, 8.31566, 67.5218, -0.750053,
+//                       -0.96459, 0.312321, 3.8674, 1.26649);
 //    EF::enable_multithreading = false;
 //    while (true) { GP::run_flock_simulation(fp, 1); }
 }

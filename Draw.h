@@ -459,6 +459,9 @@ public:
         if (isStaticCameraMode()) { animateStaticCamera(); }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250526 try more damping (blender) to camera UP.
+    
     // Invoke the "follow camera" model, update look_from/look_at/up and camera.
     void animateFollowCamera()
     {
@@ -475,15 +478,49 @@ public:
         setCameraByFromAtUp();
     }
 
+//    // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
+//    void animateWingmanCamera()
+//    {
+//        Vec3 global_cam = aimAgent().ls().globalize(wingman_cam_local_offset_);
+//        cameraLookFrom() = from_memory_.blend(global_cam, 0.80);
+//        cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.67);
+//        cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.80).normalize();
+//        setCameraByFromAtUp();
+//    }
+    
+    
+//        // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
+//        void animateWingmanCamera()
+//        {
+//            Vec3 global_cam = aimAgent().ls().globalize(wingman_cam_local_offset_);
+//            cameraLookFrom() = from_memory_.blend(global_cam, 0.80);
+//            cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.67);
+//    //        cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.80).normalize();
+//    //        cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.95).normalize();
+//    //        cameraLookUp()   =   up_memory_.blend(aimAgent().up(), EF::roll_rate).normalize();
+//
+//            blendInNewCameraLookUp(aimAgent().up());
+//
+//            setCameraByFromAtUp();
+//        }
+
     // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
     void animateWingmanCamera()
     {
         Vec3 global_cam = aimAgent().ls().globalize(wingman_cam_local_offset_);
         cameraLookFrom() = from_memory_.blend(global_cam, 0.80);
         cameraLookAt()   =   at_memory_.blend(aimAgent().position(), 0.67);
-        cameraLookUp()   =   up_memory_.blend(aimAgent().up(), 0.80).normalize();
+        blendInNewCameraLookUp(aimAgent().up());
         setCameraByFromAtUp();
     }
+
+    
+    void blendInNewCameraLookUp(const Vec3& new_up)
+    {
+        cameraLookUp() = up_memory_.blend(new_up, EF::roll_rate).normalize();
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Adjust "static camera" model according to mouse input.
     void animateStaticCamera()

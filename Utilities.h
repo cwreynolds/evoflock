@@ -621,6 +621,12 @@ inline static bool enable_multithreading = true;
 // TODO 20250510 Transitional global switch for controlling speed with fitness.
 inline static bool fitness_speed_control = false;
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250526 try more damping (blender) to camera UP.
+//double roll_rate = 0.95;
+double roll_rate = 0.975;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 }  // end of namespace EvoFlock
 namespace EF = EvoFlock;
 

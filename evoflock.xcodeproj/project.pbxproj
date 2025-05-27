@@ -100,6 +100,7 @@
 		840B67B62B5C28D1008AE661 /* shape.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shape.h; sourceTree = "<group>"; };
 		8413ADFB2B89626F006693A1 /* GP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GP.h; sourceTree = "<group>"; };
 		8413ADFC2B8AB10C006693A1 /* LazyPredator */ = {isa = PBXFileReference; lastKnownFileType = folder; path = LazyPredator; sourceTree = "<group>"; };
+		8419349B2DE3F66800A9C8EE /* EvoFlock style template.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "EvoFlock style template.numbers"; sourceTree = "<group>"; };
 		841F3D552B49E90000483276 /* evoflock */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = evoflock; sourceTree = BUILT_PRODUCTS_DIR; };
 		841F3D5F2B49E9FE00483276 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		841F3D612B49EE6C00483276 /* Vec3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Vec3.h; sourceTree = "<group>"; };
@@ -258,6 +259,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8419349C2DE3F66800A9C8EE /* doc */ = {
+			isa = PBXGroup;
+			children = (
+				8419349B2DE3F66800A9C8EE /* EvoFlock style template.numbers */,
+			);
+			path = doc;
+			sourceTree = "<group>";
+		};
 		841F3D4C2B49E90000483276 = {
 			isa = PBXGroup;
 			children = (
@@ -279,6 +288,7 @@
 				841F3D612B49EE6C00483276 /* Vec3.h */,
 				848101FB2C77B53E00433168 /* CMakeLists.txt */,
 				8413ADFC2B8AB10C006693A1 /* LazyPredator */,
+				8419349C2DE3F66800A9C8EE /* doc */,
 				841F3D562B49E90000483276 /* Products */,
 				848101F52C7666CA00433168 /* Frameworks */,
 			);

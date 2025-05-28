@@ -544,28 +544,13 @@ public:
     // global up. Overrides method in base class Agent
     Vec3 up_reference(const Vec3& acceleration) override
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250526 try more damping (blender) to camera UP.
-        
-//        Vec3 global_up_scaled = Vec3(0, acceleration.length(), 0);
-//        Vec3 global_up_scaled = Vec3(0, acceleration.length() * 0.5, 0);
-
-//        double upness = 0.5;
-        double upness = 0.2;
+        double upness = 0.2;  // Essentially "keel weight" urge to be upright.
         Vec3 global_up_scaled = Vec3(0, acceleration.length() * upness, 0);
-
-//        Vec3 new_up = acceleration + global_up_scaled;
         Vec3 new_up = (acceleration + global_up_scaled).normalize();
-
-//        up_memory_.blend(new_up, 0.95);
         up_memory_.blend(new_up, EF::roll_rate);
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         Vec3 up_ref = up_memory_.value.normalize();
         // Make REALLY sure this always returns a unit length vector.
         return (up_ref.is_unit_length() ? up_ref : Vec3(0, 1, 0));
-
     }
 
     // This ad hoc global value is provided only for temporary debugging.

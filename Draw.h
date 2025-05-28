@@ -459,30 +459,6 @@ public:
         if (isStaticCameraMode()) { animateStaticCamera(); }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250526 try more damping (blender) to camera UP.
-    
-//        // Invoke the "follow camera" model, update look_from/look_at/up and camera.
-//        void animateFollowCamera()
-//        {
-//            Vec3 camera_pos = cameraLookFrom();
-//            Vec3 offset_from_camera_to_target = aimAgent().position() - camera_pos;
-//            Vec3 offset_direction = offset_from_camera_to_target.normalize_or_0();
-//            Vec3 target_offset = offset_direction * cameraDesiredOffsetDistance();
-//            Vec3 new_from = aimAgent().position() - target_offset;
-//            Vec3 new_at = aimAgent().position();
-//            Vec3 new_up = (camera().j() + Vec3(0, 0.3, 0)).normalize();
-//            cameraLookFrom() = from_memory_.blend(new_from, 0.90);
-//
-//    //        cameraLookAt()   =   at_memory_.blend(new_at,   0.75);
-//    //        blendInNewCameraLookAt(new_at);
-//    //        blendInNewCameraLookAt(new_at, 0.75);
-//            blendInNewCameraLookAt(new_at);
-//
-//            blendInNewCameraLookUp(new_up);
-//            setCameraByFromAtUp();
-//        }
-
     // Invoke the "follow camera" model, update look_from/look_at/up and camera.
     void animateFollowCamera()
     {
@@ -493,50 +469,36 @@ public:
         Vec3 new_from = aimAgent().position() - target_offset;
         Vec3 new_at = aimAgent().position();
         Vec3 new_up = (camera().j() + Vec3(0, 0.3, 0)).normalize();
-        cameraLookFrom() = from_memory_.blend(new_from, 0.90);
+        blendInNewCameraLookFrom(new_from);
         blendInNewCameraLookAt(new_at);
         blendInNewCameraLookUp(new_up);
         setCameraByFromAtUp();
     }
 
-//        // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
-//        void animateWingmanCamera()
-//        {
-//            Vec3 global_cam = aimAgent().ls().globalize(wingman_cam_local_offset_);
-//            cameraLookFrom() = from_memory_.blend(global_cam, 0.80);
-//
-//    //        cameraLookAt()   = at_memory_.blend(aimAgent().position(), 0.67);
-//    //        blendInNewCameraLookAt(aimAgent().position(), 0.68);
-//    //        blendInNewCameraLookAt(aimAgent().position(), 0.6);
-//            blendInNewCameraLookAt(aimAgent().position(), 0.67);
-//
-//            blendInNewCameraLookUp(aimAgent().up());
-//            setCameraByFromAtUp();
-//        }
-
     // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
     void animateWingmanCamera()
     {
         Vec3 global_cam = aimAgent().ls().globalize(wingman_cam_local_offset_);
-        cameraLookFrom() = from_memory_.blend(global_cam, 0.80);
-//        blendInNewCameraLookAt(aimAgent().position(), 0.67);
+        blendInNewCameraLookFrom(global_cam);
         blendInNewCameraLookAt(aimAgent().position());
         blendInNewCameraLookUp(aimAgent().up());
         setCameraByFromAtUp();
     }
 
-    
+    // These blend a new camera look-from-at-up into the current state.
+    // Each have a default blend rate which can be overridden.
+    void blendInNewCameraLookFrom(const Vec3& new_from, double rate = 0.95)
+    {
+        cameraLookFrom() = from_memory_.blend(new_from, rate);
+    }
+    void blendInNewCameraLookAt(const Vec3& new_at, double rate = 0.9)
+    {
+        cameraLookAt() = at_memory_.blend(new_at, rate);
+    }
     void blendInNewCameraLookUp(const Vec3& new_up, double rate = EF::roll_rate)
     {
         cameraLookUp() = up_memory_.blend(new_up, rate).normalize();
     }
-    
-    void blendInNewCameraLookAt(const Vec3& new_at, double rate = 0.8)
-    {
-        cameraLookAt() = at_memory_.blend(new_at, rate);
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Adjust "static camera" model according to mouse input.
     void animateStaticCamera()

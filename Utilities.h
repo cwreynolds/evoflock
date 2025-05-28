@@ -621,19 +621,8 @@ inline static bool enable_multithreading = true;
 // TODO 20250510 Transitional global switch for controlling speed with fitness.
 inline static bool fitness_speed_control = false;
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250526 try more damping (blender) to camera UP.
-//double roll_rate = 0.95;
-//double roll_rate = 0.975;
-//double roll_rate = 0.97;
-//double roll_rate = 0.975;
-//double roll_rate = 0.98;
-//double roll_rate = 0.97;
-//double roll_rate = 0.95;
-//double roll_rate = 0.975;
-//double roll_rate = 0.98;
+// Controls roll (rotation around forward axis) blend rate for Boid and Camera.
 double roll_rate = 0.99;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 }  // end of namespace EvoFlock
 namespace EF = EvoFlock;

@@ -624,7 +624,15 @@ inline static bool fitness_speed_control = false;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20250526 try more damping (blender) to camera UP.
 //double roll_rate = 0.95;
-double roll_rate = 0.975;
+//double roll_rate = 0.975;
+//double roll_rate = 0.97;
+//double roll_rate = 0.975;
+//double roll_rate = 0.98;
+//double roll_rate = 0.97;
+//double roll_rate = 0.95;
+//double roll_rate = 0.975;
+//double roll_rate = 0.98;
+double roll_rate = 0.99;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 }  // end of namespace EvoFlock

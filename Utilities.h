@@ -17,14 +17,14 @@
 #pragma once
 #include <iostream>
 #include <iomanip>
+#include <sstream>
+#include <format>
 #include <cstdlib>
 #include <chrono>
 #include <thread>
 #include <cassert>
 #include <mutex>
 class Vec3;
-
-#include <sstream>
 
 namespace Utilities 
 {
@@ -299,14 +299,9 @@ public:
     }
     T average() const { return sum() / data_.size(); }
     bool empty() const { return data_.empty(); }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250530 sometimes mouse gestures slow frame rate WAY down.
-
     size_t size() const { return data_.size(); }
-
     void fill(T x) { data_.resize(size_, x); }
     std::string to_string() const { return vec_to_string(data_, 4); }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 private:
     size_t size_ = 0;
     size_t index_ = 0;
@@ -320,83 +315,48 @@ private:
 class AnimationTimer
 {
 public:
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250530 sometimes mouse gestures slow frame rate WAY down.
-    
-//    AnimationTimer() : AnimationTimer(30) {}
-
-//    AnimationTimer(int frames_per_second)
-//      : frame_start_time_(TimeClock::now()),
-//        frame_duration_history_(5),
-//        frames_per_second_(frames_per_second)
-//    {}
-
     AnimationTimer()
       : frame_start_time_(TimeClock::now()),
         frame_duration_history_(5)
     {}
 
+    // Make sure FPS has been set and frame_duration_history_ is initialized.
+    void lazyInit()
+    {
+        assert(frames_per_second_ > 0);
+        if (frame_duration_history_.empty()) { resetHistory(); }
+    }
+    
     // Measured duration of the previous frame. Used as the simulation time step
     // for the current frame. I think that off-by-one delay is inevitable.
     double frameDuration() const { return frame_duration_; }
 
-//    // Average duration of recent frames.
-//    double frameDurationAverage() const
-//    {
-//        double fd_average = frameDurationTarget();
-//        if (not frame_duration_history_.empty())
-//        {
-//            fd_average= frame_duration_history_.average();
-//        }
-//        return fd_average;
-//    }
-//
-//    // Average duration of recent frames.
-//    double frameDurationAverage() const
-//    {
-//        return (frame_duration_history_.empty() ?
-//                frameDurationTarget() :
-//                frame_duration_history_.average());
-//    }
-
-    
     // Average duration of recent frames.
-    double frameDurationAverage() const
+    double frameDurationAverage()
     {
-        return (frame_duration_history_.empty() ?
-                frameDurationTarget() :
-                frame_duration_history_.average());
+        lazyInit();
+        return frame_duration_history_.average();
     }
 
     // Count of frames this simulation (aka simulation steps).
     int frameCounter() const { return frame_counter_; }
     
-//  oh things that currently do: if (frame_duration_history_.empty())
-//  should they instead be happening in setFrameStartTime()?
-        
     // Record real time at beginning of frame.
-    void setFrameStartTime() { frame_start_time_ = TimeClock::now(); }
-
+    void setFrameStartTime() { lazyInit(); frame_start_time_ = TimeClock::now(); }
 
     // Called after simulation step and frame draw: sleeps until min_frame_time.
     void sleepUntilEndOfFrame(double min_frame_time)  // In seconds.
     {
         if (min_frame_time > 0)
         {
-            
-            if (frame_duration_history_.empty()) { resetHistory(); }
-
-            
+            lazyInit();
             // Elapsed time since beginning of frame: simulation and graphics.
             double non_sleep_time = time_diff_in_seconds(frame_start_time_,
                                                          TimeClock::now());
             // Amount of time to sleep until the end of the current frame.
             double sleep_time = min_frame_time - non_sleep_time;
             // Adjust based on N previous frame durations
-
-//            double fd_average = frame_duration_history_.average();
             double fd_average = frameDurationAverage();
-
             double adjust = fd_average - min_frame_time;
             // Provide some minimal sleep time for multithreading.
             double min_sleep_time = min_frame_time * 0.01;
@@ -406,76 +366,52 @@ public:
                                        min_frame_time);
             // Sleep for that clipped interval.
             thread_sleep_in_seconds(clipped_time);
-            
 
-            //std::cout << std::endl;
-            //std::cout << "fd_average     = " << fd_average << std::endl;
-            //std::cout << "non_sleep_time = " << non_sleep_time << std::endl;
-            //std::cout << "sleep_time     = " << sleep_time << std::endl;
-            //std::cout << "clipped_time   = " << clipped_time << std::endl;
-            
-//            static int ad_hoc_frame_counter = 0;
-//            std::cout << "frame_counter_ = " << frame_counter_ << std::endl;
-            if ((frame_counter_ % 10) == 0)
+            bool verbose = false;
+            if (verbose and (frame_counter_ % 10) == 0)
             {
-                std::cout << std::endl;
-                std::cout << "frame_counter_ = " << frame_counter_ << std::endl;
-                
-                std::cout << "frames_per_second = " << frames_per_second_ << std::endl;
-                std::cout << "fd_history.size() = " << frame_duration_history_.size() << std::endl;
-                std::cout << "frameDurationTarget = " << frameDurationTarget() << std::endl;
-
-                std::cout << "fd_average     = " << fd_average << std::endl;
-                std::cout << "non_sleep_time = " << non_sleep_time << std::endl;
-                std::cout << "sleep_time     = " << sleep_time << std::endl;
-                std::cout << "clipped_time   = " << clipped_time << std::endl;
+                std::cout<<std::endl;
+                std::cout<<"frame_counter_ = " << frame_counter_ << std::endl;
+                std::cout << "fps = " << frames_per_second_ << std::endl;
+                std::cout<<std::format("fd_average     = {:.6}\n",fd_average);
+                std::cout<<std::format("non_sleep_time = {:.6}\n",non_sleep_time);
+                std::cout<<std::format("sleep_time     = {:.6}\n",sleep_time);
+                std::cout<<std::format("adjust         = {:.6}\n",adjust);
+                std::cout<<std::format("clipped_time   = {:.6}\n",clipped_time);
             }
         }
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Measure how much wall clock time has elapsed for this simulation step.
     void measureFrameDuration()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250530 sometimes mouse gestures slow frame rate WAY down.
-        assert(frames_per_second_ > 0);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         TimePoint frame_end_time = TimeClock::now();
+        lazyInit();
         frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
         frame_counter_ += 1;
         frame_duration_history_.insert(frame_duration_);
-        // If frame time is twice the target duration, reset smoothing history.
-        if (frame_duration_ > (2 * frameDurationTarget())) { resetHistory(); }
+        
+        // If frame time is 10% above target duration, reset smoothing history.
+        if (frame_duration_ > (1.1 * frameDurationTarget()))
+        {
+            std::cout << "frame_duration_history_.average() = ";
+            std::cout << frame_duration_history_.average() << std::endl;
+            resetHistory();
+        }
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250530 sometimes mouse gestures slow frame rate WAY down.
-    
-//    void resetHistory()
-//    {
-//        std::cout << "frame_duration_history_.average() = ";
-//        std::cout << frame_duration_history_.average() << std::endl;
-//        frame_duration_history_.fill(frameDurationTarget());
-//    }
-  
+    // Set all entries in frame_duration_history_ to the target frame duration.
     void resetHistory()
     {
-//        std::cout << "frame_duration_history_.average() = ";
-//        std::cout << frame_duration_history_.average() << std::endl;
         frame_duration_history_.fill(frameDurationTarget());
     }
 
-//    double frameDurationTarget() const { return 1.0 / frames_per_second_; }
-
+    // Convert FPS to frame duration in seconds. (Error if FPS was never set.)
     double frameDurationTarget() const
     {
         assert(frames_per_second_ > 0);
         return 1.0 / frames_per_second_;
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     int getFPS() const { return frames_per_second_; }
     void setFPS(int fps) { frames_per_second_ = fps; }

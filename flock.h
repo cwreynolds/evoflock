@@ -136,9 +136,9 @@ public:
         draw().beginAnimatedScene();
         while (still_running())
         {
-            aTimer().setFrameStartTime();
             updateObstacleSetForGUI();
             updateSelectedBoidForGUI();
+            aTimer().setFrameStartTime();
             // Run simulation steps "as fast as possible" or at fixed rate?
             bool afap = not (fixed_time_step() and draw().enable());
             double fd = aTimer().frameDuration();
@@ -254,11 +254,9 @@ public:
         std::cout << int(separation_score_sum_);
         if (EF::fitness_speed_control)
         {
-            std::cout << std::fixed << std::setprecision(2);
-            std::cout << ", average speed = ";
-            std::cout << averageSpeedPerBoidStep();
-            std::cout << ", speedScore() = ";
-            std::cout << speedScore();
+            double average_speed = averageSpeedPerBoidStep();
+            std::cout << std::format(", average speed = {:.3}", average_speed);
+            std::cout << std::format(", speedScore() = {:.3}", speedScore());
         }
         std::cout << std::endl;
     }

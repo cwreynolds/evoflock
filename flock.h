@@ -34,7 +34,7 @@ private:
     BoidPtrList boids_;
 
     BoidInstanceList boid_instance_list_;
-    util::AnimationTimer animation_timer_;
+    util::AnimationClock animation_clock_;
 
     // TODO Parameters that may (or may not?) be better kept separate from FP.
     int boid_count_ = 200;
@@ -80,8 +80,8 @@ public:
     static ObstaclePtrList& obstacles() { return obstacles_; }
     static Draw& draw() { return Draw::getInstance(); }
     
-    util::AnimationTimer& aTimer() { return animation_timer_; }
-    const util::AnimationTimer& aTimer() const { return animation_timer_; }
+    util::AnimationClock& clock() { return animation_clock_; }
+    const util::AnimationClock& clock() const { return animation_clock_; }
 
     double max_simulation_steps() const { return max_simulation_steps_; }
     void set_max_simulation_steps(double mss) { max_simulation_steps_ = mss; }
@@ -122,7 +122,7 @@ public:
         useObstacleSet();
         // This will normally be overwritten, but set a default default.
         set_fixed_fps(30);
-        aTimer().setFPS(fixed_fps());
+        clock().setFPS(fixed_fps());
     }
 
     // Run boids simulation.
@@ -131,18 +131,18 @@ public:
         // Log the FlockParameters object, but only for interactive drawing mode
         if (draw().enable()) { fp().print(); }
         set_fixed_fps(fp().getFPS());
-        aTimer().setFPS(fp().getFPS());
+        clock().setFPS(fp().getFPS());
         make_boids(boid_count(), fp().sphereRadius(), fp().sphereCenter());
         draw().beginAnimatedScene();
         while (still_running())
         {
             updateObstacleSetForGUI();
             updateSelectedBoidForGUI();
-            aTimer().setFrameStartTime();
+            clock().setFrameStartTime();
             // Run simulation steps "as fast as possible" or at fixed rate?
             bool afap = not (fixed_time_step() and draw().enable());
-            double fd = aTimer().frameDuration();
-            double fdt = aTimer().frameDurationTarget();
+            double fd = clock().frameDuration();
+            double fdt = clock().frameDurationTarget();
             double step_duration = afap ? fd : fdt;
             // Unclear why must be called before beginOneAnimatedFrame() but I
             // was unable to find a work around. (Otherwise no boids drawn.)
@@ -163,15 +163,15 @@ public:
             selectedBoid()->drawAnnotationForBoidAndNeighbors();
             draw().aimAgent() = *selectedBoid();
             draw().endOneAnimatedFrame();
-            aTimer().sleepUntilEndOfFrame(afap ? 0 : step_duration);
-            if (not draw().simPause()) { aTimer().measureFrameDuration(); }
+            clock().sleepUntilEndOfFrame(afap ? 0 : step_duration);
+            if (not draw().simPause()) { clock().measureFrameDuration(); }
         }
         draw().endAnimatedScene();
         printRunStats();
         if (max_simulation_steps() == std::numeric_limits<double>::infinity())
         {
             std::cout << log_prefix << "Exit at step: ";
-            std::cout << aTimer().frameCounter() << std::endl;
+            std::cout << clock().frameCounter() << std::endl;
         }
     }
 
@@ -275,6 +275,10 @@ public:
     // less than 0.5.  TODO 20250427 should this be in Utilities?
     static double emphasizeHighScores(double unit_score, double emphasis)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250601 saw this fail today, but no clue about the bad value.
+        if (not util::between(unit_score, 0, 1)) { debugPrint(unit_score); }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         assert(util::between(unit_score, 0, 1));
         assert(util::between(emphasis, 0, 1));
         double x = util::interpolate(emphasis, 0.5, 1.0);  // knee x
@@ -431,7 +435,7 @@ public:
     // Keep track of a smoothed (LPF) version of frames per second metric.
     void update_fps()
     {
-        double fd = aTimer().frameDuration();
+        double fd = clock().frameDuration();
         fps_.blend((fixed_time_step() ? fixed_fps() : int(1 / fd)), 0.95);
     }
     
@@ -586,7 +590,7 @@ public:
     bool still_running()
     {
         bool a = (not draw().enable()) ? true : not draw().exitFromRun();
-        bool b = aTimer().frameCounter() < max_simulation_steps();
+        bool b = clock().frameCounter() < max_simulation_steps();
         return a and b;
     }
     

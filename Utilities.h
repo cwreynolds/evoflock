@@ -308,17 +308,12 @@ private:
     std::vector<T> data_;
 };
 
-// Timer/clock class for animation. Originally misplaced in Draw in the earlier
-// Python "flock" project. Now split off because in evoflock the lifetime of
-// Draw is unrelated to the lifetime of an animation clock. TODO: should this
-// be renamed AnimationClock?
-class AnimationTimer
+// Clock class for animation. Controls and records passage of animation time.
+class AnimationClock
 {
 public:
-    AnimationTimer()
-      : frame_start_time_(TimeClock::now()),
-        frame_duration_history_(5)
-    {}
+    AnimationClock()
+      : frame_start_time_(TimeClock::now()), frame_duration_history_(20) {}
 
     // Make sure FPS has been set and frame_duration_history_ is initialized.
     void lazyInit()
@@ -326,6 +321,9 @@ public:
         assert(frames_per_second_ > 0);
         if (frame_duration_history_.empty()) { resetHistory(); }
     }
+    
+    // Count of frames this simulation (aka simulation steps).
+    int frameCounter() const { return frame_counter_; }
     
     // Measured duration of the previous frame. Used as the simulation time step
     // for the current frame. I think that off-by-one delay is inevitable.
@@ -338,9 +336,6 @@ public:
         return frame_duration_history_.average();
     }
 
-    // Count of frames this simulation (aka simulation steps).
-    int frameCounter() const { return frame_counter_; }
-    
     // Record real time at beginning of frame.
     void setFrameStartTime() { lazyInit(); frame_start_time_ = TimeClock::now(); }
 
@@ -367,17 +362,21 @@ public:
             // Sleep for that clipped interval.
             thread_sleep_in_seconds(clipped_time);
 
-            bool verbose = false;
+            // TODO for debugging/testing, to be removed eventually.
+            bool verbose = true;
             if (verbose and (frame_counter_ % 10) == 0)
             {
+                auto f = [&](double v) {std::cout<<std::format(" = {:.6}\n",v);};
                 std::cout<<std::endl;
-                std::cout<<"frame_counter_ = " << frame_counter_ << std::endl;
-                std::cout << "fps = " << frames_per_second_ << std::endl;
-                std::cout<<std::format("fd_average     = {:.6}\n",fd_average);
-                std::cout<<std::format("non_sleep_time = {:.6}\n",non_sleep_time);
-                std::cout<<std::format("sleep_time     = {:.6}\n",sleep_time);
-                std::cout<<std::format("adjust         = {:.6}\n",adjust);
-                std::cout<<std::format("clipped_time   = {:.6}\n",clipped_time);
+                std::cout << "frameCounter     = " << frameCounter() << std::endl;
+                std::cout << "fps              = " << getFPS() << std::endl;
+                std::cout << "totalElapsedTime"; f(totalElapsedTime());
+                std::cout << "frameDuration   "; f(frameDuration());
+                std::cout << "fd_average      "; f(fd_average);
+                std::cout << "non_sleep_time  "; f(non_sleep_time);
+                std::cout << "sleep_time      "; f(sleep_time);
+                std::cout << "adjust          "; f(adjust);
+                std::cout << "clippedSleepTime"; f(clipped_time);
             }
         }
     }
@@ -390,6 +389,7 @@ public:
         frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
         frame_counter_ += 1;
         frame_duration_history_.insert(frame_duration_);
+        incrementElapsedTime(frame_duration_);
         
         // If frame time is 10% above target duration, reset smoothing history.
         if (frame_duration_ > (1.1 * frameDurationTarget()))
@@ -413,15 +413,23 @@ public:
         return 1.0 / frames_per_second_;
     }
 
+    // Get/set frames per second (FPS) for fixed time step.
     int getFPS() const { return frames_per_second_; }
     void setFPS(int fps) { frames_per_second_ = fps; }
+    
+    // Get total elapsed animation time for this clock (in seconds).
+    double totalElapsedTime() const { return total_elapsed_time_; }
+    
+    // Add to total elapsed animation time for this clock (in seconds).
+    void incrementElapsedTime(double t) { total_elapsed_time_ += t; }
 
 private:
     TimePoint frame_start_time_;
-    int frame_counter_ = 0;      // Total number of frames so far.
-    int frames_per_second_ = 0;
-    double frame_duration_ = 0;  // Duration of frame, measured in seconds.
-    double sleep_time_ = 0;      // Per frame sleep time, updated each frame.
+    int frame_counter_ = 0;         // Total number of frames so far.
+    int frames_per_second_ = 0;     // FPS
+    double frame_duration_ = 0;     // Duration of frame, measured in seconds.
+    double sleep_time_ = 0;         // Per frame sleep time, updated each frame.
+    double total_elapsed_time_ = 0; // Duration of frame, measured in seconds.
     RollingAverage<double> frame_duration_history_;  // Last N frame durations.
 };
 

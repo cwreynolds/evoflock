@@ -546,6 +546,11 @@ public:
         };
         visualizer().RegisterMouseScrollCallback(mscb);
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250602 new(?) slow down when mouse even just moves across O3D win.
+
+    int xxx_temp_mmcb_count = 0;
 
     // Set mouse move handler for GUI.
     void setMouseMoveCallback()
@@ -554,9 +559,15 @@ public:
         {
             mmcb = [&](base_vis_t* vis, double x, double y)
             {
+                xxx_temp_mmcb_count++;
+                debugPrint(xxx_temp_mmcb_count);
+                
                 Vec3 new_pos_pixels(x, y, 0);
                 Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
                 double mouse_move_pixels = offset_pixels.length();
+                
+                debugPrint(left_mouse_button_down_);
+
                 if (left_mouse_button_down_ and (mouse_move_pixels < 50))
                 {
                     double speed = 0.01;
@@ -584,6 +595,9 @@ public:
         }
         visualizer().RegisterMouseMoveCallback(mmcb);
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     // Set mouse button handler for GUI.
     void setMouseButtonCallback()

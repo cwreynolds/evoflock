@@ -321,6 +321,45 @@ public:
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250601 draw lines to neighbors in gray of separation score.
+
+//    // Called each simulation step, records stats for the separation score.
+//    void recordSeparationScorePerStep()
+//    {
+//        // Piecewise linear function of distance to score
+//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
+//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
+//        for (auto b : boids())
+//        {
+//            double distance = b->distanceToNearestNeighbor();
+//            separation_score_sum_ += parameterToWeightWithRamps(distance, d, s);
+//        }
+//    }
+
+//        // Called each simulation step, records stats for the separation score.
+//        void recordSeparationScorePerStep()
+//        {
+//            // Piecewise linear function of distance to score
+//            std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
+//            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
+//            for (auto b : boids())
+//            {
+//                double distance = b->distanceToNearestNeighbor();
+//
+//    //            separation_score_sum_ += parameterToWeightWithRamps(distance, d, s);
+//
+//                double score = parameterToWeightWithRamps(distance, d, s);
+//
+//                b->xxx_temp_separation_score = score;
+//                separation_score_sum_ += score;
+//
+//                if (not util::between(score, 0, 1)) { debugPrint(score); }
+//                assert(util::between(score, 0, 1));
+//                assert(draw().runSimulationThisFrame());
+//            }
+//        }
+
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
@@ -330,15 +369,40 @@ public:
         for (auto b : boids())
         {
             double distance = b->distanceToNearestNeighbor();
-            separation_score_sum_ += parameterToWeightWithRamps(distance, d, s);
+            double score = parameterToWeightWithRamps(distance, d, s);
+            
+            b->xxx_temp_separation_score = score;
+            separation_score_sum_ += score;
+            
+            if (not util::between(score, 0, 1)) { debugPrint(score); }
+            assert(util::between(score, 0, 1));
+            assert(draw().runSimulationThisFrame());
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250601 saw this fail today, but no clue about the bad value.
 
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
     {
+        
+        if (not util::between(separationScorePerBoidStep(), 0, 1))
+        {
+            debugPrint(separation_score_sum_);
+            debugPrint(boidStepPerSim());
+            debugPrint(separation_score_sum_ / boidStepPerSim());
+        }
+
+
+        
         return emphasizeHighScores(separationScorePerBoidStep(), 0.0);
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Accumulators for speed score.
     // TODO Relocate in file?

@@ -312,8 +312,16 @@ private:
 class AnimationClock
 {
 public:
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250602 now seems to take too long to recover from slow frames.
+    
     AnimationClock()
       : frame_start_time_(TimeClock::now()), frame_duration_history_(20) {}
+ 
+//    AnimationClock()
+//      : frame_start_time_(TimeClock::now()), frame_duration_history_(5) {}
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Make sure FPS has been set and frame_duration_history_ is initialized.
     void lazyInit()
@@ -351,7 +359,10 @@ public:
             // Amount of time to sleep until the end of the current frame.
             double sleep_time = min_frame_time - non_sleep_time;
             // Adjust based on N previous frame durations
+            
             double fd_average = frameDurationAverage();
+//            double fd_average = frameDurationTarget();
+
             double adjust = fd_average - min_frame_time;
             // Provide some minimal sleep time for multithreading.
             double min_sleep_time = min_frame_time * 0.01;
@@ -381,6 +392,9 @@ public:
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250602 now seems to take too long to recover from slow frames.
+
     // Measure how much wall clock time has elapsed for this simulation step.
     void measureFrameDuration()
     {
@@ -391,8 +405,15 @@ public:
         frame_duration_history_.insert(frame_duration_);
         incrementElapsedTime(frame_duration_);
         
-        // If frame time is 10% above target duration, reset smoothing history.
-        if (frame_duration_ > (1.1 * frameDurationTarget()))
+//        // If frame time is 10% above target duration, reset smoothing history.
+//        if (frame_duration_ > (1.1 * frameDurationTarget()))
+
+//        // If frame time is 20% above target duration, reset smoothing history.
+//        if (frame_duration_ > (1.2 * frameDurationTarget()))
+
+        // If frame time is 50% above target duration, reset smoothing history.
+        if (frame_duration_ > (1.5 * frameDurationTarget()))
+
         {
             std::cout << "frame_duration_history_.average() = ";
             std::cout << frame_duration_history_.average() << std::endl;
@@ -400,12 +421,21 @@ public:
         }
     }
     
+//    // Set all entries in frame_duration_history_ to the target frame duration.
+//    void resetHistory()
+//    {
+//        frame_duration_history_.fill(frameDurationTarget());
+//    }
+    
     // Set all entries in frame_duration_history_ to the target frame duration.
     void resetHistory()
     {
+        frame_duration_ = frameDurationTarget();
         frame_duration_history_.fill(frameDurationTarget());
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     // Convert FPS to frame duration in seconds. (Error if FPS was never set.)
     double frameDurationTarget() const
     {

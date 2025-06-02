@@ -42,13 +42,21 @@ void visualizeBestIfRequested(LP::Population* population)
 //               -0.401251, 0.575284, 9.87024, 8.99761)
 void visualizePreviouslyLoggedFlockParameters()
 {
+//    // To use the hand-tuned parameters:
+//    // FlockParameters fp;
+//    // To visualize a given set of FlockParameters. Cut/paste from log, compile.
+//    // (These values from run 20250524_test_use_scores_in_flock_data)
+//    FlockParameters fp(90.3889, 20, 20, 20, 75.3918, 41.8466, 27.8009, 0.685528,
+//                       90.1786, 73.3035, 2.34728, 8.31566, 67.5218, -0.750053,
+//                       -0.96459, 0.312321, 3.8674, 1.26649);
+//    EF::enable_multithreading = false;
+//    while (true) { GP::run_flock_simulation(fp, 1); }
+
     // To use the hand-tuned parameters:
     // FlockParameters fp;
     // To visualize a given set of FlockParameters. Cut/paste from log, compile.
-    // (These values from run 20250524_test_use_scores_in_flock_data)
-    FlockParameters fp(90.3889, 20, 20, 20, 75.3918, 41.8466, 27.8009, 0.685528,
-                       90.1786, 73.3035, 2.34728, 8.31566, 67.5218, -0.750053,
-                       -0.96459, 0.312321, 3.8674, 1.26649);
+    // (These values from run 20250601)
+    FlockParameters fp(55.7424, 20, 20, 20, 88.3095, 59.9705, 28.3211, 28.0211, 91.9161, 69.7648, 2.95192, 77.1844, 23.2996, -0.353221, -0.999566, 0.364522, 2.76299, 1.33611);
     EF::enable_multithreading = false;
     while (true) { GP::run_flock_simulation(fp, 1); }
 }

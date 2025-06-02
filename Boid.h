@@ -516,7 +516,7 @@ public:
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250320 back to: why aren't boids flocking
+    // TODO 20250601 draw lines to neighbors in gray of separation score.
     
 //    // Called from Flock to draw annotation for selected Boid and its neighbors.
 //    void drawAnnotationForBoidAndNeighbors()
@@ -525,18 +525,39 @@ public:
 //        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
 //    }
     
+//        // Called from Flock to draw annotation for selected Boid and its neighbors.
+//        void drawAnnotationForBoidAndNeighbors()
+//        {
+//            drawAnnotation();
+//    //        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
+//
+//            for (Boid* b : cached_nearest_neighbors())
+//            {
+//                Color c(angle_weight(b, 0));
+//                draw().addThickLineToAnimatedFrame(position(), b->position(), c, 0.01);
+//            }
+//        }
+
     // Called from Flock to draw annotation for selected Boid and its neighbors.
     void drawAnnotationForBoidAndNeighbors()
     {
         drawAnnotation();
-//        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
+
+        // for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
         
         for (Boid* b : cached_nearest_neighbors())
         {
-            Color c(angle_weight(b, 0));
+//            Color c(angle_weight(b, 0));
+//            draw().addThickLineToAnimatedFrame(position(), b->position(), c, 0.01);
+
+
+//            Color c(xxx_temp_separation_score);
+            Color c(xxx_temp_separation_score > 0.5 ? 1 : 0);
             draw().addThickLineToAnimatedFrame(position(), b->position(), c, 0.01);
         }
     }
+    
+    double xxx_temp_separation_score = 0;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -316,10 +316,9 @@ public:
     // TODO 20250602 now seems to take too long to recover from slow frames.
     
     AnimationClock()
-      : frame_start_time_(TimeClock::now()), frame_duration_history_(20) {}
- 
-//    AnimationClock()
+//      : frame_start_time_(TimeClock::now()), frame_duration_history_(20) {}
 //      : frame_start_time_(TimeClock::now()), frame_duration_history_(5) {}
+    : frame_start_time_(TimeClock::now()), frame_duration_history_(1) {}
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -360,21 +359,31 @@ public:
             double sleep_time = min_frame_time - non_sleep_time;
             // Adjust based on N previous frame durations
             
-            double fd_average = frameDurationAverage();
-//            double fd_average = frameDurationTarget();
+//            double fd_average = frameDurationAverage();
+            double fd_average = frameDurationTarget();
 
             double adjust = fd_average - min_frame_time;
+            
+//            // Provide some minimal sleep time for multithreading.
+//            double min_sleep_time = min_frame_time * 0.01;
             // Provide some minimal sleep time for multithreading.
-            double min_sleep_time = min_frame_time * 0.01;
+//            double min_sleep_time = min_frame_time * 0.1;
+            double min_sleep_time = 0.001;
+
+            
             // Adjust sleep time by average of recent frame durations
             double clipped_time = clip(sleep_time - adjust,
                                        min_sleep_time,
                                        min_frame_time);
-            // Sleep for that clipped interval.
-            thread_sleep_in_seconds(clipped_time);
+            
+//            clipped_time = 0.001;
+            clipped_time = 0.01;
+
+//            // Sleep for that clipped interval.
+//            thread_sleep_in_seconds(clipped_time);
 
             // TODO for debugging/testing, to be removed eventually.
-            bool verbose = true;
+            bool verbose = false;
             if (verbose and (frame_counter_ % 10) == 0)
             {
                 auto f = [&](double v) {std::cout<<std::format(" = {:.6}\n",v);};
@@ -411,8 +420,11 @@ public:
 //        // If frame time is 20% above target duration, reset smoothing history.
 //        if (frame_duration_ > (1.2 * frameDurationTarget()))
 
-        // If frame time is 50% above target duration, reset smoothing history.
-        if (frame_duration_ > (1.5 * frameDurationTarget()))
+//        // If frame time is 50% above target duration, reset smoothing history.
+//        if (frame_duration_ > (1.5 * frameDurationTarget()))
+
+        // "How about never? Does never work for you?"
+        if (false)
 
         {
             std::cout << "frame_duration_history_.average() = ";

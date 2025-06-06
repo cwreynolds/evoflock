@@ -476,28 +476,54 @@ public:
 //        }
 //    }
 
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250606 yesterday's change introduced a bug: time not incrementing.
     
+//        // Measure how much wall clock time has elapsed for this simulation step.
+//    //    void measureFrameDuration(bool sim_paused)
+//        void measureFrameDuration(bool sim_is_running)
+//        {
+//            lazyInit();
+//            TimePoint frame_end_time = TimeClock::now();
+//            frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
+//    //        if (not sim_paused)
+//    //        if (not sim_is_running)
+//            if (sim_is_running)
+//            {
+//                frame_counter_ += 1;
+//                frame_duration_history_.insert(frame_duration_);
+//                incrementElapsedTime(frame_duration_);
+//            }
+//            if (frame_duration_ > (1.1 * frameDurationTarget()))
+//            {
+//                std::cout << "frame_duration_history_.average() = ";
+//                std::cout << frame_duration_history_.average() << std::endl;
+//                resetHistory();
+//            }
+//        }
+
     // Measure how much wall clock time has elapsed for this simulation step.
-//    void measureFrameDuration(bool sim_paused)
     void measureFrameDuration(bool sim_is_running)
     {
         lazyInit();
         TimePoint frame_end_time = TimeClock::now();
         frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
-//        if (not sim_paused)
-        if (not sim_is_running)
+        if (sim_is_running)
         {
             frame_counter_ += 1;
             frame_duration_history_.insert(frame_duration_);
             incrementElapsedTime(frame_duration_);
         }
-        if (frame_duration_ > (1.1 * frameDurationTarget()))
+        auto fdt = frameDurationTarget();
+        if (not between(frame_duration_, 0.9 * fdt, 1.1 * fdt))
         {
             std::cout << "frame_duration_history_.average() = ";
             std::cout << frame_duration_history_.average() << std::endl;
             resetHistory();
         }
     }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

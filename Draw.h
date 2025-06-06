@@ -541,11 +541,9 @@ public:
     {
         auto mscb = [&](base_vis_t* vis, double x, double y)
         {
-            xxx_temp_mscb_count++;
-//            debugPrint(xxx_temp_mscb_count);
-//            debugPrint(y);
-            std::cout << "xxx_temp_mscb_count=" << xxx_temp_mscb_count;
-            std::cout << ", y=" << y << std::endl;
+//            xxx_temp_mscb_count++;
+//            std::cout << "xxx_temp_mscb_count=" << xxx_temp_mscb_count;
+//            std::cout << ", y=" << y << std::endl;
 
             // Change follow distance.
             double adjust_speed = 0.8;
@@ -567,16 +565,14 @@ public:
         {
             mmcb = [&](base_vis_t* vis, double x, double y)
             {
-                xxx_temp_mmcb_count++;
-//                debugPrint(xxx_temp_mmcb_count);
-                std::cout << "xxx_temp_mmcb_count=" << xxx_temp_mmcb_count;
+//                xxx_temp_mmcb_count++;
+//                std::cout << "xxx_temp_mmcb_count=" << xxx_temp_mmcb_count;
 
                 Vec3 new_pos_pixels(x, y, 0);
                 Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
                 double mouse_move_pixels = offset_pixels.length();
                 
-//                debugPrint(left_mouse_button_down_);
-                std::cout << ", left_mouse_button_down_=" << left_mouse_button_down_;
+//                std::cout << ", left_mouse_button_down_=" << left_mouse_button_down_;
 
                 if (left_mouse_button_down_ and (mouse_move_pixels < 50))
                 {
@@ -600,7 +596,7 @@ public:
                     wingman_cam_local_offset_ = local_cam;
                 }
                 
-                std::cout << std::endl;
+//                std::cout << std::endl;
                 
                 mouse_pos_pixels_ = new_pos_pixels;
                 return false;

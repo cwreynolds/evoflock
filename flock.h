@@ -164,7 +164,15 @@ public:
             draw().aimAgent() = *selectedBoid();
             draw().endOneAnimatedFrame();
             clock().sleepUntilEndOfFrame(afap ? 0 : step_duration);
-            if (not draw().simPause()) { clock().measureFrameDuration(); }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250605 no "slow frames after mousing" when paused
+            
+//            if (not draw().simPause()) { clock().measureFrameDuration(); }
+//            clock().measureFrameDuration(draw().simPause());
+//            clock().measureFrameDuration(not run_sim_this_frame);
+            clock().measureFrameDuration(run_sim_this_frame);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         draw().endAnimatedScene();
         printRunStats();
@@ -239,8 +247,26 @@ public:
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();
-        recordSeparationScorePerStep();
-        recordSpeedScorePerStep();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250605 no "slow frames after mousing" when paused
+        
+//        recordSeparationScorePerStep();
+//        recordSpeedScorePerStep();
+
+        // TODO 20250605 added this conditional because I was getting an assert
+        // failure in recordSeparationScorePerStep while debugging -- make sure
+        // it makes sense here. That is, why would fly_boids() be called if NOT
+        // runSimulationThisFrame()?
+        
+        if (draw().runSimulationThisFrame())
+        {
+            recordSeparationScorePerStep();
+            recordSpeedScorePerStep();
+        }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     }
 
     // Print a one line summary of metrics from this flock simulation.

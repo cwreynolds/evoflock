@@ -377,10 +377,10 @@ public:
                                        min_frame_time);
             
 //            clipped_time = 0.001;
-            clipped_time = 0.01;
+//            clipped_time = 0.01;
 
-//            // Sleep for that clipped interval.
-//            thread_sleep_in_seconds(clipped_time);
+            // Sleep for that clipped interval.
+            thread_sleep_in_seconds(clipped_time);
 
             // TODO for debugging/testing, to be removed eventually.
             bool verbose = false;
@@ -401,37 +401,106 @@ public:
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20250602 now seems to take too long to recover from slow frames.
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250605 no "slow frames after mousing" when paused
 
+//        // Measure how much wall clock time has elapsed for this simulation step.
+//        void measureFrameDuration()
+//        {
+//            TimePoint frame_end_time = TimeClock::now();
+//            lazyInit();
+//            frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
+//            frame_counter_ += 1;
+//            frame_duration_history_.insert(frame_duration_);
+//            incrementElapsedTime(frame_duration_);
+//
+//    //        // If frame time is 10% above target duration, reset smoothing history.
+//    //        if (frame_duration_ > (1.1 * frameDurationTarget()))
+//
+//    //        // If frame time is 20% above target duration, reset smoothing history.
+//    //        if (frame_duration_ > (1.2 * frameDurationTarget()))
+//
+//    //        // If frame time is 50% above target duration, reset smoothing history.
+//    //        if (frame_duration_ > (1.5 * frameDurationTarget()))
+//
+//            // "How about never? Does never work for you?"
+//            if (false)
+//
+//            {
+//                std::cout << "frame_duration_history_.average() = ";
+//                std::cout << frame_duration_history_.average() << std::endl;
+//                resetHistory();
+//            }
+//        }
+    
+//        // Measure how much wall clock time has elapsed for this simulation step.
+//    //    void measureFrameDuration()
+//        void measureFrameDuration(bool sim_paused)
+//        {
+//            TimePoint frame_end_time = TimeClock::now();
+//            lazyInit();
+//            frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
+//            frame_counter_ += 1;
+//            frame_duration_history_.insert(frame_duration_);
+//            incrementElapsedTime(frame_duration_);
+//
+//            if (frame_duration_ > (1.1 * frameDurationTarget()))
+//            {
+//                std::cout << "frame_duration_history_.average() = ";
+//                std::cout << frame_duration_history_.average() << std::endl;
+//                resetHistory();
+//            }
+//        }
+
+//    // Measure how much wall clock time has elapsed for this simulation step.
+//    void measureFrameDuration(bool sim_paused)
+//    {
+//        if (not sim_paused)
+//        {
+//            TimePoint frame_end_time = TimeClock::now();
+//            lazyInit();
+//            frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
+//            frame_counter_ += 1;
+//            frame_duration_history_.insert(frame_duration_);
+//            incrementElapsedTime(frame_duration_);
+//            
+//            if (frame_duration_ > (1.1 * frameDurationTarget()))
+//            {
+//                std::cout << "frame_duration_history_.average() = ";
+//                std::cout << frame_duration_history_.average() << std::endl;
+//                resetHistory();
+//            }
+//        }
+//    }
+
+    
     // Measure how much wall clock time has elapsed for this simulation step.
-    void measureFrameDuration()
+//    void measureFrameDuration(bool sim_paused)
+    void measureFrameDuration(bool sim_is_running)
     {
-        TimePoint frame_end_time = TimeClock::now();
         lazyInit();
+        TimePoint frame_end_time = TimeClock::now();
         frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
-        frame_counter_ += 1;
-        frame_duration_history_.insert(frame_duration_);
-        incrementElapsedTime(frame_duration_);
-        
-//        // If frame time is 10% above target duration, reset smoothing history.
-//        if (frame_duration_ > (1.1 * frameDurationTarget()))
-
-//        // If frame time is 20% above target duration, reset smoothing history.
-//        if (frame_duration_ > (1.2 * frameDurationTarget()))
-
-//        // If frame time is 50% above target duration, reset smoothing history.
-//        if (frame_duration_ > (1.5 * frameDurationTarget()))
-
-        // "How about never? Does never work for you?"
-        if (false)
-
+//        if (not sim_paused)
+        if (not sim_is_running)
+        {
+            frame_counter_ += 1;
+            frame_duration_history_.insert(frame_duration_);
+            incrementElapsedTime(frame_duration_);
+        }
+        if (frame_duration_ > (1.1 * frameDurationTarget()))
         {
             std::cout << "frame_duration_history_.average() = ";
             std::cout << frame_duration_history_.average() << std::endl;
             resetHistory();
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
 //    // Set all entries in frame_duration_history_ to the target frame duration.
 //    void resetHistory()
@@ -446,8 +515,8 @@ public:
         frame_duration_history_.fill(frameDurationTarget());
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     // Convert FPS to frame duration in seconds. (Error if FPS was never set.)
     double frameDurationTarget() const
     {

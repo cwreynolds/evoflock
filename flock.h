@@ -144,6 +144,15 @@ public:
             double fd = clock().frameDuration();
             double fdt = clock().frameDurationTarget();
             double step_duration = afap ? fd : fdt;
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250610 "git bisect" inconclusive, more testing
+            
+            assert(not afap);
+            assert(step_duration == clock().frameDurationTarget());
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
             // Unclear why must be called before beginOneAnimatedFrame() but I
             // was unable to find a work around. (Otherwise no boids drawn.)
             bool run_sim_this_frame = draw().runSimulationThisFrame();

@@ -497,7 +497,13 @@ public:
     }
     void blendInNewCameraLookUp(const Vec3& new_up, double rate = EF::roll_rate)
     {
-        cameraLookUp() = up_memory_.blend(new_up, rate).normalize();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250610 "git bisect" inconclusive, more testing
+
+//        cameraLookUp() = up_memory_.blend(new_up, rate).normalize();
+        cameraLookUp() = up_memory_.blend(new_up.normalize(), rate).normalize();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // Adjust "static camera" model according to mouse input.

@@ -315,10 +315,18 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250602 now seems to take too long to recover from slow frames.
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250610 "git bisect" inconclusive, more testing
+
+//        AnimationClock()
+//    //      : frame_start_time_(TimeClock::now()), frame_duration_history_(20) {}
+//    //      : frame_start_time_(TimeClock::now()), frame_duration_history_(5) {}
+//        : frame_start_time_(TimeClock::now()), frame_duration_history_(1) {}
+
     AnimationClock()
-//      : frame_start_time_(TimeClock::now()), frame_duration_history_(20) {}
-//      : frame_start_time_(TimeClock::now()), frame_duration_history_(5) {}
-    : frame_start_time_(TimeClock::now()), frame_duration_history_(1) {}
+      : frame_start_time_(TimeClock::now()), frame_duration_history_(20) {}
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -357,20 +365,30 @@ public:
                                                          TimeClock::now());
             // Amount of time to sleep until the end of the current frame.
             double sleep_time = min_frame_time - non_sleep_time;
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250610 "git bisect" inconclusive, more testing
+                        
             // Adjust based on N previous frame durations
             
 //            double fd_average = frameDurationAverage();
-            double fd_average = frameDurationTarget();
+//            double fd_average = frameDurationTarget();
+            double fd_average = frameDurationAverage();
 
             double adjust = fd_average - min_frame_time;
             
-//            // Provide some minimal sleep time for multithreading.
-//            double min_sleep_time = min_frame_time * 0.01;
+//    //            // Provide some minimal sleep time for multithreading.
+//    //            double min_sleep_time = min_frame_time * 0.01;
+//                // Provide some minimal sleep time for multithreading.
+//    //            double min_sleep_time = min_frame_time * 0.1;
+//                double min_sleep_time = 0.001;
+
             // Provide some minimal sleep time for multithreading.
-//            double min_sleep_time = min_frame_time * 0.1;
+//            double min_sleep_time = 0.01;
             double min_sleep_time = 0.001;
 
-            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
             // Adjust sleep time by average of recent frame durations
             double clipped_time = clip(sleep_time - adjust,
                                        min_sleep_time,
@@ -382,9 +400,17 @@ public:
             // Sleep for that clipped interval.
             thread_sleep_in_seconds(clipped_time);
 
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250610 "git bisect" inconclusive, more testing
+
             // TODO for debugging/testing, to be removed eventually.
             bool verbose = false;
-            if (verbose and (frame_counter_ % 10) == 0)
+//            bool verbose = true;
+//            if (verbose and (frame_counter_ % 10) == 0)
+            if (verbose) // TODO every frame
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
             {
                 auto f = [&](double v) {std::cout<<std::format(" = {:.6}\n",v);};
                 std::cout<<std::endl;
@@ -398,6 +424,19 @@ public:
                 std::cout << "adjust          "; f(adjust);
                 std::cout << "clippedSleepTime"; f(clipped_time);
             }
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250610 "git bisect" inconclusive, more testing
+            
+//            assert(sleep_time > 0);
+            
+            if (sleep_time < 0)
+            {
+                std::cout << "sleep_time = " << sleep_time << " !!" << std::endl;
+            }
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
         }
     }
 
@@ -515,7 +554,16 @@ public:
             incrementElapsedTime(frame_duration_);
         }
         auto fdt = frameDurationTarget();
-        if (not between(frame_duration_, 0.9 * fdt, 1.1 * fdt))
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20250610 "git bisect" inconclusive, more testing
+        
+//        if (not between(frame_duration_, 0.9 * fdt, 1.1 * fdt))
+//        if (not between(frame_duration_, 0.833 * fdt, 1.2 * fdt))
+        double tpc = 1.2;
+        if (not between(frame_duration_, fdt * (1 / tpc), fdt * tpc))
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         {
             std::cout << "frame_duration_history_.average() = ";
             std::cout << frame_duration_history_.average() << std::endl;

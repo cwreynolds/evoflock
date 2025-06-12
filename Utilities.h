@@ -375,7 +375,16 @@ public:
 //            double fd_average = frameDurationTarget();
             double fd_average = frameDurationAverage();
 
-            double adjust = fd_average - min_frame_time;
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250611 where is the mouse-move slowness from?
+
+            // TODO 20250611 just assume there is no adjustment from history
+
+//            double adjust = fd_average - min_frame_time;
+            double adjust = 0;
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
             
 //    //            // Provide some minimal sleep time for multithreading.
 //    //            double min_sleep_time = min_frame_time * 0.01;
@@ -404,8 +413,8 @@ public:
             // TODO 20250610 "git bisect" inconclusive, more testing
 
             // TODO for debugging/testing, to be removed eventually.
-            bool verbose = false;
-//            bool verbose = true;
+//            bool verbose = false;
+            bool verbose = true;
 //            if (verbose and (frame_counter_ % 10) == 0)
             if (verbose) // TODO every frame
 
@@ -432,7 +441,8 @@ public:
             
             if (sleep_time < 0)
             {
-                std::cout << "sleep_time = " << sleep_time << " !!" << std::endl;
+//                std::cout << "sleep_time = " << sleep_time << " !!" << std::endl;
+                std::cout << "!! negative sleep_time: " << sleep_time << std::endl;
             }
 
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -565,9 +575,14 @@ public:
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         {
-            std::cout << "frame_duration_history_.average() = ";
-            std::cout << frame_duration_history_.average() << std::endl;
-            resetHistory();
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250611 where is the mouse-move slowness from?
+
+//            std::cout << "frame_duration_history_.average() = ";
+//            std::cout << frame_duration_history_.average() << std::endl;
+//            resetHistory();
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }
     }
 

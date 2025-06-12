@@ -391,8 +391,53 @@ public:
     void setEnable(bool e) { enable_ = e; }
     void toggleEnable() { enable_ = not enable_; }
 
-    bool pollEvents() { return visualizer().PollEvents(); }
-  
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250611 where is the mouse-move slowness from?
+    
+    /// Function to process the event queue and return if the window is closed.
+    ///
+    /// Use this function if you want to manage the while loop yourself. This
+    /// function will NOT block the thread. Thus it is suitable for computation
+    /// heavy task behind the scene.
+    /// bool PollEvents();
+
+
+//    bool pollEvents() { return visualizer().PollEvents(); }
+    
+//    bool pollEvents()
+//    {
+//        util::Timer t;
+//        bool pe = visualizer().PollEvents();
+//        if (t.elapsedSeconds() > 0.01) { debugPrint(t.elapsedSeconds()); }
+//        return pe;
+//    }
+
+    bool pollEvents()
+    {
+        util::Timer t;
+        
+        bool pe = visualizer().PollEvents();
+        
+//        bool pe = true;
+//        auto f = [&](){ pe = visualizer().PollEvents(); };
+//        f();
+
+//        // This one gets: *** Terminating app due to uncaught exception
+//        // 'NSInternalInconsistencyException', reason: 'nextEventMatchingMask
+//        // should only be called from the Main Thread!'
+//        bool pe = true;
+//        auto f = [&](){ pe = visualizer().PollEvents(); };
+//        std::thread t1(f);
+//        t1.join();
+        
+        
+//        if (t.elapsedSeconds() > 0.01) { debugPrint(t.elapsedSeconds()); }
+        
+        return pe;
+    }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
     void updateCamera()
     {
@@ -563,6 +608,9 @@ public:
     
     int xxx_temp_mscb_count = 0;
     int xxx_temp_mmcb_count = 0;
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250611 where is the mouse-move slowness from?
 
     // Set mouse move handler for GUI.
     void setMouseMoveCallback()
@@ -577,7 +625,7 @@ public:
                 Vec3 new_pos_pixels(x, y, 0);
                 Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
                 double mouse_move_pixels = offset_pixels.length();
-                
+
 //                std::cout << ", left_mouse_button_down_=" << left_mouse_button_down_;
 
                 if (left_mouse_button_down_ and (mouse_move_pixels < 50))
@@ -601,15 +649,31 @@ public:
                     Vec3 local_cam = aimAgent().ls().localize(cameraLookFrom());
                     wingman_cam_local_offset_ = local_cam;
                 }
-                
+
 //                std::cout << std::endl;
-                
+
                 mouse_pos_pixels_ = new_pos_pixels;
                 return false;
             };
         }
         visualizer().RegisterMouseMoveCallback(mmcb);
     }
+
+//    // Set mouse move handler for GUI.
+//    void setMouseMoveCallback()
+//    {
+//        std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
+//        {
+//            mmcb = [&](base_vis_t* vis, double x, double y)
+//            {
+//                return false;
+//            };
+//        }
+//        visualizer().RegisterMouseMoveCallback(mmcb);
+//    }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -680,7 +744,24 @@ public:
         bool ok_to_run = true;
         if (enable())
         {
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250611 where is the mouse-move slowness from?
+
             setExitFromRun(! pollEvents());
+
+//                {
+//    //                util::Timer timer("pollEvents()");
+//    //                setExitFromRun(! pollEvents());
+//
+//    //                util::Timer timer("pollEvents()");
+//    //                setExitFromRun(! pollEvents());
+//    //                if (timer.elapsedSeconds() > 0.01) debugPrint(timer.elapsedSeconds());
+//
+//                    util::Timer timer;
+//                    setExitFromRun(! pollEvents());
+//                    if (timer.elapsedSeconds() > 0.01) {debugPrint(timer.elapsedSeconds());}
+//                }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             ok_to_run = getSingleStepMode() or not simPause();
             setSingleStepMode(false);
         }

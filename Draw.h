@@ -155,10 +155,31 @@ public:
 
     void endAnimatedScene() { if (enable()) { } }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250612 perhaps issue is multiple calls to pollEvents()?
+    
+    int poll_events_count_ = 0;
+    
+//    void beginOneAnimatedFrame()
+//    {
+//        if (enable()) { clearAnimatedGeometryFromScene(); }
+//    }
+
     void beginOneAnimatedFrame()
     {
+        poll_events_count_ = 0;
+//        result_from_last_poll_events_call_ = pollEvents();
         if (enable()) { clearAnimatedGeometryFromScene(); }
     }
+
+//    void endOneAnimatedFrame()
+//    {
+//        if (enable())
+//        {
+//            updateCamera();
+//            redrawScene();
+//        }
+//    }
 
     void endOneAnimatedFrame()
     {
@@ -166,8 +187,13 @@ public:
         {
             updateCamera();
             redrawScene();
+            
+            result_from_last_poll_events_call_ = pollEvents();
+            if (poll_events_count_ > 1) { debugPrint(poll_events_count_); }
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Clear all animated geometry to begin building a new scene.
     void clearAnimatedGeometryFromScene()
@@ -412,30 +438,46 @@ public:
 //        return pe;
 //    }
 
+//        bool pollEvents()
+//        {
+//            util::Timer t;
+//
+//            bool pe = visualizer().PollEvents();
+//
+//    //        bool pe = true;
+//    //        auto f = [&](){ pe = visualizer().PollEvents(); };
+//    //        f();
+//
+//    //        // This one gets: *** Terminating app due to uncaught exception
+//    //        // 'NSInternalInconsistencyException', reason: 'nextEventMatchingMask
+//    //        // should only be called from the Main Thread!'
+//    //        bool pe = true;
+//    //        auto f = [&](){ pe = visualizer().PollEvents(); };
+//    //        std::thread t1(f);
+//    //        t1.join();
+//
+//
+//    //        if (t.elapsedSeconds() > 0.01) { debugPrint(t.elapsedSeconds()); }
+//
+//            return pe;
+//        }
+
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250612 perhaps issue is multiple calls to pollEvents()?
+    
     bool pollEvents()
     {
         util::Timer t;
-        
         bool pe = visualizer().PollEvents();
-        
-//        bool pe = true;
-//        auto f = [&](){ pe = visualizer().PollEvents(); };
-//        f();
-
-//        // This one gets: *** Terminating app due to uncaught exception
-//        // 'NSInternalInconsistencyException', reason: 'nextEventMatchingMask
-//        // should only be called from the Main Thread!'
-//        bool pe = true;
-//        auto f = [&](){ pe = visualizer().PollEvents(); };
-//        std::thread t1(f);
-//        t1.join();
-        
-        
-//        if (t.elapsedSeconds() > 0.01) { debugPrint(t.elapsedSeconds()); }
-        
+        if (t.elapsedSeconds() > 0.01) { debugPrint(t.elapsedSeconds()); }
+        poll_events_count_++;
         return pe;
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
@@ -737,6 +779,11 @@ public:
     {
         return camera_desired_offset_dist_;
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250612 perhaps issue is multiple calls to pollEvents()?
+
+    bool result_from_last_poll_events_call_ = true;
   
     // Based on pause/play and single step. Called once per frame from main loop.
     bool runSimulationThisFrame()
@@ -744,29 +791,16 @@ public:
         bool ok_to_run = true;
         if (enable())
         {
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250611 where is the mouse-move slowness from?
-
-            setExitFromRun(! pollEvents());
-
-//                {
-//    //                util::Timer timer("pollEvents()");
-//    //                setExitFromRun(! pollEvents());
-//
-//    //                util::Timer timer("pollEvents()");
-//    //                setExitFromRun(! pollEvents());
-//    //                if (timer.elapsedSeconds() > 0.01) debugPrint(timer.elapsedSeconds());
-//
-//                    util::Timer timer;
-//                    setExitFromRun(! pollEvents());
-//                    if (timer.elapsedSeconds() > 0.01) {debugPrint(timer.elapsedSeconds());}
-//                }
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            setExitFromRun(! pollEvents());
+            setExitFromRun(! result_from_last_poll_events_call_);
             ok_to_run = getSingleStepMode() or not simPause();
             setSingleStepMode(false);
         }
         return ok_to_run;
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     // Single step mode means simulation should take one step, then pause again.
     bool& getSingleStepMode() { return single_step_mode_; }

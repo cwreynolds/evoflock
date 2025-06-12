@@ -412,11 +412,19 @@ public:
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             // TODO 20250610 "git bisect" inconclusive, more testing
 
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250612 perhaps issue is multiple calls to pollEvents()?
+
             // TODO for debugging/testing, to be removed eventually.
-//            bool verbose = false;
-            bool verbose = true;
-//            if (verbose and (frame_counter_ % 10) == 0)
-            if (verbose) // TODO every frame
+//    //            bool verbose = false;
+//                bool verbose = true;
+//    //            if (verbose and (frame_counter_ % 10) == 0)
+//                if (verbose) // TODO every frame
+
+            bool verbose = false;
+            if (verbose and (frame_counter_ % 10) == 0)
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

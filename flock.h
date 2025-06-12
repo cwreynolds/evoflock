@@ -148,8 +148,8 @@ public:
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250610 "git bisect" inconclusive, more testing
             
-            assert(not afap);
-            assert(step_duration == clock().frameDurationTarget());
+//            assert(not afap);
+//            assert(step_duration == clock().frameDurationTarget());
             
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             

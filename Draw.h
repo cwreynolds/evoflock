@@ -470,7 +470,7 @@ public:
     {
         util::Timer t;
         bool pe = visualizer().PollEvents();
-        if (t.elapsedSeconds() > 0.01) { debugPrint(t.elapsedSeconds()); }
+//        if (t.elapsedSeconds() > 0.01) { debugPrint(t.elapsedSeconds()); }
         poll_events_count_++;
         return pe;
     }

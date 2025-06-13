@@ -128,6 +128,11 @@ public:
     // Run boids simulation.
     void run()
     {
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20250613 why test runSimulationThisFrame() in fly_boids()?
+//        xxx_temp_rssps_count = 0;
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         // Log the FlockParameters object, but only for interactive drawing mode
         if (draw().enable()) { fp().print(); }
         set_fixed_fps(fp().getFPS());
@@ -145,19 +150,29 @@ public:
             double fdt = clock().frameDurationTarget();
             double step_duration = afap ? fd : fdt;
             
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250610 "git bisect" inconclusive, more testing
-            
-//            assert(not afap);
-//            assert(step_duration == clock().frameDurationTarget());
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
-            // Unclear why must be called before beginOneAnimatedFrame() but I
-            // was unable to find a work around. (Otherwise no boids drawn.)
-            bool run_sim_this_frame = draw().runSimulationThisFrame();
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20250613 why test runSimulationThisFrame() in fly_boids()?
+
+//            // Unclear why must be called before beginOneAnimatedFrame() but I
+//            // was unable to find a work around. (Otherwise no boids drawn.)
+//            bool run_sim_this_frame = draw().runSimulationThisFrame();
+//            draw().beginOneAnimatedFrame();
+//            if (run_sim_this_frame)
+
+//            draw().beginOneAnimatedFrame();
+//            bool run_sim_this_frame = draw().runSimulationThisFrame();
+//            if (run_sim_this_frame)
+
             draw().beginOneAnimatedFrame();
+            bool run_sim_this_frame = draw().runSimulationThisFrame();
             if (run_sim_this_frame)
+
+//            draw().beginOneAnimatedFrame();
+//            if (draw().runSimulationThisFrame())
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+            
             {
                 // TODO 20250509 this used to be "step_duration" which caused
                 // the fly-slow-when-draw-is-turned-off bug. Have not tested
@@ -179,7 +194,15 @@ public:
 //            if (not draw().simPause()) { clock().measureFrameDuration(); }
 //            clock().measureFrameDuration(draw().simPause());
 //            clock().measureFrameDuration(not run_sim_this_frame);
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20250613 why test runSimulationThisFrame() in fly_boids()?
+
             clock().measureFrameDuration(run_sim_this_frame);
+            
+//            clock().measureFrameDuration(draw().runSimulationThisFrame());
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
@@ -245,7 +268,43 @@ public:
         // Probably unneeded since initial speed is zero, nevertheless:
         boid->setPreviousPosition(boid->position());
     }
-        
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250613 why test runSimulationThisFrame() in fly_boids()?
+
+    
+//    // Fly each boid in flock for one simulation step. Consists of two sequential
+//    // steps to avoid artifacts from order of boids. First a "sense/plan" phase
+//    // which computes the desired steering based on current state. Then an "act"
+//    // phase which actually moves the boids. Finally statistics are collected.
+//    // (20240605 renamed  Flock::fly_flock() to Flock::fly_boids())
+//    void fly_boids(double time_step)
+//    {
+//        for_all_boids([&](Boid* b){ b->plan_next_steer();});
+//        for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
+//        enforceObsBoidConstraints();
+//        
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20250605 no "slow frames after mousing" when paused
+//        
+//        //        recordSeparationScorePerStep();
+//        //        recordSpeedScorePerStep();
+//        
+//        // TODO 20250605 added this conditional because I was getting an assert
+//        // failure in recordSeparationScorePerStep while debugging -- make sure
+//        // it makes sense here. That is, why would fly_boids() be called if NOT
+//        // runSimulationThisFrame()?
+//        
+//        if (draw().runSimulationThisFrame())
+//        {
+//            recordSeparationScorePerStep();
+//            recordSpeedScorePerStep();
+//        }
+//        
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        
+//    }
+
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
     // which computes the desired steering based on current state. Then an "act"
@@ -256,27 +315,15 @@ public:
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250605 no "slow frames after mousing" when paused
-        
-//        recordSeparationScorePerStep();
-//        recordSpeedScorePerStep();
+        recordSeparationScorePerStep();
+        recordSpeedScorePerStep();
 
-        // TODO 20250605 added this conditional because I was getting an assert
-        // failure in recordSeparationScorePerStep while debugging -- make sure
-        // it makes sense here. That is, why would fly_boids() be called if NOT
-        // runSimulationThisFrame()?
-        
-        if (draw().runSimulationThisFrame())
-        {
-            recordSeparationScorePerStep();
-            recordSpeedScorePerStep();
-        }
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+//        assert(draw().runSimulationThisFrame());
     }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    
+
 
     // Print a one line summary of metrics from this flock simulation.
     void printRunStats() const
@@ -395,6 +442,58 @@ public:
 //            }
 //        }
 
+    
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250613 why test runSimulationThisFrame() in fly_boids()?
+
+//    // Called each simulation step, records stats for the separation score.
+//    void recordSeparationScorePerStep()
+//    {
+//        // Piecewise linear function of distance to score
+//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
+//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
+//        for (auto b : boids())
+//        {
+//            double distance = b->distanceToNearestNeighbor();
+//            double score = parameterToWeightWithRamps(distance, d, s);
+//            
+//            b->xxx_temp_separation_score = score;
+//            separation_score_sum_ += score;
+//            
+//            if (not util::between(score, 0, 1)) { debugPrint(score); }
+//            assert(util::between(score, 0, 1));
+//            assert(draw().runSimulationThisFrame());
+//        }
+//    }
+
+//        int xxx_temp_rssps_count = 0;
+//
+//        // Called each simulation step, records stats for the separation score.
+//        void recordSeparationScorePerStep()
+//        {
+//            // Piecewise linear function of distance to score
+//            std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
+//            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
+//            for (auto b : boids())
+//            {
+//                double distance = b->distanceToNearestNeighbor();
+//                double score = parameterToWeightWithRamps(distance, d, s);
+//
+//                b->xxx_temp_separation_score = score;
+//                separation_score_sum_ += score;
+//
+//    //            if (not util::between(score, 0, 1)) { debugPrint(score); }
+//    //            assert(util::between(score, 0, 1));
+//    //            assert(draw().runSimulationThisFrame());
+//            }
+//
+//            assert(xxx_temp_rssps_count < max_simulation_steps());
+//            xxx_temp_rssps_count++;
+//        }
+
+//    int xxx_temp_rssps_count = 0;
+    
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
@@ -405,15 +504,14 @@ public:
         {
             double distance = b->distanceToNearestNeighbor();
             double score = parameterToWeightWithRamps(distance, d, s);
-            
-            b->xxx_temp_separation_score = score;
+            b->xxx_temp_separation_score = score;  // temp for annotation
             separation_score_sum_ += score;
-            
-            if (not util::between(score, 0, 1)) { debugPrint(score); }
-            assert(util::between(score, 0, 1));
-            assert(draw().runSimulationThisFrame());
         }
     }
+
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

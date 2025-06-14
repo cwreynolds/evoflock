@@ -198,10 +198,14 @@ public:
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // TODO 20250613 why test runSimulationThisFrame() in fly_boids()?
 
-            clock().measureFrameDuration(run_sim_this_frame);
+//            clock().measureFrameDuration(run_sim_this_frame);
             
 //            clock().measureFrameDuration(draw().runSimulationThisFrame());
-            
+
+//            clock().measureFrameDuration(afap, run_sim_this_frame);
+
+            clock().measureFrameDuration(run_sim_this_frame);
+
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

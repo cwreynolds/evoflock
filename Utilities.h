@@ -312,23 +312,8 @@ private:
 class AnimationClock
 {
 public:
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250602 now seems to take too long to recover from slow frames.
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250610 "git bisect" inconclusive, more testing
-
-//        AnimationClock()
-//    //      : frame_start_time_(TimeClock::now()), frame_duration_history_(20) {}
-//    //      : frame_start_time_(TimeClock::now()), frame_duration_history_(5) {}
-//        : frame_start_time_(TimeClock::now()), frame_duration_history_(1) {}
-
     AnimationClock()
       : frame_start_time_(TimeClock::now()), frame_duration_history_(20) {}
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Make sure FPS has been set and frame_duration_history_ is initialized.
     void lazyInit()
@@ -365,69 +350,21 @@ public:
                                                          TimeClock::now());
             // Amount of time to sleep until the end of the current frame.
             double sleep_time = min_frame_time - non_sleep_time;
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250610 "git bisect" inconclusive, more testing
-                        
             // Adjust based on N previous frame durations
-            
-//            double fd_average = frameDurationAverage();
-//            double fd_average = frameDurationTarget();
             double fd_average = frameDurationAverage();
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250611 where is the mouse-move slowness from?
-
-            // TODO 20250611 just assume there is no adjustment from history
-
-//            double adjust = fd_average - min_frame_time;
-            double adjust = 0;
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-            
-//    //            // Provide some minimal sleep time for multithreading.
-//    //            double min_sleep_time = min_frame_time * 0.01;
-//                // Provide some minimal sleep time for multithreading.
-//    //            double min_sleep_time = min_frame_time * 0.1;
-//                double min_sleep_time = 0.001;
-
+            double adjust = fd_average - min_frame_time;
             // Provide some minimal sleep time for multithreading.
-//            double min_sleep_time = 0.01;
             double min_sleep_time = 0.001;
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
             // Adjust sleep time by average of recent frame durations
             double clipped_time = clip(sleep_time - adjust,
                                        min_sleep_time,
                                        min_frame_time);
-            
-//            clipped_time = 0.001;
-//            clipped_time = 0.01;
-
             // Sleep for that clipped interval.
             thread_sleep_in_seconds(clipped_time);
 
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250610 "git bisect" inconclusive, more testing
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250612 perhaps issue is multiple calls to pollEvents()?
-
-            // TODO for debugging/testing, to be removed eventually.
-//    //            bool verbose = false;
-//                bool verbose = true;
-//    //            if (verbose and (frame_counter_ % 10) == 0)
-//                if (verbose) // TODO every frame
-
+            // Log for debugging, can be removed eventually.
             bool verbose = false;
             if (verbose and (frame_counter_ % 10) == 0)
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
             {
                 auto f = [&](double v) {std::cout<<std::format(" = {:.6}\n",v);};
                 std::cout<<std::endl;
@@ -441,123 +378,10 @@ public:
                 std::cout << "adjust          "; f(adjust);
                 std::cout << "clippedSleepTime"; f(clipped_time);
             }
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250610 "git bisect" inconclusive, more testing
-            
-//            assert(sleep_time > 0);
-            
-//                if (sleep_time < 0)
-//                {
-//    //                std::cout << "sleep_time = " << sleep_time << " !!" << std::endl;
-//                    std::cout << "!! negative sleep_time: " << sleep_time << std::endl;
-//                }
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
+            // Ensure FD history has not been invalidated by external delays.
+            resetHistoryIfInvalid();
         }
     }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250602 now seems to take too long to recover from slow frames.
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250605 no "slow frames after mousing" when paused
-
-//        // Measure how much wall clock time has elapsed for this simulation step.
-//        void measureFrameDuration()
-//        {
-//            TimePoint frame_end_time = TimeClock::now();
-//            lazyInit();
-//            frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
-//            frame_counter_ += 1;
-//            frame_duration_history_.insert(frame_duration_);
-//            incrementElapsedTime(frame_duration_);
-//
-//    //        // If frame time is 10% above target duration, reset smoothing history.
-//    //        if (frame_duration_ > (1.1 * frameDurationTarget()))
-//
-//    //        // If frame time is 20% above target duration, reset smoothing history.
-//    //        if (frame_duration_ > (1.2 * frameDurationTarget()))
-//
-//    //        // If frame time is 50% above target duration, reset smoothing history.
-//    //        if (frame_duration_ > (1.5 * frameDurationTarget()))
-//
-//            // "How about never? Does never work for you?"
-//            if (false)
-//
-//            {
-//                std::cout << "frame_duration_history_.average() = ";
-//                std::cout << frame_duration_history_.average() << std::endl;
-//                resetHistory();
-//            }
-//        }
-    
-//        // Measure how much wall clock time has elapsed for this simulation step.
-//    //    void measureFrameDuration()
-//        void measureFrameDuration(bool sim_paused)
-//        {
-//            TimePoint frame_end_time = TimeClock::now();
-//            lazyInit();
-//            frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
-//            frame_counter_ += 1;
-//            frame_duration_history_.insert(frame_duration_);
-//            incrementElapsedTime(frame_duration_);
-//
-//            if (frame_duration_ > (1.1 * frameDurationTarget()))
-//            {
-//                std::cout << "frame_duration_history_.average() = ";
-//                std::cout << frame_duration_history_.average() << std::endl;
-//                resetHistory();
-//            }
-//        }
-
-//    // Measure how much wall clock time has elapsed for this simulation step.
-//    void measureFrameDuration(bool sim_paused)
-//    {
-//        if (not sim_paused)
-//        {
-//            TimePoint frame_end_time = TimeClock::now();
-//            lazyInit();
-//            frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
-//            frame_counter_ += 1;
-//            frame_duration_history_.insert(frame_duration_);
-//            incrementElapsedTime(frame_duration_);
-//            
-//            if (frame_duration_ > (1.1 * frameDurationTarget()))
-//            {
-//                std::cout << "frame_duration_history_.average() = ";
-//                std::cout << frame_duration_history_.average() << std::endl;
-//                resetHistory();
-//            }
-//        }
-//    }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250606 yesterday's change introduced a bug: time not incrementing.
-    
-//        // Measure how much wall clock time has elapsed for this simulation step.
-//    //    void measureFrameDuration(bool sim_paused)
-//        void measureFrameDuration(bool sim_is_running)
-//        {
-//            lazyInit();
-//            TimePoint frame_end_time = TimeClock::now();
-//            frame_duration_ = time_diff_in_seconds(frame_start_time_, frame_end_time);
-//    //        if (not sim_paused)
-//    //        if (not sim_is_running)
-//            if (sim_is_running)
-//            {
-//                frame_counter_ += 1;
-//                frame_duration_history_.insert(frame_duration_);
-//                incrementElapsedTime(frame_duration_);
-//            }
-//            if (frame_duration_ > (1.1 * frameDurationTarget()))
-//            {
-//                std::cout << "frame_duration_history_.average() = ";
-//                std::cout << frame_duration_history_.average() << std::endl;
-//                resetHistory();
-//            }
-//        }
 
     // Measure how much wall clock time has elapsed for this simulation step.
     void measureFrameDuration(bool sim_is_running)
@@ -571,48 +395,28 @@ public:
             frame_duration_history_.insert(frame_duration_);
             incrementElapsedTime(frame_duration_);
         }
-        auto fdt = frameDurationTarget();
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20250610 "git bisect" inconclusive, more testing
-        
-//        if (not between(frame_duration_, 0.9 * fdt, 1.1 * fdt))
-//        if (not between(frame_duration_, 0.833 * fdt, 1.2 * fdt))
-        double tpc = 1.2;
-        if (not between(frame_duration_, fdt * (1 / tpc), fdt * tpc))
+    }
 
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // Resets frame duration history if the average has gotten out of bounds.
+    void resetHistoryIfInvalid()
+    {
+        double error_bound = 1.3;  // +/- 30%
+        double max_ok = frameDurationTarget() * error_bound;
+        double min_ok = frameDurationTarget() / error_bound;
+        double fd_average = frame_duration_history_.average();
+        if (not between(fd_average, min_ok, max_ok))
         {
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250611 where is the mouse-move slowness from?
-
-//            std::cout << "frame_duration_history_.average() = ";
-//            std::cout << frame_duration_history_.average() << std::endl;
-//            resetHistory();
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            std::cout << "resetHistory: fd_average = " << fd_average << std::endl;
+            resetHistory();
         }
     }
 
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-//    // Set all entries in frame_duration_history_ to the target frame duration.
-//    void resetHistory()
-//    {
-//        frame_duration_history_.fill(frameDurationTarget());
-//    }
-    
     // Set all entries in frame_duration_history_ to the target frame duration.
     void resetHistory()
     {
         frame_duration_ = frameDurationTarget();
         frame_duration_history_.fill(frameDurationTarget());
     }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     // Convert FPS to frame duration in seconds. (Error if FPS was never set.)
     double frameDurationTarget() const

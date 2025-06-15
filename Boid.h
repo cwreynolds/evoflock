@@ -514,9 +514,6 @@ public:
             draw().addThickLineToAnimatedFrame(position(), poi, c, 0.01);
         }
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250601 draw lines to neighbors in gray of separation score.
     
 //    // Called from Flock to draw annotation for selected Boid and its neighbors.
 //    void drawAnnotationForBoidAndNeighbors()
@@ -529,8 +526,6 @@ public:
 //        void drawAnnotationForBoidAndNeighbors()
 //        {
 //            drawAnnotation();
-//    //        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
-//
 //            for (Boid* b : cached_nearest_neighbors())
 //            {
 //                Color c(angle_weight(b, 0));
@@ -542,16 +537,8 @@ public:
     void drawAnnotationForBoidAndNeighbors()
     {
         drawAnnotation();
-
-        // for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
-        
         for (Boid* b : cached_nearest_neighbors())
         {
-//            Color c(angle_weight(b, 0));
-//            draw().addThickLineToAnimatedFrame(position(), b->position(), c, 0.01);
-
-
-//            Color c(xxx_temp_separation_score);
             Color c(xxx_temp_separation_score > 0.5 ? 1 : 0);
             draw().addThickLineToAnimatedFrame(position(), b->position(), c, 0.01);
         }
@@ -559,7 +546,6 @@ public:
     
     double xxx_temp_separation_score = 0;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Bird-like roll control: blends vector toward path curvature center with
     // global up. Overrides method in base class Agent

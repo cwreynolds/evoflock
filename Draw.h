@@ -142,6 +142,7 @@ public:
         std::cout << triangle_count_ << "." << std::endl;
     }
 
+    // Called to begin an animated scene, typically composed of many frames.
     void beginAnimatedScene()
     {
         if (enable())
@@ -153,47 +154,27 @@ public:
         }
     }
 
+    // Called to end an animated scene.
     void endAnimatedScene() { if (enable()) { } }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250612 perhaps issue is multiple calls to pollEvents()?
-    
-    int poll_events_count_ = 0;
-    
-//    void beginOneAnimatedFrame()
-//    {
-//        if (enable()) { clearAnimatedGeometryFromScene(); }
-//    }
-
+    // Called to begin each animation frame.
     void beginOneAnimatedFrame()
     {
         poll_events_count_ = 0;
-//        result_from_last_poll_events_call_ = pollEvents();
         if (enable()) { clearAnimatedGeometryFromScene(); }
     }
 
-//    void endOneAnimatedFrame()
-//    {
-//        if (enable())
-//        {
-//            updateCamera();
-//            redrawScene();
-//        }
-//    }
-
+    // Called to end each animation frame.
     void endOneAnimatedFrame()
     {
         if (enable())
         {
             updateCamera();
             redrawScene();
-            
             result_from_last_poll_events_call_ = pollEvents();
             if (poll_events_count_ > 1) { debugPrint(poll_events_count_); }
         }
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Clear all animated geometry to begin building a new scene.
     void clearAnimatedGeometryFromScene()
@@ -416,69 +397,15 @@ public:
     bool enable() const { return enable_ and not exitFromRun(); }
     void setEnable(bool e) { enable_ = e; }
     void toggleEnable() { enable_ = not enable_; }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250611 where is the mouse-move slowness from?
     
-    /// Function to process the event queue and return if the window is closed.
-    ///
-    /// Use this function if you want to manage the while loop yourself. This
-    /// function will NOT block the thread. Thus it is suitable for computation
-    /// heavy task behind the scene.
-    /// bool PollEvents();
-
-
-//    bool pollEvents() { return visualizer().PollEvents(); }
-    
-//    bool pollEvents()
-//    {
-//        util::Timer t;
-//        bool pe = visualizer().PollEvents();
-//        if (t.elapsedSeconds() > 0.01) { debugPrint(t.elapsedSeconds()); }
-//        return pe;
-//    }
-
-//        bool pollEvents()
-//        {
-//            util::Timer t;
-//
-//            bool pe = visualizer().PollEvents();
-//
-//    //        bool pe = true;
-//    //        auto f = [&](){ pe = visualizer().PollEvents(); };
-//    //        f();
-//
-//    //        // This one gets: *** Terminating app due to uncaught exception
-//    //        // 'NSInternalInconsistencyException', reason: 'nextEventMatchingMask
-//    //        // should only be called from the Main Thread!'
-//    //        bool pe = true;
-//    //        auto f = [&](){ pe = visualizer().PollEvents(); };
-//    //        std::thread t1(f);
-//    //        t1.join();
-//
-//
-//    //        if (t.elapsedSeconds() > 0.01) { debugPrint(t.elapsedSeconds()); }
-//
-//            return pe;
-//        }
-
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250612 perhaps issue is multiple calls to pollEvents()?
-    
+    // Process asynch events: key presses, mouse moves, closing window, etc.
     bool pollEvents()
     {
         util::Timer t;
         bool pe = visualizer().PollEvents();
-//        if (t.elapsedSeconds() > 0.01) { debugPrint(t.elapsedSeconds()); }
         poll_events_count_++;
         return pe;
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
     void updateCamera()
@@ -584,13 +511,7 @@ public:
     }
     void blendInNewCameraLookUp(const Vec3& new_up, double rate = EF::roll_rate)
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250610 "git bisect" inconclusive, more testing
-
-//        cameraLookUp() = up_memory_.blend(new_up, rate).normalize();
         cameraLookUp() = up_memory_.blend(new_up.normalize(), rate).normalize();
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // Adjust "static camera" model according to mouse input.
@@ -625,19 +546,11 @@ public:
                                       cameraLookUp());
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250602 new(?) slow down when mouse even just moves across O3D win.
-    
-
     // Set mouse scroll wheel handler for GUI.
     void setMouseScrollCallback()
     {
         auto mscb = [&](base_vis_t* vis, double x, double y)
         {
-//            xxx_temp_mscb_count++;
-//            std::cout << "xxx_temp_mscb_count=" << xxx_temp_mscb_count;
-//            std::cout << ", y=" << y << std::endl;
-
             // Change follow distance.
             double adjust_speed = 0.8;
             double min = 0.05;
@@ -647,12 +560,6 @@ public:
         };
         visualizer().RegisterMouseScrollCallback(mscb);
     }
-    
-    int xxx_temp_mscb_count = 0;
-    int xxx_temp_mmcb_count = 0;
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250611 where is the mouse-move slowness from?
 
     // Set mouse move handler for GUI.
     void setMouseMoveCallback()
@@ -661,15 +568,9 @@ public:
         {
             mmcb = [&](base_vis_t* vis, double x, double y)
             {
-//                xxx_temp_mmcb_count++;
-//                std::cout << "xxx_temp_mmcb_count=" << xxx_temp_mmcb_count;
-
                 Vec3 new_pos_pixels(x, y, 0);
                 Vec3 offset_pixels = mouse_pos_pixels_ - new_pos_pixels;
                 double mouse_move_pixels = offset_pixels.length();
-
-//                std::cout << ", left_mouse_button_down_=" << left_mouse_button_down_;
-
                 if (left_mouse_button_down_ and (mouse_move_pixels < 50))
                 {
                     double speed = 0.01;
@@ -691,34 +592,12 @@ public:
                     Vec3 local_cam = aimAgent().ls().localize(cameraLookFrom());
                     wingman_cam_local_offset_ = local_cam;
                 }
-
-//                std::cout << std::endl;
-
                 mouse_pos_pixels_ = new_pos_pixels;
                 return false;
             };
         }
         visualizer().RegisterMouseMoveCallback(mmcb);
     }
-
-//    // Set mouse move handler for GUI.
-//    void setMouseMoveCallback()
-//    {
-//        std::function<bool(base_vis_t *, double, double)> mmcb = nullptr;
-//        {
-//            mmcb = [&](base_vis_t* vis, double x, double y)
-//            {
-//                return false;
-//            };
-//        }
-//        visualizer().RegisterMouseMoveCallback(mmcb);
-//    }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
     // Set mouse button handler for GUI.
     void setMouseButtonCallback()
@@ -780,18 +659,12 @@ public:
         return camera_desired_offset_dist_;
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250612 perhaps issue is multiple calls to pollEvents()?
-
-    bool result_from_last_poll_events_call_ = true;
-  
     // Based on pause/play and single step. Called once per frame from main loop.
     bool runSimulationThisFrame()
     {
         bool ok_to_run = true;
         if (enable())
         {
-//            setExitFromRun(! pollEvents());
             setExitFromRun(! result_from_last_poll_events_call_);
             ok_to_run = getSingleStepMode() or not simPause();
             setSingleStepMode(false);
@@ -799,9 +672,6 @@ public:
         return ok_to_run;
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
     // Single step mode means simulation should take one step, then pause again.
     bool& getSingleStepMode() { return single_step_mode_; }
     bool getSingleStepMode() const { return single_step_mode_; }
@@ -960,6 +830,12 @@ private:
     
     // "A" command toggles drawing of annotation lines, etc.
     bool enable_annotation_ = true;
+    
+    // Used to ensure that pollEvents() is called only once per frame.
+    int poll_events_count_ = 0;
+
+    // Used to cache value returned by the one pollEvents() call per frame.
+    bool result_from_last_poll_events_call_ = true;
 
 #ifdef USE_OPEN3D
     

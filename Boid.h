@@ -48,9 +48,15 @@ private:  // move to bottom of class later
     // Low pass filter for roll control ("up" target).
     util::Blender<Vec3> up_memory_;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250616 prefer neighbors ahead of us
+    
     // Cache of nearest neighbors.
     BoidPtrList cached_nearest_neighbors_;
-    int neighbors_count = 7;
+//    int neighbors_count = 7;
+    int neighbors_count_ = 7;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Used to detect agent crossing Obstacle surface.
     Vec3 previous_position_ = Vec3::none();
@@ -397,30 +403,56 @@ public:
         return util::remap_interval_clip(projection, cos_angle_threshold, 1, 0, 1);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250616 prefer neighbors ahead of us
+
     // Returns a list of the "neighbors_count" Boids nearest this one.
-    BoidPtrList nearest_neighbors() {return nearest_neighbors(neighbors_count);}
+//    BoidPtrList nearest_neighbors() {return nearest_neighbors(neighbors_count);}
+    BoidPtrList nearest_neighbors() {return nearest_neighbors(neighbors_count_);}
     BoidPtrList nearest_neighbors(int n){return recompute_nearest_neighbors(n);}
 
     // Recomputes a cached list of the "neighbors_count" Boids nearest this one.
     BoidPtrList recompute_nearest_neighbors()
     {
-        return recompute_nearest_neighbors(neighbors_count);
+//        return recompute_nearest_neighbors(neighbors_count);
+        return recompute_nearest_neighbors(neighbors_count_);
     }
     BoidPtrList recompute_nearest_neighbors(int n)
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240626 Oh, this is why is_first_boid() stopped working...
-//        BoidPtrList& fb = flock_boids();
-//        BoidPtrList fb = flock_boids();
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20240626 Oh, this is why is_first_boid() stopped working...
+//    //        BoidPtrList& fb = flock_boids();
+//    //        BoidPtrList fb = flock_boids();
+//            // Copy list of pointers to flock-mates, to sorted in-place.
+//            BoidPtrList fb = flock_boids();
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         // Copy list of pointers to flock-mates, to sorted in-place.
         BoidPtrList fb = flock_boids();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+//        // How far is given boid from "this" boid? Returns infinity for itself.
+//        auto distance_squared_from_me = [&](const Boid* boid)
+//        {
+//            double d2 = (boid->position() - position()).length_squared();
+//            return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
+//        };
+        
         // How far is given boid from "this" boid? Returns infinity for itself.
         auto distance_squared_from_me = [&](const Boid* boid)
         {
-            double d2 = (boid->position() - position()).length_squared();
+            Vec3 offset_to_other = boid->position() - position();
+            
+//            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 10; }
+//            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
+//            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 4; }
+            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
+
+//            double d2 = (boid->position() - position()).length_squared();
+            double d2 = offset_to_other.length_squared();
+
             return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
         };
+
         // Are boids a and b sorted by least distance from me?
         auto sorted = [&](const Boid* a, const Boid* b)
         {
@@ -437,6 +469,8 @@ public:
         assert(distance_squared_from_me(cached_nearest_neighbors_[0]) > 0);
         return cached_nearest_neighbors_;
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Ad hoc low-pass filtering of steering force. Blends this step's newly
     // determined "raw" steering into a per-boid accumulator, then returns that

@@ -102,8 +102,13 @@ int main(int argc, const char * argv[])
     // inline in this function's source code, above.
     visualizePreviouslyLoggedFlockParameters();
     
-    int individuals = 500;
-    int subpops = 25;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250616 prefer neighbors ahead of us
+//    int individuals = 500;
+//    int subpops = 25;
+    int individuals = 750;
+    int subpops = 27;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int max_evolution_steps = Boid::GP_not_GA ? 20 : 30000;
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();

@@ -22,30 +22,6 @@
 #endif  // USE_OPEN3D
 
 
-// Just a thin layer on top of Vec3 to more conveniently represent color values.
-class Color : public Vec3
-{
-public:
-    Color () : Vec3() {};
-    Color (Vec3 v) : Vec3(v) {};
-    Color (double gray) : Vec3(gray, gray, gray) {};
-    Color (double red, double green, double blue) : Vec3(red, green, blue) {};
-    double r() const { return x(); }
-    double g() const { return y(); }
-    double b() const { return z(); }
-    static Color black()   { return {0, 0, 0};}
-    static Color white()   { return {1, 1, 1};}
-    static Color red()     { return {1, 0, 0};}
-    static Color yellow()  { return {1, 1, 0};}
-    static Color green()   { return {0, 1, 0};}
-    static Color cyan()    { return {0, 1, 1};}
-    static Color blue()    { return {0, 0, 1};}
-    static Color magenta() { return {1, 0, 1};}
-    static Color randomInRgbBox(Color a, Color b)
-        { return EF::RS().randomPointInAxisAlignedBox(a, b); }
-};
-
-
 class Draw
 {
 public:

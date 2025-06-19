@@ -170,7 +170,15 @@ inline void fitness_logger(const MOF& mof)
 
 // Run flock simulation with given parameters "runs" times and returns the MOF
 // with the LEAST scalar fitness score.
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250617 try 1 rather than 4 sims per fitness test
+
+//inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
+//inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 1)
 inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     MOF least_mof;
     double least_scalar_fitness = std::numeric_limits<double>::infinity();

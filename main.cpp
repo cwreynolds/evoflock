@@ -36,37 +36,36 @@ void visualizeBestIfRequested(LP::Population* population)
     }
 }
 
-// WIP tool for visualizing a logged FlockParameters, eg:
-//     Run_Flock(87.4777, 20, 20, 20, 84.9358, 98.4413, 26.6924, 1.90821,
-//               53.2896, 94.8003, 2.77889, 37.8503, 42.3571, -0.787644,
-//               -0.401251, 0.575284, 9.87024, 8.99761)
+// Tool for visualizing a logged set of FlockParameters.
+// To visualize a given set of FlockParameters. Cut/paste from log, compile.
+// Comment out body of this function for normal evolution run.
 void visualizePreviouslyLoggedFlockParameters()
 {
-//    //    // To use the hand-tuned parameters:
-//    //    // FlockParameters fp;
-//    //    // To visualize a given set of FlockParameters. Cut/paste from log, compile.
-//    //    // (These values from run 20250524_test_use_scores_in_flock_data)
-//    //    FlockParameters fp(90.3889, 20, 20, 20, 75.3918, 41.8466, 27.8009, 0.685528,
-//    //                       90.1786, 73.3035, 2.34728, 8.31566, 67.5218, -0.750053,
-//    //                       -0.96459, 0.312321, 3.8674, 1.26649);
-//    //    EF::enable_multithreading = false;
-//    //    while (true) { GP::run_flock_simulation(fp, 1); }
+//    // To use the hand-tuned parameters:
+//    // FlockParameters fp;
+//    
+//    // (These values from run 20250524_test_use_scores_in_flock_data)
+//    //FlockParameters fp(90.3889, 20, 20, 20, 75.3918, 41.8466, 27.8009, 0.685528,
+//    //                   90.1786, 73.3035, 2.34728, 8.31566, 67.5218, -0.750053,
+//    //                   -0.96459, 0.312321, 3.8674, 1.26649);
+//    
+//    // These values from run 20250601, very nice motion.
+//    //FlockParameters fp(55.7424, 20, 20, 20, 88.3095, 59.9705, 28.3211, 28.0211,
+//    //                   91.9161, 69.7648, 2.95192, 77.1844, 23.2996, -0.353221,
+//    //                   -0.999566, 0.364522, 2.76299, 1.33611);
+//    
+//    // 20250616b_dv_neighbors_behind_pop_750
+//    //FlockParameters fp(83.6605, 20, 20, 20, 99.4266, 39.4691, 25.5936, 14.3034,
+//    //                   99.0738, 80.6256, 2.27497, 22.9588, 24.356, -0.115794,
+//    //                   0.254552, 0.625807, 2.11305, 0.889898);
+//    
+//    // from run 20250617_only_1_sim_per_individual
+//    FlockParameters fp(96.076, 20, 20, 20, 85.7334, 57.0328, 24.97, 38.3267,
+//                       96.3787, 83.4721, 3.15953, 59.1314, 71.415, -0.641807,
+//                       -0.870298, 0.197666, 2.68647, 1.69024);
 //
-//        // To use the hand-tuned parameters:
-//        // FlockParameters fp;
-//        // To visualize a given set of FlockParameters. Cut/paste from log, compile.
-//        // (These values from run 20250601)
-//        FlockParameters fp(55.7424, 20, 20, 20, 88.3095, 59.9705, 28.3211, 28.0211, 91.9161, 69.7648, 2.95192, 77.1844, 23.2996, -0.353221, -0.999566, 0.364522, 2.76299, 1.33611);
-//        EF::enable_multithreading = false;
-//        while (true) { GP::run_flock_simulation(fp, 1); }
-    
-    // To use the hand-tuned parameters:
-    // FlockParameters fp;
-    // To visualize a given set of FlockParameters. Cut/paste from log, compile.
-    // (These values from run 20250601)
-    FlockParameters fp(83.6605, 20, 20, 20, 99.4266, 39.4691, 25.5936, 14.3034, 99.0738, 80.6256, 2.27497, 22.9588, 24.356, -0.115794, 0.254552, 0.625807, 2.11305, 0.889898);
-    EF::enable_multithreading = false;
-    while (true) { GP::run_flock_simulation(fp, 1); }
+//    EF::enable_multithreading = false;
+//    while (true) { GP::run_flock_simulation(fp, 1); }
 }
 
 

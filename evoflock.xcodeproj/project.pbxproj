@@ -100,7 +100,6 @@
 		840B67B62B5C28D1008AE661 /* shape.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shape.h; sourceTree = "<group>"; };
 		8413ADFB2B89626F006693A1 /* GP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GP.h; sourceTree = "<group>"; };
 		8413ADFC2B8AB10C006693A1 /* LazyPredator */ = {isa = PBXFileReference; lastKnownFileType = folder; path = LazyPredator; sourceTree = "<group>"; };
-		8419349B2DE3F66800A9C8EE /* EvoFlock style template.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = "EvoFlock style template.numbers"; sourceTree = "<group>"; };
 		841E7D5A2DE92A42006F99CA /* 20221007_0806_step_7030.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221007_0806_step_7030.png; sourceTree = "<group>"; };
 		841E7D5B2DE92A42006F99CA /* 20221030_1220_step_19.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221030_1220_step_19.png; sourceTree = "<group>"; };
 		841E7D5C2DE92A42006F99CA /* 20221030_1220_step_1045.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221030_1220_step_1045.png; sourceTree = "<group>"; };
@@ -293,7 +292,6 @@
 			isa = PBXGroup;
 			children = (
 				841E7D782DE92A42006F99CA /* EvoFlock */,
-				8419349B2DE3F66800A9C8EE /* EvoFlock style template.numbers */,
 				84C14A712E01CCF8008762C2 /* fitness plot template.numbers */,
 			);
 			path = doc;

@@ -71,9 +71,11 @@ void visualizePreviouslyLoggedFlockParameters()
 
 int main(int argc, const char * argv[])
 {
-    EF::setRS(LP::LPRS());
     EF::unit_test();
-    
+    EF::setRS(LP::LPRS());
+    EF::RS().setSeedFromClock();
+    std::cout << "RandomSequence seed = " << EF::RS().getSeed() << std::endl;
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250510 temp global switch for controlling speed with fitness.
     //

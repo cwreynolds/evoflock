@@ -221,6 +221,16 @@ void thread_sleep_in_seconds(double sleep_time)
     std::this_thread::sleep_for(std::chrono::microseconds(micro_seconds));
 }
 
+// Number of seconds since the epoch (January 1, 1970) as an "integral" (not
+// floating point). Code from https://stackoverflow.com/a/14315771/1991373
+std::chrono::system_clock::rep seconds_since_epoch()
+{
+    static_assert(std::is_integral<std::chrono::system_clock::rep>::value,
+                  "Representation of ticks isn't an integral value.");
+    auto now = std::chrono::system_clock::now().time_since_epoch();
+    return std::chrono::duration_cast<std::chrono::seconds>(now).count();
+}
+
 
 // Simple tool for inline timing sections of code. For example:
 //    void foo()
@@ -640,6 +650,8 @@ public:
         std::lock_guard<std::mutex> grsm(global_rs_mutex_);
         state_ = seed;
     }
+    // Set seed from clock so it is unique for each run.
+    void setSeedFromClock() { setSeed((uint32_t)util::seconds_since_epoch()); }
     // Get state.
     uint32_t getSeed() { return state_; }
 private:

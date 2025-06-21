@@ -142,6 +142,7 @@
 		848101F62C7666CA00433168 /* libOpen3D.0.18.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpen3D.0.18.0.dylib; path = "../open3d-devel-darwin-arm64-0.18.0+c219d82/lib/libOpen3D.0.18.0.dylib"; sourceTree = "<group>"; };
 		848101FB2C77B53E00433168 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		848BC33C2B69856700509CE5 /* flock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = flock.h; sourceTree = "<group>"; };
+		849817952E077C11002B4548 /* fitness_plot_template.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = fitness_plot_template.numbers; sourceTree = "<group>"; };
 		849C91502C7E9DFC007DFBDE /* libOpen3D.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D.a; path = ../../../../../usr/local/lib/libOpen3D.a; sourceTree = "<group>"; };
 		849C91522C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_filament.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_filament.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_filament.a; sourceTree = "<group>"; };
 		849C91532C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a"; sourceTree = "<group>"; };
@@ -291,6 +292,7 @@
 			isa = PBXGroup;
 			children = (
 				841E7D782DE92A42006F99CA /* EvoFlock */,
+				849817952E077C11002B4548 /* fitness_plot_template.numbers */,
 			);
 			path = doc;
 			sourceTree = "<group>";

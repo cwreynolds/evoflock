@@ -60,9 +60,14 @@ void visualizePreviouslyLoggedFlockParameters()
 //    //                   0.254552, 0.625807, 2.11305, 0.889898);
 //    
 //    // from run 20250617_only_1_sim_per_individual
-//    FlockParameters fp(96.076, 20, 20, 20, 85.7334, 57.0328, 24.97, 38.3267,
-//                       96.3787, 83.4721, 3.15953, 59.1314, 71.415, -0.641807,
-//                       -0.870298, 0.197666, 2.68647, 1.69024);
+//    //FlockParameters fp(96.076, 20, 20, 20, 85.7334, 57.0328, 24.97, 38.3267,
+//    //                   96.3787, 83.4721, 3.15953, 59.1314, 71.415, -0.641807,
+//    //                   -0.870298, 0.197666, 2.68647, 1.69024);
+//
+//    // from run 20250622_test_fix_for_slow_sim
+//    FlockParameters fp(93.4907, 20, 20, 20, 96.1618, 48.9378, 35.8806, 19.816,
+//                       84.7544, 76.4079, 3.01808, 79.4333, 53.4527, -0.543717,
+//                       -0.462297, 0.132325, 3.80525, 0.949715);
 //
 //    EF::enable_multithreading = false;
 //    while (true) { GP::run_flock_simulation(fp, 1); }
@@ -115,8 +120,19 @@ int main(int argc, const char * argv[])
     // TODO 20250616 prefer neighbors ahead of us
 //    int individuals = 500;
 //    int subpops = 25;
-    int individuals = 750;
-    int subpops = 27;
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250623 more on per-Boid neighbor sorting
+
+//    int individuals = 750;
+//    int subpops = 27;
+    
+    // TODO 20250623 maybe that was a little too high?
+    int individuals = 600;
+    int subpops = 25;
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int max_evolution_steps = Boid::GP_not_GA ? 20 : 30000;
 

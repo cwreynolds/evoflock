@@ -234,6 +234,11 @@ public:
     // phase which actually moves the boids. Finally statistics are collected.
     void fly_boids(double time_step)
     {
+        //~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~
+        // TODO 20250622 WIP fix recent sim slowness
+        for_all_boids([&](Boid* b){ b->rnn_count = 0; });
+        //~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~
+
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();

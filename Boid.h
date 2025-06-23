@@ -417,8 +417,72 @@ public:
 //        return recompute_nearest_neighbors(neighbors_count);
         return recompute_nearest_neighbors(neighbors_count_);
     }
+    
+    //~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~
+    // TODO 20250622 WIP fix recent sim slowness
+
+    
+//        BoidPtrList recompute_nearest_neighbors(int n)
+//        {
+//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //            // TODO 20240626 Oh, this is why is_first_boid() stopped working...
+//    //    //        BoidPtrList& fb = flock_boids();
+//    //    //        BoidPtrList fb = flock_boids();
+//    //            // Copy list of pointers to flock-mates, to sorted in-place.
+//    //            BoidPtrList fb = flock_boids();
+//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            // Copy list of pointers to flock-mates, to sorted in-place.
+//            BoidPtrList fb = flock_boids();
+//
+//    //        // How far is given boid from "this" boid? Returns infinity for itself.
+//    //        auto distance_squared_from_me = [&](const Boid* boid)
+//    //        {
+//    //            double d2 = (boid->position() - position()).length_squared();
+//    //            return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
+//    //        };
+//
+//            // How far is given boid from "this" boid? Returns infinity for itself.
+//            auto distance_squared_from_me = [&](const Boid* boid)
+//            {
+//                Vec3 offset_to_other = boid->position() - position();
+//
+//    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 10; }
+//    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
+//    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 4; }
+//                if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
+//
+//    //            double d2 = (boid->position() - position()).length_squared();
+//                double d2 = offset_to_other.length_squared();
+//
+//                return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
+//            };
+//
+//            // Are boids a and b sorted by least distance from me?
+//            auto sorted = [&](const Boid* a, const Boid* b)
+//            {
+//                return distance_squared_from_me(a) < distance_squared_from_me(b);
+//            };
+//            // Maybe neighbor list size should be min(n,flock.size())? But for now:
+//            assert((fb.size() > n) && "neighborhood > flock size");
+//            // Sort all boids in flock by nearest distance (squared) from me.
+//            std::partial_sort(fb.begin(), fb.begin() + n, fb.end(), sorted);
+//            // Set "cached_nearest_neighbors_" to nearest "n" of flock_boids.
+//            cached_nearest_neighbors_.resize(n);
+//            std::copy(fb.begin(), fb.begin() + n, cached_nearest_neighbors_.begin());
+//            // Verify neighbor distances.
+//            assert(distance_squared_from_me(cached_nearest_neighbors_[0]) > 0);
+//            return cached_nearest_neighbors_;
+//        }
+    
+    int rnn_count = 0;  // TODO TEMP for testing
+    
     BoidPtrList recompute_nearest_neighbors(int n)
     {
+        assert(rnn_count == 0);
+        rnn_count++;
+        
+        
 //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //            // TODO 20240626 Oh, this is why is_first_boid() stopped working...
 //    //        BoidPtrList& fb = flock_boids();
@@ -427,8 +491,9 @@ public:
 //            BoidPtrList fb = flock_boids();
 //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        // Copy list of pointers to flock-mates, to sorted in-place.
-        BoidPtrList fb = flock_boids();
+        // Copy list of pointers to flock-mates, to be sorted in-place.
+//        BoidPtrList fb = flock_boids();
+        BoidPtrList& fb = flock_boids();
 
 //        // How far is given boid from "this" boid? Returns infinity for itself.
 //        auto distance_squared_from_me = [&](const Boid* boid)
@@ -437,20 +502,47 @@ public:
 //            return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
 //        };
         
+//            // How far is given boid from "this" boid? Returns infinity for itself.
+//            auto distance_squared_from_me = [&](const Boid* boid)
+//            {
+//                Vec3 offset_to_other = boid->position() - position();
+//
+//    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 10; }
+//    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
+//    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 4; }
+//                if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
+//
+//    //            double d2 = (boid->position() - position()).length_squared();
+//                double d2 = offset_to_other.length_squared();
+//
+//                return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
+//            };
+
+//            // How far is given boid from "this" boid? Returns infinity for itself.
+//            auto distance_squared_from_me = [&](const Boid* boid)
+//            {
+//    //            Vec3 offset_to_other = boid->position() - position();
+//    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
+//    //            double d2 = offset_to_other.length_squared();
+//    //            return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
+//
+//                Vec3 offset_to_other = boid->position() - position();
+//                double d2 = offset_to_other.length_squared();
+//                double forwardness = offset_to_other.dot(forward());
+//                return (d2 > 0 ?
+//                        d2 * (forwardness < 0 ? 2 : 1) :
+//                        std::numeric_limits<double>::infinity());
+//            };
+
         // How far is given boid from "this" boid? Returns infinity for itself.
         auto distance_squared_from_me = [&](const Boid* boid)
         {
             Vec3 offset_to_other = boid->position() - position();
-            
-//            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 10; }
-//            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
-//            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 4; }
-            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
-
-//            double d2 = (boid->position() - position()).length_squared();
             double d2 = offset_to_other.length_squared();
-
-            return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
+            double forwardness = offset_to_other.dot(forward());
+            return (d2 > 0 ?
+                    d2 * (forwardness < 0 ? 2 : 1) :
+                    std::numeric_limits<double>::infinity());
         };
 
         // Are boids a and b sorted by least distance from me?
@@ -467,9 +559,18 @@ public:
         std::copy(fb.begin(), fb.begin() + n, cached_nearest_neighbors_.begin());
         // Verify neighbor distances.
         assert(distance_squared_from_me(cached_nearest_neighbors_[0]) > 0);
+        
+        
+        assert(rnn_count == 1);
+        rnn_count--;
+
+        
         return cached_nearest_neighbors_;
     }
+
     
+    //~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Ad hoc low-pass filtering of steering force. Blends this step's newly

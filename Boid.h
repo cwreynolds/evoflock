@@ -47,16 +47,10 @@ private:  // move to bottom of class later
     util::Blender<Vec3> steer_memory_;
     // Low pass filter for roll control ("up" target).
     util::Blender<Vec3> up_memory_;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250616 prefer neighbors ahead of us
-    
+        
     // Cache of nearest neighbors.
     BoidPtrList cached_nearest_neighbors_;
-//    int neighbors_count = 7;
     int neighbors_count_ = 7;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Used to detect agent crossing Obstacle surface.
     Vec3 previous_position_ = Vec3::none();
@@ -86,32 +80,12 @@ private:  // move to bottom of class later
 public:
     
     // Accessors
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240617 revisit incremental_sort()
-    
-//    BoidPtrList& flock_boids() { return *flock_boids_; }
-//    const BoidPtrList& flock_boids() const { return *flock_boids_; }
-//    void set_flock_boids(BoidPtrList* bpl) { flock_boids_ = bpl; }
-    
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250623 more on per-Boid neighbor sorting
-
-    // TODO each boid keeps its own "approximately sorted" list of flockmates.
-    
-//    BoidPtrList& flock_boids() { return flock_boids_; }
-//    const BoidPtrList& flock_boids() const { return flock_boids_; }
-//    void set_flock_boids(BoidPtrList* bpl) { flock_boids_ = *bpl; }
     
     // Get reference to this Boid's local list of flockmate pointers.
     BoidPtrList& flock_boids() { return flock_boids_; }
     const BoidPtrList& flock_boids() const { return flock_boids_; }
     // Set this Boid's local list of flockmate pointers, called by Flock at init
     void set_flock_boids(const BoidPtrList* bpl) { flock_boids_ = *bpl; }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     ObstaclePtrList& flock_obstacles() { return *flock_obstacles_; }
     const ObstaclePtrList& flock_obstacles() const { return *flock_obstacles_; }
@@ -414,304 +388,15 @@ public:
         return util::remap_interval_clip(projection, cos_angle_threshold, 1, 0, 1);
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250616 prefer neighbors ahead of us
-
     // Returns a list of the "neighbors_count" Boids nearest this one.
-//    BoidPtrList nearest_neighbors() {return nearest_neighbors(neighbors_count);}
     BoidPtrList nearest_neighbors() {return nearest_neighbors(neighbors_count_);}
     BoidPtrList nearest_neighbors(int n){return recompute_nearest_neighbors(n);}
 
     // Recomputes a cached list of the "neighbors_count" Boids nearest this one.
     BoidPtrList recompute_nearest_neighbors()
     {
-//        return recompute_nearest_neighbors(neighbors_count);
         return recompute_nearest_neighbors(neighbors_count_);
     }
-    
-    //~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~
-    // TODO 20250622 WIP fix recent sim slowness
-
-    
-//        BoidPtrList recompute_nearest_neighbors(int n)
-//        {
-//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //            // TODO 20240626 Oh, this is why is_first_boid() stopped working...
-//    //    //        BoidPtrList& fb = flock_boids();
-//    //    //        BoidPtrList fb = flock_boids();
-//    //            // Copy list of pointers to flock-mates, to sorted in-place.
-//    //            BoidPtrList fb = flock_boids();
-//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//            // Copy list of pointers to flock-mates, to sorted in-place.
-//            BoidPtrList fb = flock_boids();
-//
-//    //        // How far is given boid from "this" boid? Returns infinity for itself.
-//    //        auto distance_squared_from_me = [&](const Boid* boid)
-//    //        {
-//    //            double d2 = (boid->position() - position()).length_squared();
-//    //            return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
-//    //        };
-//
-//            // How far is given boid from "this" boid? Returns infinity for itself.
-//            auto distance_squared_from_me = [&](const Boid* boid)
-//            {
-//                Vec3 offset_to_other = boid->position() - position();
-//
-//    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 10; }
-//    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
-//    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 4; }
-//                if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
-//
-//    //            double d2 = (boid->position() - position()).length_squared();
-//                double d2 = offset_to_other.length_squared();
-//
-//                return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
-//            };
-//
-//            // Are boids a and b sorted by least distance from me?
-//            auto sorted = [&](const Boid* a, const Boid* b)
-//            {
-//                return distance_squared_from_me(a) < distance_squared_from_me(b);
-//            };
-//            // Maybe neighbor list size should be min(n,flock.size())? But for now:
-//            assert((fb.size() > n) && "neighborhood > flock size");
-//            // Sort all boids in flock by nearest distance (squared) from me.
-//            std::partial_sort(fb.begin(), fb.begin() + n, fb.end(), sorted);
-//            // Set "cached_nearest_neighbors_" to nearest "n" of flock_boids.
-//            cached_nearest_neighbors_.resize(n);
-//            std::copy(fb.begin(), fb.begin() + n, cached_nearest_neighbors_.begin());
-//            // Verify neighbor distances.
-//            assert(distance_squared_from_me(cached_nearest_neighbors_[0]) > 0);
-//            return cached_nearest_neighbors_;
-//        }
-    
-//        // TODO TEMP for testing -- trying to verify this code is still thread-safe.
-//        int xxx_temp_rnn_count = 0;
-//
-//        BoidPtrList recompute_nearest_neighbors(int n)
-//        {
-//            assert(xxx_temp_rnn_count == 0);
-//            xxx_temp_rnn_count++;
-//
-//
-//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //            // TODO 20240626 Oh, this is why is_first_boid() stopped working...
-//    //    //        BoidPtrList& fb = flock_boids();
-//    //    //        BoidPtrList fb = flock_boids();
-//    //            // Copy list of pointers to flock-mates, to sorted in-place.
-//    //            BoidPtrList fb = flock_boids();
-//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//            // Copy list of pointers to flock-mates, to be sorted in-place.
-//    //        BoidPtrList fb = flock_boids();
-//            BoidPtrList& fb = flock_boids();
-//
-//    //        // How far is given boid from "this" boid? Returns infinity for itself.
-//    //        auto distance_squared_from_me = [&](const Boid* boid)
-//    //        {
-//    //            double d2 = (boid->position() - position()).length_squared();
-//    //            return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
-//    //        };
-//
-//    //            // How far is given boid from "this" boid? Returns infinity for itself.
-//    //            auto distance_squared_from_me = [&](const Boid* boid)
-//    //            {
-//    //                Vec3 offset_to_other = boid->position() - position();
-//    //
-//    //    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 10; }
-//    //    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
-//    //    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 4; }
-//    //                if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
-//    //
-//    //    //            double d2 = (boid->position() - position()).length_squared();
-//    //                double d2 = offset_to_other.length_squared();
-//    //
-//    //                return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
-//    //            };
-//
-//    //            // How far is given boid from "this" boid? Returns infinity for itself.
-//    //            auto distance_squared_from_me = [&](const Boid* boid)
-//    //            {
-//    //    //            Vec3 offset_to_other = boid->position() - position();
-//    //    //            if (offset_to_other.dot(forward()) < 0) { offset_to_other *= 2; }
-//    //    //            double d2 = offset_to_other.length_squared();
-//    //    //            return (d2 > 0) ? d2 : std::numeric_limits<double>::infinity();
-//    //
-//    //                Vec3 offset_to_other = boid->position() - position();
-//    //                double d2 = offset_to_other.length_squared();
-//    //                double forwardness = offset_to_other.dot(forward());
-//    //                return (d2 > 0 ?
-//    //                        d2 * (forwardness < 0 ? 2 : 1) :
-//    //                        std::numeric_limits<double>::infinity());
-//    //            };
-//
-//            // How far is given boid from "this" boid? Returns infinity for itself.
-//            auto distance_squared_from_me = [&](const Boid* boid)
-//            {
-//                Vec3 offset_to_other = boid->position() - position();
-//                double d2 = offset_to_other.length_squared();
-//                double forwardness = offset_to_other.dot(forward());
-//                return (d2 > 0 ?
-//                        d2 * (forwardness < 0 ? 2 : 1) :
-//                        std::numeric_limits<double>::infinity());
-//            };
-//
-//            // Are boids a and b sorted by least distance from me?
-//            auto sorted = [&](const Boid* a, const Boid* b)
-//            {
-//                return distance_squared_from_me(a) < distance_squared_from_me(b);
-//            };
-//            // Maybe neighbor list size should be min(n,flock.size())? But for now:
-//            assert((fb.size() > n) && "neighborhood > flock size");
-//            // Sort all boids in flock by nearest distance (squared) from me.
-//            std::partial_sort(fb.begin(), fb.begin() + n, fb.end(), sorted);
-//            // Set "cached_nearest_neighbors_" to nearest "n" of flock_boids.
-//            cached_nearest_neighbors_.resize(n);
-//            std::copy(fb.begin(), fb.begin() + n, cached_nearest_neighbors_.begin());
-//            // Verify neighbor distances.
-//            assert(distance_squared_from_me(cached_nearest_neighbors_[0]) > 0);
-//
-//
-//            assert(xxx_temp_rnn_count == 1);
-//            xxx_temp_rnn_count--;
-//
-//
-//            return cached_nearest_neighbors_;
-//        }
-
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250623 more on per-Boid neighbor sorting
-
-//        // TODO TEMP trying to verify this code is still thread-safe.
-//        int xxx_temp_rnn_count = 0;
-//
-//        BoidPtrList recompute_nearest_neighbors(int n)
-//        {
-//            // TODO TEMP trying to verify this code is still thread-safe.
-//            assert(xxx_temp_rnn_count == 0);
-//            xxx_temp_rnn_count++;
-//
-//    //        // Copy list of pointers to flock-mates, to be sorted in-place.
-//    //        BoidPtrList& fb = flock_boids();
-//
-//    //        // How far is given boid from "this" boid? Returns infinity for itself.
-//    //        auto distance_squared_from_me = [&](const Boid* boid)
-//    //        {
-//    //            Vec3 offset_to_other = boid->position() - position();
-//    //            double d2 = offset_to_other.length_squared();
-//    //            double forwardness = offset_to_other.dot(forward());
-//    //            return (d2 > 0 ?
-//    //                    d2 * (forwardness < 0 ? 2 : 1) :
-//    //                    std::numeric_limits<double>::infinity());
-//    //        };
-//
-//    //            // Metric for "neighbor distance": which is the distance squared between "me" (this boid) and the given neighbor, times a factor of "penalty" if the neighbor is behind me.
-//    //            auto neighbor_nearness = [&](const Boid* neighbor)
-//    //            {
-//    //                Vec3 offset_to_other = neighbor->position() - position();
-//    //    //            double d2 = offset_to_other.length_squared();
-//    //                double distance_squared = offset_to_other.length_squared();
-//    //                double penalty = 2;
-//    //                double forwardness = offset_to_other.dot(forward());
-//    //                return (distance_squared > 0 ?
-//    //    //                    d2 * (forwardness < 0 ? 2 : 1) :
-//    //                        distance_squared * (forwardness > 0 ? 1 : penalty) :
-//    //                        std::numeric_limits<double>::infinity());
-//    //            };
-//
-//            // Metric for "neighbor distance": the distance squared between "me"
-//            // (this boid) and the given neighbor, times a factor of "penalty"
-//            // if the neighbor is behind me. Infinite if neighbor is me.
-//            auto neighbor_distance = [&](const Boid* neighbor)
-//            {
-//                Vec3 offset_to_other = neighbor->position() - position();
-//                double distance_squared = offset_to_other.length_squared();
-//                double penalty = 2;
-//                double forwardness = offset_to_other.dot(forward());
-//                return (distance_squared > 0 ?
-//                        distance_squared * (forwardness > 0 ? 1 : penalty) :
-//                        std::numeric_limits<double>::infinity());
-//            };
-//
-//            // Are boids a and b sorted by least distance from me?
-//            auto sorted = [&](const Boid* a, const Boid* b)
-//            {
-//    //            return distance_squared_from_me(a) < distance_squared_from_me(b);
-//    //            return neighbor_nearness(a) < neighbor_nearness(b);
-//                return neighbor_distance(a) < neighbor_distance(b);
-//            };
-//
-//            // Short name for this boid's list of pointers all boids in flock.
-//            BoidPtrList& fb = flock_boids();
-//            // Maybe neighbor list size should be min(n,flock.size())? But for now:
-//            assert((fb.size() > n) && "neighborhood > flock size");
-//            // Sort all boids in flock by nearest distance (squared) from me.
-//            std::partial_sort(fb.begin(), fb.begin() + n, fb.end(), sorted);
-//            // Set "cached_nearest_neighbors_" to nearest "n" of flock_boids.
-//            cached_nearest_neighbors_.resize(n);
-//            std::copy(fb.begin(), fb.begin() + n, cached_nearest_neighbors_.begin());
-//            // Verify nearest neighbor is not coincident with this boid.
-//    //        assert(distance_squared_from_me(cached_nearest_neighbors_[0]) > 0);
-//    //        assert(neighbor_nearness(cached_nearest_neighbors_[0]) > 0);
-//            assert(neighbor_distance(cached_nearest_neighbors_[0]) > 0);
-//
-//            // TODO TEMP trying to verify this code is still thread-safe.
-//            xxx_temp_rnn_count--;
-//            assert(xxx_temp_rnn_count == 0);
-//
-//            return cached_nearest_neighbors_;
-//        }
-
-//        // TODO TEMP trying to verify this code is still thread-safe.
-//        int xxx_temp_rnn_count = 0;
-//
-//        BoidPtrList recompute_nearest_neighbors(int n)
-//        {
-//            // TODO TEMP trying to verify this code is still thread-safe.
-//            assert(xxx_temp_rnn_count == 0);
-//            xxx_temp_rnn_count++;
-//
-//            // Metric for "neighbor distance": distance squared between "me"
-//            // (this boid) and the given neighbor, times a factor of "penalty"
-//            // if the neighbor is behind me. Infinite if neighbor is me.
-//            auto neighbor_distance = [&](const Boid* neighbor)
-//            {
-//                Vec3 offset_to_other = neighbor->position() - position();
-//                double distance_squared = offset_to_other.length_squared();
-//                double penalty = 2;
-//
-//    //            double forwardness = offset_to_other.dot(forward());
-//                double forwardness = forward().dot(offset_to_other);
-//
-//                return (distance_squared > 0 ?
-//                        distance_squared * (forwardness > 0 ? 1 : penalty) :
-//                        std::numeric_limits<double>::infinity());
-//            };
-//            // Are boids a and b sorted by least distance from me?
-//            auto sorted = [&](const Boid* a, const Boid* b)
-//            {
-//                return neighbor_distance(a) < neighbor_distance(b);
-//            };
-//            // Short name for this boid's list of pointers all boids in flock.
-//            BoidPtrList& fb = flock_boids();
-//            // Maybe neighbor list size should be min(n,flock.size())? But for now:
-//            assert((fb.size() > n) && "neighborhood > flock size");
-//            // Sort all boids in flock by nearest distance (squared) from me.
-//            std::partial_sort(fb.begin(), fb.begin() + n, fb.end(), sorted);
-//            // Set "cached_nearest_neighbors_" to nearest "n" of flock_boids.
-//            cached_nearest_neighbors_.resize(n);
-//            std::copy(fb.begin(), fb.begin() + n, cached_nearest_neighbors_.begin());
-//            // Verify nearest neighbor is not coincident with this boid.
-//            assert(neighbor_distance(cached_nearest_neighbors_[0]) > 0);
-//
-//            // TODO TEMP trying to verify this code is still thread-safe.
-//            xxx_temp_rnn_count--;
-//            assert(xxx_temp_rnn_count == 0);
-//
-//            return cached_nearest_neighbors_;
-//        }
 
     // TODO TEMP trying to verify this code is still thread-safe.
     int xxx_temp_rnn_count = 0;
@@ -758,12 +443,6 @@ public:
 
         return cached_nearest_neighbors_;
     }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~~ ~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Ad hoc low-pass filtering of steering force. Blends this step's newly
     // determined "raw" steering into a per-boid accumulator, then returns that

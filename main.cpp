@@ -128,8 +128,15 @@ int main(int argc, const char * argv[])
 //    int subpops = 27;
     
     // TODO 20250623 maybe that was a little too high?
-    int individuals = 600;
-    int subpops = 25;
+//    int individuals = 600;
+//    int subpops = 25;
+    
+//    // TODO 20250623 try going in opposite direction
+//    int individuals = 800;
+//    int subpops = 28;
+    
+    int individuals = 500;
+    int subpops = 22;
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

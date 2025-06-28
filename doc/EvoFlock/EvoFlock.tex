@@ -55,8 +55,13 @@
 
 \captionsetup{hypcap=false}
 
-\titlepic{\igfour{20221121_1819_step_6464.png} \hfill \igfour{20221108_2018_step_6562.png} \hfill\igfour{20221215_step_7182.png}\hfill\igfour{20221216_step_5997.png} \captionof{figure}{...random unrelated figure...} 
+% \titlepic{\igfour{20221121_1819_step_6464.png} \hfill \igfour{20221108_2018_step_6562.png} \hfill\igfour{20221215_step_7182.png}\hfill\igfour{20221216_step_5997.png} \captionof{figure}{...random unrelated figure...} 
+% \label{fig:teaser}}
+
+\titlepic{\includegraphics[width=\textwidth]{images/temp_fig_1.png}
+\captionof{figure}{Boids flocking around obstacles, using evolved parameters.} 
 \label{fig:teaser}}
+
 
 % Remove today's date being inserted after the title/author information.
 \date{}
@@ -94,9 +99,15 @@ This paper is about automating that adjustment process using metrics of flock qu
 \section{Related Work}
 \label{sec:related}
 
-... \textit{boids} \citep{reynolds_flocks_1987} and others (\citet{aoki_simulation_1982}, \citet{cucker_emergent_2007}, \citet{bhattacharya_collective_2010} [[[\textbf{Is this the best cite for Vicsek?}]]]).
-
+Since the 1980s various simulation models of bird flocks have been proposed including \textit{boids} \citep{reynolds_flocks_1987} and others (\citet{aoki_simulation_1982}, \citet{cucker_emergent_2007}, \citet{bhattacharya_collective_2010} [[[\textbf{Is this the best citation for Vicsek?}]]]).
 \par
+
+Most previous work on automatic tuning for flock models has used reinforcement learning [[[\textbf{cite}]]] as the optimization technique. While this paper was being drafted, a preprint was posted \citep{brambati_learning_2025} which uses reinforcement learning with an objective function very similar to the one used here. Other flock tuning based on reinforcement learn include:
+[[[\textbf{cites?}]]].
+\par
+
+
+The approach used here was developed as part of a larger ongoing collaboration investigating new approaches to optimization of multi-agent motion. [[[\textbf{cite Matthew's thesis?}]]]
 
 \section{Description of the Technique}
 \label{sec:Description}
@@ -104,11 +115,28 @@ This paper is about automating that adjustment process using metrics of flock qu
 xxx
 \par
 
+\subsection{Optimization Method}
+\label{subsec:Objective_Function}
+
+...In this work, optimization is used to find simulation parameters for individuals that best fit the group behavior goals... It uses a genetic algorithm, a technique based on concepts from biological evolution, as seen in the natural world. Genetic algorithms were first described by \citet{holland_adaptation_1975}. Evolution was first described by \citet{darwin_origin_1859}.
+\par
+
 \subsection{Objective Function}
 \label{subsec:Objective_Function}
 
-xxx
+This work is based on optimizing a set of parameters for a flock (multi-agent motion) model. Optimization procedures are guided by an \textit{objective function}. In many optimization problems, the overall objective is a combination of several, potentially contradictory goals. This is generally called multi-objective optimization. 
 \par
+
+To motivate this concept, consider building a bridge over a river. A key criterion is that the bridge is reliable: it will carry the required loads without collapsing. Another criterion is that the cost of building the bridge is minimized. These criteria are directly opposed. A very strong bridge is reliable but costly. A very cheap bridge is unlikely to be reliable. This trade-off is often called \textit{Pareto optimality}. Tuples of such Pareto optimal values form the \textit{Pareto front}, see Figure \ref{fig:Pareto-front}.
+\par
+
+\begin{figure}[]
+    \includegraphics[width=\columnwidth]{images/temp_MOF.png}
+    \caption{Hypothetical bridge example: pairs of Pareto optimal values for reliability and cheapness. [[[\textbf{TEMP}]]]}
+    \label{fig:Pareto-front}
+\end{figure}
+
+[[[\textbf{to be polished}]]] Other types of multi-objective optimization have less contradictory goals. The multi-agent motion problem seems to fall into this category. Here all that is required is to find parameter sets so that each of the objectives can be well satisfied. [[[\textbf{another figure?}]]]
 
 \subsection{Multi-Objective Optimization}
 \label{subsec:Multi-Objective}

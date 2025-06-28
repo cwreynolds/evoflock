@@ -71,28 +71,47 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
-    This paper describes an automatic method for adjusting boid-like models. Simulating the motion of bird flocks, human crowds, vehicle traffic, and other multi-agent systems is a widely used computational technique. These simulations model the behavior of a group member (bird, human, or vehicle). The group behaviors (flock, crowd, traffic) emerge from interactions between group members. These models tend to have many numeric control parameters. While each parameter is understandable in isolation, their interaction can be complex and nonlinear. It can be difficult to know how to adjust which parameters to make a desired change in the group behavior. Changing one aspect of group behavior often causes other aspects to change, leading to a long process of incremental changes. In this work, the desired group behavior is measured with an objective(/fitness/loss) function and optimized with a genetic algorithm.
+    This paper describes an automatic method for adjusting or tuning multi-agent motion models. Simulating the motion of bird flocks, human crowds, vehicle traffic, and other multi-agent systems is a widely used computational technique. These simulations model the behavior of a group member (bird, human, or vehicle). The group behaviors (flock, crowd, traffic) emerge from interactions between group members. These models tend to have many numeric control parameters. Although each parameter is understandable in isolation, their interaction can be complex and nonlinear. It can be difficult to know how to adjust which parameters to make a desired change in the group behavior. Changing one aspect of group behavior often causes other aspects to change, leading to a long process of incremental changes. In this work, the desired group behavior is measured with an objective(/fitness/loss) function and optimized with a genetic algorithm.
 \end{abstract}
 
-\noindent{\small\textbf{Keywords:} flocking, boids, inverse design, optimization, evolutionary computation, genetic algorithm}
+\noindent{\small\textbf{Keywords:} boids, inverse design, optimization, evolutionary computation, genetic algorithm, flocks, herds, schools, crowds, traffic}
 
 
 \section{Introduction}
 \label{sec:intro}
 
-Simulation models of multi-agent motion are used in many fields, including: animation, games, biology, and [...]. Several early models include \textit{boids} \citep{reynolds_flocks_1987} and others [Aoki, Smael, Viksek, ...]. All allow creating simulations of flocks, and other group motions.  They tend to produce motion that most observers would recognize as some sort of flock. (This paper will refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic) can be portrayed with suitable adjustment of the model.)
+Simulation models of multi-agent motion are used in many fields, including: animation, games, biology, control of robotic swarms and [...]. Several early models include \textit{boids} \citep{reynolds_flocks_1987} and others [Aoki, Smael, Viksek, ...]. All allow creating simulations of flocks, and other group motions.  They tend to produce motion that most observers would recognize as some sort of flock. This paper will refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic) can be portrayed with suitable adjustment of the model.
 \par
 
 This paper addresses the issue of \textit{adjusting} or \textit{tuning} multi-agent motion models. For example, modifying a model of bird flocks to instead portray fish schools. Or say, to start from a model of flocking crows and change it to represent a flock of sparrows. Or to take a faithful model of a birds flock in nature, and change it, say for storytelling purposes, to convey a flock of birds that are happy, or angry. Similarly, to take a generic flock model, and fit it to observations of real birds.
 \par
 
-A boids-like simulation model usually has a collection of numeric parameters to control its action. (In this work, there are about 20 parameters.) Initially, adjusting the parameters is required, simply to create group motion that looks like flocking. Any sort of modification to a group motion model, such as the examples mentioned above, required further adjustments to the parameters. Each such adjustment requires selecting which parameter(s) to change, whether it should increase or decrease, and by how much. Often more than one parameter needs changing. The difficulty is that the effects of control parameters overlap and interact. So changing one usually requires changing another to compensate. Often the result is that many of them need changing, and the overall behavior of the model gets worse. It can become a frustrating and time consuming process.
+A boids-like simulation model usually has a collection of numeric parameters to control its action. (In this work, there are about 20 parameters.) Initially, adjusting the parameters is required, simply to create group motion that looks like flocking. Any sort of modification to a group motion model, such as the examples mentioned above, required further adjustments to the parameters. Each such adjustment requires selecting which parameter(s) to change, whether it should increase or decrease, and by how much. Often more than one parameter needs changing. The difficulty is that the effects of control parameters overlap and interact. Changing one usually requires changing another to compensate. Often, the result is that many of them need to be changed, and the overall behavior of the model gets worse. It can become a frustrating and time-consuming process.
 \par
 
-This paper is about automating that adjustment process using metrics of flock quality, and an optimization process.
+This paper is about automating that adjustment process using metrics of flock quality, and an optimization process. The metrics use multiple objectives. The optimization process is a genetic algorithm.
 
 \section{Related Work}
 \label{sec:related}
+
+... \textit{boids} \citep{reynolds_flocks_1987} and others (\citet{aoki_simulation_1982}, \citet{cucker_emergent_2007}, \citet{bhattacharya_collective_2010} [[[\textbf{Is this the best cite for Vicsek?}]]]).
+
+\par
+
+\section{Description of the Technique}
+\label{sec:Description}
+
+xxx
+\par
+
+\subsection{Objective Function}
+\label{subsec:Objective_Function}
+
+xxx
+\par
+
+\subsection{Multi-Objective Optimization}
+\label{subsec:Multi-Objective}
 
 xxx
 \par

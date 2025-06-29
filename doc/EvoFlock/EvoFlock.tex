@@ -112,14 +112,20 @@ The approach used here was developed as part of a larger ongoing collaboration i
 \section{Description of the Technique}
 \label{sec:Description}
 
-xxx
+This section discusses the various components of the optimization process for adjusting parameters of a flock (multi-agent motion) model.
 \par
 
-\subsection{Optimization Method}
-\label{subsec:Objective_Function}
+\subsection{Optimization with Genetic Algorithms}
+\label{subsec:Optimization_with_GA}
 
-...In this work, optimization is used to find simulation parameters for individuals that best fit the group behavior goals... It uses a genetic algorithm, a technique based on concepts from biological evolution, as seen in the natural world. Genetic algorithms were first described by \citet{holland_adaptation_1975}. Evolution was first described by \citet{darwin_origin_1859}.
+Optimization can be used to find a set of simulation parameters that best fit the given behavioral goals. The approach described here uses a \textit{genetic algorithm} (GA), a technique based loosely on concepts from biological evolution, as seen in the natural world. Genetic algorithms were first described by \citet{holland_adaptation_1975}. Evolution was first described by \citet{darwin_origin_1859}.
 \par
+
+Genetic Algorithms are a stochastic population-based approach to optimization and discovery. They proceed by a random process. For example, a model parameter might be changed by adding a signed zero-centered random value, offsetting the parameter by a small amount from its previous value. A genetic algorithm maintains a \textit{population} of candidate solution. Usually the population contains a fixed number (tens to thousands) of candidate solutions, often called \textit{individuals}. Typically each individual is a fixed-sized vector of numeric values.
+
+Many variations on genetic algorithms have been developed. Sometimes, the entire population of individuals is updated, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state}, updates individuals one at a time.
+
+[[[\textbf{reproduction}]]]
 
 \subsection{Objective Function}
 \label{subsec:Objective_Function}
@@ -130,7 +136,7 @@ This work is based on optimizing a set of parameters for a flock (multi-agent mo
 To motivate this concept, consider building a bridge over a river. A key criterion is that the bridge is reliable: it will carry the required loads without collapsing. Another criterion is that the cost of building the bridge is minimized. These criteria are directly opposed. A very strong bridge is reliable but costly. A very cheap bridge is unlikely to be reliable. This trade-off is often called \textit{Pareto optimality}. Tuples of such Pareto optimal values form the \textit{Pareto front}, see Figure \ref{fig:Pareto-front}.
 \par
 
-\begin{figure}[]
+\begin{figure}[h]
     \includegraphics[width=\columnwidth]{images/temp_MOF.png}
     \caption{Hypothetical bridge example: pairs of Pareto optimal values for reliability and cheapness. [[[\textbf{TEMP}]]]}
     \label{fig:Pareto-front}

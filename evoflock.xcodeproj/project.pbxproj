@@ -100,32 +100,6 @@
 		840B67B62B5C28D1008AE661 /* shape.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shape.h; sourceTree = "<group>"; };
 		8413ADFB2B89626F006693A1 /* GP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GP.h; sourceTree = "<group>"; };
 		8413ADFC2B8AB10C006693A1 /* LazyPredator */ = {isa = PBXFileReference; lastKnownFileType = folder; path = LazyPredator; sourceTree = "<group>"; };
-		841E7D5A2DE92A42006F99CA /* 20221007_0806_step_7030.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221007_0806_step_7030.png; sourceTree = "<group>"; };
-		841E7D5B2DE92A42006F99CA /* 20221030_1220_step_19.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221030_1220_step_19.png; sourceTree = "<group>"; };
-		841E7D5C2DE92A42006F99CA /* 20221030_1220_step_1045.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221030_1220_step_1045.png; sourceTree = "<group>"; };
-		841E7D5D2DE92A42006F99CA /* 20221030_1220_step_2014.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221030_1220_step_2014.png; sourceTree = "<group>"; };
-		841E7D5E2DE92A42006F99CA /* 20221030_1220_step_3059.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221030_1220_step_3059.png; sourceTree = "<group>"; };
-		841E7D5F2DE92A42006F99CA /* 20221030_1220_step_6650.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221030_1220_step_6650.png; sourceTree = "<group>"; };
-		841E7D602DE92A42006F99CA /* 20221030_1220_step_7467.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221030_1220_step_7467.png; sourceTree = "<group>"; };
-		841E7D612DE92A42006F99CA /* 20221108_2018_step_4655.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221108_2018_step_4655.png; sourceTree = "<group>"; };
-		841E7D622DE92A42006F99CA /* 20221108_2018_step_5498.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221108_2018_step_5498.png; sourceTree = "<group>"; };
-		841E7D632DE92A42006F99CA /* 20221108_2018_step_5947.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221108_2018_step_5947.png; sourceTree = "<group>"; };
-		841E7D642DE92A42006F99CA /* 20221108_2018_step_6562.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221108_2018_step_6562.png; sourceTree = "<group>"; };
-		841E7D652DE92A42006F99CA /* 20221121_1819_step_6324.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221121_1819_step_6324.png; sourceTree = "<group>"; };
-		841E7D662DE92A42006F99CA /* 20221121_1819_step_6464.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221121_1819_step_6464.png; sourceTree = "<group>"; };
-		841E7D672DE92A42006F99CA /* 20221121_1819_step_6677.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221121_1819_step_6677.png; sourceTree = "<group>"; };
-		841E7D682DE92A42006F99CA /* 20221121_1819_step_6755.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221121_1819_step_6755.png; sourceTree = "<group>"; };
-		841E7D692DE92A42006F99CA /* 20221215_step_5867.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221215_step_5867.png; sourceTree = "<group>"; };
-		841E7D6A2DE92A42006F99CA /* 20221215_step_5892.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221215_step_5892.png; sourceTree = "<group>"; };
-		841E7D6B2DE92A42006F99CA /* 20221215_step_6830.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221215_step_6830.png; sourceTree = "<group>"; };
-		841E7D6C2DE92A42006F99CA /* 20221215_step_6916.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221215_step_6916.png; sourceTree = "<group>"; };
-		841E7D6D2DE92A42006F99CA /* 20221215_step_7182.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221215_step_7182.png; sourceTree = "<group>"; };
-		841E7D6E2DE92A42006F99CA /* 20221216_step_5997.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 20221216_step_5997.png; sourceTree = "<group>"; };
-		841E7D6F2DE92A42006F99CA /* coc_overview.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = coc_overview.pdf; sourceTree = "<group>"; };
-		841E7D702DE92A42006F99CA /* predator_cnn.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = predator_cnn.pdf; sourceTree = "<group>"; };
-		841E7D712DE92A42006F99CA /* SQM_plot_easy_vs_hard.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = SQM_plot_easy_vs_hard.pdf; sourceTree = "<group>"; };
-		841E7D722DE92A42006F99CA /* SQM_plot_run_variance.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = SQM_plot_run_variance.pdf; sourceTree = "<group>"; };
-		841E7D732DE92A42006F99CA /* texsyn_overview.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = texsyn_overview.pdf; sourceTree = "<group>"; };
 		841E7D752DE92A42006F99CA /* alifeconf.sty */ = {isa = PBXFileReference; lastKnownFileType = text; path = alifeconf.sty; sourceTree = "<group>"; };
 		841E7D762DE92A42006F99CA /* Evoflock.bib */ = {isa = PBXFileReference; lastKnownFileType = text; path = Evoflock.bib; sourceTree = "<group>"; };
 		841E7D772DE92A42006F99CA /* EvoFlock.tex */ = {isa = PBXFileReference; lastKnownFileType = text; path = EvoFlock.tex; sourceTree = "<group>"; };
@@ -143,6 +117,9 @@
 		848101FB2C77B53E00433168 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		848BC33C2B69856700509CE5 /* flock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = flock.h; sourceTree = "<group>"; };
 		849817952E077C11002B4548 /* fitness_plot_template.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = fitness_plot_template.numbers; sourceTree = "<group>"; };
+		849817962E1368DC002B4548 /* EvoFlock_Figures.pages */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvoFlock_Figures.pages; sourceTree = "<group>"; };
+		849817972E13696C002B4548 /* temp_fig_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_fig_1.png; sourceTree = "<group>"; };
+		849817982E13696C002B4548 /* temp_MOF_HV.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_MOF_HV.png; sourceTree = "<group>"; };
 		849C91502C7E9DFC007DFBDE /* libOpen3D.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D.a; path = ../../../../../usr/local/lib/libOpen3D.a; sourceTree = "<group>"; };
 		849C91522C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_filament.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_filament.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_filament.a; sourceTree = "<group>"; };
 		849C91532C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a"; sourceTree = "<group>"; };
@@ -292,6 +269,7 @@
 			isa = PBXGroup;
 			children = (
 				841E7D782DE92A42006F99CA /* EvoFlock */,
+				849817962E1368DC002B4548 /* EvoFlock_Figures.pages */,
 				849817952E077C11002B4548 /* fitness_plot_template.numbers */,
 			);
 			path = doc;
@@ -300,32 +278,8 @@
 		841E7D742DE92A42006F99CA /* images */ = {
 			isa = PBXGroup;
 			children = (
-				841E7D5A2DE92A42006F99CA /* 20221007_0806_step_7030.png */,
-				841E7D5B2DE92A42006F99CA /* 20221030_1220_step_19.png */,
-				841E7D5C2DE92A42006F99CA /* 20221030_1220_step_1045.png */,
-				841E7D5D2DE92A42006F99CA /* 20221030_1220_step_2014.png */,
-				841E7D5E2DE92A42006F99CA /* 20221030_1220_step_3059.png */,
-				841E7D5F2DE92A42006F99CA /* 20221030_1220_step_6650.png */,
-				841E7D602DE92A42006F99CA /* 20221030_1220_step_7467.png */,
-				841E7D612DE92A42006F99CA /* 20221108_2018_step_4655.png */,
-				841E7D622DE92A42006F99CA /* 20221108_2018_step_5498.png */,
-				841E7D632DE92A42006F99CA /* 20221108_2018_step_5947.png */,
-				841E7D642DE92A42006F99CA /* 20221108_2018_step_6562.png */,
-				841E7D652DE92A42006F99CA /* 20221121_1819_step_6324.png */,
-				841E7D662DE92A42006F99CA /* 20221121_1819_step_6464.png */,
-				841E7D672DE92A42006F99CA /* 20221121_1819_step_6677.png */,
-				841E7D682DE92A42006F99CA /* 20221121_1819_step_6755.png */,
-				841E7D692DE92A42006F99CA /* 20221215_step_5867.png */,
-				841E7D6A2DE92A42006F99CA /* 20221215_step_5892.png */,
-				841E7D6B2DE92A42006F99CA /* 20221215_step_6830.png */,
-				841E7D6C2DE92A42006F99CA /* 20221215_step_6916.png */,
-				841E7D6D2DE92A42006F99CA /* 20221215_step_7182.png */,
-				841E7D6E2DE92A42006F99CA /* 20221216_step_5997.png */,
-				841E7D6F2DE92A42006F99CA /* coc_overview.pdf */,
-				841E7D702DE92A42006F99CA /* predator_cnn.pdf */,
-				841E7D712DE92A42006F99CA /* SQM_plot_easy_vs_hard.pdf */,
-				841E7D722DE92A42006F99CA /* SQM_plot_run_variance.pdf */,
-				841E7D732DE92A42006F99CA /* texsyn_overview.pdf */,
+				849817972E13696C002B4548 /* temp_fig_1.png */,
+				849817982E13696C002B4548 /* temp_MOF_HV.png */,
 			);
 			path = images;
 			sourceTree = "<group>";

@@ -1,11 +1,12 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %
 % Evoflock: evolved inverse design of multi-agent motion
 % speculative draft paper
 %
 % May 29, 2025  Begin draft.
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[letterpaper]{article}
 \usepackage{natbib,alifeconf}
@@ -23,7 +24,7 @@
 \usepackage{float}
 \usepackage[T1]{fontenc} % ??? QQQ -- "<"
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % \graphicspath{ {images/} {images/fcd5/} }
 \graphicspath{ {images/} }
@@ -42,26 +43,23 @@
 % small fixed-width font
 \newcommand{\stt}[1]{{\small \texttt{#1}}}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
+
 \title{Evoflock: evolved inverse design of multi-agent motion}
+
 \author{Craig Reynolds\authorcr
     unaffiliated researcher\authorcr 
     cwr@red3d.com}
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \captionsetup{hypcap=false}
 
-% \titlepic{\igfour{20221121_1819_step_6464.png} \hfill \igfour{20221108_2018_step_6562.png} \hfill\igfour{20221215_step_7182.png}\hfill\igfour{20221216_step_5997.png} \captionof{figure}{...random unrelated figure...} 
-% \label{fig:teaser}}
-
 \titlepic{\includegraphics[width=\textwidth]{images/temp_fig_1.png}
-\captionof{figure}{Boids flocking around obstacles, using evolved parameters.} 
+\captionof{figure}{Boids flocking in a space cluttered with obstacles. Behavioral parameters of the boids are determined by inverse design, using multi-objective evolutionary optimization.} 
 \label{fig:teaser}}
-
 
 % Remove today's date being inserted after the title/author information.
 \date{}
@@ -81,30 +79,36 @@
 
 \noindent{\small\textbf{Keywords:} boids, inverse design, optimization, evolutionary computation, genetic algorithm, flocks, herds, schools, crowds, traffic}
 
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/temp_MOF_HV.png}
+    \caption{\textbf{UPDATE} Hypothetical bridge example: pairs of Pareto optimal values for reliability and cheapness. [[[\textbf{TEMP}]]]}
+    \label{fig:MOF_HV}
+\end{figure*}
 
 \section{Introduction}
 \label{sec:intro}
 
-Simulation models of multi-agent motion are used in many fields, including: animation, games, biology, control of robotic swarms and [...]. Several early models include \textit{boids} \citep{reynolds_flocks_1987} and others [Aoki, Smael, Viksek, ...]. All allow creating simulations of flocks, and other group motions.  They tend to produce motion that most observers would recognize as some sort of flock. This paper will refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic) can be portrayed with suitable adjustment of the model.
-\par
+Simulation models of multi-agent motion are used in many fields, including: animation, games, biology, robotic swarms and [...]. Several early models include \textit{boids} \citep{reynolds_flocks_1987} and others [Aoki, Smael, Viksek, ...]. All allow creating simulations of flocks, and other group motions.  They tend to produce motion that most observers would recognize as some sort of flock. This paper will refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic) can be portrayed with suitable adjustment of the model.
 
 This paper addresses the issue of \textit{adjusting} or \textit{tuning} multi-agent motion models. For example, modifying a model of bird flocks to instead portray fish schools. Or say, to start from a model of flocking crows and change it to represent a flock of sparrows. Or to take a faithful model of a birds flock in nature, and change it, say for storytelling purposes, to convey a flock of birds that are happy, or angry. Similarly, to take a generic flock model, and fit it to observations of real birds.
-\par
 
 A boids-like simulation model usually has a collection of numeric parameters to control its action. (In this work, there are about 20 parameters.) Initially, adjusting the parameters is required, simply to create group motion that looks like flocking. Any sort of modification to a group motion model, such as the examples mentioned above, required further adjustments to the parameters. Each such adjustment requires selecting which parameter(s) to change, whether it should increase or decrease, and by how much. Often more than one parameter needs changing. The difficulty is that the effects of control parameters overlap and interact. Changing one usually requires changing another to compensate. Often, the result is that many of them need to be changed, and the overall behavior of the model gets worse. It can become a frustrating and time-consuming process.
-\par
 
 This paper is about automating that adjustment process using metrics of flock quality, and an optimization process. The metrics use multiple objectives. The optimization process is a genetic algorithm.
+
+The anonymized c++ code for this project can be viewed at:
+\scriptsize
+\url{https://anonymous.4open.science/r/evoflock-9B09/}
+\normalsize
 
 \section{Related Work}
 \label{sec:related}
 
 Since the 1980s various simulation models of bird flocks have been proposed including \textit{boids} \citep{reynolds_flocks_1987} and others (\citet{aoki_simulation_1982}, \citet{cucker_emergent_2007}, \citet{bhattacharya_collective_2010} [[[\textbf{Is this the best citation for Vicsek?}]]]).
-\par
 
 Most previous work on automatic tuning for flock models has used reinforcement learning [[[\textbf{cite}]]] as the optimization technique. While this paper was being drafted, a preprint was posted \citep{brambati_learning_2025} which uses reinforcement learning with an objective function very similar to the one used here. Other flock tuning based on reinforcement learn include:
 [[[\textbf{cites?}]]].
-\par
 
 
 The approach used here was developed as part of a larger ongoing collaboration investigating new approaches to optimization of multi-agent motion. [[[\textbf{cite Matthew's thesis?}]]]
@@ -113,34 +117,34 @@ The approach used here was developed as part of a larger ongoing collaboration i
 \label{sec:Description}
 
 This section discusses the various components of the optimization process for adjusting parameters of a flock (multi-agent motion) model.
-\par
 
 \subsection{Optimization with Genetic Algorithms}
 \label{subsec:Optimization_with_GA}
 
 Optimization can be used to find a set of simulation parameters that best fit the given behavioral goals. The approach described here uses a \textit{genetic algorithm} (GA), a technique based loosely on concepts from biological evolution, as seen in the natural world. Genetic algorithms were first described by \citet{holland_adaptation_1975}. Evolution was first described by \citet{darwin_origin_1859}.
-\par
 
 Genetic Algorithms are a stochastic population-based approach to optimization and discovery. They proceed by a random process. For example, a model parameter might be changed by adding a signed zero-centered random value, offsetting the parameter by a small amount from its previous value. A genetic algorithm maintains a \textit{population} of candidate solution. Usually the population contains a fixed number (tens to thousands) of candidate solutions, often called \textit{individuals}. Typically each individual is a fixed-sized vector of numeric values.
 
 Many variations on genetic algorithms have been developed. Sometimes, the entire population of individuals is updated, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state}, updates individuals one at a time.
 
+[[[\textbf{genome}]]]
+
 [[[\textbf{reproduction}]]]
+
+[[[\textbf{maybe add diagram of SSGA step}]]]
 
 \subsection{Objective Function}
 \label{subsec:Objective_Function}
 
 This work is based on optimizing a set of parameters for a flock (multi-agent motion) model. Optimization procedures are guided by an \textit{objective function}. In many optimization problems, the overall objective is a combination of several, potentially contradictory goals. This is generally called multi-objective optimization. 
-\par
 
 To motivate this concept, consider building a bridge over a river. A key criterion is that the bridge is reliable: it will carry the required loads without collapsing. Another criterion is that the cost of building the bridge is minimized. These criteria are directly opposed. A very strong bridge is reliable but costly. A very cheap bridge is unlikely to be reliable. This trade-off is often called \textit{Pareto optimality}. Tuples of such Pareto optimal values form the \textit{Pareto front}, see Figure \ref{fig:Pareto-front}.
-\par
 
-\begin{figure}[h]
-    \includegraphics[width=\columnwidth]{images/temp_MOF.png}
-    \caption{Hypothetical bridge example: pairs of Pareto optimal values for reliability and cheapness. [[[\textbf{TEMP}]]]}
-    \label{fig:Pareto-front}
-\end{figure}
+% \begin{figure}[h]
+%     \includegraphics[width=\columnwidth]{images/temp_MOF.png}
+%     \caption{Hypothetical bridge example: pairs of Pareto optimal values for reliability and cheapness. [[[\textbf{TEMP}]]]}
+%     \label{fig:Pareto-front}
+% \end{figure}
 
 [[[\textbf{to be polished}]]] Other types of multi-objective optimization have less contradictory goals. The multi-agent motion problem seems to fall into this category. Here all that is required is to find parameter sets so that each of the objectives can be well satisfied. [[[\textbf{another figure?}]]]
 
@@ -148,36 +152,37 @@ To motivate this concept, consider building a bridge over a river. A key criteri
 \label{subsec:Multi-Objective}
 
 xxx
-\par
+
+[[[\textbf{scalarization}]]]
+
+[[[\textbf{hypervolume}]]]
 
 \section{Conclusions}
 \label{sec:Conclusions}
 
 xxx
-\par
 
 \section{Limitations}
 \label{sec:limitations}
 
 xxx
-\par
 
 \section{Future Work}
 \label{sec:future}
 
 xxx
-\par
 
 \section{Acknowledgements}
 \label{sec:ack}
 
-...Gilbert, Matthew, Jennifer, Wahrman(?)...
-\par
+[[[\textbf{Gilbert, Matthew, Jennifer, Wahrman(?)}]]]
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \bibliographystyle{apalike}
 \bibliography{EvoFlock.bib}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Appendix / Supplemental Materials
 

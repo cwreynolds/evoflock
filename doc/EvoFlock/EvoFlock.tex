@@ -71,7 +71,7 @@
 % \pagestyle{plain}
 % \pagenumbering{arabic}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
     This paper describes an automatic method for adjusting or tuning multi-agent motion models. Simulating the motion of bird flocks, human crowds, vehicle traffic, and other multi-agent systems is a widely used computational technique. These simulations model the behavior of a group member (bird, human, or vehicle). The group behaviors (flock, crowd, traffic) emerge from interactions between group members. These models tend to have many numeric control parameters. Although each parameter is understandable in isolation, their interaction can be complex and nonlinear. It can be difficult to know how to adjust which parameters to make a desired change in the group behavior. Changing one aspect of group behavior often causes other aspects to change, leading to a long process of incremental changes. In this work, the desired group behavior is measured with an objective(/fitness/loss) function and optimized with a genetic algorithm.
@@ -79,12 +79,23 @@
 
 \noindent{\small\textbf{Keywords:} boids, inverse design, optimization, evolutionary computation, genetic algorithm, flocks, herds, schools, crowds, traffic}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{figure*}[t]
     \centering
     \includegraphics[width=0.9\textwidth]{images/temp_MOF_HV.png}
     \caption{(A) Normalized multi-objective fitness space. For two objectives, each with scores ranging over [0, 1], a 2D square. (B) The \textit{Pareto front} for two mutually conflicting objectives. (Like \textit{reliability} and \textit{cheapness} in the hypothetical bridge design example.) All the objectives can not be well satisfied at the same time. This is seen in the distance from (1,1) to the red curve. (C) Mostly compatible objectives, more typical of criteria for flock tuning. (D) Scalarization of a multiple-objective fitness value, using \textit{hypervolume}: the product of all objective scores. In this 2D example it is the blue rectangle's \textit{area}. [[[\textbf{TEMP}]]]}
     \label{fig:MOF_HV}
 \end{figure*}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/temp_sep_score.png}
+    \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
+    \label{fig:separation_score}
+\end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
 \label{sec:intro}

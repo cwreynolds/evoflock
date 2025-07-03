@@ -372,6 +372,15 @@ public:
             // Sleep for that clipped interval.
             thread_sleep_in_seconds(clipped_time);
 
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250702 yet another slow frame draw symptom
+//            if (frameDuration() > 2 * frameDurationTarget())
+            if (frameDuration() > 1.1 * frameDurationTarget())
+            {
+                std::cout << "frameDuration() = " << frameDuration() << std::endl;
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             // Log for debugging, can be removed eventually.
             bool verbose = false;
             if (verbose and (frame_counter_ % 10) == 0)
@@ -388,8 +397,13 @@ public:
                 std::cout << "adjust          "; f(adjust);
                 std::cout << "clippedSleepTime"; f(clipped_time);
             }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250702 yet another slow frame draw symptom
+
             // Ensure FD history has not been invalidated by external delays.
             resetHistoryIfInvalid();
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
     }
 

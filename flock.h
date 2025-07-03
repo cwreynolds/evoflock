@@ -164,6 +164,16 @@ public:
             draw().endOneAnimatedFrame();
             clock().sleepUntilEndOfFrame(afap ? 0 : step_duration);
             clock().measureFrameDuration(run_sim_this_frame);
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250702 yet another slow frame draw symptom
+            if (clock().frameDuration() > 1.1 * clock().frameDurationTarget())
+            {
+                std::cout << "frameDuration() = "
+                          << clock().frameDuration() << std::endl;
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         }
         draw().endAnimatedScene();
         printRunStats();

@@ -140,6 +140,25 @@ public:
         if (enable()) { clearAnimatedGeometryFromScene(); }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250702 yet another slow frame draw symptom
+
+//    // Called to end each animation frame.
+//    void endOneAnimatedFrame()
+//    {
+//        if (enable())
+//        {
+//            updateCamera();
+//            redrawScene();
+//            result_from_last_poll_events_call_ = pollEvents();
+//            if (poll_events_count_ > 1) { debugPrint(poll_events_count_); }
+//        }
+//    }
+    
+    
+    int xxx_temp_frame_count = 0;
+
+
     // Called to end each animation frame.
     void endOneAnimatedFrame()
     {
@@ -147,10 +166,20 @@ public:
         {
             updateCamera();
             redrawScene();
+            
+//            xxx_temp_frame_count++;
+//            if ((xxx_temp_frame_count % 10) == 0)
+//            {
+//                result_from_last_poll_events_call_ = pollEvents();
+//            }
+
             result_from_last_poll_events_call_ = pollEvents();
+
             if (poll_events_count_ > 1) { debugPrint(poll_events_count_); }
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Clear all animated geometry to begin building a new scene.
     void clearAnimatedGeometryFromScene()
@@ -374,14 +403,32 @@ public:
     void setEnable(bool e) { enable_ = e; }
     void toggleEnable() { enable_ = not enable_; }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250702 yet another slow frame draw symptom
+
+//    // Process asynch events: key presses, mouse moves, closing window, etc.
+//    bool pollEvents()
+//    {
+//        util::Timer t;
+//        bool pe = visualizer().PollEvents();
+//        poll_events_count_++;
+//        return pe;
+//    }
+
+
     // Process asynch events: key presses, mouse moves, closing window, etc.
     bool pollEvents()
     {
         util::Timer t;
         bool pe = visualizer().PollEvents();
         poll_events_count_++;
+        
+        if (t.elapsedSeconds() > 0.1) { debugPrint(t.elapsedSeconds()) }
+        
         return pe;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Update the camera view. Runs "follow cam". Sets Open3d view dep on mode.
     void updateCamera()

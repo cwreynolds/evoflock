@@ -84,21 +84,16 @@
 \begin{figure*}[t]
     \centering
     \includegraphics[width=0.9\textwidth]{images/temp_MOF_HV.png}
-    \caption{(A) Normalized multi-objective fitness space. For two objectives, each with scores ranging over [0, 1], a 2D square. (B) The \textit{Pareto front} for two mutually conflicting objectives. (Like \textit{reliability} and \textit{cheapness} in the hypothetical bridge design example.) All the objectives can not be well satisfied at the same time. This is seen in the distance from (1,1) to the red curve. (C) Mostly compatible objectives, more typical of criteria for flock tuning. (D) Scalarization of a multiple-objective fitness value, using \textit{hypervolume}: the product of all objective scores. In this 2D example it is the blue rectangle's \textit{area}. [[[\textbf{TEMP}]]]}
+    \caption{(A) Normalized multi-objective fitness space. For two objectives, each with scores ranging over [0, 1], a 2D square. (B) The \textit{Pareto front} for two mutually conflicting objectives. (Like \textit{reliability} and \textit{affordability} in the hypothetical bridge design example.) The objectives can not all be equally well satisfied. Visually, this is the distance from (1,1) to the red curve. (C) Mostly compatible objectives, more typical of criteria for flock tuning. Here, the Pareto front passes near the global optimum. (D) Scalarization of a multiple-objective fitness value, using \textit{hypervolume}: the product of all objective scores. In this 2D example it is the blue rectangle's \textit{area}. [[[\textbf{TEMP}]]]}
     \label{fig:MOF_HV}
-\end{figure*}
-
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/temp_sep_score.png}
-    \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
-    \label{fig:separation_score}
 \end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Introduction}
 \label{sec:intro}
+
+[[[...say something about how I used three objectives to evolve flocking of the type shown in Fig. 1 --- maybe try an experiment with ``open air flocking'' to see if it will work with just separation score...]]]
 
 Simulation models of multi-agent motion are used in many fields, including: animation, games, biology, robotic swarms, and urban planning. Several early models include \textit{boids} \citep{reynolds_flocks_1987} and others (see \nameref{sec:related}). All allow creating simulations of flocks, and other group motions.  They tend to produce motion that most observers would recognize as some sort of flock. This paper will refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic) can be portrayed with suitable adjustment of the model.
 
@@ -114,6 +109,25 @@ The anonymized c++ code for this project can be viewed at:
 \scriptsize
 \url{https://anonymous.4open.science/r/evoflock-9B09/}
 \normalsize
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/temp_sep_score.png}
+    \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
+    \label{fig:separation_score}
+\end{figure*}
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/temp_speed_score.png}
+    \caption{Score for desired boid \textit{speed}, here 20 meters per second. This function is highest when speed is between 19 and 21 m/s. The \textit{speed} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
+    \label{fig:speed_score}
+\end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Related Work}
 \label{sec:related}
@@ -138,7 +152,7 @@ Optimization can be used to find a set of simulation parameters that best fit gi
 
 A GA is a stochastic population-based approach to optimization and discovery. They proceed by a random process. For example, a model parameter might be changed by adding a signed zero-centered random value, offsetting the parameter by a small amount from its previous value. A genetic algorithm maintains a \textit{population} of candidate solution. Usually the population contains a fixed number (tens to thousands) of candidate solutions, often called \textit{individuals}. Typically each individual is a fixed-sized vector of numeric parameter values.
 
-Many variations on genetic algorithms have been developed. Sometimes, the entire population of individuals is updated in parallel, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state} (SSGA) updates individuals one at a time \citep{syswerda_study_1991}. If a generational GA is run for G generations with a population of P individuals, a corresponding SSGA would be run for $G \times P$ steps.
+Many variations on genetic algorithms have been developed. Sometimes, the entire population of individuals is updated in parallel, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state} (SSGA) updates individuals one at a time \citep{syswerda_study_1991}. If a generational GA is run for $G$ generations with a population of $P$ individuals, a corresponding SSGA would be run for $G{\times}P$ steps.
 
 [[[\textbf{genome}]]]
 
@@ -171,41 +185,55 @@ Having described the components of the optimization framework for this inverse d
 
 The objectives described below are based on measurements made during the flock simulation process. That is, in addition to running the simulation, \textit{metric} code is run while updating each individual boid step, after a flock update, and at the end of a simulation. This data is stored in the flock instance and queried by the evolutionary optimization framework in which it is run.
 
-\subsection{Objective for Seperation}
-\label{subsec:seperation_objective}
+\subsection{Objective for Separation}
+\label{subsec:separation_objective}
 
 A key observation is that the birds in a flock are grouped closely together, yet manage to avoid colliding with each other. [[[\textbf{find some citation to back this up?}]]] These goals can be seen as a requirement that the distance between simulated boids fall within a certain distance interval. Specifically, for a given boid, we determine its nearest neighbor, and measure the distance between their centers. A score is computed based on that distance. It is zero if either the distance is too small (potential collision) or the distance is too large (failure to form a dense flock group). It is one in an acceptable range, and piecewise linear ramps transition from one to zero outside this desired range. See Figure \ref{fig:separation_score}.
 
-An equally iconic property of natural flocks is that birds are \textit{aligned}, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment. Simply optimizing to obtain separation appears to \textbf{cause} the alignemnt.
+An equally iconic property of natural flocks is that birds are \textit{aligned}, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment. Simply optimizing to obtain separation appears to \textbf{cause} the alignment.
 
 \subsection{Objective for Obstacle Avoidance}
 \label{subsec:avoidance_objective}
 
-The example application in this work can be described as ``flocking in the presence of obstacles'' as shown in Figure \ref{fig:boid_flock}. Part of the simulation of each boid in the flock is predicting future obstacle collisions, and steering (turning) to avoid them. A part of this is detecting failures of obstacle avoidance. In simulation this is a matter of a boid having incorrectly passed through the surface of the obstacle. A kinematic constraint is invoked to move the boid back to the correct side of the boundary. This failure is recorded in a collision counter on the boid. At the end of the flock simulation this is turned into a normalized score of the number of collisions over the total number of boid-steps. (Typically in these experiments there are 200 boids and 500 simulation steps, so the final score is total number of collisions over 100,000.)
+The example application in this work can be described as ``flocking in the presence of obstacles'' as shown in Figure \ref{fig:boid_flock}. Part of the simulation of each boid in the flock is predicting future obstacle collisions, and steering (turning) to avoid them. A part of this is detecting failures of obstacle avoidance. In simulation this is a matter of a boid having incorrectly passed through the surface of the obstacle. A kinematic constraint is invoked to move the boid back to the correct side of the boundary. This failure is recorded in a collision counter on the boid. At the end of the flock simulation this is turned into a normalized score of the number of collisions over the total number of boid-steps. (Typically in these experiments, a fitness test runs 200 boids for 500 simulation steps, so the final score is total number of collisions over 100,000.)
+
+\subsection{Objective for Speed Target}
+\label{subsec:speed_objective}
+
+Initially, each boid's flight speed was simply clamped kinematically at 20 meters per second. Later, a third objective was added to establish a target speed range. Flight speed could be left to the optimizer to determine, but that allows the ``attractive nuisance'' solution of \textit{speed=0}. A given inverse design problem would probably have some speed in mind. For example, a flock of finches, or one of swallows, have very different typical speeds. Figure \ref{fig:speed_score} shows a speed score function used in these experiments. It has a target range on [19, 21] with a fixed support ramping down to zero outside that range.
+
+\subsection{Adjusting Objectives}
+\label{subsec:adjust_objective}
+
+[[[...need to say something (here?) about the nonlinearities used on the scores: remapInterval() for obstacle non-collisions and emphasizeHighScores() for separation...]]]
 
 \section{Conclusions}
 \label{sec:Conclusions}
 
-xxx
-
-[[[I said this above, should it be here, or simply call back to it? An equally iconic property of natural flocks is that birds are aligned, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment.]]]
+[[[I said this above, should it be here, or simply call back to it? \textit{An equally iconic property of natural flocks is that birds are aligned, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment.}]]]
 
 \section{Limitations}
 \label{sec:limitations}
 
-xxx
+[[[...for speed score and separation score: does it matter if the ramps on either side of the sweet spot are there? Should try a test...]]]
+
+[[[...discuss the ``ignoring noise'' paper...]]]
 
 \section{Future Work}
 \label{sec:future}
 
-xxx
+[[[...I plan to try adding a fourth objective --- perhaps for path curvature --- as an exercise to talk about more advanced inverse design problems --- but if not, it should be mentioned here...]]]
 
 \section{Acknowledgements}
 \label{sec:ack}
 
-[[[\textbf{Gilbert, Matthew, Jennifer, Wahrman(?)}]]]
+[[[\textbf{Gilbert, Matthew, Jennifer, Wahrman(?), Inman Harvey?}]]]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+.
+
+[[[Add a table to contain all relevant parameters in one place]]]
 
 \bibliographystyle{apalike}
 \bibliography{EvoFlock.bib}

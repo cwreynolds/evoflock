@@ -52,14 +52,32 @@ private:
     static inline std::vector<ObstaclePtrList> obstacle_presets_;
     static inline int obstacle_selection_counter_ = -1;
     static inline ObstaclePtrList obstacles_;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250704 open space flocking -- no obstacles
+
+//    // Index of the initial/default obstacle set.
+//    static inline int default_obstacle_set_index_ =
+//    // 0;  // Sphere and vertical cylinder.
+//    // 1;  // Sphere and 6 cylinders.
+//    // 2;  // Sphere and plane.
+//    // 3;  // Sphere only.
+//    4;  // Sphere and many little spheres.
+//    // 5;  // Sphere with smaller sphere inside.
+  
+    
     // Index of the initial/default obstacle set.
     static inline int default_obstacle_set_index_ =
     // 0;  // Sphere and vertical cylinder.
     // 1;  // Sphere and 6 cylinders.
     // 2;  // Sphere and plane.
     // 3;  // Sphere only.
-    4;  // Sphere and many little spheres.
+    // 4;  // Sphere and many little spheres.
     // 5;  // Sphere with smaller sphere inside.
+    6;  // No obstacles
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
@@ -568,6 +586,15 @@ public:
             obs.push_back(new SphereObstacle(sr, sc, oside));
             obs.push_back(new SphereObstacle(12, sc, iside));
             obstacle_presets_.push_back(obs);
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250704 open space flocking -- no obstacles
+            
+            // Set 6 -- no obstacles
+            obs.clear();
+            obstacle_presets_.push_back(obs);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             // Set initial obstacle set to the default.
             draw().obstacleSetIndex() = default_obstacle_set_index_;

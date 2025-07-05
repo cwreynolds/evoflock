@@ -69,6 +69,11 @@ void visualizePreviouslyLoggedFlockParameters()
                        84.7544, 76.4079, 3.01808, 79.4333, 53.4527, -0.543717,
                        -0.462297, 0.132325, 3.80525, 0.949715);
 
+    // from (disappointing) run 20250704_open_space_flocking
+    //FlockParameters fp(93.9295, 20, 20, 20, 76.095, 21.176, 31.0822, 13.7764,
+    //                   71.8005, 48.7475, 2.90648, 31.4824, 97.1207, -0.600948,
+    //                   -0.94693, -0.998404, 61.8045, 3.5044);
+    
     EF::enable_multithreading = false;
     while (true) { GP::run_flock_simulation(fp, 1); }
 }

@@ -100,9 +100,6 @@
 		840B67B62B5C28D1008AE661 /* shape.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = shape.h; sourceTree = "<group>"; };
 		8413ADFB2B89626F006693A1 /* GP.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GP.h; sourceTree = "<group>"; };
 		8413ADFC2B8AB10C006693A1 /* LazyPredator */ = {isa = PBXFileReference; lastKnownFileType = folder; path = LazyPredator; sourceTree = "<group>"; };
-		841E7D752DE92A42006F99CA /* alifeconf.sty */ = {isa = PBXFileReference; lastKnownFileType = text; path = alifeconf.sty; sourceTree = "<group>"; };
-		841E7D762DE92A42006F99CA /* Evoflock.bib */ = {isa = PBXFileReference; lastKnownFileType = text; path = Evoflock.bib; sourceTree = "<group>"; };
-		841E7D772DE92A42006F99CA /* EvoFlock.tex */ = {isa = PBXFileReference; lastKnownFileType = text; path = EvoFlock.tex; sourceTree = "<group>"; };
 		841F3D552B49E90000483276 /* evoflock */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = evoflock; sourceTree = BUILT_PRODUCTS_DIR; };
 		841F3D5F2B49E9FE00483276 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		841F3D612B49EE6C00483276 /* Vec3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Vec3.h; sourceTree = "<group>"; };
@@ -118,8 +115,13 @@
 		848BC33C2B69856700509CE5 /* flock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = flock.h; sourceTree = "<group>"; };
 		849817952E077C11002B4548 /* fitness_plot_template.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = fitness_plot_template.numbers; sourceTree = "<group>"; };
 		849817962E1368DC002B4548 /* EvoFlock_Figures.pages */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvoFlock_Figures.pages; sourceTree = "<group>"; };
-		849817972E13696C002B4548 /* temp_fig_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_fig_1.png; sourceTree = "<group>"; };
-		849817982E13696C002B4548 /* temp_MOF_HV.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_MOF_HV.png; sourceTree = "<group>"; };
+		849817992E1ACC39002B4548 /* temp_fig_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_fig_1.png; sourceTree = "<group>"; };
+		8498179A2E1ACC39002B4548 /* temp_MOF_HV.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_MOF_HV.png; sourceTree = "<group>"; };
+		8498179B2E1ACC39002B4548 /* temp_sep_score.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_sep_score.png; sourceTree = "<group>"; };
+		8498179C2E1ACC39002B4548 /* temp_speed_score.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_speed_score.png; sourceTree = "<group>"; };
+		8498179E2E1ACC39002B4548 /* alifeconf.sty */ = {isa = PBXFileReference; lastKnownFileType = text; path = alifeconf.sty; sourceTree = "<group>"; };
+		8498179F2E1ACC39002B4548 /* Evoflock.bib */ = {isa = PBXFileReference; lastKnownFileType = text; path = Evoflock.bib; sourceTree = "<group>"; };
+		849817A02E1ACC39002B4548 /* EvoFlock.tex */ = {isa = PBXFileReference; lastKnownFileType = text; path = EvoFlock.tex; sourceTree = "<group>"; };
 		849C91502C7E9DFC007DFBDE /* libOpen3D.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D.a; path = ../../../../../usr/local/lib/libOpen3D.a; sourceTree = "<group>"; };
 		849C91522C7E9F7A007DFBDE /* libOpen3D_3rdparty_filament_filament.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libOpen3D_3rdparty_filament_filament.a; path = ../../../../../usr/local/lib/libOpen3D_3rdparty_filament_filament.a; sourceTree = "<group>"; };
 		849C91532C7E9F7A007DFBDE /* libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a"; path = "../../../../../usr/local/lib/libOpen3D_3rdparty_vtk_vtkpugixml-9.1.a"; sourceTree = "<group>"; };
@@ -268,31 +270,11 @@
 		8419349C2DE3F66800A9C8EE /* doc */ = {
 			isa = PBXGroup;
 			children = (
-				841E7D782DE92A42006F99CA /* EvoFlock */,
+				849817A12E1ACC39002B4548 /* EvoFlock paper */,
 				849817962E1368DC002B4548 /* EvoFlock_Figures.pages */,
 				849817952E077C11002B4548 /* fitness_plot_template.numbers */,
 			);
 			path = doc;
-			sourceTree = "<group>";
-		};
-		841E7D742DE92A42006F99CA /* images */ = {
-			isa = PBXGroup;
-			children = (
-				849817972E13696C002B4548 /* temp_fig_1.png */,
-				849817982E13696C002B4548 /* temp_MOF_HV.png */,
-			);
-			path = images;
-			sourceTree = "<group>";
-		};
-		841E7D782DE92A42006F99CA /* EvoFlock */ = {
-			isa = PBXGroup;
-			children = (
-				841E7D742DE92A42006F99CA /* images */,
-				841E7D752DE92A42006F99CA /* alifeconf.sty */,
-				841E7D762DE92A42006F99CA /* Evoflock.bib */,
-				841E7D772DE92A42006F99CA /* EvoFlock.tex */,
-			);
-			path = EvoFlock;
 			sourceTree = "<group>";
 		};
 		841F3D4C2B49E90000483276 = {
@@ -400,6 +382,28 @@
 				848101F62C7666CA00433168 /* libOpen3D.0.18.0.dylib */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8498179D2E1ACC39002B4548 /* images */ = {
+			isa = PBXGroup;
+			children = (
+				849817992E1ACC39002B4548 /* temp_fig_1.png */,
+				8498179A2E1ACC39002B4548 /* temp_MOF_HV.png */,
+				8498179B2E1ACC39002B4548 /* temp_sep_score.png */,
+				8498179C2E1ACC39002B4548 /* temp_speed_score.png */,
+			);
+			path = images;
+			sourceTree = "<group>";
+		};
+		849817A12E1ACC39002B4548 /* EvoFlock paper */ = {
+			isa = PBXGroup;
+			children = (
+				8498179D2E1ACC39002B4548 /* images */,
+				8498179E2E1ACC39002B4548 /* alifeconf.sty */,
+				8498179F2E1ACC39002B4548 /* Evoflock.bib */,
+				849817A02E1ACC39002B4548 /* EvoFlock.tex */,
+			);
+			path = "EvoFlock paper";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

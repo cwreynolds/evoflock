@@ -53,12 +53,12 @@
     unaffiliated researcher\authorcr 
     cwr@red3d.com}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \captionsetup{hypcap=false}
 
 \titlepic{\includegraphics[width=\textwidth]{images/temp_fig_1.png}
-\captionof{figure}{Boids flocking in a space cluttered with obstacles. Behavioral parameters of the boids are determined by inverse design, using multi-objective evolutionary optimization.} 
+\captionof{figure}{800 boids flocking in a space cluttered with obstacles. Behavioral parameters of the boids are determined by inverse design, using multi-objective evolutionary optimization.} 
 \label{fig:boid_flock}}
 
 % Remove today's date being inserted after the title/author information.
@@ -93,9 +93,9 @@
 \section{Introduction}
 \label{sec:intro}
 
-[[[...say something about how I used three objectives to evolve flocking of the type shown in Fig. 1 --- maybe try an experiment with ``open air flocking'' to see if it will work with just separation score...]]]
+[[[\textbf{...say something about how I used three objectives to evolve flocking of the type shown in Fig. 1 --- maybe try an experiment with ``open air flocking'' to see if it will work with just separation score...}]]]
 
-[[[...the idea of ``a `black box' boid flocking model'' is mentioned twice. Should say more about that. Point out that my approach does not require access to the BB model, nor impose constraints on it (like Matthew needing code subject to auto-diff). Note more generally, this approach does not require a differentiable model, in contrast to an approach based on stochastic gradient descent...]]]
+[[[\textbf{...the idea of ``a `black box' boid flocking model'' is mentioned twice. Should say more about that. Point out that my approach does not require access to the BB model, nor impose constraints on it (like Matthew needing code subject to auto-diff). Note more generally, this approach does not require a differentiable model, in contrast to an approach based on stochastic gradient descent...}]]]
 
 Simulation models of multi-agent motion are used in many fields, including: animation, games, biology, robotic swarms, and urban planning. Several early models include \textit{boids} \citep{reynolds_flocks_1987} and others (see \nameref{sec:related}). All allow creating simulations of flocks, and other group motions.  They tend to produce motion that most observers would recognize as some sort of flock. This paper will refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic) can be portrayed with suitable adjustment of the model.
 
@@ -126,7 +126,7 @@ A video of flock simulations based on this approach is available here:
     \centering
     \includegraphics[width=0.9\textwidth]{images/temp_sep_score.png}
     \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
-    \label{fig:separation_score}
+    \label{fig:SeparationScore}
 \end{figure*}
 
 \begin{figure*}[t]
@@ -170,7 +170,7 @@ Many variations on genetic algorithms have been developed. Sometimes, the entire
 [[[\textbf{maybe add diagram of SSGA step}]]]
 
 \subsection{Objective Function}
-\label{subsec:Objective_Function}
+\label{subsec:ObjectiveFunction}
 
 This work is based on optimizing a set of parameters for a flock (multi-agent motion) model. Optimization procedures are guided by an \textit{objective function}. In many optimization problems, the overall objective is a combination of several, potentially contradictory goals, called multi-objective optimization. 
 
@@ -190,12 +190,12 @@ xxx
 \section{Parameter set for a flocking model}
 \label{sec:parameter_set}
 
-[[[...list the parameters, talk a bit about the flocking model...]]]
+[[[\textbf{...list the parameters, talk a bit about the flocking model...}]]]
 
-[[[...note that flocking model needs to be cleaned up and that I'm using ``evolved speed control''...]]]
+[[[\textbf{...note that flocking model needs to be cleaned up and that I'm using ``evolved speed control''...}]]]
 
 \section{An objective function for flocking}
-\label{sec:flocking_objective}
+\label{sec:FlockingObjective}
 
 Having described the components of the optimization framework for this inverse design project (see \nameref{sec:Description}), this section focuses on the specific objective(/fitness/loss) function that was used in this work to optimize a multi-agent motion model for flocking.
 
@@ -204,7 +204,7 @@ The objectives described below are based on measurements made during the flock s
 \subsection{Objective for Separation}
 \label{subsec:separation_objective}
 
-A key observation is that the birds in a flock are grouped closely together, yet manage to avoid colliding with each other. [[[\textbf{find some citation to back this up?}]]] These goals can be seen as a requirement that the distance between simulated boids fall within a certain distance interval. Specifically, for a given boid, we determine its nearest neighbor, and measure the distance between their centers. A score is computed based on that distance. It is zero if either the distance is too small (potential collision) or the distance is too large (failure to form a dense flock group). It is one in an acceptable range, and piecewise linear ramps transition from one to zero outside this desired range. See Figure \ref{fig:separation_score}.
+A key observation is that the birds in a flock are grouped closely together, yet manage to avoid colliding with each other. [[[\textbf{find some citation to back this up?}]]] These goals can be seen as a requirement that the distance between simulated boids fall within a certain distance interval. Specifically, for a given boid, we determine its nearest neighbor, and measure the distance between their centers. A score is computed based on that distance. It is zero if either the distance is too small (potential collision) or the distance is too large (failure to form a dense flock group). It is one in an acceptable range, and piecewise linear ramps transition from one to zero outside this desired range. See Figure \ref{fig:SeparationScore}.
 
 An equally iconic property of natural flocks is that birds are \textit{aligned}, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment. Simply optimizing to obtain separation appears to \textbf{cause} the alignment.
 
@@ -223,33 +223,35 @@ Flight speed could be left to the optimizer to determine, but that allows the ``
 \subsection{Adjusting Objectives}
 \label{subsec:adjust_objective}
 
-[[[...need to say something (here?) about the nonlinearities used on the scores: remapInterval() for obstacle non-collisions and emphasizeHighScores() for separation...]]]
+[[[\textbf{...need to say something (here?) about the nonlinearities used on the scores: remapInterval() for obstacle non-collisions and emphasizeHighScores() for separation...}]]]
 
 \subsection{Adding an objective}
 \label{subsec:add_objective}
 
-[[[...make experiment with goal of increasing path curvature. If it works describe here. Otherwise put it in \nameref{sec:future}...]]]
+[[[\textbf{...make experiment with goal of increasing path curvature. If it works describe here. Otherwise put it in \nameref{sec:future}...}]]]
 
-[[[...need to say something (here?) about the nonlinearities used on the scores: remapInterval() for obstacle non-collisions and emphasizeHighScores() for separation...]]]
+[[[\textbf{...need to say something (here?) about the nonlinearities used on the scores: remapInterval() for obstacle non-collisions and emphasizeHighScores() for separation...}]]]
 
 \section{Conclusions}
 \label{sec:Conclusions}
 
-This work suggests that evolutionary optimization, via a genetic algorithm, can successfully optimize a set of parameters for a ``black box'' boid flocking model. This suggests that other similar multi-agent motion models --- for example, multi robot terrain search --- might well be solved using a genetic algorithm in a similar way, using an objective with some similarity to the one discussed in \ref{sec:flocking_objective}.
+This work suggests that evolutionary optimization, via a genetic algorithm, can successfully optimize a set of parameters for a ``black box'' boid flocking model. This suggests that other similar multi-agent motion models --- for example, multi robot terrain search --- might well be solved using a genetic algorithm in a similar way, using an objective with some similarity to the one discussed in \nameref{sec:FlockingObjective}.
 
-[[[I said this above, should it be here, or simply call back to it? \textit{An equally iconic property of natural flocks is that birds are aligned, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment.}]]]
+[[[\textbf{should this be in the introduction? Say something about using deep reinforcement learning for flocks, etc.}]]] One advantage of using evolutionary optimization for this type of inverse design problem is that the multi-agent simulation can be treated as a ``black box.'' As such, there are few constraints on how the simulation is implemented. For example, to use \textit{stochastic gradient descent} (SGD) \citep{robbins_stochastic_1951} the flock model must be differentiable, either analytically or with \textit{automatic differentiation} [[[\textbf{cite autograd?}]]]. Conversely, evolutionary optimization only requires the measured scalar fitness of a simulation, no gradients are used.
+
+[[[\textbf{I said this above, should it be here, or simply call back to it? \textit{An equally iconic property of natural flocks is that birds are aligned, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment.}}]]]
 
 \section{Limitations}
 \label{sec:limitations}
 
-[[[...for speed score and separation score: does it matter if the ramps on either side of the sweet spot are there? Should try a test...]]]
+[[[\textbf{...for speed score and separation score: does it matter if the ramps on either side of the sweet spot are there? Should try a test...}]]]
 
-[[[...discuss the ``ignoring noise'' paper...]]]
+[[[\textbf{...discuss the ``ignoring noise'' paper...}]]]
 
 \section{Future Work}
 \label{sec:future}
 
-[[[...I plan to try adding a fourth objective --- perhaps for path curvature --- as an exercise to talk about more advanced inverse design problems --- but if not, it should be mentioned here...]]]
+[[[\textbf{...I plan to try adding a fourth objective --- perhaps for path curvature --- as an exercise to talk about more advanced inverse design problems --- but if not, it should be mentioned here...}]]]
 
 \section{Acknowledgements}
 \label{sec:ack}
@@ -260,7 +262,7 @@ This work suggests that evolutionary optimization, via a genetic algorithm, can 
 
 .
 
-[[[...go through all papers in my Zotero with the tag \textit{evoflock}...]]]
+[[[\textbf{...go through all papers in my Zotero with the tag \textit{evoflock}...}]]]
 
 \begin{table}[t]
 \centering

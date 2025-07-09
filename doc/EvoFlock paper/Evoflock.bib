@@ -13,6 +13,23 @@
 }
 
 
+@article{baydin_automatic_2018,
+	title = {Automatic {Differentiation} in {Machine} {Learning}: a {Survey}},
+	volume = {18},
+	issn = {1533-7928},
+	shorttitle = {Automatic {Differentiation} in {Machine} {Learning}},
+	url = {http://jmlr.org/papers/v18/17-468.html},
+	abstract = {Derivatives, mostly in the form of gradients and Hessians, are ubiquitous in machine learning. Automatic differentiation (AD), also called algorithmic differentiation or simply “autodiff”, is a family of techniques similar to but more general than backpropagation for efficiently and accurately evaluating derivatives of numeric functions expressed as computer programs. AD is a small but established field with applications in areas including computational fluid dynamics, atmospheric sciences, and engineering design optimization. Until very recently, the fields of machine learning and AD have largely been unaware of each other and, in some cases, have independently discovered each other's results. Despite its relevance, general-purpose AD has been missing from the machine learning toolbox, a situation slowly changing with its ongoing adoption under the names “dynamic computational graphs” and “differentiable programming.” We survey the intersection of AD and machine learning, cover applications where AD has direct relevance, and address the main implementation techniques. By precisely defining the main differentiation techniques and their interrelationships, we aim to bring clarity to the usage of the terms “autodiff”, “automatic differentiation”, and “symbolic differentiation” as these are encountered more and more in machine learning settings.},
+	number = {153},
+	urldate = {2025-07-08},
+	journal = {Journal of Machine Learning Research},
+	author = {Baydin, Atilim Gunes and Pearlmutter, Barak A. and Radul, Alexey Andreyevich and Siskind, Jeffrey Mark},
+	year = {2018},
+	keywords = {autodiff, calculus, differentiable, differentiable programming, history, math, optimization, survey},
+	pages = {1--43},
+	file = {Full Text PDF:/Users/cwr/Zotero/storage/QTIMAFEZ/Baydin et al. - 2018 - Automatic Differentiation in Machine Learning a Survey.pdf:application/pdf},
+}
+
 @article{bhattacharya_collective_2010,
 	title = {Collective decision making in cohesive flocks},
 	volume = {12},
@@ -46,6 +63,22 @@
 	keywords = {collective, learning, boids, steering, Condensed Matter - Soft Condensed Matter, fitness, flocking, reinforcement learning, evoflock},
 	annote = {Comment: 13 pages + appendices},
 	file = {Preprint PDF:/Users/cwr/Zotero/storage/MCBEH9XD/Brambati et al. - 2025 - Learning to flock in open space by avoiding collisions and staying together.pdf:application/pdf;Snapshot:/Users/cwr/Zotero/storage/KLEY5ZGX/2506.html:text/html},
+}
+
+@misc{cornelisse_building_2025,
+	title = {Building reliable sim driving agents by scaling self-play},
+	url = {http://arxiv.org/abs/2502.14706},
+	doi = {10.48550/arXiv.2502.14706},
+	abstract = {Simulation agents are essential for designing and testing systems that interact with humans, such as autonomous vehicles (AVs). These agents serve various purposes, from benchmarking AV performance to stress-testing system limits, but all applications share one key requirement: reliability. To enable sound experimentation, a simulation agent must behave as intended. It should minimize actions that may lead to undesired outcomes, such as collisions, which can distort the signal-to-noise ratio in analyses. As a foundation for reliable sim agents, we propose scaling self-play to thousands of scenarios on the Waymo Open Motion Dataset under semi-realistic limits on human perception and control. Training from scratch on a single GPU, our agents solve almost the full training set within a day. They generalize to unseen test scenes, achieving a 99.8\% goal completion rate with less than 0.8\% combined collision and off-road incidents across 10,000 held-out scenarios. Beyond in-distribution generalization, our agents show partial robustness to out-of-distribution scenes and can be fine-tuned in minutes to reach near-perfect performance in such cases. We open-source the pre-trained agents and integrate them with a batched multi-agent simulator. Demonstrations of agent behaviors can be viewed at https://sites.google.com/view/reliable-sim-agents, and we open-source our agents at https://github.com/Emerge-Lab/gpudrive.},
+	urldate = {2025-07-08},
+	publisher = {arXiv},
+	author = {Cornelisse, Daphne and Pandya, Aarav and Joseph, Kevin and Suárez, Joseph and Vinitsky, Eugene},
+	month = may,
+	year = {2025},
+	note = {arXiv:2502.14706 [cs]},
+	keywords = {Computer Science - Artificial Intelligence, Computer Science - Robotics},
+	annote = {Comment: v3},
+	file = {Preprint PDF:/Users/cwr/Zotero/storage/MEJMVDWW/Cornelisse et al. - 2025 - Building reliable sim driving agents by scaling self-play.pdf:application/pdf;Snapshot:/Users/cwr/Zotero/storage/XJWY294U/2502.html:text/html},
 }
 
 @article{cucker_emergent_2007,
@@ -104,6 +137,19 @@
 	pages = {25--34},
 }
 
+@incollection{reynolds_evolved_1993,
+	title = {An {Evolved}, {Vision}-{Based} {Behavioral} {Model} of {Coordinated} {Group} {Motion}},
+	isbn = {978-0-262-28715-9},
+	url = {https://doi.org/10.7551/mitpress/3116.003.0052},
+	booktitle = {From {Animals} to {Animats} 2: {Proceedings} of the {Second} {International} {Conference} on {Simulation} of {Adaptive} {Behavior}},
+	publisher = {The MIT Press},
+	author = {Reynolds, Craig W.},
+	month = apr,
+	year = {1993},
+	doi = {10.7551/mitpress/3116.003.0052},
+	note = {\_eprint: https://direct.mit.edu/book/chapter-pdf/2314157/9780262287159\_cby.pdf},
+	file = {PDF:/Users/cwr/Zotero/storage/GK3G9VKB/Reynolds - 1993 - An Evolved, Vision-Based Behavioral Model of Coordinated Group Motion.pdf:application/pdf},
+}
 
 @article{robbins_stochastic_1951,
 	title = {A {Stochastic} {Approximation} {Method}},
@@ -121,6 +167,16 @@
 	note = {Publisher: Institute of Mathematical Statistics},
 	pages = {400--407},
 	file = {Full Text PDF:/Users/cwr/Zotero/storage/LH7SEM7N/Robbins and Monro - 1951 - A Stochastic Approximation Method.pdf:application/pdf},
+}
+
+@book{sutton_reinforcement_1998,
+	title = {Reinforcement {Learning}: {An} {Introduction}},
+	url = {http://www.cs.ualberta.ca/~sutton/book/the-book.html},
+	abstract = {This introductory textbook on reinforcement learning is targeted toward engineers and scientists in artificial intelligence, operations research, neural networks, and control systems, and we hope it will also be of interest to psychologists and neuroscientists. It also contains several new results. An html version is available.},
+	publisher = {MIT Press},
+	author = {Sutton, Richard S. and Barto, Andrew G.},
+	year = {1998},
+	keywords = {computational learning machine reinforcement supervised wleformativeeassessment},
 }
 
 @incollection{syswerda_study_1991,

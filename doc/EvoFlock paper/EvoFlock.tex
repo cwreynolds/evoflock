@@ -79,17 +79,6 @@
 
 \noindent{\small\textbf{Keywords:} boids, inverse design, optimization, evolutionary computation, genetic algorithm, flocks, herds, schools, crowds, traffic}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/temp_MOF_HV.png}
-    \caption{(A) Normalized multi-objective fitness space. For two objectives, each with scores ranging over [0, 1], a 2D square. (B) The \textit{Pareto front} for two mutually conflicting objectives. (Like \textit{reliability} and \textit{affordability} in the hypothetical bridge design example.) The objectives can not all be equally well satisfied. Visually, this is the distance from (1,1) to the red curve. (C) Mostly compatible objectives, more typical of criteria for flock tuning. Here, the Pareto front passes near the global optimum. (D) Scalarization of a multiple-objective fitness value, using \textit{hypervolume}: the product of all objective scores. In this 2D example it is the blue rectangle's \textit{area}. [[[\textbf{TEMP}]]]}
-    \label{fig:MOF_HV}
-\end{figure*}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \section{Introduction}
 \label{sec:intro}
 
@@ -107,47 +96,45 @@ Initially, adjusting the parameters is required simply to create group motion th
 
 This paper is about automating that adjustment process using metrics of flock quality and an optimization process. The metrics use multiple objectives. The optimization process used in these experiments is a genetic algorithm.
 
+A summary of (``hyper'')parameters for this framework is given in \ref{table:parameters}.
+
 The anonymized c++ code for this project can be viewed at:
 \scriptsize
 \url{https://anonymous.4open.science/r/evoflock-9B09/}
 \normalsize
 
-A summary of (``hyper'')parameters for this framework is given in \ref{table:parameters}.
-
 A video of flock simulations based on this approach is available here:
 \scriptsize
 \url{https://www.youtube.com/xxx}
 \normalsize
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/temp_sep_score.png}
-    \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
-    \label{fig:SeparationScore}
-\end{figure*}
-
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/temp_speed_score.png}
-    \caption{Score for desired boid \textit{speed}, here 20 meters per second. This function is highest when speed is between 19 and 21 m/s. The \textit{speed} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
-    \label{fig:speed_score}
-\end{figure*}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[[[\textbf{fix URL once posted}]]]
 
 \section{Related Work}
 \label{sec:related}
 
+[[[\textbf{mention self-play}]]]
+
 Since the 1980s various simulation models of bird flocks have been proposed including \textit{boids} \citep{reynolds_flocks_1987} and others (\citet{aoki_simulation_1982}, \citet{cucker_emergent_2007}, \citet{bhattacharya_collective_2010} [[[\textbf{Is this the best citation for Vicsek?}]]]).
 
-Most previous work on automatic tuning for flock models has used reinforcement learning [[[\textbf{cite}]]] as the optimization technique. While this paper was being drafted, a preprint was posted \citep{brambati_learning_2025} which uses reinforcement learning with an objective function very similar to the one used here. Other flock tuning based on reinforcement learn include:
+Most previous work on automatic tuning for flock models has used reinforcement learning \citep{sutton_reinforcement_1998} as the optimization technique. For example, recent excellent work on high quality \textit{driving agents} for a multi-agent traffic simulation based on self-play using reinforcement learning \citep{cornelisse_building_2025}.
+
+While this paper was being drafted, a preprint was posted \citep{brambati_learning_2025} using reinforcement learning with an objective function very similar to the one used here. Other flock tuning based on reinforcement learning include:
 [[[\textbf{cites?}]]].
 
+An early, while not very successful, attempt to tune flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming}, a variation on the \textit{genetic algorithm} based on arbitrary tree-shaped genomes.
 
 The approach used here was developed as part of a larger ongoing collaboration investigating new approaches to optimization of multi-agent motion. [[[\textbf{cite Matthew's thesis?}]]]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/temp_MOF_HV.png}
+    \caption{(A) Normalized multi-objective fitness space. For two objectives, each with scores ranging over [0, 1], a unit square. (B) The \textit{Pareto front} for two mutually conflicting objectives. (Like \textit{reliability} and \textit{affordability} in the hypothetical bridge design example.) The objectives can not all be simultaneously well satisfied. Visually, this is the distance from (1,1) to the red curve. (C) Mostly compatible objectives, more typical of criteria for flock tuning. Here, the Pareto front passes near the global optimum. (D) Scalarization of a multiple-objective fitness value, using \textit{hypervolume}: the product of all objective scores. In this 2D example it is the blue rectangle's \textit{area}.}
+    \label{fig:MOF_HV}
+\end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Description of the Technique}
 \label{sec:Description}
@@ -168,6 +155,7 @@ Many variations on genetic algorithms have been developed. Sometimes, the entire
 [[[\textbf{reproduction / crossover}]]]
 
 [[[\textbf{maybe add diagram of SSGA step}]]]
+
 
 \subsection{Objective Function}
 \label{subsec:ObjectiveFunction}
@@ -208,17 +196,42 @@ A key observation is that the birds in a flock are grouped closely together, yet
 
 An equally iconic property of natural flocks is that birds are \textit{aligned}, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment. Simply optimizing to obtain separation appears to \textbf{cause} the alignment.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[t]
+    \centering
+    % \includegraphics[width=0.9\textwidth]{images/temp_sep_score.png}
+    \includegraphics[width=0.9\linewidth]{images/temp_sep_score.png}
+    \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
+    \label{fig:SeparationScore}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 \subsection{Objective for Obstacle Avoidance}
 \label{subsec:avoidance_objective}
 
 The example application in this work can be described as ``flocking in the presence of obstacles'' as shown in Figure \ref{fig:boid_flock}. Part of the simulation of each boid in the flock is predicting future obstacle collisions, and steering (turning) to avoid them. A part of this is detecting failures of obstacle avoidance. In simulation this is a matter of a boid having incorrectly passed through the surface of the obstacle. A kinematic constraint is invoked to move the boid back to the correct side of the boundary. This failure is recorded in a collision counter on the boid. At the end of the flock simulation this is turned into a normalized score of the number of collisions over the total number of boid-steps. (Typically in these experiments, a fitness test runs 200 boids for 500 simulation steps, so the final score is total number of collisions over 100,000.)
 
-\subsection{Objective for Speed Target}
+\subsection{Objective for Flight Speed}
 \label{subsec:speed_objective}
 
-Early in this project, each boid's flight speed was clipped kinematically to remain below 20 meters per second (as in early boid models \citep{reynolds_flocks_1987}). Later, a third optimization objective was added to establish a target speed range. A new behavior was added to the boid to apply an acceleration along the direction of motion to adjust flight speed to be in the desired range.
+Originally, following early boid models \citep{reynolds_flocks_1987}, each boid's flight speed was kinematically clipped to remain below 20 meters per second. Later, a third optimization objective was added to establish a target speed range. A new behavior was added to the boid to apply a force along its direction of motion to adjust its flight speed toward the desired range. The strength of this behavior became one of the flock parameters to be optimized in the inverse flock design process.
 
-Flight speed could be left to the optimizer to determine, but that allows the ``attractive nuisance'' solution of zero speed. A given inverse design problem would probably have some speed in mind. For example, a flock of finches versus a flock of swallows have very different typical speeds. Figure \ref{fig:speed_score} shows a speed score function used in these experiments. It has a target range on the interval [19, 21] with a fixed support ramping down to zero outside that range.
+Flight speed \textit{can} be left to “float” during optimization, but there seems to be an annoyingly large basin of attractions around not moving (speed = 0). In any case, an inverse design problem probably assumes some range of valid speeds. This suggests that the speed range should be given in the inverse design problem statement. For example, modeling a flock of finches and a flock of swallows would require very different speed ranges. Figure \ref{fig:speed_score} shows a speed score function used in these experiments. It has a target range in the interval [19, 21] with a fixed support ramping down to zero outside that range.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[t]
+    \centering
+    % \includegraphics[width=0.9\textwidth]{images/temp_speed_score.png}
+    \includegraphics[width=0.9\linewidth]{images/temp_speed_score.png}
+    \caption{Score for desired boid \textit{speed}, here 20 meters per second. This function is highest when speed is between 19 and 21 m/s. The \textit{speed} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
+    \label{fig:speed_score}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 \subsection{Adjusting Objectives}
 \label{subsec:adjust_objective}
@@ -237,7 +250,7 @@ Flight speed could be left to the optimizer to determine, but that allows the ``
 
 This work suggests that evolutionary optimization, via a genetic algorithm, can successfully optimize a set of parameters for a ``black box'' boid flocking model. This suggests that other similar multi-agent motion models --- for example, multi robot terrain search --- might well be solved using a genetic algorithm in a similar way, using an objective with some similarity to the one discussed in \nameref{sec:FlockingObjective}.
 
-[[[\textbf{should this be in the introduction? Say something about using deep reinforcement learning for flocks, etc.}]]] One advantage of using evolutionary optimization for this type of inverse design problem is that the multi-agent simulation can be treated as a ``black box.'' As such, there are few constraints on how the simulation is implemented. For example, to use \textit{stochastic gradient descent} (SGD) \citep{robbins_stochastic_1951} the flock model must be differentiable, either analytically or with \textit{automatic differentiation} [[[\textbf{cite autograd?}]]]. Conversely, evolutionary optimization only requires the measured scalar fitness of a simulation, no gradients are used.
+[[[\textbf{should this be in the introduction? Say something about using deep reinforcement learning for flocks, etc.}]]] One advantage of using evolutionary optimization for this type of inverse design problem is that the multi-agent simulation can be treated as a ``black box.'' As such, there are few constraints on how the simulation is implemented. For example, to use \textit{stochastic gradient descent} (SGD) \citep{robbins_stochastic_1951} the flock model must be differentiable, either analytically or with \textit{automatic differentiation} \citep{baydin_automatic_2018}. Conversely, evolutionary optimization only requires the measured scalar fitness of a simulation, no gradients are used.
 
 [[[\textbf{I said this above, should it be here, or simply call back to it? \textit{An equally iconic property of natural flocks is that birds are aligned, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment.}}]]]
 
@@ -266,19 +279,20 @@ This work suggests that evolutionary optimization, via a genetic algorithm, can 
 
 \begin{table}[t]
 \centering
-\begin{tabular}{ | l | c | l | }
+\begin{tabular}{ | l | c | c | }
     \hline
     % \multicolumn{3}{|c|}{Project Parameters} \\
     \textbf{Description} & \textbf{Value} & \textbf{Notes} \\
     \hline
-    boids per flock & 200 & ? \\
-    flock simulation steps & 500 & \\
+    boids per flock & 200 &  \\
+    flock simulation steps & 500 & ``16.6 sec'' \\
+    simulation time step & 1/30 seconds & \\
     boid body diameter & 1 meter & \\
     boid body mass & 1 kilogram & \\
     boid max force & < 100 newtons & \\
     boid speed range & 19 to 21 m/s & \\
-    run time: flock sim & $\sim$0.2 seconds & \\
-    run time: evolution & $\sim$2 hours \\
+    run time: flock sim & $\sim$0.2 seconds & $200{\times}500$ \\
+    run time: evolution & $\sim$2 hours & \\
     \hline
 \end{tabular}
 \caption{Detailed (``hyper'')parameters for the evolutionary inverse design framework. Run times are on a Apple Macbook Pro M1 Max 2021.}

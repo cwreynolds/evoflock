@@ -317,16 +317,62 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250709 experiment: compare emphasizeHighScores() with exponential
 
+//    // Return a unit fitness component: quality of obstacle avoidance.
+//    double obstacleCollisionsScore() const
+//    {
+//        double count = getTotalObstacleCollisions();
+//        double non_coll_steps = boidStepPerSim() - count;
+//        double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
+//        return emphasizeHighScores(norm_non_coll_steps, 0.995);
+//    }
+
+//        // Return a unit fitness component: quality of obstacle avoidance.
+//        double obstacleCollisionsScore() const
+//        {
+//            double count = getTotalObstacleCollisions();
+//            double non_coll_steps = boidStepPerSim() - count;
+//            double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
+//    //        return emphasizeHighScores(norm_non_coll_steps, 0.995);
+//            // Apply a very high exponent to ignore all but nearly perfect scores.
+//            return std::pow(norm_non_coll_steps, 500);
+//        }
+
+//        // Return a unit fitness component: quality of obstacle avoidance.
+//        double obstacleCollisionsScore() const
+//        {
+//            double count = getTotalObstacleCollisions();
+//            double non_coll_steps = boidStepPerSim() - count;
+//            double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
+//
+//    //        return emphasizeHighScores(norm_non_coll_steps, 0.995);
+//
+//    //        // Apply a very high exponent to ignore all but nearly perfect scores.
+//    //        return std::pow(norm_non_coll_steps, 500);
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            // TODO 20250709 experiment: will it work with just linear score?
+//
+//
+//    //        // Experiment -- linear response
+//    //        return norm_non_coll_steps;
+//
+//            // Square score (on [0, 1]) to depress all but high scores.
+//            return std::pow(norm_non_coll_steps, 2);
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//        }
+
     // Return a unit fitness component: quality of obstacle avoidance.
     double obstacleCollisionsScore() const
     {
         double count = getTotalObstacleCollisions();
         double non_coll_steps = boidStepPerSim() - count;
         double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
-//        return emphasizeHighScores(norm_non_coll_steps, 0.995);
         // Apply a very high exponent to ignore all but nearly perfect scores.
         return std::pow(norm_non_coll_steps, 500);
     }
+
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~

@@ -41,41 +41,41 @@ void visualizeBestIfRequested(LP::Population* population)
 // Comment out body of this function for normal evolution run.
 void visualizePreviouslyLoggedFlockParameters()
 {
-    // To use the hand-tuned parameters:
-    // FlockParameters fp;
-    
-    // (These values from run 20250524_test_use_scores_in_flock_data)
-    //FlockParameters fp(90.3889, 20, 20, 20, 75.3918, 41.8466, 27.8009, 0.685528,
-    //                   90.1786, 73.3035, 2.34728, 8.31566, 67.5218, -0.750053,
-    //                   -0.96459, 0.312321, 3.8674, 1.26649);
-    
-    // These values from run 20250601, very nice motion.
-    //FlockParameters fp(55.7424, 20, 20, 20, 88.3095, 59.9705, 28.3211, 28.0211,
-    //                   91.9161, 69.7648, 2.95192, 77.1844, 23.2996, -0.353221,
-    //                   -0.999566, 0.364522, 2.76299, 1.33611);
-    
-    // 20250616b_dv_neighbors_behind_pop_750
-    //FlockParameters fp(83.6605, 20, 20, 20, 99.4266, 39.4691, 25.5936, 14.3034,
-    //                   99.0738, 80.6256, 2.27497, 22.9588, 24.356, -0.115794,
-    //                   0.254552, 0.625807, 2.11305, 0.889898);
-    
-    // from run 20250617_only_1_sim_per_individual
-    //FlockParameters fp(96.076, 20, 20, 20, 85.7334, 57.0328, 24.97, 38.3267,
-    //                   96.3787, 83.4721, 3.15953, 59.1314, 71.415, -0.641807,
-    //                   -0.870298, 0.197666, 2.68647, 1.69024);
-
-    // from run 20250622_test_fix_for_slow_sim
-    FlockParameters fp(93.4907, 20, 20, 20, 96.1618, 48.9378, 35.8806, 19.816,
-                       84.7544, 76.4079, 3.01808, 79.4333, 53.4527, -0.543717,
-                       -0.462297, 0.132325, 3.80525, 0.949715);
-
-    // from (disappointing) run 20250704_open_space_flocking
-    //FlockParameters fp(93.9295, 20, 20, 20, 76.095, 21.176, 31.0822, 13.7764,
-    //                   71.8005, 48.7475, 2.90648, 31.4824, 97.1207, -0.600948,
-    //                   -0.94693, -0.998404, 61.8045, 3.5044);
-    
-    EF::enable_multithreading = false;
-    while (true) { GP::run_flock_simulation(fp, 1); }
+//    // To use the hand-tuned parameters:
+//    // FlockParameters fp;
+//    
+//    // (These values from run 20250524_test_use_scores_in_flock_data)
+//    //FlockParameters fp(90.3889, 20, 20, 20, 75.3918, 41.8466, 27.8009, 0.685528,
+//    //                   90.1786, 73.3035, 2.34728, 8.31566, 67.5218, -0.750053,
+//    //                   -0.96459, 0.312321, 3.8674, 1.26649);
+//    
+//    // These values from run 20250601, very nice motion.
+//    //FlockParameters fp(55.7424, 20, 20, 20, 88.3095, 59.9705, 28.3211, 28.0211,
+//    //                   91.9161, 69.7648, 2.95192, 77.1844, 23.2996, -0.353221,
+//    //                   -0.999566, 0.364522, 2.76299, 1.33611);
+//    
+//    // 20250616b_dv_neighbors_behind_pop_750
+//    //FlockParameters fp(83.6605, 20, 20, 20, 99.4266, 39.4691, 25.5936, 14.3034,
+//    //                   99.0738, 80.6256, 2.27497, 22.9588, 24.356, -0.115794,
+//    //                   0.254552, 0.625807, 2.11305, 0.889898);
+//    
+//    // from run 20250617_only_1_sim_per_individual
+//    //FlockParameters fp(96.076, 20, 20, 20, 85.7334, 57.0328, 24.97, 38.3267,
+//    //                   96.3787, 83.4721, 3.15953, 59.1314, 71.415, -0.641807,
+//    //                   -0.870298, 0.197666, 2.68647, 1.69024);
+//
+//    // from run 20250622_test_fix_for_slow_sim
+//    FlockParameters fp(93.4907, 20, 20, 20, 96.1618, 48.9378, 35.8806, 19.816,
+//                       84.7544, 76.4079, 3.01808, 79.4333, 53.4527, -0.543717,
+//                       -0.462297, 0.132325, 3.80525, 0.949715);
+//
+//    // from (disappointing) run 20250704_open_space_flocking
+//    //FlockParameters fp(93.9295, 20, 20, 20, 76.095, 21.176, 31.0822, 13.7764,
+//    //                   71.8005, 48.7475, 2.90648, 31.4824, 97.1207, -0.600948,
+//    //                   -0.94693, -0.998404, 61.8045, 3.5044);
+//    
+//    EF::enable_multithreading = false;
+//    while (true) { GP::run_flock_simulation(fp, 1); }
 }
 
 
@@ -84,7 +84,51 @@ int main(int argc, const char * argv[])
     EF::unit_test();
     EF::setRS(LP::LPRS());
     EF::RS().setSeedFromClock();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250709 experiment: compare emphasizeHighScores() with exponential
+    EF::RS().setSeed(1752085214);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << "RandomSequence seed = " << EF::RS().getSeed() << std::endl;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250709 experiment: compare emphasizeHighScores() with exponential
+    //               cf Flock::obstacleCollisionsScore()
+    
+//        std::cout << "x,ehs,pow" << std::endl;
+//        double steps = 100000;
+//        for (int i = steps * 0.9; i <= steps; i++)
+//        {
+//            double x = i / steps;
+//            std::cout << x;
+//            std::cout << ",";
+//            std::cout << Flock::emphasizeHighScores(x, 0.995);
+//            std::cout << ",";
+//    //        std::cout << std::pow(x, 10);
+//    //        std::cout << std::pow(x, 20);
+//    //        std::cout << std::pow(x, 50);
+//    //        std::cout << std::pow(x, 100);
+//            std::cout << std::pow(x, 500); // aha, this one is pretty close
+//            std::cout << std::endl;
+//        }
+//        exit(EXIT_SUCCESS);
+    
+//            std::cout << "x,ehs,pow" << std::endl;
+//    //        double steps = 100000;
+//        double steps = 100;
+//    //    for (int i = steps * 0.9; i <= steps; i++)
+//        for (int i = 0; i <= steps; i++)
+//        {
+//            double x = i / steps;
+//            std::cout << x;
+//            std::cout << ",";
+//            std::cout << Flock::emphasizeHighScores(x, 0.995);
+//            std::cout << ",";
+//            std::cout << std::pow(x, 50); // aha, this one is pretty close
+//            std::cout << std::endl;
+//        }
+//        exit(EXIT_SUCCESS);
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250510 temp global switch for controlling speed with fitness.

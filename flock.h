@@ -56,25 +56,25 @@ private:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250704 open space flocking -- no obstacles
 
-//    // Index of the initial/default obstacle set.
-//    static inline int default_obstacle_set_index_ =
-//    // 0;  // Sphere and vertical cylinder.
-//    // 1;  // Sphere and 6 cylinders.
-//    // 2;  // Sphere and plane.
-//    // 3;  // Sphere only.
-//    4;  // Sphere and many little spheres.
-//    // 5;  // Sphere with smaller sphere inside.
-  
-    
     // Index of the initial/default obstacle set.
     static inline int default_obstacle_set_index_ =
     // 0;  // Sphere and vertical cylinder.
     // 1;  // Sphere and 6 cylinders.
     // 2;  // Sphere and plane.
     // 3;  // Sphere only.
-    // 4;  // Sphere and many little spheres.
+    4;  // Sphere and many little spheres.
     // 5;  // Sphere with smaller sphere inside.
-    6;  // No obstacles
+  
+    
+//    // Index of the initial/default obstacle set.
+//    static inline int default_obstacle_set_index_ =
+//    // 0;  // Sphere and vertical cylinder.
+//    // 1;  // Sphere and 6 cylinders.
+//    // 2;  // Sphere and plane.
+//    // 3;  // Sphere only.
+//    // 4;  // Sphere and many little spheres.
+//    // 5;  // Sphere with smaller sphere inside.
+//    6;  // No obstacles
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -314,16 +314,21 @@ public:
                 util::remap_interval(unit_score, x, 1, y, 1));
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250709 experiment: compare emphasizeHighScores() with exponential
+
     // Return a unit fitness component: quality of obstacle avoidance.
     double obstacleCollisionsScore() const
     {
         double count = getTotalObstacleCollisions();
         double non_coll_steps = boidStepPerSim() - count;
         double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
-        return emphasizeHighScores(norm_non_coll_steps, 0.995);
+//        return emphasizeHighScores(norm_non_coll_steps, 0.995);
+        // Apply a very high exponent to ignore all but nearly perfect scores.
+        return std::pow(norm_non_coll_steps, 500);
     }
-    
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20250511 maybe move to utility.h if kept
     // rename args and vars, this version parrots recordSeparationScorePerStep()
@@ -402,12 +407,16 @@ public:
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250709 only called in printRunStats() replace with speedScore()?
+    
     // Average speed for each Boid on each simulation step.
     double averageSpeedPerBoidStep() const
     {
         return sum_of_speeds_over_all_boid_steps_ / boidStepPerSim();
     }
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Average speed for each Boid on each simulation step.
     double speedScore() const
     {

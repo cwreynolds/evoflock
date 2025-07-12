@@ -79,6 +79,17 @@
 
 \noindent{\small\textbf{Keywords:} boids, inverse design, optimization, evolutionary computation, genetic algorithm, flocks, herds, schools, crowds, traffic}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/temp_MOF_HV.png}
+    \caption{(A) Normalized multi-objective fitness space. For two objectives, each with scores ranging over [0, 1], a unit square. (B) The \textit{Pareto front} for two mutually conflicting objectives. (Like \textit{reliability} and \textit{affordability} in the hypothetical bridge design example.) The objectives can not all be simultaneously well satisfied. Visually, this is the distance from (1,1) to the red curve. (C) Mostly compatible objectives, more typical of criteria for flock tuning. Here, the Pareto front passes near the global optimum. (D) Scalarization of a multiple-objective fitness value, using \textit{hypervolume}: the product of all objective scores. In this 2D example it is the blue rectangle's \textit{area}.}
+    \label{fig:MOF_HV}
+\end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Introduction}
 \label{sec:intro}
 
@@ -111,6 +122,17 @@ A video of flock simulations based on this approach is available here:
 \normalsize
 [[[\textbf{fix URL once posted}]]]
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/temp_evo_update.png}
+    \caption{One update step of the evolutionary optimization process: (a) randomly select one of the \textit{sub-populations}, (b) from that subpop, randomly select three \textit{individuals} (flock parameter sets), (c) get fitness for each, either by running flock simulations (green), or using the fitness cached (orange) from previous tournaments, (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g) that new individual replaces the worst of the three back in the sub-population.}
+    \label{fig:temp_evo_update}
+\end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Related Work}
 \label{sec:related}
 
@@ -126,17 +148,6 @@ While this paper was being drafted, a preprint was posted \citep{brambati_learni
 An early, while not very successful, attempt to tune flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming}, a variation on the \textit{genetic algorithm} based on arbitrary tree-shaped genomes.
 
 The approach used here was developed as part of a larger ongoing collaboration investigating new approaches to optimization of multi-agent motion. [[[\textbf{cite Matthew's thesis?}]]]
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure*}[t]
-    \centering
-    \includegraphics[width=0.9\textwidth]{images/temp_MOF_HV.png}
-    \caption{(A) Normalized multi-objective fitness space. For two objectives, each with scores ranging over [0, 1], a unit square. (B) The \textit{Pareto front} for two mutually conflicting objectives. (Like \textit{reliability} and \textit{affordability} in the hypothetical bridge design example.) The objectives can not all be simultaneously well satisfied. Visually, this is the distance from (1,1) to the red curve. (C) Mostly compatible objectives, more typical of criteria for flock tuning. Here, the Pareto front passes near the global optimum. (D) Scalarization of a multiple-objective fitness value, using \textit{hypervolume}: the product of all objective scores. In this 2D example it is the blue rectangle's \textit{area}.}
-    \label{fig:MOF_HV}
-\end{figure*}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Description of the Technique}
 \label{sec:Description}
@@ -251,6 +262,58 @@ Flight speed \textit{can} be left to “float” during optimization. Unfortuate
 
 [[[\textbf{...need to say something (here?) about the nonlinearities used on the scores: remapInterval() for obstacle non-collisions and emphasizeHighScores() for separation...}]]]
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}[b]
+\centering
+\begin{tabular}{ | l | c | c | }
+    \hline
+    % \multicolumn{3}{|c|}{Project Parameters} \\
+    \textbf{Description} & \textbf{Value} & \textbf{Notes} \\
+    \hline
+    boids per flock & 200 &  \\
+    flock simulation steps & 500 & ``16.6 sec'' \\
+    simulation time step & 1/30 seconds & \\
+    \hline
+    boid body diameter & 1 meter & \\
+    boid body mass & 1 kilogram & \\
+    boid max force & < 100 newtons & \\
+    boid speed range & 19 to 21 m/s & \\
+    obs avoid exponent & 500 & \\
+    k nearest neighbors & 7 & cf. StarFlag \\
+    \hline
+    evolution population & 500, 1000 & \\
+    evolution steps & 30,000 & SSGA \\
+    \hline
+    run time: flock sim & $\sim$0.2 seconds & $200{\times}500$ \\
+    run time: evolution & $\sim$2 hours & \\
+    \hline
+\end{tabular}
+\caption{Detailed (``hyper'')parameters for the evolutionary inverse design framework. Run times are on a 2021 Apple Macbook Pro M1 Max.}
+\label{table:HyperParameters}
+\end{table}
+
+\begin{table}[b]
+\centering
+\begin{tabular}{ | l | c | c | }
+    \hline
+    \textbf{Description} & \textbf{Range} & \textbf{Notes} \\
+    \hline
+    max force & [0, 100] & Newtons \\
+    forward weight & [0, 100] &  \\
+    separate weight & [0, 100] &  \\
+    align weight & [0, 100] &  \\
+    cohere weight & [0, 100] &  \\
+    predictive avoid weight & [0, 100] &  \\
+    static avoid weight & [0, 100] &  \\
+    \hline
+\end{tabular}
+\caption{Flock model parameters subject to optimization. These are a vector of scalar values, each with an associated range. They are initially randomized then adjusted over time according to the objective function.}
+\label{table:flock-parameters}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Conclusions}
 \label{sec:Conclusions}
 
@@ -278,53 +341,6 @@ This work suggests that evolutionary optimization, via a genetic algorithm, can 
 \label{sec:ack}
 
 [[[\textbf{Gilbert, Matthew, Jennifer, Wahrman(?), Inman Harvey?}]]]
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{table}[b]
-\centering
-\begin{tabular}{ | l | c | c | }
-    \hline
-    % \multicolumn{3}{|c|}{Project Parameters} \\
-    \textbf{Description} & \textbf{Value} & \textbf{Notes} \\
-    \hline
-    boids per flock & 200 &  \\
-    flock simulation steps & 500 & ``16.6 sec'' \\
-    simulation time step & 1/30 seconds & \\
-    boid body diameter & 1 meter & \\
-    boid body mass & 1 kilogram & \\
-    boid max force & < 100 newtons & \\
-    boid speed range & 19 to 21 m/s & \\
-    run time: flock sim & $\sim$0.2 seconds & $200{\times}500$ \\
-    run time: evolution & $\sim$2 hours & \\
-    obs avoid exponent & 500 & \\
-    k nearest neighbors & 7 & cf. StarFlag \\
-    \hline
-\end{tabular}
-\caption{Detailed (``hyper'')parameters for the evolutionary inverse design framework. Run times are on a Apple Macbook Pro M1 Max 2021.}
-\label{table:HyperParameters}
-\end{table}
-
-\begin{table}[b]
-\centering
-\begin{tabular}{ | l | c | c | }
-    \hline
-    \textbf{Description} & \textbf{Range} & \textbf{Notes} \\
-    \hline
-    max force & [0, 100] & Newtons \\
-    forward weight & [0, 100] &  \\
-    separate weight & [0, 100] &  \\
-    align weight & [0, 100] &  \\
-    cohere weight & [0, 100] &  \\
-    predictive avoid weight & [0, 100] &  \\
-    static avoid weight & [0, 100] &  \\
-    \hline
-\end{tabular}
-\caption{Flock model parameters subject to optimization. These are a vector of scalar values, each with an associated range. They are initially randomized then adjusted over time according to the objective function.}
-\label{table:flock-parameters}
-\end{table}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \bibliographystyle{apalike}
 \bibliography{EvoFlock.bib}

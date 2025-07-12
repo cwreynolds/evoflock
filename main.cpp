@@ -96,7 +96,10 @@ int main(int argc, const char * argv[])
     EF::RS().setSeedFromClock();
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250709 experiment: compare emphasizeHighScores() with exponential
-    EF::RS().setSeed(1752085214);
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250711 try runs with bigger evolution population
+//    EF::RS().setSeed(1752085214);
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << "RandomSequence seed = " << EF::RS().getSeed() << std::endl;
 
@@ -194,8 +197,17 @@ int main(int argc, const char * argv[])
 //    int individuals = 800;
 //    int subpops = 28;
     
-    int individuals = 500;
-    int subpops = 22;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250711 try runs with bigger evolution population
+
+//    int individuals = 500;
+//    int subpops = 22;
+
+    int individuals = 1000;
+    int subpops = 32;
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -209,7 +221,10 @@ int main(int argc, const char * argv[])
     int max_crossover_tree_size = Boid::GP_not_GA ? 60 : ga_tree_size;
     int max_initial_tree_size   = Boid::GP_not_GA ? 60 : ga_tree_size;
 
-    LP::LPRS().setSeed(20240722);
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250711 try runs with bigger evolution population
+//    LP::LPRS().setSeed(20240722);
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     // TODO experimental_GP_stub
     auto fitness_function = (Boid::GP_not_GA ?
@@ -225,7 +240,15 @@ int main(int argc, const char * argv[])
     fs.print();
 
     {
-        std::cout << "Create population." << std::endl;
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20250711 try runs with bigger evolution population
+        
+//        std::cout << "Create population." << std::endl;
+        
+        std::cout << "Create population, individuals = " << individuals;
+        std::cout << ", subpops/demes = " << subpops << std::endl;
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         util::Timer t("Create population.");
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         // TODO 20240713 experiment with increasing initial tree size.

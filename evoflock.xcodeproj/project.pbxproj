@@ -108,6 +108,7 @@
 		841F3D642B4C73A500483276 /* Utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
 		843278062B50594E00CF4AEC /* LocalSpace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalSpace.h; sourceTree = "<group>"; };
 		843CA0DE2E21EB5300778963 /* temp_evo_update.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_evo_update.png; sourceTree = "<group>"; };
+		843CA0DF2E233DE900778963 /* temp_fit_plot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_fit_plot.png; sourceTree = "<group>"; };
 		845F845D2D90E397000BF13C /* FlockParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FlockParameters.h; sourceTree = "<group>"; };
 		847454BE2B6195F000214306 /* obstacle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = obstacle.h; sourceTree = "<group>"; };
 		847454BF2B65BE9C00214306 /* Boid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Boid.h; sourceTree = "<group>"; };
@@ -391,6 +392,7 @@
 				849817992E1ACC39002B4548 /* temp_fig_1.png */,
 				8498179A2E1ACC39002B4548 /* temp_MOF_HV.png */,
 				843CA0DE2E21EB5300778963 /* temp_evo_update.png */,
+				843CA0DF2E233DE900778963 /* temp_fit_plot.png */,
 				8498179B2E1ACC39002B4548 /* temp_sep_score.png */,
 				8498179C2E1ACC39002B4548 /* temp_speed_score.png */,
 			);

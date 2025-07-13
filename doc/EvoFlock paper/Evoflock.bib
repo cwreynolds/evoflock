@@ -1,3 +1,18 @@
+@misc{antipov_evolutionary_2025,
+	title = {Evolutionary {Algorithms} {Are} {Significantly} {More} {Robust} to {Noise} {When} {They} {Ignore} {It}},
+	url = {http://arxiv.org/abs/2409.00306},
+	doi = {10.48550/arXiv.2409.00306},
+	abstract = {Randomized search heuristics (RSHs) are known to have a certain robustness to noise. Mathematical analyses trying to quantify rigorously how robust RSHs are to a noisy access to the objective function typically assume that each solution is re-evaluated whenever it is compared to others. This aims at preventing that a single noisy evaluation has a lasting negative effect, but is computationally expensive and requires the user to foresee that noise is present (as in a noise-free setting, one would never re-evaluate solutions). In this work, we conduct the first mathematical runtime analysis of an evolutionary algorithm solving a single-objective noisy problem without re-evaluations. We prove that the \$(1+1)\$ evolutionary algorithm without re-evaluations can optimize the classic LeadingOnes benchmark with up to constant noise rates, in sharp contrast to the version with re-evaluations, where only noise with rates \$O(n{\textasciicircum}\{-2\} {\textbackslash}log n)\$ can be tolerated. This result suggests that re-evaluations are much less needed than what was previously thought, and that they actually can be highly detrimental. The insights from our mathematical proofs indicate that this similar results are plausible for other classic benchmarks.},
+	urldate = {2025-06-09},
+	publisher = {arXiv},
+	author = {Antipov, Denis and Doerr, Benjamin},
+	month = may,
+	year = {2025},
+	note = {arXiv:2409.00306 [cs]},
+	keywords = {evolution, ga, gp, noise, Computer Science - Neural and Evolutionary Computing, evoflock, robustness, variance},
+	annote = {Comment: Full version of the paper accepted to IJCAI 2025},
+	file = {Preprint PDF:/Users/cwr/Zotero/storage/JCBJ2N4W/Antipov and Doerr - 2025 - Evolutionary Algorithms Are Significantly More Robust to Noise When They Ignore It.pdf:application/pdf;Snapshot:/Users/cwr/Zotero/storage/7UQRFVAT/2409.html:text/html},
+}
 
 @article{aoki_simulation_1982,
 	title = {A simulation study of the schooling mechanism in fish},
@@ -65,6 +80,22 @@
 	file = {Preprint PDF:/Users/cwr/Zotero/storage/MCBEH9XD/Brambati et al. - 2025 - Learning to flock in open space by avoiding collisions and staying together.pdf:application/pdf;Snapshot:/Users/cwr/Zotero/storage/KLEY5ZGX/2506.html:text/html},
 }
 
+@misc{choi_flocking_2025,
+	title = {Flocking with random non-reciprocal interactions},
+	url = {http://arxiv.org/abs/2506.22060},
+	doi = {10.48550/arXiv.2506.22060},
+	abstract = {Flocking is ubiquitous in nature and emerges due to short or long range alignment interactions among self-propelled agents. Two unfriendly species that anti-align or even interact non-reciprocally show more complex collective phenomena, ranging from parallel and anti-parallel flocking over runand chase behavior to chiral phases. Whether flocking or any of these collective phenomena can survive in the presence of a large number of species with random non-reciprocal interactions remained elusive so far. As a first step here the extreme case of a Vicsek-like model with fully random nonreciprocal interactions between the individual particles is considered. As soon as the alignment bias is of the same order as the random interactions the ordered flocking phase occurs, but deep within this phase, the random non-reciprocal interactions can still support global chiral and oscillating states in which the collective movement direction rotates or oscillates slowly. For short-range interactions, moreover, even without alignment bias self-organized cliques emerge, in which medium size clusters of particles that have predominantly aligning interactions meet accidentally and stay together for macroscopic times. These results may serve as a starting point for the study of multi-species flocking models with non-random but complex non-reciprocal inter-species interactions.},
+	urldate = {2025-07-05},
+	publisher = {arXiv},
+	author = {Choi, Jiwon and Noh, Jae Dong and Rieger, Heiko},
+	month = jun,
+	year = {2025},
+	note = {arXiv:2506.22060 [cond-mat]},
+	keywords = {behavior, boids, steering, group, species, Condensed Matter - Soft Condensed Matter, Condensed Matter - Statistical Mechanics, flocking, evoflock, asymmetry},
+	annote = {Comment: 9 pages, 7 figures},
+	file = {Preprint PDF:/Users/cwr/Zotero/storage/FXEMK87Z/Choi et al. - 2025 - Flocking with random non-reciprocal interactions.pdf:application/pdf;Snapshot:/Users/cwr/Zotero/storage/HZCRTSZK/2506.html:text/html},
+}
+
 @misc{cornelisse_building_2025,
 	title = {Building reliable sim driving agents by scaling self-play},
 	url = {http://arxiv.org/abs/2502.14706},
@@ -110,11 +141,56 @@
 	annote = { or the Preservation of Favored Races in the Struggle for Life},
 }
 
+@book{dimock_aerodynamic_2003,
+	address = {1801 Alexander Bell Drive, Suite 500, Reston, VA 20191–4344},
+	title = {The {Aerodynamic} {Benefits} of {Self}-{Organization} in {Bird} {Flocks}},
+	abstract = {Natural aggregation processes such as the familiar flocking of birds have been accurately modeled using a simple, decentralized controller. Variations on this ” boid” controller typically involve three or more control laws, each with an associated control gain and sensor range. In this paper, the boid controller is fitted with an additional rule designed to produce aerodynamically-efficient formations, such as those exploited by migratory birds and hypothetical unmanned aerial vehicles. A simple genetic algorithm is then used to optimize the control parameters for minimum power consumption in a flock of simulated birds. This report focuses on the development and utility of the flocking simulator as a fitness function for the GA. Preliminary results indicate that average power consumption can be significantly reduced with the modified, optimized boid controller.},
+	publisher = {American Institute of Aeronautics and Astronautics},
+	author = {Dimock, Glen A. and Selig, Michael S.},
+	month = jan,
+	year = {2003},
+	keywords = {collective, self\_organizing, shape, flock, steering, emergence, birds, swarm\_intelligence, group, formations, bird\_flight},
+}
+
 @book{holland_adaptation_1975,
     title={Adaptation in Natural and Artificial Systems},
     author={Holland, John},
     year={1975},
     publisher = {MIT Press},
+}
+
+@article{jaderberg_human-level_2019,
+	title = {Human-level performance in first-person multiplayer games with population-based deep reinforcement learning},
+	volume = {364},
+	issn = {0036-8075, 1095-9203},
+	url = {http://arxiv.org/abs/1807.01281},
+	doi = {10.1126/science.aau6249},
+	abstract = {Recent progress in artificial intelligence through reinforcement learning (RL) has shown great success on increasingly complex single-agent environments and two-player turn-based games. However, the real-world contains multiple agents, each learning and acting independently to cooperate and compete with other agents, and environments reflecting this degree of complexity remain an open challenge. In this work, we demonstrate for the first time that an agent can achieve human-level in a popular 3D multiplayer first-person video game, Quake III Arena Capture the Flag, using only pixels and game points as input. These results were achieved by a novel two-tier optimisation process in which a population of independent RL agents are trained concurrently from thousands of parallel matches with agents playing in teams together and against each other on randomly generated environments. Each agent in the population learns its own internal reward signal to complement the sparse delayed reward from winning, and selects actions using a novel temporally hierarchical representation that enables the agent to reason at multiple timescales. During game-play, these agents display human-like behaviours such as navigating, following, and defending based on a rich learned representation that is shown to encode high-level game knowledge. In an extensive tournament-style evaluation the trained agents exceeded the win-rate of strong human players both as teammates and opponents, and proved far stronger than existing state-of-the-art agents. These results demonstrate a significant jump in the capabilities of artificial agents, bringing us closer to the goal of human-level intelligence.},
+	number = {6443},
+	urldate = {2024-07-03},
+	journal = {Science},
+	author = {Jaderberg, Max and Czarnecki, Wojciech M. and Dunning, Iain and Marris, Luke and Lever, Guy and Castaneda, Antonio Garcia and Beattie, Charles and Rabinowitz, Neil C. and Morcos, Ari S. and Ruderman, Avraham and Sonnerat, Nicolas and Green, Tim and Deason, Louise and Leibo, Joel Z. and Silver, David and Hassabis, Demis and Kavukcuoglu, Koray and Graepel, Thore},
+	month = may,
+	year = {2019},
+	note = {arXiv:1807.01281 [cs, stat]},
+	keywords = {learning, multiagent, optimization, cooperative, team, strategy, Computer Science - Artificial Intelligence, Computer Science - Machine Learning, Statistics - Machine Learning, reinforcement learning, game, adversarial, self\_play, play, evoflock},
+	pages = {859--865},
+	file = {arXiv Fulltext PDF:/Users/cwr/Zotero/storage/GJ8XLW3L/Jaderberg et al. - 2019 - Human-level performance in first-person multiplaye.pdf:application/pdf;arXiv.org Snapshot:/Users/cwr/Zotero/storage/SMXAWVNY/1807.html:text/html},
+}
+
+@misc{montanari_optimal_2025,
+	title = {Optimal flock formation induced by agent heterogeneity},
+	url = {http://arxiv.org/abs/2504.12297},
+	doi = {10.48550/arXiv.2504.12297},
+	abstract = {The study of flocking in biological systems has identified conditions for self-organized collective behavior, inspiring the development of decentralized strategies to coordinate the dynamics of swarms of drones and other autonomous vehicles. Previous research has focused primarily on the role of the time-varying interaction network among agents while assuming that the agents themselves are identical or nearly identical. Here, we depart from this conventional assumption to investigate how inter-individual differences between agents affect the stability and convergence in flocking dynamics. We show that flocks of agents with optimally assigned heterogeneous parameters significantly outperform their homogeneous counterparts, achieving 20-40\% faster convergence to desired formations across various control tasks. These tasks include target tracking, flock formation, and obstacle maneuvering. In systems with communication delays, heterogeneity can enable convergence even when flocking is unstable for identical agents. Our results challenge existing paradigms in multi-agent control and establish system disorder as an adaptive, distributed mechanism to promote collective behavior in flocking dynamics.},
+	urldate = {2025-04-20},
+	publisher = {arXiv},
+	author = {Montanari, Arthur N. and Barioni, Ana Elisa D. and Duan, Chao and Motter, Adilson E.},
+	month = apr,
+	year = {2025},
+	note = {arXiv:2504.12297 [cond-mat]},
+	keywords = {autonomous, boids, steering, multiagent, network, Mathematics - Dynamical Systems, Autonomous vehicles, Electrical Engineering and Systems Science - Systems and Control, flocking, dynamic, Consensus reaching problem, Nonlinear Sciences - Adaptation and Self-Organizing Systems, Condensed Matter - Disordered Systems and Neural Networks, nonlinear, Mathematics - Optimization and Control, Dynamical systems, Computer Science - Systems and Control, multi-agent},
+	file = {Preprint PDF:/Users/cwr/Zotero/storage/58EH26TM/Montanari et al. - 2025 - Optimal flock formation induced by agent heterogeneity.pdf:application/pdf;Snapshot:/Users/cwr/Zotero/storage/J86TS8BU/2504.html:text/html},
 }
 
 @inproceedings{reynolds_flocks_1987,
@@ -167,6 +243,24 @@
 	note = {Publisher: Institute of Mathematical Statistics},
 	pages = {400--407},
 	file = {Full Text PDF:/Users/cwr/Zotero/storage/LH7SEM7N/Robbins and Monro - 1951 - A Stochastic Approximation Method.pdf:application/pdf},
+}
+
+@inproceedings{stonedahl_finding_2011,
+	address = {Berlin, Heidelberg},
+	title = {Finding {Forms} of {Flocking}: {Evolutionary} {Search} in {ABM} {Parameter}-{Spaces}},
+	isbn = {978-3-642-18345-4},
+	shorttitle = {Finding {Forms} of {Flocking}},
+	doi = {10.1007/978-3-642-18345-4_5},
+	abstract = {While agent-based models (ABMs) are becoming increasingly popular for simulating complex and emergent phenomena in many fields, understanding and analyzing ABMs poses considerable challenges. ABM behavior often depends on many model parameters, and the task of exploring a model’s parameter space and discovering the impact of different parameter settings can be difficult and time-consuming. Exhaustively running the model with all combinations of parameter settings is generally infeasible, but judging behavior by varying one parameter at a time risks overlooking complex nonlinear interactions between parameters. Alternatively, we present a case study in computer-aided model exploration, demonstrating how evolutionary search algorithms can be used to probe for several qualitative behaviors (convergence, non-convergence, volatility, and the formation of vee shapes) in two different flocking models. We also introduce a new software tool (BehaviorSearch) for performing parameter search on ABMs created in the NetLogo modeling environment.},
+	language = {en},
+	booktitle = {Multi-{Agent}-{Based} {Simulation} {XI}},
+	publisher = {Springer},
+	author = {Stonedahl, Forrest and Wilensky, Uri},
+	editor = {Bosse, Tibor and Geller, Armando and Jonker, Catholijn M.},
+	year = {2011},
+	keywords = {behavior, collective, evolution, boids, algorithm, swarm, ga, flocking, genetic algorithms, inverse\_problems, inverse\_design, ABM, agent-based modeling, model exploration, multi-agent simulation, parameter search},
+	pages = {61--75},
+	file = {Full Text PDF:/Users/cwr/Zotero/storage/WAY4AQY3/Stonedahl and Wilensky - 2011 - Finding Forms of Flocking Evolutionary Search in .pdf:application/pdf},
 }
 
 @book{sutton_reinforcement_1998,

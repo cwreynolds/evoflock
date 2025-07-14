@@ -74,7 +74,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
-    This paper describes an automatic method for adjusting or tuning multi-agent motion models. Simulating the motion of bird flocks, human crowds, vehicle traffic, and other multi-agent systems is a widely used computational technique. These simulations model the behavior of a group member (bird, human, or vehicle). The group behaviors (flock, crowd, traffic) emerge from interactions between group members. These models tend to have many numeric control parameters. Although each parameter is understandable in isolation, their interaction can be complex and nonlinear. It can be difficult to know how to adjust which parameters to make a desired change in the group behavior. Changing one aspect of group behavior often causes other aspects to change, leading to a long process of incremental changes. In this work, the desired group behavior is measured with an objective(/fitness/loss) function and optimized with a genetic algorithm.
+    This paper describes an automatic method for \textit{adjusting} or \textit{tuning} models of multi-agent motion. Simulating the motion of bird flocks, human crowds, vehicle traffic, and other multi-agent systems is a widely used technique. These simulations model the behavior of a group member (bird, human, or vehicle). The group behaviors (flock, crowd, traffic) \textit{emerge} from interactions between group members. These models usually have many numeric control parameters. Although each parameter may be intuitive in isolation, their interaction can be complex and nonlinear. It can be difficult to know how to adjust which parameters to make a desired change in the group behavior. Changing one aspect of group behavior often causes other aspects to change, leading to a long frustrating process of incremental changes. In this work, the desired group behavior is measured with an objective(/fitness/loss) function and optimized with a \textit{genetic algorithm}.
 \end{abstract}
 
 \noindent{\small\textbf{Keywords:} boids, inverse design, optimization, evolutionary computation, genetic algorithm, flocks, herds, schools, crowds, traffic}
@@ -93,23 +93,21 @@
 \section{Introduction}
 \label{sec:intro}
 
-[[[\textbf{...say something about how I used three objectives to evolve flocking of the type shown in Fig. 1 --- maybe try an experiment with ``open air flocking'' to see if it will work with just separation score...}]]]
+Simulation models of multi-agent motion are used in many fields. These include animation, games, biology, robotic swarms, urban planning, and training autonomous vehicles. Since the 1980s, several models of group motion have been developed, including \textit{boids} and others. See \nameref{sec:related}. These allow creating simulations of flocks and other group motions, which most observers recognize as some type of flocking. This paper will refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic, drone swarms) can also be portrayed.
 
-Simulation models of multi-agent motion are used in many fields, including animation, games, biology, robotic swarms, urban planning, and training autonomous vehicles. Several early models include \textit{boids} and others (see \nameref{sec:related}). These allow creating simulations of flocks and other group motions, which most observers recognize as flocking in the abstract. This paper will refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic, drone swarms) can also be portrayed.
+This project addresses the issue of \textit{adjusting} or \textit{tuning} multi-agent motion models, toward a given behavioral goal. For example, modifying a model of bird flocks to instead portray fish schools. Or start from a model of flocking crows and change it to represent flocking sparrows. Or to take a plausibly realistic model of a natural bird flock, and change it, say for storytelling purposes, to convey a flock of birds that are happy, or angry. Similarly, starting from a generic abstract flock model and fitting it to field observations of a given species of real birds in nature.
 
-This project addresses the issue of \textit{adjusting} or \textit{tuning} multi-agent motion models, toward a given behavioral goal. For example, modifying a model of bird flocks to instead portray fish schools. Or starting from a model of flocking crows and changing it to represent a flock of sparrows. Or to take a plausibly realistic model of a natural bird flock, and change it, say for storytelling purposes, to convey a flock of birds that are happy, or angry. Similarly, starting from a generic abstract flock model and fitting it to observations of a given species of real birds in nature.
+A boids-like simulation model typically has a collection of numeric parameters (``knobs'') that control its action. The theme of this work is a software framework that automatically finds a set of near-optimal parameters for a simulation-based multi-agent system. The flock model used for these experiments is a predefined hand-written ``black box'' model whose input is a parameter set (consisting of about [[[\textbf{20}]]] numbers, see Table \ref{table:flock-parameters}). The user provides a \textit{fitness} (also known as \textit{objective} or \textit{loss}) function. It takes a candidate parameter set, runs a simulation, and returns a score reflecting how well the behavioral goals were met. The optimization process runs (for about two hours on a laptop) and produces a high quality parameter set, as measured by the objective function.
 
-A boids-like simulation model typically has a collection of numeric parameters (``knobs'') that control its action. The theme of this work is to automatically determine a set of near-optimal parameters for a simulation-based multi-agent system. The flock model used for these experiments is a predefined hand-written ``black box'' model whose input is a parameter set (consisting of about [[[\textbf{20}]]] numbers, see Table \ref{table:flock-parameters}). The user provides a \textit{fitness} (also known as \textit{objective} or \textit{loss}) function. It takes a candidate parameter set, runs a simulation, and returns a score reflecting how well the behavioral goals were met. The optimization process runs (for about two hours on a laptop) and produces a high quality parameter set, as measured by the objective function.
-
-For a user of this optimization framework, it is convenient that the flock model is treated as a black box. Almost no restrictions are imposed on a pre-existing model by the optimization framework. There are no restrictions on model design, its mutability, or the programming language used. (The latter can be an issue if optimization requires language tools such as automatic differentiation.)
+For a user of this optimization framework, it is convenient that the flock model is treated as a black box. Almost no restrictions are imposed on a preexisting model by the optimization framework. There are no restrictions on model design, its mutability, or the programming language used. (The latter can be an issue if optimization requires language tools such as automatic differentiation \citep{baydin_automatic_2018}.)
 
 In the past, flock models have been tuned manually. That can be a frustrating and time-consuming process. For a new model, adjusting parameters is required simply to create group motion that looks like plausible flocking. Any modification to a group motion model (e.g. birds{$\rightarrow$}fish) requires further adjustments to the parameters. Each such adjustment requires selecting which parameter(s) to change, whether it should increase or decrease, and by how much. Often more than one parameter needs to be changed. The main difficulty is that effects of control parameters may overlap and interact in non-linear ways. Changing one usually requires changing others to compensate. Often, the result is that many parameters need to be changed, leading to a long series of changes and testing.
 
-[[[\textbf{is this a summary or repetitive?}]]] This paper is about automating that adjustment process using metrics of flock quality and an optimization process. The metrics use multiple objectives. The optimization process used in these experiments is a genetic algorithm.
+This paper is about automating that adjustment process using metrics of flock quality and an optimization process. The metrics use multiple objectives. The nature of those objectives and how to add new ones will be described in sections \nameref{sec:FlockingObjective} and \nameref{subsec:add_objective}. The optimization process used in these experiments is a genetic algorithm, described in section \nameref{subsec:Optimization_with_GA}.
 
-A summary of (``hyper'')parameters for this framework is given in \ref{table:HyperParameters}.
+A summary of (``hyper'')parameters for this framework is given in Table \ref{table:HyperParameters}.
 
-The anonymized c++ code for this project can be viewed at:
+The anonymized c++ code for this project can be found at:
 \scriptsize
 \url{https://anonymous.4open.science/r/evoflock-9B09/}
 \normalsize
@@ -136,7 +134,13 @@ A video of flock simulations based on this approach is available here:
 
 [[[\textbf{...mention self-play...}]]]
 
-Since the 1980s various simulation models of bird flocks have been proposed including \textit{boids} \citep{reynolds_flocks_1987} and others (\citet{aoki_simulation_1982}, \citet{cucker_emergent_2007}, \citet{bhattacharya_collective_2010} [[[\textbf{Is this the best citation for Vicsek?}]]]).
+Since the 1980s various simulation models of bird flocks have been proposed including \textit{boids} \citep{reynolds_flocks_1987} and others:
+\citet{aoki_simulation_1982}, 
+\citet{akira_okubo_dynamical_1986}, 
+\citet{cucker_emergent_2007}, \citet{bhattacharya_collective_2010},
+[[[\textbf{Is this the best citation for Vicsek?}]]],
+[[[\textbf{...Iztok Lebar Bajec <ilb@fri.uni-lj.si>...}]]]
+[[[\textbf{...Seventh Starling Andrea Cavagna <andrea.cavagna@gmail.com>...}]]]
 
 Most previous work on automatic tuning for flock models has used reinforcement learning \citep{sutton_reinforcement_1998} as the optimization technique. For example, recent excellent work on high quality \textit{driving agents} for a multi-agent traffic simulation based on self-play using reinforcement learning \citep{cornelisse_building_2025}.
 
@@ -145,7 +149,9 @@ While this paper was being drafted, a preprint was posted \citep{brambati_learni
 
 [[[\textbf{...say something about \citep{jaderberg_human-level_2019}...}]]]
 
-An early, but not very successful, attempt to tune flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming}, a variation on the \textit{genetic algorithm} based on arbitrary tree-shaped genomes. [[[\textbf{...also mention \citep{stonedahl_finding_2011} and ``utility of the flocking simulator as a fitness function for the GA'' ...}]]]
+An early, if not very successful, attempt at inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}, a variation on the \textit{genetic algorithm} \citep{holland_adaptation_1975}). GP uses an arbitrary tree-shaped genomes while GA uses a fixed size vector of parameters.
+
+[[[\textbf{...also mention \citep{stonedahl_finding_2011} and ``utility of the flocking simulator as a fitness function for the GA'' ...}]]]
 
 The approach used here was developed as part of a larger ongoing collaboration investigating new approaches to optimization of multi-agent motion. [[[\textbf{cite Matthew's thesis?}]]]
 
@@ -218,6 +224,19 @@ An equally iconic property of natural flocks is that birds are \textit{aligned},
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[t]
+    \centering
+    % \includegraphics[width=0.9\textwidth]{images/temp_speed_score.png}
+    \includegraphics[width=0.9\linewidth]{images/temp_speed_score.png}
+    \caption{Score for desired boid \textit{speed}, here 20 meters per second. This function is highest when speed is between 19 and 21 m/s. The \textit{speed} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
+    \label{fig:speed_score}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 \subsection{Objective for Obstacle Avoidance}
 \label{subsec:avoidance_objective}
 
@@ -232,17 +251,6 @@ Originally, following early boid models \citep{reynolds_flocks_1987}, each boid'
 
 Flight speed \textit{can} be left to “float” during optimization. Unfortuately there is an annoyingly large basin of attractions around not moving (speed = 0). In any case, an inverse design problem probably assumes some range of valid speeds. This suggests that the speed range should be given in the inverse design problem statement. For example, modeling a flock of finches and a flock of swallows would imply very different speed ranges. Figure \ref{fig:speed_score} shows a speed score function used in these experiments. It has a target range in the interval [19, 21] with a fixed support ramping down to zero outside that range.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure}[t]
-    \centering
-    % \includegraphics[width=0.9\textwidth]{images/temp_speed_score.png}
-    \includegraphics[width=0.9\linewidth]{images/temp_speed_score.png}
-    \caption{Score for desired boid \textit{speed}, here 20 meters per second. This function is highest when speed is between 19 and 21 m/s. The \textit{speed} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
-    \label{fig:speed_score}
-\end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -254,7 +262,7 @@ Flight speed \textit{can} be left to “float” during optimization. Unfortuate
     \textbf{Description} & \textbf{Value} & \textbf{Notes} \\
     \hline
     boids per flock & 200 &  \\
-    flock simulation steps & 500 & ``16.6 sec'' \\
+    flock simulation steps & 500 & $\sim$16.6 sec \\
     simulation time step & 1/30 seconds & \\
     \hline
     boid body diameter & 1 meter & \\
@@ -279,18 +287,29 @@ Flight speed \textit{can} be left to “float” during optimization. Unfortuate
 \centering
 \begin{tabular}{ | l | c | c | }
     \hline
-    \textbf{Description} & \textbf{Range} & \textbf{Notes} \\
+    \textbf{Description} & \textbf{Range} & \textbf{Units} \\
     \hline
-    max force & [0, 100] & Newtons \\
-    forward weight & [0, 100] &  \\
-    separate weight & [0, 100] &  \\
-    align weight & [0, 100] &  \\
-    cohere weight & [0, 100] &  \\
-    predictive avoid weight & [0, 100] &  \\
-    static avoid weight & [0, 100] &  \\
+    max force & [0, 100] & newtons \\
+    min speed & [20, 20] & \textit{unused} \\
+    speed & [20, 20] & \textit{unused} \\
+    max speed & [20, 20] & \textit{unused} \\
+    forward weight & [0, 100] & \textit{none} \\
+    separate weight & [0, 100] & \textit{none} \\
+    align weight & [0, 100] & \textit{none} \\
+    cohere weight & [0, 100] & \textit{none} \\
+    predictive avoid weight & [0, 100] & \textit{none} \\
+    static avoid weight & [0, 100] & \textit{none} \\
+    max dist separate & [0, 100] & meters \\
+    max dist align & [0, 100] & meters \\
+    max dist cohere & [0, 100] & meters \\
+    angle separate & [-1, +1] & cos(a) \\
+    angle align & [-1, +1] & cos(a) \\
+    angle cohere & [-1, +1] & cos(a) \\
+    fly away max dist & [0, 100] & meters \\
+    min time to collide & [0, 10] & seconds \\
     \hline
 \end{tabular}
-\caption{Flock model parameters subject to optimization. These are a vector of scalar values, each with an associated range. They are initially randomized then adjusted over time according to the objective function.}
+\caption{Flock model parameters subject to optimization. These are a vector of scalar values, each with an associated range. They are initially randomized then optimized over time according to the objective function. [[[\textbf{...TEMP --- this is just a placeholder --- before paper submission I hope to make changes to this parameterization of the black box model, such as moving from ``max distance'' parameters to exponents (and scales?) controlling falloff for all 7 neighbors ...}]]] }
 \label{table:flock-parameters}
 \end{table}
 
@@ -315,7 +334,7 @@ Flight speed \textit{can} be left to “float” during optimization. Unfortuate
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]{images/temp_fit_plot.png}
-    \caption{Plot of scalarized fitness (and objective metrics) over 30,000 steps of evolutionary time. The bold black trace (ending at 0.83) is the cumulative best population fitness. The bold gray trace (bottommost) is population average fitness. The colored traces correspond to best and average values (saturated and pastel) for the three component fitness objectives: obstacle avoidance (red), separation (green), and speed (blue). Data from run 20250711a. [[[\textbf{TEMP}]]]}
+    \caption{Plot of scalarized fitness (and its component objective metrics) over 30,000 steps of evolutionary time. The black bold trace (ending at 0.83) is the cumulative best population fitness. The bold gray trace (bottommost) is population average fitness. The colored traces correspond to best and average values (saturated and pastel) for the three component fitness objectives: obstacle avoidance (red), separation (green), and speed (blue). Data from run 20250711a. [[[\textbf{TEMP}]]]}
     \label{fig:fit_plot}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -324,7 +343,7 @@ Flight speed \textit{can} be left to “float” during optimization. Unfortuate
 \section{Conclusions}
 \label{sec:Conclusions}
 
-This work suggests that evolutionary optimization, via a genetic algorithm, can successfully optimize a set of parameters for a ``black box'' boid flocking model. This suggests that other similar multi-agent motion models --- for example, multi robot terrain search --- might well be solved using a genetic algorithm in a similar way, using an objective with some similarity to the one discussed in \nameref{sec:FlockingObjective}.
+This work suggests that evolutionary optimization, via a genetic algorithm, can successfully optimize a set of parameters for a ``black box'' boid flocking model. This suggests that other similar multi-agent motion models --- for example, multi robot terrain search --- might well be solved using a genetic algorithm in a similar way, using an objective with some similarity to the one discussed in section \nameref{sec:FlockingObjective}.
 
 [[[\textbf{should this be in the introduction? Say something about using deep reinforcement learning for flocks, etc.}]]] One advantage of using evolutionary optimization for this type of inverse design problem is that the multi-agent simulation can be treated as a ``black box.'' As such, there are few constraints on how the simulation is implemented. For example, to use \textit{stochastic gradient descent} (SGD) \citep{robbins_stochastic_1951} the flock model must be differentiable, either analytically or with \textit{automatic differentiation} \citep{baydin_automatic_2018}. Conversely, evolutionary optimization only requires the measured scalar fitness of a simulation, no gradients are used.
 
@@ -340,11 +359,15 @@ This work suggests that evolutionary optimization, via a genetic algorithm, can 
 \section{Future Work}
 \label{sec:future}
 
-[[[\textbf{...I plan to try adding a fourth objective --- perhaps for path curvature --- as an exercise to talk about more advanced inverse design problems --- but if not, it should be mentioned here...}]]]
+hope[[[\textbf{...I plan to try adding a fourth objective --- perhaps for path curvature --- as an exercise to talk about more advanced inverse design problems --- but if not, it should be mentioned here...}]]]
 
 [[[\textbf{...experiment with open space flocking --- no obstacles --- perhaps in conjunction with path curvature objective...}]]]
 
 [[[\textbf{...perhaps try non-uniform \citep{montanari_optimal_2025} and non-reciprocal \citep{choi_flocking_2025} multi-agent models...}]]]
+
+[[[\textbf{...mention a GP (rather than GA) version of this approach...}]]]
+
+[[[\textbf{...say something about how I used three objectives to evolve flocking of the type shown in Fig. 1 --- maybe try an experiment with ``open air flocking'' to see if it will work with just separation score... --- ...so I did try this and the results were pretty boring, maybe it would look better after i add a fourth objective for path curvature...}]]]
 
 \section{Acknowledgements}
 \label{sec:ack}

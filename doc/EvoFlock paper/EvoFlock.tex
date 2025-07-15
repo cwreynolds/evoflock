@@ -132,17 +132,20 @@ A video of flock simulations based on this approach is available here:
 \section{Related Work}
 \label{sec:related}
 
-[[[\textbf{...mention self-play...}]]]
-
-Since the 1980s various simulation models of bird flocks have been proposed including \textit{boids} \citep{reynolds_flocks_1987} and others:
+Since the 1980s many simulation-based models of bird flocks have been proposed. They have commonalities and differences in modeling philosophy and computational technique. These early models include \textit{boids} and others:
 \citet{aoki_simulation_1982}, 
 \citet{akira_okubo_dynamical_1986}, 
-\citet{cucker_emergent_2007}, \citet{bhattacharya_collective_2010},
-[[[\textbf{Is this the best citation for Vicsek?}]]],
-[[[\textbf{...Iztok Lebar Bajec <ilb@fri.uni-lj.si>...}]]]
-[[[\textbf{...Seventh Starling Andrea Cavagna <andrea.cavagna@gmail.com>...}]]]
+\citep{reynolds_flocks_1987},
+\citet{toner_flocks_1998}, 
+\citet{frank_heppner_stochastic_1990}, 
+\citet{bajec_simulating_2005},
+\citet{cucker_emergent_2007},
+\citet{moskon_fuzzy_2007},
+\citet{cavagna_seventh_2008},
+\citet{bajec_organized_2009}.
 
 Most previous work on automatic tuning for flock models has used reinforcement learning \citep{sutton_reinforcement_1998} as the optimization technique. For example, recent excellent work on high quality \textit{driving agents} for a multi-agent traffic simulation based on self-play using reinforcement learning \citep{cornelisse_building_2025}.
+[[[\textbf{...mention self-play, and how the current work has a similar character...}]]]
 
 While this paper was being drafted, a preprint was posted \citep{brambati_learning_2025} using reinforcement learning with an objective function very similar to the one used here. Other flock tuning based on reinforcement learning include:
 [[[\textbf{cites?}]]].
@@ -150,6 +153,8 @@ While this paper was being drafted, a preprint was posted \citep{brambati_learni
 [[[\textbf{...say something about \citep{jaderberg_human-level_2019}...}]]]
 
 An early, if not very successful, attempt at inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}, a variation on the \textit{genetic algorithm} \citep{holland_adaptation_1975}). GP uses an arbitrary tree-shaped genomes while GA uses a fixed size vector of parameters.
+
+[[[\textbf{``...these models use genetic algorithms to \textit{tune} the parameters of previously presented non-evolutionary models, but very few attempt to evolve collective behaviour from scratch...'' \citep{demsar_evolution_2017}}]]]
 
 [[[\textbf{...also mention \citep{stonedahl_finding_2011} and ``utility of the flocking simulator as a fitness function for the GA'' ...}]]]
 
@@ -163,18 +168,15 @@ This section discusses the various components of the optimization process for ad
 \subsection{Optimization with Genetic Algorithms}
 \label{subsec:Optimization_with_GA}
 
-Optimization can be used to find a set of simulation parameters that best fit given behavioral goals. The approach described here uses a \textit{genetic algorithm} (GA), a technique based loosely on concepts of biological evolution, as seen in the natural world. Genetic algorithms were first described by \citet{holland_adaptation_1975}. Evolution was first described by \citet{darwin_origin_1859}.
+Optimization can be used to find a set of simulation parameters that best fit the behavioral goals, as given by an objective function. The approach described here uses a \textit{genetic algorithm} (GA), a technique based loosely on concepts of biological evolution, as seen in the natural world. Genetic algorithms were first described by \citet{holland_adaptation_1975}. Evolution was first described by \citet{darwin_origin_1859}.
 
-A GA is a stochastic population-based approach to optimization and discovery. They proceed by a random process. For example, a model parameter might be changed by adding a signed zero-centered random value, offsetting the parameter by a small amount from its previous value. A genetic algorithm maintains a \textit{population} of candidate solution. Usually the population contains a fixed number (tens to thousands) of candidate solutions, often called \textit{individuals}. Typically each individual is a fixed-sized vector of numeric parameter values.
+A genetic algorithm maintains a \textit{population} of candidate solutions. Usually, the population contains a fixed number (tens to thousands) of candidate solutions, often called \textit{individuals}. Typically, each individual is a fixed-sized vector of numeric parameter values. The population may be further divided into \textit{demes} or \textit{islands}, representing smaller breeding subpopulations. This is thought to promote diversity by pursuing different solutions in parallel. In an island model, there is usually some kind of \textit{migration} where individuals occasionally move from one island to another.
 
-Many variations on genetic algorithms have been developed. Sometimes, the entire population of individuals is updated in parallel, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state} (SSGA) updates individuals one at a time \citep{syswerda_study_1991}. If a generational GA is run for $G$ generations with a population of $P$ individuals, a corresponding SSGA would be run for $G{\times}P$ steps.
+A GA is a population-based stochastic approach to optimization and discovery. Unlike random search, they proceed by a random process guided by the frequency of useful partial solutions in the population, a model of biological gene frequency in a species' \textit{genome}.
 
-[[[\textbf{genome}]]]
+A GA's ``genome'' changes over time under the influence of the objective function. For example, a model parameter might be changed by \textit{mutation}: adding a signed zero-centered random value, offsetting the parameter by a small amount from its previous value. Perhaps more importantly individuals are modified by \textit{crossover} where two \textit{parent} individuals are recombined to create a new \textit{offspring}. In a rough model of biological crossover involving parental DNA, two parental parameter sets are merged into one, by taking each parameter at random from one parent or the other (called uniform crossover).
 
-[[[\textbf{reproduction / crossover}]]]
-
-[[[\textbf{maybe add diagram of SSGA step}]]]
-
+Many variations on genetic algorithms have been developed over the years. Sometimes, the entire population of individuals is updated in parallel, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state genetic algorithms} (SSGA) updates individuals one at a time \citep{syswerda_study_1991}. If a generational GA is run for $G$ generations with a population of $P$ individuals, a corresponding SSGA would be run for $G{\times}P$ steps. See Figure \ref{fig:temp_evo_update} for a diagram of the SSGA update cycle, along with the ``tournament of three individuals'' used in this work.
 
 \subsection{Objective Function}
 \label{subsec:ObjectiveFunction}
@@ -230,7 +232,7 @@ An equally iconic property of natural flocks is that birds are \textit{aligned},
     \centering
     % \includegraphics[width=0.9\textwidth]{images/temp_speed_score.png}
     \includegraphics[width=0.9\linewidth]{images/temp_speed_score.png}
-    \caption{Score for desired boid \textit{speed}, here 20 meters per second. This function is highest when speed is between 19 and 21 m/s. The \textit{speed} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
+    \caption{Score for desired boid \textit{speed}, here $\sim$20 meters per second. This function is highest when speed is between 19 and 21 m/s and falls off to zero outside that range. The \textit{speed} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
     \label{fig:speed_score}
 \end{figure}
 

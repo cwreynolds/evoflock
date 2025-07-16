@@ -84,7 +84,7 @@
 \begin{figure*}[t]
     \centering
     \includegraphics[width=0.9\textwidth]{images/temp_MOF_HV.png}
-    \caption{(A) Normalized multi-objective fitness space. For two objectives, each with scores ranging over [0, 1], a unit square. (B) The \textit{Pareto front} for two mutually conflicting objectives. (Like \textit{reliability} and \textit{affordability} in the hypothetical bridge design example.) The objectives can not all be simultaneously well satisfied. Visually, this is the distance from (1,1) to the red curve. (C) Mostly compatible objectives, more typical of criteria for flock tuning. Here, the Pareto front passes near the global optimum. (D) Scalarization of a multiple-objective fitness value, using \textit{hypervolume}: the product of all objective scores. In this 2D example it is the blue rectangle's \textit{area}.}
+    \caption{(A) Normalized multi-objective fitness space. For two objectives, each with scores ranging over [0, 1], a unit square. (B) The \textit{Pareto front} for two mutually conflicting objectives. (Like \textit{reliability} and \textit{affordability} in the hypothetical bridge design example.) The objectives can not all be simultaneously well satisfied. Visually, this is the distance from (1,1) to the red curve. (C) Mostly compatible objectives, more typical of criteria for flock tuning. Here, the Pareto front passes near the global optimum. (D) Scalarization of a multiple-objective fitness value, using \textit{hypervolume}: the product of all objective scores. In this 2D example it is the blue rectangle's \textit{area}. Solving a multi-objective problem using scalarized fitness works best for case (C).}
     \label{fig:MOF_HV}
 \end{figure*}
 
@@ -132,7 +132,7 @@ A video of flock simulations based on this approach is available here:
 \section{Related Work}
 \label{sec:related}
 
-Since the 1980s many simulation-based models of bird flocks have been proposed. They have commonalities and differences in modeling philosophy and computational technique. These early models include \textit{boids} and others:
+Since the 1980s many simulation-based models of bird flocks have been proposed. They have commonalities and differences in their modeling philosophy and computational technique. These early models include \textit{boids} and others:
 \citet{aoki_simulation_1982}, 
 \citet{akira_okubo_dynamical_1986}, 
 \citep{reynolds_flocks_1987},
@@ -142,7 +142,8 @@ Since the 1980s many simulation-based models of bird flocks have been proposed. 
 \citet{cucker_emergent_2007},
 \citet{moskon_fuzzy_2007},
 \citet{cavagna_seventh_2008},
-\citet{bajec_organized_2009}.
+\citet{bajec_organized_2009},
+\citet{hoetzlein_flock2_2024}.
 
 Most previous work on automatic tuning for flock models has used reinforcement learning \citep{sutton_reinforcement_1998} as the optimization technique. For example, recent excellent work on high quality \textit{driving agents} for a multi-agent traffic simulation based on self-play using reinforcement learning \citep{cornelisse_building_2025}.
 [[[\textbf{...mention self-play, and how the current work has a similar character...}]]]
@@ -183,16 +184,18 @@ Many variations on genetic algorithms have been developed over the years. Someti
 
 This work is based on optimizing a set of parameters for a flock (multi-agent motion) model. Optimization procedures are guided by an \textit{objective function}. In many optimization problems, the overall objective is a combination of several, potentially contradictory goals, called multi-objective optimization. 
 
-To motivate this concept, consider building a bridge over a river. A key goal is that the bridge is reliable: it will carry the required loads without collapsing. Another important goal is that the cost of building the bridge is minimized. These criteria are directly opposed. A very strong bridge is reliable but costly. A very cheap bridge is unlikely to be reliable. This trade-off is often called \textit{Pareto optimality}. Tuples of such Pareto optimal values form the \textit{Pareto front}, see Figure \ref{fig:MOF_HV}(b).
+To motivate this concept, consider building a bridge over a river. A key goal is that the bridge is reliable: that it will carry the required loads without collapsing. Another important goal is to minimize the cost of building the bridge. These criteria are directly opposed. A very strong bridge is reliable but costly. A very cheap bridge is unlikely to be reliable. This trade-off is often called \textit{Pareto optimality}. Tuples of such Pareto optimal values form the \textit{Pareto front}, see Figure \ref{fig:MOF_HV}(b).
 
 Other types of multi-objective optimization have less contradictory goals. The multi-agent motion problem seems to fall into this category. For this application, all that is required is to find parameter sets so that each of the objectives can be well satisfied, see Figure \ref{fig:MOF_HV}(c).
 
 \subsection{Multi-Objective Optimization}
 \label{subsec:Multi-Objective}
 
-[[[\textbf{scalarization}]]]
+Early genetic algorithms were used for problems with a single scalar fitness value. These have the advantage of having a \textit{total order}. However, like the bridge example above, many problems inherently have \textit{multiple objectives} (see Figure \ref{fig:MOF_HV}(B)). The flock optimization problems addressed here seem to be in the ``mostly compatible'' type of multiple objective problems (see Figure \ref{fig:MOF_HV}(C)) so can be solved with \textit{scalarization}. A scalarizer maps from multiple objective values to a single scaler value that somehow summarizes the multiple objective values.
 
-[[[\textbf{...hypervolume --- mention the product is of objective components clipped above 0: max(o, 0.1)} to allow other components to ``show through'' --- include this floor value to table 1...]]]
+A simple and commonly used scalarizer is called \textit{hypervolume}, which simply multiples together the components of a multiple objective value. The name hypervolume refers to a \textit{n}-dimensional box whose edges correspond to the components of a multiple objective value. Hypervolume has the property that its value changes in proportion to changes in each component.
+
+So for example, the hypervolume goes up (or down) if any component goes up (or down) --- as long as none of the components are zero, which ``hides'' contributions of other components. To avoid this, the hypervolume used here remaps the fitness range from [0, 1] to [e, 1] before taking the product. [[[\textbf{...say more about the details? It is clipped to be above a value on [0.01] --- include this floor value to Table \ref{table:HyperParameters} --- should it remap rather than clip? ...}]]]
 
 \section{Parameter set for a flocking model}
 \label{sec:parameter_set}
@@ -311,7 +314,7 @@ Flight speed \textit{can} be left to “float” during optimization. Unfortuate
     min time to collide & [0, 10] & seconds \\
     \hline
 \end{tabular}
-\caption{Flock model parameters subject to optimization. These are a vector of scalar values, each with an associated range. They are initially randomized then optimized over time according to the objective function. [[[\textbf{...TEMP --- this is just a placeholder --- before paper submission I hope to make changes to this parameterization of the black box model, such as moving from ``max distance'' parameters to exponents (and scales?) controlling falloff for all 7 neighbors ...}]]] }
+\caption{Flock model parameters subject to optimization. These are a vector of scalar values, each with an associated range. They are initially randomized then optimized over time according to the objective function. [[[\textbf{...TEMP --- this is just a placeholder --- before paper submission I hope to make changes to this parameterization of the black box model, such as moving from ``max distance'' parameters to exponents (and scales?) controlling falloff for the 7 nearest neighbors --- say something about the non-optimized ``Shared const/input parameters'' of FlockParameters ...}]]] }
 \label{table:flock-parameters}
 \end{table}
 

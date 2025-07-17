@@ -203,8 +203,19 @@ int main(int argc, const char * argv[])
 //    int individuals = 500;
 //    int subpops = 22;
 
-    int individuals = 1000;
-    int subpops = 32;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250716 new hypervolume min, change pop 1000 to 750.
+
+//    int individuals = 1000;
+//    int subpops = 32;
+
+//    int individuals = 750;
+//    int subpops = 27;
+
+    int individuals = 500;
+    int subpops = 22;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

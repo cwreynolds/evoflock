@@ -195,14 +195,18 @@ Early genetic algorithms were used for problems with a single scalar fitness val
 
 A simple and commonly used scalarizer is called \textit{hypervolume}, which simply multiples together the components of a multiple objective value. The name hypervolume refers to a \textit{n}-dimensional box whose edges correspond to the components of a multiple objective value. Hypervolume has the property that its value changes in proportion to changes in each component.
 
-So for example, the hypervolume goes up (or down) if any component goes up (or down) --- as long as none of the components are zero, which ``hides'' contributions of other components. To avoid this, the hypervolume used here remaps the fitness range from [0, 1] to [e, 1] before taking the product. [[[\textbf{...say more about the details? It is clipped to be above a value on [0.01] --- include this floor value to Table \ref{table:HyperParameters} --- should it remap rather than clip? ...}]]]
+So for example, the hypervolume goes up (or down) if any component goes up (or down) --- as long as none of the components are zero, which ``hides'' contributions of other components. To avoid this, the hypervolume varient used here remaps the fitness range from [0, 1] to [$\epsilon$, 1] before taking the product. ($\epsilon$ is 0.01 for the ``normalized fitness'' values used here.)
 
 \section{Parameter set for a flocking model}
 \label{sec:parameter_set}
 
-[[[\textbf{...list the parameters, talk a bit about the flocking model...}]]]
+The focus of this paper is on the \textit{inverse design}, the optimization of parameter sets to achieve behavior under the direction of an objective function. As such, details of a particular flocking model are largely off-topic. However, just to ground the discussion for readers unfamiliar with flocking models, a quick overview is given here.
 
-[[[\textbf{...note that flocking model needs to be cleaned up and that I'm using ``evolved speed control''...}]]]
+Most flock models are written from the perspective of an individual ``boid'' at a single time step. The boid identifies its neighbors. (The model used in this work uses \textit{topological distance} to find the seven nearest neighbors.) The boid reacts to its neighbors by computing \textit{steering forces} related to their distance and angle. It may also need to steer to avoid obstacles. These component steering forces are combined (often by 3D vector addition) then applied to the boid's physics model (often a simple \textit{self-propelled particle} model).
+
+Each of these steering behaviors has parameters, such as weights, distances, and angles. (For example, what is the minimum amount of time before a predicted collision with an obstacle at which the boid should start steering to avoid?) There are also parameters related to it physical model, such as the maximum force it can apply.
+
+The collection of all these make up the flock's \textit{parameter set} which is adjusted by optimization according the the objective function. See Table \ref{table:flock-parameters} for a list of the parameter set used in these experiments.
 
 \section{An objective function for flocking}
 \label{sec:FlockingObjective}
@@ -278,7 +282,8 @@ Flight speed \textit{can} be left to “float” during optimization. Unfortuate
     k nearest neighbors & 7 & cf. StarFlag \\
     \hline
     evolution population & 500, 1000 & \\
-    evolution steps & 30,000 & SSGA \\
+    evolution steps (SSGA) & 30,000 & \\
+    hypervolume epsilon ($\epsilon$) & 0.01 & \\
     \hline
     run time: flock sim & $\sim$0.2 seconds & $200{\times}500$ \\
     run time: evolution & $\sim$2 hours & \\

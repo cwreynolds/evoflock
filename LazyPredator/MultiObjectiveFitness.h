@@ -43,15 +43,35 @@ public:
                                                 std::multiplies()); }
     std::string to_string() const { return vec_to_string(mof_); }
     const std::vector<double> as_vector() const { return mof_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250716 new hypervolume min, change pop 1000 to 750.
+
+//    double hyperVolume() const
+//    {
+//        double volume = 1;
+//        double min = LPRS().frandom01() * 0.01;
+//        for (auto& o : mof_) { assert(util::between(o, 0.0, 1.0)); }
+//        for (auto& o : mof_) { volume *= std::max(o, min); }
+//        return volume;
+//    }
+
     double hyperVolume() const
     {
+        assertNormalized();
         double volume = 1;
-        double min = LPRS().frandom01() * 0.01;
-        for (auto& o : mof_) { assert(util::between(o, 0.0, 1.0)); }
-        for (auto& o : mof_) { volume *= std::max(o, min); }
+        
+//        double min = LPRS().frandom01() * 0.01;
+//        for (auto& o : mof_) { assert(util::between(o, 0.0, 1.0)); }
+//        for (auto& o : mof_) { volume *= std::max(o, min); }
+
+        double min = 0.01;
+        for (auto& o : mof_) { volume *= util::remap_interval(o, 0, 1, min, 1); }
+
         return volume;
     }
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Are all scalar fitness components on the range [0,1]?
     bool allComponentsAreNormalized() const
     {

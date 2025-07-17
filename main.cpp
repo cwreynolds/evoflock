@@ -94,54 +94,8 @@ int main(int argc, const char * argv[])
     EF::unit_test();
     EF::setRS(LP::LPRS());
     EF::RS().setSeedFromClock();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250709 experiment: compare emphasizeHighScores() with exponential
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250711 try runs with bigger evolution population
-//    EF::RS().setSeed(1752085214);
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << "RandomSequence seed = " << EF::RS().getSeed() << std::endl;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250709 experiment: compare emphasizeHighScores() with exponential
-    //               cf Flock::obstacleCollisionsScore()
-    
-//        std::cout << "x,ehs,pow" << std::endl;
-//        double steps = 100000;
-//        for (int i = steps * 0.9; i <= steps; i++)
-//        {
-//            double x = i / steps;
-//            std::cout << x;
-//            std::cout << ",";
-//            std::cout << Flock::emphasizeHighScores(x, 0.995);
-//            std::cout << ",";
-//    //        std::cout << std::pow(x, 10);
-//    //        std::cout << std::pow(x, 20);
-//    //        std::cout << std::pow(x, 50);
-//    //        std::cout << std::pow(x, 100);
-//            std::cout << std::pow(x, 500); // aha, this one is pretty close
-//            std::cout << std::endl;
-//        }
-//        exit(EXIT_SUCCESS);
-    
-//            std::cout << "x,ehs,pow" << std::endl;
-//    //        double steps = 100000;
-//        double steps = 100;
-//    //    for (int i = steps * 0.9; i <= steps; i++)
-//        for (int i = 0; i <= steps; i++)
-//        {
-//            double x = i / steps;
-//            std::cout << x;
-//            std::cout << ",";
-//            std::cout << Flock::emphasizeHighScores(x, 0.995);
-//            std::cout << ",";
-//            std::cout << std::pow(x, 50); // aha, this one is pretty close
-//            std::cout << std::endl;
-//        }
-//        exit(EXIT_SUCCESS);
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250510 temp global switch for controlling speed with fitness.
@@ -178,51 +132,9 @@ int main(int argc, const char * argv[])
     // inline in this function's source code, above.
     visualizePreviouslyLoggedFlockParameters();
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250616 prefer neighbors ahead of us
-//    int individuals = 500;
-//    int subpops = 25;
+    int individuals = 300;
+    int subpops = 17;
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250623 more on per-Boid neighbor sorting
-
-//    int individuals = 750;
-//    int subpops = 27;
-    
-    // TODO 20250623 maybe that was a little too high?
-//    int individuals = 600;
-//    int subpops = 25;
-    
-//    // TODO 20250623 try going in opposite direction
-//    int individuals = 800;
-//    int subpops = 28;
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250711 try runs with bigger evolution population
-
-//    int individuals = 500;
-//    int subpops = 22;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250716 new hypervolume min, change pop 1000 to 750.
-
-//    int individuals = 1000;
-//    int subpops = 32;
-
-//    int individuals = 750;
-//    int subpops = 27;
-
-    int individuals = 500;
-    int subpops = 22;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int max_evolution_steps = Boid::GP_not_GA ? 20 : 30000;
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
@@ -231,11 +143,6 @@ int main(int argc, const char * argv[])
     int min_crossover_tree_size = Boid::GP_not_GA ? 20 :  2;
     int max_crossover_tree_size = Boid::GP_not_GA ? 60 : ga_tree_size;
     int max_initial_tree_size   = Boid::GP_not_GA ? 60 : ga_tree_size;
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250711 try runs with bigger evolution population
-//    LP::LPRS().setSeed(20240722);
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     // TODO experimental_GP_stub
     auto fitness_function = (Boid::GP_not_GA ?
@@ -251,15 +158,8 @@ int main(int argc, const char * argv[])
     fs.print();
 
     {
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20250711 try runs with bigger evolution population
-        
-//        std::cout << "Create population." << std::endl;
-        
         std::cout << "Create population, individuals = " << individuals;
         std::cout << ", subpops/demes = " << subpops << std::endl;
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         util::Timer t("Create population.");
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         // TODO 20240713 experiment with increasing initial tree size.

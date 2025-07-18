@@ -695,8 +695,13 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 inline static bool enable_multithreading = true;
 
-// TODO 20250510 Transitional global switch for controlling speed with fitness.
-inline static bool fitness_speed_control = false;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250719 remove fitness_speed_control assume always true.
+
+//    // TODO 20250510 Transitional global switch for controlling speed with fitness.
+//    inline static bool fitness_speed_control = false;
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Controls roll (rotation around forward axis) blend rate for Boid and Camera.
 double roll_rate = 0.99;

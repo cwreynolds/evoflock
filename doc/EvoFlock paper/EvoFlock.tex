@@ -97,7 +97,7 @@ Simulation models of multi-agent motion are used in many fields. These include a
 
 This project addresses the issue of \textit{adjusting} or \textit{tuning} multi-agent motion models, toward a given behavioral goal. For example, modifying a model of bird flocks to instead portray fish schools. Or start from a model of flocking crows and change it to represent flocking sparrows. Or to take a plausibly realistic model of a natural bird flock, and change it, say for storytelling purposes, to convey a flock of birds that are happy, or angry. Similarly, starting from a generic abstract flock model and fitting it to field observations of a given species of real birds in nature.
 
-A boids-like simulation model typically has a collection of numeric parameters (``knobs'') that control its action. The theme of this work is a software framework that automatically finds a set of near-optimal parameters for a simulation-based multi-agent system. The flock model used for these experiments is a predefined hand-written ``black box'' model whose input is a parameter set (consisting of about [[[\textbf{20}]]] numbers, see Table \ref{table:flock-parameters}). The user provides a \textit{fitness} (also known as \textit{objective} or \textit{loss}) function. It takes a candidate parameter set, runs a simulation, and returns a score reflecting how well the behavioral goals were met. The optimization process runs (for about two hours on a laptop) and produces a high quality parameter set, as measured by the objective function.
+A boids-like simulation model typically has a collection of numeric parameters (``knobs'') that control its action. The theme of this work is a software framework that automatically finds a set of near-optimal parameters for a simulation-based multi-agent system. The flock model used for these experiments is a predefined hand-written ``black box'' model whose input is a \textit{parameter set} (consisting of about [[[\textbf{15}]]] numbers, see Table \ref{table:flock-parameters}). The user provides a \textit{fitness} (also known as \textit{objective} or \textit{loss}) function. It takes a candidate parameter set, runs a simulation, and returns a score reflecting how well the behavioral goals were met. The optimization process runs (for about two hours on a laptop) and produces a high quality parameter set, as measured by the objective function.
 
 For a user of this optimization framework, it is convenient that the flock model is treated as a black box. Almost no restrictions are imposed on a preexisting model by the optimization framework. There are no restrictions on model design, its mutability, or the programming language used. (The latter can be an issue if optimization requires language tools such as automatic differentiation \citep{baydin_automatic_2018}.)
 
@@ -272,9 +272,9 @@ The collection of all these make up the flock's \textit{parameter set} which is 
     \textbf{Description} & \textbf{Range} & \textbf{Units} \\
     \hline
     max force & [0, 100] & newtons \\
-    min speed & [20, 20] & \textit{unused} \\
-    speed & [20, 20] & \textit{unused} \\
-    max speed & [20, 20] & \textit{unused} \\
+    % min speed & [20, 20] & \textit{unused} \\
+    % speed & [20, 20] & \textit{unused} \\
+    % max speed & [20, 20] & \textit{unused} \\
     forward weight & [0, 100] & \textit{none} \\
     separate weight & [0, 100] & \textit{none} \\
     align weight & [0, 100] & \textit{none} \\
@@ -323,7 +323,7 @@ For collision avoidance, the goal is not merely to \textit{reduce} the number of
 
 Originally, following early boid models \citep{reynolds_flocks_1987}, each boid's flight speed was kinematically clipped to remain below 20 meters per second. Later, a third flock optimization objective was added to establish a target speed range. A new behavior was added to each boid to apply a force along its direction of motion to adjust its flight speed toward the desired range. The strength of this behavior became one of the flock parameters being optimized in the inverse flock design process.
 
-Flight speed \textit{can} be left to “float” during optimization. Unfortuately there is an annoyingly large basin of attractions around not moving (speed=0). In any case, an inverse design problem would probably assume a range of valid speeds. This suggests that the speed range should be given in the inverse design problem statement. For example, modeling a flock of finches and a flock of swallows would imply very different speed ranges. Figure \ref{fig:speed_score} shows a speed score function used in these experiments. It has a target range in the interval [19, 21] with a fixed support ramping down to zero outside that range.
+Flight speed \textit{can} be left to “float” during optimization. Unfortuately there is an annoyingly large basin of attractions around not moving (speed=0). In any case, any given inverse design problem would likely imply a range of valid speeds. This suggests that the speed range should be given in the inverse design problem statement. For example, modeling a flock of finches and a flock of swallows would imply very different speed ranges. Figure \ref{fig:speed_score} shows a speed score function used in these experiments. It has a target range in the interval [19, 21] with a fixed support ramping down to zero outside that range.
 
 \subsection{Adding an objective}
 \label{subsec:add_objective}
@@ -351,6 +351,8 @@ This work suggests that evolutionary optimization, via a genetic algorithm, can 
 
 \section{Limitations}
 \label{sec:limitations}
+
+[[[\textbf{...point of that that every run is a winner, often the objective is not well met --- fitness nearer 70\% than 80\% --- and the performance noticeably diminished --- happens maybe once in every 2 or 3 runs...}]]]
 
 [[[\textbf{...for speed score and separation score: does it matter if the ramps on either side of the sweet spot are there? Should try a test...}]]]
 

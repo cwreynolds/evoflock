@@ -106,8 +106,13 @@ int main(int argc, const char * argv[])
     // fitness objective is added which gives a "point" for every boid-step when
     // its speed is in the desired range.
     
-    EF::fitness_speed_control = true;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250719 remove fitness_speed_control assume always true.
+
+//    EF::fitness_speed_control = true;
 //    EF::fitness_speed_control = false;
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     

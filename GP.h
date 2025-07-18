@@ -88,37 +88,62 @@ inline std::vector<std::string> mof_names()
                                          "occupied",
                                          
                                      }) :
-            (EF::fitness_speed_control ?
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250719 remove fitness_speed_control assume always true.
+
+//            (EF::fitness_speed_control ?
+//             std::vector<std::string>(
+//                                      {
+//                                          "avoid",
+//                                          "separate",
+//                                          "speed"
+//                                      }) :
+//             std::vector<std::string>(
+//                                      {
+//                                          "avoid",
+//                                          "separate",
+//                                      })
+//             )
+            
              std::vector<std::string>(
                                       {
                                           "avoid",
                                           "separate",
                                           "speed"
-                                      }) :
-             std::vector<std::string>(
-                                      {
-                                          "avoid",
-                                          "separate",
                                       })
-             ));
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            );
 }
 
 // After a Flock's simulation has been run, it is passed here to build its multi
 // objective fitness object from metrics saved inside the Flock object.
 inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 {
-    return (EF::fitness_speed_control ?
-            MOF(
-                {
-                    flock.obstacleCollisionsScore(),
-                    flock.separationScore(),
-                    flock.speedScore()
-                }) :
-            MOF(
-                {
-                    flock.obstacleCollisionsScore(),
-                    flock.separationScore(),
-                }));
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250719 remove fitness_speed_control assume always true.
+    
+//    return (EF::fitness_speed_control ?
+//            MOF(
+//                {
+//                    flock.obstacleCollisionsScore(),
+//                    flock.separationScore(),
+//                    flock.speedScore()
+//                }) :
+//            MOF(
+//                {
+//                    flock.obstacleCollisionsScore(),
+//                    flock.separationScore(),
+//                }));
+  
+    return MOF(
+               {
+                   flock.obstacleCollisionsScore(),
+                   flock.separationScore(),
+                   flock.speedScore()
+               });
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 // Initialize basic run parameters of Flock object
@@ -409,7 +434,12 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
             { "Real_0_10",   0.0,  10.0, jiggle_scale },
             { "Real_0_100",  0.0, 100.0, jiggle_scale },
             { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
-            { "Real_20_20",  20.0,  20.0, 0 },            // for boid speed values
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250719 remove fitness_speed_control assume always true.
+
+//            { "Real_20_20",  20.0,  20.0, 0 },            // for boid speed values
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         },
         {
             {
@@ -426,10 +456,15 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                 {
                     "Real_0_100",  // max_force
 
-                    // 20240427 Policy change: specify rather than optimize speed:
-                    "Real_20_20",  // min_speed
-                    "Real_20_20",  // speed
-                    "Real_20_20",  // max_speed
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20250719 remove fitness_speed_control assume always true.
+
+//                    // 20240427 Policy change: specify rather than optimize speed:
+//                    "Real_20_20",  // min_speed
+//                    "Real_20_20",  // speed
+//                    "Real_20_20",  // max_speed
+
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                     "Real_0_100",  // weight_forward
                     "Real_0_100",  // weight_separate
@@ -546,14 +581,29 @@ void save_fitness_time_series(LP::Population& population)
         {
             pathname = "/Users/cwr/Desktop/flock_data/fitness_data.csv";
             std::ofstream stream(pathname);
-            std::string labels = (EF::fitness_speed_control ?
-                                  ("step,average,best,"
-                                   "ave_obs_avoid,best_obs_avoid,"
-                                   "ave_good_nn_dist,best_good_nn_dist,"
-                                   "ave_speed_score,best_speed_score") :
-                                  ("step,average,best,"
-                                   "ave_obs_avoid,best_obs_avoid,"
-                                   "ave_good_nn_dist,best_good_nn_dist,"));
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250719 remove fitness_speed_control assume always true.
+
+//            std::string labels = (EF::fitness_speed_control ?
+//                                  ("step,average,best,"
+//                                   "ave_obs_avoid,best_obs_avoid,"
+//                                   "ave_good_nn_dist,best_good_nn_dist,"
+//                                   "ave_speed_score,best_speed_score") :
+//                                  ("step,average,best,"
+//                                   "ave_obs_avoid,best_obs_avoid,"
+//                                   "ave_good_nn_dist,best_good_nn_dist,"));
+            
+//            std::string labels = ("step,average,best,"
+//                                  "ave_obs_avoid,best_obs_avoid,"
+//                                  "ave_good_nn_dist,best_good_nn_dist,"
+//                                  "ave_speed_score,best_speed_score");
+
+            std::string labels = ("step,average,best,"
+                                  "ave_avoid_score,best_avoid_score,"
+                                  "ave_sep_score,best_sep_score,"
+                                  "ave_speed_score,best_speed_score");
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             stream << labels << std::endl;
             stream.close();
         }
@@ -565,12 +615,21 @@ void save_fitness_time_series(LP::Population& population)
         stream << bestNonObsCol(population) << ",";
         stream << averageGoodNnDist(population) << ",";
         stream << bestGoodNnDist(population);
-        if (EF::fitness_speed_control)
-        {
-            stream << ",";
-            stream << averageSpeedScore(population) << ",";
-            stream << bestSpeedScore(population);
-        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250719 remove fitness_speed_control assume always true.
+
+//        if (EF::fitness_speed_control)
+//        {
+//            stream << ",";
+//            stream << averageSpeedScore(population) << ",";
+//            stream << bestSpeedScore(population);
+//        }
+
+        stream << ",";
+        stream << averageSpeedScore(population) << ",";
+        stream << bestSpeedScore(population);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         stream << std::endl;
         stream.close();
     }

@@ -27,7 +27,13 @@ public:
     Vec3 position() const { return ls_.p(); }
     double mass() const { return mass_; }
     double speed() const { return speed_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250719 remove fitness_speed_control assume always true.
+    //               obsolete now?
+    
     double max_speed() const { return max_speed_; }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double max_force() const { return max_force_; }
 
     // Setters
@@ -36,7 +42,13 @@ public:
     void setForward(Vec3 f) { ls_.setK(f); }
     void setPosition(Vec3 p) { ls_.setP(p); }
     void setSpeed(double speed) { speed_ = speed; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250719 remove fitness_speed_control assume always true.
+    //               obsolete now?
+
     void setMaxSpeed(double max_speed) { max_speed_ = max_speed; }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     void setMaxForce(double max_force) { max_force_ = max_force; }
 
     // Get current velocity vector.
@@ -61,9 +73,18 @@ public:
     {
         Vec3 new_velocity = velocity() + (acceleration * time_step);
         double new_speed = new_velocity.length();
-        setSpeed(EF::fitness_speed_control ?
-                 new_speed :
-                 util::clip(new_speed, 0, max_speed()));
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250719 remove fitness_speed_control assume always true.
+
+//        setSpeed(EF::fitness_speed_control ?
+//                 new_speed :
+//                 util::clip(new_speed, 0, max_speed()));
+        
+        setSpeed(new_speed);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         setPathCurvature(new_velocity);
         setAcceleration(new_velocity, time_step);
         // Update geometric state when moving.

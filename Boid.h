@@ -97,9 +97,14 @@ public:
     void set_fp(FlockParameters* fp)
     {
         fp_ = fp;
-        setSpeed(fp->initSpeed());
-        setMaxSpeed(fp->maxSpeed());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250719 remove fitness_speed_control assume always true.
+
+//        setSpeed(fp->initSpeed());
+//        setMaxSpeed(fp->maxSpeed());
         setMaxForce(fp->maxForce());
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     Draw& draw() { return *draw_; }
@@ -209,9 +214,17 @@ public:
     {
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
-        Vec3 f = (EF::fitness_speed_control ?
-                  steerForSpeedControl():
-                  forward())                       * fp().weightForward();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250719 remove fitness_speed_control assume always true.
+
+//        Vec3 f = (EF::fitness_speed_control ?
+//                  steerForSpeedControl():
+//                  forward())                       * fp().weightForward();
+
+        Vec3 f = steerForSpeedControl()            * fp().weightForward();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 s = steer_to_separate(neighbors)      * fp().weightSeparate();
         Vec3 a = steer_to_align(neighbors)         * fp().weightAlign();
         Vec3 c = steer_to_cohere(neighbors)        * fp().weightCohere();
@@ -346,19 +359,27 @@ public:
     Vec3 anti_stall_adjustment(const Vec3& raw_steering)
     {
         Vec3 adjusted = raw_steering;
-        if (not EF::fitness_speed_control)
-        {
-            double prevention_margin = 1.5;
-            if (speed() < (fp().minSpeed() * prevention_margin))
-            {
-                if (raw_steering.dot(forward()) < 0)
-                {
-                    Vec3 ahead = forward() * fp().maxForce() * 0.9;
-                    Vec3 side = raw_steering.perpendicular_component(forward());
-                    adjusted = ahead + side;
-                }
-            }
-        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250719 remove fitness_speed_control assume always true.
+
+        // TODO 20250719 remember to get rid of anti_stall_adjustment()
+
+//        if (not EF::fitness_speed_control)
+//        {
+//            double prevention_margin = 1.5;
+//            if (speed() < (fp().minSpeed() * prevention_margin))
+//            {
+//                if (raw_steering.dot(forward()) < 0)
+//                {
+//                    Vec3 ahead = forward() * fp().maxForce() * 0.9;
+//                    Vec3 side = raw_steering.perpendicular_component(forward());
+//                    adjusted = ahead + side;
+//                }
+//            }
+//        }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         return adjusted;
     }
 

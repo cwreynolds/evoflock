@@ -97,14 +97,7 @@ public:
     void set_fp(FlockParameters* fp)
     {
         fp_ = fp;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250719 remove fitness_speed_control assume always true.
-
-//        setSpeed(fp->initSpeed());
-//        setMaxSpeed(fp->maxSpeed());
         setMaxForce(fp->maxForce());
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     Draw& draw() { return *draw_; }
@@ -214,24 +207,13 @@ public:
     {
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250719 remove fitness_speed_control assume always true.
-
-//        Vec3 f = (EF::fitness_speed_control ?
-//                  steerForSpeedControl():
-//                  forward())                       * fp().weightForward();
-
         Vec3 f = steerForSpeedControl()            * fp().weightForward();
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 s = steer_to_separate(neighbors)      * fp().weightSeparate();
         Vec3 a = steer_to_align(neighbors)         * fp().weightAlign();
         Vec3 c = steer_to_cohere(neighbors)        * fp().weightCohere();
         Vec3 ap = steer_for_predictive_avoidance() * fp().weightAvoidPredict();
         Vec3 as = fly_away_from_obstacles()        * fp().weightAvoidStatic();
         Vec3 combined_steering = smoothed_steering(f + s + a + c + ap + as);
-        combined_steering = anti_stall_adjustment(combined_steering);
         saveAnnotation(s, a, c, ap, as, combined_steering);
         return combined_steering;
     }
@@ -348,39 +330,6 @@ public:
             avoidance += oa;
         }
         return avoidance;
-    }
-
-    // Prevent "stalls" -- when a Boid's speed drops so low that it looks like
-    // it is floating rather than flying. Tries to keep the boid's speed above
-    // min_speed() (currently (20231227) self.max_speed * 0.3). It starts to
-    // adjust when self.speed get within 1.5 times the min speed (which is about
-    // self.max_speed * 0.5 now). This is done by extracting the lateral turning
-    // component of steering and adding that to a moderate forward acceleration.
-    Vec3 anti_stall_adjustment(const Vec3& raw_steering)
-    {
-        Vec3 adjusted = raw_steering;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250719 remove fitness_speed_control assume always true.
-
-        // TODO 20250719 remember to get rid of anti_stall_adjustment()
-
-//        if (not EF::fitness_speed_control)
-//        {
-//            double prevention_margin = 1.5;
-//            if (speed() < (fp().minSpeed() * prevention_margin))
-//            {
-//                if (raw_steering.dot(forward()) < 0)
-//                {
-//                    Vec3 ahead = forward() * fp().maxForce() * 0.9;
-//                    Vec3 side = raw_steering.perpendicular_component(forward());
-//                    adjusted = ahead + side;
-//                }
-//            }
-//        }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        return adjusted;
     }
 
     // Compute a behavioral weight (on [0, 1]) for a neighbor of this Boid.

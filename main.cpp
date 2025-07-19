@@ -95,26 +95,6 @@ int main(int argc, const char * argv[])
     EF::setRS(LP::LPRS());
     EF::RS().setSeedFromClock();
     std::cout << "RandomSequence seed = " << EF::RS().getSeed() << std::endl;
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250510 temp global switch for controlling speed with fitness.
-    //
-    // I added this global switch to help with switching over to a regime where
-    // there are no kinematic constraints on boid speed. Instead a target speed
-    // range becomes one of the input parameters to a flock evolution run. A new
-    // fitness objective is added which gives a "point" for every boid-step when
-    // its speed is in the desired range.
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250719 remove fitness_speed_control assume always true.
-
-//    EF::fitness_speed_control = true;
-//    EF::fitness_speed_control = false;
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // TODO experimental_GP_stub
     Boid::GP_not_GA = false;

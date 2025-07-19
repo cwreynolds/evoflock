@@ -30,14 +30,9 @@ public:
     // remain fixed during evolution run. MUST update constParameterCount() when
     // const parameters are added or removed.
     static int constParameterCount() { return 7; }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250719 remove fitness_speed_control assume always true.
-    
-    // The count(/size) of tunable parameters in this class.
-//    static int tunableParameterCount() { return 18; }
+    // The count(/size) of tunable parameters in this class. For consistency
+    // check, especially when changing the number of parameters.
     static int tunableParameterCount() { return 15; }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // "assume a spherical boid" unit diameter
     double bodyDiameter() const { return body_diameter_; }
     // Should this be called "world radius"?
@@ -56,27 +51,13 @@ public:
     // Hand-tuned parameters used as default.
     const static inline std::vector<double> hand_tuned_parameters =
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250719 remove fitness_speed_control assume always true.
-        
-//        100,  // max_force = ;          // Max acceleration (m/s²)
-//        20,   // min_speed = ;           // Speed lower limit (m/s)
-//        0,    //speed = 0;                // Initial speed (m/s)
-//        20,   // max_speed = ;           // Speed upper limit (m/s)
-        
         100,  // max_force = ;          // Max acceleration (m/s²)
-//        20,   // min_speed = ;           // Speed lower limit (m/s)
-//        0,    //speed = 0;                // Initial speed (m/s)
-//        20,   // max_speed = ;           // Speed upper limit (m/s)
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         // Weights for component steering behaviors.
         4,    // weight_forward
         40,   // weight_separate
         45,   // weight_align
         35,   // weight_cohere
-
         85,   // weightAvoidPredict
         55,   // weightAvoidStatic
 
@@ -100,50 +81,8 @@ public:
         1.4,   // min_time_to_collide
     };
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250719 remove fitness_speed_control assume always true.
-
-
-//    // Accessors for tuning parameters:
-//    const double& maxForce()        const { return tuning_parameters.at(0); }
-//    const double& minSpeed()        const { return tuning_parameters.at(1); }
-//    const double& initSpeed()       const { return tuning_parameters.at(2); }
-//    const double& maxSpeed()        const { return tuning_parameters.at(3); }
-//    
-//    void setMinSpeed(double s)      { tuning_parameters.at(1) = s; }
-//    void setInitSpeed(double s)     { tuning_parameters.at(2) = s; }
-//    void setMaxSpeed(double s)      { tuning_parameters.at(3) = s; }
-//    
-//    const double& weightForward()   const { return tuning_parameters.at(4); }
-//    const double& weightSeparate()  const { return tuning_parameters.at(5); }
-//    const double& weightAlign()     const { return tuning_parameters.at(6); }
-//    const double& weightCohere()    const { return tuning_parameters.at(7); }
-//    const double& weightAvoidPredict()const { return tuning_parameters.at(8); }
-//    const double& weightAvoidStatic() const { return tuning_parameters.at(9); }
-//
-//    const double& maxDistSeparate() const { return tuning_parameters.at(10); }
-//    const double& maxDistAlign()    const { return tuning_parameters.at(11); }
-//    const double& maxDistCohere()   const { return tuning_parameters.at(12); }
-//    
-//    // Cosine of threshold angle (max angle from forward to be seen)
-//    const double& angleSeparate()   const { return tuning_parameters.at(13); }
-//    const double& angleAlign()      const { return tuning_parameters.at(14); }
-//    const double& angleCohere()     const { return tuning_parameters.at(15); }
-//    
-//    const double& flyAwayMaxDist()  const { return tuning_parameters.at(16); }
-//    
-//    // ignore obstacle until predicted impact is in less than this many seconds.
-//    const double& minTimeToCollide() const { return tuning_parameters.at(17); }
-  
     // Accessors for tuning parameters:
     const double& maxForce()        const { return tuning_parameters.at(0); }
-//    const double& minSpeed()        const { return tuning_parameters.at(1); }
-//    const double& initSpeed()       const { return tuning_parameters.at(2); }
-//    const double& maxSpeed()        const { return tuning_parameters.at(3); }
-    
-//    void setMinSpeed(double s)      { tuning_parameters.at(1) = s; }
-//    void setInitSpeed(double s)     { tuning_parameters.at(2) = s; }
-//    void setMaxSpeed(double s)      { tuning_parameters.at(3) = s; }
     
     const double& weightForward()   const { return tuning_parameters.at(1); }
     const double& weightSeparate()  const { return tuning_parameters.at(2); }
@@ -166,33 +105,15 @@ public:
     // ignore obstacle until predicted impact is in less than this many seconds.
     const double& minTimeToCollide() const { return tuning_parameters.at(14); }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
     // Default constructor
     FlockParameters() : FlockParameters(hand_tuned_parameters) {}
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250719 remove fitness_speed_control assume always true.
-
-//    // Constructor based on a vector of numeric parameters.
-//    FlockParameters(const std::vector<double>& vector_of_parameters_)
-//    {
-//        assert(vector_of_parameters_.size() == tunableParameterCount());
-//        tuning_parameters = vector_of_parameters_;
-//        enforceConstraints();
-//    }
-
     // Constructor based on a vector of numeric parameters.
     FlockParameters(const std::vector<double>& vector_of_parameters_)
     {
-//        debugPrint(tunableParameterCount());
         assert(vector_of_parameters_.size() == tunableParameterCount());
         tuning_parameters = vector_of_parameters_;
-        enforceConstraints();
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Constructor for individual tunable parameters.
     FlockParameters(double max_force,
@@ -236,38 +157,7 @@ public:
             fly_away_max_dist,
             min_time_to_collide
         };
-        enforceConstraints();
     }
-    
-    // Enforce some constraints since values get randomized by evolutions.
-    void enforceConstraints()
-    {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250719 remove fitness_speed_control assume always true.
-
-//        double a = minSpeed();
-//        double b = maxSpeed();
-//        setMinSpeed(std::min(a, b));
-//        setMinSpeed(std::max(a, b));
-//        setInitSpeed(util::clip(initSpeed(), minSpeed(), maxSpeed()));
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250719 remove fitness_speed_control assume always true.
-
-//    // The count(/size) of tunable parameters in this class.
-//    static int tunableParameterCount(){return int(hand_tuned_parameters.size());}
-    
-    
-//    const static inline int expected_parameter_count = 18;
-//
-//    // The count(/size) of tunable parameters in this class.
-//    static int tunableParameterCount() { return 18; }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // The count(/size) of ALL parameters in this class.
     static int parameterCount()
@@ -292,14 +182,6 @@ public:
         std::cout << "  " << tunableParameterCount();
         std::cout << " parameters to be optimized:" << std::endl;
         indent(); debugPrint(maxForce());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250719 remove fitness_speed_control assume always true.
-
-//        indent(); debugPrint(minSpeed());
-//        indent(); debugPrint(initSpeed());
-//        indent(); debugPrint(maxSpeed());
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         indent(); debugPrint(weightForward());
         indent(); debugPrint(weightSeparate());
         indent(); debugPrint(weightAlign());

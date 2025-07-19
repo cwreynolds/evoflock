@@ -27,13 +27,6 @@ public:
     Vec3 position() const { return ls_.p(); }
     double mass() const { return mass_; }
     double speed() const { return speed_; }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250719 remove fitness_speed_control assume always true.
-    //               obsolete now?
-    
-    double max_speed() const { return max_speed_; }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double max_force() const { return max_force_; }
 
     // Setters
@@ -42,13 +35,6 @@ public:
     void setForward(Vec3 f) { ls_.setK(f); }
     void setPosition(Vec3 p) { ls_.setP(p); }
     void setSpeed(double speed) { speed_ = speed; }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250719 remove fitness_speed_control assume always true.
-    //               obsolete now?
-
-    void setMaxSpeed(double max_speed) { max_speed_ = max_speed; }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     void setMaxForce(double max_force) { max_force_ = max_force; }
 
     // Get current velocity vector.
@@ -73,18 +59,7 @@ public:
     {
         Vec3 new_velocity = velocity() + (acceleration * time_step);
         double new_speed = new_velocity.length();
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250719 remove fitness_speed_control assume always true.
-
-//        setSpeed(EF::fitness_speed_control ?
-//                 new_speed :
-//                 util::clip(new_speed, 0, max_speed()));
-        
         setSpeed(new_speed);
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         setPathCurvature(new_velocity);
         setAcceleration(new_velocity, time_step);
         // Update geometric state when moving.
@@ -144,7 +119,6 @@ public:
         // Classic case: https://en.wikipedia.org/wiki/Newton%27s_laws_of_motion
         // Discrete case: https://math.stackexchange.com/a/2880227/516283
         Agent agent0;
-        agent0.setMaxSpeed(1000); // Disable speed ceiling for this sub-test.
         double n = 100;
         double scalar_acceleration = 0.1;
         Vec3 z_acceleration(0, 0, scalar_acceleration);
@@ -180,7 +154,6 @@ public:
         // force is expressed in Agent's local space then transformed into
         // global space.
         Agent agent2;
-        agent2.setMaxSpeed(1000); // Disable speed ceiling for this sub-test.
         Vec3 local_force(0.1, 0.5, 1);
         for (int i = 0; i < n; i++)
         {
@@ -192,8 +165,6 @@ public:
                            1079.7517268385,
                            1041.8997370084);
         assert (Vec3::is_equal_within_epsilon(agent2.position(), ref_position2, e));
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
 

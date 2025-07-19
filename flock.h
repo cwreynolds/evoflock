@@ -278,21 +278,9 @@ public:
         std::cout << getTotalObstacleCollisions();
         std::cout << ", separation_score_sum_ = ";
         std::cout << int(separation_score_sum_);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250719 remove fitness_speed_control assume always true.
-
-//        if (EF::fitness_speed_control)
-//        {
-//            double average_speed = averageSpeedPerBoidStep();
-//            std::cout << std::format(", average speed = {:.3}", average_speed);
-//            std::cout << std::format(", speedScore() = {:.3}", speedScore());
-//        }
-
         double average_speed = averageSpeedPerBoidStep();
         std::cout << std::format(", average speed = {:.3}", average_speed);
         std::cout << std::format(", speedScore() = {:.3}", speedScore());
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         std::cout << std::endl;
     }
 

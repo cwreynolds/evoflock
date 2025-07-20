@@ -234,7 +234,10 @@ public:
         Vec3 direction;
         for (Boid* neighbor : neighbors)
         {
-            assert(neighbor);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\
+            // TODO 20250720 changing dist calc in Boid::neighborWeight().
+//            assert(neighbor);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             Vec3 offset = position() - neighbor->position();
             double weight = neighborWeight(neighbor,
                                            fp().maxDistSeparate(),
@@ -332,6 +335,31 @@ public:
         return avoidance;
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250720 changing dist calc in Boid::neighborWeight().
+
+//    // Compute a behavioral weight (on [0, 1]) for a neighbor of this Boid.
+//    // Shared by separate, align, and cohere steering behaviors
+//    double neighborWeight(Boid* neighbor,
+//                          double max_dist,
+//                          double cos_angle_threshold)
+//    {
+//        double dist = (neighbor->position() - position()).length();
+//        double unit_nearness = 1 - util::clip01(dist / max_dist);
+//        double angular_cutoff = angle_weight(neighbor, cos_angle_threshold);
+//        double weight = unit_nearness * angular_cutoff;
+//        return weight;
+//    }
+    
+    // TODO no longer on [0, 1]
+    
+    // plot y=1/(x+1) and y=5/(x+1) and y=20/(x+1) from 0 to 20
+    // plot y=1/((x+1) * 1) and y=1/((x+1) * 5) and y=1/((x+1) * 5) from 0 to 20
+    // plot y=1/((x+1) * 1) and y=1/((x+1) * 5) and y=1/((x+1) * 20) from 0 to 20, y from 0 to 1
+    // plot y=1/((x+1)^1) and y=1/((x+1)^5) and y=1/((x+1)^20) from 0 to 20, y from 0 to 1
+
+    // plot y=1/((x*0.5)+1) and y=1/((x*1)+1) and y=1/((x*2)+1) from 0 to 20, y from 0 to 1
+    
     // Compute a behavioral weight (on [0, 1]) for a neighbor of this Boid.
     // Shared by separate, align, and cohere steering behaviors
     double neighborWeight(Boid* neighbor,
@@ -339,11 +367,17 @@ public:
                           double cos_angle_threshold)
     {
         double dist = (neighbor->position() - position()).length();
-        double unit_nearness = 1 - util::clip01(dist / max_dist);
+        
+//        double unit_nearness = 1 - util::clip01(dist / max_dist);
+        double unit_nearness = 1 / std::pow(dist + 1, max_dist);
+
         double angular_cutoff = angle_weight(neighbor, cos_angle_threshold);
         double weight = unit_nearness * angular_cutoff;
         return weight;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     // Weighting for a neighbor Boid based on how close its position is to "my"
     // forward axis. Dots/projects the normal from my center toward its, onto my
@@ -368,7 +402,7 @@ public:
         return recompute_nearest_neighbors(neighbors_count_);
     }
 
-    // TODO TEMP trying to verify this code is still thread-safe.
+    // TODO TEMP trying to verify this code is still thread-safe. Remove later.
     int xxx_temp_rnn_count = 0;
     
     BoidPtrList recompute_nearest_neighbors(int n)

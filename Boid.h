@@ -351,14 +351,20 @@ public:
 //        return weight;
 //    }
     
-    // TODO no longer on [0, 1]
+//    // TODO no longer on [0, 1]
+//
+//    // plot y=1/(x+1) and y=5/(x+1) and y=20/(x+1) from 0 to 20
+//    // plot y=1/((x+1) * 1) and y=1/((x+1) * 5) and y=1/((x+1) * 5) from 0 to 20
+//    // plot y=1/((x+1) * 1) and y=1/((x+1) * 5) and y=1/((x+1) * 20) from 0 to 20, y from 0 to 1
+//    // plot y=1/((x+1)^1) and y=1/((x+1)^5) and y=1/((x+1)^20) from 0 to 20, y from 0 to 1
+//
+//    // plot y=1/((x*0.5)+1) and y=1/((x*1)+1) and y=1/((x*2)+1) from 0 to 20, y from 0 to 1
     
-    // plot y=1/(x+1) and y=5/(x+1) and y=20/(x+1) from 0 to 20
-    // plot y=1/((x+1) * 1) and y=1/((x+1) * 5) and y=1/((x+1) * 5) from 0 to 20
-    // plot y=1/((x+1) * 1) and y=1/((x+1) * 5) and y=1/((x+1) * 20) from 0 to 20, y from 0 to 1
-    // plot y=1/((x+1)^1) and y=1/((x+1)^5) and y=1/((x+1)^20) from 0 to 20, y from 0 to 1
-
-    // plot y=1/((x*0.5)+1) and y=1/((x*1)+1) and y=1/((x*2)+1) from 0 to 20, y from 0 to 1
+    // For plot of this distance falloff func see https://tinyurl.com/458twk9z
+    // (plot y=1/((x*0.2)+1), y=1/((x*0.5)+1), y=1/((x*1)+1), y=1/((x*2)+1),
+    //  y=1/((x*5)+1), x from 0 to 20, y from 0 to 1)
+    
+    int nw_step_count = 0;
     
     // Compute a behavioral weight (on [0, 1]) for a neighbor of this Boid.
     // Shared by separate, align, and cohere steering behaviors
@@ -368,8 +374,26 @@ public:
     {
         double dist = (neighbor->position() - position()).length();
         
-//        double unit_nearness = 1 - util::clip01(dist / max_dist);
-        double unit_nearness = 1 / std::pow(dist + 1, max_dist);
+        double unit_nearness = 1 - util::clip01(dist / max_dist);
+//        double unit_nearness = 1 / std::pow(dist + 1, max_dist);
+//        double unit_nearness = 1 / ((dist * max_dist) + 1);
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20250721 VERY TEMP
+        if (isSelected() and (nw_step_count == 499))
+        {
+            double o = 1 - util::clip01(dist / max_dist);
+            double n = 1 / ((dist * max_dist) + 1);
+//            if (o < 0.9 or n > 0.1)
+            {
+                grabPrintLock_evoflock();
+                std::cout << std::format("o = {:.3}", o) << ", ";
+                std::cout << std::format("n = {:.3}", n) << ", ";
+                std::cout << std::format("max = {:.3}", max_dist);
+                std::cout << std::endl;
+            }
+        }
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
         double angular_cutoff = angle_weight(neighbor, cos_angle_threshold);
         double weight = unit_nearness * angular_cutoff;

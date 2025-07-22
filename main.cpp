@@ -199,6 +199,17 @@ int main(int argc, const char * argv[])
             // TODO experimental_GP_stub
 //            const LP::Individual* individual = population->nthBestFitness(i);
             LP::Individual* individual = population->nthBestFitness(i);
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20250721 add a FP::print() for best individual at end of run
+            
+            LP::GpTree t = individual->tree();
+            GP::fp_from_ga_tree(t).print();
+            std::cout << std::endl;
+            std::cout << std::endl;
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            
 //            std::cout << individual->tree().to_string() << std::endl;
             std::cout << individual->tree().to_string(true) << std::endl;
 //            auto fitness = GP::rerun_flock_simulation(individual);

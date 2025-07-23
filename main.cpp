@@ -80,9 +80,14 @@ void visualizePreviouslyLoggedFlockParameters()
 //    //                   -0.868455, 0.0992426, 28.1231, 1.28869);
 //    
 //    // from run 20250709_obs_avoid_square
-//    FlockParameters fp(95.0626, 20, 20, 20, 75.7318, 38.9368, 41.1228, 7.78766,
-//                       96.1189, 27.145, 2.70433, 27.9354, 7.56547, -0.785536,
-//                       -0.67676, 0.52532, 28.3042, 1.16165);
+//    //FlockParameters fp(95.0626, 20, 20, 20, 75.7318, 38.9368, 41.1228, 7.78766,
+//    //                   96.1189, 27.145, 2.70433, 27.9354, 7.56547, -0.785536,
+//    //                   -0.67676, 0.52532, 28.3042, 1.16165);
+//    
+//    // from run 20250721c_old_falloff_more_log
+//    FlockParameters fp(72.9053, 78.2308, 53.0839, 36.1152, 6.51767, 88.0149,
+//                       71.9993, 2.38176, 12.0969, 88.8369, -0.823082, -0.675907,
+//                       0.532154, 5.18991, 1.19003);
 //    
 //    EF::enable_multithreading = false;
 //    while (true) { GP::run_flock_simulation(fp, 1); }
@@ -203,11 +208,13 @@ int main(int argc, const char * argv[])
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // TODO 20250721 add a FP::print() for best individual at end of run
             
-            LP::GpTree t = individual->tree();
-            GP::fp_from_ga_tree(t).print();
-            std::cout << std::endl;
-            std::cout << std::endl;
-
+            if (i == 0)
+            {
+                LP::GpTree t = individual->tree();
+                GP::fp_from_ga_tree(t).print();
+                std::cout << std::endl;
+                std::cout << std::endl;
+            }
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             
 //            std::cout << individual->tree().to_string() << std::endl;

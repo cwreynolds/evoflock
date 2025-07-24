@@ -117,12 +117,6 @@ public:
 
     // Constructor for individual tunable parameters.
     FlockParameters(double max_force,
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20250721 add a FP::print() for best individual at end of run
-//                    double min_speed,
-//                    double speed,
-//                    double max_speed,
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     double weight_forward,
                     double weight_separate,
                     double weight_align,
@@ -142,12 +136,6 @@ public:
         tuning_parameters =
         {
             max_force,
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250721 add a FP::print() for best individual at end of run
-//            min_speed,
-//            speed,
-//            max_speed,
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             weight_forward,
             weight_separate,
             weight_align,

@@ -205,9 +205,6 @@ int main(int argc, const char * argv[])
 //            const LP::Individual* individual = population->nthBestFitness(i);
             LP::Individual* individual = population->nthBestFitness(i);
             
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20250721 add a FP::print() for best individual at end of run
-            
             if (i == 0)
             {
                 LP::GpTree t = individual->tree();
@@ -215,7 +212,6 @@ int main(int argc, const char * argv[])
                 std::cout << std::endl;
                 std::cout << std::endl;
             }
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             
 //            std::cout << individual->tree().to_string() << std::endl;
             std::cout << individual->tree().to_string(true) << std::endl;

@@ -74,7 +74,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
-    This paper describes an automatic method for \textit{adjusting} or \textit{tuning} models of multi-agent motion. Simulating the motion of bird flocks, human crowds, vehicle traffic, and other multi-agent systems is a widely used technique. These simulations model the behavior of a group member (bird, human, or vehicle). The group behaviors (flock, crowd, traffic) \textit{emerge} from interactions between group members. These models usually have many numeric control parameters. Although each parameter may be intuitive in isolation, their interaction can be complex and nonlinear. It can be difficult to know how to adjust which parameters to make a desired change in the group behavior. Changing one aspect of group behavior often causes other aspects to change, leading to a long frustrating process of incremental changes. In this work, the desired group behavior is measured with an objective(/fitness/loss) function and optimized with a \textit{genetic algorithm}.
+    This paper describes an automatic method for \textit{adjusting} or \textit{tuning} models of multi-agent motion. Simulating the motion of bird flocks, human crowds, vehicle traffic, and other multi-agent systems is a widely used technique. These simulations model the behavior of a single group member (bird, human, or vehicle). The group behaviors (flock, crowd, traffic) \textit{emerge} from interactions between group members. These models usually have many numeric control parameters. Although each parameter may be intuitive in isolation, their interaction can be complex and nonlinear. It can be difficult to know how to adjust which parameters to make a desired change in the group behavior. Changing one aspect of group behavior often causes other aspects to change, leading to a long frustrating process of incremental changes. In this work, the desired group behavior is measured with an objective(/fitness/loss) function and optimized with a \textit{genetic algorithm}.
 \end{abstract}
 
 \noindent{\small\textbf{Keywords:} boids, inverse design, optimization, evolutionary computation, genetic algorithm, flocks, herds, schools, crowds, traffic}
@@ -123,7 +123,7 @@ A video of flock simulations based on this approach is available here:
 \begin{figure*}[t]
     \centering
     \includegraphics[width=0.7\textwidth]{images/temp_evo_update.png}
-    \caption{One update step of the evolutionary optimization process: (a) randomly select one of the \textit{sub-populations}, (b) from that subpop, randomly select three \textit{individuals} (each holding a flock parameter set), (c) get fitness for each, either by running flock simulations (green), or using the fitness cached from previous tournaments (orange), (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g) that new individual replaces the worst of the three back in the sub-population.}
+    \caption{One update step of the (SSGA) evolutionary optimization process, using a 3-way tournament: (a) randomly select one of the \textit{sub-populations}, (b) from that sub-population, randomly select three \textit{individuals}, each holding a flock parameter set, (c) get fitness for each, either by running flock simulations (green), or using the fitness cached from previous tournaments (orange), (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g,h) that new individual replaces the worst of the three back in the population.}
     \label{fig:temp_evo_update}
 \end{figure*}
 
@@ -132,18 +132,30 @@ A video of flock simulations based on this approach is available here:
 \section{Related Work}
 \label{sec:related}
 
-Since the 1980s many simulation-based models of bird flocks have been proposed. They have commonalities and differences in their modeling philosophy and computational technique. These early models include \textit{boids} and others:
+Since the 1980s many simulation-based models of bird flocks have been proposed. Although they have broadly similar goals, there are many differences in their modeling philosophy and computational technique. These models include \textit{boids} and others:
 \citet{aoki_simulation_1982}, 
 \citet{akira_okubo_dynamical_1986}, 
 \citep{reynolds_flocks_1987},
+\citep{tu_artificial_1994},
 \citet{toner_flocks_1998}, 
-\citet{frank_heppner_stochastic_1990}, 
+\citet{heppner_stochastic_1990}, 
 \citet{bajec_simulating_2005},
 \citet{cucker_emergent_2007},
 \citet{moskon_fuzzy_2007},
 \citet{cavagna_seventh_2008},
 \citet{bajec_organized_2009},
 \citet{hoetzlein_flock2_2024}.
+
+
+[[[\textbf{...maybe section here about papers ``most similar'' to mine?...}]]]
+An early, if not very successful, attempt at inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}, a variation on the \textit{genetic algorithm} \citep{holland_adaptation_1975}). 
+% GP uses an arbitrary tree-shaped genomes while GA uses a fixed size vector of parameters.
+\citet{stolfi_escorting_2025} use evolutionary optimization to design robotic swarms for ``escorting'' tasks.
+
+[[[\textbf{``...these models use genetic algorithms to \textit{tune} the parameters of previously presented non-evolutionary models, but very few attempt to evolve collective behaviour from scratch...'' \citep{demsar_evolution_2017}}]]]
+
+[[[\textbf{...also mention \citep{stonedahl_finding_2011} and ``utility of the flocking simulator as a fitness function for the GA'' ...}]]]
+
 
 Most previous work on automatic tuning for flock models has used reinforcement learning \citep{sutton_reinforcement_1998} as the optimization technique. For example, recent excellent work on high quality \textit{driving agents} for a multi-agent traffic simulation based on self-play using reinforcement learning \citep{cornelisse_building_2025}.
 [[[\textbf{...mention self-play, and how the current work has a similar character...}]]]
@@ -153,13 +165,18 @@ While this paper was being drafted, a preprint was posted \citep{brambati_learni
 
 [[[\textbf{...say something about \citep{jaderberg_human-level_2019}...}]]]
 
-An early, if not very successful, attempt at inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}, a variation on the \textit{genetic algorithm} \citep{holland_adaptation_1975}). GP uses an arbitrary tree-shaped genomes while GA uses a fixed size vector of parameters.
-
-[[[\textbf{``...these models use genetic algorithms to \textit{tune} the parameters of previously presented non-evolutionary models, but very few attempt to evolve collective behaviour from scratch...'' \citep{demsar_evolution_2017}}]]]
-
-[[[\textbf{...also mention \citep{stonedahl_finding_2011} and ``utility of the flocking simulator as a fitness function for the GA'' ...}]]]
-
 The approach used here was developed as part of a larger ongoing collaboration investigating new approaches to optimization of multi-agent motion. [[[\textbf{cite Matthew's thesis?}]]]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/temp_system_blocks.png}
+    \caption{Overall structure of the flock optimization presented here. A generic optimization base (blue) operates on a user's flock inverse design problem (orange). The user's description includes: a parameter set specification, an objective function, a flock simulator, and score keepting utilities. [[[\textbf{...oh, maybe objective function should contain the sim and metering...}]]] [[[\textbf{TEMP}]]]}
+    \label{fig:system_blocks}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Description of the Technique}
 \label{sec:Description}
@@ -199,17 +216,6 @@ Early genetic algorithms were used for problems with a single scalar fitness val
 A simple and commonly used scalarizer is called \textit{hypervolume}, which simply multiples together the components of a multiple objective value. The name hypervolume refers to a \textit{n}-dimensional box whose edges correspond to the components of a multiple objective value. Hypervolume has the property that its value changes in proportion to changes in each component.
 
 So for example, the hypervolume goes up (or down) if any component goes up (or down) --- as long as none of the components are zero, which ``hides'' contributions of other components. To avoid this, the hypervolume varient used here remaps the fitness range from [0, 1] to [$\epsilon$, 1] before taking the product. ($\epsilon$ is 0.01 for the ``normalized fitness'' values used here.)
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=0.9\linewidth]{images/temp_system_blocks.png}
-    \caption{Overall structure of the flock optimization presented here. A generic optimization base (blue) operates on a user's flock inverse design problem (orange). The user's description includes: a parameter set specification, an objective function, a flock simulator, and score keepting utilities. [[[\textbf{...oh, maybe objective function should contain the sim and metering...}]]] [[[\textbf{TEMP}]]]}
-    \label{fig:speed_score}
-\end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -374,7 +380,7 @@ This work suggests that evolutionary optimization, via a genetic algorithm, can 
 \section{Future Work}
 \label{sec:future}
 
-hope[[[\textbf{...I plan to try adding a fourth objective --- perhaps for path curvature --- as an exercise to talk about more advanced inverse design problems --- but if not, it should be mentioned here...}]]]
+[[[\textbf{...I plan to try adding a fourth objective --- perhaps for path curvature --- as an exercise to talk about more advanced inverse design problems --- but if not, it should be mentioned here...}]]]
 
 [[[\textbf{...experiment with open space flocking --- no obstacles --- perhaps in conjunction with path curvature objective...}]]]
 
@@ -387,7 +393,7 @@ hope[[[\textbf{...I plan to try adding a fourth objective --- perhaps for path c
 \section{Acknowledgements}
 \label{sec:ack}
 
-The work described here is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, and Jennifer Luo. I also want to thank my long time (~30 year) friend and ALife colleague, Inman Harvey, whose deep insights taught me much about evolutionary computation and scholarship. Thanks to my family for loving support. [[[\textbf{revisit this}]]]
+The work described here is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, and Jennifer Luo. I also want to thank my long time ($\sim$30 year) friend and ALife colleague, Inman Harvey, whose deep insights taught me much about evolutionary computation and scholarship. Thanks to my family for loving support. [[[\textbf{revisit this}]]]
 % Wahrman(?)
 % flocking friends?
 

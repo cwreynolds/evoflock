@@ -396,11 +396,6 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
             { "Real_0_10",   0.0,  10.0, jiggle_scale },
             { "Real_0_100",  0.0, 100.0, jiggle_scale },
             { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250720 changing dist calc in Boid::neighborWeight().
-//            { "Real_0_3",    0.0,   3.0, jiggle_scale },
-            { "Real_0_5",    0.0,   5.0, jiggle_scale },
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         },
         {
             {
@@ -422,22 +417,9 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                     "Real_0_100",  // weightAvoidPredict
                     "Real_0_100",  // weightAvoidStatic
 
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20250720 changing dist calc in Boid::neighborWeight().
-
                     "Real_0_100",  // max_dist_separate
                     "Real_0_100",  // max_dist_align
                     "Real_0_100",  // max_dist_cohere
-
-//                    "Real_0_3",  // max_dist_separate
-//                    "Real_0_3",  // max_dist_align
-//                    "Real_0_3",  // max_dist_cohere
-
-//                    "Real_0_5",  // max_dist_separate
-//                    "Real_0_5",  // max_dist_align
-//                    "Real_0_5",  // max_dist_cohere
-
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                     // Cosine of threshold angle (max angle from forward to be seen)
                     "Real_m1_p1",  // angle_separate

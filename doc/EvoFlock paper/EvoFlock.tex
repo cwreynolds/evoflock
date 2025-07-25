@@ -132,11 +132,12 @@ A video of flock simulations based on this approach is available here:
 \section{Related Work}
 \label{sec:related}
 
-Since the 1980s many simulation-based models of bird flocks have been proposed. Although they have broadly similar goals, there are many differences in their modeling philosophy and computational technique. These models include \textit{boids} and others:
+Since the 1980s many simulation-based models of bird flocks have been proposed. Although they have broadly similar intent, there are many differences in their modeling philosophy and computational technique. These models include \textit{boids} and others:
 \citet{aoki_simulation_1982}, 
 \citet{akira_okubo_dynamical_1986}, 
-\citep{reynolds_flocks_1987},
-\citep{tu_artificial_1994},
+\citet{reynolds_flocks_1987},
+\citet{tu_artificial_1994},
+\citet{vicsek_novel_1995}
 \citet{toner_flocks_1998}, 
 \citet{heppner_stochastic_1990}, 
 \citet{bajec_simulating_2005},
@@ -144,8 +145,9 @@ Since the 1980s many simulation-based models of bird flocks have been proposed. 
 \citet{moskon_fuzzy_2007},
 \citet{cavagna_seventh_2008},
 \citet{bajec_organized_2009},
+\citet{bhattacharya_collective_2010}
+\citet{vasarhelyi_optimized_2018}
 \citet{hoetzlein_flock2_2024}.
-
 
 [[[\textbf{...maybe section here about papers ``most similar'' to mine?...}]]]
 An early, if not very successful, attempt at inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}, a variation on the \textit{genetic algorithm} \citep{holland_adaptation_1975}). 
@@ -156,6 +158,8 @@ An early, if not very successful, attempt at inverse design for flock simulation
 
 [[[\textbf{...also mention \citep{stonedahl_finding_2011} and ``utility of the flocking simulator as a fitness function for the GA'' ...}]]]
 
+[[[\textbf{note ``...In this paper, we propose such a flocking model for real drones incorporating an evolutionary optimization framework with carefully chosen order parameters and fitness functions...'' \citep{vasarhelyi_optimized_2018}
+}]]]
 
 Most previous work on automatic tuning for flock models has used reinforcement learning \citep{sutton_reinforcement_1998} as the optimization technique. For example, recent excellent work on high quality \textit{driving agents} for a multi-agent traffic simulation based on self-play using reinforcement learning \citep{cornelisse_building_2025}.
 [[[\textbf{...mention self-play, and how the current work has a similar character...}]]]
@@ -286,7 +290,7 @@ The collection of all these make up the flock's \textit{parameter set} which is 
     equivalent generations & 100 & \\
     hypervolume epsilon & 0.01 & $\epsilon$ \\
     \hline
-    run time: flock sim & $\sim$0.2 seconds & $200{\times}500$ \\
+    run time: flock sim & $\sim$0.25 seconds & $200{\times}500$ \\
     run time: evolution & $\sim$2 hours & \\
     \hline
 \end{tabular}
@@ -366,7 +370,11 @@ This work suggests that evolutionary optimization, via a genetic algorithm, can 
 
 [[[\textbf{should this be in the introduction? Say something about using deep reinforcement learning for flocks, etc.}]]] One advantage of using evolutionary optimization for this type of inverse design problem is that the multi-agent simulation can be treated as a ``black box.'' As such, there are few constraints on how the simulation is implemented. For example, to use \textit{stochastic gradient descent} (SGD) \citep{robbins_stochastic_1951} the flock model must be differentiable, either analytically or with \textit{automatic differentiation} \citep{baydin_automatic_2018}. Conversely, evolutionary optimization only requires the measured scalar fitness of a simulation, no gradients are used.
 
-[[[\textbf{I said this above, should it be here, or simply call back to it? \textit{An equally iconic property of natural flocks is that birds are aligned, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment.}}]]]
+[[[\textbf{...I said this above, should it be here, or simply call back to it? \textit{An equally iconic property of natural flocks is that birds are aligned, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment...}}]]]
+
+[[[\textbf{...say something about how increasing the evo pop size gives some advantage in being able to track more potential solutions, but that for a given number of evo steps, there are fewer ``updates per individual'' which reduces quality of optimization --- ``less parallel population, more sequential evolution''...}]]]
+
+[[[\textbf{...similarly: for a long time I was using pop=500/steps=30000. Then I tried increasing pop, eventually to 1000. I was getting worse results. Today (20250724) I tried running for steps=60000, which did well reaching EOR best fitness of 88\% --- and separately with pop=150, which did poorly (72\%)...}]]]
 
 \section{Limitations}
 \label{sec:limitations}

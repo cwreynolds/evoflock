@@ -75,6 +75,10 @@
 
 \begin{abstract}
     This paper describes an automatic method for \textit{adjusting} or \textit{tuning} models of multi-agent motion. Simulating the motion of bird flocks, human crowds, vehicle traffic, and other multi-agent systems is a widely used technique. These simulations model the behavior of a single group member (bird, human, or vehicle). The group behaviors (flock, crowd, traffic) \textit{emerge} from interactions between group members. These models usually have many numeric control parameters. Although each parameter may be intuitive in isolation, their interaction can be complex and nonlinear. It can be difficult to know how to adjust which parameters to make a desired change in the group behavior. Changing one aspect of group behavior often causes other aspects to change, leading to a long frustrating process of incremental changes. In this work, the desired group behavior is measured with an objective(/fitness/loss) function and optimized with a \textit{genetic algorithm}.
+
+    [[[\textbf{...maybe explicitly mention the components of my objective function?...}]]]
+
+    [[[\textbf{...maybe an ``Interestingly...'' mention of how alignment just emerges out of learning to maintain a given interval of separation...}]]]
 \end{abstract}
 
 \noindent{\small\textbf{Keywords:} boids, inverse design, optimization, evolutionary computation, genetic algorithm, flocks, herds, schools, crowds, traffic}
@@ -132,14 +136,14 @@ A video of flock simulations based on this approach is available here:
 \section{Related Work}
 \label{sec:related}
 
-Since the 1980s many simulation-based models of bird flocks have been proposed. Although they have broadly similar intent, there are many differences in their modeling philosophy and computational technique. These models include \textit{boids} and others:
+Since the 1980s, many simulation-based models of bird flocks have been proposed. They have broadly similar intent, with many differences in their modeling philosophy and computational technique. These models include \textit{boids} and many others:
 \citet{aoki_simulation_1982}, 
 \citet{akira_okubo_dynamical_1986}, 
 \citet{reynolds_flocks_1987},
-\citet{tu_artificial_1994},
-\citet{vicsek_novel_1995}
-\citet{toner_flocks_1998}, 
 \citet{heppner_stochastic_1990}, 
+\citet{tu_artificial_1994},
+\citet{vicsek_novel_1995},
+\citet{toner_flocks_1998}, 
 \citet{bajec_simulating_2005},
 \citet{cucker_emergent_2007},
 \citet{moskon_fuzzy_2007},
@@ -149,27 +153,15 @@ Since the 1980s many simulation-based models of bird flocks have been proposed. 
 \citet{vasarhelyi_optimized_2018}
 \citet{hoetzlein_flock2_2024}.
 
-[[[\textbf{...maybe section here about papers ``most similar'' to mine?...}]]]
-An early, if not very successful, attempt at inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}, a variation on the \textit{genetic algorithm} \citep{holland_adaptation_1975}). 
-% GP uses an arbitrary tree-shaped genomes while GA uses a fixed size vector of parameters.
-\citet{stolfi_escorting_2025} use evolutionary optimization to design robotic swarms for ``escorting'' tasks.
+Early users of flock models found ``tuning'' their many parameters to be frustratingly difficult. This led to research on better tools for this task. This paragraph lists the works that most directly led to the technique described in this paper. An early, but not very successful, attempt at inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}. (GP is a variation on the \textit{genetic algorithm} (GA) \citep{holland_adaptation_1975}.) \citet{stonedahl_finding_2011} use a GA to search parameter spaces using an objective function running flock simulations based on NetLogo \citep{tisue_netlogo_2004}. Similarly \citet{demsar_evolution_2017} attempt ``to evolve collective behavior from scratch.'' \citet{vasarhelyi_optimized_2018} used a GA to tune flocking models suitable for the flight dynamics of a swarm of real drones. \citet{stolfi_escorting_2025} use evolutionary optimization to design robotic swarms for ``escorting'' tasks.
 
-[[[\textbf{``...these models use genetic algorithms to \textit{tune} the parameters of previously presented non-evolutionary models, but very few attempt to evolve collective behaviour from scratch...'' \citep{demsar_evolution_2017}}]]]
+Most previous work on automatically tuning flock/multi-agent models has used \textit{reinforcement learning} (RL) \citep{sutton_reinforcement_1998} as the optimization technique. For example, recent excellent work in \citet{cornelisse_building_2025} on high quality \textit{driver agents} for a multi-agent traffic simulation. It uses \textit{self-play} where agents learn (``bootstrap'') from interacting with each other. The technique described in this paper also has an aspect of self-play as flockmates learn to synchronize with each other.
 
-[[[\textbf{...also mention \citep{stonedahl_finding_2011} and ``utility of the flocking simulator as a fitness function for the GA'' ...}]]]
+As this paper was being drafted, a preprint was posted \citep{brambati_learning_2025} using reinforcement learning with an objective function very similar to the one used here. 
 
-[[[\textbf{note ``...In this paper, we propose such a flocking model for real drones incorporating an evolutionary optimization framework with carefully chosen order parameters and fitness functions...'' \citep{vasarhelyi_optimized_2018}
-}]]]
+Notable, if somewhat tangential: \citet{jaderberg_human-level_2019} uses a hybrid approach to learn human-level game-playing agents for multiplayer games. It uses population-based reinforcement learning, which combines aspects of RL, population-based GA, and the self-play mentioned above.
 
-Most previous work on automatic tuning for flock models has used reinforcement learning \citep{sutton_reinforcement_1998} as the optimization technique. For example, recent excellent work on high quality \textit{driving agents} for a multi-agent traffic simulation based on self-play using reinforcement learning \citep{cornelisse_building_2025}.
-[[[\textbf{...mention self-play, and how the current work has a similar character...}]]]
-
-While this paper was being drafted, a preprint was posted \citep{brambati_learning_2025} using reinforcement learning with an objective function very similar to the one used here. Other flock tuning based on reinforcement learning include:
-[[[\textbf{cites?}]]].
-
-[[[\textbf{...say something about \citep{jaderberg_human-level_2019}...}]]]
-
-The approach used here was developed as part of a larger ongoing collaboration investigating new approaches to optimization of multi-agent motion. [[[\textbf{cite Matthew's thesis?}]]]
+The approach used here was developed as part of a larger ongoing collaboration investigating new approaches to optimization of multi-agent motion. [[[\textbf{...My impulse here is to cite ``(Shang, 2025)'' Matthew's thesis. But I don't know where/how to do that, nor if it is appropriate. Suggestions appreciated...}]]]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -190,6 +182,8 @@ This section discusses the various components of the optimization process for ad
 
 \subsection{Optimization with Genetic Algorithms}
 \label{subsec:Optimization_with_GA}
+
+[[[\textbf{...make some mention of \textit{LazyPredator}...}]]]
 
 Optimization can be used to find a set of simulation parameters that best fit the behavioral goals, as given by an objective function. The approach described here uses a \textit{genetic algorithm} (GA), a technique based loosely on concepts of biological evolution, as seen in the natural world. Genetic algorithms were first described by \citet{holland_adaptation_1975}. Evolution was first described by \citet{darwin_origin_1859}.
 
@@ -227,7 +221,7 @@ So for example, the hypervolume goes up (or down) if any component goes up (or d
     \centering
     % \includegraphics[width=0.9\textwidth]{images/temp_sep_score.png}
     \includegraphics[width=0.9\linewidth]{images/temp_sep_score.png}
-    \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
+    \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{...should I say ``all boid-steps''?...}]]]}
     \label{fig:SeparationScore}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -237,7 +231,7 @@ So for example, the hypervolume goes up (or down) if any component goes up (or d
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.9\linewidth]{images/temp_speed_score.png}
-    \caption{Score for desired boid \textit{speed}, here $\sim$20 meters per second. This function is highest when speed is between 19 and 21 m/s and falls off to zero outside that range. The \textit{speed} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{TEMP}]]]}
+    \caption{Score for desired boid \textit{speed}, here $\sim$20 meters per second. This function is highest when speed is between 19 and 21 m/s and falls off to zero outside that range. The \textit{speed} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{boid-steps?}]]]}
     \label{fig:speed_score}
 \end{figure}
 
@@ -264,6 +258,40 @@ Each of these steering behaviors has parameters, such as weights, distances, and
 
 The collection of all these make up the flock's \textit{parameter set} which is adjusted by optimization according the the objective function. See Table \ref{table:flock-parameters} for a list of the parameter set used in these experiments.
 
+
+
+\section{An objective function for flocking}
+\label{sec:FlockingObjective}
+
+Having described the components of the optimization framework for this inverse design project (see \nameref{sec:Description}), this section focuses on the specific objective(/fitness/loss) function that was used in this work to optimize a multi-agent motion model for flocking.
+
+The objectives described below are based on measurements made during the flock simulation process. That is, in addition to running the simulation, ``bookkeeping'' code is run while updating each individual boid step, after a flock update, and at the end of a simulation. Those metrics are stored in the flock instance and queried by the evolutionary optimization framework in which the flock simulation is run.
+
+\subsection{Objective for Separation}
+\label{subsec:separation_objective}
+
+A key observation is that the birds in a flock are grouped closely together, yet manage to avoid colliding with each other. [[[\textbf{find some citation to back this up?}]]] These goals can be seen as a requirement that the distance between simulated boids fall within a certain distance interval. Specifically, for a given boid, we determine its nearest neighbor, and measure the distance between their centers. A score is computed based on that distance. It is zero if either the distance is too small (potential collision) or the distance is too large (failure to cohere: form a dense flock). It is one in an acceptable range, and piecewise linear ramps transition from one to zero outside this desired range. See Figure \ref{fig:SeparationScore}.
+
+An equally iconic property of natural flocks is that birds are \textit{aligned}, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment. Simply optimizing to obtain separation appears to \textbf{cause} the alignment.
+
+\subsection{Objective for Obstacle Avoidance}
+\label{subsec:avoidance_objective}
+
+The example application in this work can be described as ``flocking in the presence of obstacles'' as shown in Figure \ref{fig:boid_flock}. At each time step, part of each boid's simulation is predicting future obstacle collisions and applying steering force to avoid them. The same code detects obstacle avoidance failures. In simulation, this is a matter of a boid having incorrectly passed through the surface of the obstacle. A kinematic constraint is invoked to move the boid back to the correct side of the boundary. This failure is recorded in a collision counter on each boid. At the end of the flock simulation this is turned into a normalized score of the total number of all collisions over the total number of boid-steps. (Typically in these experiments, a fitness test runs 200 boids for 500 simulation steps, so the final score is total number of collisions over 100,000.) 
+
+For collision avoidance, the goal is not merely to \textit{reduce} the number of collisions but to effectively eliminate them. (An informal goal in these experiments has been {$\leq$}10 collisions per 100,000 boid-steps.) To express this, the normalized obstacle avoidance score (on [0, 1]) is exponentiated to the 500\textsuperscript{th} power. This pushes nearly the whole score's range down near zero, except for a small region near a perfect score of one. This effectively rejects flock parameter sets with more than a handful of collisions per flock simulation.
+
+\subsection{Objective for Flight Speed}
+\label{subsec:speed_objective}
+
+Originally, following early boid models \citep{reynolds_flocks_1987}, each boid's flight speed was kinematically clipped to remain below 20 meters per second. Later, a third flock optimization objective was added to establish a target speed range. A new behavior was added to each boid to apply a force along its direction of motion to adjust its flight speed toward the desired range. The strength of this behavior became one of the flock parameters being optimized in the inverse flock design process.
+
+Flight speed \textit{can} be left to “float” during optimization. Unfortuately there is an annoyingly large basin of attractions around not moving (speed=0). In any case, any given inverse design problem would likely imply a range of valid speeds. This suggests that the speed range should be given in the inverse design problem statement. For example, modeling a flock of finches and a flock of swallows would imply very different speed ranges. Figure \ref{fig:speed_score} shows a speed score function used in these experiments. It has a target range in the interval [19, 21] with a fixed support ramping down to zero outside that range.
+
+\subsection{Adding an objective}
+\label{subsec:add_objective}
+
+[[[\textbf{...Make experiment with adding a goal for increasing path curvature. If it works describe here. Otherwise put it in \nameref{sec:future}...}]]]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -329,39 +357,6 @@ The collection of all these make up the flock's \textit{parameter set} which is 
 \end{table}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{An objective function for flocking}
-\label{sec:FlockingObjective}
-
-Having described the components of the optimization framework for this inverse design project (see \nameref{sec:Description}), this section focuses on the specific objective(/fitness/loss) function that was used in this work to optimize a multi-agent motion model for flocking.
-
-The objectives described below are based on measurements made during the flock simulation process. That is, in addition to running the simulation, ``bookkeeping'' code is run while updating each individual boid step, after a flock update, and at the end of a simulation. Those metrics are stored in the flock instance and queried by the evolutionary optimization framework in which the flock simulation is run.
-
-\subsection{Objective for Separation}
-\label{subsec:separation_objective}
-
-A key observation is that the birds in a flock are grouped closely together, yet manage to avoid colliding with each other. [[[\textbf{find some citation to back this up?}]]] These goals can be seen as a requirement that the distance between simulated boids fall within a certain distance interval. Specifically, for a given boid, we determine its nearest neighbor, and measure the distance between their centers. A score is computed based on that distance. It is zero if either the distance is too small (potential collision) or the distance is too large (failure to cohere: form a dense flock). It is one in an acceptable range, and piecewise linear ramps transition from one to zero outside this desired range. See Figure \ref{fig:SeparationScore}.
-
-An equally iconic property of natural flocks is that birds are \textit{aligned}, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment. Simply optimizing to obtain separation appears to \textbf{cause} the alignment.
-
-\subsection{Objective for Obstacle Avoidance}
-\label{subsec:avoidance_objective}
-
-The example application in this work can be described as ``flocking in the presence of obstacles'' as shown in Figure \ref{fig:boid_flock}. At each time step, part of each boid's simulation is predicting future obstacle collisions and applying steering force to avoid them. The same code detects obstacle avoidance failures. In simulation, this is a matter of a boid having incorrectly passed through the surface of the obstacle. A kinematic constraint is invoked to move the boid back to the correct side of the boundary. This failure is recorded in a collision counter on each boid. At the end of the flock simulation this is turned into a normalized score of the total number of all collisions over the total number of boid-steps. (Typically in these experiments, a fitness test runs 200 boids for 500 simulation steps, so the final score is total number of collisions over 100,000.) 
-
-For collision avoidance, the goal is not merely to \textit{reduce} the number of collisions but to effectively eliminate them. (An informal goal in these experiments has been {$\leq$}10 collisions per 100,000 boid-steps.) To express this, the normalized obstacle avoidance score (on [0, 1]) is exponentiated to the 500\textsuperscript{th} power. This pushes nearly the whole score's range down near zero, except for a small region near a perfect score of one. This effectively rejects flock parameter sets with more than a handful of collisions per flock simulation.
-
-\subsection{Objective for Flight Speed}
-\label{subsec:speed_objective}
-
-Originally, following early boid models \citep{reynolds_flocks_1987}, each boid's flight speed was kinematically clipped to remain below 20 meters per second. Later, a third flock optimization objective was added to establish a target speed range. A new behavior was added to each boid to apply a force along its direction of motion to adjust its flight speed toward the desired range. The strength of this behavior became one of the flock parameters being optimized in the inverse flock design process.
-
-Flight speed \textit{can} be left to “float” during optimization. Unfortuately there is an annoyingly large basin of attractions around not moving (speed=0). In any case, any given inverse design problem would likely imply a range of valid speeds. This suggests that the speed range should be given in the inverse design problem statement. For example, modeling a flock of finches and a flock of swallows would imply very different speed ranges. Figure \ref{fig:speed_score} shows a speed score function used in these experiments. It has a target range in the interval [19, 21] with a fixed support ramping down to zero outside that range.
-
-\subsection{Adding an objective}
-\label{subsec:add_objective}
-
-[[[\textbf{...Make experiment with adding a goal for increasing path curvature. If it works describe here. Otherwise put it in \nameref{sec:future}...}]]]
 
 \section{Conclusions}
 \label{sec:Conclusions}

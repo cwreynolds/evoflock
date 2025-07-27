@@ -127,7 +127,7 @@ A video of flock simulations based on this approach is available here:
 \begin{figure*}[t]
     \centering
     \includegraphics[width=0.7\textwidth]{images/temp_evo_update.png}
-    \caption{One update step of the (SSGA) evolutionary optimization process, using a 3-way tournament: (a) randomly select one of the \textit{sub-populations}, (b) from that sub-population, randomly select three \textit{individuals}, each holding a flock parameter set, (c) get fitness for each, either by running flock simulations (green), or using the fitness cached from previous tournaments (orange), (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g,h) that new individual replaces the worst of the three back in the population.}
+    \caption{One update step of the (SSGA) evolutionary optimization process, using a 3-way tournament: (a) uniformly select one of the \textit{sub-populations}, (b) from that sub-population, uniformly select three \textit{individuals}, each holding a flock parameter set, (c) get fitness for each, either by running flock simulations (green), or using the fitness cached from previous tournaments (orange), (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g,h) that new individual replaces the worst of the three back in the population.}
     \label{fig:temp_evo_update}
 \end{figure*}
 
@@ -168,7 +168,7 @@ The approach used here was developed as part of a larger ongoing collaboration i
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.9\linewidth]{images/temp_system_blocks.png}
-    \caption{Overall structure of the flock optimization presented here. A generic optimization base (blue) operates on a user's flock inverse design problem (orange). The user's description includes: a parameter set specification, an objective function, a flock simulator, and score keepting utilities. [[[\textbf{...oh, maybe objective function should contain the sim and metering...}]]] [[[\textbf{TEMP}]]]}
+    \caption{Overall structure of the flock optimization presented here. A generic optimization base (green) operates on a user's flock inverse design problem (blue). The user's description includes a parameter set specification and an objective function, the latter containing a flock simulator and score keeping utilities. [[[\textbf{TEMP}]]]}
     \label{fig:system_blocks}
 \end{figure}
 
@@ -270,9 +270,9 @@ The objectives described below are based on measurements made during the flock s
 \subsection{Objective for Separation}
 \label{subsec:separation_objective}
 
-A key observation is that the birds in a flock are grouped closely together, yet manage to avoid colliding with each other. [[[\textbf{find some citation to back this up?}]]] These goals can be seen as a requirement that the distance between simulated boids fall within a certain distance interval. Specifically, for a given boid, we determine its nearest neighbor, and measure the distance between their centers. A score is computed based on that distance. It is zero if either the distance is too small (potential collision) or the distance is too large (failure to cohere: form a dense flock). It is one in an acceptable range, and piecewise linear ramps transition from one to zero outside this desired range. See Figure \ref{fig:SeparationScore}.
+A key observation is that the birds in a flock are grouped closely together but nearly always avoid colliding with flockmates. These goals (close together, no collisions) can be seen as a requirement that the distance between simulated boids fall within a certain distance interval. Specifically, for a given boid, we determine its nearest neighbor and measure the distance between their centers. A score is computed on the basis of that distance. See Figure \ref{fig:SeparationScore}. It is zero if either the distance is too small (potential collision) or too large (failure to form a dense flock). Within an acceptable distance range, its value is one. Outside that desired range, piecewise linear ramps transition down to zero.
 
-An equally iconic property of natural flocks is that birds are \textit{aligned}, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment. Simply optimizing to obtain separation appears to \textbf{cause} the alignment.
+An equally iconic property of natural flocks is that birds are \textit{aligned}, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment. The optimization for proper separation appears to \textbf{cause} the alignment.
 
 \subsection{Objective for Obstacle Avoidance}
 \label{subsec:avoidance_objective}

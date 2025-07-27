@@ -256,6 +256,13 @@ public:
         boid->setPreviousPosition(boid->position());
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250726 log curvature stats
+    double min_curvature = +std::numeric_limits<double>::infinity();
+    double max_curvature = -std::numeric_limits<double>::infinity();
+    double sum_curvature = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
     // which computes the desired steering based on current state. Then an "act"
@@ -267,6 +274,17 @@ public:
         enforceObsBoidConstraints();
         recordSeparationScorePerStep();
         recordSpeedScorePerStep();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250726 log curvature stats
+        for_all_boids
+        ([&](Boid* b)
+         {
+            double c = b->getPathCurvature();
+            min_curvature = std::min(c, min_curvature);
+            max_curvature = std::max(c, max_curvature);
+            sum_curvature += c;
+        });
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Print a one line summary of metrics from this flock simulation.
@@ -281,6 +299,21 @@ public:
         double average_speed = averageSpeedPerBoidStep();
         std::cout << std::format(", average speed = {:.3}", average_speed);
         std::cout << std::format(", speedScore() = {:.3}", speedScore());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250726 log curvature stats
+        
+//        double ac = sum_curvature / boidStepPerSim();
+//        std::cout << ", min/ave/max curvature = ";
+//        std::cout << std::format("{:.3}", min_curvature);
+//        std::cout << std::format("/{:.3}", ac);
+//        std::cout << std::format("/{:.3}", max_curvature);
+
+        double ac = sum_curvature / boidStepPerSim();
+        std::cout << std::format(", minc={:.3}", min_curvature);
+        std::cout << std::format(", c={:.3}", ac);
+        std::cout << std::format(", maxc={:.3}", max_curvature);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         std::cout << std::endl;
     }
 

@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %
-% Evoflock: evolved inverse design of multi-agent motion
+% "Evoflock: evolved inverse design of multi-agent motion"
 % speculative draft paper
 %
 % May 29, 2025  Begin draft.
@@ -109,18 +109,7 @@ In the past, flock models have been tuned manually. That can be a frustrating an
 
 This paper is about automating that adjustment process using metrics of flock quality and an optimization process. The metrics use multiple objectives. The nature of those objectives and how to add new ones will be described in sections \nameref{sec:FlockingObjective} and \nameref{subsec:add_objective}. The optimization process used in these experiments is a genetic algorithm, described in section \nameref{subsec:Optimization_with_GA}.
 
-A summary of (``hyper'')parameters for this framework is given in Table \ref{table:HyperParameters}.
-
-The anonymized c++ code for this project can be found at:
-\scriptsize
-\url{https://anonymous.4open.science/r/evoflock-9B09/}
-\normalsize
-
-A video of flock simulations based on this approach is available here:
-\scriptsize
-\url{https://www.youtube.com/xxx}
-\normalsize
-[[[\textbf{fix URL once posted}]]]
+A summary of (``hyper'')parameters for this framework is given in Table \ref{table:HyperParameters}. See \href{https://anonymous.4open.science/r/evoflock-9B09/}{anonymized c++ code} for this project. See this \href{https://drive.google.com/file/d/1ZbanvWVfapnH2TpTqamypWFoXuMeoY9b/view?usp=sharing}{video} of flock simulations based on this approach.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -130,6 +119,17 @@ A video of flock simulations based on this approach is available here:
     \caption{One update step of the (SSGA) evolutionary optimization process, using a 3-way tournament: (a) uniformly select one of the \textit{sub-populations}, (b) from that sub-population, uniformly select three \textit{individuals}, each holding a flock parameter set, (c) get fitness for each, either by running flock simulations (green), or using the fitness cached from previous tournaments (orange), (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g,h) that new individual replaces the worst of the three back in the population.}
     \label{fig:temp_evo_update}
 \end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/temp_system_blocks.png}
+    \caption{Overall structure of the flock optimization presented here. A generic optimization base (green) operates on a user's flock inverse design problem (blue). The user's description includes a parameter set specification and an objective function, the latter containing a flock simulator and score keeping utilities. [[[\textbf{TEMP}]]]}
+    \label{fig:system_blocks}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -155,7 +155,7 @@ Since the 1980s, many simulation-based models of bird flocks have been proposed.
 
 Early users of flock models found ``tuning'' their many parameters to be frustratingly difficult. This led to research on better tools for this task. This paragraph lists the works that most directly led to the technique described in this paper. An early, but not very successful, attempt at inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}. (GP is a variation on the \textit{genetic algorithm} (GA) \citep{holland_adaptation_1975}.) \citet{stonedahl_finding_2011} use a GA to search parameter spaces using an objective function running flock simulations based on NetLogo \citep{tisue_netlogo_2004}. Similarly \citet{demsar_evolution_2017} attempt ``to evolve collective behavior from scratch.'' \citet{vasarhelyi_optimized_2018} used a GA to tune flocking models suitable for the flight dynamics of a swarm of real drones. \citet{stolfi_escorting_2025} use evolutionary optimization to design robotic swarms for ``escorting'' tasks.
 
-Most previous work on automatically tuning flock/multi-agent models has used \textit{reinforcement learning} (RL) \citep{sutton_reinforcement_1998} as the optimization technique. For example, recent excellent work in \citet{cornelisse_building_2025} on high quality \textit{driver agents} for a multi-agent traffic simulation. It uses \textit{self-play} where agents learn (``bootstrap'') from interacting with each other. The technique described in this paper also has an aspect of self-play as flockmates learn to synchronize with each other.
+Most previous work on automatically tuning flock/multi-agent models has used \textit{reinforcement learning} (RL) \citep{sutton_reinforcement_1998} as the optimization technique. For example, recent excellent work in \citet{cornelisse_building_2025} and \citet{cusumano-towner_robust_2025} on high quality \textit{driver agents} for a multi-agent traffic simulation. They use \textit{self-play} where agents learn (``bootstrap'') from interacting with each other. The technique described in this paper also has an aspect of self-play as flockmates learn to synchronize with each other.
 
 As this paper was being drafted, a preprint was posted \citep{brambati_learning_2025} using reinforcement learning with an objective function very similar to the one used here. 
 
@@ -163,22 +163,10 @@ Notable, if somewhat tangential: \citet{jaderberg_human-level_2019} uses a hybri
 
 The approach used here was developed as part of a larger ongoing collaboration investigating new approaches to optimization of multi-agent motion. [[[\textbf{...My impulse here is to cite ``(Shang, 2025)'' Matthew's thesis. But I don't know where/how to do that, nor if it is appropriate. Suggestions appreciated...}]]]
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=0.9\linewidth]{images/temp_system_blocks.png}
-    \caption{Overall structure of the flock optimization presented here. A generic optimization base (green) operates on a user's flock inverse design problem (blue). The user's description includes a parameter set specification and an objective function, the latter containing a flock simulator and score keeping utilities. [[[\textbf{TEMP}]]]}
-    \label{fig:system_blocks}
-\end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \section{Description of the Technique}
 \label{sec:Description}
 
-This section discusses the various components of the optimization process for adjusting parameters of a flock, or other kinds of multi-agent motion model.
-
+This section discusses the various components of the optimization process for adjusting parameters of a flock, or other kinds of multi-agent motion model. See Figure \ref{fig:system_blocks} for a diagram.
 
 \subsection{Optimization with Genetic Algorithms}
 \label{subsec:Optimization_with_GA}
@@ -193,7 +181,7 @@ A GA is a population-based stochastic approach to optimization and discovery. Un
 
 A GA's ``genome'' changes over time under the influence of the objective function. For example, a model parameter might be changed by \textit{mutation}: adding a signed zero-centered random value, offsetting the parameter by a small amount from its previous value. Perhaps more importantly individuals are modified by \textit{crossover} where two \textit{parent} individuals are recombined to create a new \textit{offspring}. In a rough model of biological crossover involving parental DNA, two parental parameter sets are merged into one, by taking each parameter at random from one parent or the other (called uniform crossover).
 
-Many variations on genetic algorithms have been developed over the years. Sometimes, the entire population of individuals is updated in parallel, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state genetic algorithms} (SSGA) updates individuals one at a time \citep{syswerda_study_1991}. If a generational GA is run for $G$ generations with a population of $P$ individuals, a corresponding SSGA would be run for $G{\times}P$ steps. See Figure \ref{fig:temp_evo_update} for a diagram of the SSGA update cycle, along with the ``tournament of three individuals'' used in this work.
+Many variations on genetic algorithms have been developed over the years. Sometimes, the entire population of individuals is updated in parallel, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state genetic algorithms} (SSGA) updates individuals one at a time \citep{syswerda_study_1991}. If a generational GA is run for $G$ generations with a population of $P$ individuals, a corresponding SSGA would be run for $G{\times}P$ steps. See Figure \ref{fig:temp_evo_update} for a diagram of the SSGA update cycle, along with the ``tournament of three individuals'' used in this work. A preexisting GA framework called \textit{LazyPredator} was used for this work.
 
 [[[\textbf{...negative selection for diveristy preservation}]]]
 
@@ -396,7 +384,7 @@ This work suggests that evolutionary optimization, via a genetic algorithm, can 
 \section{Acknowledgements}
 \label{sec:ack}
 
-The work described here is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, and Jennifer Luo. I also want to thank my long time ($\sim$30 year) friend and ALife colleague, Inman Harvey, whose deep insights taught me much about evolutionary computation and scholarship. Thanks to my family for loving support. [[[\textbf{revisit this}]]]
+This work is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, and Jennifer Luo. I also want to thank my long time ($\sim$30 year) friend and ALife colleague, Inman Harvey, whose deep insights taught me much about evolutionary computation and scholarship. Thanks to my family for loving support. [[[\textbf{revisit this}]]]
 % Wahrman(?)
 % flocking friends?
 

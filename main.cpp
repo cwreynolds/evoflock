@@ -93,9 +93,14 @@ void visualizePreviouslyLoggedFlockParameters()
 //    FlockParameters fp(89.1471, 77.8088, 49.7681, 43.8368, 0.148081, 88.4284,
 //                       66.634, 2.55657, 5.65042, 27.2281, -0.92727, -0.53234,
 //                       0.378495, 3.94743, 1.04012);
-//    
-//    EF::enable_multithreading = false;
-//    while (true) { GP::run_flock_simulation(fp, 1); }
+    
+    // from run 20250724_pop_300_steps_60000
+    FlockParameters fp(89.1471, 77.8088, 49.7681, 43.8368, 0.148081, 88.4284,
+                       66.634, 2.55657, 5.65042, 27.2281, -0.92727, -0.53234,
+                       0.378495, 3.94743, 1.04012);
+    
+    EF::enable_multithreading = false;
+    while (true) { GP::run_flock_simulation(fp, 1); }
 }
 
 

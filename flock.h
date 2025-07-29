@@ -307,11 +307,24 @@ public:
 //        std::cout << std::format("{:.3}", min_curvature);
 //        std::cout << std::format("/{:.3}", ac);
 //        std::cout << std::format("/{:.3}", max_curvature);
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20250728 EF::add_curvature_objective
 
-        double ac = sum_curvature / boidStepPerSim();
-        std::cout << std::format(", minc={:.3}", min_curvature);
-        std::cout << std::format(", c={:.3}", ac);
-        std::cout << std::format(", maxc={:.3}", max_curvature);
+//        double ac = sum_curvature / boidStepPerSim();
+//        std::cout << std::format(", minc={:.3}", min_curvature);
+//        std::cout << std::format(", c={:.3}", ac);
+//        std::cout << std::format(", maxc={:.3}", max_curvature);
+
+        if (EF::add_curvature_objective)
+        {
+            double ac = sum_curvature / boidStepPerSim();
+            std::cout << std::format(", minc={:.3}", min_curvature);
+            std::cout << std::format(", c={:.3}", ac);
+            std::cout << std::format(", maxc={:.3}", max_curvature);
+        }
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         std::cout << std::endl;
@@ -447,6 +460,39 @@ public:
     {
         return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250728 EF::add_curvature_objective
+    
+//    double curvatureScore() const
+//    {
+//        double average_curvature = sum_curvature / boidStepPerSim();
+//        return util::remap_interval_clip(average_curvature, 0, 1, 0.8, 1);
+//    }
+
+//    double curvatureScore() const
+//    {
+//        return sum_curvature / boidStepPerSim();
+//    }
+
+    double curvatureScore() const
+    {
+        double average_curvature = sum_curvature / boidStepPerSim();
+        
+        // 20250728_curvature_20pc
+//        return util::remap_interval_clip(average_curvature, 0, 1, 0.8, 1);
+        
+        // 20250728_curvature_50pc
+//        return util::remap_interval_clip(average_curvature, 0, 1, 0.5, 1);
+        
+        // 20250728_curve_0_10pc_50pc_1
+//        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
+        
+        // 20250728_curve_0_10pc_80pc_1
+        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.

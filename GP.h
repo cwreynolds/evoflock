@@ -76,6 +76,12 @@ inline double scalarize_fitness_hyperVolume(MOF mof) {return mof.hyperVolume();}
 //inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250728 EF::add_curvature_objective
+
+//inline static bool add_curvature_objective = true;
+
+
 inline std::vector<std::string> mof_names()
 {
     return (Boid::GP_not_GA ?
@@ -88,25 +94,65 @@ inline std::vector<std::string> mof_names()
                                          "occupied",
                                          
                                      }) :
+//             std::vector<std::string>(
+//                                      {
+//                                          "avoid",
+//                                          "separate",
+//                                          "speed"
+//                                      })
+
+            (EF::add_curvature_objective ?
+             std::vector<std::string>(
+                                      {
+                                          "avoid",
+                                          "separate",
+                                          "speed",
+                                          "curvature"
+                                      })
+:
              std::vector<std::string>(
                                       {
                                           "avoid",
                                           "separate",
                                           "speed"
-                                      }));
+                                      }))
+            );
 }
+
+//    // After a Flock's simulation has been run, it is passed here to build its multi
+//    // objective fitness object from metrics saved inside the Flock object.
+//    inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
+//    {
+//        return MOF(
+//                   {
+//                       flock.obstacleCollisionsScore(),
+//                       flock.separationScore(),
+//                       flock.speedScore()
+//                   });
+//    }
 
 // After a Flock's simulation has been run, it is passed here to build its multi
 // objective fitness object from metrics saved inside the Flock object.
 inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 {
-    return MOF(
+    return (EF::add_curvature_objective ?
+            MOF(
                {
                    flock.obstacleCollisionsScore(),
                    flock.separationScore(),
-                   flock.speedScore()
-               });
+                   flock.speedScore(),
+                   flock.curvatureScore()
+               }) :
+            MOF(
+                {
+                    flock.obstacleCollisionsScore(),
+                    flock.separationScore(),
+                    flock.speedScore()
+                })
+            );
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Initialize basic run parameters of Flock object
 inline void init_flock(Flock& flock)

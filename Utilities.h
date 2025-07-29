@@ -695,6 +695,13 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 inline static bool enable_multithreading = true;
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250728 EF::add_curvature_objective
+
+inline static bool add_curvature_objective = true;
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 // Controls roll (rotation around forward axis) blend rate for Boid and Camera.
 double roll_rate = 0.99;
 

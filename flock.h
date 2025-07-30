@@ -479,17 +479,20 @@ public:
     {
         double average_curvature = sum_curvature / boidStepPerSim();
         
-        // 20250728_curvature_20pc
+//        // 20250728_curvature_20pc
 //        return util::remap_interval_clip(average_curvature, 0, 1, 0.8, 1);
         
-        // 20250728_curvature_50pc
+//        // 20250728_curvature_50pc
 //        return util::remap_interval_clip(average_curvature, 0, 1, 0.5, 1);
         
-        // 20250728_curve_0_10pc_50pc_1
+//        // 20250728_curve_0_10pc_50pc_1
 //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
         
         // 20250728_curve_0_10pc_80pc_1
         return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
+        
+//        // 20250728_curve_0_10pc_90pc_1
+//        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.9, 1);
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

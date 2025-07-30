@@ -205,10 +205,10 @@ private:
     //int max_simulation_steps_ = 2000;   // ~66 seconds: for obs collision test
     //int max_simulation_steps_ = 9000;  // 5 minutes for demo mode
     
-    int boids_per_flock_ = 200;  // Normal, for evolution runs.
+    //int boids_per_flock_ = 200;  // Normal, for evolution runs.
     //int boids_per_flock_ = 400;  // More.
     //int boids_per_flock_ = 800;  // Even more.
-    //int boids_per_flock_ = 1000;  // Kiloboid.
+    int boids_per_flock_ = 1000;  // Kiloboid.
 
     std::string use_obstacle_set = "Sphere";
     int fps_ = 30;

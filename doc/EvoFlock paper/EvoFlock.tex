@@ -74,11 +74,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{abstract}
-    This paper describes an automatic method for \textit{adjusting} or \textit{tuning} models of multi-agent motion. Simulating the motion of bird flocks, human crowds, vehicle traffic, and other multi-agent systems is a widely used technique. These simulations model the behavior of a single group member (bird, human, or vehicle). The group behaviors (flock, crowd, traffic) \textit{emerge} from interactions between group members. These models usually have many numeric control parameters. Although each parameter may be intuitive in isolation, their interaction can be complex and nonlinear. It can be difficult to know how to adjust which parameters to make a desired change in the group behavior. Changing one aspect of group behavior often causes other aspects to change, leading to a long frustrating process of incremental changes. In this work, the desired group behavior is measured with an objective(/fitness/loss) function and optimized with a \textit{genetic algorithm}.
-
-    [[[\textbf{...maybe explicitly mention the components of my objective function?...}]]]
-
-    [[[\textbf{...maybe an ``Interestingly...'' mention of how alignment just emerges out of learning to maintain a given interval of separation...}]]]
+    This paper describes an automatic method for \textit{adjusting} or \textit{tuning} models of multi-agent motion. Simulating the motion of bird flocks, human crowds, vehicle traffic, and other multi-agent systems is a widely used technique. These simulations model the behavior of a single group member (bird, human, or vehicle). The group behaviors (flock, crowd, traffic) \textit{emerge} from interactions between group members. These models typically have many numeric control parameters. Although each parameter may be intuitive in isolation, their interaction can be complex and nonlinear. It can be difficult to know how to adjust which parameters to make a desired change in the group behavior. Changing one aspect of group behavior often causes other aspects to change, leading to a long frustrating process of incremental changes. In this work, the desired group behavior is measured with an objective(/fitness/loss) function and optimized with a \textit{genetic algorithm}. The objective function used here combines scoring that a flock's birds maintain proper spacing with neighbors, fly near a given speed, and avoid obstacles. Interestingly, the vivid alignment of birds in a flock seems to \textit{emerge} from maintaining proper spacing between flockmates.
 \end{abstract}
 
 \noindent{\small\textbf{Keywords:} boids, inverse design, optimization, evolutionary computation, genetic algorithm, flocks, herds, schools, crowds, traffic}
@@ -99,11 +95,11 @@
 
 [[[\textbf{...maybe use the name EvoFlock more often to replace awkward phrases like ``this project'' or ``the work described here'' ...}]]]
 
-Simulation models of multi-agent motion are used in many fields. These include animation, games, biology, robotic swarms, urban planning, and training autonomous vehicles. Since the 1980s, several models of group motion have been developed, including \textit{boids} and others. See \nameref{sec:related}. These allow creating simulations of flocks and other group motions, which most observers recognize as some type of flocking. This paper will refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic, drone swarms) can also be portrayed.
+Simulation models of multi-agent motion are used in many fields. These include animation, games, biology, robotic swarms, urban planning, training autonomous vehicles, and other applications. Since the 1980s, several models of group motion have been developed, including \textit{boids} and others (see \nameref{sec:related}). These allow creating simulations of flocks and other group motions, which most observers recognize as some type of flocking. This paper will refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic, drone swarms) can also be portrayed.
 
-This project addresses the issue of \textit{adjusting} or \textit{tuning} multi-agent motion models, toward a given behavioral goal. For example, modifying a model of bird flocks to instead portray fish schools. Or start from a model of flocking crows and change it to represent flocking sparrows. Or to take a plausibly realistic model of a natural bird flock, and change it, say for storytelling purposes, to convey a flock of birds that are happy, or angry. Similarly, starting from a generic abstract flock model and fitting it to field observations of a given species of real birds in nature.
+This project addresses the issue of \textit{adjusting} or \textit{tuning} multi-agent motion models, toward a given behavioral goal. For example, modifying an existing model of bird flocks to instead portray fish schools. Or starting from a model of flocking crows and change it to represent flocking sparrows. Or to take a plausibly realistic model of a natural bird flock, and change it, say for storytelling purposes, to convey a flock of birds that are happy, or angry. Similarly, starting from a generic abstract flock model and fitting it to field observations of a given species of real birds in nature.
 
-A boids-like simulation model typically has a collection of numeric parameters (``knobs'') that control its action. The theme of this work is a software framework that automatically finds a set of near-optimal parameters for a simulation-based multi-agent system. The flock model used for these experiments is a predefined hand-written ``black box'' model whose input is a \textit{parameter set} (consisting of about [[[\textbf{15}]]] numbers, see Table \ref{table:flock-parameters}). The user provides a \textit{fitness} (also known as \textit{objective} or \textit{loss}) function. It takes a candidate parameter set, runs a simulation, and returns a score reflecting how well the behavioral goals were met. The optimization process runs (for about two hours on a laptop) and produces a high quality parameter set, as measured by the objective function.
+A boids-like simulation model typically has a collection of numeric parameters (``knobs'') that control its action. The theme of this work is a software framework that automatically finds a set of near-optimal parameters for a simulation-based multi-agent system. The flock model used for these experiments is a predefined hand-written ``black box'' model whose input is a \textit{parameter set} (consisting of about 15 numbers, see Table \ref{table:flock-parameters}). The user provides a \textit{fitness} (also known as \textit{objective} or \textit{loss}) function. It takes a candidate parameter set, runs a simulation, and returns a score reflecting how well the behavioral goals were met. The optimization process runs (for about two hours on a laptop) and produces a high quality parameter set, as measured by the objective function.
 
 For a user of this optimization framework, it is convenient that the flock model is treated as a black box. Almost no restrictions are imposed on a preexisting model by the optimization framework. There are no restrictions on model design, its mutability, or the programming language used. (The latter can be an issue if optimization requires language tools such as automatic differentiation \citep{baydin_automatic_2018}.)
 
@@ -164,7 +160,7 @@ As this paper was being drafted, a preprint was posted \citep{brambati_learning_
 
 Notable, if somewhat tangential: \citet{jaderberg_human-level_2019} uses a hybrid approach to learn human-level game-playing agents for multiplayer games. It uses population-based reinforcement learning, which combines aspects of RL, population-based GA, and the self-play mentioned above.
 
-The approach used here was developed as part of a larger ongoing collaboration investigating new approaches to optimization of multi-agent motion. [[[\textbf{...My impulse here is to cite ``(Shang, 2025)'' Matthew's thesis. But I don't know where/how to do that, nor if it is appropriate. Suggestions appreciated...}]]]
+The approach used here was developed as part of a larger ongoing collaboration investigating new approaches to optimization of multi-agent motion. [[[\textbf{...My impulse here is to cite ``(Shang, 2025)'' Matthew's thesis. But I don't know where/how to do that, nor if it might be too soon. Suggestions appreciated...}]]]
 
 \section{Description of the Technique}
 \label{sec:Description}
@@ -200,7 +196,7 @@ Genetic algorithms were originally used for problems with a single scalar fitnes
 
 A simple and commonly used scalarizer is called \textit{hypervolume}, which simply multiples together the components of a multiple objective value. The name hypervolume refers to a \textit{n}-dimensional box whose edges correspond to the components of a multiple objective value. Hypervolume has the property that its value changes in proportion to changes in each component.
 
-So, for example, the hypervolume goes up (or down) if any component goes up (or down). This holds as long as none of the components is zero, which ``hides'' contributions of other components. To avoid this, the hypervolume variant used here remaps the fitness range from [0, 1] to [$\epsilon$, 1] before taking the product. ($\epsilon$ is 0.01 for the ``normalized fitness'' values used here.)
+So, for example, the hypervolume goes up (or down) as any component goes up (or down). This holds as long as none of the components is zero, which ``hides'' contributions of other components. To avoid this, the hypervolume variant used here remaps the fitness range from [0, 1] to [$\epsilon$, 1] before taking the product. ($\epsilon$ is 0.01 for the ``normalized fitness'' values used here.)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -208,7 +204,7 @@ So, for example, the hypervolume goes up (or down) if any component goes up (or 
     \centering
     % \includegraphics[width=0.9\textwidth]{images/temp_sep_score.png}
     \includegraphics[width=0.9\linewidth]{images/temp_sep_score.png}
-    \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{...should I say ``all boid-steps''?...}]]]}
+    \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all \textit{boid-steps}. (That is, for 200 boids on 500 simulation steps, so 100,000 boid steps.)}
     \label{fig:SeparationScore}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -218,7 +214,7 @@ So, for example, the hypervolume goes up (or down) if any component goes up (or 
 \begin{figure}[t]
     \centering
     \includegraphics[width=0.9\linewidth]{images/temp_speed_score.png}
-    \caption{Score for desired boid \textit{speed}, here $\sim$20 meters per second. This function is highest when speed is between 19 and 21 m/s and falls off to zero outside that range. The \textit{speed} score for an entire flock simulation is the average of this function, over all boids, on all simulation steps. [[[\textbf{boid-steps?}]]]}
+    \caption{Score for desired boid \textit{speed}, here $\sim$20 meters per second. This function is highest when speed is between 19 and 21 m/s and falls off to zero outside that range. The \textit{speed} score for an entire flock simulation is the average of this function over all boid-steps.}
     \label{fig:speed_score}
 \end{figure}
 
@@ -229,7 +225,7 @@ So, for example, the hypervolume goes up (or down) if any component goes up (or 
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]{images/temp_fit_plot.png}
-    \caption{Plot of scalarized fitness (and its component metrics) over 30,000 steps of evolutionary time. The black bold trace (ending at 0.83) is the cumulative best population fitness. The bold gray trace (bottommost) is population average fitness. The colored traces correspond to best and average values (saturated and pastel) for the three component fitness objectives: obstacle avoidance (red), separation (green), and speed (blue). Data from run 20250711a. [[[\textbf{TEMP}]]]}
+    \caption{Plot of scalarized fitness (and its component metrics) over 30,000 steps of evolutionary time. The black bold trace (ending at 0.83) is the cumulative best population fitness. The bold gray trace (bottommost) is population average fitness. The colored traces correspond to best and average values (saturated and pastel) for the three component fitness objectives: obstacle avoidance (red), separation (green), and speed (blue). Data from run 20250711a.}
     \label{fig:fit_plot}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -264,7 +260,7 @@ An equally iconic property of natural flocks is that birds are \textit{aligned},
 \subsection{Objective for Obstacle Avoidance}
 \label{subsec:avoidance_objective}
 
-The example application in this work can be described as ``flocking in the presence of obstacles'' as shown in Figure \ref{fig:boid_flock}. At each time step, part of each boid's simulation is predicting future obstacle collisions and applying steering force to avoid them. The same code detects obstacle avoidance failures. In simulation, this is a matter of a boid having incorrectly passed through the surface of the obstacle. A kinematic constraint is invoked to move the boid back to the correct side of the boundary. This failure is recorded in a collision counter on each boid. At the end of the flock simulation this is turned into a normalized score of the total number of all collisions over the total number of boid-steps. (Typically in these experiments, a fitness test runs 200 boids for 500 simulation steps, so the final score is total number of collisions over 100,000.) 
+The example application in this work can be described as ``flocking in the presence of obstacles'' as shown in Figure \ref{fig:boid_flock}. At each time step, part of each boid's simulation is predicting future obstacle collisions and applying steering force to avoid them. The same code detects obstacle avoidance failures. In simulation, this is a matter of a boid having incorrectly passed through the surface of the obstacle. A kinematic constraint is invoked to move the boid back to the correct side of the boundary. This failure is recorded in a collision counter on each boid. At the end of the flock simulation this is turned into a normalized score of the total number of all collisions over the total number of boid-steps. (Typically in these experiments, a fitness test runs 200 boids for 500 simulation steps, so the final score is the total number of collisions over 100,000.) 
 
 For collision avoidance, the goal is not merely to \textit{reduce} the number of collisions but to effectively eliminate them. (An informal goal in these experiments has been {$\leq$}10 collisions per 100,000 boid-steps.) To express this, the normalized obstacle avoidance score (on [0, 1]) is exponentiated to the 500\textsuperscript{th} power. This pushes nearly the whole score's range down near zero, except for a small region near a perfect score of one. This effectively rejects flock parameter sets with more than a handful of collisions per flock simulation.
 
@@ -278,15 +274,15 @@ Flight speed \textit{can} be left to ``float'' during optimization. Unfortunatel
 \section{Adding an Objective}
 \label{sec:add_objective}
 
-EvoFlock seeks to simplify changes to a flock models. This section describes such a modification, adding a new fitness objective to the ``flocking with obstacles'' described in the previous section (three objectives: separation range, obstacle avoidance, and speed control). The flocking motion that results is competent and smooth. Let us assume for some user/application-specific reason, the quality of motion is judged to be ``too smooth''. 
+EvoFlock aims to simplify modifying flock models. This section describes such a modification, adding a new fitness objective to the ``flocking with obstacles'' behavior described in the previous section (three objectives: separation in range, speed in range, and obstacle avoidance). The flocking motion that results is competent and smooth. Let us assume for some user/application-specific reason, the quality of motion is judged to be ``too smooth''. 
 
-This can be seen as the previous three objectives tending to minimize boid \textit{path curvature}. Perhaps boosting the curvature would counteract the ``too smooth'' quality of motion? [[[\textbf{...mention ``playful''?...}]]]
+This can be seen as a tendency of the previous three objectives to minimize the boid's \textit{path curvature}. Perhaps intentionally amplifying the curvature would counteract that ``too smooth'' quality of motion? (For example, lending a more ``playful'' quality of motion?)
 
-The Boid class used here already provided an accessor for instantaneous path curvature. A candidate ``flock curvature'' score could be simply averaging that over all boid-steps. A test run showed that the instantaneous curvature of a boid's path is approximately on [0, 2]. The average curvature over a run is on [0, 1] at the beginning, but about [0, 0.04] at the end. This supports the notion that basic flocking minimizes curvature.
+The \texttt{Boid} class used by EvoFlock already provided an accessor for its instantaneous path curvature. A candidate ``flock curvature'' score could be simply averaging that over all boid-steps. A test run showed that the instantaneous curvature of a boid's path is approximately on [0, 2]. The average curvature over a run is on [0, 1] at the beginning, but about [0, 0.04] at the end. This supports the notion that basic flocking minimizes curvature.
 
-A proposed objective metric maps a run's average curvature from [0, 1] to a score of [0.8, 1]. This is effectively a fitness penalty capped at 20\% for no path curvature ranging to no penalty for ``maximum curviness.'' Making this change to the code took about an hour of programmer effort, followed by a two hour optimization run.
+An objective metric for boosting curvature might map the average curvature of a run to a normalized fitness score. Prototyping this code change took about an hour of programmer effort, followed by a few two-hour optimization runs to find good ``hyperparameters.'' In the end selecting a linear mapping (with clipping) from curvature of [0, 0.1] to a score of [0.8, 1]. This is effectively a fitness penalty of 20\% for no path curvature, ramping up to no penalty for ``very curvy.'' 
 
-
+A sample of the resulting flock motion can be seen in this \href{https://drive.google.com/file/d/1HOeCqkmY__SiON4TCAQyPKa3CviIlPgM/view?usp=sharing}{video}, a simulation with 1000 boids, using flock parameters evolved with this new curvature-boosting objective. (Compare with the non-curvature-boosting \href{https://drive.google.com/file/d/1ZbanvWVfapnH2TpTqamypWFoXuMeoY9b/view?usp=sharing}{video} mentioned in the \nameref{sec:intro}.)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -347,7 +343,7 @@ A proposed objective metric maps a run's average curvature from [0, 1] to a scor
     min time to collide & [0, 10] & seconds \\
     \hline
 \end{tabular}
-\caption{Flock model parameters subject to optimization. These are a vector of scalar values, each with an associated range. They are initially randomized then optimized over time according to the objective function. [[[\textbf{...TEMP --- this is just a placeholder --- before paper submission I hope to make changes to this parameterization of the black box model, such as: removing the now unused min/max/speeds, moving from ``max distance'' parameters to exponents (and scales?) controlling falloff for the 7 nearest neighbors --- say something about the non-optimized ``Shared const/input parameters'' of FlockParameters ...}]]] }
+\caption{Flock model parameters subject to optimization: a collection of scalar values, each with an associated range. They are initially randomized then optimized over time according to the objective function. These values are held in a c++ class called \texttt{FlockParameters} along with ``constant'' parameters (flock population, time step, etc.) which are not subject to the optimization process.}
 \label{table:flock-parameters}
 \end{table}
 
@@ -356,40 +352,38 @@ A proposed objective metric maps a run's average curvature from [0, 1] to a scor
 \section{Conclusions}
 \label{sec:Conclusions}
 
-This work suggests that evolutionary optimization, via a genetic algorithm, can successfully optimize a set of parameters for a ``black box'' boid flocking model. This suggests that other similar multi-agent motion models --- for example, multi robot terrain search --- might well be solved using a genetic algorithm in a similar way, using an objective with some similarity to the one discussed in section \nameref{sec:FlockingObjective}.
+This work suggests that evolutionary optimization, via a genetic algorithm, can successfully optimize a set of parameters for a ``black box'' boid flocking model. This suggests that other similar multi-agent motion models --- for example, multi-robot terrain search --- might well be solved using a genetic algorithm in a similar way, using an objective with some similarity to the one discussed in section \nameref{sec:FlockingObjective}.
 
-[[[\textbf{should this be in the introduction? Say something about using deep reinforcement learning for flocks, etc.}]]] One advantage of using evolutionary optimization for this type of inverse design problem is that the multi-agent simulation can be treated as a ``black box.'' As such, there are few constraints on how the simulation is implemented. For example, to use \textit{stochastic gradient descent} (SGD) \citep{robbins_stochastic_1951} the flock model must be differentiable, either analytically or with \textit{automatic differentiation} \citep{baydin_automatic_2018}. Conversely, evolutionary optimization only requires the measured scalar fitness of a simulation, no gradients are used.
+One advantage of using evolutionary optimization for this type of inverse design problem is that the multi-agent simulation can be treated as a ``black box.'' As such, there are few constraints on how the simulation is implemented. In contrast, using \textit{stochastic gradient descent} (SGD) \citep{robbins_stochastic_1951} requires that the flock model be differentiable, either analytically or via \textit{automatic differentiation} \citep{baydin_automatic_2018}. Conveniently, evolutionary optimization only requires only a flock simulation's scalar fitness value, no gradients are needed.
 
-[[[\textbf{...I said this above, should it be here, or simply call back to it? \textit{An equally iconic property of natural flocks is that birds are aligned, flying on nearly parallel paths with their neighbors. An interesting result of this work is that this alignment appears to \textit{emerge} from the ``acceptable neighbor distance'' criteria. It was \textbf{not} necessary to have an explicit optimization objective for alignment...}}]]]
+A surprising finding of this work is that the \textit{alignment} of birds in a flock seems to \textit{emerge} from maintaining proper spacing between flockmates. In retrospect this seems plausible: a group of fast moving animals, with a desire to remain close-but-not-too-close to each other, while dodging around obstacles, must travel on parallel curved paths. However, before these experiments, it was not clear whether an objective function specifically to require alignment would be needed.
 
-[[[\textbf{...say something about how increasing the evo pop size gives some advantage in being able to track more potential solutions, but that for a given number of evo steps, there are fewer ``updates per individual'' which reduces quality of optimization --- ``less parallel population, more sequential evolution''...}]]]
-
-[[[\textbf{...similarly: for a long time I was using pop=500/steps=30000. Then I tried increasing pop, eventually to 1000. I was getting worse results. Today (20250724) I tried running for steps=60000, which did well reaching EOR best fitness of 88\% --- and separately with pop=150, which did poorly (72\%)...}]]]
+A note about GA population size versus the number of SSGA updates (see Figure \ref{fig:temp_evo_update}). Some experiments were made with increasing the evolutionary population from 500 to 1000. The hope was that more \textit{individuals} (more flock parameter sets) would allow a wider coverage of the parameter space. The opposite seemed to be true. Larger populations led to worse results (often summarized as the best fitness at end of the run). In contrast, reducing the population from 500 to 300 produced somewhat better results, but 150 was worse. Finally, for a population size of 300, running for twice as long (60,000 updates) produced better results (roughly from 0.81 to 0.88).
 
 \section{Limitations}
 \label{sec:limitations}
 
-[[[\textbf{...point of that that every run is a winner, often the objective is not well met --- fitness nearer 70\% than 80\% --- and the performance noticeably diminished --- happens maybe once in every 2 or 3 runs...}]]]
+Because EvoFlock is a stochastic algorithm, the quality of results vary from run to run. It is not deterministic, first because the random number generator is seeded from wall clock time, and because the objective function is multithreaded. For the three objective version, end-of-run best fitness are around 0.82. Sometimes they are closer to 0.75. \textbf{[[[...I need to run a bunch of them and plot the distribution of results...]]]}
 
-[[[\textbf{...for speed score and separation score: does it matter if the ramps on either side of the sweet spot are there? Should try a test...}]]]
-
-[[[\textbf{...discuss the ``ignoring noise'' paper \citep{antipov_evolutionary_2025}...}]]]
+The current objective function runs \textbf{four} flock simulations for each parameter set. These are run in parallel threads on separate CPU cores, so there is little time penalty. However, if not for this 4{$\times$} load, the cores would be free for other types of parallelism. The four simulations are an attempt to reduce fitness variance from the randomized simulations. Recent work \citep{antipov_evolutionary_2025} has shown that this may be misguided, and that quality of results do not suffer from noisy fitness values.
 
 \section{Future Work}
 \label{sec:future}
 
-[[[\textbf{...experiment with open space flocking --- no obstacles --- perhaps in conjunction with path curvature objective...}]]]
+All the examples in this work were based on tightly enclosed spaces cluttered with obstacles. These environments forced the boids to always be avoiding collisions with obstacles or with their flockmates. Other researchers have looked at ``open space flocking'' \citep{hoetzlein_flock2_2024} and \citep{brambati_learning_2025}. Parameter sets found with EvoFlock can easily be run in open space but the results are disappointing. This is especially true for the 3 objective version (separation, speed, obstacle), and to a lesser extent, the 4 objective version (with curvature). Digging deeper into open space flocking seems a good direction for future work.
 
-[[[\textbf{...perhaps try non-uniform \citep{montanari_optimal_2025} and non-reciprocal \citep{choi_flocking_2025} multi-agent models, see also \citep{weis_generalized_2025}...}]]]
+Similarly, multi-agent models with non-uniform agents \citep{montanari_optimal_2025} and non-reciprocal behaviors \citep{choi_flocking_2025}, \citep{weis_generalized_2025} are promising future topics.
 
-[[[\textbf{...mention a GP (rather than GA) version of this approach...}]]]
+The formulation for speed score (Figure \ref{fig:speed_score}) and separation score (Figure \ref{fig:SeparationScore}) include ``ramps'' outside the target range. Are these necessary, or even helpful? The robust sampling provided by 100,000 scores per range may tend to ``smooth out'' those scores without the extra complexity of ramps.
 
-[[[\textbf{...say something about how I used three objectives to evolve flocking of the type shown in Fig. 1 --- maybe try an experiment with ``open air flocking'' to see if it will work with just separation score... --- ...so I did try this and the results were pretty boring, maybe it would look better after i add a fourth objective for path curvature...}]]]
+This work found good results using the genetic algorithm \citep{holland_adaptation_1975}. It would be interesting to try a version using genetic programming \citep{koza_genetic_1992}.
+
+% [[[\textbf{...say something about how I used three objectives to evolve flocking of the type shown in Fig. 1 --- maybe try an experiment with ``open air flocking'' to see if it will work with just separation score... --- ...so I did try this and the results were pretty boring, maybe it would look better after i add a fourth objective for path curvature...}]]]
 
 \section{Acknowledgements}
 \label{sec:ack}
 
-This work is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, and Jennifer Luo. I also want to thank my long time ($\sim$30 year) friend and ALife colleague, Inman Harvey, whose deep insights taught me much about evolutionary computation and scholarship. Thanks to my family for loving support. [[[\textbf{revisit this}]]]
+This work is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, and Jennifer Luo. I also want to thank my long time ($\sim$30 year) friend and ALife colleague, Inman Harvey, whose deep insights taught me much about evolutionary computation and scholarship. Thanks to my family for loving support.
 % Wahrman(?)
 % flocking friends?
 

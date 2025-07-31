@@ -59,8 +59,8 @@
 
 \captionsetup{hypcap=false}
 
-\titlepic{\includegraphics[width=\textwidth]{images/temp_fig_1.png}
-\captionof{figure}{800 boids flocking in a space cluttered with obstacles. Behavioral parameters of the boids are determined by inverse design, using multi-objective evolutionary optimization. See this simulation running in \href{https://drive.google.com/file/d/1ZbanvWVfapnH2TpTqamypWFoXuMeoY9b/view?usp=sharing}{Video 1}.} 
+\titlepic{\includegraphics[width=\textwidth]{images/temp_fig_1.jpeg}
+\captionof{figure}{1000 boids flocking in a space cluttered with obstacles. Behavioral parameters of the boids are determined by inverse design, using multi-objective evolutionary optimization. See this simulation running in \href{https://drive.google.com/file/d/1ZbanvWVfapnH2TpTqamypWFoXuMeoY9b/view?usp=sharing}{Video 1}.} 
 \label{fig:boid_flock}}
 
 % Remove today's date being inserted after the title/author information.
@@ -83,7 +83,7 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{figure*}[t]
+\begin{figure*}[]
     \centering
     \includegraphics[width=0.9\textwidth]{images/temp_MOF_HV.png}
     \caption{(A) Normalized multi-objective fitness space. For two objectives, a unit square. (B) The \textit{Pareto front} for two mutually conflicting objectives. (Like \textit{reliability} and \textit{affordability} in the hypothetical bridge design example.) The objectives can not all be fully satisfied at any point along the front. Visually, this is the ``distance'' from (1, 1) to the red curve. (C) Two ``mostly compatible'' objectives, more typical of criteria for flock tuning. Here, the Pareto front passes near the global optimum. (D) Scalarization of a multiple-objective fitness value, using \textit{hypervolume}: the product of all objective scores. In this 2D example it is the blue rectangle's \textit{area}. Solving a multi-objective problem using scalarized fitness works best for problems of type (C).}
@@ -111,23 +111,12 @@ A summary of (``hyper'')parameters for this framework is given in Table \ref{tab
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{figure*}[t]
+\begin{figure*}[]
     \centering
     \includegraphics[width=0.7\textwidth]{images/temp_evo_update.png}
     \caption{One update step of the (SSGA) evolutionary optimization process, using a 3-way tournament: (a) uniformly select one of the \textit{sub-populations}, (b) from that sub-population, uniformly select three \textit{individuals}, each holding a flock parameter set, (c) get fitness for each, either by running flock simulations (green), or using the fitness cached from previous tournaments (orange), (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g,h) that new individual replaces the worst of the three back in the population. This approach of removing the worst individuals --- rather than promoting the best --- is a form of \textit{negative selection} which tends to preserve diversity in the population.}
     \label{fig:temp_evo_update}
 \end{figure*}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=0.9\linewidth]{images/temp_system_blocks.png}
-    \caption{Overall structure of the flock optimization presented here. A generic optimization base (green) operates on a user's flock inverse design problem (blue). The user's description includes a parameter set specification and an objective function, the latter containing a flock simulator and score keeping utilities. [[[\textbf{TEMP}]]]}
-    \label{fig:system_blocks}
-\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -162,6 +151,18 @@ Notable, if somewhat tangential: \citet{jaderberg_human-level_2019} uses a hybri
 
 EvoFlock was developed as part of a larger ongoing collaboration investigating new approaches to inverse design of multi-agent motion. [[[\textbf{...My impulse here is to cite ``(Shang, 2025)'' Matthew's thesis. But I don't know where/how to do that, nor if it might be too soon. Suggestions appreciated...}]]]
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[b!]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/temp_system_blocks.png}
+    \caption{Overall structure of the flock optimization presented here. A generic optimization base (green) operates on a user's flock inverse design problem (blue). The user's description includes a parameter set specification and an objective function, the latter containing a flock simulator and score keeping utilities.}
+    \label{fig:system_blocks}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 \section{Description of the Technique}
 \label{sec:Description}
 
@@ -189,6 +190,7 @@ To motivate this concept, consider building a bridge over a river. A key goal is
 
 Other types of multi-objective optimization have less contradictory goals. The multi-agent motion problem seems to fall into this category. For this application, all that is required is to find parameter sets so that each of the objectives can be fairly well satisfied, see Figure \ref{fig:MOF_HV}(c).
 
+
 \subsection{Multi-Objective Optimization}
 \label{subsec:Multi-Objective}
 
@@ -200,7 +202,7 @@ So, for example, the hypervolume goes up (or down) as any component goes up (or 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{figure}[t]
+\begin{figure}[]
     \centering
     % \includegraphics[width=0.9\textwidth]{images/temp_sep_score.png}
     \includegraphics[width=0.9\linewidth]{images/temp_sep_score.png}
@@ -211,7 +213,7 @@ So, for example, the hypervolume goes up (or down) as any component goes up (or 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{figure}[t]
+\begin{figure}[]
     \centering
     \includegraphics[width=0.9\linewidth]{images/temp_speed_score.png}
     \caption{Score for desired boid \textit{speed}, here $\sim$20 meters per second. This function is highest when speed is between 19 and 21 m/s and falls off to zero outside that range. The \textit{speed} score for an entire flock simulation is the average of this function over all boid-steps.}
@@ -222,7 +224,7 @@ So, for example, the hypervolume goes up (or down) as any component goes up (or 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{figure}[t]
+\begin{figure}[]
     \centering
     \includegraphics[width=\linewidth]{images/temp_fit_plot.png}
     \caption{Plot of scalarized fitness (and its component metrics) over 30,000 steps of evolutionary time. The black bold trace (ending at 0.83) is the cumulative best population fitness. The bold gray trace (bottommost) is population average fitness. The colored traces correspond to best and average values (saturated and pastel) for the three component fitness objectives: obstacle avoidance (red), separation (green), and speed (blue). Data from run 20250711a.}
@@ -241,12 +243,10 @@ Each of these steering behaviors has parameters, such as weights, distances, and
 
 The collection of all these make up the flock's \textit{parameter set} which is adjusted by optimization according the the objective function. See Table \ref{table:flock-parameters} for a list of the parameter set used in these experiments.
 
-
-
 \section{An objective function for flocking}
 \label{sec:FlockingObjective}
 
-Having described the components of the optimization framework for this inverse design project (see \nameref{sec:Description}), this section focuses on the specific objective(/fitness/loss) function that was used in this work to optimize a multi-agent motion model for flocking.
+Having described the components of EvoFlock (see \nameref{sec:Description}), this section focuses on the specific objective(/fitness/loss) function that was used in this work to optimize a multi-agent motion model for flocking, see Figure \ref{fig:fit_plot}
 
 The objectives described below are based on measurements made during the flock simulation process. In addition to running the simulation, ``bookkeeping'' code is run (while updating each individual boid step, after a flock updatemstep, and at the end of a simulation). Those metrics are stored in the flock instance and accessed by the evolutionary optimization framework in which the flock simulation is run.
 
@@ -280,13 +280,13 @@ This can be seen as a tendency of the previous three objectives to minimize the 
 
 The \code{Boid} class used by EvoFlock already provided an accessor for its instantaneous path curvature. A candidate ``flock curvature'' score could be simply averaging that over all boid-steps. A test run showed that the instantaneous curvature of a boid's path is approximately on [0, 2]. The average curvature over a run is on [0, 1] at the beginning, but about [0, 0.04] at the end. This supports the notion that basic flocking minimizes curvature.
 
-An objective metric for boosting curvature might map the average curvature of a run to a normalized fitness score. Prototyping this code change took about an hour of programmer effort, followed by a few two-hour optimization runs to find effective ``hyperparameters.'' This led to a linear mapping (with clipping) from a curvature range of [0, 0.1] to a score range of [0.8, 1]. This is effectively a fitness penalty of 20\% for no path curvature, ramping up to no penalty for ``very curvy.'' 
+An objective metric for boosting curvature might map the average curvature of a run to a normalized fitness score. Prototyping this code change took about an hour of programmer effort, followed by a few two-hour optimization runs to find effective ``hyperparameters'': a linear mapping (with clipping) from a curvature range of [0, 0.1] to a score range of [0.8, 1]. This is effectively a fitness penalty of 20\% for no path curvature, ramping up to no penalty for ``very curvy.'' 
 
-A sample of the resulting flock motion can be seen in this \href{https://drive.google.com/file/d/1HOeCqkmY__SiON4TCAQyPKa3CviIlPgM/view?usp=sharing}{video}, a simulation with 1000 boids, using flock parameters evolved with this new curvature-boosting objective. (Compare with the non-curvature-boosting \href{https://drive.google.com/file/d/1ZbanvWVfapnH2TpTqamypWFoXuMeoY9b/view?usp=sharing}{video} mentioned in the \nameref{sec:intro}.)
+A sample of the resulting flock motion can be seen in \href{https://drive.google.com/file/d/1HOeCqkmY__SiON4TCAQyPKa3CviIlPgM/view?usp=sharing}{Video 2}, a simulation with 1000 boids, using flock parameters evolved with this new curvature-boosting objective. (Compare with the non-curvature-boosting \href{https://drive.google.com/file/d/1ZbanvWVfapnH2TpTqamypWFoXuMeoY9b/view?usp=sharing}{Video 1} mentioned in the \nameref{sec:intro}.)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{table}[t]
+\begin{table}[]
 \centering
 \begin{tabular}{ | l | c | c | }
     \hline
@@ -318,7 +318,12 @@ A sample of the resulting flock motion can be seen in this \href{https://drive.g
 \label{table:HyperParameters}
 \end{table}
 
-\begin{table}[t]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}[]
 \centering
 \begin{tabular}{ | l | c | c | }
     \hline
@@ -375,9 +380,9 @@ All the examples in this work were based on tightly enclosed spaces cluttered wi
 
 Similarly, multi-agent models with non-uniform agents \citep{montanari_optimal_2025} and non-reciprocal behaviors \citep{choi_flocking_2025}, \citep{weis_generalized_2025} are promising future research topics.
 
-The formulation for speed score (Figure \ref{fig:speed_score}) and separation score (Figure \ref{fig:SeparationScore}) include ``ramps'' outside the target range. Are these necessary, or even helpful? The robust sampling provided by 100,000 scores per run may tend to ``smooth out'' those scores without the extra complexity of choosing slopes for ramps.
+The formulation for speed score (Figure \ref{fig:speed_score}) and separation score (Figure \ref{fig:SeparationScore}) include ``ramps'' outside the target range. Are these necessary or even helpful? The robust sampling provided by 100,000 scores per run may tend to ``smooth out'' those scores without the extra complexity of choosing slopes for ramps.
 
-EvoFlock found good results using the genetic algorithm \citep{holland_adaptation_1975}. It would be interesting to try a version using genetic programming \citep{koza_genetic_1992}.
+EvoFlock finds good results using the genetic algorithm \citep{holland_adaptation_1975}. It would be interesting to try a version using genetic programming \citep{koza_genetic_1992}. This would eliminate the need to start by hand coding a ``black-box flocking model'' and could instead evolve it from scratch.
 
 \section{Acknowledgements}
 \label{sec:ack}

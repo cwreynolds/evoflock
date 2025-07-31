@@ -201,9 +201,9 @@ private:
     double sphere_radius_ = 50;
     Vec3 sphere_center_;
     
-    int max_simulation_steps_ = 500;    // ~17 seconds: for evolution run
+    //int max_simulation_steps_ = 500;    // ~17 seconds: for evolution run
     //int max_simulation_steps_ = 2000;   // ~66 seconds: for obs collision test
-    //int max_simulation_steps_ = 9000;  // 5 minutes for demo mode
+    int max_simulation_steps_ = 9000;  // 5 minutes for demo mode
     
     //int boids_per_flock_ = 200;  // Normal, for evolution runs.
     //int boids_per_flock_ = 400;  // More.

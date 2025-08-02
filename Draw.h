@@ -133,12 +133,25 @@ public:
     // Called to end an animated scene.
     void endAnimatedScene() { if (enable()) { } }
 
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250801 hack version of "space-time worms"
+    
+//    // Called to begin each animation frame.
+//    void beginOneAnimatedFrame()
+//    {
+//        poll_events_count_ = 0;
+//        if (enable()) { clearAnimatedGeometryFromScene(); }
+//    }
+
     // Called to begin each animation frame.
     void beginOneAnimatedFrame()
     {
         poll_events_count_ = 0;
-        if (enable()) { clearAnimatedGeometryFromScene(); }
+//        if (enable()) { clearAnimatedGeometryFromScene(); }
+        if (enable() and not getWorms()) { clearAnimatedGeometryFromScene(); }
     }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250702 yet another slow frame draw symptom
@@ -732,6 +745,16 @@ public:
         return enable_annotation_ and not isStaticCameraMode();
     }
 
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250801 hack version of "space-time worms"
+    
+    // "W" command toggles "space-time worms".
+    bool enable_worms_ = false;
+    bool getWorms() const { return enable_worms_; }
+    void toggleWorms() { enable_worms_ = not enable_worms_; }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     // Called in constructor to set up the various key cmd and mouse callbacks.
     void setupGuiCallbacks()
     {
@@ -771,6 +794,15 @@ public:
 
         // Add "B" cmd runs a sim, with best individual & graphics, then reset.
         rk('B', [&](vis* v) { setVisBestMode(); return rv; });
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20250801 hack version of "space-time worms"
+        
+        // Add "W" cmd to toggle "space-time worms".
+        rk('W', [&](vis* v) { toggleWorms(); return rv; });
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
 
         // Set mouse move/scroll/button handlers.
         setMouseCallbacks();

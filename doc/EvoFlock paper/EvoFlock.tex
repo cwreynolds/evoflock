@@ -369,7 +369,7 @@ A note about GA population size versus the number of SSGA updates (see Figure \r
 \section{Limitations}
 \label{sec:limitations}
 
-Because EvoFlock is a stochastic algorithm, the quality of results vary from run to run. It is not deterministic, both because the random number generator is seeded from wall clock time, and because the objective function is multithreaded so inherently non-deterministic. For the three objective version, end-of-run best fitness are around 0.82. Sometimes they are closer to 0.75. \textbf{[[[...I need to run a bunch of them and plot the distribution of results...]]]}
+Because EvoFlock is a stochastic algorithm, the quality of results varies from run to run. (The three-objective version end-of-run best fitness is about 0.82, but can be as low as 0.75.) It is not deterministic, both because the random number generator is seeded from wall clock time, and because the objective function is multi-threaded so inherently non-deterministic.  \textbf{[[[...I need to run a bunch of them and plot the distribution of results...]]]}
 
 The current objective function runs \textbf{four} flock simulations for each parameter set. These are run in parallel threads on separate CPU cores, so there is little time penalty. However, if not for this 4{$\times$} load, the cores would be free for other types of parallelism. The four simulations are an attempt to reduce fitness variance of the randomized simulations. Recent work \citep{antipov_evolutionary_2025} has shown that this may be misguided, and that the quality of results do not suffer from using noisy raw fitness values.
 
@@ -387,7 +387,7 @@ EvoFlock finds good results using the genetic algorithm \citep{holland_adaptatio
 \section{Acknowledgements}
 \label{sec:ack}
 
-This work is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, and Jennifer Luo. I also want to thank my long time ($\sim$30 year) friend and ALife colleague, Inman Harvey, whose deep insights taught me much about evolutionary computation and scholarship. Thanks to my family for loving support.
+This work is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, and Jennifer Luo. I also want to thank my long time (30 year?) friend and ALife colleague, Inman Harvey, whose deep insights taught me much about evolutionary computation and scholarship. To Andy Kopra for discussions that led to the 1993 paper. Thanks to John Holland for genetic algorithms and to John Koza for introducing me to GP and GA. Thanks to my family for their loving support.
 % Wahrman(?)
 % flocking friends?
 

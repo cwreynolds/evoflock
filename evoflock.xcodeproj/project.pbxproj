@@ -112,6 +112,7 @@
 		845F845D2D90E397000BF13C /* FlockParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FlockParameters.h; sourceTree = "<group>"; };
 		847454BE2B6195F000214306 /* obstacle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = obstacle.h; sourceTree = "<group>"; };
 		847454BF2B65BE9C00214306 /* Boid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Boid.h; sourceTree = "<group>"; };
+		847C8CF32E4180F100DBC072 /* 20250806_UCSC_inverse_flocks.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = 20250806_UCSC_inverse_flocks.pdf; sourceTree = "<group>"; };
 		848101F62C7666CA00433168 /* libOpen3D.0.18.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpen3D.0.18.0.dylib; path = "../open3d-devel-darwin-arm64-0.18.0+c219d82/lib/libOpen3D.0.18.0.dylib"; sourceTree = "<group>"; };
 		848101FB2C77B53E00433168 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		848BC33C2B69856700509CE5 /* flock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = flock.h; sourceTree = "<group>"; };
@@ -275,6 +276,7 @@
 				849817A12E1ACC39002B4548 /* EvoFlock paper */,
 				849817962E1368DC002B4548 /* EvoFlock_Figures.pages */,
 				849817952E077C11002B4548 /* fitness_plot_template.numbers */,
+				847C8CF32E4180F100DBC072 /* 20250806_UCSC_inverse_flocks.pdf */,
 			);
 			path = doc;
 			sourceTree = "<group>";

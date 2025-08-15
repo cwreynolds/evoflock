@@ -697,9 +697,15 @@ inline static bool enable_multithreading = true;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20250728 EF::add_curvature_objective
-
 inline static bool add_curvature_objective = true;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250815 EF::record_best_fits_in_file
+inline static bool record_best_fits_in_file = true;
+inline static std::string best_fits_filename = "/Users/cwr/Desktop/best_fits.csv";
+// util::date_hours_minutes()
+// see save_fitness_time_series()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Controls roll (rotation around forward axis) blend rate for Boid and Camera.

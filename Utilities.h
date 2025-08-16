@@ -686,34 +686,5 @@ std::lock_guard<std::recursive_mutex> pl_(util::DebugPrint::getPrintMutex());
 #define debugPrint(e){ grabPrintLock_evoflock(); \
                        std::cout << #e" = " << (e) << std::endl << std::flush; }
 
-// EF::RS() is the single, shared, thread-safe, settable, RandomSequence object.
-namespace EvoFlock
-{
-inline static RandomSequence rs_default_;
-inline static RandomSequence* rs_ = &rs_default_;
-inline void setRS(RandomSequence& rs) { rs_ = &rs; }
-inline RandomSequence& RS(){ return *rs_; }
-inline static bool enable_multithreading = true;
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250728 EF::add_curvature_objective
-inline static bool add_curvature_objective = true;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250815 EF::record_best_fits_in_file
-inline static bool record_best_fits_in_file = true;
-inline static std::string best_fits_filename = "/Users/cwr/Desktop/best_fits.csv";
-// util::date_hours_minutes()
-// see save_fitness_time_series()
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-// Controls roll (rotation around forward axis) blend rate for Boid and Camera.
-double roll_rate = 0.99;
-
-}  // end of namespace EvoFlock
-namespace EF = EvoFlock;
-
-
 // Square a double
 inline double sq(double f) { return f * f; }

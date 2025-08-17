@@ -484,6 +484,17 @@ double executions_per_second(std::function<void()> work_load, int count = 500000
 }
 
 
+// Returns string for current date and time in format: "YYYYMMDD_HHMM"
+inline std::string date_hours_minutes()
+{
+    std::stringstream ss;
+    auto t = std::time(nullptr);
+    auto l = std::localtime(&t);
+    ss << std::put_time(l, "%Y%m%d_%H%M");
+    return ss.str();
+}
+
+
 // Given an indexable "collection" (class C) of objects of type "T" (e.g.
 // std::vector<T>), apply a given function of 2 arguments (pair_func(T a, T b))
 // to each unique pairwise combination of elements from the collection. Except

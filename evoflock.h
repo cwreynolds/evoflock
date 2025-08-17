@@ -2,7 +2,7 @@
 //
 //  EvoFlock.h -- new flock experiments
 //
-//  Top level header file for evoflock project. 
+//  Top level header file for evoflock project
 //
 //  Created by Craig Reynolds on September 3,, 2024.
 //  MIT License -- Copyright © 2024 Craig Reynolds

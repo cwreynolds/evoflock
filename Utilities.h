@@ -24,6 +24,8 @@
 #include <thread>
 #include <cassert>
 #include <mutex>
+#include <filesystem>
+namespace fs = std::filesystem;
 class Vec3;
 
 namespace Utilities 

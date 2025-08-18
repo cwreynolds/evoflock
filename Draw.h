@@ -55,11 +55,6 @@ public:
 
 private:
 
-    // TODO 20241026 -- Temporary for debugging odd symptom: running from inside
-    // Xcode launches a separate copy of the executable about a second after the
-    // first. Oddly this symptom seems to come and go as I edit main.cpp
-    static inline int constructor_count = 0;
-    
     // Default constructor
     Draw() : Draw(false) {}
     
@@ -76,12 +71,6 @@ private:
         window_xy_size = {1800, 1200, 0};
         window_xy_position_ul = cwr_screen_size - window_xy_size ;
 
-        // TODO 20241026 -- Temporary for debugging odd symptom: running from inside
-        // Xcode launches a separate copy of the executable about a second after the
-        // first. Oddly this symptom seems to come and go as I edit main.cpp
-        constructor_count++;
-        assert(constructor_count == 1);
-        
         setEnable(enabled);
 
 #ifdef USE_OPEN3D

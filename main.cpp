@@ -23,10 +23,10 @@
 int main(int argc, const char * argv[])
 {
     EF::unit_test();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250815 EF::record_best_fits_in_file
+
 //    EF::runOneFlockEvolution();
     EF::runFlockEvolutionLoop();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    delete &Draw::getInstance();
     return EXIT_SUCCESS;
 }

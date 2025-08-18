@@ -36,12 +36,7 @@ inline static double roll_rate = 0.99;
 // Global switch (temp?) enables 4th objective component for boosting curvature.
 inline static bool add_curvature_objective = false;
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250815 EF::record_best_fits_in_file
 inline static bool record_best_fits_in_file = true;
-//inline static std::string best_fits_filename = "/Users/cwr/Desktop/best_fits.csv";
-inline static std::string best_fits_filename;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }  // end of namespace EvoFlock
 namespace EF = EvoFlock;
 
@@ -99,20 +94,15 @@ void visualizeBestIfRequested(LP::Population* population)
 }
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250815 EF::record_best_fits_in_file
-
 void maybeRecordPerRunBestFit(LP::Population* population)
 {
-    static std::string pathname;
+    std::string pathname = "/Users/cwr/Desktop/best_fits.csv";
     if (record_best_fits_in_file)
     {
-        if (pathname.empty())
+        if (not fs::exists(pathname))
         {
-            pathname = "/Users/cwr/Desktop/best_fits.csv";
             std::ofstream stream(pathname);
-            std::string labels = ("date and time,run best fit");
-            stream << labels << std::endl;
+            stream << "date and time,run best fit" << std::endl;
             stream.close();
         }
         std::ofstream stream(pathname, std::ios_base::app);
@@ -120,8 +110,6 @@ void maybeRecordPerRunBestFit(LP::Population* population)
         stream << population->bestFitness()->getFitness() << std::endl;
     }
 }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 // Tool for visualizing a logged set of FlockParameters.
@@ -222,14 +210,11 @@ void runOneFlockEvolution()
     // WIP/HACK runs flock sim, with graphics, for the FlockParameters written
     // inline in this function's source code, above.
     visualizePreviouslyLoggedFlockParameters();
-    
-    // TODO run one evolution ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    
+
     int individuals = 300;
     int subpops = 17;
     int max_evolution_steps = Boid::GP_not_GA ? 20 : 30000;
-    
-    
+
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
     debugPrint(ga_tree_size);
     
@@ -292,11 +277,8 @@ void runOneFlockEvolution()
             }
             std::cout << std::endl;
             visualizeBestIfRequested(population);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250815 EF::record_best_fits_in_file
-            maybeRecordPerRunBestFit(population);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
+        maybeRecordPerRunBestFit(population);
     }
     
     // Save end of run data.
@@ -338,8 +320,6 @@ void runOneFlockEvolution()
     if (not Draw::getInstance().exitFromRun()) { record_top_10(); }
     delete population;
     LP::Individual::leakCheck();
-    delete &Draw::getInstance();
-    //    return EXIT_SUCCESS;
 }
 
 

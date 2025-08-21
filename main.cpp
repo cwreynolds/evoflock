@@ -58,13 +58,24 @@ int best_fits_histogram()
         0.817572,
         0.839593,
         0.835494,
+        
+        0.793139,
+        0.846227,
+        0.848922,
+        0.876363,
+        0.815757,
+        0.774554,
+        0.854187,
     };
     debugPrint(bf.size());
     std::ranges::sort(bf);
-    for (auto f : bf) { std::cout << f << std::endl; }
+//    for (auto f : bf) { std::cout << f << std::endl; }
 //    double step = 0.02;
-    double step = 0.01;
-    double bot = 0.78;
+//    double step = 0.01;
+    double step = 0.02;
+//    double bot = 0.78;
+//    double bot = 0.77;
+    double bot = 0.74;
     double top = bot + step;
     while (top < 0.92)
     {
@@ -117,8 +128,8 @@ int main(int argc, const char * argv[])
 {
     EF::unit_test();
 
-//    EF::runOneFlockEvolution();
-    EF::runFlockEvolutionLoop();
+    EF::runOneFlockEvolution();
+//    EF::runFlockEvolutionLoop();
 //    best_fits_histogram();
     
     delete &Draw::getInstance();

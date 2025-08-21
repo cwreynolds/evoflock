@@ -49,7 +49,7 @@
 
 \begin{document}
 
-\title{Evoflock: evolved inverse design of multi-agent motion}
+\title{{\tiny draft 2: \today}\\Evoflock: evolved inverse design of multi-agent motion}
 
 \author{Craig Reynolds\authorcr
     unaffiliated researcher\authorcr 
@@ -226,6 +226,17 @@ So, for example, the hypervolume goes up (or down) as any component goes up (or 
 
 \begin{figure}[]
     \centering
+    \includegraphics[width=0.9\linewidth]{images/temp_avoidance_score.png}
+    \caption{Score for obstacle avoidance. It is the normalized number of collision-free boid-steps, raised to a high (500) power. This function is nearly zero until the number of collision-free steps is about 99\%.}
+    \label{fig:avoid_score}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[]
+    \centering
     \includegraphics[width=\linewidth]{images/temp_fit_plot.png}
     \caption{Plot of scalarized fitness (and its component metrics) over 30,000 steps of evolutionary time. The black bold trace (ending at 0.83) is the cumulative best population fitness. The bold gray trace (bottommost) is population average fitness. The colored traces correspond to best and average values (saturated and pastel) for the three component fitness objectives: obstacle avoidance (red), separation (green), and speed (blue). Data from run 20250711a.}
     \label{fig:fit_plot}
@@ -262,7 +273,7 @@ An equally iconic property of natural flocks is that birds are \textit{aligned},
 
 The example application in this work can be described as ``flocking in the presence of obstacles'' as shown in Figure \ref{fig:boid_flock}. At each time step, part of each boid's simulation is predicting future obstacle collisions and applying steering force to avoid them. The same code detects obstacle avoidance failures. In simulation, this is a matter of a boid having incorrectly passed through the surface of an obstacle (a zero-crossing of the obstacle's signed distance function). A kinematic constraint is invoked to move the boid back to the correct side of the boundary. This failure is recorded in the boid's collision counter. At the end of the flock simulation this is turned into a normalized score of the total number of all collisions over the total number of boid-steps. (Typically in these experiments, a fitness test runs 200 boids for 500 simulation steps, so the final score is the total number of collisions over 100,000 boid-steps.) 
 
-For collision avoidance, the goal is not merely to \textit{reduce} the number of collisions but to effectively eliminate them. (An informal goal in these experiments has been {$\leq$}10 collisions per 100,000 boid-steps.) To express this, the normalized obstacle avoidance score (on [0, 1]) is exponentiated to the 500\textsuperscript{th} power. This pushes nearly the whole score's range down near zero, except for a small region near a perfect score of one. This effectively rejects flock parameter sets with more than a handful of collisions per flock simulation.
+For collision avoidance, the goal is not merely to \textit{reduce} the number of collisions but to effectively eliminate them. (An informal goal in these experiments has been {$\leq$}10 collisions per 100,000 boid-steps.) To express this, the normalized obstacle avoidance score (on [0, 1]) is exponentiated to the 500\textsuperscript{th} power. This pushes nearly the whole score's range down near zero, except for a small region near a perfect score of one. This effectively rejects flock parameter sets with more than a handful of collisions per flock simulation. See Figure \ref{fig:avoid_score}.
 
 \subsection{Objective for Flight Speed}
 \label{subsec:speed_objective}
@@ -270,6 +281,17 @@ For collision avoidance, the goal is not merely to \textit{reduce} the number of
 Originally (following early boid models \citep{reynolds_flocks_1987}) each boid's flight speed was kinematically clipped to remain below 20 meters per second. Later, a third flock optimization objective was added to establish a target speed range. A new behavior was added to each boid to apply a force along its direction of motion to adjust its flight speed toward the desired range. The strength of this behavior became one of the flock parameters being optimized in the inverse flock design process.
 
 Flight speed \textit{can} be left to ``float'' during optimization. Unfortunately, there is an annoyingly large basin of attractions around not moving (speed=0). It seems likely that any given inverse design problem would imply a range of valid speeds. This suggests that the speed range should be given in the inverse design problem statement. For example, modeling vehicle traffic and pedestrian crowds would imply very different speed ranges. Figure \ref{fig:speed_score} shows a speed score function used in these experiments. It has a target range in the interval [19, 21] with a fixed support ramping down to zero outside that range.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/temp_curve_score.png}
+    \caption{Score for boosting boid path curvature by slightly penalizing especially low curvature. Measured as average over all boid-steps of flock run. Score ramps from 0.8 to 1.0 for curvature on [0, 0.1] then clips at 1 for higher curvature.}
+    \label{fig:seed_variance}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Adding an Objective}
 \label{sec:add_objective}
@@ -366,10 +388,21 @@ A surprising finding of this work is that the \textit{alignment} of birds in a f
 
 A note about GA population size versus the number of SSGA updates (see Figure \ref{fig:temp_evo_update}). Some experiments were made increasing the evolutionary population from 500 to 1000. The hope was that more \textit{individuals} (more flock parameter sets) would allow a better solution to be found by using a wider coverage of the parameter space. The opposite seemed to be true. Larger populations led to worse results (often summarized as the best scalar fitness at end of the run). In contrast, reducing the population from 500 to 300 produced somewhat better results, but 150 was worse. Finally, for a population size of 300, more steps seemed to help: running 30,000 updates produced fitness around 0.82 while running 60,000 updates produced fitness around 0.88. Apparently having more updates per individual produced better results.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/temp_seed_variance.png}
+    \caption{A histogram of final best fitness from 38 identical runs, varying only by random seeds}
+    \label{fig:seed_variance}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Limitations}
 \label{sec:limitations}
 
-Because EvoFlock is a stochastic algorithm, the quality of results varies from run to run. (The three-objective version end-of-run best fitness is about 0.82, but can be as low as 0.75.) It is not deterministic, both because the random number generator is seeded from wall clock time, and because the objective function is multi-threaded so inherently non-deterministic.  \textbf{[[[...I need to run a bunch of them and plot the distribution of results...]]]}
+Because EvoFlock is a stochastic algorithm, the quality of the results varies from run to run. (For the three-objective version, best fitness is about 0.83, but can be as low as 0.77. See Figure \ref{fig:seed_variance}.) The result is not deterministic, both because the random number generator is seeded from wall clock time for each run, and because the objective function is multithreaded and so is inherently nondeterministic.
 
 The current objective function runs \textbf{four} flock simulations for each parameter set. These are run in parallel threads on separate CPU cores, so there is little time penalty. However, if not for this 4{$\times$} load, the cores would be free for other types of parallelism. The four simulations are an attempt to reduce fitness variance of the randomized simulations. Recent work \citep{antipov_evolutionary_2025} has shown that this may be misguided, and that the quality of results do not suffer from using noisy raw fitness values.
 

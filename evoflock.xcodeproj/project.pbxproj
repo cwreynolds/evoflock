@@ -114,6 +114,10 @@
 		847454BF2B65BE9C00214306 /* Boid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Boid.h; sourceTree = "<group>"; };
 		847C8CF32E4180F100DBC072 /* 20250806_UCSC_inverse_flocks.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = 20250806_UCSC_inverse_flocks.pdf; sourceTree = "<group>"; };
 		847ED7422E554320005909CD /* seed_induced_variation.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = seed_induced_variation.numbers; sourceTree = "<group>"; };
+		847ED7432E57C044005909CD /* temp_avoidance_score.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_avoidance_score.png; sourceTree = "<group>"; };
+		847ED7442E57C05F005909CD /* temp_curve_score.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_curve_score.png; sourceTree = "<group>"; };
+		847ED7452E57C095005909CD /* temp_seed_variance.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_seed_variance.png; sourceTree = "<group>"; };
+		847ED7462E57C0AC005909CD /* temp_system_blocks.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_system_blocks.png; sourceTree = "<group>"; };
 		848101F62C7666CA00433168 /* libOpen3D.0.18.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libOpen3D.0.18.0.dylib; path = "../open3d-devel-darwin-arm64-0.18.0+c219d82/lib/libOpen3D.0.18.0.dylib"; sourceTree = "<group>"; };
 		848101FB2C77B53E00433168 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		848BC33C2B69856700509CE5 /* flock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = flock.h; sourceTree = "<group>"; };
@@ -393,12 +397,16 @@
 		8498179D2E1ACC39002B4548 /* images */ = {
 			isa = PBXGroup;
 			children = (
-				849817992E1ACC39002B4548 /* temp_fig_1.png */,
-				8498179A2E1ACC39002B4548 /* temp_MOF_HV.png */,
+				847ED7432E57C044005909CD /* temp_avoidance_score.png */,
+				847ED7442E57C05F005909CD /* temp_curve_score.png */,
 				843CA0DE2E21EB5300778963 /* temp_evo_update.png */,
+				849817992E1ACC39002B4548 /* temp_fig_1.png */,
 				843CA0DF2E233DE900778963 /* temp_fit_plot.png */,
+				8498179A2E1ACC39002B4548 /* temp_MOF_HV.png */,
+				847ED7452E57C095005909CD /* temp_seed_variance.png */,
 				8498179B2E1ACC39002B4548 /* temp_sep_score.png */,
 				8498179C2E1ACC39002B4548 /* temp_speed_score.png */,
+				847ED7462E57C0AC005909CD /* temp_system_blocks.png */,
 			);
 			path = images;
 			sourceTree = "<group>";

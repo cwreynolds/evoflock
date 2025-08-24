@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %
-% "Evoflock: evolved inverse design of multi-agent motion"
+% "EvoFlock: evolved inverse design of multi-agent motion"
 % speculative draft paper
 %
 % May 29, 2025  Begin draft.
@@ -49,7 +49,7 @@
 
 \begin{document}
 
-\title{{\tiny draft 2: \today}\\Evoflock: evolved inverse design of multi-agent motion}
+\title{{\tiny draft 2: \today}\\EvoFlock: evolved inverse design of multi-agent motion}
 
 \author{Craig Reynolds\authorcr
     unaffiliated researcher\authorcr 
@@ -181,6 +181,7 @@ The ``genome'' of a GA changes over time under the influence of the objective fu
 
 Many variations on genetic algorithms have been developed over the years. Sometimes, the entire population of individuals is updated in parallel, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state genetic algorithms} (SSGA) updates individuals one at a time \citep{syswerda_study_1991}. If a generational GA is run for $G$ generations with a population of $P$ individuals, a corresponding SSGA would be run for $G{\times}P$ steps. A preexisting GA framework called \textit{LazyPredator} is used for this project. See Figure \ref{fig:temp_evo_update} for a diagram of the SSGA update cycle, and the ``tournament of three individuals'' based on \textit{negative selection} which promotes diversity in the population.
 
+
 \subsection{Objective Function}
 \label{subsec:ObjectiveFunction}
 
@@ -200,38 +201,6 @@ A simple and commonly used scalarizer is called \textit{hypervolume}, which simp
 
 So, for example, the hypervolume goes up (or down) as any component goes up (or down). This holds as long as none of the components is zero, which ``hides'' contributions of other components. To avoid this, the hypervolume variant used here remaps the fitness range from [0, 1] to [$\epsilon$, 1] before taking the product. ($\epsilon$ is 0.01 for the ``normalized fitness'' values used here.)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure}[]
-    \centering
-    % \includegraphics[width=0.9\textwidth]{images/temp_sep_score.png}
-    \includegraphics[width=0.9\linewidth]{images/temp_sep_score.png}
-    \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all \textit{boid-steps}. (That is, for 200 boids on 500 simulation steps, so 100,000 boid steps.)}
-    \label{fig:SeparationScore}
-\end{figure}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure}[]
-    \centering
-    \includegraphics[width=0.9\linewidth]{images/temp_speed_score.png}
-    \caption{Score for desired boid \textit{speed}, here $\sim$20 meters per second. This function is highest when speed is between 19 and 21 m/s and falls off to zero outside that range. The \textit{speed} score for an entire flock simulation is the average of this function over all boid-steps.}
-    \label{fig:speed_score}
-\end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure}[]
-    \centering
-    \includegraphics[width=0.9\linewidth]{images/temp_avoidance_score.png}
-    \caption{Score for obstacle avoidance. It is the normalized number of collision-free boid-steps, raised to a high (500) power. This function is nearly zero until the number of collision-free steps is about 99\%.}
-    \label{fig:avoid_score}
-\end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -253,6 +222,37 @@ Most flock models are written from the perspective of an individual boid (agent)
 Each of these steering behaviors has parameters, such as weights, distances, and angles. (For example, the weight given to alignment behavior, or the minimum time before a predicted obstacle collision at which the boid should steer to avoid.) There are also parameters related to its physical model, such as the maximum force it can apply.
 
 The collection of all these make up the flock's \textit{parameter set} which is adjusted by optimization according the the objective function. See Table \ref{table:flock-parameters} for a list of the parameter set used in these experiments.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[]
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/temp_sep_score.png}
+    \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all \textit{boid-steps}. (That is, for 200 boids on 500 simulation steps, so 100,000 boid steps.)\\}
+    \label{fig:SeparationScore}
+
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/temp_speed_score.png}
+    \caption{Score for desired boid \textit{speed}, here $\sim$20 meters per second. This function is highest when speed is between 19 and 21 m/s and falls off to zero outside that range. The \textit{speed} score for an entire flock simulation is the average of this function over all boid-steps.\\}
+    \label{fig:speed_score}
+
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/temp_avoidance_score.png}
+    \caption{Score for obstacle avoidance. It is the normalized number of collision-free boid-steps, raised to a high (500) power. This function is nearly zero until the number of collision-free steps is about 99\%.}
+    \label{fig:avoid_score}
+
+\end{figure}
+
+\begin{figure}[b]
+
+    \centering
+    \includegraphics[width=0.9\linewidth]{images/temp_curve_score.png}
+    \caption{Score for boosting boid path curvature by slightly penalizing especially low curvature. Measured as average over all boid-steps of flock run. Score ramps from 0.8 to 1.0 for curvature on [0, 0.1] then clips at 1 for higher curvature.}
+    \label{fig:curve_score}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 \section{An objective function for flocking}
 \label{sec:FlockingObjective}
@@ -284,16 +284,6 @@ Originally (following early boid models \citep{reynolds_flocks_1987}) each boid'
 
 Flight speed \textit{can} be left to ``float'' during optimization. Unfortunately, there is an annoyingly large basin of attractions around not moving (speed=0). It seems likely that any given inverse design problem would imply a range of valid speeds. This suggests that the speed range should be given in the inverse design problem statement. For example, modeling vehicle traffic and pedestrian crowds would imply very different speed ranges. Figure \ref{fig:speed_score} shows a speed score function used in these experiments. It has a target range in the interval [19, 21] with a fixed support ramping down to zero outside that range.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\begin{figure}[]
-    \centering
-    \includegraphics[width=0.9\linewidth]{images/temp_curve_score.png}
-    \caption{Score for boosting boid path curvature by slightly penalizing especially low curvature. Measured as average over all boid-steps of flock run. Score ramps from 0.8 to 1.0 for curvature on [0, 0.1] then clips at 1 for higher curvature.}
-    \label{fig:curve_score}
-\end{figure}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Adding an Objective}
 \label{sec:add_objective}
@@ -406,9 +396,9 @@ A note about GA population size versus the number of SSGA updates (see Figure \r
 \section{Limitations}
 \label{sec:limitations}
 
-Because EvoFlock is a stochastic algorithm, the quality of the results varies from run to run. (For the three-objective version, best fitness is about 0.83, but can be as low as 0.77. See Figure \ref{fig:seed_variance}.) The result is not deterministic, both because the random number generator is seeded from wall clock time for each run, and because the objective function is multithreaded and so is inherently nondeterministic.
+Because EvoFlock is a stochastic algorithm, the quality of the results varies from run to run. (For the three-objective version, typical end-of-run best fitness is around 0.83, but can be as low as 0.76. See Figure \ref{fig:seed_variance}.) This procedure is not deterministic, both because the random number generator is seeded from wall clock time for each run and because the objective function is multithreaded and so is inherently nondeterministic.
 
-The current objective function runs \textbf{four} flock simulations for each parameter set. These are run in parallel threads on separate CPU cores, so there is little time penalty. However, if not for this 4{$\times$} load, the cores would be free for other types of parallelism. The four simulations are an attempt to reduce fitness variance of the randomized simulations. Recent work \citep{antipov_evolutionary_2025} has shown that this may be misguided, and that the quality of results do not suffer from using noisy raw fitness values.
+The current objective function runs \textbf{four} flock simulations for each parameter set. These are run in parallel threads on separate CPU cores, so there is little time penalty. However, if not for this 4{$\times$} load, the cores would be free for other types of parallelism. The four simulations are an attempt to reduce fitness variance of the randomized simulations, to avoid ``lucky'' high scores. (Of the four fitness values, the \textit{lowest} (worst) is returned from the objective function as a conservative estimate.) Recent work \citep{antipov_evolutionary_2025} has shown that this may be misguided, and that the quality of results do not suffer from using noisy raw fitness values.
 
 \section{Future Work}
 \label{sec:future}

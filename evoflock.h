@@ -94,24 +94,6 @@ void visualizeBestIfRequested(LP::Population* population)
 }
 
 
-void maybeRecordPerRunBestFit(LP::Population* population)
-{
-    std::string pathname = "/Users/cwr/Desktop/best_fits.csv";
-    if (record_best_fits_in_file)
-    {
-        if (not fs::exists(pathname))
-        {
-            std::ofstream stream(pathname);
-            stream << "date and time,run best fit" << std::endl;
-            stream.close();
-        }
-        std::ofstream stream(pathname, std::ios_base::app);
-        stream << util::date_hours_minutes() << ",";
-        stream << population->bestFitness()->getFitness() << std::endl;
-    }
-}
-
-
 // Tool for visualizing a logged set of FlockParameters.
 // To visualize a given set of FlockParameters. Cut/paste from log, compile.
 // Comment out body of this function for normal evolution run.
@@ -278,7 +260,6 @@ void runOneFlockEvolution()
             std::cout << std::endl;
             visualizeBestIfRequested(population);
         }
-        maybeRecordPerRunBestFit(population);
     }
     
     // Save end of run data.

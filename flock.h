@@ -53,9 +53,6 @@ private:
     static inline int obstacle_selection_counter_ = -1;
     static inline ObstaclePtrList obstacles_;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250704 open space flocking -- no obstacles
-
     // Index of the initial/default obstacle set.
     static inline int default_obstacle_set_index_ =
     // 0;  // Sphere and vertical cylinder.
@@ -64,20 +61,7 @@ private:
     // 3;  // Sphere only.
     4;  // Sphere and many little spheres.
     // 5;  // Sphere with smaller sphere inside.
-  
-    
-//    // Index of the initial/default obstacle set.
-//    static inline int default_obstacle_set_index_ =
-//    // 0;  // Sphere and vertical cylinder.
-//    // 1;  // Sphere and 6 cylinders.
-//    // 2;  // Sphere and plane.
-//    // 3;  // Sphere only.
-//    // 4;  // Sphere and many little spheres.
-//    // 5;  // Sphere with smaller sphere inside.
-//    6;  // No obstacles
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+    // 6;  // No obstacles
 
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
@@ -256,12 +240,21 @@ public:
         boid->setPreviousPosition(boid->position());
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250726 log curvature stats
-    double min_curvature = +std::numeric_limits<double>::infinity();
-    double max_curvature = -std::numeric_limits<double>::infinity();
-    double sum_curvature = 0;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Collect flock curvature stats
+    double min_curvature_ = +std::numeric_limits<double>::infinity();
+    double max_curvature_ = -std::numeric_limits<double>::infinity();
+    double sum_curvature_ = 0;
+    void collectCurvatureStats()
+    {
+        auto ccs = [&](Boid* b)
+        {
+            double c = b->getPathCurvature();
+            min_curvature_ = std::min(c, min_curvature_);
+            max_curvature_ = std::max(c, max_curvature_);
+            sum_curvature_ += c;
+        };
+        for_all_boids(ccs);
+    }
 
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
@@ -274,17 +267,7 @@ public:
         enforceObsBoidConstraints();
         recordSeparationScorePerStep();
         recordSpeedScorePerStep();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250726 log curvature stats
-        for_all_boids
-        ([&](Boid* b)
-         {
-            double c = b->getPathCurvature();
-            min_curvature = std::min(c, min_curvature);
-            max_curvature = std::max(c, max_curvature);
-            sum_curvature += c;
-        });
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        collectCurvatureStats();
     }
 
     // Print a one line summary of metrics from this flock simulation.
@@ -299,34 +282,13 @@ public:
         double average_speed = averageSpeedPerBoidStep();
         std::cout << std::format(", average speed = {:.3}", average_speed);
         std::cout << std::format(", speedScore() = {:.3}", speedScore());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250726 log curvature stats
-        
-//        double ac = sum_curvature / boidStepPerSim();
-//        std::cout << ", min/ave/max curvature = ";
-//        std::cout << std::format("{:.3}", min_curvature);
-//        std::cout << std::format("/{:.3}", ac);
-//        std::cout << std::format("/{:.3}", max_curvature);
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20250728 EF::add_curvature_objective
-
-//        double ac = sum_curvature / boidStepPerSim();
-//        std::cout << std::format(", minc={:.3}", min_curvature);
-//        std::cout << std::format(", c={:.3}", ac);
-//        std::cout << std::format(", maxc={:.3}", max_curvature);
-
         if (EF::add_curvature_objective)
         {
-            double ac = sum_curvature / boidStepPerSim();
-            std::cout << std::format(", minc={:.3}", min_curvature);
+            double ac = sum_curvature_ / boidStepPerSim();
+            std::cout << std::format(", minc={:.3}", min_curvature_);
             std::cout << std::format(", c={:.3}", ac);
-            std::cout << std::format(", maxc={:.3}", max_curvature);
+            std::cout << std::format(", maxc={:.3}", max_curvature_);
         }
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         std::cout << std::endl;
     }
 
@@ -461,49 +423,11 @@ public:
         return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250728 EF::add_curvature_objective
-    
-//    double curvatureScore() const
-//    {
-//        double average_curvature = sum_curvature / boidStepPerSim();
-//        return util::remap_interval_clip(average_curvature, 0, 1, 0.8, 1);
-//    }
-
-//    double curvatureScore() const
-//    {
-//        return sum_curvature / boidStepPerSim();
-//    }
-
-//        double curvatureScore() const
-//        {
-//            double average_curvature = sum_curvature / boidStepPerSim();
-//
-//    //        // 20250728_curvature_20pc
-//    //        return util::remap_interval_clip(average_curvature, 0, 1, 0.8, 1);
-//
-//    //        // 20250728_curvature_50pc
-//    //        return util::remap_interval_clip(average_curvature, 0, 1, 0.5, 1);
-//
-//    //        // 20250728_curve_0_10pc_50pc_1
-//    //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
-//
-//            // 20250728_curve_0_10pc_80pc_1
-//            return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
-//
-//    //        // 20250728_curve_0_10pc_90pc_1
-//    //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.9, 1);
-//        }
-
     double curvatureScore() const
     {
-        double average_curvature = sum_curvature / boidStepPerSim();
-                
-        // 20250728_curve_0_10pc_80pc_1
+        double average_curvature = sum_curvature_ / boidStepPerSim();
         return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.
@@ -678,14 +602,9 @@ public:
             obs.push_back(new SphereObstacle(12, sc, iside));
             obstacle_presets_.push_back(obs);
             
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250704 open space flocking -- no obstacles
-            
             // Set 6 -- no obstacles
             obs.clear();
             obstacle_presets_.push_back(obs);
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             // Set initial obstacle set to the default.
             draw().obstacleSetIndex() = default_obstacle_set_index_;

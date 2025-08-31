@@ -78,11 +78,7 @@ inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVol
 
 inline std::vector<std::string> mof_names()
 {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250829 refactor Boid::GP_not_GA
-//    return (Boid::GP_not_GA ?
     return (EF::usingGP() ?
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             std::vector<std::string>(
                                      {
                                          "avoid",
@@ -255,12 +251,7 @@ std::map<LP::Individual*, LP::GpTree> trees_of_individuals;
 
 inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
 {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250829 refactor Boid::GP_not_GA
-//    assert(Boid::GP_not_GA);
     assert(EF::usingGP());
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     int runs = 4;
     MOF least_mof;
     double least_scalar_fitness = std::numeric_limits<double>::infinity();

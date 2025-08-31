@@ -160,11 +160,6 @@ public:
 //        annotation(s, a, c, o, combined_steering);
 //        return combined_steering;
 //    }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250829 refactor Boid::GP_not_GA
-//    static inline bool GP_not_GA = false;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     std::function<Vec3()> override_steer_function = nullptr;
         
@@ -187,12 +182,7 @@ public:
     {
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250829 refactor Boid::GP_not_GA
-//        if (GP_not_GA and override_steer_function)
         if (EF::usingGP() and override_steer_function)
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             // TODO seems redundant, both here and in the IF
             assert(override_steer_function);

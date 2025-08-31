@@ -36,24 +36,11 @@ inline static double roll_rate = 0.99;
 // Global switch (temp?) enables 4th objective component for boosting curvature.
 inline static bool add_curvature_objective = false;
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250829 refactor Boid::GP_not_GA
-
-//inline static bool record_best_fits_in_file = true;
-
-//static inline bool GP_not_GA_ = false;
-//inline bool usingGP() { return GP_not_GA_; }
-//inline bool usingGA() { return not GP_not_GA_; }
-//inline void setUsingGP() { GP_not_GA_ = true; }
-//inline void setUsingGA() { GP_not_GA_ = false; }
-
 static inline bool using_GA_ = true;
 inline bool usingGP() { return not using_GA_; }
 inline bool usingGA() { return using_GA_; }
 inline void setUsingGP() { using_GA_ = false; }
 inline void setUsingGA() { using_GA_ = true; }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }  // end of namespace EvoFlock
 namespace EF = EvoFlock;
 
@@ -189,14 +176,8 @@ void runOneFlockEvolution()
     RS().setSeedFromClock();
     std::cout << "RandomSequence seed = " << RS().getSeed() << std::endl;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250829 refactor Boid::GP_not_GA
-
-    // TODO experimental_GP_stub
-//    Boid::GP_not_GA = false;
+    // Using GA (genetic algorithm) or GP (genetic programming) this run?
     EF::setUsingGA();
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
@@ -216,34 +197,23 @@ void runOneFlockEvolution()
     // inline in this function's source code, above.
     visualizePreviouslyLoggedFlockParameters();
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250829 refactor Boid::GP_not_GA
-
     int individuals = 300;
     int subpops = 17;
-//    int max_evolution_steps = Boid::GP_not_GA ? 20 : 30000;
     int max_evolution_steps = EF::usingGP() ? 20 : 30000;
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
     debugPrint(ga_tree_size);
     
-//    int min_crossover_tree_size = Boid::GP_not_GA ? 20 :  2;
-//    int max_crossover_tree_size = Boid::GP_not_GA ? 60 : ga_tree_size;
-//    int max_initial_tree_size   = Boid::GP_not_GA ? 60 : ga_tree_size;
     int min_crossover_tree_size = EF::usingGP() ? 20 :  2;
     int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
     int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
-
-    // TODO experimental_GP_stub
-//    auto fitness_function = (Boid::GP_not_GA ?
+    
     auto fitness_function = (EF::usingGP() ?
                              GP::evoflock_gp_fitness_function :
                              GP::evoflock_ga_fitness_function);
     
     LP::Population* population = nullptr;
     
-    // TODO experimental_GP_stub
-//    LP::FunctionSet fs = (Boid::GP_not_GA ?
     LP::FunctionSet fs = (EF::usingGP() ?
                           GP::test_gp_boid_function_set() :
                           GP::evoflock_ga_function_set());
@@ -274,8 +244,6 @@ void runOneFlockEvolution()
             fs.setCrossoverFunction(GP::evoflock_ga_crossover);
         }
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     {
         std::cout << "Run evolution." << std::endl;
@@ -320,11 +288,7 @@ void runOneFlockEvolution()
             
             std::cout << individual->tree().to_string(true) << std::endl;
             LazyPredator::MultiObjectiveFitness fitness;
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250829 refactor Boid::GP_not_GA
-//            if (Boid::GP_not_GA)
             if (EF::usingGP())
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             {
                 fitness = GP::evoflock_gp_fitness_function(individual);
             }

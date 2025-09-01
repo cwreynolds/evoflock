@@ -176,8 +176,14 @@ void runOneFlockEvolution()
     RS().setSeedFromClock();
     std::cout << "RandomSequence seed = " << RS().getSeed() << std::endl;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250831 now that EvoFlock GA mode works, retry GP again.
+    
     // Using GA (genetic algorithm) or GP (genetic programming) this run?
-    EF::setUsingGA();
+//    EF::setUsingGA();
+    EF::setUsingGP();
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
@@ -214,9 +220,13 @@ void runOneFlockEvolution()
     
     LP::Population* population = nullptr;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250831 now that EvoFlock GA mode works, retry GP again.
     LP::FunctionSet fs = (EF::usingGP() ?
-                          GP::test_gp_boid_function_set() :
+//                          GP::test_gp_boid_function_set() :
+                          GP::evoflock_gp_function_set() :
                           GP::evoflock_ga_function_set());
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     fs.print();
     
     {
@@ -244,6 +254,21 @@ void runOneFlockEvolution()
             fs.setCrossoverFunction(GP::evoflock_ga_crossover);
         }
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250831 now that EvoFlock GA mode works, retry GP again.
+    
+    Draw::getInstance().setEnable(false);
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout <<  "##########";
+    std::cout <<  "    Draw::getInstance().setEnable(false);    ";
+    std::cout <<  "##########";
+    std::cout << std::endl;
+    std::cout << std::endl;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     {
         std::cout << "Run evolution." << std::endl;

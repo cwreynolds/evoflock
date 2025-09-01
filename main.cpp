@@ -29,6 +29,6 @@ int main(int argc, const char * argv[])
 //    EF::runFlockEvolutionLoop();
 //    best_fits_histogram();
     
-    delete &Draw::getInstance();
+    Draw::deleteInstance();
     return EXIT_SUCCESS;
 }

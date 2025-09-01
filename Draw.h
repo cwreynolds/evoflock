@@ -52,6 +52,12 @@ public:
         }
         return *global_object_;
     }
+    
+    // Clean up by deleting the global Draw object, if it has been allocated.
+    static void deleteInstance()
+    {
+        if (global_object_) { delete global_object_; }
+    }
 
 private:
 

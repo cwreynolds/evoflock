@@ -173,7 +173,20 @@ void visualizePreviouslyLoggedFlockParameters()
 void runOneFlockEvolution()
 {
     setRS(LP::LPRS());
-    RS().setSeedFromClock();
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250903 Assertion failed: (size_ok(new_tree))
+//    RS().setSeedFromClock();
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout <<  "##########";
+    std::cout <<  "    NOT reseeding RandomSequence seed from clock    ";
+    std::cout <<  "##########";
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     std::cout << "RandomSequence seed = " << RS().getSeed() << std::endl;
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

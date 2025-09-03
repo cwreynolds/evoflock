@@ -76,19 +76,42 @@ inline double scalarize_fitness_hyperVolume(MOF mof) {return mof.hyperVolume();}
 //inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
 
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20250902 Assertion failed: (mof.size() == mof_names().size())
+
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (EF::usingGP() ?
+//                std::vector<std::string>(
+//                                         {
+//                                             "avoid",
+//                                             "separate",
+//                                             "cohere",
+//                                             "cluster",
+//                                             "occupied",
+//
+//                                         }) :
+//                (EF::add_curvature_objective ?
+//                 std::vector<std::string>(
+//                                          {
+//                                              "avoid",
+//                                              "separate",
+//                                              "speed",
+//                                              "curvature"
+//                                          }) :
+//                 std::vector<std::string>(
+//                                          {
+//                                              "avoid",
+//                                              "separate",
+//                                              "speed"
+//                                          }))
+//                );
+//    }
+
 inline std::vector<std::string> mof_names()
 {
-    return (EF::usingGP() ?
-            std::vector<std::string>(
-                                     {
-                                         "avoid",
-                                         "separate",
-                                         "cohere",
-                                         "cluster",
-                                         "occupied",
-                                         
-                                     }) :
-            (EF::add_curvature_objective ?
+    return (EF::add_curvature_objective ?
              std::vector<std::string>(
                                       {
                                           "avoid",
@@ -101,9 +124,11 @@ inline std::vector<std::string> mof_names()
                                           "avoid",
                                           "separate",
                                           "speed"
-                                      }))
-            );
+                                      }));
 }
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
 // After a Flock's simulation has been run, it is passed here to build its multi
 // objective fitness object from metrics saved inside the Flock object.
@@ -287,6 +312,17 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
         // These steps happen in the single thread with lock on save_mof_mutex.
         {
             std::lock_guard<std::mutex> smm(save_mof_mutex);
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250902 Assertion failed: (mof.size() == mof_names().size())
+            
+            if ((mof.size() != mof_names().size()))
+            {
+                debugPrint(mof.size());
+                debugPrint(mof_names().size());
+                debugPrint(util::vec_to_string(mof_names()));
+            }
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             assert(mof.size() == mof_names().size());
             scalar_fits.push_back(scalarize_fitness(mof));
             if (least_scalar_fitness > scalar_fits.back())
@@ -840,20 +876,28 @@ LP::FunctionSet evoflock_gp_function_set()
                     double distance = std::numeric_limits<double>::infinity();
                     auto collisions = boid.get_predicted_obstacle_collisions();
                     
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    // TOODO 20240809 why is obstacle avoidance broken?
-                    assert(not collisions.empty());
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20250902 Assertion failed: (mof.size() == mof_names().size())
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // TOODO 20240809 why is obstacle avoidance broken?
+//                    assert(not collisions.empty());
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                     if (collisions.size() > 0)
                     {
                         const Collision& first_collision = collisions.front();
                         
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        // TOODO 20240809 why is obstacle avoidance broken?
-                        debugPrint(first_collision)
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        // TODO 20250902 Assertion failed: (mof.size() == mof_names().size())
+
+//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                        // TOODO 20240809 why is obstacle avoidance broken?
+//                        debugPrint(first_collision)
+//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                         Vec3 poi = first_collision.point_of_impact;
                         distance = (poi - boid.position()).length();
                     }

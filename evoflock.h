@@ -231,7 +231,13 @@ void runOneFlockEvolution()
     // Later: set max_evolution_steps back to 20 to reproduce then drill in for
     // the fix.
     
-    int max_evolution_steps = 30000;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250905 30000 GP steps OK, now Boid::gp_boid_per_thread_ is nullptr
+    
+//    int max_evolution_steps = 30000;
+    int max_evolution_steps = 10;
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -334,7 +340,15 @@ void runOneFlockEvolution()
             if (i == 0)
             {
                 LP::GpTree t = individual->tree();
-                GP::fp_from_ga_tree(t).print();
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20250905 30000 GP steps OK, now Boid::gp_boid_per_thread_
+                std::cout << "@@@@ before call fp_from_ga_tree()" << std::endl;
+                
+//                GP::fp_from_ga_tree(t).print();
+                
+                std::cout << "@@@@ after call fp_from_ga_tree()" << std::endl;
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                 std::cout << std::endl;
                 std::cout << std::endl;
             }

@@ -190,6 +190,15 @@ public:
     {
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20250905 30000 GP steps OK, now Boid::gp_boid_per_thread_ is nullptr
+        
+        // TODO -- VERY TEMP
+        if (EF::usingGP()) { assert(override_steer_function); }
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
         if (EF::usingGP() and override_steer_function)
         {
             // TODO seems redundant, both here and in the IF

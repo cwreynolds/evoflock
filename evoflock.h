@@ -218,7 +218,22 @@ void runOneFlockEvolution()
 
     int individuals = 300;
     int subpops = 17;
-    int max_evolution_steps = EF::usingGP() ? 20 : 30000;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250904 Boid::gp_boid_per_thread_ is nullptr...
+
+//    int max_evolution_steps = EF::usingGP() ? 20 : 30000;
+
+    // TODO 20250904 the "Boid::gp_boid_per_thread_ is nullptr" issue may be a
+    // minor bug, but this is suspiciously happening at step 20. For now just
+    // goose it up to 30000 to let a normal run happen before the error.
+    //
+    // Later: set max_evolution_steps back to 20 to reproduce then drill in for
+    // the fix.
+    
+    int max_evolution_steps = 30000;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
     debugPrint(ga_tree_size);

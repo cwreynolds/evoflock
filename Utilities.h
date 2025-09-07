@@ -151,6 +151,27 @@ template <typename T> std::string vec_to_string(const std::vector<T>& vector)
     return vec_to_string(vector, 0);
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250906 ordinal words
+
+std::string ordinal_word(int n)
+{
+    // the OCD in me wants a version for all non-neagtive numbers, but for now:
+    assert((n >= 0) and (n <= 10));
+    std::vector<std::string> ordinals = {"zeroth", "first", "second", "third",
+        "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"};
+    return ordinals[n];
+}
+
+std::string capitalize_word(const std::string& word)
+{
+    std::string cap = word;
+    if (not std::empty(word)) { cap[0] = std::toupper(cap[0]); }
+    return cap;
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 // Utility for blending per-step values into accumulators for low pass filtering.
 template<typename T>
 class Blender

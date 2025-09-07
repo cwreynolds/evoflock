@@ -332,6 +332,15 @@ void runOneFlockEvolution()
         for (int i = 0; i < 10; i++)
         {
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250906 ordinal words
+            
+            std::cout << std::endl << "**** ";
+            std::cout << util::capitalize_word(util::ordinal_word(i));
+            std::cout << " best end-of-run individual:" << std::endl << std::endl;
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20240703 fix end of run logging for GP
             // TODO experimental_GP_stub
             //            const LP::Individual* individual = population->nthBestFitness(i);

@@ -184,19 +184,14 @@ void runOneFlockEvolution()
     std::cout <<  "##########";
     std::cout << std::endl;
     std::cout << std::endl;
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     std::cout << "RandomSequence seed = " << RS().getSeed() << std::endl;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250831 now that EvoFlock GA mode works, retry GP again.
-    
     // Using GA (genetic algorithm) or GP (genetic programming) this run?
-//    EF::setUsingGA();
+    // EF::setUsingGA();
     EF::setUsingGP();
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    std::cout << (EF::usingGP()?"GP":"GA") << " evolutionary mode." << std::endl;
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
@@ -218,35 +213,17 @@ void runOneFlockEvolution()
 
     int individuals = 300;
     int subpops = 17;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250904 Boid::gp_boid_per_thread_ is nullptr...
-
-//    int max_evolution_steps = EF::usingGP() ? 20 : 30000;
-
-    // TODO 20250904 the "Boid::gp_boid_per_thread_ is nullptr" issue may be a
-    // minor bug, but this is suspiciously happening at step 20. For now just
-    // goose it up to 30000 to let a normal run happen before the error.
-    //
-    // Later: set max_evolution_steps back to 20 to reproduce then drill in for
-    // the fix.
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250905 30000 GP steps OK, now Boid::gp_boid_per_thread_ is nullptr
-    
-//    int max_evolution_steps = 30000;
-    int max_evolution_steps = 10;
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    int max_evolution_steps = 30000;
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
-    debugPrint(ga_tree_size);
     
     int min_crossover_tree_size = EF::usingGP() ? 20 :  2;
     int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
     int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+    
+    debugPrint(min_crossover_tree_size);
+    debugPrint(max_crossover_tree_size);
+    debugPrint(max_initial_tree_size);
     
     auto fitness_function = (EF::usingGP() ?
                              GP::evoflock_gp_fitness_function :
@@ -254,13 +231,10 @@ void runOneFlockEvolution()
     
     LP::Population* population = nullptr;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250831 now that EvoFlock GA mode works, retry GP again.
     LP::FunctionSet fs = (EF::usingGP() ?
-//                          GP::test_gp_boid_function_set() :
                           GP::evoflock_gp_function_set() :
                           GP::evoflock_ga_function_set());
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     fs.print();
     
     {
@@ -331,37 +305,20 @@ void runOneFlockEvolution()
         std::cout << std::endl;
         for (int i = 0; i < 10; i++)
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250906 ordinal words
-            
+            LP::Individual* individual = population->nthBestFitness(i);
+
             std::cout << std::endl << "**** ";
             std::cout << util::capitalize_word(util::ordinal_word(i));
             std::cout << " best end-of-run individual:" << std::endl << std::endl;
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240703 fix end of run logging for GP
-            // TODO experimental_GP_stub
-            //            const LP::Individual* individual = population->nthBestFitness(i);
-            LP::Individual* individual = population->nthBestFitness(i);
-            
-            if (i == 0)
+                        
+            // For pop best, print formatted version of FlockParameters
+            if ((i == 0) and (EF::usingGA()))
             {
-                LP::GpTree t = individual->tree();
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                // TODO 20250905 30000 GP steps OK, now Boid::gp_boid_per_thread_
-                std::cout << "@@@@ before call fp_from_ga_tree()" << std::endl;
-                
-//                GP::fp_from_ga_tree(t).print();
-                
-                std::cout << "@@@@ after call fp_from_ga_tree()" << std::endl;
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-                std::cout << std::endl;
+                LP::GpTree t = individual->tree(); // Copy for non-const call.
+                GP::fp_from_ga_tree(t).print();
                 std::cout << std::endl;
             }
-            
+
             std::cout << individual->tree().to_string(true) << std::endl;
             LazyPredator::MultiObjectiveFitness fitness;
             if (EF::usingGP())
@@ -372,7 +329,6 @@ void runOneFlockEvolution()
             {
                 fitness = GP::rerun_flock_simulation(individual);
             }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             debugPrint(fitness);
         }
     };

@@ -371,6 +371,7 @@ FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
 #endif // eval_const_20240628
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
+    assert(EF::usingGA());
     std::vector<double> parameters;
     for (int i = 0; i < FlockParameters::tunableParameterCount(); i++)
     {

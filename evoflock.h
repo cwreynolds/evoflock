@@ -172,23 +172,7 @@ void visualizePreviouslyLoggedFlockParameters()
 
 void runOneFlockEvolution()
 {
-    setRS(LP::LPRS());
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250903 Assertion failed: (size_ok(new_tree))
-//    RS().setSeedFromClock();
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout <<  "##########";
-    std::cout <<  "    NOT reseeding RandomSequence seed from clock    ";
-    std::cout <<  "##########";
-    std::cout << std::endl;
-    std::cout << std::endl;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    std::cout << "RandomSequence seed = " << RS().getSeed() << std::endl;
-    
-    // Using GA (genetic algorithm) or GP (genetic programming) this run?
+    // Does this run use GA (genetic algorithm) or GP (genetic programming)?
     // EF::setUsingGA();
     EF::setUsingGP();
     std::cout << (EF::usingGP()?"GP":"GA") << " evolutionary mode." << std::endl;
@@ -197,6 +181,11 @@ void runOneFlockEvolution()
     // Flock's boids in parallel).
     enable_multithreading = true;
     
+    // Merge LP and EF RandomSequence, init from clock for unique runs, and log.
+    setRS(LP::LPRS());
+    RS().setSeedFromClock();
+    std::cout << "RandomSequence seed = " << RS().getSeed() << std::endl;
+    
     // But first, here in the main thread, build (then delete) one Flock object
     // to set up static state, such as defining Obstacle sets, making one active,
     // then uploading it to GPU.
@@ -204,7 +193,10 @@ void runOneFlockEvolution()
     // 20250426 When I tried removing this, the Open3D window showed the default
     // Obstacle set plus "Set 0: sphere and right hand vertical cylinder."
     {
-        Flock flock;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250908 assert FlockParameters only used in GA mode.
+//        Flock flock;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // WIP/HACK runs flock sim, with graphics, for the FlockParameters written
@@ -262,21 +254,6 @@ void runOneFlockEvolution()
             fs.setCrossoverFunction(GP::evoflock_ga_crossover);
         }
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250831 now that EvoFlock GA mode works, retry GP again.
-    
-    Draw::getInstance().setEnable(false);
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout <<  "##########";
-    std::cout <<  "    Draw::getInstance().setEnable(false);    ";
-    std::cout <<  "##########";
-    std::cout << std::endl;
-    std::cout << std::endl;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
     {
         std::cout << "Run evolution." << std::endl;

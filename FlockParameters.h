@@ -112,8 +112,54 @@ public:
     FlockParameters(const std::vector<double>& vector_of_parameters_)
     {
         assert(vector_of_parameters_.size() == tunableParameterCount());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250908 assert FlockParameters only used in GA mode.
+//        assert(EF::usingGA());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         tuning_parameters = vector_of_parameters_;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250908 assert FlockParameters only used in GA mode.
+
+//    // Constructor for individual tunable parameters.
+//    FlockParameters(double max_force,
+//                    double weight_forward,
+//                    double weight_separate,
+//                    double weight_align,
+//                    double weight_cohere,
+//                    double weight_avoid_predict,
+//                    double weight_avoid_static,
+//                    double max_dist_separate,
+//                    double max_dist_align,
+//                    double max_dist_cohere,
+//                    double angle_separate,
+//                    double angle_align,
+//                    double angle_cohere,
+//                    double fly_away_max_dist,
+//                    double min_time_to_collide)
+//    {
+//
+//        // Set tuning parameter vector to given values.
+//        tuning_parameters =
+//        {
+//            max_force,
+//            weight_forward,
+//            weight_separate,
+//            weight_align,
+//            weight_cohere,
+//            weight_avoid_predict,
+//            weight_avoid_static,
+//            max_dist_separate,
+//            max_dist_align,
+//            max_dist_cohere,
+//            angle_separate,
+//            angle_align,
+//            angle_cohere,
+//            fly_away_max_dist,
+//            min_time_to_collide
+//        };
+//    }
 
     // Constructor for individual tunable parameters.
     FlockParameters(double max_force,
@@ -131,27 +177,28 @@ public:
                     double angle_cohere,
                     double fly_away_max_dist,
                     double min_time_to_collide)
-    {
-        // Set tuning parameter vector to given values.
-        tuning_parameters =
-        {
-            max_force,
-            weight_forward,
-            weight_separate,
-            weight_align,
-            weight_cohere,
-            weight_avoid_predict,
-            weight_avoid_static,
-            max_dist_separate,
-            max_dist_align,
-            max_dist_cohere,
-            angle_separate,
-            angle_align,
-            angle_cohere,
-            fly_away_max_dist,
-            min_time_to_collide
-        };
-    }
+      : FlockParameters
+    (std::vector<double>({
+        max_force,
+        weight_forward,
+        weight_separate,
+        weight_align,
+        weight_cohere,
+        weight_avoid_predict,
+        weight_avoid_static,
+        max_dist_separate,
+        max_dist_align,
+        max_dist_cohere,
+        angle_separate,
+        angle_align,
+        angle_cohere,
+        fly_away_max_dist,
+        min_time_to_collide
+    })) {}
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // The count(/size) of ALL parameters in this class.
     static int parameterCount()

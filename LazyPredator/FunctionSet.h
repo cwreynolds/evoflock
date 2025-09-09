@@ -448,14 +448,7 @@ public:
     GpTree newMakeRandomTree(int min_tree_size,
                              int max_tree_size) const
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250903 Assertion failed: (size_ok(new_tree))
-        
-//        return newMakeRandomTree(min_tree_size, max_tree_size, 100);
-        
-        //TODO try just brute-forcing it by increasing retry count:
-        return newMakeRandomTree(min_tree_size, max_tree_size, 1000);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        return newMakeRandomTree(min_tree_size, max_tree_size, 100);
     }
     GpTree newMakeRandomTree(int min_tree_size,
                              int max_tree_size,

@@ -130,8 +130,17 @@ public:
     // Run boids simulation.
     void run()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250908 assert FlockParameters only used in GA mode.
+
+//        // Log the FlockParameters object, but only for interactive drawing mode
+//        if (draw().enable()) { fp().print(); }
+
         // Log the FlockParameters object, but only for interactive drawing mode
-        if (draw().enable()) { fp().print(); }
+        if (draw().enable() and EF::usingGA()) { fp().print(); }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         set_fixed_fps(fp().getFPS());
         clock().setFPS(fp().getFPS());
         make_boids(boid_count(), fp().sphereRadius(), fp().sphereCenter());

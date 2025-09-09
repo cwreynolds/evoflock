@@ -170,15 +170,8 @@ public:
     static void setGpPerThread(Boid* boid) { gp_boid_per_thread_ = boid; }
     static Boid* getGpPerThread()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250903 Assertion failed: (size_ok(new_tree))
-
-        if (not gp_boid_per_thread_) { debugPrint(gp_boid_per_thread_); }
-
-//        assert(gp_boid_per_thread_ && "invalid Boid::gp_boid_per_thread_");
+        assert(EF::usingGP());
         assert(gp_boid_per_thread_ && "Boid::gp_boid_per_thread_ is nullptr");
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return gp_boid_per_thread_;
     }
     

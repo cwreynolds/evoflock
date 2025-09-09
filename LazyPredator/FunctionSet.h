@@ -448,7 +448,11 @@ public:
     GpTree newMakeRandomTree(int min_tree_size,
                              int max_tree_size) const
     {
-        return newMakeRandomTree(min_tree_size, max_tree_size, 100);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250909 does turning of multithreading help?
+//        return newMakeRandomTree(min_tree_size, max_tree_size, 100);
+        return newMakeRandomTree(min_tree_size, max_tree_size, 200);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     GpTree newMakeRandomTree(int min_tree_size,
                              int max_tree_size,

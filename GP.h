@@ -242,6 +242,19 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
     
     // Occasionally poll the Draw GUI to check for events esp the "B" command.
     Draw::getInstance().pollEvents();
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250909 does turning of multithreading help?
+    
+    // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
+    {
+        grabPrintLock_evoflock();
+        debugPrint(EF::enable_multithreading);
+        debugPrint(Draw::getInstance().enable());
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     if (EF::enable_multithreading)
     {
@@ -295,7 +308,13 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
         // LP::GpTree gp_tree;
         // gp_tree = individual->tree();
         
-        flock.override_steer_function = [&]()
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20250909 does turning of multithreading help?
+
+//        flock.override_steer_function = [&]()
+        flock.override_steer_function_ = [&]()
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         {
             LP::GpTree gp_tree = individual->tree();
             Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
@@ -315,12 +334,12 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             // TODO 20250902 Assertion failed: (mof.size() == mof_names().size())
             
-            if ((mof.size() != mof_names().size()))
-            {
-                debugPrint(mof.size());
-                debugPrint(mof_names().size());
-                debugPrint(util::vec_to_string(mof_names()));
-            }
+//            if ((mof.size() != mof_names().size()))
+//            {
+//                debugPrint(mof.size());
+//                debugPrint(mof_names().size());
+//                debugPrint(util::vec_to_string(mof_names()));
+//            }
             
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             assert(mof.size() == mof_names().size());

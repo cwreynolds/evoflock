@@ -215,7 +215,8 @@ public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240619 WIP first GP_not_GA run
-    std::function<Vec3()> override_steer_function = nullptr;
+//    std::function<Vec3()> override_steer_function = nullptr;
+    std::function<Vec3()> override_steer_function_ = nullptr;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void init_boid(Boid* boid, double radius, Vec3 center, RandomSequence& rs)
@@ -234,7 +235,8 @@ public:
         boid->set_flock_obstacles(&obstacles());
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20240619 WIP first GP_not_GA run
-        boid->override_steer_function = override_steer_function;
+//        boid->override_steer_function = override_steer_function;
+        boid->override_steer_function_ = override_steer_function_;
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         Vec3 mean_forward(1, 0, 0);

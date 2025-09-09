@@ -179,8 +179,12 @@ void runOneFlockEvolution()
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
-    enable_multithreading = true;
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250909 does turning of multithreading help?
+//    enable_multithreading = true;
+    enable_multithreading = false;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Merge LP and EF RandomSequence, init from clock for unique runs, and log.
     setRS(LP::LPRS());
     RS().setSeedFromClock();
@@ -244,7 +248,6 @@ void runOneFlockEvolution()
                                                   max_crossover_tree_size,
                                                   fs);
         // TODO experimental_GP_stub
-//        if (Boid::GP_not_GA)
         if (EF::usingGP())
         {
             population->explicit_treeValue_in_evolutionStep = false;

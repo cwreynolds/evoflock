@@ -32,21 +32,38 @@ inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
     return std::any_cast<MOF>(individual->tree().getRootValue());
 }
 
-inline MOF run_gp_flock_simulation(LP::Individual* individual,
-                                   bool write_file);
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250910 add new EF::unify_GA_GP
 
-inline MOF run_gp_flock_simulation(LP::Individual* individual)
-{
-    return run_gp_flock_simulation(individual, false);
-}
+//    inline MOF run_gp_flock_simulation(LP::Individual* individual,
+//                                       bool write_file);
+//
+//    inline MOF run_gp_flock_simulation(LP::Individual* individual)
+//    {
+//        return run_gp_flock_simulation(individual, false);
+//    }
 
-// Fitness function, runs a flock simulation using evolved tree for steering
-inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
-{
-    //    std::cout << "#################################" << std::endl;
-    //    std::cout << "in evoflock_gp_fitness_function()" << std::endl;
-    return run_gp_flock_simulation(individual);
-}
+
+
+//    // Fitness function, runs a flock simulation using evolved tree for steering
+//    inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
+//    {
+//        return run_gp_flock_simulation(individual);
+//    }
+
+
+//inline MOF run_gp_flock_simulation(LP::Individual* individual);
+
+
+//    inline MOF fitnessFunction(LP::Individual* individual)
+//    {
+//        return (EF::usingGP() ?
+//                evoflock_gp_fitness_function(individual) :
+//                evoflock_ga_fitness_function(individual));
+//    }
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 // Take the minimum element of a MultiObjectiveFitness ("Shangian scalarizer").
@@ -249,9 +266,17 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
     // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
     {
         grabPrintLock_evoflock();
+        std::cout << std::endl;
+        std::cout << "-----------------------------------------------" << std::endl;
+        debugPrint(EF::unify_GA_GP);
+        debugPrint(EF::usingGP());
         debugPrint(EF::enable_multithreading);
         debugPrint(Draw::getInstance().enable());
+        std::cout << "-----------------------------------------------" << std::endl;
+        std::cout << std::endl;
+        
     }
+
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -287,7 +312,13 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
 std::map<LP::Individual*, Vec3> values_of_individuals;
 std::map<LP::Individual*, LP::GpTree> trees_of_individuals;
 
-inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250910 add new EF::unify_GA_GP
+
+//inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
+inline MOF run_gp_flock_simulation(LP::Individual* individual)
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     assert(EF::usingGP());
     int runs = 4;
@@ -352,6 +383,25 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
         }
     };
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250909 does turning of multithreading help?
+    
+    // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
+    {
+        grabPrintLock_evoflock();
+        std::cout << std::endl;
+        std::cout << "-----------------------------------------------" << std::endl;
+        debugPrint(EF::unify_GA_GP);
+        debugPrint(EF::usingGP());
+        debugPrint(EF::enable_multithreading);
+        debugPrint(Draw::getInstance().enable());
+        std::cout << "-----------------------------------------------" << std::endl;
+        std::cout << std::endl;
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
     if (EF::enable_multithreading)
     {
         // Do each simulation run in a parallel thread.
@@ -374,6 +424,24 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
     return least_mof;
     
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250910 add new EF::unify_GA_GP
+
+// Fitness function, runs a flock simulation using evolved tree for steering
+inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
+{
+    return run_gp_flock_simulation(individual);
+}
+
+inline MOF fitnessFunction(LP::Individual* individual)
+{
+    return (EF::usingGP() ?
+            evoflock_gp_fitness_function(individual) :
+            evoflock_ga_fitness_function(individual));
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
 inline MOF run_hand_tuned_flock_simulation()

@@ -41,6 +41,10 @@ inline bool usingGP() { return not using_GA_; }
 inline bool usingGA() { return using_GA_; }
 inline void setUsingGP() { using_GA_ = false; }
 inline void setUsingGA() { using_GA_ = true; }
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250910 add new EF::unify_GA_GP
+bool unify_GA_GP = false;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }  // end of namespace EvoFlock
 namespace EF = EvoFlock;
 
@@ -172,6 +176,10 @@ void visualizePreviouslyLoggedFlockParameters()
 
 void runOneFlockEvolution()
 {
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250910 add new EF::unify_GA_GP
+    unify_GA_GP = true;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
     // EF::setUsingGA();
     EF::setUsingGP();
@@ -213,7 +221,7 @@ void runOneFlockEvolution()
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
     
-    int min_crossover_tree_size = EF::usingGP() ? 20 :  2;
+    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
     int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
     int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
     
@@ -221,10 +229,13 @@ void runOneFlockEvolution()
     debugPrint(max_crossover_tree_size);
     debugPrint(max_initial_tree_size);
     
-    auto fitness_function = (EF::usingGP() ?
-                             GP::evoflock_gp_fitness_function :
-                             GP::evoflock_ga_fitness_function);
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250910 add new EF::unify_GA_GP
+//    auto fitness_function = (EF::usingGP() ?
+//                             GP::evoflock_gp_fitness_function :
+//                             GP::evoflock_ga_fitness_function);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     LP::Population* population = nullptr;
     
     LP::FunctionSet fs = (EF::usingGP() ?
@@ -267,7 +278,14 @@ void runOneFlockEvolution()
             // Exit if user interactively exits run.
             if (Draw::getInstance().exitFromRun()) { break; }
             GP::save_fitness_time_series(*population);
-            population->evolutionStep(fitness_function, GP::scalarize_fitness);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250910 add new EF::unify_GA_GP
+            
+//            population->evolutionStep(fitness_function, GP::scalarize_fitness);
+
+            population->evolutionStep(GP::fitnessFunction, GP::scalarize_fitness);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if ((population->getStepCount() % 100) == 0)
             {
                 LP::Individual* individual = population->bestFitness();

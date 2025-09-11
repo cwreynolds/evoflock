@@ -32,39 +32,6 @@ inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
     return std::any_cast<MOF>(individual->tree().getRootValue());
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250910 add new EF::unify_GA_GP
-
-//    inline MOF run_gp_flock_simulation(LP::Individual* individual,
-//                                       bool write_file);
-//
-//    inline MOF run_gp_flock_simulation(LP::Individual* individual)
-//    {
-//        return run_gp_flock_simulation(individual, false);
-//    }
-
-
-
-//    // Fitness function, runs a flock simulation using evolved tree for steering
-//    inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
-//    {
-//        return run_gp_flock_simulation(individual);
-//    }
-
-
-//inline MOF run_gp_flock_simulation(LP::Individual* individual);
-
-
-//    inline MOF fitnessFunction(LP::Individual* individual)
-//    {
-//        return (EF::usingGP() ?
-//                evoflock_gp_fitness_function(individual) :
-//                evoflock_ga_fitness_function(individual));
-//    }
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 // Take the minimum element of a MultiObjectiveFitness ("Shangian scalarizer").
 inline double scalarize_fitness_min(MOF mof) { return mof.min(); }
@@ -215,6 +182,168 @@ inline void fitness_logger(const MOF& mof)
     std::cout.precision(old_precision);
 }
 
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20240628 can we do an eval of a const tree?
+#ifdef eval_const_20240628
+FlockParameters fp_from_ga_tree(const LazyPredator::GpTree& tree)
+#else  // eval_const_20240628
+FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
+#endif // eval_const_20240628
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+{
+    assert(EF::usingGA());
+    std::vector<double> parameters;
+    for (int i = 0; i < FlockParameters::tunableParameterCount(); i++)
+    {
+        parameters.push_back(tree.evalSubtree<double>(i));
+    }
+    return FlockParameters(parameters);
+}
+
+
+FlockParameters fp_from_ga_individual(LP::Individual* individual)
+{
+    LP::GpTree tree = individual->tree();
+    return fp_from_ga_tree(tree);
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
+
+
+// TODO rewrite:
+// Run flock simulation with given parameters "runs" times and returns the MOF
+// with the LEAST scalar fitness score.
+
+//inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
+inline MOF run_ga_gp_flock_simulation(LP::Individual* individual)
+
+
+
+{
+    int runs = 4;
+    
+//        FlockParameters fp;
+//        if (EF::usingGA())
+//        {
+//    //        LP::Individual* individual = population->bestFitness();
+//            LP::GpTree tree = individual->tree();
+//    //        FlockParameters fp = GP::fp_from_ga_tree(tree);
+//    //        FlockParameters fp = fp_from_ga_tree(tree);
+//            fp = fp_from_ga_tree(tree);
+//    //        GP::run_flock_simulation(fp, 1);
+//        }
+    
+//    FlockParameters fp;
+//    if (EF::usingGA())
+//    {
+//        LP::GpTree tree = individual->tree();
+//        fp = fp_from_ga_tree(tree);
+//    }
+    
+    FlockParameters fp;
+    if (EF::usingGA()) { fp = fp_from_ga_individual(individual); }
+
+
+    MOF least_mof;
+    double least_scalar_fitness = std::numeric_limits<double>::infinity();
+    std::vector<double> scalar_fits;
+    std::mutex save_mof_mutex;
+    
+    // Perform one simulation run, and record results.
+    auto do_1_run = [&]()
+    {
+        // These steps can happen in parallel threads:
+        Flock flock;
+        init_flock(flock);
+        flock.fp() = fp;
+        flock.run();
+        MOF mof = multiObjectiveFitnessOfFlock(flock);
+        // These steps happen in the single thread with lock on save_mof_mutex.
+        {
+            std::lock_guard<std::mutex> smm(save_mof_mutex);
+            assert(mof.size() == mof_names().size());
+            scalar_fits.push_back(scalarize_fitness(mof));
+            if (least_scalar_fitness > scalar_fits.back())
+            {
+                least_scalar_fitness = scalar_fits.back();
+                least_mof = mof;
+            }
+            // Store these stats on the "current individual"
+            LP::Individual* i = LP::Population::evolution_step_individual;
+            if (i)
+            {
+                std::vector<double>& udfp = i->user_data_for_plotting;
+                udfp.clear();
+                udfp.push_back(flock.obstacleCollisionsScore());
+                udfp.push_back(flock.separationScore());
+                udfp.push_back(flock.speedScore());
+            }
+        }
+    };
+    
+    // Occasionally poll the Draw GUI to check for events esp the "B" command.
+    Draw::getInstance().pollEvents();
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250909 does turning of multithreading help?
+    
+    // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
+    {
+        grabPrintLock_evoflock();
+        std::cout << std::endl;
+        std::cout << "-----------------------------------------------" << std::endl;
+        debugPrint(EF::unify_GA_GP);
+        debugPrint(EF::usingGP());
+        debugPrint(EF::enable_multithreading);
+        debugPrint(Draw::getInstance().enable());
+        std::cout << "-----------------------------------------------" << std::endl;
+        std::cout << std::endl;
+        
+    }
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    
+    if (EF::enable_multithreading)
+    {
+        bool previous_enable_state = Draw::getInstance().enable();
+        Draw::getInstance().setEnable(false);
+        
+        // Do each simulation run in a parallel thread.
+        std::vector<std::thread> threads;
+        for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
+        // Wait for helper threads to finish, join them with this thread.
+        for (auto& t : threads) { t.join(); }
+        
+        Draw::getInstance().setEnable(previous_enable_state);
+    }
+    else
+    {
+        // Do each simulation run sequentially.
+        for (int r = 0; r < runs; r++) { do_1_run(); }
+    }
+    
+    assert(scalar_fits.size() == runs);
+    fitness_logger(least_mof);
+    std::cout << "    min composite "<< least_scalar_fitness;
+    std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
+    std::cout << std::endl << std::endl;
+    return least_mof;
+}
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 // Run flock simulation with given parameters "runs" times and returns the MOF
 // with the LEAST scalar fitness score.
 
@@ -312,13 +441,7 @@ inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
 std::map<LP::Individual*, Vec3> values_of_individuals;
 std::map<LP::Individual*, LP::GpTree> trees_of_individuals;
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250910 add new EF::unify_GA_GP
-
-//inline MOF run_gp_flock_simulation(LP::Individual* individual, bool write_file)
 inline MOF run_gp_flock_simulation(LP::Individual* individual)
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     assert(EF::usingGP());
     int runs = 4;
@@ -425,8 +548,6 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual)
     
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250910 add new EF::unify_GA_GP
 
 // Fitness function, runs a flock simulation using evolved tree for steering
 inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
@@ -434,6 +555,9 @@ inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
     return run_gp_flock_simulation(individual);
 }
 
+
+// Generic EvoFlock fitness function handling both GA and GP. In the future this
+// may want to be one of many fitness function but leaving it simple for now.
 inline MOF fitnessFunction(LP::Individual* individual)
 {
     return (EF::usingGP() ?
@@ -441,7 +565,6 @@ inline MOF fitnessFunction(LP::Individual* individual)
             evoflock_ga_fitness_function(individual));
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
 inline MOF run_hand_tuned_flock_simulation()
@@ -449,23 +572,28 @@ inline MOF run_hand_tuned_flock_simulation()
     return run_flock_simulation(FlockParameters());
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240628 can we do an eval of a const tree?
-#ifdef eval_const_20240628
-FlockParameters fp_from_ga_tree(const LazyPredator::GpTree& tree)
-#else  // eval_const_20240628
-FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
-#endif // eval_const_20240628
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-{
-    assert(EF::usingGA());
-    std::vector<double> parameters;
-    for (int i = 0; i < FlockParameters::tunableParameterCount(); i++)
-    {
-        parameters.push_back(tree.evalSubtree<double>(i));
-    }
-    return FlockParameters(parameters);
-}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
+
+//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    // TODO 20240628 can we do an eval of a const tree?
+//    #ifdef eval_const_20240628
+//    FlockParameters fp_from_ga_tree(const LazyPredator::GpTree& tree)
+//    #else  // eval_const_20240628
+//    FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
+//    #endif // eval_const_20240628
+//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    {
+//        assert(EF::usingGA());
+//        std::vector<double> parameters;
+//        for (int i = 0; i < FlockParameters::tunableParameterCount(); i++)
+//        {
+//            parameters.push_back(tree.evalSubtree<double>(i));
+//        }
+//        return FlockParameters(parameters);
+//    }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Wrote this to run at the end of evolution on the top-10 fitness individuals
 // of population in order to record flock data for playback
@@ -582,7 +710,16 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                 [](LazyPredator::GpTree& t)
 #endif // eval_const_20240628
                 {
+                    
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
+
+                    
+//                    auto fitness = run_flock_simulation(fp_from_ga_tree(t));
                     auto fitness = run_flock_simulation(fp_from_ga_tree(t));
+
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                     return std::any(fitness);
                 }
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

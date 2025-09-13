@@ -25,12 +25,28 @@ namespace GP
 // Abbreviated name for this overly-long class name.
 typedef LazyPredator::MultiObjectiveFitness MOF;
 
-// Fitness function, simply returns Individual's tree's value (computing it and
-// caching it on first call).
-inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
-{
-    return std::any_cast<MOF>(individual->tree().getRootValue());
-}
+//    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//    // TODO 20250912 is GpFunc "Run_Flock" return value used?
+//
+//    //    // Fitness function, simply returns Individual's tree's value (computing it and
+//    //    // caching it on first call).
+//    //    inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
+//    //    {
+//    //        return std::any_cast<MOF>(individual->tree().getRootValue());
+//    //    }
+//
+//    // Fitness function, simply returns Individual's tree's value (computing it and
+//    // caching it on first call).
+//    inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
+//    {
+//
+//        std::cout << "in GP::evoflock_ga_fitness_function()" << std::endl;
+//
+//        return run_ga_gp_flock_simulation(individual);
+//
+//    }
+//
+//    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
 
 // Take the minimum element of a MultiObjectiveFitness ("Shangian scalarizer").
@@ -225,33 +241,10 @@ FlockParameters fp_from_ga_individual(LP::Individual* individual)
 
 //inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
 inline MOF run_ga_gp_flock_simulation(LP::Individual* individual)
-
-
-
 {
     int runs = 4;
-    
-//        FlockParameters fp;
-//        if (EF::usingGA())
-//        {
-//    //        LP::Individual* individual = population->bestFitness();
-//            LP::GpTree tree = individual->tree();
-//    //        FlockParameters fp = GP::fp_from_ga_tree(tree);
-//    //        FlockParameters fp = fp_from_ga_tree(tree);
-//            fp = fp_from_ga_tree(tree);
-//    //        GP::run_flock_simulation(fp, 1);
-//        }
-    
-//    FlockParameters fp;
-//    if (EF::usingGA())
-//    {
-//        LP::GpTree tree = individual->tree();
-//        fp = fp_from_ga_tree(tree);
-//    }
-    
     FlockParameters fp;
     if (EF::usingGA()) { fp = fp_from_ga_individual(individual); }
-
 
     MOF least_mof;
     double least_scalar_fitness = std::numeric_limits<double>::infinity();
@@ -549,22 +542,68 @@ inline MOF run_gp_flock_simulation(LP::Individual* individual)
 }
 
 
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+// TODO 20250912 is GpFunc "Run_Flock" return value used?
+
+//    // Fitness function, simply returns Individual's tree's value (computing it and
+//    // caching it on first call).
+//    inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
+//    {
+//        return std::any_cast<MOF>(individual->tree().getRootValue());
+//    }
+
+// Fitness function, simply returns Individual's tree's value (computing it and
+// caching it on first call).
+inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
+{
+    
+    std::cout << "in GP::evoflock_ga_fitness_function()" << std::endl;
+    
+    return run_ga_gp_flock_simulation(individual);
+    
+}
+
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+// TODO 20250912 is GpFunc "Run_Flock" return value used?
+
+
+// This should presumable be calling run_ga_gp_flock_simulation()
+
 // Fitness function, runs a flock simulation using evolved tree for steering
 inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
 {
     return run_gp_flock_simulation(individual);
 }
 
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
-// Generic EvoFlock fitness function handling both GA and GP. In the future this
-// may want to be one of many fitness function but leaving it simple for now.
-inline MOF fitnessFunction(LP::Individual* individual)
-{
-    return (EF::usingGP() ?
-            evoflock_gp_fitness_function(individual) :
-            evoflock_ga_fitness_function(individual));
-}
 
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+// TODO 20250912 is GpFunc "Run_Flock" return value used?
+
+// Maybe this should be calling run_ga_gp_flock_simulation() unconditionally?
+
+
+    // Generic EvoFlock fitness function handling both GA and GP. In the future this
+    // may want to be one of many fitness function but leaving it simple for now.
+    inline MOF fitnessFunction(LP::Individual* individual)
+    {
+        return (EF::usingGP() ?
+                evoflock_gp_fitness_function(individual) :
+                evoflock_ga_fitness_function(individual));
+    }
+
+//    // Generic EvoFlock fitness function handling both GA and GP. In the future this
+//    // may want to be one of many fitness function but leaving it simple for now.
+//    inline MOF fitnessFunction(LP::Individual* individual)
+//    {
+//        return multiObjectiveFitnessOfFlock(<#const Flock &flock#>);
+//    }
+
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
 // Run flock simulation with given parameters, return a MultiObjectiveFitness.
 inline MOF run_hand_tuned_flock_simulation()
@@ -711,14 +750,24 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
 #endif // eval_const_20240628
                 {
                     
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    
+                    
+                    
+                    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                     // TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
 
+                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+                    // TODO 20250912 is GpFunc "Run_Flock" return value used?
                     
 //                    auto fitness = run_flock_simulation(fp_from_ga_tree(t));
-                    auto fitness = run_flock_simulation(fp_from_ga_tree(t));
 
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    auto fitness = run_flock_simulation(fp_from_ga_tree(t));
+
+                    MOF fitness;
+                    
+                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+                    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
                     return std::any(fitness);
                 }

@@ -178,7 +178,7 @@ void runOneFlockEvolution()
 {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250910 add new EF::unify_GA_GP
-    unify_GA_GP = true;
+//    unify_GA_GP = true;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -218,11 +218,11 @@ void runOneFlockEvolution()
     //
     // 20250426 When I tried removing this, the Open3D window showed the default
     // Obstacle set plus "Set 0: sphere and right hand vertical cylinder."
+    //
+    // 20250912 commenting this out worked fine in experimental GP mode. Now I'm
+    // trying to get an updated GA mode working again, so turning it on again for now.
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250908 assert FlockParameters only used in GA mode.
-//        Flock flock;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Flock flock;
     }
     
     // WIP/HACK runs flock sim, with graphics, for the FlockParameters written

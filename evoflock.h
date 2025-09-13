@@ -43,7 +43,7 @@ inline void setUsingGP() { using_GA_ = false; }
 inline void setUsingGA() { using_GA_ = true; }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20250910 add new EF::unify_GA_GP
-bool unify_GA_GP = false;
+//    bool unify_GA_GP = false;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }  // end of namespace EvoFlock
 namespace EF = EvoFlock;
@@ -83,6 +83,25 @@ void unit_test()
     std::cout << "All unit tests OK." << std::endl;
 }
 
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20250913 change GpType for GpFunc "Run_Flock"
+
+//    // Handler for GUI's B key command to visualize "best" Individual.
+//    void visualizeBestIfRequested(LP::Population* population)
+//    {
+//        Draw& draw = Draw::getInstance();
+//        if (draw.getVisBestMode())
+//        {
+//            bool previous_emt_state = enable_multithreading;
+//            enable_multithreading = false;
+//            LP::Individual* individual = population->bestFitness();
+//            LP::GpTree tree = individual->tree();
+//            FlockParameters fp = GP::fp_from_ga_tree(tree);
+//            GP::run_flock_simulation(fp, 1);
+//            enable_multithreading = previous_emt_state;
+//            draw.clearVisBestMode();
+//        }
+//    }
 
 // Handler for GUI's B key command to visualize "best" Individual.
 void visualizeBestIfRequested(LP::Population* population)
@@ -93,13 +112,20 @@ void visualizeBestIfRequested(LP::Population* population)
         bool previous_emt_state = enable_multithreading;
         enable_multithreading = false;
         LP::Individual* individual = population->bestFitness();
-        LP::GpTree tree = individual->tree();
-        FlockParameters fp = GP::fp_from_ga_tree(tree);
-        GP::run_flock_simulation(fp, 1);
+        
+//        LP::GpTree tree = individual->tree();
+//        FlockParameters fp = GP::fp_from_ga_tree(tree);
+        
+//        GP::run_flock_simulation(fp, 1);
+//        GP::run_ga_gp_flock_simulation(individual);
+        GP::run_ga_gp_flock_simulation(individual, 1);
+
         enable_multithreading = previous_emt_state;
         draw.clearVisBestMode();
     }
 }
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
 // Tool for visualizing a logged set of FlockParameters.
@@ -184,12 +210,23 @@ void runOneFlockEvolution()
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250913 change GpType for GpFunc "Run_Flock"
+
+//        // Does this run use GA (genetic algorithm) or GP (genetic programming)?
+//    //    // EF::setUsingGA();
+//    //    EF::setUsingGP();
+//        EF::setUsingGA();
+//        // EF::setUsingGP();
+//        std::cout << (EF::usingGP()?"GP":"GA") << " evolutionary mode." << std::endl;
+    
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-//    // EF::setUsingGA();
-//    EF::setUsingGP();
-    EF::setUsingGA();
+    // EF::setUsingGA();
+    EF::setUsingGP();
     // EF::setUsingGP();
     std::cout << (EF::usingGP()?"GP":"GA") << " evolutionary mode." << std::endl;
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
@@ -235,10 +272,20 @@ void runOneFlockEvolution()
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
     
-    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250913 change GpType for GpFunc "Run_Flock"
+
+//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+
     
+    int min_crossover_tree_size = EF::usingGP() ?  20 : 2;
+    int max_crossover_tree_size = EF::usingGP() ? 100 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ?  50 : ga_tree_size;
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     debugPrint(min_crossover_tree_size);
     debugPrint(max_crossover_tree_size);
     debugPrint(max_initial_tree_size);

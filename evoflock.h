@@ -202,6 +202,41 @@ void visualizePreviouslyLoggedFlockParameters()
 
 void runOneFlockEvolution()
 {
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250914 testing, why did I see score of 0.3 when average score was 19?
+    
+//    obs_collisions = 810, separation_score_sum_ = 47146, average speed = 20.2, speedScore() = 0.324
+//    obs_collisions = 844, separation_score_sum_ = 46432, average speed = 19.8, speedScore() = 0.33
+//    obs_collisions = 828, separation_score_sum_ = 45691, average speed = 20, speedScore() = 0.325
+//    obs_collisions = 808, separation_score_sum_ = 46666, average speed = 19.9, speedScore() = 0.328
+
+
+    auto testSpeedScore = [](double speed)
+    {
+        return Flock::parameterToWeightWithRamps(speed,
+                                                 { 0, 19, 21, 25},
+                                                 { 0,  1,  1,  0});
+    };
+    
+    debugPrint(testSpeedScore(0));
+    debugPrint(testSpeedScore(5));
+    debugPrint(testSpeedScore(10));
+    debugPrint(testSpeedScore(15));
+    debugPrint(testSpeedScore(19));
+    debugPrint(testSpeedScore(20));
+
+//    return;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
+    
+    
+    
+    
+    
+    
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250910 add new EF::unify_GA_GP
 //    unify_GA_GP = true;
@@ -268,7 +303,15 @@ void runOneFlockEvolution()
 
     int individuals = 300;
     int subpops = 17;
-    int max_evolution_steps = 30000;
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20250913 testing
+
+//    int max_evolution_steps = 30000;
+//    int max_evolution_steps = EF::usingGP() ? 60000 : 30000;
+    int max_evolution_steps = EF::usingGP() ? 30000 : 30000;
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
     
@@ -279,10 +322,18 @@ void runOneFlockEvolution()
 //    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
 
-    
-    int min_crossover_tree_size = EF::usingGP() ?  20 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 100 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ?  50 : ga_tree_size;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250914 VERY ad hoc work-around for zero speed issue
+
+//    int min_crossover_tree_size = EF::usingGP() ?  20 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 100 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ?  50 : ga_tree_size;
+
+    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
+    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 25 : ga_tree_size;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

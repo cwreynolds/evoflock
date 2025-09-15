@@ -345,6 +345,7 @@ public:
     // rename args and vars, this version parrots recordSeparationScorePerStep()
     // would it be any better to pass in a vector of Pair(x,y)s?
     
+    static
     double parameterToWeightWithRamps(double parameter,
                                       const std::vector<double>& d,
                                       const std::vector<double>& s)
@@ -409,15 +410,26 @@ public:
             // Sum used for average speed over entire run.
             sum_of_speeds_over_all_boid_steps_ += b->speed();
             
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250914 VERY ad hoc work-around for zero speed issue
+            //               try getting rid of the wide flat "porch" where any
+            //               speed below 15 got the same score
+
             // Sum scores for "speed is in correct range".
             // TODO TEMP WARNING FIX -- raw inline constants.
             double score = parameterToWeightWithRamps(b->speed(),
-                                                      {15, 19, 21, 25},
+//                                                      {15, 19, 21, 25},
+                                                      { 0, 19, 21, 25},
                                                       { 0,  1,  1,  0});
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
             sum_of_speed_scores_over_all_boid_steps_ += score;
         }
     }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250709 only called in printRunStats() replace with speedScore()?
     

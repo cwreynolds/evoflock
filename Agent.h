@@ -80,9 +80,28 @@ public:
             //
             // Rotate LocalSpace to align with new_forward.
             Vec3 reference_up = up_reference(acceleration * time_step);
-            reference_up = (reference_up.is_parallel(new_forward) ?
-                            new_forward.find_perpendicular() :
-                            reference_up);
+            
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20250913 error in is_parallel()
+
+//            reference_up = (reference_up.is_parallel(new_forward) ?
+//                            new_forward.find_perpendicular() :
+//                            reference_up);
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20250914 make Vec3::ensure_not_parallel a bit more bullet proof
+
+//            bool need_new_up = (new_forward.is_unit_length() and
+//                                reference_up.is_parallel(new_forward));
+//            if (need_new_up) { reference_up = new_forward.find_perpendicular(); }
+  
+            reference_up = new_forward.ensure_not_parallel(reference_up);
+
+//            reference_up = reference_up.ensure_not_parallel(new_forward);
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             set_ls(ls().rotate_to_new_forward(new_forward, reference_up));

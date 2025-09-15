@@ -183,6 +183,21 @@ public:
 //            Vec3 steering_from_evolved_function = override_steer_function();
             Vec3 steering_from_evolved_function = override_steer_function_();
             setGpPerThread(nullptr);
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250914 VERY ad hoc work-around for zero speed issue
+            
+//            if (speed() < 10)
+//            {
+//                steering_from_evolved_function += forward() * max_force() * 0.2;
+//            }
+
+            // Just give a 10% push in the forward direction, to prevent them
+            // from just sitting there at zero speed.
+            steering_from_evolved_function += forward() * max_force() * 0.1;
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             return steering_from_evolved_function;
         }
         else

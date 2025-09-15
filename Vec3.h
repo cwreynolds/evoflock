@@ -181,15 +181,59 @@ public:
                 Vec3(0, 1, 0) :          // perpendicular to "reference"
                 cross(reference).normalize());
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250914 make Vec3::ensure_not_parallel a bit more bullet proof
+
+//    // Wrapper for find_perpendicular(): ensures that the given reference is NOT
+//    // PARALLEL to "this" Vec3, otherwise replacing it with a new perpendicular.
+//    Vec3 ensure_not_parallel(const Vec3& reference) const
+//    {
+//        return (is_parallel(reference) ?  // Is "this" parallel to "reference"?
+//                find_perpendicular() :    // If so find arbitrary perpendicular,
+//                reference);               // otherwise use original "reference".
+//    }
+  
+    
+//        // Wrapper for find_perpendicular(): ensures that the given reference is NOT
+//        // PARALLEL to "this" Vec3, otherwise replacing it with a new perpendicular.
+//        Vec3 ensure_not_parallel(const Vec3& reference) const
+//        {
+//    //        bool need_new_reference = (reference.is_unit_length() and
+//    //                                   is_parallel(reference));
+//    //        bool need_new_reference = (not reference.is_unit_length() and
+//    //                                   is_parallel(reference));
+//            bool need_new_reference = (not reference.is_unit_length() or
+//                                       is_parallel(reference));
+//
+//
+//
+//            return (need_new_reference ?    // Is "this" parallel to "reference"?
+//                    find_perpendicular() :  // If so find arbitrary perpendicular,
+//                    reference);             // otherwise use original "reference".
+//        }
 
     // Wrapper for find_perpendicular(): ensures that the given reference is NOT
     // PARALLEL to "this" Vec3, otherwise replacing it with a new perpendicular.
     Vec3 ensure_not_parallel(const Vec3& reference) const
     {
-        return (is_parallel(reference) ?  // Is "this" parallel to "reference"?
-                find_perpendicular() :    // If so find arbitrary perpendicular,
-                reference);               // otherwise use original "reference".
+        Vec3 result = reference;
+        
+        
+        if ((not reference.is_unit_length()) or  is_parallel(reference))
+        {
+//            debugPrint(result.to_string());
+            result = find_perpendicular();
+//            debugPrint(result.to_string());
+        }
+        
+        
+        
+        return result;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
     // Check if two vectors are within epsilon of being equal.
     bool is_equal_within_epsilon(const Vec3& other,
@@ -397,6 +441,33 @@ public:
         assert (b.is_perpendicular(b.find_perpendicular()));
         assert (c.is_perpendicular(c.find_perpendicular()));
         assert (not a.is_perpendicular(b));
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250914 make Vec3::ensure_not_parallel a bit more bullet proof
+        
+        
+//        Vec3 ensure_not_parallel(const Vec3& reference) const
+        
+//        debugPrint(v100.ensure_not_parallel(v001).to_string());
+//        debugPrint(v100.ensure_not_parallel(v000).to_string());
+//        assert(v100.ensure_not_parallel(v001) == v001);
+//        assert(v100.ensure_not_parallel(v000) == v001);
+
+        
+//        debugPrint(v100.dot(v100.ensure_not_parallel(v001)));
+//        debugPrint(v100.dot(v100.ensure_not_parallel(v000)));
+
+//        assert(v100.dot(v100.ensure_not_parallel(v001)) != 1);
+//        assert(v100.dot(v100.ensure_not_parallel(v000)) != 1);
+        
+        
+        assert(not v100.is_parallel(v100.ensure_not_parallel(v001)));
+        assert(not v100.is_parallel(v100.ensure_not_parallel(v000)));
+        assert(not v100.is_parallel(v100.ensure_not_parallel(diag_norm)));
+        
+//        assert(false);
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
         Vec3 e = Vec3(2, 4, 8);
         Vec3 f = Vec3(2, 4, 8 - util::epsilon * 2);

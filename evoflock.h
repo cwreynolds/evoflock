@@ -329,9 +329,35 @@ void runOneFlockEvolution()
 //    int max_crossover_tree_size = EF::usingGP() ? 100 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ?  50 : ga_tree_size;
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20250915 try smaller trees
+
+//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 25 : ga_tree_size;
+
+//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 25 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 15 : ga_tree_size;
+
+//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 35 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 15 : ga_tree_size;
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250916 maybe bigger trees ARE better, revert speed score
+    
+//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
+
     int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 25 : ga_tree_size;
+    int max_crossover_tree_size = EF::usingGP() ? 80 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

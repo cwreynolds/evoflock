@@ -417,10 +417,21 @@ public:
 
             // Sum scores for "speed is in correct range".
             // TODO TEMP WARNING FIX -- raw inline constants.
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250915 revert
+//                double score = parameterToWeightWithRamps(b->speed(),
+//    //                                                      {15, 19, 21, 25},
+//                                                          { 0, 19, 21, 25},
+//                                                          { 0,  1,  1,  0});
+            
+            
             double score = parameterToWeightWithRamps(b->speed(),
-//                                                      {15, 19, 21, 25},
-                                                      { 0, 19, 21, 25},
+                                                      {15, 19, 21, 25},
                                                       { 0,  1,  1,  0});
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
@@ -440,11 +451,41 @@ public:
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250915 for GP, apply score function to average speed (all steps, boids)
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250916 maybe bigger trees ARE better, revert speed score
+
     // Average speed for each Boid on each simulation step.
     double speedScore() const
     {
         return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
     }
+
+
+//    // Speed score for all boids on all steps.
+//    double speedScore() const
+//    {
+//        if (EF::usingGA())
+//        {
+//            return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
+//        }
+//        else
+//        {
+//            // TODO 20250915 very temp, apply score func to average speed
+//            return parameterToWeightWithRamps(averageSpeedPerBoidStep(),
+//                                                      {15, 19, 21, 25},
+//                                                      { 0,  1,  1,  0});
+//        }
+//    }
+
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     
     double curvatureScore() const
     {

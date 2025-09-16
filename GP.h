@@ -1179,19 +1179,51 @@ LP::FunctionSet evoflock_gp_function_set()
                     return std::any(util::interpolate(i, a, b));
                 }
             },
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20250915 replace Ifle with If_Pos
+//            {
+//                "Ifle", "Vec3", {"Scalar_100", "Scalar_100", "Vec3", "Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    double i = tree.evalSubtree<double>(0);
+//                    double j = tree.evalSubtree<double>(1);
+//                    Vec3 a = tree.evalSubtree<Vec3>(2);
+//                    Vec3 b = tree.evalSubtree<Vec3>(3);
+//                    return std::any(i <= j ? a : b);
+//                }
+//            },
+//            {
+//                "If_Pos", "Vec3", {"Scalar_100", "Vec3", "Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    double i = tree.evalSubtree<double>(0);
+//                    Vec3 a = tree.evalSubtree<Vec3>(1);
+//                    Vec3 b = tree.evalSubtree<Vec3>(2);
+//                    return std::any(i > 0 ? a : b);
+//                }
+//            },
             {
-                "Ifle", "Vec3", {"Scalar_100", "Scalar_100", "Vec3", "Vec3"},
+                "If_Pos", "Vec3", {"Scalar_100", "Vec3", "Vec3"},
                 [](LP::GpTree& tree)
                 {
-                    double i = tree.evalSubtree<double>(0);
-                    double j = tree.evalSubtree<double>(1);
-                    Vec3 a = tree.evalSubtree<Vec3>(2);
-                    Vec3 b = tree.evalSubtree<Vec3>(3);
-                    return std::any(i <= j ? a : b);
+                    return std::any(0 < tree.evalSubtree<double>(0) ?
+                                    tree.evalSubtree<Vec3>(1) :
+                                    tree.evalSubtree<Vec3>(2));
                 }
             },
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
             // Boid API:
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20250915 add speed() GpFunc
+            {
+                "Speed", "Scalar_100", {},
+                [](LP::GpTree& t)
+                {
+                    return std::any(Boid::getGpPerThread()->speed());
+                }
+            },
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
             {
                 "Velocity", "Vec3", {},
                 [](LP::GpTree& t)

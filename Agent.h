@@ -72,6 +72,25 @@ public:
             set_ls(ls().rotate_to_new_forward(new_forward, reference_up));
             // Set new position.
             setPosition(position() + (new_forward * speed() * time_step));
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+
+            
+            if (not ls().is_orthonormal())
+            {
+                debugPrint(acceleration);
+                debugPrint(time_step);
+                debugPrint(new_velocity);
+                debugPrint(new_speed);
+                debugPrint(new_forward);
+                debugPrint(reference_up);
+                debugPrint(acceleration.is_valid());
+                debugPrint(new_forward.is_valid());
+                debugPrint(reference_up.is_valid());
+            }
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
             assert (ls().is_orthonormal());
         }
     }

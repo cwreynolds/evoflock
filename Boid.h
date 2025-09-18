@@ -162,6 +162,87 @@ public:
     // TODO 20250909 does turning of multithreading help?
 
     
+//        // Basic flocking behavior. Computes steering force for one simulation step
+//        // (an animation frame) for one boid in a flock.
+//        Vec3 steer_to_flock()
+//        {
+//            BoidPtrList neighbors = nearest_neighbors();
+//            flush_cache_of_predicted_obstacle_collisions();
+//
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//            // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+//
+//    //        if (EF::usingGP()) { assert(override_steer_function); } // TEMP?
+//    //        if (EF::usingGP()) { assert(override_steer_function_); } // TEMP?
+//
+//    //        if (EF::usingGP() and override_steer_function)
+//    //        if (EF::usingGP() and override_steer_function_)
+//            if (EF::usingGP())
+//            {
+//                assert(override_steer_function_);
+//                setGpPerThread(this);
+//                Vec3 steering_from_evolved_function = override_steer_function_();
+//                setGpPerThread(nullptr);
+//
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//                // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+//
+//    //            if (not steering_from_evolved_function.is_valid())
+//    //            {
+//    //                steering_from_evolved_function = Vec3();
+//    //            }
+//
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20250914 VERY ad hoc work-around for zero speed issue
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                // TODO 20250917 maybe just enough to get them moving initially?
+//
+//
+//                // Just give a 10% push in the forward direction, to prevent them
+//                // from just sitting there at zero speed.
+//                if (speed() < 15)
+//                {
+//                    steering_from_evolved_function += forward() * max_force() * 0.1;
+//                }
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//                // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+//
+//                // TODO very experimental, push steering components into reasonable range.
+//
+//                auto vlimiter = [](Vec3& v)
+//                {
+//                    auto limiter = [](double x)
+//                    {
+//                        bool questionable = ((std::abs(x) < 0.00000000001) or
+//                                             (x < -10000000000) or
+//                                             (x > 10000000000));
+//                        return questionable ? 0 : x;
+//                    };
+//
+//                    return Vec3(limiter(v.x()), limiter(v.y()), limiter(v.z()));
+//                };
+//
+//    //            return steering_from_evolved_function;
+//                return vlimiter(steering_from_evolved_function);
+//
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//            }
+//
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//            else
+//            {
+//                return pre_GP_steer_to_flock();
+//            }
+//        }
+
     // Basic flocking behavior. Computes steering force for one simulation step
     // (an animation frame) for one boid in a flock.
     Vec3 steer_to_flock()
@@ -169,14 +250,13 @@ public:
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
         
-//        if (EF::usingGP()) { assert(override_steer_function); } // TEMP?
-        if (EF::usingGP()) { assert(override_steer_function_); } // TEMP?
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
 
-//        if (EF::usingGP() and override_steer_function)
-        if (EF::usingGP() and override_steer_function_)
+        if (EF::usingGP())
         {
+            assert(override_steer_function_);
             setGpPerThread(this);
-//            Vec3 steering_from_evolved_function = override_steer_function();
             Vec3 steering_from_evolved_function = override_steer_function_();
             setGpPerThread(nullptr);
             
@@ -196,8 +276,48 @@ public:
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-            return steering_from_evolved_function;
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+                        
+            // TODO very experimental, push steering components into reasonable range.
+            
+//                auto vlimiter = [](Vec3& v)
+//                {
+//                    auto limiter = [](double x)
+//                    {
+//                        bool questionable = ((std::abs(x) < 0.00000000001) or
+//                                             (x < -10000000000) or
+//                                             (x > 10000000000));
+//                        return questionable ? 0 : x;
+//                    };
+//
+//                    return Vec3(limiter(v.x()), limiter(v.y()), limiter(v.z()));
+//                };
+//
+//    //            return steering_from_evolved_function;
+//                return vlimiter(steering_from_evolved_function);
+
+            auto vlimiter = [](Vec3& v)
+            {
+                auto limiter = [](double x)
+                {
+                    bool questionable = ((std::abs(x) < 0.00000000001) or
+                                         (x < -10000000000) or
+                                         (x > 10000000000));
+                    return questionable ? 0 : x;
+                };
+
+                return Vec3(limiter(v.x()), limiter(v.y()), limiter(v.z()));
+            };
+
+//            return steering_from_evolved_function;
+            return vlimiter(steering_from_evolved_function);
+
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         }
+        
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         else
         {
             return pre_GP_steer_to_flock();

@@ -85,15 +85,35 @@ public:
         double original_length = length();
         return  {*this / original_length, original_length};
     }
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
 
+  
+
+//    bool is_unit_length(double epsilon = util::epsilon) const
+//    {
+//        return util::within_epsilon(length_squared(), 1, epsilon);
+//    }
+    
     bool is_unit_length(double epsilon = util::epsilon) const
     {
-        return util::within_epsilon(length_squared(), 1, epsilon);
+//        return (is_valid() ?
+//                util::within_epsilon(length_squared(), 1, epsilon) :
+//                false);
+
+        return is_valid() and util::within_epsilon(length_squared(), 1, epsilon);
     }
+
+
     bool is_zero_length(double epsilon = util::epsilon) const
     {
-        return util::within_epsilon(length_squared(), 0, epsilon);
+//        return util::within_epsilon(length_squared(), 0, epsilon);
+        return is_valid() and util::within_epsilon(length_squared(), 0, epsilon);
     }
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
 
     // Returns vector parallel to "this" but no longer than "max_length"
     Vec3 truncate(double max_length) const

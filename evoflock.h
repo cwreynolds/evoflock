@@ -326,8 +326,15 @@ void runOneFlockEvolution()
 //    int max_evolution_steps = 30000;
 //    int max_evolution_steps = EF::usingGP() ? 60000 : 30000;
 //    int max_evolution_steps = EF::usingGP() ? 30000 : 30000;
-    int max_evolution_steps = EF::usingGP() ? 60000 : 30000;
     
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+    
+//    int max_evolution_steps = EF::usingGP() ? 60000 : 30000;
+    int max_evolution_steps = 30000;
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
@@ -371,9 +378,18 @@ void runOneFlockEvolution()
 //    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
 
-    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 80 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+
+//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 80 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
+
+    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 20 : ga_tree_size;
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

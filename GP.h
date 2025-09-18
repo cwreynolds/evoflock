@@ -273,7 +273,61 @@ FlockParameters fp_from_ga_individual(LP::Individual* individual)
 
 
 
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+// TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
 
+//    double clean_num(double x)
+//    {
+//        bool unclean = (std::isnan(x) or
+//                        std::isinf(x) or
+//                        x < std::numeric_limits<double>::min());
+//        return (unclean ? 0 : x);
+//    }
+
+
+//    double clean_num(double x)
+//    {
+//        bool unclean = (std::isnan(x) or
+//                        std::isinf(x) or
+//                        x < std::numeric_limits<double>::min()
+//                        or
+//                        std::abs(x) < 0.00000000001);
+//        return (unclean ? 0 : x);
+//    }
+
+//    auto vlimiter = [](Vec3& v)
+//    {
+//        auto limiter = [](double x)
+//        {
+//            bool questionable = ((std::abs(x) < 0.00000000001) or
+//                                 (x < -10000000000) or
+//                                 (x > 10000000000));
+//            return questionable ? 0 : x;
+//        };
+//
+//        return Vec3(limiter(v.x()), limiter(v.y()), limiter(v.z()));
+//    };
+
+
+// These "cleaners" are to prevent ludicrous values from evolved trees.
+double clean_num(double x)
+{
+    bool unclean = (std::isnan(x) or
+                    std::isinf(x) or
+                    (x < std::numeric_limits<double>::min()) or
+                    (std::abs(x) < 0.00000000001) or
+                    (x < -10000000000) or
+                    (x > +10000000000));
+    return (unclean ? 0 : x);
+}
+
+// These "cleaners" are to prevent ludicrous values from evolved trees.
+Vec3 clean_vec3(Vec3 v)
+{
+    return { clean_num(v.x()), clean_num(v.y()), clean_num(v.z()) };
+}
+
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
 
 
@@ -333,11 +387,28 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
                 LP::GpTree gp_tree = individual->tree();
                 Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
                 if (not steering.is_valid()) { steering = Vec3(); }
-                double max_steering_length = 10;
-                steering = steering.truncate(max_steering_length);
+                
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+                // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+
+                // TODO in FlockParameters this ranges up to 100, so this clip may be too aggressive
+                
+//                double max_steering_length = 10;
+//                steering = steering.truncate(max_steering_length);
+
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
                 double min_steering_length = 0.00001;
                 if (steering.length() < min_steering_length) { steering = Vec3(); }
-                return steering;
+                
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+                // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+
+//                return steering;
+                return clean_vec3(steering);
+
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
             };
         }
 
@@ -997,23 +1068,35 @@ Boid* getGpBoidNeighbor(int n)
     return neighbors.at(n - 1);
 }
 
-double clean_num(double x)
-{
-    bool unclean = (std::isnan(x) or
-                    std::isinf(x) or
-                    x < std::numeric_limits<double>::min());
-    return (unclean ? 0 : x);
-}
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+// TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
 
-Vec3 clean_vec3(Vec3 v)
-{
-    return { clean_num(v.x()), clean_num(v.y()), clean_num(v.z()) };
-}
+//    double clean_num(double x)
+//    {
+//        bool unclean = (std::isnan(x) or
+//                        std::isinf(x) or
+//                        x < std::numeric_limits<double>::min());
+//        return (unclean ? 0 : x);
+//    }
+//
+//    Vec3 clean_vec3(Vec3 v)
+//    {
+//        return { clean_num(v.x()), clean_num(v.y()), clean_num(v.z()) };
+//    }
+
+
+//    Vec3 ensure_unit_length(Vec3 v)
+//    {
+//        return (v.is_unit_length() ? v : Vec3(1, 0, 0));
+//    }
 
 Vec3 ensure_unit_length(Vec3 v)
 {
-    return (v.is_unit_length() ? v : Vec3(1, 0, 0));
+    Vec3 cv = clean_vec3(v);
+    return (cv.is_unit_length() ? cv : Vec3(1, 0, 0));
 }
+
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
 // FuntionSet for the GP version of EvoFlock.
 
@@ -1147,26 +1230,32 @@ LP::FunctionSet evoflock_gp_function_set()
                                               tree.evalSubtree<Vec3>(1)));
                 }
             },
-            {
-                "Parallel_Component", "Vec3", {"Vec3", "Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    Vec3 value = tree.evalSubtree<Vec3>(0);
-                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
-                    Vec3 unit_basis = ensure_unit_length(basis);
-                    return std::any(value.parallel_component(unit_basis));
-                }
-            },
-            {
-                "Perpendicular_Component", "Vec3", {"Vec3", "Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    Vec3 value = tree.evalSubtree<Vec3>(0);
-                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
-                    Vec3 unit_basis = ensure_unit_length(basis);
-                    return std::any(value.perpendicular_component(unit_basis));
-                }
-            },
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+
+//            {
+//                "Parallel_Component", "Vec3", {"Vec3", "Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    Vec3 value = tree.evalSubtree<Vec3>(0);
+//                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
+//                    Vec3 unit_basis = ensure_unit_length(basis);
+//                    return std::any(value.parallel_component(unit_basis));
+//                }
+//            },
+//            {
+//                "Perpendicular_Component", "Vec3", {"Vec3", "Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    Vec3 value = tree.evalSubtree<Vec3>(0);
+//                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
+//                    Vec3 unit_basis = ensure_unit_length(basis);
+//                    return std::any(value.perpendicular_component(unit_basis));
+//                }
+//            },
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
             {
                 "Interpolate", "Vec3", {"Scalar_100", "Vec3", "Vec3"},
@@ -1356,6 +1445,61 @@ LP::FunctionSet evoflock_gp_function_set()
                     return std::any(normal);
                 }
             },
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+
+//            {
+//                "Parallel_Component", "Vec3", {"Vec3", "Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    Vec3 value = tree.evalSubtree<Vec3>(0);
+//                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
+//                    Vec3 unit_basis = ensure_unit_length(basis);
+//                    return std::any(value.parallel_component(unit_basis));
+//                }
+//            },
+//            {
+//                "Perpendicular_Component", "Vec3", {"Vec3", "Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    Vec3 value = tree.evalSubtree<Vec3>(0);
+//                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
+//                    Vec3 unit_basis = ensure_unit_length(basis);
+//                    return std::any(value.perpendicular_component(unit_basis));
+//                }
+//            },
+            
+            {
+                "To_Forward", "Vec3", {"Vec3"},
+                [](LP::GpTree& tree)
+                {
+//                    Vec3 value = tree.evalSubtree<Vec3>(0);
+                    Vec3 value = clean_vec3(tree.evalSubtree<Vec3>(0));
+//                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
+                    
+                    Boid& boid = *Boid::getGpPerThread();
+
+                    Vec3 unit_basis = ensure_unit_length(boid.forward());
+                    return std::any(value.parallel_component(unit_basis));
+                }
+            },
+            {
+                "To_Side", "Vec3", {"Vec3"},
+                [](LP::GpTree& tree)
+                {
+//                    Vec3 value = tree.evalSubtree<Vec3>(0);
+                    Vec3 value = clean_vec3(tree.evalSubtree<Vec3>(0));
+//                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
+                    Boid& boid = *Boid::getGpPerThread();
+//                    Vec3 unit_basis = ensure_unit_length(basis);
+                    Vec3 unit_basis = ensure_unit_length(boid.forward());
+                    return std::any(value.perpendicular_component(unit_basis));
+                }
+            },
+
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
             
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             // TODO 20240801 very experimental, add high level "hint" to

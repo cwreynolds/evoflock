@@ -255,10 +255,15 @@ void runOneFlockEvolution()
 //        // EF::setUsingGP();
 //        std::cout << (EF::usingGP()?"GP":"GA") << " evolutionary mode." << std::endl;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250916 just grasping at straws, try doubling the evo pop size.
+
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
     // EF::setUsingGA();
-    EF::setUsingGP();
     // EF::setUsingGP();
+    // EF::setUsingGA();
+    EF::setUsingGP();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << (EF::usingGP()?"GP":"GA") << " evolutionary mode." << std::endl;
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -301,14 +306,29 @@ void runOneFlockEvolution()
     // inline in this function's source code, above.
     visualizePreviouslyLoggedFlockParameters();
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250916 just grasping at straws, try doubling the evo pop size.
+
     int individuals = 300;
     int subpops = 17;
+
+//    int individuals = 600;
+//    int subpops = 24;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     // TODO 20250913 testing
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20250917 maybe just enough to get them moving initially?
+
 //    int max_evolution_steps = 30000;
 //    int max_evolution_steps = EF::usingGP() ? 60000 : 30000;
-    int max_evolution_steps = EF::usingGP() ? 30000 : 30000;
+//    int max_evolution_steps = EF::usingGP() ? 30000 : 30000;
+    int max_evolution_steps = EF::usingGP() ? 60000 : 30000;
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 

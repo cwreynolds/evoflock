@@ -66,62 +66,12 @@ public:
         if (speed() > 0)
         {
             Vec3 new_forward = new_velocity / new_speed;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250903 Assertion failed: (size_ok(new_tree))
-
-            // Rotate LocalSpace to align with new_forward.
-//            Vec3 reference_up = up_reference(acceleration * time_step);
-            
-//            Vec3 reference_up = up_reference(acceleration * time_step);
-//            reference_up = reference_up.ensure_not_parallel(new_forward);
-
-            // TODO 20250903 I think there is a cleaner way to write this using
-            //               ensure_not_parallel. but just for the moment:
-            //
             // Rotate LocalSpace to align with new_forward.
             Vec3 reference_up = up_reference(acceleration * time_step);
-            
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-            // TODO 20250913 error in is_parallel()
-
-//            reference_up = (reference_up.is_parallel(new_forward) ?
-//                            new_forward.find_perpendicular() :
-//                            reference_up);
-            
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20250914 make Vec3::ensure_not_parallel a bit more bullet proof
-
-//            bool need_new_up = (new_forward.is_unit_length() and
-//                                reference_up.is_parallel(new_forward));
-//            if (need_new_up) { reference_up = new_forward.find_perpendicular(); }
-  
             reference_up = new_forward.ensure_not_parallel(reference_up);
-
-//            reference_up = reference_up.ensure_not_parallel(new_forward);
-
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             set_ls(ls().rotate_to_new_forward(new_forward, reference_up));
             // Set new position.
             setPosition(position() + (new_forward * speed() * time_step));
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250903 Assertion failed: (size_ok(new_tree))
-            
-            if (not ls().is_orthonormal())
-            {
-                debugPrint(new_velocity);
-                debugPrint(new_speed);
-                debugPrint(new_forward);
-                debugPrint(reference_up);
-                debugPrint(new_forward.is_parallel(reference_up));
-                debugPrint(new_forward.dot(reference_up));
-                debugPrint(reference_up.perpendicular_component(reference_up));
-            }
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             assert (ls().is_orthonormal());
         }
     }

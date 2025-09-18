@@ -139,14 +139,10 @@ public:
         setPreviousPosition(position());
         steer(next_steer_, time_step);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250909 does turning of multithreading help?
-
-//    std::function<Vec3()> override_steer_function = nullptr;
+    
+    // For GP mode: set to a lambda encapsulating the evolved steering function.
+    // (Move within file? Add accessors?)
     std::function<Vec3()> override_steer_function_ = nullptr;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // In the GP (vs GA) version, the evolved code is a per-frame steering function
     // for each Boid. This API supplies a "per thread global" which points to the
@@ -186,16 +182,18 @@ public:
             
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250914 VERY ad hoc work-around for zero speed issue
-            
-//            if (speed() < 10)
-//            {
-//                steering_from_evolved_function += forward() * max_force() * 0.2;
-//            }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250917 maybe just enough to get them moving initially?
+  
 
             // Just give a 10% push in the forward direction, to prevent them
             // from just sitting there at zero speed.
-            steering_from_evolved_function += forward() * max_force() * 0.1;
+            if (speed() < 15)
+            {
+                steering_from_evolved_function += forward() * max_force() * 0.1;
+            }
 
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             return steering_from_evolved_function;

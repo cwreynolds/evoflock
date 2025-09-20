@@ -276,6 +276,19 @@ public:
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();
+        
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250920 experimental curriculum learning
+        
+//        if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.4))
+//        if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.2))
+        if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.3))
+        {
+            for (auto b : boids()) { b->setObsCollisionCount(0); }
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         recordSeparationScorePerStep();
         recordSpeedScorePerStep();
         collectCurvatureStats();
@@ -375,6 +388,19 @@ public:
             double distance = b->distanceToNearestNeighbor();
             double score = parameterToWeightWithRamps(distance, d, s);
             b->xxx_temp_separation_score = score;  // temp for annotation
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250920 experimental curriculum learning
+            
+//            if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.2))
+//            if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.4))
+            if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.6))
+            {
+                score = 1;
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+
             separation_score_sum_ += score;
         }
     }
@@ -425,10 +451,19 @@ public:
 //                                                          { 0, 19, 21, 25},
 //                                                          { 0,  1,  1,  0});
             
-            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250920 experimental curriculum learning
+
+//            double score = parameterToWeightWithRamps(b->speed(),
+//                                                      {15, 19, 21, 25},
+//                                                      { 0,  1,  1,  0});
+
             double score = parameterToWeightWithRamps(b->speed(),
-                                                      {15, 19, 21, 25},
+//                                                      {15, 19, 21, 25},
+                                                      { 0, 19, 21, 25},
                                                       { 0,  1,  1,  0});
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -439,6 +474,42 @@ public:
         }
     }
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250920 experimental curriculum learning
+    
+//        double fractionOfSimulationElapsed() const
+//        {
+//            double c = clock().frameCounter();
+//            double m = fp().maxSimulationSteps();
+//    //            {
+//    //                grabPrintLock_evoflock();
+//    //    //            debugPrint(double(clock().frameCounter()) /
+//    //    //                       fp().maxSimulationSteps());
+//    //                debugPrint(c / m);
+//    //            }
+//    //        return clock().frameCounter() / boidStepPerSim();
+//    //        return clock().frameCounter() / fp().maxSimulationSteps();
+//            return c / m;
+//        }
+    
+//        double fractionOfSimulationElapsed() const
+//        {
+//    //        double c = clock().frameCounter();
+//    //        double m = fp().maxSimulationSteps();
+//    //        return c / m;
+//
+//            return double(clock().frameCounter()) / fp().maxSimulationSteps();
+//
+//        }
+
+    double fractionOfSimulationElapsed() const
+    {
+        return double(clock().frameCounter()) / fp().maxSimulationSteps();
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

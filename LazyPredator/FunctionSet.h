@@ -451,7 +451,15 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250909 does turning of multithreading help?
 //        return newMakeRandomTree(min_tree_size, max_tree_size, 100);
-        return newMakeRandomTree(min_tree_size, max_tree_size, 200);
+
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+        // TODO 20250919 increase tree size to avoid losing obstacle perceptions!
+
+//        return newMakeRandomTree(min_tree_size, max_tree_size, 200);
+        return newMakeRandomTree(min_tree_size, max_tree_size, 400);
+
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     GpTree newMakeRandomTree(int min_tree_size,

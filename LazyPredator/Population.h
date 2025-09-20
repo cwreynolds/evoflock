@@ -61,14 +61,23 @@ public:
         if (subpopulation_count == 0) { subpopulation_count = 1; } // Default.
         assert(subpopulation_count > 0);
         subpopulations_.resize(subpopulation_count);
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+        // TODO 20250919 increase tree size to avoid losing obstacle perceptions!
         for (int i = 0; i < individual_count; i++)
         {
             Individual* new_individual = ((max_init_tree_size == 0) ?
                                           new Individual :
+//                                          new Individual(max_init_tree_size,
+//                                                         *fs));
                                           new Individual(max_init_tree_size,
+                                                         
+                                                         min_crossover_tree_size,
+                                                         max_crossover_tree_size,
+
                                                          *fs));
             subpopulation(i % subpopulation_count).push_back(new_individual);
         }
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
         updateSortedCollectionOfIndividuals();
         idle_time_ = TimeDuration::zero();
         // TODO keep, remove, or move to unit tests?

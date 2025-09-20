@@ -384,10 +384,24 @@ void runOneFlockEvolution()
 //    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
 //    int max_crossover_tree_size = EF::usingGP() ? 80 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
+    
+    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+    // TODO 20250919 increase tree size to avoid losing obstacle perceptions!
+    //
+    // The run that I started around 5:45pm on 20250919 seems stuck with very
+    // low scores (~0.017). Perhaps because it had lost the ability to perceive
+    // obstacles. Maybe that is why bigger programs seem to be important? I’m
+    // going to stop this run and increase the tree size parameters.
 
-    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 20 : ga_tree_size;
+//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 20 : ga_tree_size;
+
+    int min_crossover_tree_size = EF::usingGP() ?  20 : 2;
+    int max_crossover_tree_size = EF::usingGP() ? 100 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 100 : ga_tree_size;
+
+    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
 
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 

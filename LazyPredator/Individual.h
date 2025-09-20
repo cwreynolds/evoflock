@@ -63,6 +63,44 @@ public:
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
     }
+    
+    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+    // TODO 20250919 increase tree size to avoid losing obstacle perceptions!
+    //
+    // TODO -- it looks like 
+    
+    
+//    new Individual(max_init_tree_size,
+//                   
+//                   min_crossover_tree_size,
+//                   max_crossover_tree_size,
+//                   
+//                   *fs));
+
+    Individual(int max_tree_size,
+               int min_crossover_tree_size,
+               int max_crossover_tree_size,
+               const FunctionSet& fs) : Individual()
+    {
+        if (not increasing_initial_tree_size)
+        {
+            fs.makeRandomTree(max_tree_size, tree_);
+        }
+        else
+        {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20240715 WIP new approach to tree generation.
+            
+//            tree_ = fs.newMakeRandomTree(max_tree_size / 2, max_tree_size);
+
+            tree_ = fs.newMakeRandomTree(min_crossover_tree_size,
+                                         max_crossover_tree_size);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        }
+    }
+
+    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Individual(const GpTree& gp_tree) : Individual() { tree_ = gp_tree; }

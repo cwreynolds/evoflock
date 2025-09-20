@@ -243,6 +243,13 @@ public:
 //            }
 //        }
 
+    
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250919 move all "data cleaning" to GP module
+    
+    
+    
     // Basic flocking behavior. Computes steering force for one simulation step
     // (an animation frame) for one boid in a flock.
     Vec3 steer_to_flock()
@@ -260,21 +267,21 @@ public:
             Vec3 steering_from_evolved_function = override_steer_function_();
             setGpPerThread(nullptr);
             
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250914 VERY ad hoc work-around for zero speed issue
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250917 maybe just enough to get them moving initially?
-  
-
-            // Just give a 10% push in the forward direction, to prevent them
-            // from just sitting there at zero speed.
-            if (speed() < 15)
-            {
-                steering_from_evolved_function += forward() * max_force() * 0.1;
-            }
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20250914 VERY ad hoc work-around for zero speed issue
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            // TODO 20250917 maybe just enough to get them moving initially?
+//  
+//
+//            // Just give a 10% push in the forward direction, to prevent them
+//            // from just sitting there at zero speed.
+//            if (speed() < 15)
+//            {
+//                steering_from_evolved_function += forward() * max_force() * 0.1;
+//            }
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
@@ -298,31 +305,59 @@ public:
 //    //            return steering_from_evolved_function;
 //                return vlimiter(steering_from_evolved_function);
 
-            auto vlimiter = [](Vec3& v)
-            {
-                auto limiter = [](double x)
-                {
-                    bool questionable = ((std::abs(x) < 0.00000000001) or
-                                         (x < -10000000000) or
-                                         (x > 10000000000));
-                    return questionable ? 0 : x;
-                };
+//                auto vlimiter = [](Vec3& v)
+//                {
+//                    auto limiter = [](double x)
+//                    {
+//                        bool questionable = ((std::abs(x) < 0.00000000001) or
+//                                             (x < -10000000000) or
+//                                             (x > 10000000000));
+//                        return questionable ? 0 : x;
+//                    };
+//
+//                    return Vec3(limiter(v.x()), limiter(v.y()), limiter(v.z()));
+//                };
+//
+//    //            return steering_from_evolved_function;
+//                return vlimiter(steering_from_evolved_function);
 
-                return Vec3(limiter(v.x()), limiter(v.y()), limiter(v.z()));
-            };
-
-//            return steering_from_evolved_function;
-            return vlimiter(steering_from_evolved_function);
-
+            return steering_from_evolved_function;
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         }
         
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         else
         {
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250919 move all "data cleaning" to GP module
+
+//            return pre_GP_steer_to_flock();
+  
+//                static double max_steer_length = 0;
+//                Vec3 steer = pre_GP_steer_to_flock();
+//                double steer_length = steer.length();
+//                max_steer_length = std::max(steer_length, max_steer_length);
+//    //            debugPrint(steer_length);
+//    //            debugPrint(max_steer_length);
+//
+//                {
+//                    grabPrintLock_evoflock()
+//                    std::cout << "steer_length = " << steer_length;
+//                    std::cout << "  max_steer_length = " << max_steer_length;
+//                    std::cout << std::endl;
+//                }
+//
+//                return steer;
+            
             return pre_GP_steer_to_flock();
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }
     }
+    
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

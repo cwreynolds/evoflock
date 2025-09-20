@@ -393,8 +393,14 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
 
                 // TODO in FlockParameters this ranges up to 100, so this clip may be too aggressive
                 
-//                double max_steering_length = 10;
-//                steering = steering.truncate(max_steering_length);
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20250919 move all "data cleaning" to GP module
+
+                // Ran a test in GA mode. Max steering force length was 1000.
+                double max_steering_length = 1000;
+                steering = steering.truncate(max_steering_length);
+
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
@@ -403,9 +409,29 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
                 
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
                 // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+                
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20250919 move all "data cleaning" to GP module
+                
+                
+                
+                // Just give a 10% push in the forward direction, to prevent them
+                // from sitting at their initial position at zero speed.
+//                if (speed() < 15)
+                Boid* b = Boid::getGpPerThread();
+                if (b->speed() < 15) // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                {
+//                    steering += forward() * max_force() * 0.1;
+                    steering += b->forward() * b->max_force() * 0.1;
+                }
+
+
 
 //                return steering;
                 return clean_vec3(steering);
+
+                
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 

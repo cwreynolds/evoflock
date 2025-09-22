@@ -1171,15 +1171,18 @@ LP::FunctionSet evoflock_gp_function_set()
                                               tree.evalSubtree<double>(1)));
                 }
             },
-            {
-                "Power", "Scalar_100", {"Scalar_100", "Scalar_100"},
-                [](LP::GpTree& tree)
-                {
-                    double base = tree.evalSubtree<double>(0);
-                    double expt = tree.evalSubtree<double>(1);
-                    return std::any(clean_num(std::pow(base, expt)));
-                }
-            },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250920 experimental curriculum learning
+//            {
+//                "Power", "Scalar_100", {"Scalar_100", "Scalar_100"},
+//                [](LP::GpTree& tree)
+//                {
+//                    double base = tree.evalSubtree<double>(0);
+//                    double expt = tree.evalSubtree<double>(1);
+//                    return std::any(clean_num(std::pow(base, expt)));
+//                }
+//            },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             {
                 "Abs", "Scalar_100", {"Scalar_100"},
                 [](LP::GpTree& tree)
@@ -1283,17 +1286,24 @@ LP::FunctionSet evoflock_gp_function_set()
             
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
-            {
-                "Interpolate", "Vec3", {"Scalar_100", "Vec3", "Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    double i = tree.evalSubtree<double>(0);
-                    Vec3 a = tree.evalSubtree<Vec3>(1);
-                    Vec3 b = tree.evalSubtree<Vec3>(2);
-//                    return std::any(util::interpolate(util::clip01(i), a, b));
-                    return std::any(util::interpolate(i, a, b));
-                }
-            },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250920 experimental curriculum learning
+
+//                {
+//                    "Interpolate", "Vec3", {"Scalar_100", "Vec3", "Vec3"},
+//                    [](LP::GpTree& tree)
+//                    {
+//                        double i = tree.evalSubtree<double>(0);
+//                        Vec3 a = tree.evalSubtree<Vec3>(1);
+//                        Vec3 b = tree.evalSubtree<Vec3>(2);
+//    //                    return std::any(util::interpolate(util::clip01(i), a, b));
+//                        return std::any(util::interpolate(i, a, b));
+//                    }
+//                },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            
+            
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
             // TODO 20250915 replace Ifle with If_Pos
 //            {
@@ -1370,39 +1380,42 @@ LP::FunctionSet evoflock_gp_function_set()
                                     Boid::getGpPerThread()->position());
                 }
             },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250920 experimental curriculum learning
 
-            {
-                "Neighbor_2_Velocity", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    return std::any(getGpBoidNeighbor(2)->velocity());
-                    
-                }
-            },
-            {
-                "Neighbor_2_Offset", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    return std::any(getGpBoidNeighbor(2)->position() -
-                                    Boid::getGpPerThread()->position());
-                }
-            },
-            {
-                "Neighbor_3_Velocity", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    return std::any(getGpBoidNeighbor(3)->velocity());
-                    
-                }
-            },
-            {
-                "Neighbor_3_Offset", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    return std::any(getGpBoidNeighbor(3)->position() -
-                                    Boid::getGpPerThread()->position());
-                }
-            },
+//            {
+//                "Neighbor_2_Velocity", "Vec3", {},
+//                [](LP::GpTree& t)
+//                {
+//                    return std::any(getGpBoidNeighbor(2)->velocity());
+//                    
+//                }
+//            },
+//            {
+//                "Neighbor_2_Offset", "Vec3", {},
+//                [](LP::GpTree& t)
+//                {
+//                    return std::any(getGpBoidNeighbor(2)->position() -
+//                                    Boid::getGpPerThread()->position());
+//                }
+//            },
+//            {
+//                "Neighbor_3_Velocity", "Vec3", {},
+//                [](LP::GpTree& t)
+//                {
+//                    return std::any(getGpBoidNeighbor(3)->velocity());
+//                    
+//                }
+//            },
+//            {
+//                "Neighbor_3_Offset", "Vec3", {},
+//                [](LP::GpTree& t)
+//                {
+//                    return std::any(getGpBoidNeighbor(3)->position() -
+//                                    Boid::getGpPerThread()->position());
+//                }
+//            },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             {
                 "First_Obs_Dist", "Scalar_100", {},
                 [](LP::GpTree& t)

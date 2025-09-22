@@ -283,10 +283,18 @@ public:
         
 //        if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.4))
 //        if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.2))
-        if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.3))
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20250921 try evolving JUST speed
+
+//        if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.3))
+        if (EF::usingGP())
         {
             for (auto b : boids()) { b->setObsCollisionCount(0); }
         }
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         recordSeparationScorePerStep();
@@ -394,10 +402,17 @@ public:
             
 //            if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.2))
 //            if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.4))
-            if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.6))
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250921 try evolving JUST speed
+
+//            if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.6))
+            if (EF::usingGP())
             {
                 score = 1;
             }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
 

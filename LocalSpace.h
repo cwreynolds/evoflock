@@ -41,13 +41,36 @@ public:
     void setP(Vec3 p) { p_ = p; }
     void setIJKP(Vec3 i, Vec3 j, Vec3 k, Vec3 p) { i_=i; j_=j; k_=k; p_=p; }
     
-    // Transforms a global space position into the local space of this object.
-    Vec3 localize(Vec3 global_vector) const
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250922 WIP switch to "evolved program returns local vec
+
+//    // Transforms a global space position into the local space of this object.
+//    Vec3 localize(Vec3 global_vector) const
+//    {
+//        Vec3 v = global_vector - p();
+//        return Vec3(v.dot(i()), v.dot(j()), v.dot(k()));
+//    }
+
+    // Transform a point in global coordinate space to this local space.
+    Vec3 localize(Vec3 global_point) const
     {
-        Vec3 v = global_vector - p();
+        Vec3 v = global_point - p();
         return Vec3(v.dot(i()), v.dot(j()), v.dot(k()));
     }
     
+    
+    // TODO 20250922 I have no confidence in this. Needs careful unit tests.
+
+    // Transform a direction vector from global space to this local space.
+    Vec3 localizeDirection(Vec3 global_direction) const
+    {
+        Vec3 v = global_direction + p();
+        Vec3 rotated = Vec3(v.dot(i()), v.dot(j()), v.dot(k()));
+        return rotated - p();
+    }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     // Transforms a local space position to the global space.
     Vec3 globalize(Vec3 local_vector) const
     {

@@ -346,14 +346,181 @@ Vec3 clean_vec3(Vec3 v)
 // Run flock simulation with given parameters "runs" times and returns the MOF
 // with the LEAST scalar fitness score.
 
-//inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
-//inline MOF run_ga_gp_flock_simulation(LP::Individual* individual)
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20250922 WIP switch to "evolved program returns local vec
+
+
+//    //inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
+//    //inline MOF run_ga_gp_flock_simulation(LP::Individual* individual)
+//    inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
+//    {
+//    //    int runs = 4;
+//    //    FlockParameters fp;
+//    //    if (EF::usingGA()) { fp = fp_from_ga_individual(individual); }
+//
+//        MOF least_mof;
+//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
+//        std::vector<double> scalar_fits;
+//        std::mutex save_mof_mutex;
+//
+//        // Perform one simulation run, and record results.
+//        auto do_1_run = [&]()
+//        {
+//            // These steps can happen in parallel threads:
+//            Flock flock;
+//            init_flock(flock);
+//
+//
+//    //    //        FlockParameters fp;
+//    //            if (EF::usingGA())
+//    //            {
+//    //                flock.fp() = fp_from_ga_individual(individual);
+//    //            }
+//    //    //        flock.fp() = fp;
+//
+//            if (EF::usingGA())
+//            {
+//                // For GA, set Flock's FlockParameters.
+//                flock.fp() = fp_from_ga_individual(individual);
+//            }
+//            else
+//            {
+//                // For GP, set Flock's override_steer_function_.
+//                flock.override_steer_function_ = [&]()
+//                {
+//                    LP::GpTree gp_tree = individual->tree();
+//                    Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
+//                    if (not steering.is_valid()) { steering = Vec3(); }
+//
+//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//                    // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+//
+//                    // TODO in FlockParameters this ranges up to 100, so this clip may be too aggressive
+//
+//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                    // TODO 20250919 move all "data cleaning" to GP module
+//
+//                    // Ran a test in GA mode. Max steering force length was 1000.
+//                    double max_steering_length = 1000;
+//                    steering = steering.truncate(max_steering_length);
+//
+//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//                    double min_steering_length = 0.00001;
+//                    if (steering.length() < min_steering_length) { steering = Vec3(); }
+//
+//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//                    // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
+//
+//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                    // TODO 20250919 move all "data cleaning" to GP module
+//
+//
+//
+//                    // Just give a 10% push in the forward direction, to prevent them
+//                    // from sitting at their initial position at zero speed.
+//    //                if (speed() < 15)
+//                    Boid* b = Boid::getGpPerThread();
+//                    if (b->speed() < 15) // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//                    {
+//    //                    steering += forward() * max_force() * 0.1;
+//                        steering += b->forward() * b->max_force() * 0.1;
+//                    }
+//
+//
+//
+//    //                return steering;
+//                    return clean_vec3(steering);
+//
+//
+//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//                };
+//            }
+//
+//
+//
+//            flock.run();
+//            MOF mof = multiObjectiveFitnessOfFlock(flock);
+//            // These steps happen in the single thread with lock on save_mof_mutex.
+//            {
+//                std::lock_guard<std::mutex> smm(save_mof_mutex);
+//                assert(mof.size() == mof_names().size());
+//                scalar_fits.push_back(scalarize_fitness(mof));
+//                if (least_scalar_fitness > scalar_fits.back())
+//                {
+//                    least_scalar_fitness = scalar_fits.back();
+//                    least_mof = mof;
+//                }
+//                // Store these stats on the "current individual"
+//                LP::Individual* i = LP::Population::evolution_step_individual;
+//                if (i)
+//                {
+//                    std::vector<double>& udfp = i->user_data_for_plotting;
+//                    udfp.clear();
+//                    udfp.push_back(flock.obstacleCollisionsScore());
+//                    udfp.push_back(flock.separationScore());
+//                    udfp.push_back(flock.speedScore());
+//                }
+//            }
+//        };
+//
+//        // Occasionally poll the Draw GUI to check for events esp the "B" command.
+//        Draw::getInstance().pollEvents();
+//
+//    //    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//    //    // TODO 20250909 does turning of multithreading help?
+//    //
+//    //    // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
+//    //    {
+//    //        grabPrintLock_evoflock();
+//    //        std::cout << std::endl;
+//    //        std::cout << "-----------------------------------------------" << std::endl;
+//    //        debugPrint(EF::unify_GA_GP);
+//    //        debugPrint(EF::usingGP());
+//    //        debugPrint(EF::enable_multithreading);
+//    //        debugPrint(Draw::getInstance().enable());
+//    //        std::cout << "-----------------------------------------------" << std::endl;
+//    //        std::cout << std::endl;
+//    //
+//    //    }
+//    //
+//    //    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//        if (EF::enable_multithreading)
+//        {
+//            bool previous_enable_state = Draw::getInstance().enable();
+//            Draw::getInstance().setEnable(false);
+//
+//            // Do each simulation run in a parallel thread.
+//            std::vector<std::thread> threads;
+//            for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
+//            // Wait for helper threads to finish, join them with this thread.
+//            for (auto& t : threads) { t.join(); }
+//
+//            Draw::getInstance().setEnable(previous_enable_state);
+//        }
+//        else
+//        {
+//            // Do each simulation run sequentially.
+//            for (int r = 0; r < runs; r++) { do_1_run(); }
+//        }
+//
+//        assert(scalar_fits.size() == runs);
+//        fitness_logger(least_mof);
+//        std::cout << "    min composite "<< least_scalar_fitness;
+//        std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
+//        std::cout << std::endl << std::endl;
+//        return least_mof;
+//    }
+
+
 inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
 {
-//    int runs = 4;
-//    FlockParameters fp;
-//    if (EF::usingGA()) { fp = fp_from_ga_individual(individual); }
-
     MOF least_mof;
     double least_scalar_fitness = std::numeric_limits<double>::infinity();
     std::vector<double> scalar_fits;
@@ -365,18 +532,9 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
         // These steps can happen in parallel threads:
         Flock flock;
         init_flock(flock);
-        
-        
-//    //        FlockParameters fp;
-//            if (EF::usingGA())
-//            {
-//                flock.fp() = fp_from_ga_individual(individual);
-//            }
-//    //        flock.fp() = fp;
-        
         if (EF::usingGA())
         {
-            // For GA, set Flock's FlockParameters.
+            // For GA, set Flock's FlockParameters from evolved "tree".
             flock.fp() = fp_from_ga_individual(individual);
         }
         else
@@ -384,62 +542,42 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
             // For GP, set Flock's override_steer_function_.
             flock.override_steer_function_ = [&]()
             {
+                Boid* boid = Boid::getGpPerThread();
                 LP::GpTree gp_tree = individual->tree();
-                Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
+                
+//                Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
+                // TEMP: here we are assuming GpTree returns a local steer vec
+                Vec3 local_steering = std::any_cast<Vec3>(gp_tree.eval());
+                Vec3 steering = boid->ls().globalize(local_steering);
+
+                // KEEP? added while tracking down "cleaning" issues
                 if (not steering.is_valid()) { steering = Vec3(); }
                 
-                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-                // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
-
-                // TODO in FlockParameters this ranges up to 100, so this clip may be too aggressive
-                
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                // TODO 20250919 move all "data cleaning" to GP module
-
                 // Ran a test in GA mode. Max steering force length was 1000.
-                double max_steering_length = 1000;
+//                double max_steering_length = 1000;
+                // WIP reduce by an order of magnitude, close to max_force()
+                double max_steering_length = 100;
                 steering = steering.truncate(max_steering_length);
 
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
+                // KEEP? added while tracking down "cleaning" issues
                 double min_steering_length = 0.00001;
                 if (steering.length() < min_steering_length) { steering = Vec3(); }
                 
-                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-                // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
-                
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                // TODO 20250919 move all "data cleaning" to GP module
-                
-                
-                
                 // Just give a 10% push in the forward direction, to prevent them
                 // from sitting at their initial position at zero speed.
-//                if (speed() < 15)
-                Boid* b = Boid::getGpPerThread();
-                if (b->speed() < 15) // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                {
-//                    steering += forward() * max_force() * 0.1;
-                    steering += b->forward() * b->max_force() * 0.1;
-                }
-
-
-
-//                return steering;
+//                Boid* b = Boid::getGpPerThread();
+//                if (b->speed() < 15) // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//                {
+//                    steering += b->forward() * b->max_force() * 0.1;
+//                }
+//                if (boid->speed() < 15) // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//                {
+//                    steering += boid->forward() * boid->max_force() * 0.1;
+//                }
                 return clean_vec3(steering);
-
-                
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
             };
         }
 
-        
-        
         flock.run();
         MOF mof = multiObjectiveFitnessOfFlock(flock);
         // These steps happen in the single thread with lock on save_mof_mutex.
@@ -467,26 +605,7 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
     
     // Occasionally poll the Draw GUI to check for events esp the "B" command.
     Draw::getInstance().pollEvents();
-    
-//    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//    // TODO 20250909 does turning of multithreading help?
-//    
-//    // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
-//    {
-//        grabPrintLock_evoflock();
-//        std::cout << std::endl;
-//        std::cout << "-----------------------------------------------" << std::endl;
-//        debugPrint(EF::unify_GA_GP);
-//        debugPrint(EF::usingGP());
-//        debugPrint(EF::enable_multithreading);
-//        debugPrint(Draw::getInstance().enable());
-//        std::cout << "-----------------------------------------------" << std::endl;
-//        std::cout << std::endl;
-//        
-//    }
-//    
-//    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    
+        
     if (EF::enable_multithreading)
     {
         bool previous_enable_state = Draw::getInstance().enable();
@@ -513,6 +632,9 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
     std::cout << std::endl << std::endl;
     return least_mof;
 }
+
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
@@ -1353,14 +1475,40 @@ LP::FunctionSet evoflock_gp_function_set()
                 "Velocity", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    return std::any(Boid::getGpPerThread()->velocity());
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20250922 WIP switch to "evolved program returns local vec
+                    
+//                    return std::any(Boid::getGpPerThread()->velocity());
+                    
+//                    Boid* b = Boid::getGpPerThread();
+//                    return std::any(b->ls().localize(b->velocity()));
+
+                    Boid& boid = *Boid::getGpPerThread();
+                    return std::any(boid.ls().localizeDirection(boid.velocity()));
+
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                 }
             },
             {
                 "Acceleration", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    return std::any(Boid::getGpPerThread()->getAcceleration());
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20250922 WIP switch to "evolved program returns local vec
+                    
+//                    return std::any(Boid::getGpPerThread()->getAcceleration());
+
+//                    Boid* b = Boid::getGpPerThread();
+//                    return std::any(b->ls().localize(b->getAcceleration()));
+
+//                    Boid& boid = *Boid::getGpPerThread();
+//                    return std::any(boid.ls().localizeDirection(boid.getAcceleration()));
+
+                    Boid& boid = *Boid::getGpPerThread();
+                    Vec3 acceleration = boid.getAcceleration();
+                    return std::any(boid.ls().localizeDirection(acceleration));
+
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                 }
             },
             
@@ -1368,16 +1516,39 @@ LP::FunctionSet evoflock_gp_function_set()
                 "Neighbor_1_Velocity", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    return std::any(getGpBoidNeighbor(1)->velocity());
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20250922 WIP switch to "evolved program returns local vec
+
+//                    return std::any(getGpBoidNeighbor(1)->velocity());
                     
+//                    Boid* b = Boid::getGpPerThread();
+//                    return std::any(b->ls().localize(getGpBoidNeighbor(1)->velocity()));
+
+                    Boid& boid = *Boid::getGpPerThread();
+                    Vec3 nv = getGpBoidNeighbor(1)->velocity();
+                    return std::any(boid.ls().localizeDirection(nv));
+
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                 }
             },
             {
                 "Neighbor_1_Offset", "Vec3", {},
                 [](LP::GpTree& t)
                 {
-                    return std::any(getGpBoidNeighbor(1)->position() -
-                                    Boid::getGpPerThread()->position());
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20250922 WIP switch to "evolved program returns local vec
+
+//                    return std::any(getGpBoidNeighbor(1)->position() -
+//                                    Boid::getGpPerThread()->position());
+
+//                    Boid* b = Boid::getGpPerThread();
+//                    return std::any(b->ls().localize(getGpBoidNeighbor(1)->position()));
+
+                    Boid& b = *Boid::getGpPerThread();
+                    Vec3 no = getGpBoidNeighbor(1)->position() - b.position();
+                    return std::any(b.ls().localizeDirection(no));
+
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                 }
             },
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1423,29 +1594,9 @@ LP::FunctionSet evoflock_gp_function_set()
                     Boid& boid = *Boid::getGpPerThread();
                     double distance = std::numeric_limits<double>::infinity();
                     auto collisions = boid.get_predicted_obstacle_collisions();
-                    
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    // TODO 20250902 Assertion failed: (mof.size() == mof_names().size())
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    // TOODO 20240809 why is obstacle avoidance broken?
-//                    assert(not collisions.empty());
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
                     if (collisions.size() > 0)
                     {
                         const Collision& first_collision = collisions.front();
-                        
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        // TODO 20250902 Assertion failed: (mof.size() == mof_names().size())
-
-//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                        // TOODO 20240809 why is obstacle avoidance broken?
-//                        debugPrint(first_collision)
-//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
                         Vec3 poi = first_collision.point_of_impact;
                         distance = (poi - boid.position()).length();
                     }
@@ -1459,28 +1610,25 @@ LP::FunctionSet evoflock_gp_function_set()
                     Boid& boid = *Boid::getGpPerThread();
                     Vec3 normal;
                     auto collisions = boid.get_predicted_obstacle_collisions();
-                    
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    // TOODO 20240809 why is obstacle avoidance broken?
-                    assert(not collisions.empty());
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    
                     if (collisions.size() > 0)
                     {
                         const Collision& first_collision = collisions.front();
-                        
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        // TOODO 20240809 why is obstacle avoidance broken?
-//                        debugPrint(first_collision)
-                        
-//                        debugPrint(Draw().frameCounter())
-//                        bool log = (boid.is_first_boid() and
-//                                    ((Draw().frameCounter() % 100) == 0));
-//                        if (log) { debugPrint(first_collision) }
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        
                         normal = first_collision.normal_at_poi;
-                }
+                        
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        // TODO 20250922 WIP switch to "evolved program returns local vec
+                        
+                        // Convert normal to local space.
+//                        Vec3 norm_plus_pos = normal + boid.position();
+//                        normal = boid.ls().localize(norm_plus_pos);
+                        
+//                        normal = boid.ls().localize(normal + boid.position());
+                        
+                        
+                        normal = boid.ls().localizeDirection(normal);
+
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    }
                     return std::any(normal);
                 }
             },
@@ -1513,27 +1661,50 @@ LP::FunctionSet evoflock_gp_function_set()
                 "To_Forward", "Vec3", {"Vec3"},
                 [](LP::GpTree& tree)
                 {
-//                    Vec3 value = tree.evalSubtree<Vec3>(0);
                     Vec3 value = clean_vec3(tree.evalSubtree<Vec3>(0));
-//                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
                     
-                    Boid& boid = *Boid::getGpPerThread();
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20250922 WIP switch to "evolved program returns local vec
 
-                    Vec3 unit_basis = ensure_unit_length(boid.forward());
-                    return std::any(value.parallel_component(unit_basis));
+//                    Boid& boid = *Boid::getGpPerThread();
+                    Boid& b = *Boid::getGpPerThread();
+
+//                    Vec3 unit_basis = ensure_unit_length(boid.forward());
+//                    Vec3 unit_basis(0, 0, 1);
+//                    return std::any(value.parallel_component(unit_basis));
+                    
+                    // Take component of "value" which is parallel to "forward".
+                    Vec3 parallel = value.parallel_component(b.forward());
+                    return std::any(b.ls().localizeDirection(parallel));
+
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                 }
             },
             {
                 "To_Side", "Vec3", {"Vec3"},
                 [](LP::GpTree& tree)
                 {
-//                    Vec3 value = tree.evalSubtree<Vec3>(0);
                     Vec3 value = clean_vec3(tree.evalSubtree<Vec3>(0));
-//                    Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
-                    Boid& boid = *Boid::getGpPerThread();
-//                    Vec3 unit_basis = ensure_unit_length(basis);
-                    Vec3 unit_basis = ensure_unit_length(boid.forward());
+                    
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                    // TODO 20250922 WIP switch to "evolved program returns local vec
+                    
+//                    Boid& boid = *Boid::getGpPerThread();
+                    Boid& b = *Boid::getGpPerThread();
+
+//                    Vec3 unit_basis = ensure_unit_length(boid.forward());
+//                    return std::any(value.perpendicular_component(unit_basis));
+
+                    Vec3 unit_basis(0, 0, 1);
                     return std::any(value.perpendicular_component(unit_basis));
+                    
+                    
+                    // Take component of "value" perpendicular to "forward".
+                    Vec3 perp = value.perpendicular_component(b.forward());
+                    return std::any(b.ls().localizeDirection(perp));
+
+
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                 }
             },
 

@@ -341,77 +341,19 @@ void runOneFlockEvolution()
 
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250913 change GpType for GpFunc "Run_Flock"
 
-//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250914 VERY ad hoc work-around for zero speed issue
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20250923 smooth in evolved steering -- try smaller trees again
 
 //    int min_crossover_tree_size = EF::usingGP() ?  20 : 2;
 //    int max_crossover_tree_size = EF::usingGP() ? 100 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ?  50 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 100 : ga_tree_size;
 
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20250915 try smaller trees
+    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
 
-//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 25 : ga_tree_size;
-
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 25 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 15 : ga_tree_size;
-
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 35 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 15 : ga_tree_size;
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250916 maybe bigger trees ARE better, revert speed score
-    
-//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
-
-//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 80 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
-    
-    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-    // TODO 20250919 increase tree size to avoid losing obstacle perceptions!
-    //
-    // The run that I started around 5:45pm on 20250919 seems stuck with very
-    // low scores (~0.017). Perhaps because it had lost the ability to perceive
-    // obstacles. Maybe that is why bigger programs seem to be important? I’m
-    // going to stop this run and increase the tree size parameters.
-
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 20 : ga_tree_size;
-
-    int min_crossover_tree_size = EF::usingGP() ?  20 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 100 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 100 : ga_tree_size;
-
-    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     debugPrint(min_crossover_tree_size);
     debugPrint(max_crossover_tree_size);

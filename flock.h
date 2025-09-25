@@ -213,11 +213,7 @@ public:
         enforceObsBoidConstraintsDoNotCount();
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240619 WIP first GP_not_GA run
-//    std::function<Vec3()> override_steer_function = nullptr;
     std::function<Vec3()> override_steer_function_ = nullptr;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void init_boid(Boid* boid, double radius, Vec3 center, RandomSequence& rs)
     {
@@ -233,12 +229,14 @@ public:
         boid->set_draw(&draw());
         boid->set_flock_boids(&boids());
         boid->set_flock_obstacles(&obstacles());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240619 WIP first GP_not_GA run
-//        boid->override_steer_function = override_steer_function;
         boid->override_steer_function_ = override_steer_function_;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20250925 turn off curriculum learning experiment
+        //               VERY TEMP: I GIVE UP, JUST SET INIT SPEED TO 20
+        
+        boid->setSpeed(20);
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         Vec3 mean_forward(1, 0, 0);
         Vec3 noise_forward = rs.random_point_in_unit_radius_sphere() * 0.1;
         Vec3 new_forward = (mean_forward + noise_forward).normalize();
@@ -290,7 +288,11 @@ public:
 //        if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.3))
         if (EF::usingGP())
         {
-            for (auto b : boids()) { b->setObsCollisionCount(0); }
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250925 turn off curriculum learning experiment
+//            for (auto b : boids()) { b->setObsCollisionCount(0); }
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            
         }
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
@@ -409,7 +411,10 @@ public:
 //            if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.6))
             if (EF::usingGP())
             {
-                score = 1;
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20250925 turn off curriculum learning experiment
+//                score = 1;
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             }
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -473,10 +478,26 @@ public:
 //                                                      {15, 19, 21, 25},
 //                                                      { 0,  1,  1,  0});
 
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20250925 turn off curriculum learning experiment
+
+//                double score = parameterToWeightWithRamps(b->speed(),
+//    //                                                      {15, 19, 21, 25},
+//                                                          { 0, 19, 21, 25},
+//                                                          { 0,  1,  1,  0});
+
+//            double score = parameterToWeightWithRamps(b->speed(),
+//                                                      {15, 19, 21, 25},
+//                                                      { 0,  1,  1,  0});
+
+            
             double score = parameterToWeightWithRamps(b->speed(),
 //                                                      {15, 19, 21, 25},
-                                                      { 0, 19, 21, 25},
-                                                      { 0,  1,  1,  0});
+//                                                      { 0, 19, 21, 25},
+                                                      { 0, 18, 19, 21, 25},
+                                                      { 0, .2, 1,  1,  0});
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -595,7 +616,12 @@ public:
             int preserve_collision_count = b->getObsCollisionCount();
             b->enforceObstacleConstraint();
             b->setObsCollisionCount(preserve_collision_count);
-            b->setSpeed(0);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250925 turn off curriculum learning experiment
+//            b->setSpeed(0);
+//            b->setSpeed(20);
+            b->setSpeedAfterObstacleCollision();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         };
         for_all_boids(enforce_one_boid_do_not_count);
     }

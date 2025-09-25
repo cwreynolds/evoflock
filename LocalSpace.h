@@ -258,74 +258,57 @@ public:
         Vec3 local_direction = ls.localizeDirection(global_direction);
         Vec3 global_direction2 = ls.globalizeDirection(local_direction);
 
-
-//        debugPrint(ls.pr);
+//        std::cout << std::endl;
+//        std::cout << std::endl;
 //
-//        // Serialize LocalSpace object to stream.
-//        inline std::ostream& operator<<(std::ostream& os, const LocalSpace& ls)
-//        {
-//            os << "[i=" << ls.i();
-//            os << ", j=" << ls.j();
-//            os << ", k=" << ls.k();
-//            os << ", p=" << ls.p();
-//            os << "]";
-//            return os;
-//        }
+//        std::cout << "ls = [i=" << ls.i();
+//        std::cout << ", j=" << ls.j();
+//        std::cout << ", k=" << ls.k();
+//        std::cout << ", p=" << ls.p();
+//        std::cout << "]";
+//        std::cout << std::endl;
+//
+//        
+//        debugPrint(global_direction);
+//        debugPrint(local_direction);
+//        debugPrint(global_direction2);
+//
+//        debugPrint(global_direction.length());
+//        debugPrint(local_direction.length());
+//        debugPrint(global_direction2.length());
+//
+//        std::cout << std::endl;
+//        std::cout << std::endl;
 
-        std::cout << std::endl;
-        std::cout << std::endl;
-
-        std::cout << "ls = [i=" << ls.i();
-        std::cout << ", j=" << ls.j();
-        std::cout << ", k=" << ls.k();
-        std::cout << ", p=" << ls.p();
-        std::cout << "]";
-        std::cout << std::endl;
-
+//        // WIP tests, reconsider design?
+//        assert(util::within_epsilon(local_direction.length(),
+//                                    global_direction.length(),
+//                                    e));
+//        assert(util::within_epsilon(local_direction.length(),
+//                                    global_direction2.length(),
+//                                    e));
+//        assert(Vec3::is_equal_within_epsilon(global_direction,
+//                                             global_direction2,
+//                                             e));
+//        
+//        assert(Vec3::is_equal_within_epsilon(global_direction,
+//                                             global_direction2,
+//                                             e));
         
-        debugPrint(global_direction);
-        debugPrint(local_direction);
-        debugPrint(global_direction2);
-
-        debugPrint(global_direction.length());
-        debugPrint(local_direction.length());
-        debugPrint(global_direction2.length());
-
-        std::cout << std::endl;
-        std::cout << std::endl;
-        
-//        exit(0);
-        
-//        // Temporary, but maybe should keep this test?
-//        {
-//            double p = global_direction.length();
-//            double q = local_direction.length();
-//            assert(util::within_epsilon(p, q, e));
-//        }
-
-        // Temporary, but maybe should keep this test?
+        // WIP tests, reconsider design?
         assert(util::within_epsilon(local_direction.length(),
                                     global_direction.length(),
                                     e));
-        
         assert(util::within_epsilon(local_direction.length(),
                                     global_direction2.length(),
                                     e));
-        
-//        Vec3 global_direction(2, 3, 4);
-//        Vec3 local_direction = ls.localizeDirection(global_direction);
-//        Vec3 global_direction2 = ls.globalizeDirection(local_direction);
+        assert(Vec3::within_epsilon(global_direction,
+                                    global_direction2,
+                                    e));
+        assert(Vec3::within_epsilon(local_direction,
+                                    ls.localizeDirection(global_direction),
+                                    e));
 
-//        assert(global_direction.is_equal_within_epsilon(global_direction2, e));
-
-        assert(Vec3::is_equal_within_epsilon(global_direction,
-                                             global_direction2,
-                                             e));
-        
-        assert(Vec3::is_equal_within_epsilon(global_direction,
-                                             global_direction2,
-                                             e));
-        
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         

@@ -26,7 +26,19 @@ public:
     Vec3 forward() const { return ls_.k(); }
     Vec3 position() const { return ls_.p(); }
     double mass() const { return mass_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250925 turn off curriculum learning experiment
+    
     double speed() const { return speed_; }
+    
+//    double speed() const
+//    {
+//        grabPrintLock_evoflock();
+//        debugPrint(speed_);
+//        return speed_;
+//    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double max_force() const { return max_force_; }
 
     // Setters
@@ -34,7 +46,23 @@ public:
     void setUp(Vec3 u) { ls_.setJ(u); }
     void setForward(Vec3 f) { ls_.setK(f); }
     void setPosition(Vec3 p) { ls_.setP(p); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250925 turn off curriculum learning experiment
+
     void setSpeed(double speed) { speed_ = speed; }
+
+//    void setSpeed(double speed)
+//    {
+//        if (speed_ == 20)
+//        {
+//            grabPrintLock_evoflock();
+//            std::cout << "    was 20, now " << speed << std::endl;
+//            assert(speed > 0);
+//        }
+//        speed_ = speed;
+//    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     void setMaxForce(double max_force) { max_force_ = max_force; }
 
     // Get current velocity vector.

@@ -255,6 +255,10 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20250925 rename Vec3::is_equal_within_epsilon() to within_epsilon()
+    //               For now, just add the new name.
+
     // Check if two vectors are within epsilon of being equal.
     bool is_equal_within_epsilon(const Vec3& other,
                                  double epsilon=util::epsilon) const
@@ -270,6 +274,16 @@ public:
     {
         return a.is_equal_within_epsilon(b, epsilon);
     }
+    
+    static bool within_epsilon(const Vec3& a,
+                               const Vec3& b,
+                               double epsilon=util::epsilon)
+    {
+        return is_equal_within_epsilon(a, b, epsilon);
+    }
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 
     // Rotate X and Y values about the Z axis by given angle.
     // This is used in combination with a LocalSpace transform to get model in

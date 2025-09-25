@@ -545,6 +545,20 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
                 Boid* boid = Boid::getGpPerThread();
                 LP::GpTree gp_tree = individual->tree();
                 
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250925 turn off curriculum learning experiment
+                
+//                if (boid->isSelected())
+//                if (boid->isSelected() and (flock.clock().frameCounter() == 1))
+//                {
+//                    grabPrintLock_evoflock();
+//                    std::cout << "====> ";
+//                    debugPrint(boid->speed());
+//                }
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                
 //                Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
                 // TEMP: here we are assuming GpTree returns a local steer vec
                 Vec3 local_steering = std::any_cast<Vec3>(gp_tree.eval());

@@ -604,7 +604,13 @@ public:
             {
                 // Count collision, set speed to zero, clear smoothing history.
                 incObsCollisionCount();
-                setSpeed(0);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250925 turn off curriculum learning experiment
+                
+//                setSpeed(0);
+                setSpeedAfterObstacleCollision();
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 resetSteerUpMemories();
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20250319 maybe do not point away after obs collisions?
@@ -620,6 +626,21 @@ public:
             }
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250925 turn off curriculum learning experiment
+    
+    void setSpeedAfterObstacleCollision()
+    {
+//        setSpeed(0);
+//        setSpeed(20);
+//        setSpeed(EF::usingGA() ? 0 : 20);  // TODO temporary experiment
+
+        // TODO temporary experiment -- leave it unchanged for GP for now.
+        if (EF::usingGA()) { setSpeed(0); }
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Returns distance from this Boid to its nearest neighbor, center to center.
     double distanceToNearestNeighbor() const

@@ -58,16 +58,49 @@ public:
         return Vec3(v.dot(i()), v.dot(j()), v.dot(k()));
     }
     
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250924 fix LocalSpace::localizeDirection()
+
     // TODO 20250922 I have no confidence in this. Needs careful unit tests.
+
+//    // Transform a direction vector from global space to this local space.
+//    Vec3 localizeDirection(Vec3 global_direction) const
+//    {
+//        Vec3 v = global_direction + p();
+//        Vec3 rotated = Vec3(v.dot(i()), v.dot(j()), v.dot(k()));
+//        return rotated - p();
+//    }
+  
+//    // Transform a direction vector from global space to this local space.
+//    Vec3 localizeDirection(Vec3 global_direction) const
+//    {
+//        Vec3 v = global_direction;
+//        Vec3 rotated = Vec3(v.dot(i()), v.dot(j()), v.dot(k()));
+//        return rotated;
+//    }
+
+    
+//    // Transform a direction vector from global space to this local space.
+//    Vec3 localizeDirection(Vec3 global_direction) const
+//    {
+//        return Vec3(global_direction.dot(i()),
+//                    global_direction.dot(j()),
+//                    global_direction.dot(k()));
+//    }
 
     // Transform a direction vector from global space to this local space.
     Vec3 localizeDirection(Vec3 global_direction) const
     {
-        Vec3 v = global_direction + p();
-        Vec3 rotated = Vec3(v.dot(i()), v.dot(j()), v.dot(k()));
-        return rotated - p();
+        return
+        {
+            global_direction.dot(i()),
+            global_direction.dot(j()),
+            global_direction.dot(k())
+        };
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -79,6 +112,20 @@ public:
                 (k() * local_vector.z()) +
                 p());
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250924 add LocalSpace::globalizeDirection()
+
+    // Transform a local space position to the global space.
+    Vec3 globalizeDirection(Vec3 local_direction) const
+    {
+        return ((i() * local_direction.x()) +
+                (j() * local_direction.y()) +
+                (k() * local_direction.z()));
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     // Checks that basis vectors are unit length and mutually perpendicular.
     bool is_orthonormal() const { return is_orthonormal(util::epsilon); }
@@ -203,6 +250,84 @@ public:
         assert (a.is_equal_within_epsilon(r.localize(r.globalize(a)), e));
         assert (b.is_equal_within_epsilon(r.globalize(r.localize(b)), e));
         assert (b.is_equal_within_epsilon(r.localize(r.globalize(b)), e));
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20250924 LocalSpace unit tests for localize/globalize direction.
+        
+        Vec3 global_direction(2, 3, 4);
+        Vec3 local_direction = ls.localizeDirection(global_direction);
+        Vec3 global_direction2 = ls.globalizeDirection(local_direction);
+
+
+//        debugPrint(ls.pr);
+//
+//        // Serialize LocalSpace object to stream.
+//        inline std::ostream& operator<<(std::ostream& os, const LocalSpace& ls)
+//        {
+//            os << "[i=" << ls.i();
+//            os << ", j=" << ls.j();
+//            os << ", k=" << ls.k();
+//            os << ", p=" << ls.p();
+//            os << "]";
+//            return os;
+//        }
+
+        std::cout << std::endl;
+        std::cout << std::endl;
+
+        std::cout << "ls = [i=" << ls.i();
+        std::cout << ", j=" << ls.j();
+        std::cout << ", k=" << ls.k();
+        std::cout << ", p=" << ls.p();
+        std::cout << "]";
+        std::cout << std::endl;
+
+        
+        debugPrint(global_direction);
+        debugPrint(local_direction);
+        debugPrint(global_direction2);
+
+        debugPrint(global_direction.length());
+        debugPrint(local_direction.length());
+        debugPrint(global_direction2.length());
+
+        std::cout << std::endl;
+        std::cout << std::endl;
+        
+//        exit(0);
+        
+//        // Temporary, but maybe should keep this test?
+//        {
+//            double p = global_direction.length();
+//            double q = local_direction.length();
+//            assert(util::within_epsilon(p, q, e));
+//        }
+
+        // Temporary, but maybe should keep this test?
+        assert(util::within_epsilon(local_direction.length(),
+                                    global_direction.length(),
+                                    e));
+        
+        assert(util::within_epsilon(local_direction.length(),
+                                    global_direction2.length(),
+                                    e));
+        
+//        Vec3 global_direction(2, 3, 4);
+//        Vec3 local_direction = ls.localizeDirection(global_direction);
+//        Vec3 global_direction2 = ls.globalizeDirection(local_direction);
+
+//        assert(global_direction.is_equal_within_epsilon(global_direction2, e));
+
+        assert(Vec3::is_equal_within_epsilon(global_direction,
+                                             global_direction2,
+                                             e));
+        
+        assert(Vec3::is_equal_within_epsilon(global_direction,
+                                             global_direction2,
+                                             e));
+        
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         
         const LocalSpace o;  // original for comparison
         Vec3 diag_ypz = (o.j() + o.k()).normalize();

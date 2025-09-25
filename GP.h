@@ -548,7 +548,13 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
 //                Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
                 // TEMP: here we are assuming GpTree returns a local steer vec
                 Vec3 local_steering = std::any_cast<Vec3>(gp_tree.eval());
-                Vec3 steering = boid->ls().globalize(local_steering);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20250924 add LocalSpace::globalizeDirection()
+
+//                Vec3 steering = boid->ls().globalize(local_steering);
+                Vec3 steering = boid->ls().globalizeDirection(local_steering);
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 // KEEP? added while tracking down "cleaning" issues
                 if (not steering.is_valid()) { steering = Vec3(); }

@@ -636,8 +636,20 @@ public:
 //        setSpeed(20);
 //        setSpeed(EF::usingGA() ? 0 : 20);  // TODO temporary experiment
 
-        // TODO temporary experiment -- leave it unchanged for GP for now.
-        if (EF::usingGA()) { setSpeed(0); }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20250925 reduce speed on collision, but not to zero
+        
+//        // TODO temporary experiment -- leave it unchanged for GP for now.
+//        if (EF::usingGA()) { setSpeed(0); }
+        
+//        setSpeed(EF::usingGA() ? 0 : speed() * 0.75);
+        
+//        setSpeed(EF::usingGA() ? 0 : speed() * 0.5);
+
+        setSpeed(EF::usingGA() ? 0 : speed() * 0.25);
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

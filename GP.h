@@ -573,12 +573,17 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
                 // KEEP? added while tracking down "cleaning" issues
                 if (not steering.is_valid()) { steering = Vec3(); }
                 
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20250926 lower limit on max steering force 100 -> 10
+
                 // Ran a test in GA mode. Max steering force length was 1000.
 //                double max_steering_length = 1000;
                 // WIP reduce by an order of magnitude, close to max_force()
-                double max_steering_length = 100;
+//                double max_steering_length = 100;
+                double max_steering_length = 10;
                 steering = steering.truncate(max_steering_length);
 
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 // KEEP? added while tracking down "cleaning" issues
                 double min_steering_length = 0.00001;
                 if (steering.length() < min_steering_length) { steering = Vec3(); }

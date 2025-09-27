@@ -277,8 +277,16 @@ void runOneFlockEvolution()
 //    int individuals = 300;
 //    int subpops = 17;
 
-    int individuals = 600;
-    int subpops = 24;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250926 evo pop from 600 back to 300
+
+//    int individuals = 600;
+//    int subpops = 24;
+
+    int individuals = 300;
+    int subpops = 17;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
@@ -321,9 +329,18 @@ void runOneFlockEvolution()
 //    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
 
-    int min_crossover_tree_size = EF::usingGP() ?  20 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 100 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 100 : ga_tree_size;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20250925 reduce speed on collision, but not to zero
+
+//    int min_crossover_tree_size = EF::usingGP() ?  20 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 100 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 100 : ga_tree_size;
+
+    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

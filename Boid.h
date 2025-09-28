@@ -400,18 +400,7 @@ public:
 
         return cached_nearest_neighbors_;
     }
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250923 smooth in evolved steering
 
-//    // Ad hoc low-pass filtering of steering force. Blends this step's newly
-//    // determined "raw" steering into a per-boid accumulator, then returns that
-//    // smoothed value to use for actually steering the boid this simulation step.
-//    Vec3 smoothed_steering(Vec3 steer)
-//    {
-//        return steer_memory_.blend(steer, 0.8);  // Ad hoc smoothness param.
-//    }
-  
     // Ad hoc low-pass filtering of steering force. Blends this step's newly
     // determined "raw" steering into a per-boid accumulator, then returns that
     // smoothed value to use for actually steering the boid this simulation step.
@@ -420,9 +409,6 @@ public:
     {
         return steer_memory_.blend(steer, smoothness);
     }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
 
     // Use Draw api to draw this Boid's “body” -- an irregular tetrahedron.
     void draw_body()
@@ -604,13 +590,7 @@ public:
             {
                 // Count collision, set speed to zero, clear smoothing history.
                 incObsCollisionCount();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250925 turn off curriculum learning experiment
-                
-//                setSpeed(0);
                 setSpeedAfterObstacleCollision();
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 resetSteerUpMemories();
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20250319 maybe do not point away after obs collisions?
@@ -627,33 +607,11 @@ public:
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250925 turn off curriculum learning experiment
-    
     void setSpeedAfterObstacleCollision()
     {
-//        setSpeed(0);
-//        setSpeed(20);
-//        setSpeed(EF::usingGA() ? 0 : 20);  // TODO temporary experiment
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20250925 reduce speed on collision, but not to zero
-        
-//        // TODO temporary experiment -- leave it unchanged for GP for now.
-//        if (EF::usingGA()) { setSpeed(0); }
-        
-//        setSpeed(EF::usingGA() ? 0 : speed() * 0.75);
-        
-//        setSpeed(EF::usingGA() ? 0 : speed() * 0.5);
-
         setSpeed(EF::usingGA() ? 0 : speed() * 0.25);
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Returns distance from this Boid to its nearest neighbor, center to center.
     double distanceToNearestNeighbor() const
     {

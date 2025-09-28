@@ -178,7 +178,7 @@ public:
                              Vec3 reference_up)
     {
         LocalSpace ls;
-        if (not Vec3::is_equal_within_epsilon(from_position, to_position))
+        if (not Vec3::within_epsilon(from_position, to_position))
         {
             ls.setP(from_position);
             Vec3 new_forward = (to_position - from_position).normalize();
@@ -246,54 +246,17 @@ public:
         assert (r.is_orthonormal() && "randomized ls is still orthonormal");
 
         double e = util::epsilon * 20; // Changed from 10 to 20 on 20240604.
-        assert (a.is_equal_within_epsilon(r.globalize(r.localize(a)), e));
-        assert (a.is_equal_within_epsilon(r.localize(r.globalize(a)), e));
-        assert (b.is_equal_within_epsilon(r.globalize(r.localize(b)), e));
-        assert (b.is_equal_within_epsilon(r.localize(r.globalize(b)), e));
-        
+        assert (Vec3::within_epsilon(a, r.globalize(r.localize(a)), e));
+        assert (Vec3::within_epsilon(a, r.localize(r.globalize(a)), e));
+        assert (Vec3::within_epsilon(b, r.globalize(r.localize(b)), e));
+        assert (Vec3::within_epsilon(b, r.localize(r.globalize(b)), e));
+
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20250924 LocalSpace unit tests for localize/globalize direction.
         
         Vec3 global_direction(2, 3, 4);
         Vec3 local_direction = ls.localizeDirection(global_direction);
         Vec3 global_direction2 = ls.globalizeDirection(local_direction);
-
-//        std::cout << std::endl;
-//        std::cout << std::endl;
-//
-//        std::cout << "ls = [i=" << ls.i();
-//        std::cout << ", j=" << ls.j();
-//        std::cout << ", k=" << ls.k();
-//        std::cout << ", p=" << ls.p();
-//        std::cout << "]";
-//        std::cout << std::endl;
-//
-//        
-//        debugPrint(global_direction);
-//        debugPrint(local_direction);
-//        debugPrint(global_direction2);
-//
-//        debugPrint(global_direction.length());
-//        debugPrint(local_direction.length());
-//        debugPrint(global_direction2.length());
-//
-//        std::cout << std::endl;
-//        std::cout << std::endl;
-
-//        // WIP tests, reconsider design?
-//        assert(util::within_epsilon(local_direction.length(),
-//                                    global_direction.length(),
-//                                    e));
-//        assert(util::within_epsilon(local_direction.length(),
-//                                    global_direction2.length(),
-//                                    e));
-//        assert(Vec3::is_equal_within_epsilon(global_direction,
-//                                             global_direction2,
-//                                             e));
-//        
-//        assert(Vec3::is_equal_within_epsilon(global_direction,
-//                                             global_direction2,
-//                                             e));
         
         // WIP tests, reconsider design?
         assert(util::within_epsilon(local_direction.length(),
@@ -317,24 +280,24 @@ public:
         Vec3 diag_ymz = (o.j() - o.k()).normalize();
         LocalSpace m = o.rotate_to_new_forward(diag_ypz, Vec3(0, 1, 0));
         assert(m.is_orthonormal());
-        assert(m.i().is_equal_within_epsilon(o.i()));
-        assert(m.j().is_equal_within_epsilon(diag_ymz));
+        assert(Vec3::within_epsilon(m.i(), o.i()));
+        assert(Vec3::within_epsilon(m.j(), diag_ymz));
         LocalSpace n = o.rotate_to_new_forward(o.i(), Vec3(0, 1, 0));
         assert(n.is_orthonormal());
-        assert(n.i().is_equal_within_epsilon(-o.k()));
-        assert(n.j().is_equal_within_epsilon(o.j()));
-        
+        assert(Vec3::within_epsilon(n.i(), -o.k()));
+        assert(Vec3::within_epsilon(n.j(), o.j()));
+
         // Tests for fromTo()
         LocalSpace ft_ls;
         Vec3 ft_tp(1, -2, 3);
         Vec3 ft_move(0, 0, 1);
         auto ft_tests = [&](Vec3 o)
         {
-            assert(o.is_equal_within_epsilon(ft_ls.p()));
-            assert(ft_tp.is_equal_within_epsilon(ft_ls.localize(ft_tp)  + o));
-            assert(ft_tp.is_equal_within_epsilon(ft_ls.localize(ft_tp   + o)));
-            assert(ft_tp.is_equal_within_epsilon(ft_ls.globalize(ft_tp) - o));
-            assert(ft_tp.is_equal_within_epsilon(ft_ls.globalize(ft_tp  - o)));
+            assert(Vec3::within_epsilon(o, ft_ls.p()));
+            assert(Vec3::within_epsilon(ft_tp, ft_ls.localize(ft_tp)  + o));
+            assert(Vec3::within_epsilon(ft_tp, ft_ls.localize(ft_tp   + o)));
+            assert(Vec3::within_epsilon(ft_tp, ft_ls.globalize(ft_tp) - o));
+            assert(Vec3::within_epsilon(ft_tp, ft_ls.globalize(ft_tp  - o)));
         };
         // Test identity LocalSpace.
         ft_tests(Vec3());
@@ -347,7 +310,7 @@ public:
         // Finally, use an arbitrary from-to, and check for cyclic consistancy.
         ft_ls = LocalSpace::fromTo(Vec3(-5, 3, -1), Vec3(3, -4, 6));
         Vec3 ft_cycle = ft_ls.globalize(ft_ls.localize(ft_tp));
-        assert(ft_tp.is_equal_within_epsilon(ft_cycle));
+        assert(Vec3::within_epsilon(ft_tp, ft_cycle));
     }
     
 private:

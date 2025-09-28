@@ -254,36 +254,19 @@ public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250925 rename Vec3::is_equal_within_epsilon() to within_epsilon()
-    //               For now, just add the new name.
+    // Check if two vectors are within epsilon of being equal.
+    static bool within_epsilon(const Vec3& a, const Vec3& b, double epsilon)
+    {
+            return (util::within_epsilon(a.x(), b.x(), epsilon) and
+                    util::within_epsilon(a.y(), b.y(), epsilon) and
+                    util::within_epsilon(a.z(), b.z(), epsilon));
+    }
 
     // Check if two vectors are within epsilon of being equal.
-    bool is_equal_within_epsilon(const Vec3& other,
-                                 double epsilon=util::epsilon) const
+    static bool within_epsilon(const Vec3& a, const Vec3& b)
     {
-        // bigger_epsilon = util.epsilon * 10  # Got occasional fail with default.
-        return (util::within_epsilon(x(), other.x(), epsilon) and
-                util::within_epsilon(y(), other.y(), epsilon) and
-                util::within_epsilon(z(), other.z(), epsilon));
+        return within_epsilon(a, b, util::epsilon);
     }
-    static bool is_equal_within_epsilon(const Vec3& a,
-                                        const Vec3& b,
-                                        double epsilon=util::epsilon)
-    {
-        return a.is_equal_within_epsilon(b, epsilon);
-    }
-    
-    static bool within_epsilon(const Vec3& a,
-                               const Vec3& b,
-                               double epsilon=util::epsilon)
-    {
-        return is_equal_within_epsilon(a, b, epsilon);
-    }
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
 
     // Rotate X and Y values about the Z axis by given angle.
     // This is used in combination with a LocalSpace transform to get model in
@@ -460,10 +443,10 @@ public:
         Vec3 diag_norm = Vec3(1, 1, 1).normalize();
         assert (Vec3(2, 4, 8).parallel_component(x_norm) == Vec3(2, 0, 0));
         assert (Vec3(2, 4, 8).perpendicular_component(x_norm) == Vec3(0, 4, 8));
-        assert (Vec3::is_equal_within_epsilon(x_norm.parallel_component(diag_norm),
-                                              Vec3(f33, f33, f33)));
-        assert (Vec3::is_equal_within_epsilon(x_norm.perpendicular_component(diag_norm),
-                                              Vec3(f66, -f33, -f33)));
+        assert (Vec3::within_epsilon(x_norm.parallel_component(diag_norm),
+                                     Vec3(f33, f33, f33)));
+        assert (Vec3::within_epsilon(x_norm.perpendicular_component(diag_norm),
+                                     Vec3(f66, -f33, -f33)));
         
         Vec3 a = Vec3(1, 2, 3).normalize();
         Vec3 b = Vec3(-9, 7, 5).normalize();
@@ -505,8 +488,8 @@ public:
         
         Vec3 e = Vec3(2, 4, 8);
         Vec3 f = Vec3(2, 4, 8 - util::epsilon * 2);
-        assert (e.is_equal_within_epsilon(e));
-        assert (! e.is_equal_within_epsilon(f));
+        assert (within_epsilon(e, e));
+        assert (not within_epsilon(e, f));
         
         Vec3 i(1, 0, 0);
         Vec3 j(0, 1, 0);
@@ -518,7 +501,6 @@ public:
         assert (j.cross(i) == -k);
         assert (k.cross(j) == -i);
         
-//        double pi = std::acos(-1);
         double pi = util::pi;
         double pi2 = pi / 2;
         double pi3 = pi / 3;
@@ -534,27 +516,27 @@ public:
         assert (Vec3::axis_angle(v111, pi3) == v111.normalize() * pi3);
         
         assert (Vec3::rotate_vec_to_vec(i, j) == v001 * pi2);
-        assert (Vec3::is_equal_within_epsilon(Vec3::rotate_vec_to_vec(v100, v110),
-                                              Vec3::axis_angle(v001, pi4)));
-        assert (Vec3::is_equal_within_epsilon(Vec3::rotate_vec_to_vec(v111, v001),
-                                              Vec3::axis_angle(Vec3(1,-1,0), ang)));
+        assert (Vec3::within_epsilon(Vec3::rotate_vec_to_vec(v100, v110),
+                                     Vec3::axis_angle(v001, pi4)));
+        assert (Vec3::within_epsilon(Vec3::rotate_vec_to_vec(v111, v001),
+                                     Vec3::axis_angle(Vec3(1,-1,0), ang)));
         
         double spi3 = std::sqrt(3) / 2;                         // sin(60°), sin(pi/3)
         double cpi3 = 0.5;                                      // cos(60°), cos(pi/3)
         double spi5 = std::sqrt((5.0 / 8) - (std::sqrt(5) / 8));// sin(36°), sin(pi/5)
         double cpi5 = (1 + std::sqrt(5)) / 4;                   // cos(36°), cos(pi/5)
-        assert (Vec3::is_equal_within_epsilon(v111.rotate_xy_about_z(pi2),
-                                              Vec3(1, -1, 1)));
-        assert (Vec3::is_equal_within_epsilon(v111.rotate_xy_about_z(pi3),
-                                              Vec3(cpi3 + spi3, cpi3 - spi3, 1)));
-        assert (Vec3::is_equal_within_epsilon(v111.rotate_xy_about_z(pi5),
-                                              Vec3(cpi5 + spi5, cpi5 - spi5, 1)));
-        assert (Vec3::is_equal_within_epsilon(v111.rotate_xz_about_y(pi2),
-                                              Vec3(1, 1, -1)));
-        assert (Vec3::is_equal_within_epsilon(v111.rotate_xz_about_y(pi3),
-                                              Vec3(cpi3 + spi3, 1, cpi3 - spi3)));
-        assert (Vec3::is_equal_within_epsilon(v111.rotate_xz_about_y(pi5),
-                                              Vec3(cpi5 + spi5, 1, cpi5 - spi5)));
+        assert (Vec3::within_epsilon(v111.rotate_xy_about_z(pi2),
+                                     Vec3(1, -1, 1)));
+        assert (Vec3::within_epsilon(v111.rotate_xy_about_z(pi3),
+                                     Vec3(cpi3 + spi3, cpi3 - spi3, 1)));
+        assert (Vec3::within_epsilon(v111.rotate_xy_about_z(pi5),
+                                     Vec3(cpi5 + spi5, cpi5 - spi5, 1)));
+        assert (Vec3::within_epsilon(v111.rotate_xz_about_y(pi2),
+                                     Vec3(1, 1, -1)));
+        assert (Vec3::within_epsilon(v111.rotate_xz_about_y(pi3),
+                                     Vec3(cpi3 + spi3, 1, cpi3 - spi3)));
+        assert (Vec3::within_epsilon(v111.rotate_xz_about_y(pi5),
+                                     Vec3(cpi5 + spi5, 1, cpi5 - spi5)));
         
         Vec3 v;
         v = Vec3(4, 5, 6);

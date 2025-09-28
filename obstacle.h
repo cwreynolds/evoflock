@@ -569,7 +569,7 @@ inline void Obstacle::unit_test()
                          5.76654576697607,
                          -5.94424294496012);
     double e = util::epsilon * 10;
-    assert(Vec3::is_equal_within_epsilon(tso_ri, tso_ri_expected, e));
+    assert(Vec3::within_epsilon(tso_ri, tso_ri_expected, e));
     
     // Test local def of classic signum(). Could move to Utilities.h if needed.
     assert(signum( 5.0) ==  1.0);
@@ -601,7 +601,7 @@ inline void Obstacle::unit_test()
         SphereObstacle sphere(radius, center);
         Vec3 inside = sphere.normal(center + test_dir);
         Vec3 outside = sphere.normal(center + (test_dir * (radius + 1)));
-        assert(Vec3::is_equal_within_epsilon(inside, outside));
+        assert(Vec3::within_epsilon(inside, outside));
     }
     
     // Verify normalTowardAllowedSide() points toward non-excluded side.
@@ -613,7 +613,7 @@ inline void Obstacle::unit_test()
         Vec3 p(1, 2, 3);
         Vec3 outside_norm = sphere_exclude_inside.normalTowardAllowedSide(p, p);
         Vec3 inside_norm = sphere_exclude_outside.normalTowardAllowedSide(p, p);
-        assert(Vec3::is_equal_within_epsilon(outside_norm, -inside_norm));
+        assert(Vec3::within_epsilon(outside_norm, -inside_norm));
     }
 
     // Test enforceConstraint() on various combinations of shape and ExcludeFrom.

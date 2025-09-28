@@ -26,19 +26,7 @@ public:
     Vec3 forward() const { return ls_.k(); }
     Vec3 position() const { return ls_.p(); }
     double mass() const { return mass_; }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250925 turn off curriculum learning experiment
-    
     double speed() const { return speed_; }
-    
-//    double speed() const
-//    {
-//        grabPrintLock_evoflock();
-//        debugPrint(speed_);
-//        return speed_;
-//    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double max_force() const { return max_force_; }
 
     // Setters
@@ -46,23 +34,7 @@ public:
     void setUp(Vec3 u) { ls_.setJ(u); }
     void setForward(Vec3 f) { ls_.setK(f); }
     void setPosition(Vec3 p) { ls_.setP(p); }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250925 turn off curriculum learning experiment
-
     void setSpeed(double speed) { speed_ = speed; }
-
-//    void setSpeed(double speed)
-//    {
-//        if (speed_ == 20)
-//        {
-//            grabPrintLock_evoflock();
-//            std::cout << "    was 20, now " << speed << std::endl;
-//            assert(speed > 0);
-//        }
-//        speed_ = speed;
-//    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     void setMaxForce(double max_force) { max_force_ = max_force; }
 
     // Get current velocity vector.
@@ -175,7 +147,7 @@ public:
         for (int i = 0; i < n; i++) { agent0.steer(z_acceleration, 1); }
         // Assert the Agent's position is where we predicted it should be.
         double e = util::epsilon * 1000; // ~1e-12
-        assert(Vec3::is_equal_within_epsilon(agent0.position(), predict_pos, e));
+        assert(Vec3::within_epsilon(agent0.position(), predict_pos, e));
         
         // Simple "historical repeatability" test. Verify that Agent's final
         // position matches a precomputed reference frozen in the source.
@@ -212,7 +184,7 @@ public:
         Vec3 ref_position2(194.704195501038, // recorded 20240119
                            1079.7517268385,
                            1041.8997370084);
-        assert (Vec3::is_equal_within_epsilon(agent2.position(), ref_position2, e));
+        assert (Vec3::within_epsilon(agent2.position(), ref_position2, e));
     }
 
 

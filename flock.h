@@ -360,15 +360,22 @@ public:
         double non_coll_steps = boidStepPerSim() - count;
         double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
         // Apply a very high exponent to ignore all but nearly perfect scores.
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20250925 reduce speed on collision, but not to zero
         //               plots at WolfAlpha: https://tinyurl.com/4vutsnar
         
 //        return std::pow(norm_non_coll_steps, 500);
 //        return std::pow(norm_non_coll_steps, EF::usingGA() ? 500 : 5);
-        return std::pow(norm_non_coll_steps, EF::usingGA() ? 500 : 1);
+        
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+        // TODO 20250928 change exponent in obstacleCollisionsScore()
+        
+//        return std::pow(norm_non_coll_steps, EF::usingGA() ? 500 : 1);
+        return std::pow(norm_non_coll_steps, EF::usingGA() ? 500 : 2);
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~

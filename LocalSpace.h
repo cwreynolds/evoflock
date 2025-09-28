@@ -41,52 +41,12 @@ public:
     void setP(Vec3 p) { p_ = p; }
     void setIJKP(Vec3 i, Vec3 j, Vec3 k, Vec3 p) { i_=i; j_=j; k_=k; p_=p; }
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250922 WIP switch to "evolved program returns local vec
-
-//    // Transforms a global space position into the local space of this object.
-//    Vec3 localize(Vec3 global_vector) const
-//    {
-//        Vec3 v = global_vector - p();
-//        return Vec3(v.dot(i()), v.dot(j()), v.dot(k()));
-//    }
-
     // Transform a point in global coordinate space to this local space.
-    Vec3 localize(Vec3 global_point) const
+    Vec3 localizePosition(Vec3 global_point) const
     {
         Vec3 v = global_point - p();
         return Vec3(v.dot(i()), v.dot(j()), v.dot(k()));
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250924 fix LocalSpace::localizeDirection()
-
-    // TODO 20250922 I have no confidence in this. Needs careful unit tests.
-
-//    // Transform a direction vector from global space to this local space.
-//    Vec3 localizeDirection(Vec3 global_direction) const
-//    {
-//        Vec3 v = global_direction + p();
-//        Vec3 rotated = Vec3(v.dot(i()), v.dot(j()), v.dot(k()));
-//        return rotated - p();
-//    }
-  
-//    // Transform a direction vector from global space to this local space.
-//    Vec3 localizeDirection(Vec3 global_direction) const
-//    {
-//        Vec3 v = global_direction;
-//        Vec3 rotated = Vec3(v.dot(i()), v.dot(j()), v.dot(k()));
-//        return rotated;
-//    }
-
-    
-//    // Transform a direction vector from global space to this local space.
-//    Vec3 localizeDirection(Vec3 global_direction) const
-//    {
-//        return Vec3(global_direction.dot(i()),
-//                    global_direction.dot(j()),
-//                    global_direction.dot(k()));
-//    }
 
     // Transform a direction vector from global space to this local space.
     Vec3 localizeDirection(Vec3 global_direction) const
@@ -99,22 +59,14 @@ public:
         };
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    // Transforms a local space position to the global space.
-    Vec3 globalize(Vec3 local_vector) const
+    // Transforms a local space position ("point") to the global space.
+    Vec3 globalizePosition(Vec3 local_position) const
     {
-        return ((i() * local_vector.x()) +
-                (j() * local_vector.y()) +
-                (k() * local_vector.z()) +
+        return ((i() * local_position.x()) +
+                (j() * local_position.y()) +
+                (k() * local_position.z()) +
                 p());
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250924 add LocalSpace::globalizeDirection()
 
     // Transform a local space position to the global space.
     Vec3 globalizeDirection(Vec3 local_direction) const
@@ -123,9 +75,6 @@ public:
                 (j() * local_direction.y()) +
                 (k() * local_direction.z()));
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
     // Checks that basis vectors are unit length and mutually perpendicular.
     bool is_orthonormal() const { return is_orthonormal(util::epsilon); }
@@ -246,19 +195,22 @@ public:
         assert (r.is_orthonormal() && "randomized ls is still orthonormal");
 
         double e = util::epsilon * 20; // Changed from 10 to 20 on 20240604.
-        assert (Vec3::within_epsilon(a, r.globalize(r.localize(a)), e));
-        assert (Vec3::within_epsilon(a, r.localize(r.globalize(a)), e));
-        assert (Vec3::within_epsilon(b, r.globalize(r.localize(b)), e));
-        assert (Vec3::within_epsilon(b, r.localize(r.globalize(b)), e));
+        assert (Vec3::within_epsilon(a,
+                                     r.globalizePosition(r.localizePosition(a)),
+                                     e));
+        assert (Vec3::within_epsilon(a,
+                                     r.localizePosition(r.globalizePosition(a)),
+                                     e));
+        assert (Vec3::within_epsilon(b,
+                                     r.globalizePosition(r.localizePosition(b)),
+                                     e));
+        assert (Vec3::within_epsilon(b,
+                                     r.localizePosition(r.globalizePosition(b)),
+                                     e));
 
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20250924 LocalSpace unit tests for localize/globalize direction.
-        
         Vec3 global_direction(2, 3, 4);
         Vec3 local_direction = ls.localizeDirection(global_direction);
         Vec3 global_direction2 = ls.globalizeDirection(local_direction);
-        
-        // WIP tests, reconsider design?
         assert(util::within_epsilon(local_direction.length(),
                                     global_direction.length(),
                                     e));
@@ -271,9 +223,6 @@ public:
         assert(Vec3::within_epsilon(local_direction,
                                     ls.localizeDirection(global_direction),
                                     e));
-
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         
         const LocalSpace o;  // original for comparison
         Vec3 diag_ypz = (o.j() + o.k()).normalize();
@@ -294,10 +243,14 @@ public:
         auto ft_tests = [&](Vec3 o)
         {
             assert(Vec3::within_epsilon(o, ft_ls.p()));
-            assert(Vec3::within_epsilon(ft_tp, ft_ls.localize(ft_tp)  + o));
-            assert(Vec3::within_epsilon(ft_tp, ft_ls.localize(ft_tp   + o)));
-            assert(Vec3::within_epsilon(ft_tp, ft_ls.globalize(ft_tp) - o));
-            assert(Vec3::within_epsilon(ft_tp, ft_ls.globalize(ft_tp  - o)));
+            assert(Vec3::within_epsilon(ft_tp,
+                                        ft_ls.localizePosition(ft_tp)  + o));
+            assert(Vec3::within_epsilon(ft_tp,
+                                        ft_ls.localizePosition(ft_tp   + o)));
+            assert(Vec3::within_epsilon(ft_tp,
+                                        ft_ls.globalizePosition(ft_tp) - o));
+            assert(Vec3::within_epsilon(ft_tp,
+                                        ft_ls.globalizePosition(ft_tp  - o)));
         };
         // Test identity LocalSpace.
         ft_tests(Vec3());
@@ -309,7 +262,7 @@ public:
         ft_tests(ft_move);
         // Finally, use an arbitrary from-to, and check for cyclic consistancy.
         ft_ls = LocalSpace::fromTo(Vec3(-5, 3, -1), Vec3(3, -4, 6));
-        Vec3 ft_cycle = ft_ls.globalize(ft_ls.localize(ft_tp));
+        Vec3 ft_cycle = ft_ls.globalizePosition(ft_ls.localizePosition(ft_tp));
         assert(Vec3::within_epsilon(ft_tp, ft_cycle));
     }
     

@@ -283,8 +283,23 @@ void runOneFlockEvolution()
 //    int individuals = 600;
 //    int subpops = 24;
 
-    int individuals = 300;
-    int subpops = 17;
+    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+    // TODO 20250928 try making 10x bigger just to see if that moves the needle
+
+//    int individuals = 300;
+//    int subpops = 17;
+    
+    int individuals = 3000;
+    int subpops = std::round(std::sqrt(individuals));
+    
+    
+//    debugPrint(individuals)
+//    debugPrint(std::sqrt(individuals))
+//    debugPrint(std::sqrt(individuals * 1.0))
+//    debugPrint(std::round(std::sqrt(individuals * 1.0)))
+//    debugPrint(std::round(std::sqrt(individuals)))
+
+    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

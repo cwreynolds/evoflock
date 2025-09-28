@@ -177,7 +177,7 @@ public:
         Vec3 local_force(0.1, 0.5, 1);
         for (int i = 0; i < n; i++)
         {
-            Vec3 global_force = agent2.ls().globalize(local_force);
+            Vec3 global_force = agent2.ls().globalizePosition(local_force);
             agent2.steer(global_force, 1);
             //debugPrint(agent2.position().to_string(15))
         }

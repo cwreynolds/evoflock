@@ -260,8 +260,10 @@ public:
             Vec3 r(radius, 0, 0);
             for (int i = 0; i < sides; i++)
             {
-                Vec3 a = ls.globalize(r.rotate_xy_about_z(angle_step * i));
-                Vec3 b = ls.globalize(r.rotate_xy_about_z(angle_step * (i+1)));
+                Vec3 spoke_1 = r.rotate_xy_about_z(angle_step * i);
+                Vec3 spoke_2 = r.rotate_xy_about_z(angle_step * (i+1));
+                Vec3 a = ls.globalizePosition(spoke_1);
+                Vec3 b = ls.globalizePosition(spoke_2);
                 Vec3 c = b + offset;
                 Vec3 d = a + offset;
                 addTriMeshToAnimatedFrame({a, b, c, d}, {3,1,0, 3,2,1}, color);
@@ -405,13 +407,13 @@ public:
         double angle = 2 * M_PI / chords;
         Vec3 up = camera().j();
         LocalSpace ls = LocalSpace::fromTo(center, cameraLookFrom(), up);
-        Vec3 lup = ls.localize(up);
+        Vec3 lup = ls.localizePosition(up);
         Vec3 local_spoke = Vec3(lup.x(), lup.y(), 0).normalize() * radius;
         for (int i = 0; i < chords; i++)
         {
             Vec3 new_spoke = local_spoke.rotate_xy_about_z(angle);
-            addLineSegmentToAnimatedFrame(ls.globalize(local_spoke),
-                                          ls.globalize(new_spoke),
+            addLineSegmentToAnimatedFrame(ls.globalizePosition(local_spoke),
+                                          ls.globalizePosition(new_spoke),
                                           c ? Color::white() : Color::black());
             local_spoke = new_spoke;
             c = not c;
@@ -466,7 +468,8 @@ public:
     // Invoke the "wingman camera" model, update look_from/look_at/up and camera.
     void animateWingmanCamera()
     {
-        Vec3 global_cam = aimAgent().ls().globalize(wingman_cam_local_offset_);
+        Vec3 local_offset = wingman_cam_local_offset_;
+        Vec3 global_cam = aimAgent().ls().globalizePosition(local_offset);
         blendInNewCameraLookFrom(global_cam);
         blendInNewCameraLookAt(aimAgent().position());
         blendInNewCameraLookUp(aimAgent().up());
@@ -563,7 +566,8 @@ public:
                     // Copy "look up" of current camera.
                     cameraLookUp() = camera().j();
                     // Transform new cam pos into local space of aimAgent()
-                    Vec3 local_cam = aimAgent().ls().localize(cameraLookFrom());
+                    Vec3 gclf = cameraLookFrom();
+                    Vec3 local_cam = aimAgent().ls().localizePosition(gclf);
                     wingman_cam_local_offset_ = local_cam;
                 }
                 mouse_pos_pixels_ = new_pos_pixels;

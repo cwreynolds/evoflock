@@ -565,7 +565,7 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20250924 add LocalSpace::globalizeDirection()
 
-//                Vec3 steering = boid->ls().globalize(local_steering);
+//                Vec3 steering = boid->ls().globalizePosition(local_steering);
                 Vec3 steering = boid->ls().globalizeDirection(local_steering);
 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

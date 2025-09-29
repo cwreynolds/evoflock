@@ -289,16 +289,21 @@ void runOneFlockEvolution()
 //    int individuals = 300;
 //    int subpops = 17;
     
-    int individuals = 3000;
+//        int individuals = 3000;
+//        int subpops = std::round(std::sqrt(individuals));
+//
+//
+//    //    debugPrint(individuals)
+//    //    debugPrint(std::sqrt(individuals))
+//    //    debugPrint(std::sqrt(individuals * 1.0))
+//    //    debugPrint(std::round(std::sqrt(individuals * 1.0)))
+//    //    debugPrint(std::round(std::sqrt(individuals)))
+
+//    int individuals = 300;
+//    int individuals = 3000;
+    int individuals = 300;
     int subpops = std::round(std::sqrt(individuals));
     
-    
-//    debugPrint(individuals)
-//    debugPrint(std::sqrt(individuals))
-//    debugPrint(std::sqrt(individuals * 1.0))
-//    debugPrint(std::round(std::sqrt(individuals * 1.0)))
-//    debugPrint(std::round(std::sqrt(individuals)))
-
     //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

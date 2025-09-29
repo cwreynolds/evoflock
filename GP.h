@@ -1720,8 +1720,8 @@ LP::FunctionSet evoflock_gp_function_set()
 //                    Vec3 unit_basis = ensure_unit_length(boid.forward());
 //                    return std::any(value.perpendicular_component(unit_basis));
 
-                    Vec3 unit_basis(0, 0, 1);
-                    return std::any(value.perpendicular_component(unit_basis));
+//                    Vec3 unit_basis(0, 0, 1);
+//                    return std::any(value.perpendicular_component(unit_basis));
                     
                     
                     // Take component of "value" perpendicular to "forward".
@@ -1734,6 +1734,25 @@ LP::FunctionSet evoflock_gp_function_set()
             },
 
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250929 experimental "higher level" GpFunc for boids
+            
+            {
+                "Speed_Control", "Vec3", {"Scalar_100"},
+                [](LP::GpTree& tree)
+                {
+                    double target_speed = clean_num(tree.evalSubtree<double>(0));
+                    Boid& b = *Boid::getGpPerThread();
+                    int sign =  (b.speed() < target_speed) ? 1 : -1;
+                    double max_force = 10;
+                    Vec3 thrust = b.forward() * max_force * sign;
+                    return std::any(thrust);
+                }
+            },
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~

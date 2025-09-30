@@ -1340,16 +1340,21 @@ LP::FunctionSet evoflock_gp_function_set()
             },
 
             // Vector functions:
-            {
-                "Vec3", "Vec3", {"Scalar_100", "Scalar_100", "Scalar_100"},
-                [](LP::GpTree& tree)
-                {
-                    Vec3 v(tree.evalSubtree<double>(0),
-                           tree.evalSubtree<double>(1),
-                           tree.evalSubtree<double>(2));
-                    return std::any(clean_vec3(v));
-                }
-            },
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20250929 I keep seeing bad designs with this at the top
+            //               Not sure how useful it is. Turn it off for now.
+//            {
+//                "Vec3", "Vec3", {"Scalar_100", "Scalar_100", "Scalar_100"},
+//                [](LP::GpTree& tree)
+//                {
+//                    Vec3 v(tree.evalSubtree<double>(0),
+//                           tree.evalSubtree<double>(1),
+//                           tree.evalSubtree<double>(2));
+//                    return std::any(clean_vec3(v));
+//                }
+//            },
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             {
                 "Add_v3", "Vec3", {"Vec3", "Vec3"},
                 [](LP::GpTree& tree)
@@ -1390,14 +1395,17 @@ LP::FunctionSet evoflock_gp_function_set()
                     return std::any(clean_vec3(n));
                 }
             },
-            {
-                "Cross", "Vec3", {"Vec3", "Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    return std::any(Vec3::cross(tree.evalSubtree<Vec3>(0),
-                                                tree.evalSubtree<Vec3>(1)));
-                }
-            },
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20250930 fewer GpFunc that may be "attractive nuisances"
+//            {
+//                "Cross", "Vec3", {"Vec3", "Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    return std::any(Vec3::cross(tree.evalSubtree<Vec3>(0),
+//                                                tree.evalSubtree<Vec3>(1)));
+//                }
+//            },
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             {
                 "Dot", "Scalar_100", {"Vec3", "Vec3"},
                 [](LP::GpTree& tree)
@@ -1474,15 +1482,22 @@ LP::FunctionSet evoflock_gp_function_set()
 //                    return std::any(i > 0 ? a : b);
 //                }
 //            },
-            {
-                "If_Pos", "Vec3", {"Scalar_100", "Vec3", "Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    return std::any(0 < tree.evalSubtree<double>(0) ?
-                                    tree.evalSubtree<Vec3>(1) :
-                                    tree.evalSubtree<Vec3>(2));
-                }
-            },
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20250930 fewer GpFunc that may be "attractive nuisances"
+
+//            {
+//                "If_Pos", "Vec3", {"Scalar_100", "Vec3", "Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    return std::any(0 < tree.evalSubtree<double>(0) ?
+//                                    tree.evalSubtree<Vec3>(1) :
+//                                    tree.evalSubtree<Vec3>(2));
+//                }
+//            },
+
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
             // Boid API:
@@ -1537,45 +1552,52 @@ LP::FunctionSet evoflock_gp_function_set()
                 }
             },
             
-            {
-                "Neighbor_1_Velocity", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    // TODO 20250922 WIP switch to "evolved program returns local vec
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20250930 fewer GpFunc that may be "attractive nuisances"
 
-//                    return std::any(getGpBoidNeighbor(1)->velocity());
-                    
-//                    Boid* b = Boid::getGpPerThread();
-//                    return std::any(b->ls().localize(getGpBoidNeighbor(1)->velocity()));
+//                {
+//                    "Neighbor_1_Velocity", "Vec3", {},
+//                    [](LP::GpTree& t)
+//                    {
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                        // TODO 20250922 WIP switch to "evolved program returns local vec
+//
+//    //                    return std::any(getGpBoidNeighbor(1)->velocity());
+//
+//    //                    Boid* b = Boid::getGpPerThread();
+//    //                    return std::any(b->ls().localize(getGpBoidNeighbor(1)->velocity()));
+//
+//                        Boid& boid = *Boid::getGpPerThread();
+//                        Vec3 nv = getGpBoidNeighbor(1)->velocity();
+//                        return std::any(boid.ls().localizeDirection(nv));
+//
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                    }
+//                },
+//                {
+//                    "Neighbor_1_Offset", "Vec3", {},
+//                    [](LP::GpTree& t)
+//                    {
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                        // TODO 20250922 WIP switch to "evolved program returns local vec
+//
+//    //                    return std::any(getGpBoidNeighbor(1)->position() -
+//    //                                    Boid::getGpPerThread()->position());
+//
+//    //                    Boid* b = Boid::getGpPerThread();
+//    //                    return std::any(b->ls().localize(getGpBoidNeighbor(1)->position()));
+//
+//                        Boid& b = *Boid::getGpPerThread();
+//                        Vec3 no = getGpBoidNeighbor(1)->position() - b.position();
+//                        return std::any(b.ls().localizeDirection(no));
+//
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                    }
+//                },
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
-                    Boid& boid = *Boid::getGpPerThread();
-                    Vec3 nv = getGpBoidNeighbor(1)->velocity();
-                    return std::any(boid.ls().localizeDirection(nv));
-
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                }
-            },
-            {
-                "Neighbor_1_Offset", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    // TODO 20250922 WIP switch to "evolved program returns local vec
-
-//                    return std::any(getGpBoidNeighbor(1)->position() -
-//                                    Boid::getGpPerThread()->position());
-
-//                    Boid* b = Boid::getGpPerThread();
-//                    return std::any(b->ls().localize(getGpBoidNeighbor(1)->position()));
-
-                    Boid& b = *Boid::getGpPerThread();
-                    Vec3 no = getGpBoidNeighbor(1)->position() - b.position();
-                    return std::any(b.ls().localizeDirection(no));
-
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                }
-            },
+            
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250920 experimental curriculum learning
 
@@ -1612,51 +1634,59 @@ LP::FunctionSet evoflock_gp_function_set()
 //                }
 //            },
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            {
-                "First_Obs_Dist", "Scalar_100", {},
-                [](LP::GpTree& t)
-                {
-                    Boid& boid = *Boid::getGpPerThread();
-                    double distance = std::numeric_limits<double>::infinity();
-                    auto collisions = boid.get_predicted_obstacle_collisions();
-                    if (collisions.size() > 0)
-                    {
-                        const Collision& first_collision = collisions.front();
-                        Vec3 poi = first_collision.point_of_impact;
-                        distance = (poi - boid.position()).length();
-                    }
-                    return std::any(distance);
-                }
-            },
-            {
-                "First_Obs_Normal", "Vec3", {},
-                [](LP::GpTree& t)
-                {
-                    Boid& boid = *Boid::getGpPerThread();
-                    Vec3 normal;
-                    auto collisions = boid.get_predicted_obstacle_collisions();
-                    if (collisions.size() > 0)
-                    {
-                        const Collision& first_collision = collisions.front();
-                        normal = first_collision.normal_at_poi;
+            
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20250930 fewer GpFunc that may be "attractive nuisances"
+            
+//                {
+//                    "First_Obs_Dist", "Scalar_100", {},
+//                    [](LP::GpTree& t)
+//                    {
+//                        Boid& boid = *Boid::getGpPerThread();
+//                        double distance = std::numeric_limits<double>::infinity();
+//                        auto collisions = boid.get_predicted_obstacle_collisions();
+//                        if (collisions.size() > 0)
+//                        {
+//                            const Collision& first_collision = collisions.front();
+//                            Vec3 poi = first_collision.point_of_impact;
+//                            distance = (poi - boid.position()).length();
+//                        }
+//                        return std::any(distance);
+//                    }
+//                },
+//                {
+//                    "First_Obs_Normal", "Vec3", {},
+//                    [](LP::GpTree& t)
+//                    {
+//                        Boid& boid = *Boid::getGpPerThread();
+//                        Vec3 normal;
+//                        auto collisions = boid.get_predicted_obstacle_collisions();
+//                        if (collisions.size() > 0)
+//                        {
+//                            const Collision& first_collision = collisions.front();
+//                            normal = first_collision.normal_at_poi;
+//
+//                            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                            // TODO 20250922 WIP switch to "evolved program returns local vec
+//
+//                            // Convert normal to local space.
+//    //                        Vec3 norm_plus_pos = normal + boid.position();
+//    //                        normal = boid.ls().localize(norm_plus_pos);
+//
+//    //                        normal = boid.ls().localize(normal + boid.position());
+//
+//
+//                            normal = boid.ls().localizeDirection(normal);
+//
+//                            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                        }
+//                        return std::any(normal);
+//                    }
+//                },
                         
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        // TODO 20250922 WIP switch to "evolved program returns local vec
-                        
-                        // Convert normal to local space.
-//                        Vec3 norm_plus_pos = normal + boid.position();
-//                        normal = boid.ls().localize(norm_plus_pos);
-                        
-//                        normal = boid.ls().localize(normal + boid.position());
-                        
-                        
-                        normal = boid.ls().localizeDirection(normal);
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    }
-                    return std::any(normal);
-                }
-            },
             
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
@@ -1682,77 +1712,121 @@ LP::FunctionSet evoflock_gp_function_set()
 //                }
 //            },
             
-            {
-                "To_Forward", "Vec3", {"Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    Vec3 value = clean_vec3(tree.evalSubtree<Vec3>(0));
-                    
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    // TODO 20250922 WIP switch to "evolved program returns local vec
-
-//                    Boid& boid = *Boid::getGpPerThread();
-                    Boid& b = *Boid::getGpPerThread();
-
-//                    Vec3 unit_basis = ensure_unit_length(boid.forward());
-//                    Vec3 unit_basis(0, 0, 1);
-//                    return std::any(value.parallel_component(unit_basis));
-                    
-                    // Take component of "value" which is parallel to "forward".
-                    Vec3 parallel = value.parallel_component(b.forward());
-                    return std::any(b.ls().localizeDirection(parallel));
-
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                }
-            },
-            {
-                "To_Side", "Vec3", {"Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    Vec3 value = clean_vec3(tree.evalSubtree<Vec3>(0));
-                    
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    // TODO 20250922 WIP switch to "evolved program returns local vec
-                    
-//                    Boid& boid = *Boid::getGpPerThread();
-                    Boid& b = *Boid::getGpPerThread();
-
-//                    Vec3 unit_basis = ensure_unit_length(boid.forward());
-//                    return std::any(value.perpendicular_component(unit_basis));
-
-//                    Vec3 unit_basis(0, 0, 1);
-//                    return std::any(value.perpendicular_component(unit_basis));
-                    
-                    
-                    // Take component of "value" perpendicular to "forward".
-                    Vec3 perp = value.perpendicular_component(b.forward());
-                    return std::any(b.ls().localizeDirection(perp));
-
-
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                }
-            },
-
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250929 not obvious these are helpful, try without
+//            {
+//                "To_Forward", "Vec3", {"Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    Vec3 value = clean_vec3(tree.evalSubtree<Vec3>(0));
+//                    Boid& b = *Boid::getGpPerThread();
+//                    // Take component of "value" which is parallel to "forward".
+//                    Vec3 parallel = value.parallel_component(b.forward());
+//                    return std::any(b.ls().localizeDirection(parallel));
+//                }
+//            },
+//            {
+//                "To_Side", "Vec3", {"Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    Vec3 value = clean_vec3(tree.evalSubtree<Vec3>(0));
+//                    Boid& b = *Boid::getGpPerThread();
+//                    // Take component of "value" perpendicular to "forward".
+//                    Vec3 perp = value.perpendicular_component(b.forward());
+//                    return std::any(b.ls().localizeDirection(perp));
+//                }
+//            },
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20250929 experimental "higher level" GpFunc for boids
             
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20250930 since we are taking such baby steps, remove arg
+
+            
             {
-                "Speed_Control", "Vec3", {"Scalar_100"},
+//                "Speed_Control", "Vec3", {"Scalar_100"},
+                "Speed_Control", "Vec3", {},
                 [](LP::GpTree& tree)
                 {
-                    double target_speed = clean_num(tree.evalSubtree<double>(0));
+//                    double target_speed = clean_num(tree.evalSubtree<double>(0));
+                    double target_speed = 20;
                     Boid& b = *Boid::getGpPerThread();
                     int sign =  (b.speed() < target_speed) ? 1 : -1;
                     double max_force = 10;
-                    Vec3 thrust = b.forward() * max_force * sign;
+                    
+                    // TODO oh this looks like a real bug:
+//                    Vec3 thrust = b.forward() * max_force * sign;
+                    Vec3 thrust = Vec3(0, 0, 1) * max_force * sign;
+
                     return std::any(thrust);
+                }
+            },
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+            
+            
+            
+            
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20250929 experimental "higher level" GpFunc for boids
+            
+            {
+                "Avoid_Obstacle", "Vec3", {},
+                [](LP::GpTree& tree)
+                {
+                    double min_dist = 25;
+                    Boid& b = *Boid::getGpPerThread();
+                    Vec3 avoidance;
+                    auto collisions = b.get_predicted_obstacle_collisions();
+                    if (collisions.size() > 0)
+                    {
+                        const Collision& first_collision = collisions.front();
+                        Vec3 poi = first_collision.point_of_impact;
+                        double distance = (poi - b.position()).length();
+                        if (distance > min_dist)
+                        {
+                            Vec3 normal = first_collision.normal_at_poi;
+                            avoidance = normal.parallel_component(b.forward());
+                            
+                            avoidance = b.ls().localizeDirection(avoidance);
+                        }
+                    }
+                    return std::any(avoidance);
+                }
+            },
+
+            {
+                "Adjust_Neighbor_Dist", "Vec3", {},
+                [](LP::GpTree& tree)
+                {
+                    Vec3 steering;
+                    Boid& b = *Boid::getGpPerThread();
+                    Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
+                                            Boid::getGpPerThread()->position());
+                    double neighbor_dist = neighbor_offset.length();
+                    Vec3 neighbor_direction = neighbor_offset / neighbor_dist;
+                    if (neighbor_dist < 2) { steering = neighbor_direction; }
+                    if (neighbor_dist > 9) { steering = -neighbor_direction; }
+                    
+                    steering = b.ls().localizeDirection(steering);
+
+                    return std::any(steering * 10);
                 }
             },
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            
+            
 
             
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~

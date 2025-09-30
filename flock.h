@@ -371,7 +371,21 @@ public:
         // TODO 20250928 change exponent in obstacleCollisionsScore()
         
 //        return std::pow(norm_non_coll_steps, EF::usingGA() ? 500 : 1);
-        return std::pow(norm_non_coll_steps, EF::usingGA() ? 500 : 2);
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20250928 change exponent in obstacleCollisionsScore()
+
+//        return std::pow(norm_non_coll_steps, EF::usingGA() ? 500 : 2);
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20250930 obstacle avoidance exponent back to 500 for GA and GP
+
+//        return std::pow(norm_non_coll_steps, EF::usingGA() ? 500 : 100);
+        return std::pow(norm_non_coll_steps, 500);
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
 

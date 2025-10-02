@@ -518,6 +518,148 @@ Vec3 clean_vec3(Vec3 v)
 //        return least_mof;
 //    }
 
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20251001 investigate low speed score with ONLY Speed_Control GpFunc
+
+//    inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
+//    {
+//        MOF least_mof;
+//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
+//        std::vector<double> scalar_fits;
+//        std::mutex save_mof_mutex;
+//
+//        // Perform one simulation run, and record results.
+//        auto do_1_run = [&]()
+//        {
+//            // These steps can happen in parallel threads:
+//            Flock flock;
+//            init_flock(flock);
+//            if (EF::usingGA())
+//            {
+//                // For GA, set Flock's FlockParameters from evolved "tree".
+//                flock.fp() = fp_from_ga_individual(individual);
+//            }
+//            else
+//            {
+//                // For GP, set Flock's override_steer_function_.
+//                flock.override_steer_function_ = [&]()
+//                {
+//                    Boid* boid = Boid::getGpPerThread();
+//                    LP::GpTree gp_tree = individual->tree();
+//
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // TODO 20250925 turn off curriculum learning experiment
+//
+//    //                if (boid->isSelected())
+//    //                if (boid->isSelected() and (flock.clock().frameCounter() == 1))
+//    //                {
+//    //                    grabPrintLock_evoflock();
+//    //                    std::cout << "====> ";
+//    //                    debugPrint(boid->speed());
+//    //                }
+//
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+//    //                Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
+//                    // TEMP: here we are assuming GpTree returns a local steer vec
+//                    Vec3 local_steering = std::any_cast<Vec3>(gp_tree.eval());
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // TODO 20250924 add LocalSpace::globalizeDirection()
+//
+//    //                Vec3 steering = boid->ls().globalizePosition(local_steering);
+//                    Vec3 steering = boid->ls().globalizeDirection(local_steering);
+//
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                    // KEEP? added while tracking down "cleaning" issues
+//                    if (not steering.is_valid()) { steering = Vec3(); }
+//
+//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                    // TODO 20250926 lower limit on max steering force 100 -> 10
+//
+//                    // Ran a test in GA mode. Max steering force length was 1000.
+//    //                double max_steering_length = 1000;
+//                    // WIP reduce by an order of magnitude, close to max_force()
+//    //                double max_steering_length = 100;
+//                    double max_steering_length = 10;
+//                    steering = steering.truncate(max_steering_length);
+//
+//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                    // KEEP? added while tracking down "cleaning" issues
+//                    double min_steering_length = 0.00001;
+//                    if (steering.length() < min_steering_length) { steering = Vec3(); }
+//
+//                    // Just give a 10% push in the forward direction, to prevent them
+//                    // from sitting at their initial position at zero speed.
+//    //                Boid* b = Boid::getGpPerThread();
+//    //                if (b->speed() < 15) // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//    //                {
+//    //                    steering += b->forward() * b->max_force() * 0.1;
+//    //                }
+//    //                if (boid->speed() < 15) // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//    //                {
+//    //                    steering += boid->forward() * boid->max_force() * 0.1;
+//    //                }
+//                    return clean_vec3(steering);
+//                };
+//            }
+//
+//            flock.run();
+//            MOF mof = multiObjectiveFitnessOfFlock(flock);
+//            // These steps happen in the single thread with lock on save_mof_mutex.
+//            {
+//                std::lock_guard<std::mutex> smm(save_mof_mutex);
+//                assert(mof.size() == mof_names().size());
+//                scalar_fits.push_back(scalarize_fitness(mof));
+//                if (least_scalar_fitness > scalar_fits.back())
+//                {
+//                    least_scalar_fitness = scalar_fits.back();
+//                    least_mof = mof;
+//                }
+//                // Store these stats on the "current individual"
+//                LP::Individual* i = LP::Population::evolution_step_individual;
+//                if (i)
+//                {
+//                    std::vector<double>& udfp = i->user_data_for_plotting;
+//                    udfp.clear();
+//                    udfp.push_back(flock.obstacleCollisionsScore());
+//                    udfp.push_back(flock.separationScore());
+//                    udfp.push_back(flock.speedScore());
+//                }
+//            }
+//        };
+//
+//        // Occasionally poll the Draw GUI to check for events esp the "B" command.
+//        Draw::getInstance().pollEvents();
+//
+//        if (EF::enable_multithreading)
+//        {
+//            bool previous_enable_state = Draw::getInstance().enable();
+//            Draw::getInstance().setEnable(false);
+//
+//            // Do each simulation run in a parallel thread.
+//            std::vector<std::thread> threads;
+//            for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
+//            // Wait for helper threads to finish, join them with this thread.
+//            for (auto& t : threads) { t.join(); }
+//
+//            Draw::getInstance().setEnable(previous_enable_state);
+//        }
+//        else
+//        {
+//            // Do each simulation run sequentially.
+//            for (int r = 0; r < runs; r++) { do_1_run(); }
+//        }
+//
+//        assert(scalar_fits.size() == runs);
+//        fitness_logger(least_mof);
+//        std::cout << "    min composite "<< least_scalar_fitness;
+//        std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
+//        std::cout << std::endl << std::endl;
+//        return least_mof;
+//    }
+
 
 inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
 {
@@ -525,7 +667,11 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
     double least_scalar_fitness = std::numeric_limits<double>::infinity();
     std::vector<double> scalar_fits;
     std::mutex save_mof_mutex;
-    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20251001 investigate low speed score with ONLY Speed_Control GpFunc
+    Flock* log_flock = nullptr;
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
     // Perform one simulation run, and record results.
     auto do_1_run = [&]()
     {
@@ -545,60 +691,82 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
                 Boid* boid = Boid::getGpPerThread();
                 LP::GpTree gp_tree = individual->tree();
                 
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250925 turn off curriculum learning experiment
                 
-//                if (boid->isSelected())
-//                if (boid->isSelected() and (flock.clock().frameCounter() == 1))
-//                {
-//                    grabPrintLock_evoflock();
-//                    std::cout << "====> ";
-//                    debugPrint(boid->speed());
-//                }
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//                    // TODO 20251001 investigate low speed score with
+//                    //               ONLY Speed_Control GpFunc
+//                    if (boid->isSelected() and
+//    //                    ((flock.clock().frameCounter() % 100) == 0))
+//    //                    ((flock.clock().frameCounter() % 100) == 1))
+//                        ((flock.clock().frameCounter() % 25) == 1))
+//                    {
+//                        if (log_flock == nullptr)
+//                        {
+//                            log_flock = &flock;
+//                        }
+//                        if (log_flock == &flock)
+//                        {
+//                            grabPrintLock_evoflock();
+//                            std::cout << "====> ";
+//                            std::cout << &flock;
+//                            std::cout << ", selected boid speed: ";
+//                            std::cout << boid->speed();
+//                            std::cout << std::endl;
+//                        }
+//                    }
+//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
-                
-//                Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
                 // TEMP: here we are assuming GpTree returns a local steer vec
                 Vec3 local_steering = std::any_cast<Vec3>(gp_tree.eval());
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250924 add LocalSpace::globalizeDirection()
-
-//                Vec3 steering = boid->ls().globalizePosition(local_steering);
                 Vec3 steering = boid->ls().globalizeDirection(local_steering);
 
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+                // TODO 20251001 investigate low speed score with
+                //               ONLY Speed_Control GpFunc
 
                 // KEEP? added while tracking down "cleaning" issues
-                if (not steering.is_valid()) { steering = Vec3(); }
+                // (or should it be: steering = clean_vec3(steering);
+//                if (not steering.is_valid()) { steering = Vec3(); }
+                steering = clean_vec3(steering);
                 
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                // TODO 20250926 lower limit on max steering force 100 -> 10
-
                 // Ran a test in GA mode. Max steering force length was 1000.
-//                double max_steering_length = 1000;
                 // WIP reduce by an order of magnitude, close to max_force()
-//                double max_steering_length = 100;
-                double max_steering_length = 10;
+//                double max_steering_length = 10;
+                double max_steering_length = 100;
                 steering = steering.truncate(max_steering_length);
 
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
                 // KEEP? added while tracking down "cleaning" issues
                 double min_steering_length = 0.00001;
                 if (steering.length() < min_steering_length) { steering = Vec3(); }
                 
-                // Just give a 10% push in the forward direction, to prevent them
-                // from sitting at their initial position at zero speed.
-//                Boid* b = Boid::getGpPerThread();
-//                if (b->speed() < 15) // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//                {
-//                    steering += b->forward() * b->max_force() * 0.1;
-//                }
-//                if (boid->speed() < 15) // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//                {
-//                    steering += boid->forward() * boid->max_force() * 0.1;
-//                }
+                
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+                // TODO 20251001 investigate low speed score with
+                //               ONLY Speed_Control GpFunc
+                if (boid->isSelected() and
+//                    ((flock.clock().frameCounter() % 25) == 1))
+                    ((flock.clock().frameCounter() % 10) == 1))
+                {
+                    if (log_flock == nullptr)
+                    {
+                        log_flock = &flock;
+                    }
+                    if (log_flock == &flock)
+                    {
+                        grabPrintLock_evoflock();
+                        std::cout << "====> ";
+                        std::cout << &flock;
+                        std::cout << ", selected boid speed: ";
+                        std::cout << boid->speed();
+                        std::cout << ", local steer: " << local_steering;
+                        std::cout << std::endl;
+                    }
+                }
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+                
                 return clean_vec3(steering);
             };
         }
@@ -630,7 +798,19 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
     
     // Occasionally poll the Draw GUI to check for events esp the "B" command.
     Draw::getInstance().pollEvents();
-        
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20251002 investigate low speed score with ONLY Speed_Control GpFunc
+    //               VERY TEMP, does it work better without multithreading?
+
+    bool saved_ef_em = EF::enable_multithreading;
+    EF::enable_multithreading = false;
+    
+    bool previous_enable_state = Draw::getInstance().enable();
+    Draw::getInstance().setEnable(false);
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
     if (EF::enable_multithreading)
     {
         bool previous_enable_state = Draw::getInstance().enable();
@@ -650,6 +830,16 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
         for (int r = 0; r < runs; r++) { do_1_run(); }
     }
     
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20251002 investigate low speed score with ONLY Speed_Control GpFunc
+    //               VERY TEMP, does it work better without multithreading?
+    
+    Draw::getInstance().setEnable(previous_enable_state);
+
+    EF::enable_multithreading = saved_ef_em;
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    
     assert(scalar_fits.size() == runs);
     fitness_logger(least_mof);
     std::cout << "    min composite "<< least_scalar_fitness;
@@ -658,6 +848,7 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
     return least_mof;
 }
 
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -1303,12 +1494,35 @@ LP::FunctionSet evoflock_gp_function_set()
                 "Speed_Control", "Vec3", {},
                 [](LP::GpTree& tree)
                 {
-                    double target_speed = 20;
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+                    // TODO 20251002 investigate low speed score with ONLY Speed_Control GpFunc
+
+//                    double target_speed = 20;
+//                    Boid& b = *Boid::getGpPerThread();
+//                        int sign =  (b.speed() < target_speed) ? 1 : -1;
+//                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                        // TODO 20251001 investigate low speed score with ONLY Speed_Control GpFunc
+//
+//    //                    double max_force = 10;
+//                        double max_force = 100;
+//
+//                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                        Vec3 thrust = Vec3(0, 0, 1) * max_force * sign;
+                    
+                    
+//                    Boid& b = *Boid::getGpPerThread();
+//                    Vec3 thrust(0, 0, b.steerForSpeedControl().length());
+//                    double max_force = 10;
+//                    return std::any(thrust * max_force);
+
                     Boid& b = *Boid::getGpPerThread();
-                    int sign =  (b.speed() < target_speed) ? 1 : -1;
-                    double max_force = 10;
-                    Vec3 thrust = Vec3(0, 0, 1) * max_force * sign;
-                    return std::any(thrust);
+                    Vec3 thrust(0, 0, b.steerForSpeedControl().dot(b.forward()));
+//                    double max_force = 10;
+//                    double max_force = 1;
+                    double max_force = 5;
+                    return std::any(thrust * max_force);
+
+                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
                 }
             },
         }

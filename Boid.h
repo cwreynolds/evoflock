@@ -609,9 +609,18 @@ public:
 
     void setSpeedAfterObstacleCollision()
     {
-        setSpeed(EF::usingGA() ? 0 : speed() * 0.25);
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20251002 investigate low speed score with ONLY Speed_Control GpFunc
+        
+//        setSpeed(EF::usingGA() ? 0 : speed() * 0.25);
+//        setSpeed(EF::usingGA() ? 0 : speed() * 1.00);
+//        setSpeed(EF::usingGA() ? 0 : speed() * 0.80);
+        setSpeed(EF::usingGA() ? 0 : speed() * 1.00);
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
     
+
     // Returns distance from this Boid to its nearest neighbor, center to center.
     double distanceToNearestNeighbor() const
     {

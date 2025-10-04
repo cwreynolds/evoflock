@@ -81,6 +81,16 @@ public:
     
     // Accessors
     
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+    // TODO 20251003 re-enable multithreading, it was not the problem
+    //               this variable was defined on Boid but apparently unused.
+    
+    void setFlock(Flock* flock) { flock_ = flock; }
+    Flock* getFlock() const { return flock_; }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
+    
     // Get reference to this Boid's local list of flockmate pointers.
     BoidPtrList& flock_boids() { return flock_boids_; }
     const BoidPtrList& flock_boids() const { return flock_boids_; }
@@ -607,19 +617,35 @@ public:
         }
     }
 
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251003 re-enable multithreading, it was not the problem
+    
+    // VERY TEMP just for debugging logging
+    Flock* log_flock = nullptr;
+
     void setSpeedAfterObstacleCollision()
     {
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20251002 investigate low speed score with ONLY Speed_Control GpFunc
-        
+
 //        setSpeed(EF::usingGA() ? 0 : speed() * 0.25);
 //        setSpeed(EF::usingGA() ? 0 : speed() * 1.00);
 //        setSpeed(EF::usingGA() ? 0 : speed() * 0.80);
-        setSpeed(EF::usingGA() ? 0 : speed() * 1.00);
-
+        
+//        setSpeed(EF::usingGA() ? 0 : speed() * 1.00);
+//        setSpeed(EF::usingGA() ? 0 : 1);
+//        setSpeed(0);
+//        setSpeed(EF::usingGA() ? 0 : speed());
+        setSpeed(0);
+        
+        if (isSelected() and (getFlock() == log_flock))
+        {
+            std::cout << "====> BANG!" << std::endl;
+        }
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
-    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
     // Returns distance from this Boid to its nearest neighbor, center to center.
     double distanceToNearestNeighbor() const

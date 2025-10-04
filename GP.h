@@ -746,7 +746,6 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
                 // TODO 20251001 investigate low speed score with
                 //               ONLY Speed_Control GpFunc
                 if (boid->isSelected() and
-//                    ((flock.clock().frameCounter() % 25) == 1))
                     ((flock.clock().frameCounter() % 10) == 1))
                 {
                     if (log_flock == nullptr)
@@ -755,6 +754,15 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
                     }
                     if (log_flock == &flock)
                     {
+                        
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        // TODO 20251003 re-enable multithreading, it was not the problem
+                        
+                        // set a temp variable on the boid for logging
+                        boid->log_flock = log_flock;
+                        
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        
                         grabPrintLock_evoflock();
                         std::cout << "====> ";
                         std::cout << &flock;
@@ -800,14 +808,15 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
     Draw::getInstance().pollEvents();
 
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20251003 re-enable multithreading, it was not the problem
     // TODO 20251002 investigate low speed score with ONLY Speed_Control GpFunc
     //               VERY TEMP, does it work better without multithreading?
 
-    bool saved_ef_em = EF::enable_multithreading;
-    EF::enable_multithreading = false;
-    
-    bool previous_enable_state = Draw::getInstance().enable();
-    Draw::getInstance().setEnable(false);
+//    bool saved_ef_em = EF::enable_multithreading;
+//    EF::enable_multithreading = false;
+//    
+//    bool previous_enable_state = Draw::getInstance().enable();
+//    Draw::getInstance().setEnable(false);
 
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
@@ -831,12 +840,13 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
     }
     
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20251003 re-enable multithreading, it was not the problem
     // TODO 20251002 investigate low speed score with ONLY Speed_Control GpFunc
     //               VERY TEMP, does it work better without multithreading?
     
-    Draw::getInstance().setEnable(previous_enable_state);
-
-    EF::enable_multithreading = saved_ef_em;
+//    Draw::getInstance().setEnable(previous_enable_state);
+//
+//    EF::enable_multithreading = saved_ef_em;
     
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     

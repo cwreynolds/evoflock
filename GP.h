@@ -25,33 +25,8 @@ namespace GP
 // Abbreviated name for this overly-long class name.
 typedef LazyPredator::MultiObjectiveFitness MOF;
 
-//    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//    // TODO 20250912 is GpFunc "Run_Flock" return value used?
-//
-//    //    // Fitness function, simply returns Individual's tree's value (computing it and
-//    //    // caching it on first call).
-//    //    inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
-//    //    {
-//    //        return std::any_cast<MOF>(individual->tree().getRootValue());
-//    //    }
-//
-//    // Fitness function, simply returns Individual's tree's value (computing it and
-//    // caching it on first call).
-//    inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
-//    {
-//
-//        std::cout << "in GP::evoflock_ga_fitness_function()" << std::endl;
-//
-//        return run_ga_gp_flock_simulation(individual);
-//
-//    }
-//
-//    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-
 // Take the minimum element of a MultiObjectiveFitness ("Shangian scalarizer").
 inline double scalarize_fitness_min(MOF mof) { return mof.min(); }
-
 
 // Take the product of MultiObjectiveFitness elements.
 inline double scalarize_fitness_prod(MOF mof)
@@ -866,194 +841,199 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20251004 cleaning up obsolete(?) GP::run_...flock_simulation()
 
-// Run flock simulation with given parameters "runs" times and returns the MOF
-// with the LEAST scalar fitness score.
 
-inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
-{
-    MOF least_mof;
-    double least_scalar_fitness = std::numeric_limits<double>::infinity();
-    std::vector<double> scalar_fits;
-    std::mutex save_mof_mutex;
-
-    // Perform one simulation run, and record results.
-    auto do_1_run = [&]()
-    {
-        // These steps can happen in parallel threads:
-        Flock flock;
-        init_flock(flock);
-        flock.fp() = fp;
-        flock.run();
-        MOF mof = multiObjectiveFitnessOfFlock(flock);
-        // These steps happen in the single thread with lock on save_mof_mutex.
-        {
-            std::lock_guard<std::mutex> smm(save_mof_mutex);
-            assert(mof.size() == mof_names().size());
-            scalar_fits.push_back(scalarize_fitness(mof));
-            if (least_scalar_fitness > scalar_fits.back())
-            {
-                least_scalar_fitness = scalar_fits.back();
-                least_mof = mof;
-            }
-            // Store these stats on the "current individual"
-            LP::Individual* i = LP::Population::evolution_step_individual;
-            if (i)
-            {
-                std::vector<double>& udfp = i->user_data_for_plotting;
-                udfp.clear();
-                udfp.push_back(flock.obstacleCollisionsScore());
-                udfp.push_back(flock.separationScore());
-                udfp.push_back(flock.speedScore());
-            }
-        }
-    };
-    
-    // Occasionally poll the Draw GUI to check for events esp the "B" command.
-    Draw::getInstance().pollEvents();
-    
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    // TODO 20250909 does turning of multithreading help?
-//    // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
+//    // Run flock simulation with given parameters "runs" times and returns the MOF
+//    // with the LEAST scalar fitness score.
+//
+//    inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
 //    {
-//        grabPrintLock_evoflock();
-//        std::cout << std::endl;
-//        std::cout << "-----------------------------------------------" << std::endl;
-//        debugPrint(EF::unify_GA_GP);
-//        debugPrint(EF::usingGP());
-//        debugPrint(EF::enable_multithreading);
-//        debugPrint(Draw::getInstance().enable());
-//        std::cout << "-----------------------------------------------" << std::endl;
-//        std::cout << std::endl;
+//        MOF least_mof;
+//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
+//        std::vector<double> scalar_fits;
+//        std::mutex save_mof_mutex;
+//
+//        // Perform one simulation run, and record results.
+//        auto do_1_run = [&]()
+//        {
+//            // These steps can happen in parallel threads:
+//            Flock flock;
+//            init_flock(flock);
+//            flock.fp() = fp;
+//            flock.run();
+//            MOF mof = multiObjectiveFitnessOfFlock(flock);
+//            // These steps happen in the single thread with lock on save_mof_mutex.
+//            {
+//                std::lock_guard<std::mutex> smm(save_mof_mutex);
+//                assert(mof.size() == mof_names().size());
+//                scalar_fits.push_back(scalarize_fitness(mof));
+//                if (least_scalar_fitness > scalar_fits.back())
+//                {
+//                    least_scalar_fitness = scalar_fits.back();
+//                    least_mof = mof;
+//                }
+//                // Store these stats on the "current individual"
+//                LP::Individual* i = LP::Population::evolution_step_individual;
+//                if (i)
+//                {
+//                    std::vector<double>& udfp = i->user_data_for_plotting;
+//                    udfp.clear();
+//                    udfp.push_back(flock.obstacleCollisionsScore());
+//                    udfp.push_back(flock.separationScore());
+//                    udfp.push_back(flock.speedScore());
+//                }
+//            }
+//        };
 //        
+//        // Occasionally poll the Draw GUI to check for events esp the "B" command.
+//        Draw::getInstance().pollEvents();
+//        
+//    //    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //    // TODO 20250909 does turning of multithreading help?
+//    //    // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
+//    //    {
+//    //        grabPrintLock_evoflock();
+//    //        std::cout << std::endl;
+//    //        std::cout << "-----------------------------------------------" << std::endl;
+//    //        debugPrint(EF::unify_GA_GP);
+//    //        debugPrint(EF::usingGP());
+//    //        debugPrint(EF::enable_multithreading);
+//    //        debugPrint(Draw::getInstance().enable());
+//    //        std::cout << "-----------------------------------------------" << std::endl;
+//    //        std::cout << std::endl;
+//    //        
+//    //    }
+//    //    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+//        if (EF::enable_multithreading)
+//        {
+//            bool previous_enable_state = Draw::getInstance().enable();
+//            Draw::getInstance().setEnable(false);
+//            
+//            // Do each simulation run in a parallel thread.
+//            std::vector<std::thread> threads;
+//            for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
+//            // Wait for helper threads to finish, join them with this thread.
+//            for (auto& t : threads) { t.join(); }
+//            
+//            Draw::getInstance().setEnable(previous_enable_state);
+//        }
+//        else
+//        {
+//            // Do each simulation run sequentially.
+//            for (int r = 0; r < runs; r++) { do_1_run(); }
+//        }
+//        
+//        assert(scalar_fits.size() == runs);
+//        fitness_logger(least_mof);
+//        std::cout << "    min composite "<< least_scalar_fitness;
+//        std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
+//        std::cout << std::endl << std::endl;
+//        return least_mof;
 //    }
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-    if (EF::enable_multithreading)
-    {
-        bool previous_enable_state = Draw::getInstance().enable();
-        Draw::getInstance().setEnable(false);
-        
-        // Do each simulation run in a parallel thread.
-        std::vector<std::thread> threads;
-        for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
-        // Wait for helper threads to finish, join them with this thread.
-        for (auto& t : threads) { t.join(); }
-        
-        Draw::getInstance().setEnable(previous_enable_state);
-    }
-    else
-    {
-        // Do each simulation run sequentially.
-        for (int r = 0; r < runs; r++) { do_1_run(); }
-    }
-    
-    assert(scalar_fits.size() == runs);
-    fitness_logger(least_mof);
-    std::cout << "    min composite "<< least_scalar_fitness;
-    std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
-    std::cout << std::endl << std::endl;
-    return least_mof;
-}
+//    // TODO 20240622 just temporary for debugging
+//    std::map<LP::Individual*, Vec3> values_of_individuals;
+//    std::map<LP::Individual*, LP::GpTree> trees_of_individuals;
 
-// TODO 20240622 just temporary for debugging
-std::map<LP::Individual*, Vec3> values_of_individuals;
-std::map<LP::Individual*, LP::GpTree> trees_of_individuals;
-
-inline MOF run_gp_flock_simulation(LP::Individual* individual)
-{
-    assert(EF::usingGP());
-    int runs = 4;
-    MOF least_mof;
-    double least_scalar_fitness = std::numeric_limits<double>::infinity();
-    std::vector<double> scalar_fits;
-    std::mutex save_mof_mutex;
-    // Perform one simulation run, and record results.
-    auto do_1_run = [&]()
-    {
-        // These steps can happen in parallel threads:
-        Flock flock;
-        init_flock(flock);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240627 it would be nice to not have to duplicate tree for each
-        //               boid on every simulation step.
-        //
-        // LP::GpTree gp_tree;
-        // gp_tree = individual->tree();
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20250909 does turning of multithreading help?
-
-//        flock.override_steer_function = [&]()
-        flock.override_steer_function_ = [&]()
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        {
-            LP::GpTree gp_tree = individual->tree();
-            Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
-            if (not steering.is_valid()) { steering = Vec3(); }
-            double max_steering_length = 10;
-            steering = steering.truncate(max_steering_length);
-            double min_steering_length = 0.00001;
-            if (steering.length() < min_steering_length) { steering = Vec3(); }
-            return steering;
-        };
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        flock.run();
-        MOF mof = multiObjectiveFitnessOfFlock(flock);
-        // These steps happen in the single thread with lock on save_mof_mutex.
-        {
-            std::lock_guard<std::mutex> smm(save_mof_mutex);
-            assert(mof.size() == mof_names().size());
-            scalar_fits.push_back(scalarize_fitness(mof));
-            if (least_scalar_fitness > scalar_fits.back())
-            {
-                least_scalar_fitness = scalar_fits.back();
-                least_mof = mof;
-            }
-        }
-    };
-    
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    // TODO 20250909 does turning of multithreading help?
-//    // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
+//    inline MOF run_gp_flock_simulation(LP::Individual* individual)
 //    {
-//        grabPrintLock_evoflock();
-//        std::cout << std::endl;
-//        std::cout << "-----------------------------------------------" << std::endl;
-//        debugPrint(EF::unify_GA_GP);
-//        debugPrint(EF::usingGP());
-//        debugPrint(EF::enable_multithreading);
-//        debugPrint(Draw::getInstance().enable());
-//        std::cout << "-----------------------------------------------" << std::endl;
-//        std::cout << std::endl;
+//        assert(EF::usingGP());
+//        int runs = 4;
+//        MOF least_mof;
+//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
+//        std::vector<double> scalar_fits;
+//        std::mutex save_mof_mutex;
+//        // Perform one simulation run, and record results.
+//        auto do_1_run = [&]()
+//        {
+//            // These steps can happen in parallel threads:
+//            Flock flock;
+//            init_flock(flock);
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20240627 it would be nice to not have to duplicate tree for each
+//            //               boid on every simulation step.
+//            //
+//            // LP::GpTree gp_tree;
+//            // gp_tree = individual->tree();
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//            // TODO 20250909 does turning of multithreading help?
+//
+//    //        flock.override_steer_function = [&]()
+//            flock.override_steer_function_ = [&]()
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//            {
+//                LP::GpTree gp_tree = individual->tree();
+//                Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
+//                if (not steering.is_valid()) { steering = Vec3(); }
+//                double max_steering_length = 10;
+//                steering = steering.truncate(max_steering_length);
+//                double min_steering_length = 0.00001;
+//                if (steering.length() < min_steering_length) { steering = Vec3(); }
+//                return steering;
+//            };
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            flock.run();
+//            MOF mof = multiObjectiveFitnessOfFlock(flock);
+//            // These steps happen in the single thread with lock on save_mof_mutex.
+//            {
+//                std::lock_guard<std::mutex> smm(save_mof_mutex);
+//                assert(mof.size() == mof_names().size());
+//                scalar_fits.push_back(scalarize_fitness(mof));
+//                if (least_scalar_fitness > scalar_fits.back())
+//                {
+//                    least_scalar_fitness = scalar_fits.back();
+//                    least_mof = mof;
+//                }
+//            }
+//        };
+//
+//    //    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //    // TODO 20250909 does turning of multithreading help?
+//    //    // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
+//    //    {
+//    //        grabPrintLock_evoflock();
+//    //        std::cout << std::endl;
+//    //        std::cout << "-----------------------------------------------" << std::endl;
+//    //        debugPrint(EF::unify_GA_GP);
+//    //        debugPrint(EF::usingGP());
+//    //        debugPrint(EF::enable_multithreading);
+//    //        debugPrint(Draw::getInstance().enable());
+//    //        std::cout << "-----------------------------------------------" << std::endl;
+//    //        std::cout << std::endl;
+//    //    }
+//    //    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+//        if (EF::enable_multithreading)
+//        {
+//            // Do each simulation run in a parallel thread.
+//            std::vector<std::thread> threads;
+//            for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
+//            // Wait for helper threads to finish, join them with this thread.
+//            for (auto& t : threads) { t.join(); }
+//        }
+//        else
+//        {
+//            // Do simulation runs sequentially.
+//            for (int r = 0; r < runs; r++) { do_1_run(); }
+//        }
+//
+//        assert(scalar_fits.size() == runs);
+//        fitness_logger(least_mof);
+//        std::cout << "    min composite "<< least_scalar_fitness;
+//        std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
+//        std::cout << std::endl << std::endl;
+//        return least_mof;
+//
 //    }
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-    if (EF::enable_multithreading)
-    {
-        // Do each simulation run in a parallel thread.
-        std::vector<std::thread> threads;
-        for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
-        // Wait for helper threads to finish, join them with this thread.
-        for (auto& t : threads) { t.join(); }
-    }
-    else
-    {
-        // Do simulation runs sequentially.
-        for (int r = 0; r < runs; r++) { do_1_run(); }
-    }
-    
-    assert(scalar_fits.size() == runs);
-    fitness_logger(least_mof);
-    std::cout << "    min composite "<< least_scalar_fitness;
-    std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
-    std::cout << std::endl << std::endl;
-    return least_mof;
-    
-}
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 
 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
@@ -1141,11 +1121,16 @@ inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
 
 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
-// Run flock simulation with given parameters, return a MultiObjectiveFitness.
-inline MOF run_hand_tuned_flock_simulation()
-{
-    return run_flock_simulation(FlockParameters());
-}
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20251004 cleaning up obsolete(?) GP::run_...flock_simulation()
+
+//    // Run flock simulation with given parameters, return a MultiObjectiveFitness.
+//    inline MOF run_hand_tuned_flock_simulation()
+//    {
+//        return run_flock_simulation(FlockParameters());
+//    }
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
@@ -1170,16 +1155,43 @@ inline MOF run_hand_tuned_flock_simulation()
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// Wrote this to run at the end of evolution on the top-10 fitness individuals
-// of population in order to record flock data for playback
-inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
-{
-    // Is this tree copy needed to avoid using the previous cached tree root?
-    LazyPredator::GpTree t = individual->tree();
-    // Run simulation.
-    return run_flock_simulation(fp_from_ga_tree(t));
-}
 
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20251004 cleaning up obsolete(?) GP::run_...flock_simulation()
+
+//    // Wrote this to run at the end of evolution on the top-10 fitness individuals
+//    // of population in order to record flock data for playback
+//    inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
+//    {
+//        // Is this tree copy needed to avoid using the previous cached tree root?
+//        LazyPredator::GpTree t = individual->tree();
+//        // Run simulation.
+//        return run_flock_simulation(fp_from_ga_tree(t));
+//    }
+
+
+//    // Wrote this to run at the end of evolution on the top-10 fitness individuals
+//    // of population in order to record flock data for playback
+//    //inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
+//    inline MOF rerun_flock_simulation(LazyPredator::Individual* individual)
+//    {
+//    //    // Is this tree copy needed to avoid using the previous cached tree root?
+//    //    LazyPredator::GpTree t = individual->tree();
+//    //    // Run simulation.
+//    //    return run_flock_simulation(fp_from_ga_tree(t));
+//
+//        return run_ga_gp_flock_simulation(individual);
+//
+//    }
+
+//    // Wrote this to run at the end of evolution on the top-10 fitness individuals
+//    // of population in order to record flock data for playback.
+//    inline MOF rerun_flock_simulation(LazyPredator::Individual* individual)
+//    {
+//        return run_ga_gp_flock_simulation(individual);
+//    }
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 // A custom “GA style” crossover for this degenerate GP function set.
 inline void evoflock_ga_crossover(const LP::GpTree& parent0,

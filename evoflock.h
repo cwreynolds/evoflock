@@ -227,7 +227,16 @@ void runOneFlockEvolution()
     // EF::setUsingGA();
     // EF::setUsingGP();
     // EF::setUsingGA();
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251004 cleaning up obsolete(?) GP::run_...flock_simulation()
+    
+//    EF::setUsingGP();
+//    EF::setUsingGA();
     EF::setUsingGP();
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << (EF::usingGP()?"GP":"GA") << " evolutionary mode." << std::endl;
 
@@ -324,7 +333,15 @@ void runOneFlockEvolution()
     // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
     
 //    int max_evolution_steps = EF::usingGP() ? 60000 : 30000;
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251004 cleaning up obsolete(?) GP::run_...flock_simulation()
+
+//    int max_evolution_steps = 30000;
+//    int max_evolution_steps = 30; // SUPER TEMP for testing
     int max_evolution_steps = 30000;
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
@@ -454,15 +471,30 @@ void runOneFlockEvolution()
             }
 
             std::cout << individual->tree().to_string(true) << std::endl;
-            LazyPredator::MultiObjectiveFitness fitness;
-            if (EF::usingGP())
-            {
-                fitness = GP::evoflock_gp_fitness_function(individual);
-            }
-            else
-            {
-                fitness = GP::rerun_flock_simulation(individual);
-            }
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251004 cleaning up obsolete(?) GP::run_...flock_simulation()
+            
+//            LazyPredator::MultiObjectiveFitness fitness;
+//            if (EF::usingGP())
+//            {
+//                fitness = GP::evoflock_gp_fitness_function(individual);
+//            }
+//            else
+//            {
+//                fitness = GP::rerun_flock_simulation(individual);
+//            }
+
+            
+            
+//            LazyPredator::MultiObjectiveFitness fitness;
+//            fitness = GP::run_ga_gp_flock_simulation(individual);
+
+            auto fitness = GP::run_ga_gp_flock_simulation(individual);
+
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
             debugPrint(fitness);
         }
     };

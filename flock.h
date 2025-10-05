@@ -227,14 +227,7 @@ public:
         // inside the big sphere
         boid->set_fp(&fp());
         boid->set_draw(&draw());
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20251003 re-enable multithreading, it was not the problem
-        //               this variable was defined on Boid but apparently unused.
-        
         boid->setFlock(this);
-
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         boid->set_flock_boids(&boids());
         boid->set_flock_obstacles(&obstacles());
         boid->override_steer_function_ = override_steer_function_;

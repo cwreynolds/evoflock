@@ -41,10 +41,6 @@ inline bool usingGP() { return not using_GA_; }
 inline bool usingGA() { return using_GA_; }
 inline void setUsingGP() { using_GA_ = false; }
 inline void setUsingGA() { using_GA_ = true; }
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250910 add new EF::unify_GA_GP
-//    bool unify_GA_GP = false;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }  // end of namespace EvoFlock
 namespace EF = EvoFlock;
 
@@ -112,14 +108,7 @@ void visualizeBestIfRequested(LP::Population* population)
         bool previous_emt_state = enable_multithreading;
         enable_multithreading = false;
         LP::Individual* individual = population->bestFitness();
-        
-//        LP::GpTree tree = individual->tree();
-//        FlockParameters fp = GP::fp_from_ga_tree(tree);
-        
-//        GP::run_flock_simulation(fp, 1);
-//        GP::run_ga_gp_flock_simulation(individual);
-        GP::run_ga_gp_flock_simulation(individual, 1);
-
+        GP::run_flock_simulation(individual, 1);
         enable_multithreading = previous_emt_state;
         draw.clearVisBestMode();
     }
@@ -202,61 +191,14 @@ void visualizePreviouslyLoggedFlockParameters()
 
 void runOneFlockEvolution()
 {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250910 add new EF::unify_GA_GP
-//    unify_GA_GP = true;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250913 change GpType for GpFunc "Run_Flock"
-
-//        // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-//    //    // EF::setUsingGA();
-//    //    EF::setUsingGP();
-//        EF::setUsingGA();
-//        // EF::setUsingGP();
-//        std::cout << (EF::usingGP()?"GP":"GA") << " evolutionary mode." << std::endl;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250916 just grasping at straws, try doubling the evo pop size.
-
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-    // EF::setUsingGA();
-    // EF::setUsingGP();
-    // EF::setUsingGA();
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20251004 cleaning up obsolete(?) GP::run_...flock_simulation()
-    
-//    EF::setUsingGP();
-//    EF::setUsingGA();
+    //EF::setUsingGA();
     EF::setUsingGP();
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    std::cout << (EF::usingGP()?"GP":"GA") << " evolutionary mode." << std::endl;
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    std::cout << "Evolution mode = " << (EF::usingGP()?"GP":"GA") <<  std::endl;
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250909 does turning of multithreading help?
-    
-//    //    enable_multithreading = true;
-//        enable_multithreading = false;
-    
     enable_multithreading = true;
-//    enable_multithreading = false;
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Merge LP and EF RandomSequence, init from clock for unique runs, and log.
     setRS(LP::LPRS());
@@ -280,98 +222,17 @@ void runOneFlockEvolution()
     // inline in this function's source code, above.
     visualizePreviouslyLoggedFlockParameters();
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250925 turn off curriculum learning experiment
-
-//    int individuals = 300;
-//    int subpops = 17;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250926 evo pop from 600 back to 300
-
-//    int individuals = 600;
-//    int subpops = 24;
-
-    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-    // TODO 20250928 try making 10x bigger just to see if that moves the needle
-
-//    int individuals = 300;
-//    int subpops = 17;
-    
-//        int individuals = 3000;
-//        int subpops = std::round(std::sqrt(individuals));
-//
-//
-//    //    debugPrint(individuals)
-//    //    debugPrint(std::sqrt(individuals))
-//    //    debugPrint(std::sqrt(individuals * 1.0))
-//    //    debugPrint(std::round(std::sqrt(individuals * 1.0)))
-//    //    debugPrint(std::round(std::sqrt(individuals)))
-
-//    int individuals = 300;
-//    int individuals = 3000;
+    // The number of Individuals in a population for evolutionary optimization.
+    // By default it is divided into sqrt(individuals) breeding sub-populations.
     int individuals = 300;
     int subpops = std::round(std::sqrt(individuals));
     
-    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20250913 testing
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250917 maybe just enough to get them moving initially?
-
-//    int max_evolution_steps = 30000;
-//    int max_evolution_steps = EF::usingGP() ? 60000 : 30000;
-//    int max_evolution_steps = EF::usingGP() ? 30000 : 30000;
-    
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
-    
-//    int max_evolution_steps = EF::usingGP() ? 60000 : 30000;
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20251004 cleaning up obsolete(?) GP::run_...flock_simulation()
-
-//    int max_evolution_steps = 30000;
-//    int max_evolution_steps = 30; // SUPER TEMP for testing
+    // Total number of Individual update steps. (Steady state update stepss. For
+    // a generational GA, this corresponds to (max_evolution_steps / individuals)
+    // generations. So 30000 / 300 = 100 "generation equivalents.")
     int max_evolution_steps = 30000;
     
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250923 smooth in evolved steering -- try smaller trees again
-
-//    int min_crossover_tree_size = EF::usingGP() ?  20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 100 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 100 : ga_tree_size;
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20250925 turn off curriculum learning experiment
-
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250925 reduce speed on collision, but not to zero
-
-//    int min_crossover_tree_size = EF::usingGP() ?  20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 100 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 100 : ga_tree_size;
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20250930 try version with ONLY GpFunc Speed_Control.
@@ -385,12 +246,6 @@ void runOneFlockEvolution()
     int max_initial_tree_size   = EF::usingGP() ? 2 : ga_tree_size;
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     debugPrint(min_crossover_tree_size);
     debugPrint(max_crossover_tree_size);
@@ -471,30 +326,7 @@ void runOneFlockEvolution()
             }
 
             std::cout << individual->tree().to_string(true) << std::endl;
-
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20251004 cleaning up obsolete(?) GP::run_...flock_simulation()
-            
-//            LazyPredator::MultiObjectiveFitness fitness;
-//            if (EF::usingGP())
-//            {
-//                fitness = GP::evoflock_gp_fitness_function(individual);
-//            }
-//            else
-//            {
-//                fitness = GP::rerun_flock_simulation(individual);
-//            }
-
-            
-            
-//            LazyPredator::MultiObjectiveFitness fitness;
-//            fitness = GP::run_ga_gp_flock_simulation(individual);
-
-            auto fitness = GP::run_ga_gp_flock_simulation(individual);
-
-
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
+            auto fitness = GP::run_flock_simulation(individual);
             debugPrint(fitness);
         }
     };

@@ -177,37 +177,6 @@ inline void fitness_logger(const MOF& mof)
 // TODO 20250913 change GpType for GpFunc "Run_Flock"
 
 
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    // TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
-//
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    // TODO 20240628 can we do an eval of a const tree?
-//    #ifdef eval_const_20240628
-//    FlockParameters fp_from_ga_tree(const LazyPredator::GpTree& tree)
-//    #else  // eval_const_20240628
-//    FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
-//    #endif // eval_const_20240628
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    {
-//        assert(EF::usingGA());
-//        std::vector<double> parameters;
-//        for (int i = 0; i < FlockParameters::tunableParameterCount(); i++)
-//        {
-//            parameters.push_back(tree.evalSubtree<double>(i));
-//        }
-//        return FlockParameters(parameters);
-//    }
-//
-//
-//    FlockParameters fp_from_ga_individual(LP::Individual* individual)
-//    {
-//        LP::GpTree tree = individual->tree();
-//        return fp_from_ga_tree(tree);
-//    }
-//
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
@@ -248,44 +217,8 @@ FlockParameters fp_from_ga_individual(LP::Individual* individual)
 
 
 
-//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-// TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
-
-//    double clean_num(double x)
-//    {
-//        bool unclean = (std::isnan(x) or
-//                        std::isinf(x) or
-//                        x < std::numeric_limits<double>::min());
-//        return (unclean ? 0 : x);
-//    }
-
-
-//    double clean_num(double x)
-//    {
-//        bool unclean = (std::isnan(x) or
-//                        std::isinf(x) or
-//                        x < std::numeric_limits<double>::min()
-//                        or
-//                        std::abs(x) < 0.00000000001);
-//        return (unclean ? 0 : x);
-//    }
-
-//    auto vlimiter = [](Vec3& v)
-//    {
-//        auto limiter = [](double x)
-//        {
-//            bool questionable = ((std::abs(x) < 0.00000000001) or
-//                                 (x < -10000000000) or
-//                                 (x > 10000000000));
-//            return questionable ? 0 : x;
-//        };
-//
-//        return Vec3(limiter(v.x()), limiter(v.y()), limiter(v.z()));
-//    };
-
-
-// These "cleaners" are to prevent ludicrous values from evolved trees.
-double clean_num(double x)
+// These "cleaners" are to avoid returning ludicrous values from evolved trees.
+double clean(double x)
 {
     bool unclean = (std::isnan(x) or
                     std::isinf(x) or
@@ -296,347 +229,17 @@ double clean_num(double x)
     return (unclean ? 0 : x);
 }
 
-// These "cleaners" are to prevent ludicrous values from evolved trees.
-Vec3 clean_vec3(Vec3 v)
+// These "cleaners" are to avoid returning ludicrous values from evolved trees.
+Vec3 clean(Vec3 v)
 {
-    return { clean_num(v.x()), clean_num(v.y()), clean_num(v.z()) };
+    return { clean(v.x()), clean(v.y()), clean(v.z()) };
 }
 
-//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
-
-
-
-
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250913 change GpType for GpFunc "Run_Flock"
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
-
-
-// TODO rewrite:
-// Run flock simulation with given parameters "runs" times and returns the MOF
-// with the LEAST scalar fitness score.
-
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20250922 WIP switch to "evolved program returns local vec
-
-
-//    //inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
-//    //inline MOF run_ga_gp_flock_simulation(LP::Individual* individual)
-//    inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
-//    {
-//    //    int runs = 4;
-//    //    FlockParameters fp;
-//    //    if (EF::usingGA()) { fp = fp_from_ga_individual(individual); }
-//
-//        MOF least_mof;
-//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
-//        std::vector<double> scalar_fits;
-//        std::mutex save_mof_mutex;
-//
-//        // Perform one simulation run, and record results.
-//        auto do_1_run = [&]()
-//        {
-//            // These steps can happen in parallel threads:
-//            Flock flock;
-//            init_flock(flock);
-//
-//
-//    //    //        FlockParameters fp;
-//    //            if (EF::usingGA())
-//    //            {
-//    //                flock.fp() = fp_from_ga_individual(individual);
-//    //            }
-//    //    //        flock.fp() = fp;
-//
-//            if (EF::usingGA())
-//            {
-//                // For GA, set Flock's FlockParameters.
-//                flock.fp() = fp_from_ga_individual(individual);
-//            }
-//            else
-//            {
-//                // For GP, set Flock's override_steer_function_.
-//                flock.override_steer_function_ = [&]()
-//                {
-//                    LP::GpTree gp_tree = individual->tree();
-//                    Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
-//                    if (not steering.is_valid()) { steering = Vec3(); }
-//
-//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//                    // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
-//
-//                    // TODO in FlockParameters this ranges up to 100, so this clip may be too aggressive
-//
-//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//                    // TODO 20250919 move all "data cleaning" to GP module
-//
-//                    // Ran a test in GA mode. Max steering force length was 1000.
-//                    double max_steering_length = 1000;
-//                    steering = steering.truncate(max_steering_length);
-//
-//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//
-//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//
-//                    double min_steering_length = 0.00001;
-//                    if (steering.length() < min_steering_length) { steering = Vec3(); }
-//
-//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//                    // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
-//
-//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//                    // TODO 20250919 move all "data cleaning" to GP module
-//
-//
-//
-//                    // Just give a 10% push in the forward direction, to prevent them
-//                    // from sitting at their initial position at zero speed.
-//    //                if (speed() < 15)
-//                    Boid* b = Boid::getGpPerThread();
-//                    if (b->speed() < 15) // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//                    {
-//    //                    steering += forward() * max_force() * 0.1;
-//                        steering += b->forward() * b->max_force() * 0.1;
-//                    }
-//
-//
-//
-//    //                return steering;
-//                    return clean_vec3(steering);
-//
-//
-//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//
-//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//
-//                };
-//            }
-//
-//
-//
-//            flock.run();
-//            MOF mof = multiObjectiveFitnessOfFlock(flock);
-//            // These steps happen in the single thread with lock on save_mof_mutex.
-//            {
-//                std::lock_guard<std::mutex> smm(save_mof_mutex);
-//                assert(mof.size() == mof_names().size());
-//                scalar_fits.push_back(scalarize_fitness(mof));
-//                if (least_scalar_fitness > scalar_fits.back())
-//                {
-//                    least_scalar_fitness = scalar_fits.back();
-//                    least_mof = mof;
-//                }
-//                // Store these stats on the "current individual"
-//                LP::Individual* i = LP::Population::evolution_step_individual;
-//                if (i)
-//                {
-//                    std::vector<double>& udfp = i->user_data_for_plotting;
-//                    udfp.clear();
-//                    udfp.push_back(flock.obstacleCollisionsScore());
-//                    udfp.push_back(flock.separationScore());
-//                    udfp.push_back(flock.speedScore());
-//                }
-//            }
-//        };
-//
-//        // Occasionally poll the Draw GUI to check for events esp the "B" command.
-//        Draw::getInstance().pollEvents();
-//
-//    //    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//    //    // TODO 20250909 does turning of multithreading help?
-//    //
-//    //    // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
-//    //    {
-//    //        grabPrintLock_evoflock();
-//    //        std::cout << std::endl;
-//    //        std::cout << "-----------------------------------------------" << std::endl;
-//    //        debugPrint(EF::unify_GA_GP);
-//    //        debugPrint(EF::usingGP());
-//    //        debugPrint(EF::enable_multithreading);
-//    //        debugPrint(Draw::getInstance().enable());
-//    //        std::cout << "-----------------------------------------------" << std::endl;
-//    //        std::cout << std::endl;
-//    //
-//    //    }
-//    //
-//    //    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//        if (EF::enable_multithreading)
-//        {
-//            bool previous_enable_state = Draw::getInstance().enable();
-//            Draw::getInstance().setEnable(false);
-//
-//            // Do each simulation run in a parallel thread.
-//            std::vector<std::thread> threads;
-//            for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
-//            // Wait for helper threads to finish, join them with this thread.
-//            for (auto& t : threads) { t.join(); }
-//
-//            Draw::getInstance().setEnable(previous_enable_state);
-//        }
-//        else
-//        {
-//            // Do each simulation run sequentially.
-//            for (int r = 0; r < runs; r++) { do_1_run(); }
-//        }
-//
-//        assert(scalar_fits.size() == runs);
-//        fitness_logger(least_mof);
-//        std::cout << "    min composite "<< least_scalar_fitness;
-//        std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
-//        std::cout << std::endl << std::endl;
-//        return least_mof;
-//    }
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20251001 investigate low speed score with ONLY Speed_Control GpFunc
-
-//    inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
-//    {
-//        MOF least_mof;
-//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
-//        std::vector<double> scalar_fits;
-//        std::mutex save_mof_mutex;
-//
-//        // Perform one simulation run, and record results.
-//        auto do_1_run = [&]()
-//        {
-//            // These steps can happen in parallel threads:
-//            Flock flock;
-//            init_flock(flock);
-//            if (EF::usingGA())
-//            {
-//                // For GA, set Flock's FlockParameters from evolved "tree".
-//                flock.fp() = fp_from_ga_individual(individual);
-//            }
-//            else
-//            {
-//                // For GP, set Flock's override_steer_function_.
-//                flock.override_steer_function_ = [&]()
-//                {
-//                    Boid* boid = Boid::getGpPerThread();
-//                    LP::GpTree gp_tree = individual->tree();
-//
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    // TODO 20250925 turn off curriculum learning experiment
-//
-//    //                if (boid->isSelected())
-//    //                if (boid->isSelected() and (flock.clock().frameCounter() == 1))
-//    //                {
-//    //                    grabPrintLock_evoflock();
-//    //                    std::cout << "====> ";
-//    //                    debugPrint(boid->speed());
-//    //                }
-//
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//
-//    //                Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
-//                    // TEMP: here we are assuming GpTree returns a local steer vec
-//                    Vec3 local_steering = std::any_cast<Vec3>(gp_tree.eval());
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    // TODO 20250924 add LocalSpace::globalizeDirection()
-//
-//    //                Vec3 steering = boid->ls().globalizePosition(local_steering);
-//                    Vec3 steering = boid->ls().globalizeDirection(local_steering);
-//
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//                    // KEEP? added while tracking down "cleaning" issues
-//                    if (not steering.is_valid()) { steering = Vec3(); }
-//
-//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//                    // TODO 20250926 lower limit on max steering force 100 -> 10
-//
-//                    // Ran a test in GA mode. Max steering force length was 1000.
-//    //                double max_steering_length = 1000;
-//                    // WIP reduce by an order of magnitude, close to max_force()
-//    //                double max_steering_length = 100;
-//                    double max_steering_length = 10;
-//                    steering = steering.truncate(max_steering_length);
-//
-//                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//                    // KEEP? added while tracking down "cleaning" issues
-//                    double min_steering_length = 0.00001;
-//                    if (steering.length() < min_steering_length) { steering = Vec3(); }
-//
-//                    // Just give a 10% push in the forward direction, to prevent them
-//                    // from sitting at their initial position at zero speed.
-//    //                Boid* b = Boid::getGpPerThread();
-//    //                if (b->speed() < 15) // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//    //                {
-//    //                    steering += b->forward() * b->max_force() * 0.1;
-//    //                }
-//    //                if (boid->speed() < 15) // TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//    //                {
-//    //                    steering += boid->forward() * boid->max_force() * 0.1;
-//    //                }
-//                    return clean_vec3(steering);
-//                };
-//            }
-//
-//            flock.run();
-//            MOF mof = multiObjectiveFitnessOfFlock(flock);
-//            // These steps happen in the single thread with lock on save_mof_mutex.
-//            {
-//                std::lock_guard<std::mutex> smm(save_mof_mutex);
-//                assert(mof.size() == mof_names().size());
-//                scalar_fits.push_back(scalarize_fitness(mof));
-//                if (least_scalar_fitness > scalar_fits.back())
-//                {
-//                    least_scalar_fitness = scalar_fits.back();
-//                    least_mof = mof;
-//                }
-//                // Store these stats on the "current individual"
-//                LP::Individual* i = LP::Population::evolution_step_individual;
-//                if (i)
-//                {
-//                    std::vector<double>& udfp = i->user_data_for_plotting;
-//                    udfp.clear();
-//                    udfp.push_back(flock.obstacleCollisionsScore());
-//                    udfp.push_back(flock.separationScore());
-//                    udfp.push_back(flock.speedScore());
-//                }
-//            }
-//        };
-//
-//        // Occasionally poll the Draw GUI to check for events esp the "B" command.
-//        Draw::getInstance().pollEvents();
-//
-//        if (EF::enable_multithreading)
-//        {
-//            bool previous_enable_state = Draw::getInstance().enable();
-//            Draw::getInstance().setEnable(false);
-//
-//            // Do each simulation run in a parallel thread.
-//            std::vector<std::thread> threads;
-//            for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
-//            // Wait for helper threads to finish, join them with this thread.
-//            for (auto& t : threads) { t.join(); }
-//
-//            Draw::getInstance().setEnable(previous_enable_state);
-//        }
-//        else
-//        {
-//            // Do each simulation run sequentially.
-//            for (int r = 0; r < runs; r++) { do_1_run(); }
-//        }
-//
-//        assert(scalar_fits.size() == runs);
-//        fitness_logger(least_mof);
-//        std::cout << "    min composite "<< least_scalar_fitness;
-//        std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
-//        std::cout << std::endl << std::endl;
-//        return least_mof;
-//    }
-
-
-inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
+// Run flock simulation(s) described by the given evolutionary LP::Individual.
+// Makes "runs" simulations, in parallel if EF::enable_multithreading is set to
+// true. Returns the MOF with the LEAST scalar fitness score.
+inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 {
     MOF least_mof;
     double least_scalar_fitness = std::numeric_limits<double>::infinity();
@@ -666,31 +269,6 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
                 Boid* boid = Boid::getGpPerThread();
                 LP::GpTree gp_tree = individual->tree();
                 
-                
-//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//                    // TODO 20251001 investigate low speed score with
-//                    //               ONLY Speed_Control GpFunc
-//                    if (boid->isSelected() and
-//    //                    ((flock.clock().frameCounter() % 100) == 0))
-//    //                    ((flock.clock().frameCounter() % 100) == 1))
-//                        ((flock.clock().frameCounter() % 25) == 1))
-//                    {
-//                        if (log_flock == nullptr)
-//                        {
-//                            log_flock = &flock;
-//                        }
-//                        if (log_flock == &flock)
-//                        {
-//                            grabPrintLock_evoflock();
-//                            std::cout << "====> ";
-//                            std::cout << &flock;
-//                            std::cout << ", selected boid speed: ";
-//                            std::cout << boid->speed();
-//                            std::cout << std::endl;
-//                        }
-//                    }
-//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
                 // TEMP: here we are assuming GpTree returns a local steer vec
                 Vec3 local_steering = std::any_cast<Vec3>(gp_tree.eval());
                 Vec3 steering = boid->ls().globalizeDirection(local_steering);
@@ -699,11 +277,8 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
                 // TODO 20251001 investigate low speed score with
                 //               ONLY Speed_Control GpFunc
 
-                // KEEP? added while tracking down "cleaning" issues
-                // (or should it be: steering = clean_vec3(steering);
-//                if (not steering.is_valid()) { steering = Vec3(); }
-                steering = clean_vec3(steering);
-                
+                steering = clean(steering);
+
                 // Ran a test in GA mode. Max steering force length was 1000.
                 // WIP reduce by an order of magnitude, close to max_force()
 //                double max_steering_length = 10;
@@ -715,7 +290,6 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
                 // KEEP? added while tracking down "cleaning" issues
                 double min_steering_length = 0.00001;
                 if (steering.length() < min_steering_length) { steering = Vec3(); }
-                
                 
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
                 // TODO 20251001 investigate low speed score with
@@ -748,9 +322,7 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
                     }
                 }
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-                
-                return clean_vec3(steering);
+                return clean(steering);
             };
         }
 
@@ -782,19 +354,6 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
     // Occasionally poll the Draw GUI to check for events esp the "B" command.
     Draw::getInstance().pollEvents();
 
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20251003 re-enable multithreading, it was not the problem
-    // TODO 20251002 investigate low speed score with ONLY Speed_Control GpFunc
-    //               VERY TEMP, does it work better without multithreading?
-
-//    bool saved_ef_em = EF::enable_multithreading;
-//    EF::enable_multithreading = false;
-//    
-//    bool previous_enable_state = Draw::getInstance().enable();
-//    Draw::getInstance().setEnable(false);
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
     if (EF::enable_multithreading)
     {
         bool previous_enable_state = Draw::getInstance().enable();
@@ -813,18 +372,7 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
         // Do each simulation run sequentially.
         for (int r = 0; r < runs; r++) { do_1_run(); }
     }
-    
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20251003 re-enable multithreading, it was not the problem
-    // TODO 20251002 investigate low speed score with ONLY Speed_Control GpFunc
-    //               VERY TEMP, does it work better without multithreading?
-    
-//    Draw::getInstance().setEnable(previous_enable_state);
-//
-//    EF::enable_multithreading = saved_ef_em;
-    
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    
+
     assert(scalar_fits.size() == runs);
     fitness_logger(least_mof);
     std::cout << "    min composite "<< least_scalar_fitness;
@@ -833,365 +381,14 @@ inline MOF run_ga_gp_flock_simulation(LP::Individual* individual, int runs = 4)
     return least_mof;
 }
 
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20251004 cleaning up obsolete(?) GP::run_...flock_simulation()
-
-
-//    // Run flock simulation with given parameters "runs" times and returns the MOF
-//    // with the LEAST scalar fitness score.
-//
-//    inline MOF run_flock_simulation(const FlockParameters& fp, int runs = 4)
-//    {
-//        MOF least_mof;
-//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
-//        std::vector<double> scalar_fits;
-//        std::mutex save_mof_mutex;
-//
-//        // Perform one simulation run, and record results.
-//        auto do_1_run = [&]()
-//        {
-//            // These steps can happen in parallel threads:
-//            Flock flock;
-//            init_flock(flock);
-//            flock.fp() = fp;
-//            flock.run();
-//            MOF mof = multiObjectiveFitnessOfFlock(flock);
-//            // These steps happen in the single thread with lock on save_mof_mutex.
-//            {
-//                std::lock_guard<std::mutex> smm(save_mof_mutex);
-//                assert(mof.size() == mof_names().size());
-//                scalar_fits.push_back(scalarize_fitness(mof));
-//                if (least_scalar_fitness > scalar_fits.back())
-//                {
-//                    least_scalar_fitness = scalar_fits.back();
-//                    least_mof = mof;
-//                }
-//                // Store these stats on the "current individual"
-//                LP::Individual* i = LP::Population::evolution_step_individual;
-//                if (i)
-//                {
-//                    std::vector<double>& udfp = i->user_data_for_plotting;
-//                    udfp.clear();
-//                    udfp.push_back(flock.obstacleCollisionsScore());
-//                    udfp.push_back(flock.separationScore());
-//                    udfp.push_back(flock.speedScore());
-//                }
-//            }
-//        };
-//        
-//        // Occasionally poll the Draw GUI to check for events esp the "B" command.
-//        Draw::getInstance().pollEvents();
-//        
-//    //    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //    // TODO 20250909 does turning of multithreading help?
-//    //    // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
-//    //    {
-//    //        grabPrintLock_evoflock();
-//    //        std::cout << std::endl;
-//    //        std::cout << "-----------------------------------------------" << std::endl;
-//    //        debugPrint(EF::unify_GA_GP);
-//    //        debugPrint(EF::usingGP());
-//    //        debugPrint(EF::enable_multithreading);
-//    //        debugPrint(Draw::getInstance().enable());
-//    //        std::cout << "-----------------------------------------------" << std::endl;
-//    //        std::cout << std::endl;
-//    //        
-//    //    }
-//    //    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//
-//        if (EF::enable_multithreading)
-//        {
-//            bool previous_enable_state = Draw::getInstance().enable();
-//            Draw::getInstance().setEnable(false);
-//            
-//            // Do each simulation run in a parallel thread.
-//            std::vector<std::thread> threads;
-//            for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
-//            // Wait for helper threads to finish, join them with this thread.
-//            for (auto& t : threads) { t.join(); }
-//            
-//            Draw::getInstance().setEnable(previous_enable_state);
-//        }
-//        else
-//        {
-//            // Do each simulation run sequentially.
-//            for (int r = 0; r < runs; r++) { do_1_run(); }
-//        }
-//        
-//        assert(scalar_fits.size() == runs);
-//        fitness_logger(least_mof);
-//        std::cout << "    min composite "<< least_scalar_fitness;
-//        std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
-//        std::cout << std::endl << std::endl;
-//        return least_mof;
-//    }
-
-
-//    // TODO 20240622 just temporary for debugging
-//    std::map<LP::Individual*, Vec3> values_of_individuals;
-//    std::map<LP::Individual*, LP::GpTree> trees_of_individuals;
-
-//    inline MOF run_gp_flock_simulation(LP::Individual* individual)
-//    {
-//        assert(EF::usingGP());
-//        int runs = 4;
-//        MOF least_mof;
-//        double least_scalar_fitness = std::numeric_limits<double>::infinity();
-//        std::vector<double> scalar_fits;
-//        std::mutex save_mof_mutex;
-//        // Perform one simulation run, and record results.
-//        auto do_1_run = [&]()
-//        {
-//            // These steps can happen in parallel threads:
-//            Flock flock;
-//            init_flock(flock);
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20240627 it would be nice to not have to duplicate tree for each
-//            //               boid on every simulation step.
-//            //
-//            // LP::GpTree gp_tree;
-//            // gp_tree = individual->tree();
-//
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-//            // TODO 20250909 does turning of multithreading help?
-//
-//    //        flock.override_steer_function = [&]()
-//            flock.override_steer_function_ = [&]()
-//
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-//            {
-//                LP::GpTree gp_tree = individual->tree();
-//                Vec3 steering = std::any_cast<Vec3>(gp_tree.eval());
-//                if (not steering.is_valid()) { steering = Vec3(); }
-//                double max_steering_length = 10;
-//                steering = steering.truncate(max_steering_length);
-//                double min_steering_length = 0.00001;
-//                if (steering.length() < min_steering_length) { steering = Vec3(); }
-//                return steering;
-//            };
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            flock.run();
-//            MOF mof = multiObjectiveFitnessOfFlock(flock);
-//            // These steps happen in the single thread with lock on save_mof_mutex.
-//            {
-//                std::lock_guard<std::mutex> smm(save_mof_mutex);
-//                assert(mof.size() == mof_names().size());
-//                scalar_fits.push_back(scalarize_fitness(mof));
-//                if (least_scalar_fitness > scalar_fits.back())
-//                {
-//                    least_scalar_fitness = scalar_fits.back();
-//                    least_mof = mof;
-//                }
-//            }
-//        };
-//
-//    //    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //    // TODO 20250909 does turning of multithreading help?
-//    //    // TODO 20250909 AHA?! in GP-but-not-multithreading mode this is not reached
-//    //    {
-//    //        grabPrintLock_evoflock();
-//    //        std::cout << std::endl;
-//    //        std::cout << "-----------------------------------------------" << std::endl;
-//    //        debugPrint(EF::unify_GA_GP);
-//    //        debugPrint(EF::usingGP());
-//    //        debugPrint(EF::enable_multithreading);
-//    //        debugPrint(Draw::getInstance().enable());
-//    //        std::cout << "-----------------------------------------------" << std::endl;
-//    //        std::cout << std::endl;
-//    //    }
-//    //    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//
-//        if (EF::enable_multithreading)
-//        {
-//            // Do each simulation run in a parallel thread.
-//            std::vector<std::thread> threads;
-//            for (int r = 0; r < runs; r++) { threads.push_back(std::thread(do_1_run)); }
-//            // Wait for helper threads to finish, join them with this thread.
-//            for (auto& t : threads) { t.join(); }
-//        }
-//        else
-//        {
-//            // Do simulation runs sequentially.
-//            for (int r = 0; r < runs; r++) { do_1_run(); }
-//        }
-//
-//        assert(scalar_fits.size() == runs);
-//        fitness_logger(least_mof);
-//        std::cout << "    min composite "<< least_scalar_fitness;
-//        std::cout << "  {" << LP::vec_to_string(scalar_fits) << "}";
-//        std::cout << std::endl << std::endl;
-//        return least_mof;
-//
-//    }
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-
-//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-// TODO 20250912 is GpFunc "Run_Flock" return value used?
-
-//    // Fitness function, simply returns Individual's tree's value (computing it and
-//    // caching it on first call).
-//    inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
-//    {
-//        return std::any_cast<MOF>(individual->tree().getRootValue());
-//    }
-
-// Fitness function, simply returns Individual's tree's value (computing it and
-// caching it on first call).
-inline MOF evoflock_ga_fitness_function(LP::Individual* individual)
+// Generic EvoFlock fitness function handling both GA and GP. In the future this
+// may want to be one of many fitness function but leaving it simple for now.
+inline MOF fitnessFunction(LP::Individual* individual)
 {
-    
-//    std::cout << "in GP::evoflock_ga_fitness_function()" << std::endl;
-    
-    return run_ga_gp_flock_simulation(individual);
-    
+    return run_flock_simulation(individual);
 }
 
-//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-
-
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250913 change GpType for GpFunc "Run_Flock"
-
-//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-// TODO 20250912 is GpFunc "Run_Flock" return value used?
-
-
-// This should presumable be calling run_ga_gp_flock_simulation()
-
-//    // Fitness function, runs a flock simulation using evolved tree for steering
-//    inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
-//    {
-//        return run_gp_flock_simulation(individual);
-//    }
-
-
-
-//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-// Fitness function, runs a flock simulation using evolved tree for steering
-inline MOF evoflock_gp_fitness_function(LP::Individual* individual)
-{
-    return run_ga_gp_flock_simulation(individual);
-}
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-
-
-
-
-//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-// TODO 20250912 is GpFunc "Run_Flock" return value used?
-
-// Maybe this should be calling run_ga_gp_flock_simulation() unconditionally?
-
-
-    // Generic EvoFlock fitness function handling both GA and GP. In the future this
-    // may want to be one of many fitness function but leaving it simple for now.
-    inline MOF fitnessFunction(LP::Individual* individual)
-    {
-        return (EF::usingGP() ?
-                evoflock_gp_fitness_function(individual) :
-                evoflock_ga_fitness_function(individual));
-    }
-
-//    // Generic EvoFlock fitness function handling both GA and GP. In the future this
-//    // may want to be one of many fitness function but leaving it simple for now.
-//    inline MOF fitnessFunction(LP::Individual* individual)
-//    {
-//        return multiObjectiveFitnessOfFlock(<#const Flock &flock#>);
-//    }
-
-//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20251004 cleaning up obsolete(?) GP::run_...flock_simulation()
-
-//    // Run flock simulation with given parameters, return a MultiObjectiveFitness.
-//    inline MOF run_hand_tuned_flock_simulation()
-//    {
-//        return run_flock_simulation(FlockParameters());
-//    }
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
-
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    // TODO 20240628 can we do an eval of a const tree?
-//    #ifdef eval_const_20240628
-//    FlockParameters fp_from_ga_tree(const LazyPredator::GpTree& tree)
-//    #else  // eval_const_20240628
-//    FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
-//    #endif // eval_const_20240628
-//    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    {
-//        assert(EF::usingGA());
-//        std::vector<double> parameters;
-//        for (int i = 0; i < FlockParameters::tunableParameterCount(); i++)
-//        {
-//            parameters.push_back(tree.evalSubtree<double>(i));
-//        }
-//        return FlockParameters(parameters);
-//    }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20251004 cleaning up obsolete(?) GP::run_...flock_simulation()
-
-//    // Wrote this to run at the end of evolution on the top-10 fitness individuals
-//    // of population in order to record flock data for playback
-//    inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
-//    {
-//        // Is this tree copy needed to avoid using the previous cached tree root?
-//        LazyPredator::GpTree t = individual->tree();
-//        // Run simulation.
-//        return run_flock_simulation(fp_from_ga_tree(t));
-//    }
-
-
-//    // Wrote this to run at the end of evolution on the top-10 fitness individuals
-//    // of population in order to record flock data for playback
-//    //inline MOF rerun_flock_simulation(const LazyPredator::Individual* individual)
-//    inline MOF rerun_flock_simulation(LazyPredator::Individual* individual)
-//    {
-//    //    // Is this tree copy needed to avoid using the previous cached tree root?
-//    //    LazyPredator::GpTree t = individual->tree();
-//    //    // Run simulation.
-//    //    return run_flock_simulation(fp_from_ga_tree(t));
-//
-//        return run_ga_gp_flock_simulation(individual);
-//
-//    }
-
-//    // Wrote this to run at the end of evolution on the top-10 fitness individuals
-//    // of population in order to record flock data for playback.
-//    inline MOF rerun_flock_simulation(LazyPredator::Individual* individual)
-//    {
-//        return run_ga_gp_flock_simulation(individual);
-//    }
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 // A custom “GA style” crossover for this degenerate GP function set.
 inline void evoflock_ga_crossover(const LP::GpTree& parent0,
@@ -1478,7 +675,7 @@ Boid* getGpBoidNeighbor(int n)
 
 Vec3 ensure_unit_length(Vec3 v)
 {
-    Vec3 cv = clean_vec3(v);
+    Vec3 cv = clean(v);
     return (cv.is_unit_length() ? cv : Vec3(1, 0, 0));
 }
 

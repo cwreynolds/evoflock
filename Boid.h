@@ -80,16 +80,9 @@ private:  // move to bottom of class later
 public:
     
     // Accessors
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-    // TODO 20251003 re-enable multithreading, it was not the problem
-    //               this variable was defined on Boid but apparently unused.
-    
+    // Get/set each Boid's pointer to its flock. (Used only for debugging?)
     void setFlock(Flock* flock) { flock_ = flock; }
     Flock* getFlock() const { return flock_; }
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
     
     // Get reference to this Boid's local list of flockmate pointers.
     BoidPtrList& flock_boids() { return flock_boids_; }

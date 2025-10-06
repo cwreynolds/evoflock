@@ -173,22 +173,8 @@ inline void fitness_logger(const MOF& mof)
     std::cout.precision(old_precision);
 }
 
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20250913 change GpType for GpFunc "Run_Flock"
 
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240628 can we do an eval of a const tree?
-#ifdef eval_const_20240628
-FlockParameters fp_from_ga_tree(const LazyPredator::GpTree& tree)
-#else  // eval_const_20240628
 FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
-#endif // eval_const_20240628
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 {
     assert(EF::usingGA());
     std::vector<double> parameters;
@@ -199,22 +185,11 @@ FlockParameters fp_from_ga_tree(LazyPredator::GpTree& tree)
     return FlockParameters(parameters);
 }
 
-
 FlockParameters fp_from_ga_individual(LP::Individual* individual)
 {
     LP::GpTree tree = individual->tree();
     return fp_from_ga_tree(tree);
 }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-
-
 
 
 // These "cleaners" are to avoid returning ludicrous values from evolved trees.
@@ -439,16 +414,13 @@ double jiggle_scale = 0.05;
 // selecting a set of real number parameters for a flock simulation, via an
 // absolute and fixed fitness metric. There is only one function, all GpTrees
 // are exactly one function deep, differing only in their parameter values.
-LazyPredator::FunctionSet evoflock_ga_function_set_normal()
+//LazyPredator::FunctionSet evoflock_ga_function_set_normal()
+LazyPredator::FunctionSet evoflock_ga_function_set()
 {
     return
     {
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250913 change GpType for GpFunc "Run_Flock"
-//            { "Multi_Objective_Fitness" },
             { "Flock_Parameters" },
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             { "Real_0_1",    0.0,   1.0, jiggle_scale },
             { "Real_0_10",   0.0,  10.0, jiggle_scale },
             { "Real_0_100",  0.0, 100.0, jiggle_scale },
@@ -458,17 +430,9 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
             {
                 // GP function name:
                 "Run_Flock",
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20250913 change GpType for GpFunc "Run_Flock"
-                
-//                // Return type (in this case it returns a MultiObjectiveFitness):
-//                "Multi_Objective_Fitness",
 
                 // Return type: a FlockParameters object.
                 "Flock_Parameters",
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 // Function parameter type list, cf FlockParameters for details
                 {
@@ -494,65 +458,28 @@ LazyPredator::FunctionSet evoflock_ga_function_set_normal()
                     "Real_0_100", // fly_away_max_dist
                     "Real_0_10",  // min_time_to_collide
                 },
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20240628 can we do an eval of a const tree?
-                
+                                
                 // Evaluation function, which runs a flock simulation with the given
                 // parameters and returns the fitness.
-#ifdef eval_const_20240628
-                [](const LazyPredator::GpTree& t)
-#else  // eval_const_20240628
                 [](LazyPredator::GpTree& t)
-#endif // eval_const_20240628
                 {
-                    
-                    
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20250913 change GpType for GpFunc "Run_Flock"
-
-                    
-//                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                        // TODO 20250911 refactor run_flock_simulation() to include GP in addition to GA
-//
-//                        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//                        // TODO 20250912 is GpFunc "Run_Flock" return value used?
-//
-//    //                    auto fitness = run_flock_simulation(fp_from_ga_tree(t));
-//
-//    //                    auto fitness = run_flock_simulation(fp_from_ga_tree(t));
-//
-//                        MOF fitness;
-//
-//                        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//
-//                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//                        return std::any(fitness);
-                    
-                    
                     // TODO should the body of fp_from_ga_tree() be written
                     // inline here? or is it used elsewhere?
-                    
                     return std::any(fp_from_ga_tree(t));
-                    
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
                 }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
     };
 }
 
-// This is a degenerate GP function set, for what is essentially a GA problem:
-// selecting a set of real number parameters for a flock simulation, via an
-// absolute and fixed fitness metric. There is only one GpFunc, all GpTrees
-// are exactly one function deep, differing only in their parameter values.
-LP::FunctionSet evoflock_ga_function_set()
-{
-    return evoflock_ga_function_set_normal();
-}
+//    // This is a degenerate GP function set, for what is essentially a GA problem:
+//    // selecting a set of real number parameters for a flock simulation, via an
+//    // absolute and fixed fitness metric. There is only one GpFunc, all GpTrees
+//    // are exactly one function deep, differing only in their parameter values.
+//    LP::FunctionSet evoflock_ga_function_set()
+//    {
+//        return evoflock_ga_function_set_normal();
+//    }
 
 // The five functions below are "accessors" to retrieve fitness component time
 // series to be used for plotting evolution run performance. The data is stored
@@ -651,27 +578,6 @@ Boid* getGpBoidNeighbor(int n)
     return neighbors.at(n - 1);
 }
 
-//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-// TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
-
-//    double clean_num(double x)
-//    {
-//        bool unclean = (std::isnan(x) or
-//                        std::isinf(x) or
-//                        x < std::numeric_limits<double>::min());
-//        return (unclean ? 0 : x);
-//    }
-//
-//    Vec3 clean_vec3(Vec3 v)
-//    {
-//        return { clean_num(v.x()), clean_num(v.y()), clean_num(v.z()) };
-//    }
-
-
-//    Vec3 ensure_unit_length(Vec3 v)
-//    {
-//        return (v.is_unit_length() ? v : Vec3(1, 0, 0));
-//    }
 
 Vec3 ensure_unit_length(Vec3 v)
 {
@@ -679,13 +585,6 @@ Vec3 ensure_unit_length(Vec3 v)
     return (cv.is_unit_length() ? cv : Vec3(1, 0, 0));
 }
 
-//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-// FuntionSet for the GP version of EvoFlock.
-
-#ifdef eval_const_20240628
-LP::FunctionSet evoflock_gp_function_set() { return evoflock_ga_function_set;}
-#else  // eval_const_20240628
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240712 experiment: get rid of GpType "Scalar_5" (replace with
@@ -696,6 +595,7 @@ LP::FunctionSet evoflock_gp_function_set() { return evoflock_ga_function_set;}
 
 #define USE_ONLY_SPEED_CONTROL
 
+// FunctionSet for the GP version of EvoFlock.
 LP::FunctionSet evoflock_gp_function_set()
 {
 #ifdef USE_ONLY_SPEED_CONTROL
@@ -1706,7 +1606,7 @@ LP::FunctionSet test_gp_boid_function_set()
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#endif // eval_const_20240628
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240707 WIP on a prototype unit test for this GP module

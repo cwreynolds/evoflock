@@ -593,8 +593,79 @@ Vec3 ensure_unit_length(Vec3 v)
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 // TODO 20250930 try version with ONLY GpFunc Speed_Control.
 
-#define USE_ONLY_SPEED_CONTROL
 
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+// TODO 20251006 named GpFuncs at GP top level. Combine them into FunctionSets.
+
+inline LP::GpFunction Speed_Control
+ ("Speed_Control",
+  "Vec3",
+  {},
+  [](LP::GpTree& tree)
+  {
+     Boid& b = *Boid::getGpPerThread();
+     Vec3 thrust(0, 0, b.steerForSpeedControl().dot(b.forward()));
+     double max_force = 5;
+     return std::any(thrust * max_force);
+ });
+
+// Scalar functions: abs, add, subtract, multiply, exponentiation.
+
+inline LP::GpFunction Abs
+ ("Abs",
+  "Scalar_100",
+  {"Scalar_100"},
+  [](LP::GpTree& tree)
+  {
+     return std::any(clean(std::abs(clean(tree.evalSubtree<double>(0)))));
+ });
+
+inline LP::GpFunction Add
+ ("Add",
+  "Scalar_100",
+  {"Scalar_100", "Scalar_100"},
+  [](LP::GpTree& tree)
+  {
+     return std::any(clean(clean(tree.evalSubtree<double>(0)) +
+                           clean(tree.evalSubtree<double>(1))));
+ });
+
+inline LP::GpFunction Sub
+ ("Sub",
+  "Scalar_100",
+  {"Scalar_100", "Scalar_100"},
+  [](LP::GpTree& tree)
+  {
+     return std::any(clean(clean(tree.evalSubtree<double>(0)) -
+                           clean(tree.evalSubtree<double>(1))));
+ });
+
+inline LP::GpFunction Mult
+("Mult",
+ "Scalar_100",
+ {"Scalar_100", "Scalar_100"},
+ [](LP::GpTree& tree)
+ {
+    return std::any(clean(clean(tree.evalSubtree<double>(0)) *
+                          clean(tree.evalSubtree<double>(1))));
+});
+
+inline LP::GpFunction Power
+("Mult",
+ "Scalar_100",
+ {"Scalar_100", "Scalar_100"},
+ [](LP::GpTree& tree)
+ {
+    double base = clean(tree.evalSubtree<double>(0));
+    double expt = clean(tree.evalSubtree<double>(1));
+    return std::any(clean(std::pow(base, expt)));
+});
+
+
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+#define USE_ONLY_SPEED_CONTROL
+    
 // FunctionSet for the GP version of EvoFlock.
 LP::FunctionSet evoflock_gp_function_set()
 {
@@ -609,45 +680,10 @@ LP::FunctionSet evoflock_gp_function_set()
         },
         // GpFunctions
         {
-            {
-                "Speed_Control", "Vec3", {},
-                [](LP::GpTree& tree)
-                {
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-                    // TODO 20251002 investigate low speed score with ONLY Speed_Control GpFunc
-
-//                    double target_speed = 20;
-//                    Boid& b = *Boid::getGpPerThread();
-//                        int sign =  (b.speed() < target_speed) ? 1 : -1;
-//                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                        // TODO 20251001 investigate low speed score with ONLY Speed_Control GpFunc
-//
-//    //                    double max_force = 10;
-//                        double max_force = 100;
-//
-//                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                        Vec3 thrust = Vec3(0, 0, 1) * max_force * sign;
-                    
-                    
-//                    Boid& b = *Boid::getGpPerThread();
-//                    Vec3 thrust(0, 0, b.steerForSpeedControl().length());
-//                    double max_force = 10;
-//                    return std::any(thrust * max_force);
-
-                    Boid& b = *Boid::getGpPerThread();
-                    Vec3 thrust(0, 0, b.steerForSpeedControl().dot(b.forward()));
-//                    double max_force = 10;
-//                    double max_force = 1;
-                    double max_force = 5;
-                    return std::any(thrust * max_force);
-
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-                }
-            },
+            Speed_Control
         }
-        
     };
-    
+
 #else  // USE_ONLY_SPEED_CONTROL
     
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -662,52 +698,59 @@ LP::FunctionSet evoflock_gp_function_set()
         
         // GpFunctions
         {
-            // Scalar functions: add, multiply,
-            {
-                "Add", "Scalar_100", {"Scalar_100", "Scalar_100"},
-                [](LP::GpTree& tree)
-                {
-                    return std::any(clean_num(tree.evalSubtree<double>(0) +
-                                              tree.evalSubtree<double>(1)));
-                }
-            },
-            {
-                "Sub", "Scalar_100", {"Scalar_100", "Scalar_100"},
-                [](LP::GpTree& tree)
-                {
-                    return std::any(clean_num(tree.evalSubtree<double>(0) -
-                                              tree.evalSubtree<double>(1)));
-                }
-            },
-            {
-                "Mult", "Scalar_100", {"Scalar_100", "Scalar_100"},
-                [](LP::GpTree& tree)
-                {
-                    return std::any(clean_num(tree.evalSubtree<double>(0) *
-                                              tree.evalSubtree<double>(1)));
-                }
-            },
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250920 experimental curriculum learning
-            //            {
-            //                "Power", "Scalar_100", {"Scalar_100", "Scalar_100"},
-            //                [](LP::GpTree& tree)
-            //                {
-            //                    double base = tree.evalSubtree<double>(0);
-            //                    double expt = tree.evalSubtree<double>(1);
-            //                    return std::any(clean_num(std::pow(base, expt)));
-            //                }
-            //            },
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            {
-                "Abs", "Scalar_100", {"Scalar_100"},
-                [](LP::GpTree& tree)
-                {
-                    double x = tree.evalSubtree<double>(0);
-                    return std::any(clean_num(std::abs(x)));
-                }
-            },
+//            // Scalar functions: add, multiply,
+//            {
+//                "Add", "Scalar_100", {"Scalar_100", "Scalar_100"},
+//                [](LP::GpTree& tree)
+//                {
+//                    return std::any(clean_num(tree.evalSubtree<double>(0) +
+//                                              tree.evalSubtree<double>(1)));
+//                }
+//            },
+//            {
+//                "Sub", "Scalar_100", {"Scalar_100", "Scalar_100"},
+//                [](LP::GpTree& tree)
+//                {
+//                    return std::any(clean_num(tree.evalSubtree<double>(0) -
+//                                              tree.evalSubtree<double>(1)));
+//                }
+//            },
+//            {
+//                "Mult", "Scalar_100", {"Scalar_100", "Scalar_100"},
+//                [](LP::GpTree& tree)
+//                {
+//                    return std::any(clean_num(tree.evalSubtree<double>(0) *
+//                                              tree.evalSubtree<double>(1)));
+//                }
+//            },
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20250920 experimental curriculum learning
+//            //            {
+//            //                "Power", "Scalar_100", {"Scalar_100", "Scalar_100"},
+//            //                [](LP::GpTree& tree)
+//            //                {
+//            //                    double base = tree.evalSubtree<double>(0);
+//            //                    double expt = tree.evalSubtree<double>(1);
+//            //                    return std::any(clean_num(std::pow(base, expt)));
+//            //                }
+//            //            },
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            {
+//                "Abs", "Scalar_100", {"Scalar_100"},
+//                [](LP::GpTree& tree)
+//                {
+//                    double x = tree.evalSubtree<double>(0);
+//                    return std::any(clean_num(std::abs(x)));
+//                }
+//            },
             
+            // Scalar functions: abs, add, subtract, multiply, exponentiation.
+            "Abs",
+            "Add",
+            "Sub",
+            "Mult",
+            // "Power",
+
             // Vector functions:
             
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~

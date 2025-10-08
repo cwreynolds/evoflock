@@ -192,9 +192,9 @@ void visualizePreviouslyLoggedFlockParameters()
 void runOneFlockEvolution()
 {
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-    EF::setUsingGA();
-    //EF::setUsingGP();
-    std::cout << "Evolution mode = " << (EF::usingGP()?"GP":"GA") <<  std::endl;
+    //EF::setUsingGA();
+    EF::setUsingGP();
+    std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).

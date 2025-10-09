@@ -662,6 +662,142 @@ inline LP::GpFunction Power
 });
 
 
+// Vector functions: V3, Add_v3, Sub_v3, Scale_v3, Length, Normalize, Cross,
+// Dot, Parallel_Component, Perpendicular_Component, Interpolate, If_Pos
+
+inline LP::GpFunction V3 =
+{
+    "Vec3",
+    "Vec3",
+    {"Scalar_100", "Scalar_100", "Scalar_100"},
+    [](LP::GpTree& tree)
+    {
+        Vec3 v3(clean(tree.evalSubtree<double>(0)),
+                clean(tree.evalSubtree<double>(1)),
+                clean(tree.evalSubtree<double>(2)));
+        return std::any(clean(v3));
+    }
+};
+
+inline LP::GpFunction Add_v3 =
+{
+    "Add_v3", "Vec3", {"Vec3", "Vec3"},
+    [](LP::GpTree& tree)
+    {
+        return std::any(tree.evalSubtree<Vec3>(0) +
+                        tree.evalSubtree<Vec3>(1));
+    }
+};
+
+inline LP::GpFunction Sub_v3 =
+{
+    "Sub_v3", "Vec3", {"Vec3", "Vec3"},
+    [](LP::GpTree& tree)
+    {
+        return std::any(tree.evalSubtree<Vec3>(0) -
+                        tree.evalSubtree<Vec3>(1));
+    }
+};
+
+inline LP::GpFunction Scale_v3 =
+{
+    "Scale_v3", "Vec3", {"Vec3", "Scalar_100"},
+    [](LP::GpTree& tree)
+    {
+        return std::any(clean(tree.evalSubtree<Vec3>(0)) *
+                        clean(tree.evalSubtree<double>(1)));
+    }
+};
+
+inline LP::GpFunction Length =
+{
+    "Length", "Scalar_100", {"Vec3"},
+    [](LP::GpTree& tree)
+    {
+        return std::any(tree.evalSubtree<Vec3>(0).length());
+    }
+};
+
+inline LP::GpFunction Normalize =
+{
+    "Normalize", "Vec3", {"Vec3"},
+    [](LP::GpTree& tree)
+    {
+        Vec3 v = clean(tree.evalSubtree<Vec3>(0));
+        return std::any(v.normalize_or_0());
+    }
+};
+
+inline LP::GpFunction Cross =
+{
+    "Cross", "Vec3", {"Vec3", "Vec3"},
+    [](LP::GpTree& tree)
+    {
+        return std::any(Vec3::cross(tree.evalSubtree<Vec3>(0),
+                                    tree.evalSubtree<Vec3>(1)));
+    }
+};
+
+inline LP::GpFunction Dot =
+{
+    "Dot", "Scalar_100", {"Vec3", "Vec3"},
+    [](LP::GpTree& tree)
+    {
+        return std::any(Vec3::dot(tree.evalSubtree<Vec3>(0),
+                                  tree.evalSubtree<Vec3>(1)));
+    }
+};
+
+inline LP::GpFunction Parallel_Component =
+{
+    "Parallel_Component", "Vec3", {"Vec3", "Vec3"},
+    [](LP::GpTree& tree)
+    {
+        Vec3 value = tree.evalSubtree<Vec3>(0);
+        Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
+        Vec3 unit_basis = ensure_unit_length(basis);
+        return std::any(value.parallel_component(unit_basis));
+    }
+};
+
+inline LP::GpFunction Perpendicular_Component =
+{
+    "Perpendicular_Component", "Vec3", {"Vec3", "Vec3"},
+    [](LP::GpTree& tree)
+    {
+        Vec3 value = tree.evalSubtree<Vec3>(0);
+        Vec3 basis = tree.evalSubtree<Vec3>(1).normalize_or_0();
+        Vec3 unit_basis = ensure_unit_length(basis);
+        return std::any(value.perpendicular_component(unit_basis));
+    }
+};
+
+inline LP::GpFunction Interpolate =
+{
+    "Interpolate", "Vec3", {"Scalar_100", "Vec3", "Vec3"},
+    [](LP::GpTree& tree)
+    {
+        double i = tree.evalSubtree<double>(0);
+        Vec3 a = tree.evalSubtree<Vec3>(1);
+        Vec3 b = tree.evalSubtree<Vec3>(2);
+        //return std::any(util::interpolate(util::clip01(i), a, b));
+        return std::any(util::interpolate(i, a, b));
+    }
+};
+
+inline LP::GpFunction If_Pos =
+{
+    "If_Pos", "Vec3", {"Scalar_100", "Vec3", "Vec3"},
+    [](LP::GpTree& tree)
+    {
+        return std::any(0 < tree.evalSubtree<double>(0) ?
+                        tree.evalSubtree<Vec3>(1) :
+                        tree.evalSubtree<Vec3>(2));
+    }
+};
+
+
+
 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
 #define USE_ONLY_SPEED_CONTROL
@@ -767,46 +903,46 @@ LP::FunctionSet evoflock_gp_function_set()
             //                }
             //            },
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            {
-                "Add_v3", "Vec3", {"Vec3", "Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    return std::any(tree.evalSubtree<Vec3>(0) +
-                                    tree.evalSubtree<Vec3>(1));
-                }
-            },
-            {
-                "Sub_v3", "Vec3", {"Vec3", "Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    return std::any(tree.evalSubtree<Vec3>(0) -
-                                    tree.evalSubtree<Vec3>(1));
-                }
-            },
-            {
-                "Scale_v3", "Vec3", {"Vec3", "Scalar_100"},
-                [](LP::GpTree& tree)
-                {
-                    return std::any(tree.evalSubtree<Vec3>(0) *
-                                    tree.evalSubtree<double>(1));
-                }
-            },
-            {
-                "Length", "Scalar_100", {"Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    return std::any(tree.evalSubtree<Vec3>(0).length());
-                }
-            },
-            {
-                "Normalize", "Vec3", {"Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    Vec3 v = tree.evalSubtree<Vec3>(0);
-                    Vec3 n = v.normalize_or_0();
-                    return std::any(clean_vec3(n));
-                }
-            },
+//            {
+//                "Add_v3", "Vec3", {"Vec3", "Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    return std::any(tree.evalSubtree<Vec3>(0) +
+//                                    tree.evalSubtree<Vec3>(1));
+//                }
+//            },
+//            {
+//                "Sub_v3", "Vec3", {"Vec3", "Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    return std::any(tree.evalSubtree<Vec3>(0) -
+//                                    tree.evalSubtree<Vec3>(1));
+//                }
+//            },
+//            {
+//                "Scale_v3", "Vec3", {"Vec3", "Scalar_100"},
+//                [](LP::GpTree& tree)
+//                {
+//                    return std::any(tree.evalSubtree<Vec3>(0) *
+//                                    tree.evalSubtree<double>(1));
+//                }
+//            },
+//            {
+//                "Length", "Scalar_100", {"Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    return std::any(tree.evalSubtree<Vec3>(0).length());
+//                }
+//            },
+//            {
+//                "Normalize", "Vec3", {"Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    Vec3 v = tree.evalSubtree<Vec3>(0);
+//                    Vec3 n = v.normalize_or_0();
+//                    return std::any(clean_vec3(n));
+//                }
+//            },
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             // TODO 20250930 fewer GpFunc that may be "attractive nuisances"
             //            {
@@ -818,14 +954,14 @@ LP::FunctionSet evoflock_gp_function_set()
             //                }
             //            },
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            {
-                "Dot", "Scalar_100", {"Vec3", "Vec3"},
-                [](LP::GpTree& tree)
-                {
-                    return std::any(Vec3::dot(tree.evalSubtree<Vec3>(0),
-                                              tree.evalSubtree<Vec3>(1)));
-                }
-            },
+//            {
+//                "Dot", "Scalar_100", {"Vec3", "Vec3"},
+//                [](LP::GpTree& tree)
+//                {
+//                    return std::any(Vec3::dot(tree.evalSubtree<Vec3>(0),
+//                                              tree.evalSubtree<Vec3>(1)));
+//                }
+//            },
             
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
@@ -909,6 +1045,14 @@ LP::FunctionSet evoflock_gp_function_set()
             //            },
             
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            
+            
+            
+            // Vector functions: V3, Add_v3, Sub_v3, Scale_v3, Length,
+            //                   Normalize, Cross, Dot, Parallel_Component,
+            //                   Perpendicular_Component, Interpolate, If_Pos
+
+            Add_v3, Sub_v3, Scale_v3, Length, Normalize, Dot,
             
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
             

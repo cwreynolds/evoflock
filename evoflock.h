@@ -237,13 +237,15 @@ void runOneFlockEvolution()
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20250930 try version with ONLY GpFunc Speed_Control.
 
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
-
+#ifdef USE_ONLY_SPEED_CONTROL
     int min_crossover_tree_size = EF::usingGP() ? 1 : 2;
     int max_crossover_tree_size = EF::usingGP() ? 2 : ga_tree_size;
     int max_initial_tree_size   = EF::usingGP() ? 2 : ga_tree_size;
+#else  // USE_ONLY_SPEED_CONTROL
+    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
+#endif  // USE_ONLY_SPEED_CONTROL
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

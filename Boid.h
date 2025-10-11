@@ -633,7 +633,7 @@ public:
         
         if (isSelected() and (getFlock() == log_flock))
         {
-            std::cout << "====> BANG!" << std::endl;
+            std::cout << "    ====> BANG!" << std::endl;
         }
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
@@ -646,9 +646,6 @@ public:
         Boid* nearest_neighbor = cached_nearest_neighbors().at(0);
         return (position() - nearest_neighbor->position()).length();
     }
-
-    // Only used for debugging, to to pick out one boid to track/log/whatever.
-    bool is_first_boid() const { return this == flock_boids().at(0); }
     
     // For debugging: does this boid instance appear to be valid?
     // TODO 20230204 if needed again, should check other invariants.

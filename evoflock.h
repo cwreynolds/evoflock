@@ -108,6 +108,15 @@ void visualizeBestIfRequested(LP::Population* population)
         bool previous_emt_state = enable_multithreading;
         enable_multithreading = false;
         LP::Individual* individual = population->bestFitness();
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20251011 return to debug speed control
+        if (EF::usingGP())
+        {
+            auto tree_string = individual->tree().to_string(true, "    ");
+            std::cout << "    Best individual's tree:" << std::endl;
+            std::cout << tree_string << std::endl;
+        }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         GP::run_flock_simulation(individual, 1);
         enable_multithreading = previous_emt_state;
         draw.clearVisBestMode();

@@ -12,6 +12,10 @@
 
 #pragma once
 
+// TODO 20250930 try version with ONLY GpFunc Speed_Control.
+#define USE_ONLY_SPEED_CONTROL
+
+
 #include "Draw.h"
 #include "flock.h"
 #include "shape.h"
@@ -235,8 +239,15 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
                 // TODO 20251001 investigate low speed score with
                 //               ONLY Speed_Control GpFunc
-                if (boid->isSelected() and
-                    ((flock.clock().frameCounter() % 10) == 1))
+                
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                // TODO 20251012 back to only Speed_Control: use more max force
+//                if (boid->isSelected() and
+//                    ((flock.clock().frameCounter() % 10) == 1))
+                if (boid->isSelected())
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+                
                 {
                     if (log_flock == nullptr)
                     {
@@ -264,6 +275,14 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                         std::cout << boid->speed();
                         std::cout << ", local steer: " << local_steering;
                         std::cout << std::endl;
+                        
+                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                        // TODO 20251012 back to only Speed_Control: use more max force
+                        debugPrint(boid->steerForSpeedControl()
+                                   .dot(boid->forward()));
+                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                        
+                        
                         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
                         // TODO 20251011 return to debug speed control
 #endif  // USE_ONLY_SPEED_CONTROL
@@ -895,17 +914,78 @@ inline LP::GpFunction To_Side
 // Cartoonishly high level Boid API for debugging:
 // Speed_Control, Avoid_Obstacle, Adjust_Neighbor_Dist
 
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20251012 back to only Speed_Control: use more max force
+
+//    inline LP::GpFunction Speed_Control
+//     ("Speed_Control",
+//      "Vec3",
+//      {},
+//      [](LP::GpTree& tree)
+//      {
+//         Boid& b = *Boid::getGpPerThread();
+//         Vec3 thrust(0, 0, b.steerForSpeedControl().dot(b.forward()));
+//         double max_force = 5;
+//         return std::any(thrust * max_force);
+//     });
+
+
+//    inline LP::GpFunction Speed_Control
+//    ("Speed_Control",
+//     "Vec3",
+//     {},
+//     [](LP::GpTree& tree)
+//     {
+//        Boid& b = *Boid::getGpPerThread();
+//
+//
+//    //    Vec3 thrust(0, 0, b.steerForSpeedControl().dot(b.forward()));
+//
+//        double scdf = b.steerForSpeedControl().dot(b.forward());
+//        if (b.speed() < 0.01 and scdf < 0) { scdf = 1; }
+//        Vec3 thrust(0, 0, b.steerForSpeedControl().dot(b.forward()));
+//
+//
+//
+//        //    double max_force = 5;
+//        double max_force = 50;
+//
+//        return std::any(thrust * max_force);
+//    });
+
+//    inline LP::GpFunction Speed_Control
+//     ("Speed_Control",
+//      "Vec3",
+//      {},
+//      [](LP::GpTree& tree)
+//      {
+//         Boid& b = *Boid::getGpPerThread();
+//         Vec3 sfsc = b.steerForSpeedControl();
+//         double max_force = 25;
+//    //     return std::any(sfsc * max_force);
+//
+//         Vec3 local_speed_control = b.ls().localizeDirection(sfsc);
+//         return std::any(local_speed_control * max_force);
+//     });
+
 inline LP::GpFunction Speed_Control
-("Speed_Control",
- "Vec3",
- {},
- [](LP::GpTree& tree)
- {
-    Boid& b = *Boid::getGpPerThread();
-    Vec3 thrust(0, 0, b.steerForSpeedControl().dot(b.forward()));
-    double max_force = 5;
-    return std::any(thrust * max_force);
-});
+ ("Speed_Control",
+  "Vec3",
+  {},
+  [](LP::GpTree& tree)
+  {
+     Boid& b = *Boid::getGpPerThread();
+     Vec3 sfsc = b.steerForSpeedControl();
+     double max_force = 25; // TODO WARNING inline constant!!
+     Vec3 local_speed_control = b.ls().localizeDirection(sfsc);
+     
+     if (b.speed() <= 0) { local_speed_control = Vec3(0, 0, 1); }
+     
+     return std::any(local_speed_control * max_force);
+ });
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 inline LP::GpFunction Avoid_Obstacle
  (
@@ -954,10 +1034,6 @@ inline LP::GpFunction Adjust_Neighbor_Dist
       
       return std::any(steering * 10);
   });
-
-
-// TODO 20250930 try version with ONLY GpFunc Speed_Control.
-//#define USE_ONLY_SPEED_CONTROL
 
 
 // FunctionSet for the GP version of EvoFlock.

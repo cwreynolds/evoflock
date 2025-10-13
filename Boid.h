@@ -120,6 +120,22 @@ public:
     
     Vec3 getPreviousPosition() const { return previous_position_; }
     void setPreviousPosition(Vec3 prev_pos) { previous_position_ = prev_pos; }
+    
+    // For GP mode: set to a lambda encapsulating the evolved steering function.
+    // (Move within file? Add accessors?)
+    std::function<Vec3()> override_steer_function_ = nullptr;
+    
+    // In the GP (vs GA) version, the evolved code is a per-frame steering function
+    // for each Boid. This API supplies a "per thread global" which points to the
+    // current Boid.
+    static inline thread_local Boid* gp_boid_per_thread_ = nullptr;
+    static void setGpPerThread(Boid* boid) { gp_boid_per_thread_ = boid; }
+    static Boid* getGpPerThread()
+    {
+        assert(EF::usingGP());
+        assert(gp_boid_per_thread_ && "Boid::gp_boid_per_thread_ is nullptr");
+        return gp_boid_per_thread_;
+    }
 
 
     // Constructor
@@ -132,9 +148,9 @@ public:
     // Determine and store desired steering for this simulation step
     void plan_next_steer()
     {
-        next_steer_ = steer_to_flock();
+        next_steer_ = steerToFlock();
     }
-  
+
     // Apply the "steering force" -- previously computed in plan_next_steer()
     // during a separate pass -- to this Boid's geometric state.
     void apply_next_steer(double time_step)
@@ -142,58 +158,29 @@ public:
         setPreviousPosition(position());
         steer(next_steer_, time_step);
     }
-    
-    // For GP mode: set to a lambda encapsulating the evolved steering function.
-    // (Move within file? Add accessors?)
-    std::function<Vec3()> override_steer_function_ = nullptr;
 
-    // In the GP (vs GA) version, the evolved code is a per-frame steering function
-    // for each Boid. This API supplies a "per thread global" which points to the
-    // current Boid.
-    static inline thread_local Boid* gp_boid_per_thread_ = nullptr;
-    static void setGpPerThread(Boid* boid) { gp_boid_per_thread_ = boid; }
-    static Boid* getGpPerThread()
-    {
-        assert(EF::usingGP());
-        assert(gp_boid_per_thread_ && "Boid::gp_boid_per_thread_ is nullptr");
-        return gp_boid_per_thread_;
-    }
-    
-    static inline int qqq_counter = 0;
-    
     // Basic flocking behavior. Computes steering force for one simulation step
-    // (an animation frame) for one boid in a flock.
-    Vec3 steer_to_flock()
+    // (an animation frame) for one boid in a flock. Dispatches for EvoFlock's
+    // GA/GP versions, respectively for parameter evolution and model evolution.
+    Vec3 steerToFlock()
     {
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
-        if (EF::usingGP())
+        if (EF::usingGA())
         {
-            assert(override_steer_function_);
-            setGpPerThread(this);
-            Vec3 steering_from_evolved_function = override_steer_function_();
-            setGpPerThread(nullptr);
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250923 smooth in evolved steering
-            
-//            return steering_from_evolved_function;
-            return smoothed_steering(steering_from_evolved_function, 0.9);
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            return steerToFlockForGA();
         }
         else
         {
-            return pre_GP_steer_to_flock();
+            return steerToFlockForGP();
         }
     }
 
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    // TODO 20240816 temp experiment should be merged back into steer_to_flock()
-    //               after GP is working.
-    Vec3 pre_GP_steer_to_flock()
+    // Basic flocking behavior. Computes steering force for one simulation step
+    // (an animation frame) for one boid in a flock. Uses a hand-written (black-
+    // box) parametric flocking model. Modernized version of 1987 boids. Flock
+    // parameters for this boid are accessed through fp() function.
+    Vec3 steerToFlockForGA()
     {
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
@@ -206,6 +193,27 @@ public:
         Vec3 combined_steering = smoothed_steering(f + s + a + c + ap + as);
         saveAnnotation(s, a, c, ap, as, combined_steering);
         return combined_steering;
+    }
+    
+    // GP-based flocking behavior. Computes steering force for one simulation step
+    // (an animation frame) for one boid in a flock. Uses an evolved procedural
+    // flocking model, supplied as a lambda called override_steer_function_
+    Vec3 steerToFlockForGP()
+    {
+        assert(override_steer_function_);
+        setGpPerThread(this);
+        Vec3 steering_from_evolved_function = override_steer_function_();
+        setGpPerThread(nullptr);
+        
+        // This inline constant blend rate should have API to change rate.
+        Vec3 smooth = smoothed_steering(steering_from_evolved_function, 0.9);
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20251013 very experimental, reuse GA annotation for GP
+        saveAnnotation(forward() * 100, smooth, Vec3(), Vec3(), Vec3(), Vec3());
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
+        return smooth;
     }
 
     Vec3 steerForSpeedControl()

@@ -1147,7 +1147,15 @@ LP::FunctionSet test_gp_boid_function_set()
                     
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                     // TODO 20240816 VERY temp experiment
-                    return std::any(boid.pre_GP_steer_to_flock());
+                    
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    // TODO 20251013 clean up Boid::pre_GP_steer_to_flock() etc.
+
+//                    return std::any(boid.pre_GP_steer_to_flock());
+                    return std::any(boid.steerToFlockForGA());
+
+                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                    
                     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 }

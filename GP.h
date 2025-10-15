@@ -13,7 +13,7 @@
 #pragma once
 
 // TODO 20250930 try version with ONLY GpFunc Speed_Control.
-#define USE_ONLY_SPEED_CONTROL
+//#define USE_ONLY_SPEED_CONTROL
 
 
 #include "Draw.h"
@@ -576,8 +576,8 @@ Vec3 ensure_unit_length(Vec3 v)
 
 inline LP::GpFunction Abs
  ("Abs",
-  "Scalar_100",
-  {"Scalar_100"},
+  "Scalar",
+  {"Scalar"},
   [](LP::GpTree& tree)
   {
      return std::any(clean(std::abs(clean(tree.evalSubtree<double>(0)))));
@@ -585,8 +585,8 @@ inline LP::GpFunction Abs
 
 inline LP::GpFunction Add
  ("Add",
-  "Scalar_100",
-  {"Scalar_100", "Scalar_100"},
+  "Scalar",
+  {"Scalar", "Scalar"},
   [](LP::GpTree& tree)
   {
      return std::any(clean(clean(tree.evalSubtree<double>(0)) +
@@ -595,8 +595,8 @@ inline LP::GpFunction Add
 
 inline LP::GpFunction Sub
  ("Sub",
-  "Scalar_100",
-  {"Scalar_100", "Scalar_100"},
+  "Scalar",
+  {"Scalar", "Scalar"},
   [](LP::GpTree& tree)
   {
      return std::any(clean(clean(tree.evalSubtree<double>(0)) -
@@ -605,8 +605,8 @@ inline LP::GpFunction Sub
 
 inline LP::GpFunction Mult
 ("Mult",
- "Scalar_100",
- {"Scalar_100", "Scalar_100"},
+ "Scalar",
+ {"Scalar", "Scalar"},
  [](LP::GpTree& tree)
  {
     return std::any(clean(clean(tree.evalSubtree<double>(0)) *
@@ -616,8 +616,8 @@ inline LP::GpFunction Mult
 inline LP::GpFunction Power
  (
   "Power",
-  "Scalar_100",
-  {"Scalar_100", "Scalar_100"},
+  "Scalar",
+  {"Scalar", "Scalar"},
   [](LP::GpTree& tree)
   {
       double base = clean(tree.evalSubtree<double>(0));
@@ -633,7 +633,7 @@ inline LP::GpFunction V3
  (
   "Vec3",
   "Vec3",
-  {"Scalar_100", "Scalar_100", "Scalar_100"},
+  {"Scalar", "Scalar", "Scalar"},
   [](LP::GpTree& tree)
   {
       Vec3 v3(clean(tree.evalSubtree<double>(0)),
@@ -669,7 +669,7 @@ inline LP::GpFunction Scale_v3
  (
   "Scale_v3",
   "Vec3",
-  {"Vec3", "Scalar_100"},
+  {"Vec3", "Scalar"},
   [](LP::GpTree& tree)
   {
       return std::any(clean(tree.evalSubtree<Vec3>(0)) *
@@ -679,7 +679,7 @@ inline LP::GpFunction Scale_v3
 inline LP::GpFunction Length
  (
   "Length",
-  "Scalar_100",
+  "Scalar",
   {"Vec3"},
   [](LP::GpTree& tree)
   {
@@ -711,7 +711,7 @@ inline LP::GpFunction Cross
 inline LP::GpFunction Dot
  (
   "Dot",
-  "Scalar_100",
+  "Scalar",
   {"Vec3", "Vec3"},
   [](LP::GpTree& tree)
   {
@@ -749,7 +749,7 @@ inline LP::GpFunction Interpolate
  (
   "Interpolate",
   "Vec3",
-  {"Scalar_100", "Vec3", "Vec3"},
+  {"Scalar", "Vec3", "Vec3"},
   [](LP::GpTree& tree)
   {
       double i = tree.evalSubtree<double>(0);
@@ -763,7 +763,7 @@ inline LP::GpFunction If_Pos
  (
   "If_Pos",
   "Vec3",
-  {"Scalar_100", "Vec3", "Vec3"},
+  {"Scalar", "Vec3", "Vec3"},
   [](LP::GpTree& tree)
   {
       return std::any(0 < tree.evalSubtree<double>(0) ?
@@ -779,7 +779,7 @@ inline LP::GpFunction If_Pos
 inline LP::GpFunction Speed
  (
   "Speed",
-  "Scalar_100",
+  "Scalar",
   {},
   [](LP::GpTree& tree)
   {
@@ -847,7 +847,7 @@ inline LP::GpFunction Neighbor_1_Offset
 
 inline LP::GpFunction First_Obs_Dist
  (
-  "First_Obs_Dist", "Scalar_100", {},
+  "First_Obs_Dist", "Scalar", {},
   [](LP::GpTree& t)
   {
       Boid& boid = *Boid::getGpPerThread();
@@ -1044,7 +1044,7 @@ LP::FunctionSet evoflock_gp_function_set()
         // GpTypes
         {
             { "Vec3" },
-            { "Scalar_100", -100.0, 100.0 },
+            { "Scalar", -100.0, 100.0 },
         },
 
         // GpFunctions

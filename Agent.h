@@ -54,11 +54,28 @@ public:
         update_speed_and_local_space(acceleration, time_step);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251015 near zero speed, add state for debugging
+    double old_speed_memory_ = 0;
+    double new_speed_memory_ = 0;
+    double time_step_memory_ = 0;
+    Vec3 forward_memory_;
+    Vec3 acceleration_memory_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Applies given acceleration to Agent's dynamic and geometric state.
     void update_speed_and_local_space(Vec3 acceleration, double time_step)
     {
         Vec3 new_velocity = velocity() + (acceleration * time_step);
         double new_speed = new_velocity.length();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251015 near zero speed, add state for debugging
+        old_speed_memory_ = speed();
+        new_speed_memory_ = new_speed;
+        time_step_memory_ = time_step;
+        forward_memory_ = forward();
+        acceleration_memory_ = acceleration;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         setSpeed(new_speed);
         setPathCurvature(new_velocity);
         setAcceleration(new_velocity, time_step);

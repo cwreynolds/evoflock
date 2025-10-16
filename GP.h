@@ -13,7 +13,7 @@
 #pragma once
 
 // TODO 20250930 try version with ONLY GpFunc Speed_Control.
-//#define USE_ONLY_SPEED_CONTROL
+#define USE_ONLY_SPEED_CONTROL
 
 
 #include "Draw.h"
@@ -211,12 +211,16 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
             // For GP, set Flock's override_steer_function_.
             flock.override_steer_function_ = [&]()
             {
-                Boid* boid = Boid::getGpPerThread();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20251015 near zero speed, add state for debugging
+                Boid& b = *Boid::getGpPerThread();
+//                Boid* boid = Boid::getGpPerThread();
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 LP::GpTree gp_tree = individual->tree();
                 
                 // TEMP: here we are assuming GpTree returns a local steer vec
                 Vec3 local_steering = std::any_cast<Vec3>(gp_tree.eval());
-                Vec3 steering = boid->ls().globalizeDirection(local_steering);
+                Vec3 steering = b.ls().globalizeDirection(local_steering);
 
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
                 // TODO 20251001 investigate low speed score with
@@ -244,7 +248,7 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 // TODO 20251012 back to only Speed_Control: use more max force
 //                if (boid->isSelected() and
 //                    ((flock.clock().frameCounter() % 10) == 1))
-                if (boid->isSelected())
+                if (b.isSelected())
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
                 
@@ -260,7 +264,7 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                         // TODO 20251003 re-enable multithreading, it was not the problem
                         
                         // set a temp variable on the boid for logging
-                        boid->log_flock = log_flock;
+                        b.log_flock = log_flock;
                         
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                         
@@ -269,20 +273,37 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 #ifdef USE_ONLY_SPEED_CONTROL
                         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
                         grabPrintLock_evoflock();
-                        std::cout << "====> ";
+                        std::cout << std::endl;
+                        std::cout << "  ====> ";
                         std::cout << &flock;
                         std::cout << ", selected boid speed: ";
-                        std::cout << boid->speed();
+                        std::cout << b.speed();
                         std::cout << ", local steer: " << local_steering;
                         std::cout << std::endl;
                         
                         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                         // TODO 20251012 back to only Speed_Control: use more max force
-                        debugPrint(boid->steerForSpeedControl()
-                                   .dot(boid->forward()));
+                        std::cout << "  ";
+                        Vec3 sfsc = b.steerForSpeedControl();
+                        debugPrint(sfsc.dot(b.forward()));
                         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                         
+                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                        // TODO 20251015 near zero speed
                         
+                        if (b.new_speed_memory_ <= 0)
+                        {
+                            std::cout << "  new_speed=" << b.new_speed_memory_;
+                            std::cout << ", old speed=" << b.old_speed_memory_;
+                            double a = ((b.acceleration_memory_ *
+                                         b.time_step_memory_)
+                                        .dot(b.forward_memory_));
+                            std::cout << ", local accel * dt=" << a;
+                            std::cout << std::endl;
+                        }
+                        
+                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
                         // TODO 20251011 return to debug speed control
 #endif  // USE_ONLY_SPEED_CONTROL

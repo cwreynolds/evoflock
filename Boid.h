@@ -508,17 +508,39 @@ public:
 //            }
 //        }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251015 do not annotate neighbors in GP mode.
+    
+//    // Called from Flock to draw annotation for selected Boid and its neighbors.
+//    void drawAnnotationForBoidAndNeighbors()
+//    {
+//        drawAnnotation();
+//        for (Boid* b : cached_nearest_neighbors())
+//        {
+//            Color c(xxx_temp_separation_score > 0.5 ? 1 : 0);
+//            draw().addThickLineToAnimatedFrame(position(), b->position(), c, 0.01);
+//        }
+//    }
+    
+    
     // Called from Flock to draw annotation for selected Boid and its neighbors.
     void drawAnnotationForBoidAndNeighbors()
     {
         drawAnnotation();
-        for (Boid* b : cached_nearest_neighbors())
+        if (EF::usingGA())
         {
-            Color c(xxx_temp_separation_score > 0.5 ? 1 : 0);
-            draw().addThickLineToAnimatedFrame(position(), b->position(), c, 0.01);
+            for (Boid* b : cached_nearest_neighbors())
+            {
+                Color c(xxx_temp_separation_score > 0.5 ? 1 : 0);
+                draw().addThickLineToAnimatedFrame(position(),
+                                                   b->position(),
+                                                   c, 0.01);
+            }
         }
     }
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     double xxx_temp_separation_score = 0;
 
 

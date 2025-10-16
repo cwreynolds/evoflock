@@ -162,9 +162,19 @@ FlockParameters fp_from_ga_individual(LP::Individual* individual)
 }
 
 
-// These "cleaners" are to avoid returning ludicrous values from evolved trees.
+// These "cleaners" are to avoid ludicrous values in evolved trees.
 double clean(double x)
 {
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251015 verify Scalar type does not clip
+//    if (not util::between(x, -10, +10))
+//    {
+//        grabPrintLock_evoflock();
+//        static double biggest = 0;
+//        if (biggest < x) { biggest = x; }
+//        std::cout << "  !!!!!! " << x << "  biggest=" << biggest << std::endl;
+//    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     bool unclean = (std::isnan(x) or
                     std::isinf(x) or
                     (x < std::numeric_limits<double>::min()) or
@@ -195,6 +205,12 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     Flock* log_flock = nullptr;
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251016 verify GP steering is not constant
+    Vec3 prev_local_steering;
+    Vec3 prev_steering;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Perform one simulation run, and record results.
     auto do_1_run = [&]()
     {
@@ -211,11 +227,7 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
             // For GP, set Flock's override_steer_function_.
             flock.override_steer_function_ = [&]()
             {
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20251015 near zero speed, add state for debugging
                 Boid& b = *Boid::getGpPerThread();
-//                Boid* boid = Boid::getGpPerThread();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 LP::GpTree gp_tree = individual->tree();
                 
                 // TEMP: here we are assuming GpTree returns a local steer vec
@@ -259,7 +271,6 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                     }
                     if (log_flock == &flock)
                     {
-                        
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                         // TODO 20251003 re-enable multithreading, it was not the problem
                         
@@ -304,6 +315,29 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                         
                         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+                        
+                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                        // TODO 20251016 verify GP steering is not constant
+                        
+                        std::cout << "  ";
+                        std::cout << ((prev_local_steering == local_steering) ?
+                                      "same" : "diff" );
+                        std::cout << "  ";
+                        debugPrint(local_steering);
+
+                        std::cout << "  ";
+                        std::cout << ((prev_steering == steering) ?
+                                      "same" : "diff" );
+                        std::cout << "  ";
+                        debugPrint(steering);
+                        
+                        
+                        prev_local_steering = local_steering;
+                        prev_steering = steering ;
+                        
+                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                        
                         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
                         // TODO 20251011 return to debug speed control
 #endif  // USE_ONLY_SPEED_CONTROL
@@ -1065,7 +1099,10 @@ LP::FunctionSet evoflock_gp_function_set()
         // GpTypes
         {
             { "Vec3" },
-            { "Scalar", -100.0, 100.0 },
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20251015 verify Scalar type does not clip
+            { "Scalar", -10.0, 10.0 },
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         },
 
         // GpFunctions

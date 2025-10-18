@@ -207,22 +207,29 @@ public:
         assert (Vec3::within_epsilon(b,
                                      r.localizePosition(r.globalizePosition(b)),
                                      e));
-
-        Vec3 global_direction(2, 3, 4);
-        Vec3 local_direction = ls.localizeDirection(global_direction);
-        Vec3 global_direction2 = ls.globalizeDirection(local_direction);
-        assert(util::within_epsilon(local_direction.length(),
-                                    global_direction.length(),
-                                    e));
-        assert(util::within_epsilon(local_direction.length(),
-                                    global_direction2.length(),
-                                    e));
-        assert(Vec3::within_epsilon(global_direction,
-                                    global_direction2,
-                                    e));
-        assert(Vec3::within_epsilon(local_direction,
-                                    ls.localizeDirection(global_direction),
-                                    e));
+        
+        // Verify "direction" tfransforms for several LocalSpace values.
+        auto test_direction_transforms = [](const LocalSpace& ls, double epsilon)
+        {
+            Vec3 global_direction(2, 3, 4);
+            Vec3 local_direction = ls.localizeDirection(global_direction);
+            Vec3 global_direction2 = ls.globalizeDirection(local_direction);
+            assert(util::within_epsilon(local_direction.length(),
+                                        global_direction.length(),
+                                        epsilon));
+            assert(util::within_epsilon(local_direction.length(),
+                                        global_direction2.length(),
+                                        epsilon));
+            assert(Vec3::within_epsilon(global_direction,
+                                        global_direction2,
+                                        epsilon));
+            assert(Vec3::within_epsilon(local_direction,
+                                        ls.localizeDirection(global_direction),
+                                        epsilon));
+        };
+        test_direction_transforms(LocalSpace(), e);
+        test_direction_transforms(ls, e);
+        test_direction_transforms(r, e);
         
         const LocalSpace o;  // original for comparison
         Vec3 diag_ypz = (o.j() + o.k()).normalize();

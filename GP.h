@@ -210,6 +210,11 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     Vec3 prev_local_steering;
     Vec3 prev_steering;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251017 make sure we are tracking the expected number of boid-steps
+    int log_flock_selected_boid_steps = 0;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     // Perform one simulation run, and record results.
     auto do_1_run = [&]()
@@ -342,9 +347,18 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                         // TODO 20251011 return to debug speed control
 #endif  // USE_ONLY_SPEED_CONTROL
                         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+                        
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        // TODO 20251017 make sure we are tracking the expected
+                        //               number of boid-steps
+                        log_flock_selected_boid_steps++;
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                     }
                 }
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+                
+
                 return clean(steering);
             };
         }
@@ -395,6 +409,11 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         // Do each simulation run sequentially.
         for (int r = 0; r < runs; r++) { do_1_run(); }
     }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251017 make sure we are tracking the expected number of boid-steps
+    debugPrint(log_flock_selected_boid_steps);
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     assert(scalar_fits.size() == runs);
     fitness_logger(least_mof);

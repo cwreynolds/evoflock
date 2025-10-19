@@ -204,6 +204,11 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     // TODO 20251001 investigate low speed score with ONLY Speed_Control GpFunc
     Flock* log_flock = nullptr;
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251018 lock to set log_flock ptr in GP::run_flock_simulation
+    std::mutex log_flock_mutex;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20251016 verify GP steering is not constant
@@ -229,6 +234,14 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         }
         else
         {
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251018 more logging
+            {
+                grabPrintLock_evoflock();
+                std::cout << "  do_1_run(), flock = " << &flock << std::endl;
+            }
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
             // For GP, set Flock's override_steer_function_.
             flock.override_steer_function_ = [&]()
             {
@@ -270,10 +283,31 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 
                 
                 {
-                    if (log_flock == nullptr)
+                    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                    // TODO 20251018 lock to set log_flock ptr in GP::run_flock_simulation
+
+//                    if (log_flock == nullptr)
+//                    {
+//                        log_flock = &flock;
+//                    }
+
                     {
-                        log_flock = &flock;
+                        std::lock_guard<std::mutex> lfm(log_flock_mutex);
+                        if (log_flock == nullptr)
+                        {
+                            log_flock = &flock;
+                            
+                            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                            // TODO 20251018 more logging
+                            {
+                                grabPrintLock_evoflock();
+                                std::cout << "  do_1_run(), log_flock = " << &log_flock << std::endl;
+                            }
+                            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
+
+                        }
                     }
+                    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                     if (log_flock == &flock)
                     {
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
@@ -284,6 +318,12 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                         
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                         
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        // TODO 20251017 make sure we are tracking the expected
+                        //               number of boid-steps
+                        log_flock_selected_boid_steps++;
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
                         // TODO 20251011 return to debug speed control
 #ifdef USE_ONLY_SPEED_CONTROL
@@ -347,13 +387,6 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                         // TODO 20251011 return to debug speed control
 #endif  // USE_ONLY_SPEED_CONTROL
                         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-                        
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        // TODO 20251017 make sure we are tracking the expected
-                        //               number of boid-steps
-                        log_flock_selected_boid_steps++;
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
                     }
                 }
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~

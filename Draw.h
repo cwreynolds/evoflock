@@ -469,7 +469,7 @@ public:
     void animateWingmanCamera()
     {
         Vec3 local_offset = wingman_cam_local_offset_;
-        Vec3 global_cam = aimAgent().ls().globalizePosition(local_offset);
+        Vec3 global_cam = aimAgent().globalizePosition(local_offset);
         blendInNewCameraLookFrom(global_cam);
         blendInNewCameraLookAt(aimAgent().position());
         blendInNewCameraLookUp(aimAgent().up());
@@ -567,7 +567,7 @@ public:
                     cameraLookUp() = camera().j();
                     // Transform new cam pos into local space of aimAgent()
                     Vec3 gclf = cameraLookFrom();
-                    Vec3 local_cam = aimAgent().ls().localizePosition(gclf);
+                    Vec3 local_cam = aimAgent().localizePosition(gclf);
                     wingman_cam_local_offset_ = local_cam;
                 }
                 mouse_pos_pixels_ = new_pos_pixels;

@@ -143,6 +143,30 @@ public:
     const LocalSpace& ls() const { return ls_; }
     void set_ls(const LocalSpace& ls) { ls_ = ls; }
     
+    // Transform a point in global coordinate space to this local space.
+    Vec3 localizePosition(Vec3 global_point) const
+    {
+        return ls().localizePosition(global_point);
+    }
+    
+    // Transform a direction vector from global space to this local space.
+    Vec3 localizeDirection(Vec3 global_direction) const
+    {
+        return ls().localizeDirection(global_direction);
+    }
+    
+    // Transforms a local space position ("point") to the global space.
+    Vec3 globalizePosition(Vec3 local_position) const
+    {
+        return ls().globalizePosition(local_position);
+    }
+    
+    // Transform a local space position to the global space.
+    Vec3 globalizeDirection(Vec3 local_direction) const
+    {
+        return ls().globalizeDirection(local_direction);
+    }
+
     // Makes three lightweight verifications of basic Agent "flying." One is
     // "from first principles" and tests for agreement between a closed form
     // discrete Newtonian model of motion under constant acceleration. Two other

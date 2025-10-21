@@ -165,16 +165,6 @@ FlockParameters fp_from_ga_individual(LP::Individual* individual)
 // These "cleaners" are to avoid ludicrous values in evolved trees.
 double clean(double x)
 {
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251015 verify Scalar type does not clip
-//    if (not util::between(x, -10, +10))
-//    {
-//        grabPrintLock_evoflock();
-//        static double biggest = 0;
-//        if (biggest < x) { biggest = x; }
-//        std::cout << "  !!!!!! " << x << "  biggest=" << biggest << std::endl;
-//    }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     bool unclean = (std::isnan(x) or
                     std::isinf(x) or
                     (x < std::numeric_limits<double>::min()) or
@@ -301,7 +291,8 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                             // TODO 20251018 more logging
                             {
                                 grabPrintLock_evoflock();
-                                std::cout << "  do_1_run(), log_flock = " << &log_flock << std::endl;
+                                std::cout << "  do_1_run(), log_flock = ";
+                                std::cout << log_flock << std::endl;
                             }
                             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -381,6 +372,20 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                         prev_steering = steering ;
                         
                         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                        
+                        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+                        // TODO 20251020 back to too few boid steps
+                        
+                        std::cout << std::endl;
+                        std::cout << "  steps counted in do_1_run:    ";
+                        std::cout << log_flock_selected_boid_steps;
+                        std::cout << std::endl;
+                        std::cout << "  flock.clock().frameCounter(): ";
+                        std::cout << flock.clock().frameCounter();
+                        std::cout << std::endl;
+                        
+                        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
                         
                         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~

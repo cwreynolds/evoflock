@@ -207,7 +207,11 @@ void runOneFlockEvolution()
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
-    enable_multithreading = true;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251021 does turning multithreading off fix the GP? Answer: nope!
+//    enable_multithreading = true;
+    enable_multithreading = false;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Merge LP and EF RandomSequence, init from clock for unique runs, and log.
     setRS(LP::LPRS());

@@ -256,10 +256,23 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
-                // KEEP? added while tracking down "cleaning" issues
-                double min_steering_length = 0.00001;
-                if (steering.length() < min_steering_length) { steering = Vec3(); }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20251022 removed since this is literally the "stuck to
+                //               the wall" symptom, and the comments question if
+                //               the code is needed, but did not fix the problem.
+//                // KEEP? added while tracking down "cleaning" issues
+//                double min_steering_length = 0.00001;
+//                if (steering.length() < min_steering_length) { steering = Vec3(); }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20251022 add a bit of noise to avoid perfect alignment.
+                //               This does definitely change things.
+                steering += EF::RS().random_unit_vector() * 0.5;
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
                 // TODO 20251001 investigate low speed score with
                 //               ONLY Speed_Control GpFunc

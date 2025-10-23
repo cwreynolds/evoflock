@@ -210,7 +210,17 @@ void runOneFlockEvolution()
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20251021 does turning multithreading off fix the GP? Answer: nope!
 //    enable_multithreading = true;
-    enable_multithreading = false;
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    // TODO 20251022 add a bit of noise to avoid perfect alignment.
+    
+//    enable_multithreading = false;
+    enable_multithreading = true;
+    
+    std::cout << "Use multithreading: " << std::boolalpha;
+    std::cout << enable_multithreading << std::endl;
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Merge LP and EF RandomSequence, init from clock for unique runs, and log.

@@ -208,25 +208,55 @@ public:
                                      r.localizePosition(r.globalizePosition(b)),
                                      e));
         
-        // Verify "direction" tfransforms for several LocalSpace values.
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251022 add a bit of noise to avoid perfect alignment.
+
+//        // Verify "direction" tfransforms for several LocalSpace values.
+//        auto test_direction_transforms = [](const LocalSpace& ls, double epsilon)
+//        {
+//            Vec3 global_direction(2, 3, 4);
+//            Vec3 local_direction = ls.localizeDirection(global_direction);
+//            Vec3 global_direction2 = ls.globalizeDirection(local_direction);
+//            assert(util::within_epsilon(local_direction.length(),
+//                                        global_direction.length(),
+//                                        epsilon));
+//            assert(util::within_epsilon(local_direction.length(),
+//                                        global_direction2.length(),
+//                                        epsilon));
+//            assert(Vec3::within_epsilon(global_direction,
+//                                        global_direction2,
+//                                        epsilon));
+//            assert(Vec3::within_epsilon(local_direction,
+//                                        ls.localizeDirection(global_direction),
+//                                        epsilon));
+//        };
+
+        // Verify "direction" transforms for several LocalSpace values.
         auto test_direction_transforms = [](const LocalSpace& ls, double epsilon)
         {
             Vec3 global_direction(2, 3, 4);
-            Vec3 local_direction = ls.localizeDirection(global_direction);
-            Vec3 global_direction2 = ls.globalizeDirection(local_direction);
-            assert(util::within_epsilon(local_direction.length(),
-                                        global_direction.length(),
-                                        epsilon));
-            assert(util::within_epsilon(local_direction.length(),
-                                        global_direction2.length(),
-                                        epsilon));
-            assert(Vec3::within_epsilon(global_direction,
-                                        global_direction2,
-                                        epsilon));
-            assert(Vec3::within_epsilon(local_direction,
-                                        ls.localizeDirection(global_direction),
-                                        epsilon));
+            for (int i = 0; i < 100; i++)
+            {
+                Vec3 local_direction = ls.localizeDirection(global_direction);
+                Vec3 global_direction2 = ls.globalizeDirection(local_direction);
+                assert(util::within_epsilon(local_direction.length(),
+                                            global_direction.length(),
+                                            epsilon));
+                assert(util::within_epsilon(local_direction.length(),
+                                            global_direction2.length(),
+                                            epsilon));
+                assert(Vec3::within_epsilon(global_direction,
+                                            global_direction2,
+                                            epsilon));
+                assert(Vec3::within_epsilon(local_direction,
+                                            ls.localizeDirection(global_direction),
+                                            epsilon));
+                global_direction = EF::RS().random_unit_vector() * 10;
+            }
         };
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         test_direction_transforms(LocalSpace(), e);
         test_direction_transforms(ls, e);
         test_direction_transforms(r, e);

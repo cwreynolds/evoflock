@@ -368,8 +368,28 @@ public:
     
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }
-    void setEnable(bool e) { enable_ = e; }
-    void toggleEnable() { enable_ = not enable_; }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+    // TODO 20251023 align counters / no drawing for multithreading.
+
+//    void setEnable(bool e) { enable_ = e; }
+//    void toggleEnable() { enable_ = not enable_; }
+    
+//    void setEnable(bool e) { enable_ = e; }
+//    void toggleEnable() { setEnable(not enable_); }
+    
+    void setEnable(bool e)
+    {
+        enable_ = e;
+        std::cout << "Draw enable set to: " << e << std::endl;
+        
+//        e = false; // SUPER TEMP for testing
+    }
+    void toggleEnable() { setEnable(not enable_); }
+
+//    void setEnable(bool e) { enable_ = e; }
+//    void toggleEnable() { setEnable(not enable_); }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
     // Process asynch events: key presses, mouse moves, closing window, etc.
     bool pollEvents()

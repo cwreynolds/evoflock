@@ -117,7 +117,21 @@ void visualizeBestIfRequested(LP::Population* population)
             std::cout << tree_string << std::endl;
         }
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20251023 align counters / no drawing for multithreading.
+        bool previous_draw_enable_state = Draw::getInstance().enable();
+        Draw::getInstance().setEnable(true);
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
         GP::run_flock_simulation(individual, 1);
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20251023 align counters / no drawing for multithreading.
+        Draw::getInstance().setEnable(previous_draw_enable_state);
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
         enable_multithreading = previous_emt_state;
         draw.clearVisBestMode();
     }
@@ -215,7 +229,10 @@ void runOneFlockEvolution()
     // TODO 20251022 add a bit of noise to avoid perfect alignment.
     
 //    enable_multithreading = false;
-    enable_multithreading = true;
+//    enable_multithreading = true;
+//    enable_multithreading = false;
+//    enable_multithreading = true;
+    enable_multithreading = false;
     
     std::cout << "Use multithreading: " << std::boolalpha;
     std::cout << enable_multithreading << std::endl;

@@ -322,11 +322,6 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                         
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                         
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        // TODO 20251017 make sure we are tracking the expected
-                        //               number of boid-steps
-                        log_flock_selected_boid_steps++;
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
                         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
                         // TODO 20251011 return to debug speed control
@@ -398,6 +393,19 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                         std::cout << flock.clock().frameCounter();
                         std::cout << std::endl;
                         
+                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                        // TODO 20251023 align counters / no drawing for multithreading.
+//                        assert(log_flock_selected_boid_steps ==
+//                               flock.clock().frameCounter());
+                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                        // TODO 20251023 align counters / no drawing for multithreading.
+                        // TODO 20251017 make sure we are tracking the expected
+                        //               number of boid-steps
+                        log_flock_selected_boid_steps++;
+                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
                         
@@ -441,11 +449,21 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     
     // Occasionally poll the Draw GUI to check for events esp the "B" command.
     Draw::getInstance().pollEvents();
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251023 align counters / no drawing for multithreading.
+    bool previous_draw_enable_state = Draw::getInstance().enable();
+    Draw::getInstance().setEnable(false);
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
     if (EF::enable_multithreading)
     {
-        bool previous_enable_state = Draw::getInstance().enable();
-        Draw::getInstance().setEnable(false);
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20251023 align counters / no drawing for multithreading.
+//        bool previous_enable_state = Draw::getInstance().enable();
+//        Draw::getInstance().setEnable(false);
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         
         // Do each simulation run in a parallel thread.
         std::vector<std::thread> threads;
@@ -453,14 +471,35 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         // Wait for helper threads to finish, join them with this thread.
         for (auto& t : threads) { t.join(); }
         
-        Draw::getInstance().setEnable(previous_enable_state);
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20251023 align counters / no drawing for multithreading.
+//        Draw::getInstance().setEnable(previous_enable_state);
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     }
     else
     {
         // Do each simulation run sequentially.
-        for (int r = 0; r < runs; r++) { do_1_run(); }
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20251023 align counters / no drawing for multithreading.
+        
+//        for (int r = 0; r < runs; r++) { do_1_run(); }
+
+        for (int r = 0; r < runs; r++)
+        {
+            do_1_run();
+            log_flock_selected_boid_steps = 0;
+        }
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
     }
     
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251023 align counters / no drawing for multithreading.
+    Draw::getInstance().setEnable(previous_draw_enable_state);
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20251017 make sure we are tracking the expected number of boid-steps
     debugPrint(log_flock_selected_boid_steps);

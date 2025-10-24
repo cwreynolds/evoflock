@@ -105,6 +105,11 @@ void visualizeBestIfRequested(LP::Population* population)
     Draw& draw = Draw::getInstance();
     if (draw.getVisBestMode())
     {
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20251024 fixing Draw enable, and visualize best.
+        std::cout << "@@@@ enter EF::visualizeBestIfRequested()" <<std::endl;
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
         bool previous_emt_state = enable_multithreading;
         enable_multithreading = false;
         LP::Individual* individual = population->bestFitness();
@@ -134,6 +139,11 @@ void visualizeBestIfRequested(LP::Population* population)
 
         enable_multithreading = previous_emt_state;
         draw.clearVisBestMode();
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20251024 fixing Draw enable, and visualize best.
+        std::cout << "@@@@ exit  EF::visualizeBestIfRequested()" <<std::endl;
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
 }
 
@@ -215,8 +225,12 @@ void visualizePreviouslyLoggedFlockParameters()
 void runOneFlockEvolution()
 {
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251024 fixing Draw enable, and visualize best.
     //EF::setUsingGA();
-    EF::setUsingGP();
+    //EF::setUsingGP();
+    EF::setUsingGA();
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
@@ -232,8 +246,9 @@ void runOneFlockEvolution()
 //    enable_multithreading = true;
 //    enable_multithreading = false;
 //    enable_multithreading = true;
-    enable_multithreading = false;
-    
+//    enable_multithreading = false;
+    enable_multithreading = true;
+
     std::cout << "Use multithreading: " << std::boolalpha;
     std::cout << enable_multithreading << std::endl;
     

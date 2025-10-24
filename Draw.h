@@ -40,7 +40,11 @@ public:
     // Used to get the current global Draw object (drawing context).
     // Returns the existing instance, creating a new one if needed.
     // Asserts that getInstance() must not be called in constructor.
-    static Draw& getInstance() { return getInstance(true); }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251024 fixing Draw enable, and visualize best.
+//    static Draw& getInstance() { return getInstance(true); }
+    static Draw& getInstance() { return getInstance(false); }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     static Draw& getInstance(bool enabled)
     {
         assert(not global_object_under_construction_);
@@ -380,7 +384,8 @@ public:
     void setEnable(bool e)
     {
         enable_ = e;
-        std::cout << "Draw enable set to: " << e << std::endl;
+//        std::cout << "Draw enable set to: " << e << std::endl;
+        std::cout << "@@@@ Draw::setEnable(" << e << ")" <<std::endl;
         
 //        e = false; // SUPER TEMP for testing
     }

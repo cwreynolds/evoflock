@@ -229,6 +229,8 @@ void runOneFlockEvolution()
     // TODO 20251024 fixing Draw enable, and visualize best.
     //EF::setUsingGA();
     //EF::setUsingGP();
+    //EF::setUsingGA();
+    //EF::setUsingGP();
     EF::setUsingGA();
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
@@ -268,9 +270,21 @@ void runOneFlockEvolution()
     // Obstacle set plus "Set 0: sphere and right hand vertical cylinder."
     //
     // 20250912 commenting this out worked fine in experimental GP mode. Now I'm
-    // trying to get an updated GA mode working again, so turning it on again for now.
+    // trying to get an updated GA mode working again, so turning it on again
+    // for now.
+    //
+    // 20251025 After recent changes to unify control of Draw enable, this
+    // symptom came back, even with this dummy Flock call. For the moment, I
+    // have worked around the work around. But the defining, activating, and
+    // adding to the GPU-based static scene needs to be redesigned. Is it
+    // possible to define the obstacles, but not try loading into the GPU until
+    // the first time it is drawn with enable on?
     {
+        auto& draw = Draw::getInstance();
+        bool enable = draw.enable();
+        draw.setEnable(true);
         Flock flock;
+        draw.setEnable(enable);
     }
     
     // WIP/HACK runs flock sim, with graphics, for the FlockParameters written

@@ -257,6 +257,10 @@ private:
     //int boids_per_flock_ = 800;  // Even more.
     //int boids_per_flock_ = 1000;  // Kiloboid.
 
-    std::string use_obstacle_set = "Sphere";
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251026 formalize ObstacleSet as a class
+//    std::string use_obstacle_set = "Sphere";
+    std::string use_obstacle_set = "SmallSpheresInBigSphere";
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int fps_ = 30;
 };

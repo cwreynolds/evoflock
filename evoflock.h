@@ -280,11 +280,29 @@ void runOneFlockEvolution()
     // possible to define the obstacles, but not try loading into the GPU until
     // the first time it is drawn with enable on?
     {
-        auto& draw = Draw::getInstance();
-        bool enable = draw.enable();
-        draw.setEnable(true);
-        Flock flock;
-        draw.setEnable(enable);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251026 formalize ObstacleSet as a class
+        
+//        std::cout << "start initial flock set up" << std::endl;
+//        
+//
+//        auto& draw = Draw::getInstance();
+//        bool enable = draw.enable();
+//        draw.setEnable(true);
+//        Flock flock;
+//        
+//        int os_index = flock.obstacleSetsNameToIndex(flock.fp().useObstacleSet());
+//        flock.useObstacleSet(os_index);
+//
+//        
+//        draw.setEnable(enable);
+//
+//        std::cout << "finish initial flock set up" << std::endl;
+
+        
+        Flock::initializeStaticScene();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // WIP/HACK runs flock sim, with graphics, for the FlockParameters written

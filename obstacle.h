@@ -536,6 +536,34 @@ public:
     }
 };
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251026 formalize ObstacleSet as a class
+//
+// TODO          verify no duplicate name in constructor?
+
+typedef std::vector<Obstacle*> ObstaclePtrList;
+typedef std::vector<Collision> CollisionList;
+
+
+class ObstacleSet
+{
+public:
+    ObstacleSet() : ObstacleSet("unnamed", {}) {}
+    
+    ObstacleSet(const std::string& name, const ObstaclePtrList& obstacles)
+      : name_(name), obstacles_(obstacles) {}
+    
+    std::string name() const { return name_; }
+    
+    ObstaclePtrList obstacles() const { return obstacles_; }
+    
+private:
+    std::string name_;
+    ObstaclePtrList obstacles_;
+};
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 // Serialize Collision object to stream.
 inline std::ostream& operator<<(std::ostream& os, const Collision& c)
 {
@@ -655,5 +683,8 @@ inline void Obstacle::unit_test()
     }
 }
 
-typedef std::vector<Obstacle*> ObstaclePtrList;
-typedef std::vector<Collision> CollisionList;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251026 formalize ObstacleSet as a class
+//typedef std::vector<Obstacle*> ObstaclePtrList;
+//typedef std::vector<Collision> CollisionList;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

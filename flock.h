@@ -53,6 +53,20 @@ private:
     static inline int obstacle_selection_counter_ = -1;
     static inline ObstaclePtrList obstacles_;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251026 formalize ObstacleSet as a class
+
+#ifdef    NEW_OBSTACLE_SET
+    
+    static inline std::vector<ObstacleSet> obstacle_sets_;
+
+    
+    // Index of the initial/default obstacle set.
+    static inline int default_obstacle_set_index_
+        = 5;  // "SmallSpheresInBigSphere"
+
+#else  // NEW_OBSTACLE_SET
+    
     // Index of the initial/default obstacle set.
     static inline int default_obstacle_set_index_ =
     // 0;  // Sphere and vertical cylinder.
@@ -62,6 +76,12 @@ private:
     4;  // Sphere and many little spheres.
     // 5;  // Sphere with smaller sphere inside.
     // 6;  // No obstacles
+
+#endif // NEW_OBSTACLE_SET
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
 
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
@@ -120,8 +140,16 @@ public:
     //
     Flock()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251026 formalize ObstacleSet as a class
+
+#ifdef    NEW_OBSTACLE_SET
+#else  // NEW_OBSTACLE_SET
         updateObstacleSetForGUI();
         useObstacleSet();
+#endif // NEW_OBSTACLE_SET
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // This will normally be overwritten, but set a default default.
         set_fixed_fps(30);
         clock().setFPS(fixed_fps());
@@ -147,7 +175,13 @@ public:
         draw().beginAnimatedScene();
         while (still_running())
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251026 formalize ObstacleSet as a class
+#ifdef    NEW_OBSTACLE_SET
+#else  // NEW_OBSTACLE_SET
             updateObstacleSetForGUI();
+#endif // NEW_OBSTACLE_SET
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             updateSelectedBoidForGUI();
             clock().setFrameStartTime();
             // Run simulation steps "as fast as possible" or at fixed rate?
@@ -204,12 +238,24 @@ public:
         boid_instance_list().resize(boid_count());
         // Construct BoidPtrList.
         for (Boid& boid : boid_instance_list()) { boids().push_back(&boid); }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251026 formalize ObstacleSet as a class
+#ifdef    NEW_OBSTACLE_SET
+#else  // NEW_OBSTACLE_SET
         // Ensure all obstacle sets are defined and one is made active.
         preDefinedObstacleSets();
+#endif // NEW_OBSTACLE_SET
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Set up each new Boid.
         RandomSequence& rs = EF::RS();
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251026 formalize ObstacleSet as a class
+#ifdef    NEW_OBSTACLE_SET
+#else  // NEW_OBSTACLE_SET
         useObstacleSet();
+#endif // NEW_OBSTACLE_SET
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         enforceObsBoidConstraintsDoNotCount();
     }
 
@@ -730,6 +776,169 @@ public:
         }
 
     }
+    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251026 formalize ObstacleSet as a class
+
+#ifdef    NEW_OBSTACLE_SET
+    
+    
+    
+    
+    // Find index into obstacleSets() (obstacle_sets_) for a given string name.
+    int obstacleSetsNameToIndex(const std::string& name)
+    {
+        int index = -1;
+        auto os = obstacleSets();
+        // TODO probably should use std::find()?
+        for (int i = 0; i < os.size(); i++)
+        {
+            if (name == os.at(i).name()) { index = i; }
+        }
+        bool obstacle_set_name_found = index >= 0;
+        {
+            grabPrintLock_evoflock();
+            debugPrint(obstacle_set_name_found);
+        }
+        assert(obstacle_set_name_found);
+        return index;
+    }
+
+    // TODO 20251026 "modern" replacement for preDefinedObstacleSets()
+
+    // Create and cache a collection of ObstacleSet objects. One is designated
+    // the default initial set, via static FlockParameters. The user can cycle
+    // through the sets during simulation using the "O" (obstacle set) command.
+    const std::vector<ObstacleSet>& obstacleSets()
+    {
+        if (obstacle_sets_.empty())
+        {
+            auto iside = Obstacle::inside;
+            auto oside = Obstacle::outside;
+            Vec3 sc = FlockParameters().sphereCenter();
+            double sr = FlockParameters().sphereRadius();
+            
+            Obstacle* big_sphere = new SphereObstacle(sr, sc, oside);
+            Obstacle* little_sphere = new SphereObstacle(sr / 4, sc, iside);
+            Obstacle* right_cyl = new CylinderObstacle(sr * 0.2,
+                                                       sc + Vec3(sr*0.6,  sr, 0),
+                                                       sc + Vec3(sr*0.6, -sr, 0),
+                                                       iside);
+            Obstacle* plane = new PlaneObstacle(Vec3(0,1,0), sc, sr, sr * 0.001);
+            
+            // Set 0: just the big sphere.
+            obstacle_sets_.push_back(ObstacleSet("BigSphere",
+                                                 {big_sphere}));
+            
+            // Set 1: one sphere inside another
+            obstacle_sets_.push_back(ObstacleSet("BigAndSmallSphere",
+                                                 {big_sphere, little_sphere}));
+            
+            // Set 2: sphere and right hand vertical cylinder.
+            obstacle_sets_.push_back(ObstacleSet("BigSphereRightCyl",
+                                                 {big_sphere, right_cyl}));
+            
+            // Set 3: sphere and 6 cylinders parallel to main axes.
+            {
+                ObstaclePtrList obs;
+                obs.push_back(big_sphere);
+                double c6r = sr *  4 / 30;
+                double c6o = sr * 15 / 30;
+                double c6h = 50;
+                auto add_3_cyl = [&](double c6o)
+                {
+                    auto add_cyl = [&](double r, Vec3 t, Vec3 b)
+                    { obs.push_back(new CylinderObstacle(r, t, b, iside)); };
+                    add_cyl(c6r, Vec3(-c6h, 0, c6o), Vec3(c6h, 0, c6o));
+                    add_cyl(c6r, Vec3(c6o, -c6h, 0), Vec3(c6o, c6h, 0));
+                    add_cyl(c6r, Vec3(0, c6o, -c6h), Vec3(0, c6o, c6h));
+                };
+                add_3_cyl(c6o);
+                add_3_cyl(-c6o);
+                obstacle_sets_.push_back(ObstacleSet("Sphere_and_6_Cyl", obs));
+            }
+            
+            // Set 4: big sphere and horizontal plane.
+            obstacle_sets_.push_back(ObstacleSet("BigSpherePlane",
+                                                 {big_sphere, plane}));
+            
+            // Set 5: 35 random spheres inside big sphere.
+            {
+                int count = 35;
+                ObstaclePtrList obs;
+                obs.push_back(big_sphere);
+                std::vector<double> radii;
+                for (int i = 0; i < count; i++)
+                {
+                    radii.push_back(EF::RS().random2(4, 10));
+                }
+                double m = 4;  // margin between spheres.
+                int t = 4000;  // max retries.
+                auto centers = shape::arrangeNonOverlappingSpheres(radii, m, sr, t);
+                for (int i = 0; i < count; i++)
+                {
+                    obs.push_back(new SphereObstacle(radii[i], centers[i], iside));
+                }
+                obstacle_sets_.push_back(ObstacleSet("SmallSpheresInBigSphere",
+                                                     obs));
+            }
+            
+            // Set 6: no obstacles.
+            obstacle_sets_.push_back(ObstacleSet("NoObstacles", {}));
+        }
+        return obstacle_sets_;
+    }
+    
+    // For each boid in the flock, set it to use obstacle set N (which defaults
+    // the the currently selected obstacle set).
+//    void useObstacleSet() { useObstacleSet(obstacle_selection_counter_); }
+    void useObstacleSet(int n)
+    {
+//        obstacles() = preDefinedObstacleSets().at(n);
+        obstacles() = obstacleSets().at(n).obstacles();
+
+        setObstaclesOnAllBoids();
+
+//        if (n != obstacle_selection_counter_)
+        {
+            draw().clearStaticScene();
+            obstacle_selection_counter_ = n;
+            for (auto& o : obstacles()) { o->addToScene(); }
+        }
+    }
+
+    // For each boid in flock: set its obstacle set to be the obstacle set
+    // currently selected for this flock.
+    void setObstaclesOnAllBoids()
+    {
+        for_all_boids([&](Boid* b){ b->set_flock_obstacles(&obstacles()); });
+    }
+
+
+    // TODO 20251026 this had been in main(), then EF::runOneFlockEvolution()
+    //               It is a once-per-run (once per app launch) initialization.
+    //               Assumes fp().useObstacleSet() is a static FP.
+    //               maybe should be in Flock constructor on static bool flag?
+    //               Oh, doing it externally shields from multithreading issues.
+
+    static void initializeStaticScene()
+    {
+        std::cout << "++++ start initial flock set up" << std::endl;
+        auto& draw = Draw::getInstance();
+        bool enable = draw.enable();
+        draw.setEnable(true);
+        Flock flock;
+        std::string os_name = flock.fp().useObstacleSet();
+        int os_index = flock.obstacleSetsNameToIndex(os_name);
+        flock.useObstacleSet(os_index);
+        draw.setEnable(enable);
+        std::cout << "++++ finish initial flock set up" << std::endl;
+    }
+    
+    
+#else  // NEW_OBSTACLE_SET
+
 
     // Define several sets of obstacles, to allow interactively switching
     // between them, and making one active.
@@ -850,6 +1059,9 @@ public:
             enforceObsBoidConstraintsDoNotCount();
         }
     }
+    
+#endif // NEW_OBSTACLE_SET
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Simulation continues running until this returns false.
     bool still_running()

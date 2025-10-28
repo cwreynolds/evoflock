@@ -515,7 +515,15 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20251017 make sure we are tracking the expected number of boid-steps
-    debugPrint(log_flock_selected_boid_steps);
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
+
+    if (EF::usingGP()) { debugPrint(log_flock_selected_boid_steps); }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     assert(scalar_fits.size() == runs);

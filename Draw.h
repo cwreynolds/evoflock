@@ -43,7 +43,17 @@ public:
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20251024 fixing Draw enable, and visualize best.
 //    static Draw& getInstance() { return getInstance(true); }
-    static Draw& getInstance() { return getInstance(false); }
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251028 add ability to control default initial Draw enable state.
+    
+//    static Draw& getInstance() { return getInstance(false); }
+  
+    static inline bool default_init_enable_state = false;
+    static Draw& getInstance(){ return getInstance(default_init_enable_state); }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     static Draw& getInstance(bool enabled)
     {
@@ -381,14 +391,29 @@ public:
 //    void setEnable(bool e) { enable_ = e; }
 //    void toggleEnable() { setEnable(not enable_); }
     
-    void setEnable(bool e)
-    {
-        enable_ = e;
-//        std::cout << "Draw enable set to: " << e << std::endl;
-        std::cout << "@@@@ Draw::setEnable(" << e << ")" <<std::endl;
-        
-//        e = false; // SUPER TEMP for testing
-    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
+
+//        void setEnable(bool e)
+//        {
+//            enable_ = e;
+//    //        std::cout << "Draw enable set to: " << e << std::endl;
+//            std::cout << "@@@@ Draw::setEnable(" << e << ")" <<std::endl;
+//
+//    //        e = false; // SUPER TEMP for testing
+//        }
+
+//        void setEnable(bool e)
+//        {
+//            enable_ = e;
+//    //        std::cout << "@@@@ Draw::setEnable(" << e << ")" <<std::endl;
+//        }
+
+    void setEnable(bool e) { enable_ = e; }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
     void toggleEnable() { setEnable(not enable_); }
 
 //    void setEnable(bool e) { enable_ = e; }

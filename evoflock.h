@@ -310,8 +310,14 @@ void runOneFlockEvolution()
 //        std::cout << "finish initial flock set up" << std::endl;
 
         
-        Flock::initializeStaticScene();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
+
+//        Flock::initializeStaticScene();
+//        Flock::initializeStaticScene("SmallSpheresInBigSphere");
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     

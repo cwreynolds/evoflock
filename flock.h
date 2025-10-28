@@ -162,6 +162,13 @@ public:
         // This will normally be overwritten, but set a default default.
         set_fixed_fps(30);
         clock().setFPS(fixed_fps());
+        
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
+        
+        initializeStaticScene();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Run boids simulation.
@@ -787,7 +794,29 @@ public:
 #ifdef    NEW_OBSTACLE_SET
     
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
+
     
+//    // Find index into obstacleSets() (obstacle_sets_) for a given string name.
+//    int obstacleSetsNameToIndex(const std::string& name)
+//    {
+//        int index = -1;
+//        auto os = obstacleSets();
+//        // TODO probably should use std::find()?
+//        for (int i = 0; i < os.size(); i++)
+//        {
+//            if (name == os.at(i).name()) { index = i; }
+//        }
+//        bool obstacle_set_name_found = index >= 0;
+//        {
+//            grabPrintLock_evoflock();
+//            debugPrint(obstacle_set_name_found);
+//        }
+//        assert(obstacle_set_name_found);
+//        return index;
+//    }
+  
     
     // Find index into obstacleSets() (obstacle_sets_) for a given string name.
     int obstacleSetsNameToIndex(const std::string& name)
@@ -800,13 +829,16 @@ public:
             if (name == os.at(i).name()) { index = i; }
         }
         bool obstacle_set_name_found = index >= 0;
-        {
-            grabPrintLock_evoflock();
-            debugPrint(obstacle_set_name_found);
-        }
+//        {
+//            grabPrintLock_evoflock();
+//            debugPrint(obstacle_set_name_found);
+//        }
         assert(obstacle_set_name_found);
         return index;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     // TODO 20251026 "modern" replacement for preDefinedObstacleSets()
 
@@ -924,24 +956,61 @@ public:
     // typing the "O" command. If so, propagate change to all boids in flock.
     
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
+
+    
+//        void useObstacleSet() { useObstacleSet(selected_obstacle_set_index_); }
+//        void useObstacleSet(int n)
+//        {
+//    //        // Change ObstacleSet selection on Flock
+//    //        obstacles() = obstacleSets().at(n).obstacles();
+//    //
+//    //        // Propogate ObstacleSet selection to all boids in Flock
+//    //        setObstaclesOnAllBoids();
+//
+//            if (n != selected_obstacle_set_index_)
+//            {
+//                std::cout << "$$$$ enter IF in useObstacleSet()" << std::endl;
+//
+//
+//                // Change ObstacleSet selection on Flock
+//                obstacles() = obstacleSets().at(n).obstacles();
+//
+//                debugPrint(obstacles().size());
+//
+//                // Propagate ObstacleSet selection to all boids in Flock
+//                setObstaclesOnAllBoids();
+//
+//                draw().clearStaticScene();
+//                selected_obstacle_set_index_ = n;
+//
+//
+//                draw().obstacleSetIndex() = n;
+//                debugPrint(n)
+//                debugPrint(selected_obstacle_set_index_)
+//                debugPrint(draw().obstacleSetIndex())
+//
+//                for (auto& o : obstacles()) { o->addToScene(); }
+//
+//                std::cout << "$$$$  exit IF in useObstacleSet()" << std::endl;
+//
+//            }
+//        }
+    
+    
     void useObstacleSet() { useObstacleSet(selected_obstacle_set_index_); }
     void useObstacleSet(int n)
     {
-//        // Change ObstacleSet selection on Flock
-//        obstacles() = obstacleSets().at(n).obstacles();
-//        
-//        // Propogate ObstacleSet selection to all boids in Flock
-//        setObstaclesOnAllBoids();
-        
         if (n != selected_obstacle_set_index_)
         {
-            std::cout << "$$$$ enter IF in useObstacleSet()" << std::endl;
+//            std::cout << "$$$$ enter IF in useObstacleSet()" << std::endl;
             
             
             // Change ObstacleSet selection on Flock
             obstacles() = obstacleSets().at(n).obstacles();
             
-            debugPrint(obstacles().size());
+//            debugPrint(obstacles().size());
             
             // Propagate ObstacleSet selection to all boids in Flock
             setObstaclesOnAllBoids();
@@ -951,16 +1020,19 @@ public:
             
             
             draw().obstacleSetIndex() = n;
-            debugPrint(n)
-            debugPrint(selected_obstacle_set_index_)
-            debugPrint(draw().obstacleSetIndex())
+//            debugPrint(n)
+//            debugPrint(selected_obstacle_set_index_)
+//            debugPrint(draw().obstacleSetIndex())
 
             for (auto& o : obstacles()) { o->addToScene(); }
             
-            std::cout << "$$$$  exit IF in useObstacleSet()" << std::endl;
+//            std::cout << "$$$$  exit IF in useObstacleSet()" << std::endl;
 
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
@@ -982,19 +1054,125 @@ public:
     //               maybe should be in Flock constructor on static bool flag?
     //               Oh, doing it externally shields from multithreading issues.
 
-    static void initializeStaticScene()
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
+    
+//    static void initializeStaticScene()
+//    {
+//        std::cout << "++++ start initial flock set up" << std::endl;
+//        auto& draw = Draw::getInstance();
+//        bool enable = draw.enable();
+//        draw.setEnable(true);
+//        Flock flock;
+//        std::string os_name = flock.fp().useObstacleSet();
+//        int os_index = flock.obstacleSetsNameToIndex(os_name);
+//        flock.useObstacleSet(os_index);
+//        draw.setEnable(enable);
+//        std::cout << "++++ finish initial flock set up" << std::endl;
+//    }
+    
+//    static void initializeStaticScene()
+//    {
+//        initializeStaticScene(FlockParameters().useObstacleSet());
+//    }
+
+//        static void initializeStaticScene(const std::string& os_name)
+//        {
+//            std::cout << "++++ start initial flock set up" << std::endl;
+//            auto& draw = Draw::getInstance();
+//            bool enable = draw.enable();
+//            draw.setEnable(true);
+//            Flock flock;
+//    //        std::string os_name = flock.fp().useObstacleSet();
+//            int os_index = flock.obstacleSetsNameToIndex(os_name);
+//            flock.useObstacleSet(os_index);
+//            draw.setEnable(enable);
+//            std::cout << "++++ finish initial flock set up" << std::endl;
+//        }
+
+//    private:
+//        static inline std::mutex iss_mutex;
+//        static inline bool static_scene_initialized = false;
+//    public:
+    
+//    static void initializeStaticScene(const std::string& os_name)
+//    {
+//        std::lock_guard<std::mutex> issm(iss_mutex);
+//        if (not static_scene_initialized)
+//        {
+//            std::cout << "++++ start initial flock set up" << std::endl;
+//            auto& draw = Draw::getInstance();
+//            bool enable = draw.enable();
+//            draw.setEnable(true);
+//            Flock flock;
+//            int os_index = flock.obstacleSetsNameToIndex(os_name);
+//            flock.useObstacleSet(os_index);
+//            draw.setEnable(enable);
+//            static_scene_initialized = true;
+//            std::cout << "++++ finish initial flock set up" << std::endl;
+//        }
+//    }
+
+    
+//        void initializeStaticScene()
+//        {
+//    //        initializeStaticScene(FlockParameters().useObstacleSet());
+//            initializeStaticScene(fp().useObstacleSet());
+//        }
+//
+//        void initializeStaticScene(const std::string& os_name)
+//        {
+//            std::lock_guard<std::mutex> issm(iss_mutex);
+//            if (not static_scene_initialized)
+//            {
+//                std::cout << "++++ start initial flock set up" << std::endl;
+//                auto& draw = Draw::getInstance();
+//                bool enable = draw.enable();
+//                draw.setEnable(true);
+//    //            Flock flock;
+//    //            int os_index = flock.obstacleSetsNameToIndex(os_name);
+//    //            flock.useObstacleSet(os_index);
+//                int os_index = obstacleSetsNameToIndex(os_name);
+//                useObstacleSet(os_index);
+//                draw.setEnable(enable);
+//                static_scene_initialized = true;
+//                std::cout << "++++ finish initial flock set up" << std::endl;
+//            }
+//        }
+
+    
+private:
+    static inline std::mutex iss_mutex;
+    static inline bool static_scene_initialized = false;
+public:
+
+//    void initializeStaticScene()
+//    {
+//        initializeStaticScene(fp().useObstacleSet());
+//    }
+  
+    // Initialize static scene for Draw, based on named ObstacleSet.
+    // Called from Flock constructor, executed only once, thread safe via mutex.
+    void initializeStaticScene() {initializeStaticScene(fp().useObstacleSet());}
+    void initializeStaticScene(const std::string& os_name)
     {
-        std::cout << "++++ start initial flock set up" << std::endl;
-        auto& draw = Draw::getInstance();
-        bool enable = draw.enable();
-        draw.setEnable(true);
-        Flock flock;
-        std::string os_name = flock.fp().useObstacleSet();
-        int os_index = flock.obstacleSetsNameToIndex(os_name);
-        flock.useObstacleSet(os_index);
-        draw.setEnable(enable);
-        std::cout << "++++ finish initial flock set up" << std::endl;
+        std::lock_guard<std::mutex> issm(iss_mutex);
+        if (not static_scene_initialized)
+        {
+            auto& draw = Draw::getInstance();
+            bool enable = draw.enable();
+            draw.setEnable(true);
+            int os_index = obstacleSetsNameToIndex(os_name);
+            useObstacleSet(os_index);
+            draw.setEnable(enable);
+            static_scene_initialized = true;
+        }
     }
+
+    
+
+    
     
 //        // Check if obstacle set needs to be changed in response to "O" cmd in UI.
 //        void updateObstacleSetForGUI()
@@ -1031,25 +1209,38 @@ public:
 //        }
 
 
+//        // Check if obstacle set needs to be changed in response to "O" cmd in UI.
+//        void updateObstacleSetForGUI()
+//        {
+//            int os = draw().obstacleSetIndex() % obstacleSets().size();
+//            if (os != selected_obstacle_set_index_)
+//            {
+//
+//    //            debugPrint(draw().obstacleSetIndex());
+//    //            debugPrint(obstacleSets().size());
+//    //            debugPrint(os);
+//    //
+//    //            std::cout << "os (" << os << ") != selected_obstacle_set_index_ (";
+//    //            std::cout << selected_obstacle_set_index_ << ")" << std::endl;
+//
+//                useObstacleSet(os);
+//                enforceObsBoidConstraintsDoNotCount();
+//            }
+//        }
+
     // Check if obstacle set needs to be changed in response to "O" cmd in UI.
     void updateObstacleSetForGUI()
     {
-        int os = draw().obstacleSetIndex() % obstacleSets().size();
-        if (os != selected_obstacle_set_index_)
+        int osi = draw().obstacleSetIndex() % obstacleSets().size();
+        if (osi != selected_obstacle_set_index_)
         {
-
-            debugPrint(draw().obstacleSetIndex());
-            debugPrint(obstacleSets().size());
-            debugPrint(os);
-            
-            std::cout << "os (" << os << ") != selected_obstacle_set_index_ (";
-            std::cout << selected_obstacle_set_index_ << ")" << std::endl;
-            
-            useObstacleSet(os);
+            useObstacleSet(osi);
             enforceObsBoidConstraintsDoNotCount();
         }
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 #else  // NEW_OBSTACLE_SET

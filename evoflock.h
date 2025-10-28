@@ -249,7 +249,17 @@ void runOneFlockEvolution()
 //    enable_multithreading = false;
 //    enable_multithreading = true;
 //    enable_multithreading = false;
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20251027 cycle through new ObstacleSets with "O" command
+
+//    enable_multithreading = true;
+//    enable_multithreading = false;
+//    enable_multithreading = true;
+//    enable_multithreading = false;
     enable_multithreading = true;
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     std::cout << "Use multithreading: " << std::boolalpha;
     std::cout << enable_multithreading << std::endl;

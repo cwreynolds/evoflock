@@ -48,24 +48,33 @@ private:
 
     util::Blender<double> fps_;
     
-    // The static collection of various obstacle set, selectable from GUI.
-    static inline std::vector<ObstaclePtrList> obstacle_presets_;
-    static inline int obstacle_selection_counter_ = -1;
-    static inline ObstaclePtrList obstacles_;
+//    // The static collection of various obstacle set, selectable from GUI.
+//    static inline std::vector<ObstaclePtrList> obstacle_presets_;
+//    static inline int obstacle_selection_counter_ = -1;
+//    static inline ObstaclePtrList obstacles_;
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20251026 formalize ObstacleSet as a class
 
 #ifdef    NEW_OBSTACLE_SET
     
-    static inline std::vector<ObstacleSet> obstacle_sets_;
+    // Pointers to all Obstacles in currently selected ObstacleSet.
+    static inline ObstaclePtrList obstacles_;
 
+    // Static collection of all known ObstacleSets. "O" cmd cycles through these.
+    static inline std::vector<ObstacleSet> obstacle_sets_;
     
     // Index of the initial/default obstacle set.
     static inline int default_obstacle_set_index_
         = 5;  // "SmallSpheresInBigSphere"
 
 #else  // NEW_OBSTACLE_SET
+    
+    // The static collection of various obstacle set, selectable from GUI.
+    static inline std::vector<ObstaclePtrList> obstacle_presets_;
+    static inline int obstacle_selection_counter_ = -1;
+    static inline ObstaclePtrList obstacles_;
+
     
     // Index of the initial/default obstacle set.
     static inline int default_obstacle_set_index_ =
@@ -175,13 +184,7 @@ public:
         draw().beginAnimatedScene();
         while (still_running())
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251026 formalize ObstacleSet as a class
-#ifdef    NEW_OBSTACLE_SET
-#else  // NEW_OBSTACLE_SET
             updateObstacleSetForGUI();
-#endif // NEW_OBSTACLE_SET
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             updateSelectedBoidForGUI();
             clock().setFrameStartTime();
             // Run simulation steps "as fast as possible" or at fixed rate?
@@ -251,10 +254,10 @@ public:
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20251026 formalize ObstacleSet as a class
-#ifdef    NEW_OBSTACLE_SET
-#else  // NEW_OBSTACLE_SET
+//#ifdef    NEW_OBSTACLE_SET
+//#else  // NEW_OBSTACLE_SET
         useObstacleSet();
-#endif // NEW_OBSTACLE_SET
+//#endif // NEW_OBSTACLE_SET
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         enforceObsBoidConstraintsDoNotCount();
     }
@@ -890,23 +893,76 @@ public:
         return obstacle_sets_;
     }
     
-    // For each boid in the flock, set it to use obstacle set N (which defaults
-    // the the currently selected obstacle set).
-//    void useObstacleSet() { useObstacleSet(obstacle_selection_counter_); }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251027 cycle through new ObstacleSets with "O" command
+
+//        // For each boid in the flock, set it to use obstacle set N (which defaults
+//        // the the currently selected obstacle set).
+//    //    void useObstacleSet() { useObstacleSet(obstacle_selection_counter_); }
+//        void useObstacleSet(int n)
+//        {
+//    //        obstacles() = preDefinedObstacleSets().at(n);
+//            obstacles() = obstacleSets().at(n).obstacles();
+//
+//            setObstaclesOnAllBoids();
+//
+//    //        if (n != obstacle_selection_counter_)
+//            {
+//                draw().clearStaticScene();
+//                obstacle_selection_counter_ = n;
+//                for (auto& o : obstacles()) { o->addToScene(); }
+//            }
+//        }
+
+    
+    // Index (into obstacleSets()) of the currently selected ObstacleSet.
+    // -1 indicates initialization is required.
+//    int selected_obstacle_set_index_ = -1;
+    static inline int selected_obstacle_set_index_ = -1;
+
+    // Check to see if the selected ObstacleSet has changed, say by the user
+    // typing the "O" command. If so, propagate change to all boids in flock.
+    
+    
+    void useObstacleSet() { useObstacleSet(selected_obstacle_set_index_); }
     void useObstacleSet(int n)
     {
-//        obstacles() = preDefinedObstacleSets().at(n);
-        obstacles() = obstacleSets().at(n).obstacles();
-
-        setObstaclesOnAllBoids();
-
-//        if (n != obstacle_selection_counter_)
+//        // Change ObstacleSet selection on Flock
+//        obstacles() = obstacleSets().at(n).obstacles();
+//        
+//        // Propogate ObstacleSet selection to all boids in Flock
+//        setObstaclesOnAllBoids();
+        
+        if (n != selected_obstacle_set_index_)
         {
+            std::cout << "$$$$ enter IF in useObstacleSet()" << std::endl;
+            
+            
+            // Change ObstacleSet selection on Flock
+            obstacles() = obstacleSets().at(n).obstacles();
+            
+            debugPrint(obstacles().size());
+            
+            // Propagate ObstacleSet selection to all boids in Flock
+            setObstaclesOnAllBoids();
+
             draw().clearStaticScene();
-            obstacle_selection_counter_ = n;
+            selected_obstacle_set_index_ = n;
+            
+            
+            draw().obstacleSetIndex() = n;
+            debugPrint(n)
+            debugPrint(selected_obstacle_set_index_)
+            debugPrint(draw().obstacleSetIndex())
+
             for (auto& o : obstacles()) { o->addToScene(); }
+            
+            std::cout << "$$$$  exit IF in useObstacleSet()" << std::endl;
+
         }
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // For each boid in flock: set its obstacle set to be the obstacle set
     // currently selected for this flock.
@@ -914,6 +970,10 @@ public:
     {
         for_all_boids([&](Boid* b){ b->set_flock_obstacles(&obstacles()); });
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251027 cycle through new ObstacleSets with "O" command
+    
 
 
     // TODO 20251026 this had been in main(), then EF::runOneFlockEvolution()
@@ -936,7 +996,62 @@ public:
         std::cout << "++++ finish initial flock set up" << std::endl;
     }
     
+//        // Check if obstacle set needs to be changed in response to "O" cmd in UI.
+//        void updateObstacleSetForGUI()
+//        {
+//    //        int o = draw().obstacleSetIndex() % preDefinedObstacleSets().size();
+//            int os = draw().obstacleSetIndex() % obstacleSets().size();
+//    //        if (o != obstacle_selection_counter_)
+//            if (os != selected_obstacle_set_index_)
+//            {
+//    //            useObstacleSet(o);
+//                useObstacleSet(os);
+//                enforceObsBoidConstraintsDoNotCount();
+//            }
+//        }
     
+    
+//        // TODO mutex?
+//
+//    //    std::lock_guard<std::mutex> smm(save_mof_mutex);
+//
+//        static inline std::mutex change_os_mutex;
+//
+//        // Check if obstacle set needs to be changed in response to "O" cmd in UI.
+//        void updateObstacleSetForGUI()
+//        {
+//            std::lock_guard<std::mutex> cosm(change_os_mutex);
+//
+//            int os = draw().obstacleSetIndex() % obstacleSets().size();
+//            if (os != selected_obstacle_set_index_)
+//            {
+//                useObstacleSet(os);
+//                enforceObsBoidConstraintsDoNotCount();
+//            }
+//        }
+
+
+    // Check if obstacle set needs to be changed in response to "O" cmd in UI.
+    void updateObstacleSetForGUI()
+    {
+        int os = draw().obstacleSetIndex() % obstacleSets().size();
+        if (os != selected_obstacle_set_index_)
+        {
+
+            debugPrint(draw().obstacleSetIndex());
+            debugPrint(obstacleSets().size());
+            debugPrint(os);
+            
+            std::cout << "os (" << os << ") != selected_obstacle_set_index_ (";
+            std::cout << selected_obstacle_set_index_ << ")" << std::endl;
+            
+            useObstacleSet(os);
+            enforceObsBoidConstraintsDoNotCount();
+        }
+    }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 #else  // NEW_OBSTACLE_SET
 
 

@@ -689,12 +689,22 @@ public:
     bool simPause() const { return sim_pause_; }
     void toggleSimPause() { sim_pause_ = not sim_pause_; }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251027 cycle through new ObstacleSets with "O" command
+
     // Runtime counter the simulation can use to change predefined obs sets.
     // (TODO this seems very specific to flock simulation is it OK to be here?)
     int& obstacleSetIndex() { return obstacle_set_index_; }
     int obstacleSetIndex() const { return obstacle_set_index_; }
-    void nextObstacleSet() { obstacle_set_index_ += 1; }
-    
+//    void nextObstacleSet() { obstacle_set_index_ += 1; }
+    void nextObstacleSet()
+    {
+        obstacle_set_index_ += 1;
+        std::cout << "nextObstacleSet() " << obstacle_set_index_ << std::endl;
+    }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     // Runtime counter the simulation can use to change selected boid.
     int& selectedBoidIndex() { return selected_boid_index_; }
     int selectedBoidIndex() const { return selected_boid_index_; }

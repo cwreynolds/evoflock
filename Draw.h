@@ -40,21 +40,8 @@ public:
     // Used to get the current global Draw object (drawing context).
     // Returns the existing instance, creating a new one if needed.
     // Asserts that getInstance() must not be called in constructor.
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251024 fixing Draw enable, and visualize best.
-//    static Draw& getInstance() { return getInstance(true); }
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20251028 add ability to control default initial Draw enable state.
-    
-//    static Draw& getInstance() { return getInstance(false); }
-  
     static inline bool default_init_enable_state = false;
     static Draw& getInstance(){ return getInstance(default_init_enable_state); }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     static Draw& getInstance(bool enabled)
     {
         assert(not global_object_under_construction_);
@@ -382,44 +369,8 @@ public:
     
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-    // TODO 20251023 align counters / no drawing for multithreading.
-
-//    void setEnable(bool e) { enable_ = e; }
-//    void toggleEnable() { enable_ = not enable_; }
-    
-//    void setEnable(bool e) { enable_ = e; }
-//    void toggleEnable() { setEnable(not enable_); }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
-
-//        void setEnable(bool e)
-//        {
-//            enable_ = e;
-//    //        std::cout << "Draw enable set to: " << e << std::endl;
-//            std::cout << "@@@@ Draw::setEnable(" << e << ")" <<std::endl;
-//
-//    //        e = false; // SUPER TEMP for testing
-//        }
-
-//        void setEnable(bool e)
-//        {
-//            enable_ = e;
-//    //        std::cout << "@@@@ Draw::setEnable(" << e << ")" <<std::endl;
-//        }
-
     void setEnable(bool e) { enable_ = e; }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
     void toggleEnable() { setEnable(not enable_); }
-
-//    void setEnable(bool e) { enable_ = e; }
-//    void toggleEnable() { setEnable(not enable_); }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
     // Process asynch events: key presses, mouse moves, closing window, etc.
     bool pollEvents()
@@ -714,21 +665,11 @@ public:
     bool simPause() const { return sim_pause_; }
     void toggleSimPause() { sim_pause_ = not sim_pause_; }
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251027 cycle through new ObstacleSets with "O" command
-
     // Runtime counter the simulation can use to change predefined obs sets.
     // (TODO this seems very specific to flock simulation is it OK to be here?)
     int& obstacleSetIndex() { return obstacle_set_index_; }
     int obstacleSetIndex() const { return obstacle_set_index_; }
-//    void nextObstacleSet() { obstacle_set_index_ += 1; }
-    void nextObstacleSet()
-    {
-        obstacle_set_index_ += 1;
-        std::cout << "nextObstacleSet() " << obstacle_set_index_ << std::endl;
-    }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    void nextObstacleSet() { obstacle_set_index_ += 1; }
 
     // Runtime counter the simulation can use to change selected boid.
     int& selectedBoidIndex() { return selected_boid_index_; }

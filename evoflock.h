@@ -105,11 +105,6 @@ void visualizeBestIfRequested(LP::Population* population)
     Draw& draw = Draw::getInstance();
     if (draw.getVisBestMode())
     {
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20251024 fixing Draw enable, and visualize best.
-        std::cout << "@@@@ enter EF::visualizeBestIfRequested()" <<std::endl;
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
         bool previous_emt_state = enable_multithreading;
         enable_multithreading = false;
         LP::Individual* individual = population->bestFitness();
@@ -123,27 +118,12 @@ void visualizeBestIfRequested(LP::Population* population)
         }
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20251023 align counters / no drawing for multithreading.
         bool previous_draw_enable_state = Draw::getInstance().enable();
         Draw::getInstance().setEnable(true);
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
         GP::run_flock_simulation(individual, 1);
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20251023 align counters / no drawing for multithreading.
         Draw::getInstance().setEnable(previous_draw_enable_state);
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
         enable_multithreading = previous_emt_state;
         draw.clearVisBestMode();
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20251024 fixing Draw enable, and visualize best.
-        std::cout << "@@@@ exit  EF::visualizeBestIfRequested()" <<std::endl;
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
 }
 
@@ -225,101 +205,19 @@ void visualizePreviouslyLoggedFlockParameters()
 void runOneFlockEvolution()
 {
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251024 fixing Draw enable, and visualize best.
-    //EF::setUsingGA();
-    //EF::setUsingGP();
-    //EF::setUsingGA();
-    //EF::setUsingGP();
     EF::setUsingGA();
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251021 does turning multithreading off fix the GP? Answer: nope!
-//    enable_multithreading = true;
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-    // TODO 20251022 add a bit of noise to avoid perfect alignment.
-    
-//    enable_multithreading = false;
-//    enable_multithreading = true;
-//    enable_multithreading = false;
-//    enable_multithreading = true;
-//    enable_multithreading = false;
-    
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20251027 cycle through new ObstacleSets with "O" command
-
-//    enable_multithreading = true;
-//    enable_multithreading = false;
-//    enable_multithreading = true;
-//    enable_multithreading = false;
     enable_multithreading = true;
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
     std::cout << "Use multithreading: " << std::boolalpha;
     std::cout << enable_multithreading << std::endl;
     
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Merge LP and EF RandomSequence, init from clock for unique runs, and log.
     setRS(LP::LPRS());
     RS().setSeedFromClock();
     std::cout << "RandomSequence seed = " << RS().getSeed() << std::endl;
-    
-    // But first, here in the main thread, build (then delete) one Flock object
-    // to set up static state, such as defining Obstacle sets, making one active,
-    // then uploading it to GPU.
-    //
-    // 20250426 When I tried removing this, the Open3D window showed the default
-    // Obstacle set plus "Set 0: sphere and right hand vertical cylinder."
-    //
-    // 20250912 commenting this out worked fine in experimental GP mode. Now I'm
-    // trying to get an updated GA mode working again, so turning it on again
-    // for now.
-    //
-    // 20251025 After recent changes to unify control of Draw enable, this
-    // symptom came back, even with this dummy Flock call. For the moment, I
-    // have worked around the work around. But the defining, activating, and
-    // adding to the GPU-based static scene needs to be redesigned. Is it
-    // possible to define the obstacles, but not try loading into the GPU until
-    // the first time it is drawn with enable on?
-    {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251026 formalize ObstacleSet as a class
-        
-//        std::cout << "start initial flock set up" << std::endl;
-//        
-//
-//        auto& draw = Draw::getInstance();
-//        bool enable = draw.enable();
-//        draw.setEnable(true);
-//        Flock flock;
-//        
-//        int os_index = flock.obstacleSetsNameToIndex(flock.fp().useObstacleSet());
-//        flock.useObstacleSet(os_index);
-//
-//        
-//        draw.setEnable(enable);
-//
-//        std::cout << "finish initial flock set up" << std::endl;
-
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
-
-//        Flock::initializeStaticScene();
-//        Flock::initializeStaticScene("SmallSpheresInBigSphere");
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    }
     
     // WIP/HACK runs flock sim, with graphics, for the FlockParameters written
     // inline in this function's source code, above.

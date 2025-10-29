@@ -536,10 +536,6 @@ public:
     }
 };
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251026 formalize ObstacleSet as a class
-//
-// TODO          verify no duplicate name in constructor?
 
 typedef std::vector<Obstacle*> ObstaclePtrList;
 typedef std::vector<Collision> CollisionList;
@@ -562,7 +558,6 @@ private:
     ObstaclePtrList obstacles_;
 };
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Serialize Collision object to stream.
 inline std::ostream& operator<<(std::ostream& os, const Collision& c)
@@ -682,9 +677,3 @@ inline void Obstacle::unit_test()
         six_way_exclude_from(so_i, so_o, so_n);
     }
 }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251026 formalize ObstacleSet as a class
-//typedef std::vector<Obstacle*> ObstaclePtrList;
-//typedef std::vector<Collision> CollisionList;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

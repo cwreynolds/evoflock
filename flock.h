@@ -47,50 +47,12 @@ private:
     int cumulative_sep_fail_ = 0;   // separation fail: a pair of boids touch.
 
     util::Blender<double> fps_;
-    
-//    // The static collection of various obstacle set, selectable from GUI.
-//    static inline std::vector<ObstaclePtrList> obstacle_presets_;
-//    static inline int obstacle_selection_counter_ = -1;
-//    static inline ObstaclePtrList obstacles_;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251026 formalize ObstacleSet as a class
-
-#ifdef    NEW_OBSTACLE_SET
-    
+        
     // Pointers to all Obstacles in currently selected ObstacleSet.
     static inline ObstaclePtrList obstacles_;
 
     // Static collection of all known ObstacleSets. "O" cmd cycles through these.
     static inline std::vector<ObstacleSet> obstacle_sets_;
-    
-    // Index of the initial/default obstacle set.
-    static inline int default_obstacle_set_index_
-        = 5;  // "SmallSpheresInBigSphere"
-
-#else  // NEW_OBSTACLE_SET
-    
-    // The static collection of various obstacle set, selectable from GUI.
-    static inline std::vector<ObstaclePtrList> obstacle_presets_;
-    static inline int obstacle_selection_counter_ = -1;
-    static inline ObstaclePtrList obstacles_;
-
-    
-    // Index of the initial/default obstacle set.
-    static inline int default_obstacle_set_index_ =
-    // 0;  // Sphere and vertical cylinder.
-    // 1;  // Sphere and 6 cylinders.
-    // 2;  // Sphere and plane.
-    // 3;  // Sphere only.
-    4;  // Sphere and many little spheres.
-    // 5;  // Sphere with smaller sphere inside.
-    // 6;  // No obstacles
-
-#endif // NEW_OBSTACLE_SET
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
 
     // Currently selected boid's index in boids().
     int selected_boid_index_ = -1;
@@ -149,26 +111,10 @@ public:
     //
     Flock()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251026 formalize ObstacleSet as a class
-
-#ifdef    NEW_OBSTACLE_SET
-#else  // NEW_OBSTACLE_SET
-        updateObstacleSetForGUI();
-        useObstacleSet();
-#endif // NEW_OBSTACLE_SET
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // This will normally be overwritten, but set a default default.
         set_fixed_fps(30);
         clock().setFPS(fixed_fps());
-        
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
-        
         initializeStaticScene();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Run boids simulation.
@@ -248,24 +194,10 @@ public:
         boid_instance_list().resize(boid_count());
         // Construct BoidPtrList.
         for (Boid& boid : boid_instance_list()) { boids().push_back(&boid); }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251026 formalize ObstacleSet as a class
-#ifdef    NEW_OBSTACLE_SET
-#else  // NEW_OBSTACLE_SET
-        // Ensure all obstacle sets are defined and one is made active.
-        preDefinedObstacleSets();
-#endif // NEW_OBSTACLE_SET
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Set up each new Boid.
         RandomSequence& rs = EF::RS();
         for (Boid* boid : boids()) { init_boid(boid, radius, center, rs); }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251026 formalize ObstacleSet as a class
-//#ifdef    NEW_OBSTACLE_SET
-//#else  // NEW_OBSTACLE_SET
         useObstacleSet();
-//#endif // NEW_OBSTACLE_SET
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         enforceObsBoidConstraintsDoNotCount();
     }
 
@@ -787,37 +719,6 @@ public:
 
     }
     
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251026 formalize ObstacleSet as a class
-
-#ifdef    NEW_OBSTACLE_SET
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
-
-    
-//    // Find index into obstacleSets() (obstacle_sets_) for a given string name.
-//    int obstacleSetsNameToIndex(const std::string& name)
-//    {
-//        int index = -1;
-//        auto os = obstacleSets();
-//        // TODO probably should use std::find()?
-//        for (int i = 0; i < os.size(); i++)
-//        {
-//            if (name == os.at(i).name()) { index = i; }
-//        }
-//        bool obstacle_set_name_found = index >= 0;
-//        {
-//            grabPrintLock_evoflock();
-//            debugPrint(obstacle_set_name_found);
-//        }
-//        assert(obstacle_set_name_found);
-//        return index;
-//    }
-  
-    
     // Find index into obstacleSets() (obstacle_sets_) for a given string name.
     int obstacleSetsNameToIndex(const std::string& name)
     {
@@ -829,18 +730,9 @@ public:
             if (name == os.at(i).name()) { index = i; }
         }
         bool obstacle_set_name_found = index >= 0;
-//        {
-//            grabPrintLock_evoflock();
-//            debugPrint(obstacle_set_name_found);
-//        }
         assert(obstacle_set_name_found);
         return index;
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-    // TODO 20251026 "modern" replacement for preDefinedObstacleSets()
 
     // Create and cache a collection of ObstacleSet objects. One is designated
     // the default initial set, via static FlockParameters. The user can cycle
@@ -925,116 +817,30 @@ public:
         return obstacle_sets_;
     }
     
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251027 cycle through new ObstacleSets with "O" command
-
-//        // For each boid in the flock, set it to use obstacle set N (which defaults
-//        // the the currently selected obstacle set).
-//    //    void useObstacleSet() { useObstacleSet(obstacle_selection_counter_); }
-//        void useObstacleSet(int n)
-//        {
-//    //        obstacles() = preDefinedObstacleSets().at(n);
-//            obstacles() = obstacleSets().at(n).obstacles();
-//
-//            setObstaclesOnAllBoids();
-//
-//    //        if (n != obstacle_selection_counter_)
-//            {
-//                draw().clearStaticScene();
-//                obstacle_selection_counter_ = n;
-//                for (auto& o : obstacles()) { o->addToScene(); }
-//            }
-//        }
-
-    
     // Index (into obstacleSets()) of the currently selected ObstacleSet.
     // -1 indicates initialization is required.
-//    int selected_obstacle_set_index_ = -1;
     static inline int selected_obstacle_set_index_ = -1;
 
     // Check to see if the selected ObstacleSet has changed, say by the user
     // typing the "O" command. If so, propagate change to all boids in flock.
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
-
-    
-//        void useObstacleSet() { useObstacleSet(selected_obstacle_set_index_); }
-//        void useObstacleSet(int n)
-//        {
-//    //        // Change ObstacleSet selection on Flock
-//    //        obstacles() = obstacleSets().at(n).obstacles();
-//    //
-//    //        // Propogate ObstacleSet selection to all boids in Flock
-//    //        setObstaclesOnAllBoids();
-//
-//            if (n != selected_obstacle_set_index_)
-//            {
-//                std::cout << "$$$$ enter IF in useObstacleSet()" << std::endl;
-//
-//
-//                // Change ObstacleSet selection on Flock
-//                obstacles() = obstacleSets().at(n).obstacles();
-//
-//                debugPrint(obstacles().size());
-//
-//                // Propagate ObstacleSet selection to all boids in Flock
-//                setObstaclesOnAllBoids();
-//
-//                draw().clearStaticScene();
-//                selected_obstacle_set_index_ = n;
-//
-//
-//                draw().obstacleSetIndex() = n;
-//                debugPrint(n)
-//                debugPrint(selected_obstacle_set_index_)
-//                debugPrint(draw().obstacleSetIndex())
-//
-//                for (auto& o : obstacles()) { o->addToScene(); }
-//
-//                std::cout << "$$$$  exit IF in useObstacleSet()" << std::endl;
-//
-//            }
-//        }
-    
-    
     void useObstacleSet() { useObstacleSet(selected_obstacle_set_index_); }
     void useObstacleSet(int n)
     {
         if (n != selected_obstacle_set_index_)
         {
-//            std::cout << "$$$$ enter IF in useObstacleSet()" << std::endl;
-            
-            
             // Change ObstacleSet selection on Flock
             obstacles() = obstacleSets().at(n).obstacles();
-            
-//            debugPrint(obstacles().size());
-            
             // Propagate ObstacleSet selection to all boids in Flock
             setObstaclesOnAllBoids();
-
+            // Clear previous static scene elements.
             draw().clearStaticScene();
+            // Update cycle counters.
             selected_obstacle_set_index_ = n;
-            
-            
             draw().obstacleSetIndex() = n;
-//            debugPrint(n)
-//            debugPrint(selected_obstacle_set_index_)
-//            debugPrint(draw().obstacleSetIndex())
-
+            // Add new obstacles to static scene.
             for (auto& o : obstacles()) { o->addToScene(); }
-            
-//            std::cout << "$$$$  exit IF in useObstacleSet()" << std::endl;
-
         }
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // For each boid in flock: set its obstacle set to be the obstacle set
     // currently selected for this flock.
@@ -1043,114 +849,11 @@ public:
         for_all_boids([&](Boid* b){ b->set_flock_obstacles(&obstacles()); });
     }
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251027 cycle through new ObstacleSets with "O" command
-    
-
-
-    // TODO 20251026 this had been in main(), then EF::runOneFlockEvolution()
-    //               It is a once-per-run (once per app launch) initialization.
-    //               Assumes fp().useObstacleSet() is a static FP.
-    //               maybe should be in Flock constructor on static bool flag?
-    //               Oh, doing it externally shields from multithreading issues.
-
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251028 ObstacleSet name arg to Flock::initializeStaticScene()
-    
-//    static void initializeStaticScene()
-//    {
-//        std::cout << "++++ start initial flock set up" << std::endl;
-//        auto& draw = Draw::getInstance();
-//        bool enable = draw.enable();
-//        draw.setEnable(true);
-//        Flock flock;
-//        std::string os_name = flock.fp().useObstacleSet();
-//        int os_index = flock.obstacleSetsNameToIndex(os_name);
-//        flock.useObstacleSet(os_index);
-//        draw.setEnable(enable);
-//        std::cout << "++++ finish initial flock set up" << std::endl;
-//    }
-    
-//    static void initializeStaticScene()
-//    {
-//        initializeStaticScene(FlockParameters().useObstacleSet());
-//    }
-
-//        static void initializeStaticScene(const std::string& os_name)
-//        {
-//            std::cout << "++++ start initial flock set up" << std::endl;
-//            auto& draw = Draw::getInstance();
-//            bool enable = draw.enable();
-//            draw.setEnable(true);
-//            Flock flock;
-//    //        std::string os_name = flock.fp().useObstacleSet();
-//            int os_index = flock.obstacleSetsNameToIndex(os_name);
-//            flock.useObstacleSet(os_index);
-//            draw.setEnable(enable);
-//            std::cout << "++++ finish initial flock set up" << std::endl;
-//        }
-
-//    private:
-//        static inline std::mutex iss_mutex;
-//        static inline bool static_scene_initialized = false;
-//    public:
-    
-//    static void initializeStaticScene(const std::string& os_name)
-//    {
-//        std::lock_guard<std::mutex> issm(iss_mutex);
-//        if (not static_scene_initialized)
-//        {
-//            std::cout << "++++ start initial flock set up" << std::endl;
-//            auto& draw = Draw::getInstance();
-//            bool enable = draw.enable();
-//            draw.setEnable(true);
-//            Flock flock;
-//            int os_index = flock.obstacleSetsNameToIndex(os_name);
-//            flock.useObstacleSet(os_index);
-//            draw.setEnable(enable);
-//            static_scene_initialized = true;
-//            std::cout << "++++ finish initial flock set up" << std::endl;
-//        }
-//    }
-
-    
-//        void initializeStaticScene()
-//        {
-//    //        initializeStaticScene(FlockParameters().useObstacleSet());
-//            initializeStaticScene(fp().useObstacleSet());
-//        }
-//
-//        void initializeStaticScene(const std::string& os_name)
-//        {
-//            std::lock_guard<std::mutex> issm(iss_mutex);
-//            if (not static_scene_initialized)
-//            {
-//                std::cout << "++++ start initial flock set up" << std::endl;
-//                auto& draw = Draw::getInstance();
-//                bool enable = draw.enable();
-//                draw.setEnable(true);
-//    //            Flock flock;
-//    //            int os_index = flock.obstacleSetsNameToIndex(os_name);
-//    //            flock.useObstacleSet(os_index);
-//                int os_index = obstacleSetsNameToIndex(os_name);
-//                useObstacleSet(os_index);
-//                draw.setEnable(enable);
-//                static_scene_initialized = true;
-//                std::cout << "++++ finish initial flock set up" << std::endl;
-//            }
-//        }
-
-    
 private:
+    // TODO relocate these to be with other private members.
     static inline std::mutex iss_mutex;
     static inline bool static_scene_initialized = false;
 public:
-
-//    void initializeStaticScene()
-//    {
-//        initializeStaticScene(fp().useObstacleSet());
-//    }
   
     // Initialize static scene for Draw, based on named ObstacleSet.
     // Called from Flock constructor, executed only once, thread safe via mutex.
@@ -1170,64 +873,6 @@ public:
         }
     }
 
-    
-
-    
-    
-//        // Check if obstacle set needs to be changed in response to "O" cmd in UI.
-//        void updateObstacleSetForGUI()
-//        {
-//    //        int o = draw().obstacleSetIndex() % preDefinedObstacleSets().size();
-//            int os = draw().obstacleSetIndex() % obstacleSets().size();
-//    //        if (o != obstacle_selection_counter_)
-//            if (os != selected_obstacle_set_index_)
-//            {
-//    //            useObstacleSet(o);
-//                useObstacleSet(os);
-//                enforceObsBoidConstraintsDoNotCount();
-//            }
-//        }
-    
-    
-//        // TODO mutex?
-//
-//    //    std::lock_guard<std::mutex> smm(save_mof_mutex);
-//
-//        static inline std::mutex change_os_mutex;
-//
-//        // Check if obstacle set needs to be changed in response to "O" cmd in UI.
-//        void updateObstacleSetForGUI()
-//        {
-//            std::lock_guard<std::mutex> cosm(change_os_mutex);
-//
-//            int os = draw().obstacleSetIndex() % obstacleSets().size();
-//            if (os != selected_obstacle_set_index_)
-//            {
-//                useObstacleSet(os);
-//                enforceObsBoidConstraintsDoNotCount();
-//            }
-//        }
-
-
-//        // Check if obstacle set needs to be changed in response to "O" cmd in UI.
-//        void updateObstacleSetForGUI()
-//        {
-//            int os = draw().obstacleSetIndex() % obstacleSets().size();
-//            if (os != selected_obstacle_set_index_)
-//            {
-//
-//    //            debugPrint(draw().obstacleSetIndex());
-//    //            debugPrint(obstacleSets().size());
-//    //            debugPrint(os);
-//    //
-//    //            std::cout << "os (" << os << ") != selected_obstacle_set_index_ (";
-//    //            std::cout << selected_obstacle_set_index_ << ")" << std::endl;
-//
-//                useObstacleSet(os);
-//                enforceObsBoidConstraintsDoNotCount();
-//            }
-//        }
-
     // Check if obstacle set needs to be changed in response to "O" cmd in UI.
     void updateObstacleSetForGUI()
     {
@@ -1238,136 +883,6 @@ public:
             enforceObsBoidConstraintsDoNotCount();
         }
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-#else  // NEW_OBSTACLE_SET
-
-
-    // Define several sets of obstacles, to allow interactively switching
-    // between them, and making one active.
-    // TODO this architecture is left over from the Python version and may need
-    // to be refactored in the evoflock environment.
-    static const std::vector<ObstaclePtrList>& preDefinedObstacleSets()
-    {
-        if (obstacle_presets_.empty())
-        {
-            ObstaclePtrList obs;
-            auto iside = Obstacle::inside;
-            auto oside = Obstacle::outside;
-            Vec3 sc = FlockParameters().sphereCenter();
-            double sr = FlockParameters().sphereRadius();
-
-            // Set 0: sphere and right hand vertical cylinder.
-            obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, oside));
-            Vec3 ect = sc + Vec3(sr * 0.6, sr, 0);
-            Vec3 ecb = sc + Vec3(sr * 0.6, -sr, 0);
-            obs.push_back(new CylinderObstacle(sr * 0.2, ect, ecb, iside));
-            obstacle_presets_.push_back(obs);
-            
-            // Set 1: sphere and 6 cylinders.
-            obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, oside));
-            // 6 symmetric cylinders parallel to main axes.
-            double c6r = sr *  4 / 30;
-            double c6o = sr * 15 / 30;
-            double c6h = 50;
-
-            auto add_3_cyl = [&](double c6o)
-            {
-                auto add_cyl = [&](double r, Vec3 t, Vec3 b)
-                    { obs.push_back(new CylinderObstacle(r, t, b, iside)); };
-                add_cyl(c6r, Vec3(-c6h, 0, c6o), Vec3(c6h, 0, c6o));
-                add_cyl(c6r, Vec3(c6o, -c6h, 0), Vec3(c6o, c6h, 0));
-                add_cyl(c6r, Vec3(0, c6o, -c6h), Vec3(0, c6o, c6h));
-            };
-            add_3_cyl(c6o);
-            add_3_cyl(-c6o);
-            obstacle_presets_.push_back(obs);
-            
-            // Set 2 sphere and horizontal plane
-            obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, oside));
-            obs.push_back(new PlaneObstacle(Vec3(0, 1, 0), sc, sr, sr * 0.001));
-            obstacle_presets_.push_back(obs);
-            
-            // Set 3 just the big sphere.
-            obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, oside));
-            obstacle_presets_.push_back(obs);
-
-            // Set 4 -- 35 random spheres
-            obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, oside));
-            int count = 35;
-            std::vector<double> radii;
-            for (int i = 0; i < count; i++)
-            {
-                radii.push_back(EF::RS().random2(4, 10));
-            }
-            double m = 4;  // margin between spheres.
-            int t = 4000;  // max retries.
-            auto centers = shape::arrangeNonOverlappingSpheres(radii, m, sr, t);
-            for (int i = 0; i < count; i++)
-            {
-                obs.push_back(new SphereObstacle(radii[i], centers[i], iside));
-            }
-            obstacle_presets_.push_back(obs);
-
-            // Set 5 -- one sphere inside another
-            obs.clear();
-            obs.push_back(new SphereObstacle(sr, sc, oside));
-            obs.push_back(new SphereObstacle(12, sc, iside));
-            obstacle_presets_.push_back(obs);
-            
-            // Set 6 -- no obstacles
-            obs.clear();
-            obstacle_presets_.push_back(obs);
-
-            // Set initial obstacle set to the default.
-            draw().obstacleSetIndex() = default_obstacle_set_index_;
-        }
-        return obstacle_presets_;
-    }
-
-    // For each boid in flock: set its obstacle set to be the obstacle set
-    // currently selected for this flock.
-    void setObstaclesOnAllBoids()
-    {
-        for_all_boids([&](Boid* b){ b->set_flock_obstacles(&obstacles()); });
-    }
-    
-    // For each boid in the flock, set it to use obstacle set N (which defaults
-    // the the currently selected obstacle set).
-    void useObstacleSet() { useObstacleSet(obstacle_selection_counter_); }
-    void useObstacleSet(int n)
-    {
-        obstacles() = preDefinedObstacleSets().at(n);
-        setObstaclesOnAllBoids();
-        if (n != obstacle_selection_counter_)
-        {
-            draw().clearStaticScene();
-            obstacle_selection_counter_ = n;
-            for (auto& o : obstacles()) { o->addToScene(); }
-        }
-    }
-    
-    // Check if obstacle set needs to be changed in response to "O" cmd in UI.
-    void updateObstacleSetForGUI()
-    {
-        int o = draw().obstacleSetIndex() % preDefinedObstacleSets().size();
-        if (o != obstacle_selection_counter_)
-        {
-            useObstacleSet(o);
-            enforceObsBoidConstraintsDoNotCount();
-        }
-    }
-    
-#endif // NEW_OBSTACLE_SET
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Simulation continues running until this returns false.
     bool still_running()

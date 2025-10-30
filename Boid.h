@@ -205,9 +205,15 @@ public:
         Vec3 steering_from_evolved_function = override_steer_function_();
         setGpPerThread(nullptr);
         
-        // This inline constant blend rate should have API to change rate.
-        Vec3 smooth = smoothed_steering(steering_from_evolved_function, 0.9);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251030 does smoothed_steering() help or hurt? Same both ways!!
         
+        // This inline constant blend rate should have API to change rate.
+//        Vec3 smooth = smoothed_steering(steering_from_evolved_function, 0.9);
+        Vec3 smooth = steering_from_evolved_function;
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20251013 very experimental, reuse GA annotation for GP
         saveAnnotation(forward() * 100, smooth, Vec3(), Vec3(), Vec3(), Vec3());

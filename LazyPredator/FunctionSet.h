@@ -131,6 +131,12 @@ public:
             int min_size = minSizeToTerminateFunction(gp_function);
             gp_function.setMinSizeToTerminate(min_size);
         }
+
+        // Verify type and function names are unique.
+        VerifyUniqueNames vutn("GpType");
+        VerifyUniqueNames vufn("GpFunction");
+        for (GpType gp_type : type_specs) { vutn.verify(gp_type.name()); }
+        for (GpFunction func : function_specs) { vufn.verify(func.name()); }
     }
     
     // What is the minimum "size" required to terminate a program subtree with

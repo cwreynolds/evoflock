@@ -25,6 +25,7 @@
 #include <cassert>
 #include <mutex>
 #include <filesystem>
+#include <set>
 namespace fs = std::filesystem;
 class Vec3;
 
@@ -487,6 +488,31 @@ private:
     double sleep_time_ = 0;         // Per frame sleep time, updated each frame.
     double total_elapsed_time_ = 0; // Duration of frame, measured in seconds.
     RollingAverage<double> frame_duration_history_;  // Last N frame durations.
+};
+
+
+// To verify a collection of names are unique: create one of these, feed in
+// std::string names via verify(), assert fail if a duplicate is found.
+class VerifyUniqueNames
+{
+public:
+    VerifyUniqueNames() {}
+    VerifyUniqueNames(std::string category) : category_(category) {}
+    void verify(const std::string& name)
+    {
+        bool names_are_unique = (0 == names_.count(name));
+        if (not names_are_unique)
+        {
+            std::cout << "!! Duplicate " << category_ ;
+            if (not category_.empty()) { std::cout << " "; }
+            std::cout<< "name: " << name << std::endl;
+        }
+        assert(names_are_unique);
+        names_.insert(name);
+    }
+private:
+    std::set<std::string> names_;
+    std::string category_;
 };
 
 

@@ -813,6 +813,9 @@ public:
             
             // Set 6: no obstacles.
             obstacle_sets_.push_back(ObstacleSet("NoObstacles", {}));
+            
+            util::VerifyUniqueNames vun("obstacle set");
+            for (const auto& os : obstacle_sets_) { vun.verify(os.name()); }
         }
         return obstacle_sets_;
     }

@@ -549,6 +549,34 @@ inline int nearest_power_of_2(int v)
     return (v < midpoint) ? prev : next;
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251030 verify names are unique -- copied this here from EF util.
+
+// To verify a collection of names are unique: create one of these, feed in
+// std::string names via verify(), assert fail if a duplicate is found.
+class VerifyUniqueNames
+{
+public:
+    VerifyUniqueNames() {}
+    VerifyUniqueNames(std::string category) : category_(category) {}
+    void verify(const std::string& name)
+    {
+        bool names_are_unique = (0 == names_.count(name));
+        if (not names_are_unique)
+        {
+            std::cout << "!! Duplicate " << category_ ;
+            if (not category_.empty()) { std::cout << " "; }
+            std::cout<< "name: " << name << std::endl;
+        }
+        assert(names_are_unique);
+        names_.insert(name);
+    }
+private:
+    std::set<std::string> names_;
+    std::string category_;
+};
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 

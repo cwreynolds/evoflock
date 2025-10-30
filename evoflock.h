@@ -79,26 +79,6 @@ void unit_test()
     std::cout << "All unit tests OK." << std::endl;
 }
 
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20250913 change GpType for GpFunc "Run_Flock"
-
-//    // Handler for GUI's B key command to visualize "best" Individual.
-//    void visualizeBestIfRequested(LP::Population* population)
-//    {
-//        Draw& draw = Draw::getInstance();
-//        if (draw.getVisBestMode())
-//        {
-//            bool previous_emt_state = enable_multithreading;
-//            enable_multithreading = false;
-//            LP::Individual* individual = population->bestFitness();
-//            LP::GpTree tree = individual->tree();
-//            FlockParameters fp = GP::fp_from_ga_tree(tree);
-//            GP::run_flock_simulation(fp, 1);
-//            enable_multithreading = previous_emt_state;
-//            draw.clearVisBestMode();
-//        }
-//    }
-
 // Handler for GUI's B key command to visualize "best" Individual.
 void visualizeBestIfRequested(LP::Population* population)
 {
@@ -126,9 +106,6 @@ void visualizeBestIfRequested(LP::Population* population)
         draw.clearVisBestMode();
     }
 }
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
 
 // Tool for visualizing a logged set of FlockParameters.
 // To visualize a given set of FlockParameters. Cut/paste from log, compile.
@@ -205,7 +182,8 @@ void visualizePreviouslyLoggedFlockParameters()
 void runOneFlockEvolution()
 {
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-    EF::setUsingGA();
+    //EF::setUsingGA();
+    EF::setUsingGP();
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process

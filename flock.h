@@ -202,14 +202,53 @@ public:
     }
 
     std::function<Vec3()> override_steer_function_ = nullptr;
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251031 initialize inside big sphere but outside other obstacles.
 
+//    void init_boid(Boid* boid, double radius, Vec3 center, RandomSequence& rs)
+//    {
+//        // uniform over whole sphere enclosure
+//        //    boid.ls = boid.ls.randomize_orientation()
+//        //    boid.ls.p = (center + (radius * 0.95 *
+//        //                           Vec3.random_point_in_unit_radius_sphere()))
+//
+//        // Environment used for early evolution experiments. Boids start in a
+//        // clump to the "left" pointing toward a vertical cylinder on the right,
+//        // inside the big sphere
+//        boid->set_fp(&fp());
+//        boid->set_draw(&draw());
+//        boid->setFlock(this);
+//        boid->set_flock_boids(&boids());
+//        boid->set_flock_obstacles(&obstacles());
+//        boid->override_steer_function_ = override_steer_function_;
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20250925 turn off curriculum learning experiment
+//        //               VERY TEMP: I GIVE UP, JUST SET INIT SPEED TO 20
+//        
+//        boid->setSpeed(20);
+//        
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        Vec3 mean_forward(1, 0, 0);
+//        Vec3 noise_forward = rs.random_point_in_unit_radius_sphere() * 0.1;
+//        Vec3 new_forward = (mean_forward + noise_forward).normalize();
+//        boid->set_ls(boid->ls().rotate_to_new_forward(new_forward, Vec3(0, 1, 0)));
+//        Vec3 center_of_clump = center + Vec3(radius * -0.66, 0, 0);
+//        Vec3 offset_in_clump = (rs.random_point_in_unit_radius_sphere() *
+//                                radius * 0.33);
+//        boid->setPosition(center_of_clump + offset_in_clump);
+//        // Probably unneeded since initial speed is zero, nevertheless:
+//        boid->setPreviousPosition(boid->position());
+//    }
+    
     void init_boid(Boid* boid, double radius, Vec3 center, RandomSequence& rs)
     {
         // uniform over whole sphere enclosure
         //    boid.ls = boid.ls.randomize_orientation()
         //    boid.ls.p = (center + (radius * 0.95 *
         //                           Vec3.random_point_in_unit_radius_sphere()))
-
+        
         // Environment used for early evolution experiments. Boids start in a
         // clump to the "left" pointing toward a vertical cylinder on the right,
         // inside the big sphere
@@ -226,17 +265,54 @@ public:
         boid->setSpeed(20);
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        Vec3 mean_forward(1, 0, 0);
-        Vec3 noise_forward = rs.random_point_in_unit_radius_sphere() * 0.1;
-        Vec3 new_forward = (mean_forward + noise_forward).normalize();
-        boid->set_ls(boid->ls().rotate_to_new_forward(new_forward, Vec3(0, 1, 0)));
-        Vec3 center_of_clump = center + Vec3(radius * -0.66, 0, 0);
-        Vec3 offset_in_clump = (rs.random_point_in_unit_radius_sphere() *
-                                radius * 0.33);
-        boid->setPosition(center_of_clump + offset_in_clump);
+//        Vec3 mean_forward(1, 0, 0);
+//        Vec3 noise_forward = rs.random_point_in_unit_radius_sphere() * 0.1;
+//        Vec3 new_forward = (mean_forward + noise_forward).normalize();
+//        boid->set_ls(boid->ls().rotate_to_new_forward(new_forward, Vec3(0, 1, 0)));
+//        Vec3 center_of_clump = center + Vec3(radius * -0.66, 0, 0);
+//        Vec3 offset_in_clump = (rs.random_point_in_unit_radius_sphere() *
+//                                radius * 0.33);
+//        boid->setPosition(center_of_clump + offset_in_clump);
+        
+//        boid->setPosition(randomInitBoidPosition(radius, center, rs));
+        // TODO try packing into center 10% of radius
+//        boid->setPosition(randomInitBoidPosition(radius * 0.1, center, rs));
+//        boid->setPosition(randomInitBoidPosition(radius * 0.2, center, rs));
+        boid->setPosition(randomInitBoidPosition(radius * 0.1, center, rs));
+        
+//        boid->set_ls(boid->ls().randomize_orientation());
+        
+        boid->set_ls(boid->ls().rotate_to_new_forward(Vec3(1, 0, 0),
+                                                      Vec3(0, 1, 0)));
+        
         // Probably unneeded since initial speed is zero, nevertheless:
         boid->setPreviousPosition(boid->position());
     }
+
+    
+    // Find random point that is inside big sphere but outside other obstacles.
+    Vec3 randomInitBoidPosition(double radius, Vec3 center, RandomSequence& rs)
+    {
+        Vec3 new_position;
+        for (int i = 0; i < 10; i++)
+        {
+            new_position = center + (rs.randomPointInUnitRadiusSphere() * radius);
+            bool all_ok = true;
+            for (auto& o : obstacles())
+            {
+                if (o->isAgentViolatingConstraint(new_position, new_position))
+                {
+                    all_ok = false;
+                    break;
+                }
+            }
+            if (all_ok) { break; }
+        }
+        return new_position;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     // Collect flock curvature stats
     double min_curvature_ = +std::numeric_limits<double>::infinity();

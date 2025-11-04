@@ -227,8 +227,11 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // TODO 20251018 more logging
             {
-                grabPrintLock_evoflock();
-                std::cout << "  do_1_run(), flock = " << &flock << std::endl;
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20251103 back to GP fail, too few boid steps
+//                grabPrintLock_evoflock();
+//                std::cout << "  do_1_run(), flock = " << &flock << std::endl;
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             }
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -294,23 +297,29 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 //                        log_flock = &flock;
 //                    }
 
+                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                    // TODO 20251103 back to GP fail, too few boid steps
+
                     {
                         std::lock_guard<std::mutex> lfm(log_flock_mutex);
                         if (log_flock == nullptr)
                         {
                             log_flock = &flock;
                             
-                            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                            // TODO 20251018 more logging
-                            {
-                                grabPrintLock_evoflock();
-                                std::cout << "  do_1_run(), log_flock = ";
-                                std::cout << log_flock << std::endl;
-                            }
-                            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                            // TODO 20251018 more logging
+//                            {
+//                                grabPrintLock_evoflock();
+//                                std::cout << "  do_1_run(), log_flock = ";
+//                                std::cout << log_flock << std::endl;
+//                            }
+//                            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
                         }
                     }
+                    
+                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
                     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                     if (log_flock == &flock)
                     {
@@ -393,11 +402,30 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                         std::cout << flock.clock().frameCounter();
                         std::cout << std::endl;
                         
+                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                        // TODO 20251103 back to GP fail, too few boid steps
+                        
+                        assert(log_flock_selected_boid_steps ==
+                               flock.clock().frameCounter());
+                        
+                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                         // TODO 20251023 align counters / no drawing for multithreading.
                         // TODO 20251017 make sure we are tracking the expected
                         //               number of boid-steps
-                        log_flock_selected_boid_steps++;
+                        
+                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                        // TODO 20251103 back to GP fail, too few boid steps
+
+//                        log_flock_selected_boid_steps++;
+                        {
+                            // TODO just tried to see if this helped, it did not
+                            std::lock_guard<std::mutex> lfm(log_flock_mutex);
+                            log_flock_selected_boid_steps++;
+                        }
+                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
                         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
                         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~

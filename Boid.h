@@ -665,8 +665,14 @@ public:
 //        setSpeed(EF::usingGA() ? 0 : 1);
 //        setSpeed(0);
 //        setSpeed(EF::usingGA() ? 0 : speed());
-        setSpeed(0);
         
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20251103 back to GP fail, too few boid steps
+//        setSpeed(0);
+//        setSpeed(EF::usingGA() ? 0 : speed() * 0.1);
+        setSpeed(EF::usingGA() ? 0 : speed() * 1);
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
         if (isSelected() and (getFlock() == log_flock))
         {
             std::cout << "    ====> BANG!" << std::endl;

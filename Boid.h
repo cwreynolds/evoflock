@@ -164,8 +164,11 @@ public:
     // GA/GP versions, respectively for parameter evolution and model evolution.
     Vec3 steerToFlock()
     {
-        BoidPtrList neighbors = nearest_neighbors();
-        flush_cache_of_predicted_obstacle_collisions();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251104 remind me, is frame count mismatch only in multithreading?
+//        BoidPtrList neighbors = nearest_neighbors();
+//        flush_cache_of_predicted_obstacle_collisions();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if (EF::usingGA())
         {
             return steerToFlockForGA();
@@ -200,6 +203,13 @@ public:
     // flocking model, supplied as a lambda called override_steer_function_
     Vec3 steerToFlockForGP()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251104 remind me, is frame count mismatch only in multithreading?
+        BoidPtrList neighbors = nearest_neighbors();
+        flush_cache_of_predicted_obstacle_collisions();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        
         assert(override_steer_function_);
         setGpPerThread(this);
         Vec3 steering_from_evolved_function = override_steer_function_();
@@ -671,11 +681,15 @@ public:
 //        setSpeed(0);
 //        setSpeed(EF::usingGA() ? 0 : speed() * 0.1);
         setSpeed(EF::usingGA() ? 0 : speed() * 1);
+//        setSpeed(EF::usingGA() ? 0 : speed() * 0.5);
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         if (isSelected() and (getFlock() == log_flock))
         {
-            std::cout << "    ====> BANG!" << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251104 remind me, is frame count mismatch only in multithreading?
+//            std::cout << "    ====> BANG!" << std::endl;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }

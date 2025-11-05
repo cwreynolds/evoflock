@@ -12,9 +12,13 @@
 
 #pragma once
 
-// TODO 20250930 try version with ONLY GpFunc Speed_Control.
-#define USE_ONLY_SPEED_CONTROL
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251104 remind me, is frame count mismatch only in multithreading?
 
+//    // TODO 20250930 try version with ONLY GpFunc Speed_Control.
+//    #define USE_ONLY_SPEED_CONTROL
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #include "Draw.h"
 #include "flock.h"
@@ -716,6 +720,15 @@ void save_fitness_time_series(LP::Population& population)
 Boid* getGpBoidNeighbor(int n)
 {
     assert(Boid::getGpPerThread());
+    
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20251104 remind me, is frame count mismatch only in multithreading?
+//
+//    //    BoidPtrList neighbors = nearest_neighbors();
+//        BoidPtrList neighbors_2 = Boid::getGpPerThread()->nearest_neighbors();
+//
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     assert(Boid::getGpPerThread()->cached_nearest_neighbors().size() == 7);
     BoidPtrList neighbors = Boid::getGpPerThread()->cached_nearest_neighbors();
     assert(neighbors.size() >= n);

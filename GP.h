@@ -245,10 +245,23 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 Boid& b = *Boid::getGpPerThread();
                 LP::GpTree gp_tree = individual->tree();
                 
-                // TEMP: here we are assuming GpTree returns a local steer vec
-                Vec3 local_steering = std::any_cast<Vec3>(gp_tree.eval());
-                Vec3 steering = b.globalizeDirection(local_steering);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20251105 why did GP steering force get so small?
 
+//                // TEMP: here we are assuming GpTree returns a local steer vec
+//                Vec3 local_steering = std::any_cast<Vec3>(gp_tree.eval());
+//                Vec3 steering = b.globalizeDirection(local_steering);
+  
+                // Eval tree to get steering, optionally convert local to global
+                Vec3 steering_from_tree = std::any_cast<Vec3>(gp_tree.eval());
+                Vec3 steering = (EF::gp_tree_returns_local ?
+                                 b.globalizeDirection(steering_from_tree) :
+                                 steering_from_tree);
+
+ 
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
                 // TODO 20251001 investigate low speed score with
                 //               ONLY Speed_Control GpFunc
@@ -276,10 +289,34 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20251022 add a bit of noise to avoid perfect alignment.
                 //               This does definitely change things.
-                steering += EF::RS().random_unit_vector() * 0.5;
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20251105 why did GP steering force get so small?
+
+//                steering += EF::RS().random_unit_vector() * 0.5;
+                steering += EF::RS().random_unit_vector() * 0.01;
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20251105 why did GP steering force get so small?
+                
+                // TODO -- OK try to brute force magnitude of steering force
+                // from GP evolved tree to be around 30 to 40, which is what
+                // I measured in the GA version.
+                
+                steering = steering.normalize_or_0() * 35;
+                
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                
+                
+                
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
                 // TODO 20251001 investigate low speed score with
                 //               ONLY Speed_Control GpFunc
@@ -470,6 +507,22 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 udfp.push_back(flock.separationScore());
                 udfp.push_back(flock.speedScore());
             }
+            
+            
+            
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251105 why did GP steering force get so small?
+            {
+                grabPrintLock_evoflock();
+                Boid& b = *flock.selectedBoid();
+                double ave_steer_mag = (b.sum_steer_mag_for_all_steps /
+                                        b.fp().maxSimulationSteps());
+                debugPrint(ave_steer_mag);
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
         }
     };
     
@@ -948,6 +1001,15 @@ inline LP::GpFunction If_Pos
 //           Neighbor_1_Velocity, Neighbor_1_Offset,
 //           First_Obs_Dist, First_Obs_Normal, To_Forward, To_Side
 
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20251105 why did GP steering force get so small?
+inline Vec3 maybe_localize(Boid& boid, Vec3 v)
+{
+    return EF::gp_tree_returns_local ? boid.localizeDirection(v) : v;
+}
+
+
 inline LP::GpFunction Speed
  (
   "Speed",
@@ -967,7 +1029,8 @@ inline LP::GpFunction Velocity
   [](LP::GpTree& t)
   {
       Boid& boid = *Boid::getGpPerThread();
-      return std::any(boid.localizeDirection(boid.velocity()));
+//      return std::any(boid.localizeDirection(boid.velocity()));
+      return std::any(maybe_localize(boid, boid.velocity()));
   });
 
 inline LP::GpFunction Acceleration
@@ -977,9 +1040,12 @@ inline LP::GpFunction Acceleration
   {},
   [](LP::GpTree& t)
   {
+//          Boid& boid = *Boid::getGpPerThread();
+//          Vec3 acceleration = boid.getAcceleration();
+//    //      return std::any(boid.localizeDirection(acceleration));
+//          return std::any(maybe_localize(boid, acceleration));
       Boid& boid = *Boid::getGpPerThread();
-      Vec3 acceleration = boid.getAcceleration();
-      return std::any(boid.localizeDirection(acceleration));
+      return std::any(maybe_localize(boid, boid.getAcceleration()));
   });
 
 inline LP::GpFunction Forward
@@ -990,7 +1056,8 @@ inline LP::GpFunction Forward
   [](LP::GpTree& t)
   {
       Boid& boid = *Boid::getGpPerThread();
-      return std::any(boid.forward());
+//      return std::any(boid.forward());
+      return std::any(maybe_localize(boid, boid.forward()));
   });
 
 inline LP::GpFunction Neighbor_1_Velocity
@@ -1002,7 +1069,8 @@ inline LP::GpFunction Neighbor_1_Velocity
   {
       Boid& boid = *Boid::getGpPerThread();
       Vec3 nv = getGpBoidNeighbor(1)->velocity();
-      return std::any(boid.localizeDirection(nv));
+//      return std::any(boid.localizeDirection(nv));
+      return std::any(maybe_localize(boid, nv));
   });
 
 inline LP::GpFunction Neighbor_1_Offset
@@ -1012,9 +1080,12 @@ inline LP::GpFunction Neighbor_1_Offset
   {},
   [](LP::GpTree& t)
   {
-      Boid& b = *Boid::getGpPerThread();
-      Vec3 no = getGpBoidNeighbor(1)->position() - b.position();
-      return std::any(b.localizeDirection(no));
+//      Boid& b = *Boid::getGpPerThread();
+//      Vec3 no = getGpBoidNeighbor(1)->position() - b.position();
+//      return std::any(b.localizeDirection(no));
+      Boid& boid = *Boid::getGpPerThread();
+      Vec3 no = getGpBoidNeighbor(1)->position() - boid.position();
+      return std::any(maybe_localize(boid, no));
   });
 
 inline LP::GpFunction First_Obs_Dist
@@ -1046,7 +1117,8 @@ inline LP::GpFunction First_Obs_Normal
       {
           const Collision& first_collision = collisions.front();
           normal = first_collision.normal_at_poi;
-          normal = boid.localizeDirection(normal);
+//          normal = boid.localizeDirection(normal);
+          normal = maybe_localize(boid, normal);
       }
       return std::any(normal);
   });
@@ -1059,11 +1131,16 @@ inline LP::GpFunction To_Forward
   {"Vec3"},
   [](LP::GpTree& tree)
   {
+//      Vec3 value = clean(tree.evalSubtree<Vec3>(0));
+//      Boid& b = *Boid::getGpPerThread();
+//      // Take component of "value" which is parallel to "forward".
+//      Vec3 parallel = value.parallel_component(b.forward());
+//      return std::any(b.localizeDirection(parallel));
       Vec3 value = clean(tree.evalSubtree<Vec3>(0));
-      Boid& b = *Boid::getGpPerThread();
+      Boid& boid = *Boid::getGpPerThread();
       // Take component of "value" which is parallel to "forward".
-      Vec3 parallel = value.parallel_component(b.forward());
-      return std::any(b.localizeDirection(parallel));
+      Vec3 parallel = value.parallel_component(boid.forward());
+      return std::any(maybe_localize(boid, parallel));
   });
 
 inline LP::GpFunction To_Side
@@ -1073,11 +1150,16 @@ inline LP::GpFunction To_Side
   {"Vec3"},
   [](LP::GpTree& tree)
   {
+//      Vec3 value = clean(tree.evalSubtree<Vec3>(0));
+//      Boid& b = *Boid::getGpPerThread();
+//      // Take component of "value" perpendicular to "forward".
+//      Vec3 perp = value.perpendicular_component(b.forward());
+//      return std::any(b.localizeDirection(perp));
       Vec3 value = clean(tree.evalSubtree<Vec3>(0));
-      Boid& b = *Boid::getGpPerThread();
+      Boid& boid = *Boid::getGpPerThread();
       // Take component of "value" perpendicular to "forward".
-      Vec3 perp = value.perpendicular_component(b.forward());
-      return std::any(b.localizeDirection(perp));
+      Vec3 perpendicular = value.perpendicular_component(boid.forward());
+      return std::any(maybe_localize(boid, perpendicular));
   });
 
 //------------------------------------------------------------------------------
@@ -1090,11 +1172,20 @@ inline LP::GpFunction Speed_Control
   {},
   [](LP::GpTree& tree)
   {
-     Boid& b = *Boid::getGpPerThread();
-     Vec3 sfsc = b.steerForSpeedControl();
+//     Boid& b = *Boid::getGpPerThread();
+//     Vec3 sfsc = b.steerForSpeedControl();
+//     double max_force = 25; // TODO WARNING inline constant!!
+//     Vec3 local_speed_control = b.localizeDirection(sfsc);
+//     if (b.speed() <= 0) { local_speed_control = Vec3(0, 0, 1); }
+//     return std::any(local_speed_control * max_force);
+     Boid& boid = *Boid::getGpPerThread();
+     Vec3 sfsc = boid.steerForSpeedControl(); // global vector, mag on [-1,+1]
      double max_force = 25; // TODO WARNING inline constant!!
-     Vec3 local_speed_control = b.localizeDirection(sfsc);
-     if (b.speed() <= 0) { local_speed_control = Vec3(0, 0, 1); }
+     
+//     Vec3 local_speed_control = boid.localizeDirection(sfsc);
+     Vec3 local_speed_control = maybe_localize(boid, sfsc);
+
+     if (boid.speed() <= 0) { local_speed_control = Vec3(0, 0, 1); }
      return std::any(local_speed_control * max_force);
  });
 
@@ -1105,20 +1196,39 @@ inline LP::GpFunction Avoid_Obstacle
   {},
   [](LP::GpTree& tree)
   {
+//      double min_dist = 25;
+//      Boid& b = *Boid::getGpPerThread();
+//      Vec3 avoidance;
+//      auto collisions = b.get_predicted_obstacle_collisions();
+//      if (collisions.size() > 0)
+//      {
+//          const Collision& first_collision = collisions.front();
+//          Vec3 poi = first_collision.point_of_impact;
+//          double distance = (poi - b.position()).length();
+//          if (distance > min_dist)
+//          {
+//              Vec3 normal = first_collision.normal_at_poi;
+//              avoidance = normal.parallel_component(b.forward());
+//              avoidance = b.localizeDirection(avoidance);
+//          }
+//      }
+//      return std::any(avoidance);
+
       double min_dist = 25;
-      Boid& b = *Boid::getGpPerThread();
+      Boid& boid = *Boid::getGpPerThread();
       Vec3 avoidance;
-      auto collisions = b.get_predicted_obstacle_collisions();
+      auto collisions = boid.get_predicted_obstacle_collisions();
       if (collisions.size() > 0)
       {
           const Collision& first_collision = collisions.front();
           Vec3 poi = first_collision.point_of_impact;
-          double distance = (poi - b.position()).length();
+          double distance = (poi - boid.position()).length();
           if (distance > min_dist)
           {
               Vec3 normal = first_collision.normal_at_poi;
-              avoidance = normal.parallel_component(b.forward());
-              avoidance = b.localizeDirection(avoidance);
+              avoidance = normal.parallel_component(boid.forward());
+//              avoidance = b.localizeDirection(avoidance);
+              avoidance = maybe_localize(boid, avoidance);
           }
       }
       return std::any(avoidance);
@@ -1131,8 +1241,21 @@ inline LP::GpFunction Adjust_Neighbor_Dist
   {},
   [](LP::GpTree& tree)
   {
+//      Vec3 steering;
+//      Boid& b = *Boid::getGpPerThread();
+//      Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
+//                              Boid::getGpPerThread()->position());
+//      double neighbor_dist = neighbor_offset.length();
+//      Vec3 neighbor_direction = neighbor_offset / neighbor_dist;
+//      if (neighbor_dist < 2) { steering = neighbor_direction; }
+//      if (neighbor_dist > 9) { steering = -neighbor_direction; }
+//      
+//      steering = b.localizeDirection(steering);
+//      
+//      return std::any(steering * 10);
+
       Vec3 steering;
-      Boid& b = *Boid::getGpPerThread();
+      Boid& boid = *Boid::getGpPerThread();
       Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
                               Boid::getGpPerThread()->position());
       double neighbor_dist = neighbor_offset.length();
@@ -1140,10 +1263,13 @@ inline LP::GpFunction Adjust_Neighbor_Dist
       if (neighbor_dist < 2) { steering = neighbor_direction; }
       if (neighbor_dist > 9) { steering = -neighbor_direction; }
       
-      steering = b.localizeDirection(steering);
-      
+//      steering = boid.localizeDirection(steering);
+      steering = maybe_localize(boid, steering);
+
       return std::any(steering * 10);
   });
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 
 // FunctionSet for the GP version of EvoFlock.
@@ -1168,23 +1294,47 @@ LP::FunctionSet evoflock_gp_function_set()
 
 #else  // USE_ONLY_SPEED_CONTROL
 
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20251105 why did GP steering force get so small?
+
+//            // Scalar functions:
+//            Abs, Add, Sub, Mult, Power,
+//
+//            // Vector functions:
+//            V3, Add_v3, Sub_v3, Scale_v3,
+//            Length, Normalize, Cross, Dot,
+//            Parallel_Component, Perpendicular_Component,
+//            Interpolate, If_Pos,
+//            
+//            // Boid API:
+//            Speed, Velocity, Acceleration, Forward,
+//            Neighbor_1_Velocity, Neighbor_1_Offset,
+//            First_Obs_Dist, First_Obs_Normal,
+//            To_Forward, To_Side,
+//
+//            // Cartoonishly high level Boid API for debugging:
+//            Speed_Control, Avoid_Obstacle, Adjust_Neighbor_Dist,
+            
             // Scalar functions:
             Abs, Add, Sub, Mult, Power,
-
+            
             // Vector functions:
             V3, Add_v3, Sub_v3, Scale_v3,
             Length, Normalize, Cross, Dot,
-            Parallel_Component, Perpendicular_Component,
-            Interpolate, If_Pos,
+//            Parallel_Component, Perpendicular_Component,
+//            Interpolate, If_Pos,
             
-            // Boid API:
-            Speed, Velocity, Acceleration, Forward,
-            Neighbor_1_Velocity, Neighbor_1_Offset,
-            First_Obs_Dist, First_Obs_Normal,
-            To_Forward, To_Side,
-
+//            // Boid API:
+//            Speed, Velocity, Acceleration, Forward,
+//            Neighbor_1_Velocity, Neighbor_1_Offset,
+//            First_Obs_Dist, First_Obs_Normal,
+//            To_Forward, To_Side,
+            
             // Cartoonishly high level Boid API for debugging:
             Speed_Control, Avoid_Obstacle, Adjust_Neighbor_Dist,
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
 #endif  // USE_ONLY_SPEED_CONTROL
         }

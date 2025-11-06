@@ -145,10 +145,19 @@ public:
         name_ = "boid_" + std::to_string(name_counter_++);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251105 why did GP steering force get so small?
+    double sum_steer_mag_for_all_steps = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Determine and store desired steering for this simulation step
     void plan_next_steer()
     {
         next_steer_ = steerToFlock();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251105 why did GP steering force get so small?
+        sum_steer_mag_for_all_steps += next_steer_.length();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Apply the "steering force" -- previously computed in plan_next_steer()

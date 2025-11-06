@@ -228,17 +228,6 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         }
         else
         {
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20251018 more logging
-            {
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                // TODO 20251103 back to GP fail, too few boid steps
-//                grabPrintLock_evoflock();
-//                std::cout << "  do_1_run(), flock = " << &flock << std::endl;
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            }
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
             // For GP, set Flock's override_steer_function_.
             flock.override_steer_function_ = [&]()
             {
@@ -330,48 +319,41 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 
                 
                 {
-                    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                    // TODO 20251018 lock to set log_flock ptr in GP::run_flock_simulation
-
-//                    if (log_flock == nullptr)
-//                    {
-//                        log_flock = &flock;
-//                    }
-
                     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                     // TODO 20251103 back to GP fail, too few boid steps
-
                     {
                         std::lock_guard<std::mutex> lfm(log_flock_mutex);
-                        if (log_flock == nullptr)
-                        {
-                            log_flock = &flock;
-                            
-//                            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                            // TODO 20251018 more logging
-//                            {
-//                                grabPrintLock_evoflock();
-//                                std::cout << "  do_1_run(), log_flock = ";
-//                                std::cout << log_flock << std::endl;
-//                            }
-//                            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-                        }
+                        if (log_flock == nullptr) { log_flock = &flock; }
                     }
-                    
                     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
-                    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                     if (log_flock == &flock)
                     {
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        // TODO 20251003 re-enable multithreading, it was not the problem
+                        
+                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                        // TODO 20251106 change initBoidPose(), do they end up elsewhere?
+                        
+                        // draw yellow line from selected boid in log_flock to
+                        // center of first obstacle.
+                        Vec3 a = b.position();
+                        SphereObstacle* so = dynamic_cast<SphereObstacle*>(b.flock_obstacles().at(0));
+                        Vec3 soc = so->center();
+                        auto& d = Draw::getInstance();
+//                        d.addThickLineToAnimatedFrame(a, soc,
+//                                                      Color::magenta(), 0.1);
+                        d.addThickLineToAnimatedFrame(a, Vec3(),
+                                                      Color::magenta(), 0.1);
+
+                        CollisionList cl = b.get_predicted_obstacle_collisions();
+                        Collision first_collision = cl.at(0);
+                        Vec3 poi = first_collision.point_of_impact;
+                        d.addThickLineToAnimatedFrame(a, poi, Color::cyan(), 0.1);
+
+                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                         
                         // set a temp variable on the boid for logging
                         b.log_flock = log_flock;
-                        
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        
 
                         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
                         // TODO 20251011 return to debug speed control

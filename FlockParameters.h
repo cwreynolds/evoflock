@@ -257,6 +257,10 @@ private:
     //int boids_per_flock_ = 800;  // Even more.
     //int boids_per_flock_ = 1000;  // Kiloboid.
 
-    std::string use_obstacle_set = "SmallSpheresInBigSphere";
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251106 change initBoidPose(), do they end up elsewhere?
+//    std::string use_obstacle_set = "SmallSpheresInBigSphere";
+    std::string use_obstacle_set = "BigSphere";
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int fps_ = 30;
 };

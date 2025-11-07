@@ -144,6 +144,13 @@ void runOneFlockEvolution()
     int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
     int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
 #endif  // USE_ONLY_SPEED_CONTROL
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251107 try running with just GpFunc Avoid_Obstacle
+    min_crossover_tree_size = EF::usingGP() ? 1 : 2;
+    max_crossover_tree_size = EF::usingGP() ? 2 : ga_tree_size;
+    max_initial_tree_size   = EF::usingGP() ? 2 : ga_tree_size;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

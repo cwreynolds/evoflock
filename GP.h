@@ -1297,23 +1297,30 @@ LP::FunctionSet evoflock_gp_function_set()
 //            // Cartoonishly high level Boid API for debugging:
 //            Speed_Control, Avoid_Obstacle, Adjust_Neighbor_Dist,
             
-            // Scalar functions:
-            Abs, Add, Sub, Mult, Power,
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251107 try running with just GpFunc Avoid_Obstacle
             
-            // Vector functions:
-            V3, Add_v3, Sub_v3, Scale_v3,
-            Length, Normalize, Cross, Dot,
-//            Parallel_Component, Perpendicular_Component,
-//            Interpolate, If_Pos,
+//                // Scalar functions:
+//                Abs, Add, Sub, Mult, Power,
+//
+//                // Vector functions:
+//                V3, Add_v3, Sub_v3, Scale_v3,
+//                Length, Normalize, Cross, Dot,
+//    //            Parallel_Component, Perpendicular_Component,
+//    //            Interpolate, If_Pos,
+//
+//    //            // Boid API:
+//    //            Speed, Velocity, Acceleration, Forward,
+//    //            Neighbor_1_Velocity, Neighbor_1_Offset,
+//    //            First_Obs_Dist, First_Obs_Normal,
+//    //            To_Forward, To_Side,
+//
+//                // Cartoonishly high level Boid API for debugging:
+//                Speed_Control, Avoid_Obstacle, Adjust_Neighbor_Dist,
+
+            Avoid_Obstacle
             
-//            // Boid API:
-//            Speed, Velocity, Acceleration, Forward,
-//            Neighbor_1_Velocity, Neighbor_1_Offset,
-//            First_Obs_Dist, First_Obs_Normal,
-//            To_Forward, To_Side,
-            
-            // Cartoonishly high level Boid API for debugging:
-            Speed_Control, Avoid_Obstacle, Adjust_Neighbor_Dist,
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

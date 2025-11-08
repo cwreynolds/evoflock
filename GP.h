@@ -232,6 +232,10 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
             flock.override_steer_function_ = [&]()
             {
                 Boid& b = *Boid::getGpPerThread();
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20251108 try to verify get/setGpPerThread() is correct
+                std::cout << "???? in do_1_run(), b=" << &b << std::endl;
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 LP::GpTree gp_tree = individual->tree();
                 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1198,6 +1202,10 @@ inline LP::GpFunction Avoid_Obstacle
 
       double min_dist = 25;
       Boid& boid = *Boid::getGpPerThread();
+      //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+      // TODO 20251108 try to verify get/setGpPerThread() is correct
+      std::cout << "???? in Avoid_Obstacle(), boid=" << &boid << std::endl;
+      //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
       Vec3 avoidance;
       auto collisions = boid.get_predicted_obstacle_collisions();
       if (collisions.size() > 0)

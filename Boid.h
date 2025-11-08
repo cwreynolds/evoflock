@@ -125,18 +125,39 @@ public:
     // (Move within file? Add accessors?)
     std::function<Vec3()> override_steer_function_ = nullptr;
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251108 try to verify get/setGpPerThread() is correct
+
+//    // In the GP (vs GA) version, the evolved code is a per-frame steering function
+//    // for each Boid. This API supplies a "per thread global" which points to the
+//    // current Boid.
+//    static inline thread_local Boid* gp_boid_per_thread_ = nullptr;
+//    static void setGpPerThread(Boid* boid) { gp_boid_per_thread_ = boid; }
+//    static Boid* getGpPerThread()
+//    {
+//        assert(EF::usingGP());
+//        assert(gp_boid_per_thread_ && "Boid::gp_boid_per_thread_ is nullptr");
+//        return gp_boid_per_thread_;
+//    }
+
     // In the GP (vs GA) version, the evolved code is a per-frame steering function
     // for each Boid. This API supplies a "per thread global" which points to the
     // current Boid.
     static inline thread_local Boid* gp_boid_per_thread_ = nullptr;
-    static void setGpPerThread(Boid* boid) { gp_boid_per_thread_ = boid; }
+    static void setGpPerThread(Boid* boid)
+    {
+        std::cout << "???? in setGpPerThread(), boid=" << boid << std::endl;
+        gp_boid_per_thread_ = boid;
+    }
     static Boid* getGpPerThread()
     {
+        std::cout << "???? in getGpPerThread(): gp_boid_per_thread_=" << gp_boid_per_thread_ << std::endl;
         assert(EF::usingGP());
         assert(gp_boid_per_thread_ && "Boid::gp_boid_per_thread_ is nullptr");
         return gp_boid_per_thread_;
     }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // Constructor
     Boid() : Agent()

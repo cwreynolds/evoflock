@@ -685,7 +685,11 @@ public:
     void toggleAnnotation() { enable_annotation_ = not enable_annotation_; }
     bool enableAnnotation() const
     {
-        return enable_annotation_ and not isStaticCameraMode();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251109 draw annotation in static camera mode at least for now
+//        return enable_annotation_ and not isStaticCameraMode();
+        return enable_annotation_;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // "W" command toggles "space-time worms".

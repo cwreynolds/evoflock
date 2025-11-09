@@ -234,7 +234,8 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 Boid& b = *Boid::getGpPerThread();
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 // TODO 20251108 try to verify get/setGpPerThread() is correct
-                std::cout << "???? in do_1_run(), b=" << &b << std::endl;
+                // TODO 20251109 draw annotation in static camera mode at least for now
+//                std::cout << "???? in do_1_run(), b=" << &b << std::endl;
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 LP::GpTree gp_tree = individual->tree();
                 
@@ -1204,7 +1205,8 @@ inline LP::GpFunction Avoid_Obstacle
       Boid& boid = *Boid::getGpPerThread();
       //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
       // TODO 20251108 try to verify get/setGpPerThread() is correct
-      std::cout << "???? in Avoid_Obstacle(), boid=" << &boid << std::endl;
+      // TODO 20251109 draw annotation in static camera mode at least for now
+//      std::cout << "???? in Avoid_Obstacle(), boid=" << &boid << std::endl;
       //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
       Vec3 avoidance;
       auto collisions = boid.get_predicted_obstacle_collisions();

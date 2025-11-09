@@ -146,12 +146,14 @@ public:
     static inline thread_local Boid* gp_boid_per_thread_ = nullptr;
     static void setGpPerThread(Boid* boid)
     {
-        std::cout << "???? in setGpPerThread(), boid=" << boid << std::endl;
+        // TODO 20251109 draw annotation in static camera mode at least for now
+//        std::cout << "???? in setGpPerThread(), boid=" << boid << std::endl;
         gp_boid_per_thread_ = boid;
     }
     static Boid* getGpPerThread()
     {
-        std::cout << "???? in getGpPerThread(): gp_boid_per_thread_=" << gp_boid_per_thread_ << std::endl;
+        // TODO 20251109 draw annotation in static camera mode at least for now
+//        std::cout << "???? in getGpPerThread(): gp_boid_per_thread_=" << gp_boid_per_thread_ << std::endl;
         assert(EF::usingGP());
         assert(gp_boid_per_thread_ && "Boid::gp_boid_per_thread_ is nullptr");
         return gp_boid_per_thread_;

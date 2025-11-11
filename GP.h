@@ -184,6 +184,185 @@ Vec3 clean(Vec3 v)
     return { clean(v.x()), clean(v.y()), clean(v.z()) };
 }
 
+//~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~
+// TODO 20251110 refactoring to shrink the mess that is do_1_run()
+
+
+
+// New experiment, move a bunch of debugging crap out of do_1_run()
+void doOneRunDebugLogging(Boid& b,
+                          Flock& flock,
+                          Vec3 steering_from_tree,
+                          Flock* log_flock,
+                          std::mutex& log_flock_mutex)
+{
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20251001 investigate low speed score with
+    //               ONLY Speed_Control GpFunc
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251012 back to only Speed_Control: use more max force
+    //                if (boid->isSelected() and
+    //                    ((flock.clock().frameCounter() % 10) == 1))
+    if (b.isSelected())
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        
+        
+    {
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20251103 back to GP fail, too few boid steps
+        {
+            std::lock_guard<std::mutex> lfm(log_flock_mutex);
+            if (log_flock == nullptr) { log_flock = &flock; }
+        }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        
+        if (log_flock == &flock)
+        {
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251106 change initBoidPose(), do they end up elsewhere?
+            
+            // draw yellow line from selected boid in log_flock to
+            // center of first obstacle.
+            Vec3 a = b.position();
+            SphereObstacle* so = dynamic_cast<SphereObstacle*>(b.flock_obstacles().at(0));
+            Vec3 soc = so->center();
+            auto& d = Draw::getInstance();
+            //                        d.addThickLineToAnimatedFrame(a, soc,
+            //                                                      Color::magenta(), 0.1);
+//            d.addThickLineToAnimatedFrame(a, Vec3(), Color::magenta(), 0.1);
+            d.addThickLineToAnimatedFrame(a, Vec3(), Color::magenta(), 0.02);
+
+            CollisionList cl = b.get_predicted_obstacle_collisions();
+            Collision first_collision = cl.at(0);
+            Vec3 poi = first_collision.point_of_impact;
+//            d.addThickLineToAnimatedFrame(a, poi, Color::cyan(), 0.1);
+//            d.addThickLineToAnimatedFrame(a, poi, Color::cyan(), 0.02);
+            d.addThickLineToAnimatedFrame(a, poi, Color::cyan(), 0.02);
+
+            
+//            debugPrint(steering_from_tree);
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+            
+            // set a temp variable on the boid for logging
+            b.log_flock = log_flock;
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+            // TODO 20251011 return to debug speed control
+#ifdef USE_ONLY_SPEED_CONTROL
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+            grabPrintLock_evoflock();
+            std::cout << std::endl;
+            std::cout << "  ====> ";
+            std::cout << &flock;
+            std::cout << ", selected boid speed: ";
+            std::cout << b.speed();
+            std::cout << ", local steer: " << local_steering;
+            std::cout << std::endl;
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251012 back to only Speed_Control: use more max force
+            std::cout << "  ";
+            Vec3 sfsc = b.steerForSpeedControl();
+            debugPrint(sfsc.dot(b.forward()));
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251015 near zero speed
+            
+            if (b.new_speed_memory_ <= 0)
+            {
+                std::cout << "  new_speed=" << b.new_speed_memory_;
+                std::cout << ", old speed=" << b.old_speed_memory_;
+                double a = ((b.acceleration_memory_ *
+                             b.time_step_memory_)
+                            .dot(b.forward_memory_));
+                std::cout << ", local accel * dt=" << a;
+                std::cout << std::endl;
+            }
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251016 verify GP steering is not constant
+            
+            std::cout << "  ";
+            std::cout << ((prev_local_steering == local_steering) ?
+                          "same" : "diff" );
+            std::cout << "  ";
+            debugPrint(local_steering);
+            
+            std::cout << "  ";
+            std::cout << ((prev_steering == steering) ?
+                          "same" : "diff" );
+            std::cout << "  ";
+            debugPrint(steering);
+            
+            
+            prev_local_steering = local_steering;
+            prev_steering = steering ;
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20251020 back to too few boid steps
+            
+            std::cout << std::endl;
+            std::cout << "  steps counted in do_1_run:    ";
+            std::cout << log_flock_selected_boid_steps;
+            std::cout << std::endl;
+            std::cout << "  flock.clock().frameCounter(): ";
+            std::cout << flock.clock().frameCounter();
+            std::cout << std::endl;
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20251103 back to GP fail, too few boid steps
+            
+            assert(log_flock_selected_boid_steps ==
+                   flock.clock().frameCounter());
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20251023 align counters / no drawing for multithreading.
+            // TODO 20251017 make sure we are tracking the expected
+            //               number of boid-steps
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20251103 back to GP fail, too few boid steps
+            
+            //                        log_flock_selected_boid_steps++;
+            {
+                // TODO just tried to see if this helped, it did not
+                std::lock_guard<std::mutex> lfm(log_flock_mutex);
+                log_flock_selected_boid_steps++;
+            }
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+            // TODO 20251011 return to debug speed control
+#endif  // USE_ONLY_SPEED_CONTROL
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+        }
+    }
+}
+
+
+
+
+
+
+
 
 // Run flock simulation(s) described by the given evolutionary LP::Individual.
 // Makes "runs" simulations, in parallel if EF::enable_multithreading is set to
@@ -234,240 +413,40 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 Boid& b = *Boid::getGpPerThread();
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 // TODO 20251108 try to verify get/setGpPerThread() is correct
-                // TODO 20251109 draw annotation in static camera mode at least for now
 //                std::cout << "???? in do_1_run(), b=" << &b << std::endl;
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 LP::GpTree gp_tree = individual->tree();
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20251105 why did GP steering force get so small?
-
-//                // TEMP: here we are assuming GpTree returns a local steer vec
-//                Vec3 local_steering = std::any_cast<Vec3>(gp_tree.eval());
-//                Vec3 steering = b.globalizeDirection(local_steering);
-  
+                  
                 // Eval tree to get steering, optionally convert local to global
                 Vec3 steering_from_tree = std::any_cast<Vec3>(gp_tree.eval());
                 Vec3 steering = (EF::gp_tree_returns_local ?
                                  b.globalizeDirection(steering_from_tree) :
                                  steering_from_tree);
-
- 
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                
-                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-                // TODO 20251001 investigate low speed score with
-                //               ONLY Speed_Control GpFunc
-
                 steering = clean(steering);
 
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+                // I think this is obsolete, since we now normalize then scale.
+                //
                 // Ran a test in GA mode. Max steering force length was 1000.
                 // WIP reduce by an order of magnitude, close to max_force()
-//                double max_steering_length = 10;
+                //
                 double max_steering_length = 100;
                 steering = steering.truncate(max_steering_length);
-
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20251022 removed since this is literally the "stuck to
-                //               the wall" symptom, and the comments question if
-                //               the code is needed, but did not fix the problem.
-//                // KEEP? added while tracking down "cleaning" issues
-//                double min_steering_length = 0.00001;
-//                if (steering.length() < min_steering_length) { steering = Vec3(); }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20251022 add a bit of noise to avoid perfect alignment.
-                //               This does definitely change things.
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20251105 why did GP steering force get so small?
-
-//                steering += EF::RS().random_unit_vector() * 0.5;
+                // Add a small bit of noise to avoid perfect alignment.
                 steering += EF::RS().random_unit_vector() * 0.01;
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20251105 why did GP steering force get so small?
                 
                 // TODO -- OK try to brute force magnitude of steering force
                 // from GP evolved tree to be around 30 to 40, which is what
                 // I measured in the GA version.
-                
                 steering = steering.normalize_or_0() * 35;
                 
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                
-                
-                
-                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-                // TODO 20251001 investigate low speed score with
-                //               ONLY Speed_Control GpFunc
-                
-                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                // TODO 20251012 back to only Speed_Control: use more max force
-//                if (boid->isSelected() and
-//                    ((flock.clock().frameCounter() % 10) == 1))
-                if (b.isSelected())
-                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-                
-                {
-                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                    // TODO 20251103 back to GP fail, too few boid steps
-                    {
-                        std::lock_guard<std::mutex> lfm(log_flock_mutex);
-                        if (log_flock == nullptr) { log_flock = &flock; }
-                    }
-                    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-                    if (log_flock == &flock)
-                    {
-                        
-                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        // TODO 20251106 change initBoidPose(), do they end up elsewhere?
-                        
-                        // draw yellow line from selected boid in log_flock to
-                        // center of first obstacle.
-                        Vec3 a = b.position();
-                        SphereObstacle* so = dynamic_cast<SphereObstacle*>(b.flock_obstacles().at(0));
-                        Vec3 soc = so->center();
-                        auto& d = Draw::getInstance();
-//                        d.addThickLineToAnimatedFrame(a, soc,
-//                                                      Color::magenta(), 0.1);
-                        d.addThickLineToAnimatedFrame(a, Vec3(),
-                                                      Color::magenta(), 0.1);
-
-                        CollisionList cl = b.get_predicted_obstacle_collisions();
-                        Collision first_collision = cl.at(0);
-                        Vec3 poi = first_collision.point_of_impact;
-                        d.addThickLineToAnimatedFrame(a, poi, Color::cyan(), 0.1);
-
-                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                        
-                        // set a temp variable on the boid for logging
-                        b.log_flock = log_flock;
-
-                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-                        // TODO 20251011 return to debug speed control
-#ifdef USE_ONLY_SPEED_CONTROL
-                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-                        grabPrintLock_evoflock();
-                        std::cout << std::endl;
-                        std::cout << "  ====> ";
-                        std::cout << &flock;
-                        std::cout << ", selected boid speed: ";
-                        std::cout << b.speed();
-                        std::cout << ", local steer: " << local_steering;
-                        std::cout << std::endl;
-                        
-                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                        // TODO 20251012 back to only Speed_Control: use more max force
-                        std::cout << "  ";
-                        Vec3 sfsc = b.steerForSpeedControl();
-                        debugPrint(sfsc.dot(b.forward()));
-                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                        
-                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        // TODO 20251015 near zero speed
-                        
-                        if (b.new_speed_memory_ <= 0)
-                        {
-                            std::cout << "  new_speed=" << b.new_speed_memory_;
-                            std::cout << ", old speed=" << b.old_speed_memory_;
-                            double a = ((b.acceleration_memory_ *
-                                         b.time_step_memory_)
-                                        .dot(b.forward_memory_));
-                            std::cout << ", local accel * dt=" << a;
-                            std::cout << std::endl;
-                        }
-                        
-                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                        
-                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                        // TODO 20251016 verify GP steering is not constant
-                        
-                        std::cout << "  ";
-                        std::cout << ((prev_local_steering == local_steering) ?
-                                      "same" : "diff" );
-                        std::cout << "  ";
-                        debugPrint(local_steering);
-
-                        std::cout << "  ";
-                        std::cout << ((prev_steering == steering) ?
-                                      "same" : "diff" );
-                        std::cout << "  ";
-                        debugPrint(steering);
-                        
-                        
-                        prev_local_steering = local_steering;
-                        prev_steering = steering ;
-                        
-                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                        
-                        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-                        // TODO 20251020 back to too few boid steps
-                        
-                        std::cout << std::endl;
-                        std::cout << "  steps counted in do_1_run:    ";
-                        std::cout << log_flock_selected_boid_steps;
-                        std::cout << std::endl;
-                        std::cout << "  flock.clock().frameCounter(): ";
-                        std::cout << flock.clock().frameCounter();
-                        std::cout << std::endl;
-                        
-                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                        // TODO 20251103 back to GP fail, too few boid steps
-                        
-                        assert(log_flock_selected_boid_steps ==
-                               flock.clock().frameCounter());
-                        
-                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                        // TODO 20251023 align counters / no drawing for multithreading.
-                        // TODO 20251017 make sure we are tracking the expected
-                        //               number of boid-steps
-                        
-                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                        // TODO 20251103 back to GP fail, too few boid steps
-
-//                        log_flock_selected_boid_steps++;
-                        {
-                            // TODO just tried to see if this helped, it did not
-                            std::lock_guard<std::mutex> lfm(log_flock_mutex);
-                            log_flock_selected_boid_steps++;
-                        }
-                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-                        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-                        
-                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-                        // TODO 20251011 return to debug speed control
-#endif  // USE_ONLY_SPEED_CONTROL
-                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-                    }
-                }
-                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-                
-
+                doOneRunDebugLogging(b,
+                                     flock,
+                                     steering_from_tree,
+                                     log_flock,
+                                     log_flock_mutex);
                 return clean(steering);
             };
         }
@@ -551,6 +530,12 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     std::cout << std::endl << std::endl;
     return least_mof;
 }
+
+
+
+
+
+//~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~
 
 
 // Generic EvoFlock fitness function handling both GA and GP. In the future this
@@ -1328,7 +1313,8 @@ LP::FunctionSet evoflock_gp_function_set()
 //                // Cartoonishly high level Boid API for debugging:
 //                Speed_Control, Avoid_Obstacle, Adjust_Neighbor_Dist,
 
-            Avoid_Obstacle
+//            Avoid_Obstacle
+            Speed_Control
             
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

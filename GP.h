@@ -196,64 +196,39 @@ void doOneRunDebugLogging(Boid& b,
                           Flock* log_flock,
                           std::mutex& log_flock_mutex)
 {
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20251001 investigate low speed score with
-    //               ONLY Speed_Control GpFunc
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20251012 back to only Speed_Control: use more max force
-    //                if (boid->isSelected() and
-    //                    ((flock.clock().frameCounter() % 10) == 1))
     if (b.isSelected())
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         
         
     {
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20251103 back to GP fail, too few boid steps
+        // Define first flock seen as the log_flock, guard for multithreading
         {
             std::lock_guard<std::mutex> lfm(log_flock_mutex);
             if (log_flock == nullptr) { log_flock = &flock; }
         }
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        
+        // Log only for the log_flock.
         if (log_flock == &flock)
         {
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251106 change initBoidPose(), do they end up elsewhere?
-            
-            // draw yellow line from selected boid in log_flock to
-            // center of first obstacle.
-            Vec3 a = b.position();
-            SphereObstacle* so = dynamic_cast<SphereObstacle*>(b.flock_obstacles().at(0));
-            Vec3 soc = so->center();
-            auto& d = Draw::getInstance();
-            //                        d.addThickLineToAnimatedFrame(a, soc,
-            //                                                      Color::magenta(), 0.1);
-//            d.addThickLineToAnimatedFrame(a, Vec3(), Color::magenta(), 0.1);
-            d.addThickLineToAnimatedFrame(a, Vec3(), Color::magenta(), 0.02);
+            // set a temp variable on the boid for logging
+            b.log_flock = log_flock;
 
+            // draw yellow line from selected boid in log_flock to origin,
+            // to see if first obstacle is centered there.
+            Vec3 a = b.position();
+            auto& d = Draw::getInstance();
+            d.addThickLineToAnimatedFrame(a, Vec3(), Color::magenta(), 0.02);
+            // Cyan line from boid to predicted obstacle avoidance
             CollisionList cl = b.get_predicted_obstacle_collisions();
             Collision first_collision = cl.at(0);
             Vec3 poi = first_collision.point_of_impact;
-//            d.addThickLineToAnimatedFrame(a, poi, Color::cyan(), 0.1);
-//            d.addThickLineToAnimatedFrame(a, poi, Color::cyan(), 0.02);
             d.addThickLineToAnimatedFrame(a, poi, Color::cyan(), 0.02);
 
             
 //            debugPrint(steering_from_tree);
+
             
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
-            
-            // set a temp variable on the boid for logging
-            b.log_flock = log_flock;
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-            // TODO 20251011 return to debug speed control
 #ifdef USE_ONLY_SPEED_CONTROL
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
             grabPrintLock_evoflock();
             std::cout << std::endl;
             std::cout << "  ====> ";
@@ -262,17 +237,12 @@ void doOneRunDebugLogging(Boid& b,
             std::cout << b.speed();
             std::cout << ", local steer: " << local_steering;
             std::cout << std::endl;
-            
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20251012 back to only Speed_Control: use more max force
             std::cout << "  ";
             Vec3 sfsc = b.steerForSpeedControl();
             debugPrint(sfsc.dot(b.forward()));
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20251015 near zero speed
-            
             if (b.new_speed_memory_ <= 0)
             {
                 std::cout << "  new_speed=" << b.new_speed_memory_;
@@ -283,29 +253,22 @@ void doOneRunDebugLogging(Boid& b,
                 std::cout << ", local accel * dt=" << a;
                 std::cout << std::endl;
             }
-            
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
             
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20251016 verify GP steering is not constant
-            
             std::cout << "  ";
             std::cout << ((prev_local_steering == local_steering) ?
                           "same" : "diff" );
             std::cout << "  ";
             debugPrint(local_steering);
-            
             std::cout << "  ";
             std::cout << ((prev_steering == steering) ?
                           "same" : "diff" );
             std::cout << "  ";
             debugPrint(steering);
-            
-            
             prev_local_steering = local_steering;
             prev_steering = steering ;
-            
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
             
@@ -360,7 +323,11 @@ void doOneRunDebugLogging(Boid& b,
 
 
 
-
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+// TODO 20251111 any Individual whose GpTree always returns constant value?
+Vec3 constant_tree_value;
+bool any_constant_tree = true;
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 
 
@@ -394,6 +361,12 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     int log_flock_selected_boid_steps = 0;
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20251111 any Individual whose GpTree always returns constant value?
+    constant_tree_value = Vec3::none();
+    any_constant_tree = true;
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
     // Perform one simulation run, and record results.
     auto do_1_run = [&]()
     {
@@ -423,6 +396,21 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                                  b.globalizeDirection(steering_from_tree) :
                                  steering_from_tree);
                 steering = clean(steering);
+                
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+                // TODO 20251111 any Individual whose GpTree
+                //               always returns constant value?
+//                if (constant_tree_value == Vec3::none())
+                if (constant_tree_value.is_none())
+                {
+                    constant_tree_value = steering_from_tree;
+                }
+                if (constant_tree_value != steering_from_tree)
+                {
+                    any_constant_tree = false;
+                }
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
 
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
                 // I think this is obsolete, since we now normalize then scale.
@@ -473,22 +461,6 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 udfp.push_back(flock.separationScore());
                 udfp.push_back(flock.speedScore());
             }
-            
-            
-            
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251105 why did GP steering force get so small?
-            {
-                grabPrintLock_evoflock();
-                Boid& b = *flock.selectedBoid();
-                double ave_steer_mag = (b.sum_steer_mag_for_all_steps /
-                                        b.fp().maxSimulationSteps());
-                debugPrint(ave_steer_mag);
-            }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
         }
     };
     
@@ -518,10 +490,19 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251017 make sure we are tracking the expected number of boid-steps
-    if (EF::usingGP()) { debugPrint(log_flock_selected_boid_steps); }
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20251111 any Individual whose GpTree always returns constant value?
+    if (not constant_tree_value.is_none())
+    {
+        if (any_constant_tree)
+        {
+            std::cout << individual->tree().to_string() << std::endl;
+        }
+        assert(not any_constant_tree);
+    }
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
 
     assert(scalar_fits.size() == runs);
     fitness_logger(least_mof);
@@ -530,9 +511,6 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     std::cout << std::endl << std::endl;
     return least_mof;
 }
-
-
-
 
 
 //~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~

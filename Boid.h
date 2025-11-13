@@ -749,6 +749,16 @@ public:
         steer_memory_.clear();
         up_memory_.clear();
     }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251112 verify that this Boid is in the supposed Flock.
+    bool belongsToFlock(const Flock& supposed_flock) const
+    {
+        return ((getFlock() == &supposed_flock) and
+                (1 == std::ranges::count(flock_boids(), this)));
+    }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
     static void unit_test()
     {

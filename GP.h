@@ -190,13 +190,14 @@ Vec3 clean(Vec3 v)
 
 
 // New experiment, move a bunch of debugging crap out of do_1_run()
-void doOneRunDebugLogging(Boid& b,
+//void doOneRunDebugLogging(Boid& b,
+void doOneRunDebugLogging(Boid& boid,
                           Flock& flock,
                           Vec3 steering_from_tree,
                           Flock* log_flock,
                           std::mutex& log_flock_mutex)
 {
-    if (b.isSelected())
+    if (boid.isSelected())
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         
         
@@ -210,21 +211,33 @@ void doOneRunDebugLogging(Boid& b,
         if (log_flock == &flock)
         {
             // set a temp variable on the boid for logging
-            b.log_flock = log_flock;
+            boid.log_flock = log_flock;
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20251112 verify that this Boid is in the supposed Flock.
+            assert(boid.belongsToFlock(flock));
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
             // draw yellow line from selected boid in log_flock to origin,
             // to see if first obstacle is centered there.
-            Vec3 a = b.position();
+            Vec3 a = boid.position();
             auto& d = Draw::getInstance();
             d.addThickLineToAnimatedFrame(a, Vec3(), Color::magenta(), 0.02);
             // Cyan line from boid to predicted obstacle avoidance
-            CollisionList cl = b.get_predicted_obstacle_collisions();
+            CollisionList cl = boid.get_predicted_obstacle_collisions();
             Collision first_collision = cl.at(0);
             Vec3 poi = first_collision.point_of_impact;
             d.addThickLineToAnimatedFrame(a, poi, Color::cyan(), 0.02);
 
             
 //            debugPrint(steering_from_tree);
+//            debugPrint(boid.localizeDirection(steering_from_tree));
+            auto round_component = [](double x) { return x < 0.000000001 ?0:x;};
+            Vec3 local_steer = boid.localizeDirection(steering_from_tree);
+            Vec3 local_rounded(round_component(local_steer.x()),
+                               round_component(local_steer.y()),
+                               round_component(local_steer.z()));
+            debugPrint(local_rounded);
 
             
             
@@ -234,22 +247,22 @@ void doOneRunDebugLogging(Boid& b,
             std::cout << "  ====> ";
             std::cout << &flock;
             std::cout << ", selected boid speed: ";
-            std::cout << b.speed();
+            std::cout << boid.speed();
             std::cout << ", local steer: " << local_steering;
             std::cout << std::endl;
             std::cout << "  ";
-            Vec3 sfsc = b.steerForSpeedControl();
-            debugPrint(sfsc.dot(b.forward()));
+            Vec3 sfsc = boid.steerForSpeedControl();
+            debugPrint(sfsc.dot(boid.forward()));
             
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20251015 near zero speed
-            if (b.new_speed_memory_ <= 0)
+            if (boid.new_speed_memory_ <= 0)
             {
-                std::cout << "  new_speed=" << b.new_speed_memory_;
-                std::cout << ", old speed=" << b.old_speed_memory_;
-                double a = ((b.acceleration_memory_ *
-                             b.time_step_memory_)
-                            .dot(b.forward_memory_));
+                std::cout << "  new_speed=" << boid.new_speed_memory_;
+                std::cout << ", old speed=" << boid.old_speed_memory_;
+                double a = ((boid.acceleration_memory_ *
+                             boid.time_step_memory_)
+                            .dot(boid.forward_memory_));
                 std::cout << ", local accel * dt=" << a;
                 std::cout << std::endl;
             }
@@ -370,6 +383,11 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     // Perform one simulation run, and record results.
     auto do_1_run = [&]()
     {
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20251112 for logging steering_from_tree.
+        std::cout << std::endl << "    start a do_1_run()" << std::endl;
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
         // These steps can happen in parallel threads:
         Flock flock;
         init_flock(flock);
@@ -383,7 +401,7 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
             // For GP, set Flock's override_steer_function_.
             flock.override_steer_function_ = [&]()
             {
-                Boid& b = *Boid::getGpPerThread();
+                Boid& boid = *Boid::getGpPerThread();
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 // TODO 20251108 try to verify get/setGpPerThread() is correct
 //                std::cout << "???? in do_1_run(), b=" << &b << std::endl;
@@ -393,7 +411,7 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 // Eval tree to get steering, optionally convert local to global
                 Vec3 steering_from_tree = std::any_cast<Vec3>(gp_tree.eval());
                 Vec3 steering = (EF::gp_tree_returns_local ?
-                                 b.globalizeDirection(steering_from_tree) :
+                                 boid.globalizeDirection(steering_from_tree) :
                                  steering_from_tree);
                 steering = clean(steering);
                 
@@ -430,7 +448,7 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 // I measured in the GA version.
                 steering = steering.normalize_or_0() * 35;
                 
-                doOneRunDebugLogging(b,
+                doOneRunDebugLogging(boid,
                                      flock,
                                      steering_from_tree,
                                      log_flock,

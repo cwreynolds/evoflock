@@ -198,9 +198,6 @@ void doOneRunDebugLogging(Boid& boid,
                           std::mutex& log_flock_mutex)
 {
     if (boid.isSelected())
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        
-        
     {
         // Define first flock seen as the log_flock, guard for multithreading
         {
@@ -229,17 +226,13 @@ void doOneRunDebugLogging(Boid& boid,
             Vec3 poi = first_collision.point_of_impact;
             d.addThickLineToAnimatedFrame(a, poi, Color::cyan(), 0.02);
 
-            
-//            debugPrint(steering_from_tree);
-//            debugPrint(boid.localizeDirection(steering_from_tree));
-            auto round_component = [](double x) { return x < 0.000000001 ?0:x;};
-            Vec3 local_steer = boid.localizeDirection(steering_from_tree);
-            Vec3 local_rounded(round_component(local_steer.x()),
-                               round_component(local_steer.y()),
-                               round_component(local_steer.z()));
-            debugPrint(local_rounded);
-
-            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251113 also log dot(steering, forward)
+            double dsf = steering_from_tree.dot(boid.forward());
+            std::cout << "dot(steering, forward) = " << dsf;
+            std::cout << ", steering_from_tree = " << steering_from_tree;
+            std::cout << std::endl;            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             
 #ifdef USE_ONLY_SPEED_CONTROL
             grabPrintLock_evoflock();

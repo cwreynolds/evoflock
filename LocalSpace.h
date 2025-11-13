@@ -272,6 +272,17 @@ public:
         assert(n.is_orthonormal());
         assert(Vec3::within_epsilon(n.i(), -o.k()));
         assert(Vec3::within_epsilon(n.j(), o.j()));
+        
+        // Thought I saw a misbehavior, but this function seems correct.
+        auto test_ldls = [](LocalSpace ldls)
+        {
+            assert(Vec3::within_epsilon({0, 0, +1},
+                                        ldls.localizeDirection(ldls.k())));
+            assert(Vec3::within_epsilon({0, 0, -1},
+                                        ldls.localizeDirection(ldls.k() * -1)));
+        };
+        test_ldls(LocalSpace());
+        test_ldls(LocalSpace::fromTo({1, -2, 3}, {-5, 2, -3}));
 
         // Tests for fromTo()
         LocalSpace ft_ls;

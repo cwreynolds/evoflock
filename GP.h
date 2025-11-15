@@ -228,10 +228,10 @@ void doOneRunDebugLogging(Boid& boid,
 
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // TODO 20251113 also log dot(steering, forward)
-            double dsf = steering_from_tree.dot(boid.forward());
-            std::cout << "dot(steering, forward) = " << dsf;
-            std::cout << ", steering_from_tree = " << steering_from_tree;
-            std::cout << std::endl;            
+//            double dsf = steering_from_tree.dot(boid.forward());
+//            std::cout << "dot(steering, forward) = " << dsf;
+//            std::cout << ", steering_from_tree = " << steering_from_tree;
+//            std::cout << std::endl;
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             
 #ifdef USE_ONLY_SPEED_CONTROL
@@ -378,7 +378,10 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     {
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         // TODO 20251112 for logging steering_from_tree.
-        std::cout << std::endl << "    start a do_1_run()" << std::endl;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20251113 make an updated GpFunc Be_The_Boid()
+//        std::cout << std::endl << "    start a do_1_run()" << std::endl;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         // These steps can happen in parallel threads:
@@ -446,7 +449,12 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                                      steering_from_tree,
                                      log_flock,
                                      log_flock_mutex);
-                return clean(steering);
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20251114 make an updated GpFunc Be_The_Boid()
+//                return clean(steering);
+//                return clean(steering_from_tree);
+                return steering_from_tree;
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             };
         }
 
@@ -1238,6 +1246,29 @@ inline LP::GpFunction Adjust_Neighbor_Dist
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20251113 make an updated GpFunc Be_The_Boid()
+//               Replaces the version from around 20240816
+
+inline LP::GpFunction Be_The_Boid
+ ("Be_The_Boid",
+  "Vec3",
+  {},
+  [](LP::GpTree& tree)
+  {
+//     debugPrint(Boid::getGpPerThread());
+     
+     Boid& boid = *Boid::getGpPerThread();
+     FlockParameters fp(91.491, 55.5244, 27.0869, 24.3598, 14.2042,
+                        91.187, 44.2451, 2.60944, 11.2493, 50.384,
+                        -0.834407, -0.961312, 0.39291, 3.85284, 0.936081);
+     boid.set_fp(&fp);
+     return std::any(boid.steerToFlockForGA());
+ });
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+
 // FunctionSet for the GP version of EvoFlock.
 LP::FunctionSet evoflock_gp_function_set()
 {
@@ -1303,8 +1334,12 @@ LP::FunctionSet evoflock_gp_function_set()
 //                Speed_Control, Avoid_Obstacle, Adjust_Neighbor_Dist,
 
 //            Avoid_Obstacle
-            Speed_Control
-            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20251113 make an updated GpFunc Be_The_Boid()
+//            Speed_Control
+            Be_The_Boid
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
@@ -1315,94 +1350,96 @@ LP::FunctionSet evoflock_gp_function_set()
     };
 }
 
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20251113 make an updated GpFunc Be_The_Boid()
+//               remove this old version from about 20240816
 
-// TODO just laying out a hand-tuned boid behavior
-LP::FunctionSet test_gp_boid_function_set()
-{
-    return
-    {
-        // GpTypes
-        { { "Vec3" }, },
-        // GpFunctions
-        {
-            {
-                "Be_The_Boid", "Vec3", {},
-                [](LP::GpTree& tree)
-                {
-                    Vec3 avoidance;
-                    Boid& boid = *Boid::getGpPerThread();
-                    
-                    // Steer to avoid obstacles.
-                    double min_dist = boid.speed() * boid.fp().minTimeToCollide();
-                    auto collisions = boid.get_predicted_obstacle_collisions();
-                    if (collisions.size() > 0)
-                    {
-                        const Collision& first_collision = collisions.front();
-                        if (min_dist > first_collision.dist_to_collision)
-                        {
-                            avoidance = first_collision.normal_at_poi;
-                        }
-                    }
+//    // TODO just laying out a hand-tuned boid behavior
+//    LP::FunctionSet test_gp_boid_function_set()
+//    {
+//        return
+//        {
+//            // GpTypes
+//            { { "Vec3" }, },
+//            // GpFunctions
+//            {
+//                {
+//                    "Be_The_Boid", "Vec3", {},
+//                    [](LP::GpTree& tree)
+//                    {
+//                        Vec3 avoidance;
+//                        Boid& boid = *Boid::getGpPerThread();
+//
+//                        // Steer to avoid obstacles.
+//                        double min_dist = boid.speed() * boid.fp().minTimeToCollide();
+//                        auto collisions = boid.get_predicted_obstacle_collisions();
+//                        if (collisions.size() > 0)
+//                        {
+//                            const Collision& first_collision = collisions.front();
+//                            if (min_dist > first_collision.dist_to_collision)
+//                            {
+//                                avoidance = first_collision.normal_at_poi;
+//                            }
+//                        }
+//
+//                        // Steer to adjust neighbor offset.
+//                        Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
+//                                                Boid::getGpPerThread()->position());
+//                        double neighbor_dist = neighbor_offset.length();
+//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                        // VERY temp experiment
+//    //                    Vec3 neighbor_direction = neighbor_offset / neighbor_dist;
+//                        Vec3 neighbor_direction;
+//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                        double weight = 0;
+//                        if (neighbor_dist < 2) { weight = -1; }
+//                        if (neighbor_dist > 5) { weight = +1; }
+//                        Vec3 neighbor_dist_adjust = neighbor_direction * weight;
+//
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                        // TODO 20240814 adjust speed
+//                        Vec3 speed_adjust;
+//                        Vec3 forward_weighted = boid.forward() * 0.5;
+//                        if (boid.speed() < 16) { speed_adjust = forward_weighted; }
+//                        if (boid.speed() > 24) { speed_adjust = -forward_weighted; }
+//
+//                        Vec3 steer = (avoidance.is_zero_length() ?
+//                                      (neighbor_dist_adjust + speed_adjust) :
+//                                      avoidance);
+//
+//                        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                        Vec3 f = boid.forward();
+//                        Vec3 lateral = steer.perpendicular_component(boid.forward());
+//                        lateral = lateral.normalize_or_0();
+//
+//                        // temp:
+//                        double e = 0.0001;
+//                        if (not lateral.is_zero_length())
+//                        {
+//                            assert(lateral.is_perpendicular(f, e));
+//                        }
+//
+//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                        // TODO 20240816 VERY temp experiment
+//
+//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                        // TODO 20251013 clean up Boid::pre_GP_steer_to_flock() etc.
+//
+//    //                    return std::any(boid.pre_GP_steer_to_flock());
+//                        return std::any(boid.steerToFlockForGA());
+//
+//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                    }
+//                },
+//            }
+//        };
+//    }
 
-                    // Steer to adjust neighbor offset.
-                    Vec3 neighbor_offset = (getGpBoidNeighbor(1)->position() -
-                                            Boid::getGpPerThread()->position());
-                    double neighbor_dist = neighbor_offset.length();
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // VERY temp experiment
-//                    Vec3 neighbor_direction = neighbor_offset / neighbor_dist;
-                    Vec3 neighbor_direction;
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    double weight = 0;
-                    if (neighbor_dist < 2) { weight = -1; }
-                    if (neighbor_dist > 5) { weight = +1; }
-                    Vec3 neighbor_dist_adjust = neighbor_direction * weight;
-                    
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                    // TODO 20240814 adjust speed
-                    Vec3 speed_adjust;
-                    Vec3 forward_weighted = boid.forward() * 0.5;
-                    if (boid.speed() < 16) { speed_adjust = forward_weighted; }
-                    if (boid.speed() > 24) { speed_adjust = -forward_weighted; }
-
-                    Vec3 steer = (avoidance.is_zero_length() ?
-                                  (neighbor_dist_adjust + speed_adjust) :
-                                  avoidance);
-
-                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-                    Vec3 f = boid.forward();
-                    Vec3 lateral = steer.perpendicular_component(boid.forward());
-                    lateral = lateral.normalize_or_0();
-
-                    // temp:
-                    double e = 0.0001;
-                    if (not lateral.is_zero_length())
-                    {
-                        assert(lateral.is_perpendicular(f, e));
-                    }
-                    
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20240816 VERY temp experiment
-                    
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    // TODO 20251013 clean up Boid::pre_GP_steer_to_flock() etc.
-
-//                    return std::any(boid.pre_GP_steer_to_flock());
-                    return std::any(boid.steerToFlockForGA());
-
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                    
-                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                }
-            },
-        }
-    };
-}
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
 

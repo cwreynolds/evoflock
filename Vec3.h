@@ -182,6 +182,9 @@ public:
         return util::within_epsilon(dot(other), 0, epsilon);
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251115 trying to go back to "normal" GP FunctionSet
+
     // Check if two unit vectors are parallel (or anti-parallel).
     bool is_parallel(const Vec3& other) const
     {
@@ -191,6 +194,18 @@ public:
         assert (other.is_unit_length());
         return util::within_epsilon(abs(dot(other)), 1);
     }
+  
+    // TODO OK, it came up in GP. Do the normalize for now, reconsider later.
+    
+//    // Check if two unit vectors are parallel (or anti-parallel).
+//    bool is_parallel(const Vec3& other) const
+//    {//
+//        Vec3 a = normalize();
+//        Vec3 b = other.normalize();
+//        return util::within_epsilon(abs(a.dot(b)), 1);
+//    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Given a (unit) vector, return some vector that is perpendicular.
     // (There are infinitely many such vectors, one is chosen arbitrarily.)

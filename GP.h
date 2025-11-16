@@ -165,24 +165,36 @@ FlockParameters fp_from_ga_individual(LP::Individual* individual)
     return fp_from_ga_tree(tree);
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251115 trying to go back to "normal" GP FunctionSet
 
-// These "cleaners" are to avoid ludicrous values in evolved trees.
-double clean(double x)
-{
-    bool unclean = (std::isnan(x) or
-                    std::isinf(x) or
-                    (x < std::numeric_limits<double>::min()) or
-                    (std::abs(x) < 0.00000000001) or
-                    (x < -10000000000) or
-                    (x > +10000000000));
-    return (unclean ? 0 : x);
-}
+//    // These "cleaners" are to avoid ludicrous values in evolved trees.
+//    double clean(double x)
+//    {
+//        bool unclean = (std::isnan(x) or
+//                        std::isinf(x) or
+//                        (x < std::numeric_limits<double>::min()) or
+//                        (std::abs(x) < 0.00000000001) or
+//                        (x < -10000000000) or
+//                        (x > +10000000000));
+//        return (unclean ? 0 : x);
+//    }
+//
+//    // These "cleaners" are to avoid returning ludicrous values from evolved trees.
+//    Vec3 clean(Vec3 v)
+//    {
+//        return { clean(v.x()), clean(v.y()), clean(v.z()) };
+//    }
+
 
 // These "cleaners" are to avoid returning ludicrous values from evolved trees.
-Vec3 clean(Vec3 v)
-{
-    return { clean(v.x()), clean(v.y()), clean(v.z()) };
-}
+double clean(double x) { return x; }
+Vec3 clean(Vec3 v) { return v; }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
 
 //~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~
 // TODO 20251110 refactoring to shrink the mess that is do_1_run()
@@ -373,6 +385,11 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     any_constant_tree = true;
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251115 trying to go back to "normal" GP FunctionSet
+//    bool reject_individual = false;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Perform one simulation run, and record results.
     auto do_1_run = [&]()
     {
@@ -398,6 +415,14 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
             flock.override_steer_function_ = [&]()
             {
                 Boid& boid = *Boid::getGpPerThread();
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20251115 trying to go back to "normal" GP FunctionSet
+//                if (flock.override_steer_function_ == nullptr) {return Vec3();}
+//                if (reject_individual) { return Vec3(); }
+//                if (reject_individual) { return boid.forward(); }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 // TODO 20251108 try to verify get/setGpPerThread() is correct
 //                std::cout << "???? in do_1_run(), b=" << &b << std::endl;
@@ -453,13 +478,56 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 // TODO 20251114 make an updated GpFunc Be_The_Boid()
 //                return clean(steering);
 //                return clean(steering_from_tree);
+                
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20251115 trying to go back to "normal" GP FunctionSet
+                {
+                    // TODO very ad hoc
+                    auto bad = [](double x)
+                    {
+                        return not (x == 0 or
+                                    util::between(std::abs(x), 0.0001, 1000));
+                    };
+                    if (bad(steering_from_tree.x()) or
+                        bad(steering_from_tree.y()) or
+                        bad(steering_from_tree.z()))
+                    {
+//                        if (not reject_individual)
+//                        {
+//                            std::cout << "reject Individual." << std::endl;
+//                        }
+//                        reject_individual = true;
+                        steering_from_tree = boid.forward();
+                    }
+                }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                 return steering_from_tree;
+
+
+
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             };
         }
 
         flock.run();
         MOF mof = multiObjectiveFitnessOfFlock(flock);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251115 trying to go back to "normal" GP FunctionSet
+//        if (flock.override_steer_function_ == nullptr)
+        
+//        if (not reject_individual)
+//        {
+//            std::cout << "valid Individual" << std::endl;
+//        }
+//        debugPrint(util::vec_to_string(mof.as_vector()));
+//        if (reject_individual)
+//        {
+//            for (int i = 0; i < mof.size(); i++) { mof.at(i) = 0; }
+//        }
+//        debugPrint(util::vec_to_string(mof.as_vector()));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // These steps happen in the single thread with lock on save_mof_mutex.
         {
             std::lock_guard<std::mutex> smm(save_mof_mutex);
@@ -509,20 +577,24 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251115 trying to go back to "normal" GP FunctionSet
+
+//    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//    // TODO 20251111 any Individual whose GpTree always returns constant value?
+//    if (not constant_tree_value.is_none())
+//    {
+//        if (any_constant_tree)
+//        {
+//            std::cout << individual->tree().to_string() << std::endl;
+//        }
+//        assert(not any_constant_tree);
+//    }
+//    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20251111 any Individual whose GpTree always returns constant value?
-    if (not constant_tree_value.is_none())
-    {
-        if (any_constant_tree)
-        {
-            std::cout << individual->tree().to_string() << std::endl;
-        }
-        assert(not any_constant_tree);
-    }
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-
     assert(scalar_fits.size() == runs);
     fitness_logger(least_mof);
     std::cout << "    min composite "<< least_scalar_fitness;
@@ -1337,13 +1409,34 @@ LP::FunctionSet evoflock_gp_function_set()
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             // TODO 20251113 make an updated GpFunc Be_The_Boid()
 //            Speed_Control
-            Be_The_Boid
+//            Be_The_Boid
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251115 trying to go back to "normal" GP FunctionSet
+            
+            // Scalar functions:
+            Abs, Add, Sub, Mult, Power,
+            
+            // Vector functions:
+            V3, Add_v3, Sub_v3, Scale_v3,
+            Length, Normalize, Cross, Dot,
+            Parallel_Component, Perpendicular_Component,
+            Interpolate, If_Pos,
+            
+            // Boid API:
+            Speed, Velocity, Acceleration, Forward,
+            Neighbor_1_Velocity, Neighbor_1_Offset,
+            First_Obs_Dist, First_Obs_Normal,
+            To_Forward, To_Side,
+
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #endif  // USE_ONLY_SPEED_CONTROL
         }

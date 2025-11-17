@@ -106,7 +106,11 @@ void runOneFlockEvolution()
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20251104 remind me, is frame count mismatch only in multithreading?
 //    enable_multithreading = true;
-    enable_multithreading = false;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    // TODO 20251116 switch back to multithreading
+//    enable_multithreading = false;
+    enable_multithreading = true;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << "Use multithreading: " << std::boolalpha;
     std::cout << enable_multithreading << std::endl;
@@ -122,7 +126,11 @@ void runOneFlockEvolution()
 
     // The number of Individuals in a population for evolutionary optimization.
     // By default it is divided into sqrt(individuals) breeding sub-populations.
-    int individuals = 300;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    // TODO 20251116 switch back to multithreading
+//    int individuals = 300;
+    int individuals = 150;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     int subpops = std::round(std::sqrt(individuals));
     
     // Total number of Individual update steps. (Steady state update stepss. For
@@ -155,9 +163,22 @@ void runOneFlockEvolution()
 //    max_initial_tree_size   = EF::usingGP() ? 2 : ga_tree_size;
 //    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
   
-    min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    // TODO 20251116 switch back to multithreading
+
+//    min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+//    max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
+
+//    min_crossover_tree_size = EF::usingGP() ?  5 : 2;
+//    max_crossover_tree_size = EF::usingGP() ? 25 : ga_tree_size;
+//    max_initial_tree_size   = EF::usingGP() ? 25 : ga_tree_size;
+
+    min_crossover_tree_size = EF::usingGP() ?  5 : 2;
     max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
     max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     

@@ -207,7 +207,12 @@ void doOneRunDebugLogging(Boid& boid,
                           Flock& flock,
                           Vec3 steering_from_tree,
                           Flock* log_flock,
-                          std::mutex& log_flock_mutex)
+                          //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+                          // TODO 20251116 switch back to multithreading
+//                          std::mutex& log_flock_mutex)
+                          std::mutex& log_flock_mutex,
+                          int& log_flock_selected_boid_steps)
+                          //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 {
     if (boid.isSelected())
     {
@@ -226,6 +231,21 @@ void doOneRunDebugLogging(Boid& boid,
             // TODO 20251112 verify that this Boid is in the supposed Flock.
             assert(boid.belongsToFlock(flock));
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                // TODO 20251116 switch back to multithreading
+//    //            if (log_flock_selected_boid_steps != flock.clock().frameCounter())
+//                {
+//                    std::cout << std::endl;
+//                    debugPrint(log_flock_selected_boid_steps);
+//                    debugPrint(flock.clock().frameCounter());
+//                    debugPrint(&flock)
+//                    debugPrint(&boid)
+//                }
+//    //            assert(log_flock_selected_boid_steps == flock.clock().frameCounter());
+//                log_flock_selected_boid_steps++;
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 
             // draw yellow line from selected boid in log_flock to origin,
             // to see if first obstacle is centered there.
@@ -473,7 +493,12 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                                      flock,
                                      steering_from_tree,
                                      log_flock,
-                                     log_flock_mutex);
+                                     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+                                     // TODO 20251116 switch back to multithreading
+//                                     log_flock_mutex);
+                                     log_flock_mutex,
+                                     log_flock_selected_boid_steps);
+                                     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 // TODO 20251114 make an updated GpFunc Be_The_Boid()
 //                return clean(steering);
@@ -498,7 +523,14 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 //                            std::cout << "reject Individual." << std::endl;
 //                        }
 //                        reject_individual = true;
-                        steering_from_tree = boid.forward();
+                        
+                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+                        // TODO 20251116 switch back to multithreading
+
+//                        steering_from_tree = boid.forward();
+                        steering_from_tree = boid.forward() * 15;
+
+                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
                     }
                 }
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1426,7 +1458,10 @@ LP::FunctionSet evoflock_gp_function_set()
             // Vector functions:
             V3, Add_v3, Sub_v3, Scale_v3,
             Length, Normalize, Cross, Dot,
-            Parallel_Component, Perpendicular_Component,
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+            // TODO 20251116 switch back to multithreading
+//            Parallel_Component, Perpendicular_Component,
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
             Interpolate, If_Pos,
             
             // Boid API:

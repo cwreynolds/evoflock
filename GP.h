@@ -12,14 +12,6 @@
 
 #pragma once
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251104 remind me, is frame count mismatch only in multithreading?
-
-//    // TODO 20250930 try version with ONLY GpFunc Speed_Control.
-//    #define USE_ONLY_SPEED_CONTROL
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #include "Draw.h"
 #include "flock.h"
 #include "shape.h"
@@ -266,100 +258,9 @@ void doOneRunDebugLogging(Boid& boid,
 //            std::cout << std::endl;
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             
-#ifdef USE_ONLY_SPEED_CONTROL
-            grabPrintLock_evoflock();
-            std::cout << std::endl;
-            std::cout << "  ====> ";
-            std::cout << &flock;
-            std::cout << ", selected boid speed: ";
-            std::cout << boid.speed();
-            std::cout << ", local steer: " << local_steering;
-            std::cout << std::endl;
-            std::cout << "  ";
-            Vec3 sfsc = boid.steerForSpeedControl();
-            debugPrint(sfsc.dot(boid.forward()));
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251015 near zero speed
-            if (boid.new_speed_memory_ <= 0)
-            {
-                std::cout << "  new_speed=" << boid.new_speed_memory_;
-                std::cout << ", old speed=" << boid.old_speed_memory_;
-                double a = ((boid.acceleration_memory_ *
-                             boid.time_step_memory_)
-                            .dot(boid.forward_memory_));
-                std::cout << ", local accel * dt=" << a;
-                std::cout << std::endl;
-            }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251016 verify GP steering is not constant
-            std::cout << "  ";
-            std::cout << ((prev_local_steering == local_steering) ?
-                          "same" : "diff" );
-            std::cout << "  ";
-            debugPrint(local_steering);
-            std::cout << "  ";
-            std::cout << ((prev_steering == steering) ?
-                          "same" : "diff" );
-            std::cout << "  ";
-            debugPrint(steering);
-            prev_local_steering = local_steering;
-            prev_steering = steering ;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
-            
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20251020 back to too few boid steps
-            
-            std::cout << std::endl;
-            std::cout << "  steps counted in do_1_run:    ";
-            std::cout << log_flock_selected_boid_steps;
-            std::cout << std::endl;
-            std::cout << "  flock.clock().frameCounter(): ";
-            std::cout << flock.clock().frameCounter();
-            std::cout << std::endl;
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20251103 back to GP fail, too few boid steps
-            
-            assert(log_flock_selected_boid_steps ==
-                   flock.clock().frameCounter());
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20251023 align counters / no drawing for multithreading.
-            // TODO 20251017 make sure we are tracking the expected
-            //               number of boid-steps
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20251103 back to GP fail, too few boid steps
-            
-            //                        log_flock_selected_boid_steps++;
-            {
-                // TODO just tried to see if this helped, it did not
-                std::lock_guard<std::mutex> lfm(log_flock_mutex);
-                log_flock_selected_boid_steps++;
-            }
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-            // TODO 20251011 return to debug speed control
-#endif  // USE_ONLY_SPEED_CONTROL
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
         }
     }
 }
-
-
-
 
 //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 // TODO 20251111 any Individual whose GpTree always returns constant value?
@@ -367,7 +268,17 @@ Vec3 constant_tree_value;
 bool any_constant_tree = true;
 //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
-
+// If evolved steering seems numerically odd, substitute zero.
+inline Vec3 sanitizeEvolvedSteeringForce(Vec3 s)
+{
+    auto bad = [](double x)
+    {
+        // TODO very ad hoc
+        return not (x == 0 or util::between(std::abs(x), 0.0001, 1000));
+    };
+    if (bad(s.x()) or bad(s.y()) or bad(s.z())) { s = {};}
+    return s;
+}
 
 // Run flock simulation(s) described by the given evolutionary LP::Individual.
 // Makes "runs" simulations, in parallel if EF::enable_multithreading is set to
@@ -405,11 +316,6 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     any_constant_tree = true;
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251115 trying to go back to "normal" GP FunctionSet
-//    bool reject_individual = false;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Perform one simulation run, and record results.
     auto do_1_run = [&]()
     {
@@ -435,18 +341,6 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
             flock.override_steer_function_ = [&]()
             {
                 Boid& boid = *Boid::getGpPerThread();
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20251115 trying to go back to "normal" GP FunctionSet
-//                if (flock.override_steer_function_ == nullptr) {return Vec3();}
-//                if (reject_individual) { return Vec3(); }
-//                if (reject_individual) { return boid.forward(); }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                // TODO 20251108 try to verify get/setGpPerThread() is correct
-//                std::cout << "???? in do_1_run(), b=" << &b << std::endl;
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 LP::GpTree gp_tree = individual->tree();
                   
                 // Eval tree to get steering, optionally convert local to global
@@ -499,67 +393,12 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                                      log_flock_mutex,
                                      log_flock_selected_boid_steps);
                                      //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                // TODO 20251114 make an updated GpFunc Be_The_Boid()
-//                return clean(steering);
-//                return clean(steering_from_tree);
-                
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20251115 trying to go back to "normal" GP FunctionSet
-                {
-                    // TODO very ad hoc
-                    auto bad = [](double x)
-                    {
-                        return not (x == 0 or
-                                    util::between(std::abs(x), 0.0001, 1000));
-                    };
-                    if (bad(steering_from_tree.x()) or
-                        bad(steering_from_tree.y()) or
-                        bad(steering_from_tree.z()))
-                    {
-//                        if (not reject_individual)
-//                        {
-//                            std::cout << "reject Individual." << std::endl;
-//                        }
-//                        reject_individual = true;
-                        
-                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-                        // TODO 20251116 switch back to multithreading
-
-//                        steering_from_tree = boid.forward();
-                        steering_from_tree = boid.forward() * 15;
-
-                        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-                    }
-                }
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                return steering_from_tree;
-
-
-
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                return sanitizeEvolvedSteeringForce(steering_from_tree);
             };
         }
 
         flock.run();
         MOF mof = multiObjectiveFitnessOfFlock(flock);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251115 trying to go back to "normal" GP FunctionSet
-//        if (flock.override_steer_function_ == nullptr)
-        
-//        if (not reject_individual)
-//        {
-//            std::cout << "valid Individual" << std::endl;
-//        }
-//        debugPrint(util::vec_to_string(mof.as_vector()));
-//        if (reject_individual)
-//        {
-//            for (int i = 0; i < mof.size(); i++) { mof.at(i) = 0; }
-//        }
-//        debugPrint(util::vec_to_string(mof.as_vector()));
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // These steps happen in the single thread with lock on save_mof_mutex.
         {
             std::lock_guard<std::mutex> smm(save_mof_mutex);
@@ -608,24 +447,6 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         }
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251115 trying to go back to "normal" GP FunctionSet
-
-//    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//    // TODO 20251111 any Individual whose GpTree always returns constant value?
-//    if (not constant_tree_value.is_none())
-//    {
-//        if (any_constant_tree)
-//        {
-//            std::cout << individual->tree().to_string() << std::endl;
-//        }
-//        assert(not any_constant_tree);
-//    }
-//    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     
     assert(scalar_fits.size() == runs);
     fitness_logger(least_mof);
@@ -1389,12 +1210,6 @@ LP::FunctionSet evoflock_gp_function_set()
 
         // GpFunctions
         {
-#ifdef USE_ONLY_SPEED_CONTROL
-
-            Speed_Control,
-
-#else  // USE_ONLY_SPEED_CONTROL
-
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             // TODO 20251105 why did GP steering force get so small?
 
@@ -1470,10 +1285,7 @@ LP::FunctionSet evoflock_gp_function_set()
             First_Obs_Dist, First_Obs_Normal,
             To_Forward, To_Side,
 
-            
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-#endif  // USE_ONLY_SPEED_CONTROL
         }
     };
 }

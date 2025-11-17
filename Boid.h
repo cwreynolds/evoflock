@@ -241,25 +241,13 @@ public:
         flush_cache_of_predicted_obstacle_collisions();
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        
         assert(override_steer_function_);
         setGpPerThread(this);
         Vec3 steering_from_evolved_function = override_steer_function_();
         setGpPerThread(nullptr);
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251030 does smoothed_steering() help or hurt? Same both ways!!
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20251115 trying to go back to "normal" GP FunctionSet
-
         // This inline constant blend rate should have API to change rate.
         Vec3 smooth = smoothed_steering(steering_from_evolved_function, 0.9);
-//        Vec3 smooth = steering_from_evolved_function;
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20251013 very experimental, reuse GA annotation for GP
@@ -693,45 +681,18 @@ public:
         }
     }
 
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251003 re-enable multithreading, it was not the problem
-    
     // VERY TEMP just for debugging logging
     Flock* log_flock = nullptr;
 
+    // Kinematic control of Boid speed in the unfortunate event of an obstacle
+    // collision. Used in enforceObstacleConstraint().
     void setSpeedAfterObstacleCollision()
     {
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20251002 investigate low speed score with ONLY Speed_Control GpFunc
-
-//        setSpeed(EF::usingGA() ? 0 : speed() * 0.25);
-//        setSpeed(EF::usingGA() ? 0 : speed() * 1.00);
-//        setSpeed(EF::usingGA() ? 0 : speed() * 0.80);
-        
-//        setSpeed(EF::usingGA() ? 0 : speed() * 1.00);
-//        setSpeed(EF::usingGA() ? 0 : 1);
-//        setSpeed(0);
-//        setSpeed(EF::usingGA() ? 0 : speed());
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20251103 back to GP fail, too few boid steps
-//        setSpeed(0);
-//        setSpeed(EF::usingGA() ? 0 : speed() * 0.1);
-        setSpeed(EF::usingGA() ? 0 : speed() * 1);
-//        setSpeed(EF::usingGA() ? 0 : speed() * 0.5);
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-        if (isSelected() and (getFlock() == log_flock))
-        {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251104 remind me, is frame count mismatch only in multithreading?
-//            std::cout << "    ====> BANG!" << std::endl;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        }
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        //setSpeed(0);
+        //setSpeed(EF::usingGA() ? 0 : speed() * 0.1);
+        //setSpeed(EF::usingGA() ? 0 : speed() * 1);
+        setSpeed(0);
     }
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
 
     // Returns distance from this Boid to its nearest neighbor, center to center.
     double distanceToNearestNeighbor() const

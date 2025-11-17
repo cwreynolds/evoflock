@@ -80,15 +80,7 @@ public:
         setPathCurvature(new_velocity);
         setAcceleration(new_velocity, time_step);
         // Update geometric state when moving.
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251115 trying to go back to "normal" GP FunctionSet
         if (speed() > 0)
-        
-//        if (speed() > (EF::usingGA() ? 0 : 0.000001))
-
-//        bool acceleration_ok = acceleration.length() > 0.000001;
-//        if (speed() > 0 and acceleration_ok)
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         {
             Vec3 new_forward = new_velocity / new_speed;
             // Rotate LocalSpace to align with new_forward.
@@ -97,26 +89,7 @@ public:
             set_ls(ls().rotate_to_new_forward(new_forward, reference_up));
             // Set new position.
             setPosition(position() + (new_forward * speed() * time_step));
-            
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251115 trying to go back to "normal" GP FunctionSet
-            
-            // TODO try just loosening the epsilon for is_orthonormal()
-//    //            double epsilon = util::epsilon * 100;
-//    //            double epsilon = util::epsilon * 10000;
-//                double epsilon = util::epsilon * 1000000;
-//    //            debugPrint(epsilon);
-
             double epsilon = util::epsilon;
-//            if (EF::usingGP()) { epsilon *= 1000000; }
-//            if (EF::usingGP()) { epsilon *= 100000000; }
-
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20250918 back to 30000, smaller trees, GpFunc To_Forward() To_Side()
-
-            
-//            if (not ls().is_orthonormal())
             if (not ls().is_orthonormal(epsilon))
             {
                 debugPrint(acceleration);
@@ -129,14 +102,7 @@ public:
                 debugPrint(new_forward.is_valid());
                 debugPrint(reference_up.is_valid());
             }
-            
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-//            assert (ls().is_orthonormal());
             assert (ls().is_orthonormal(epsilon));
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         }
     }
     

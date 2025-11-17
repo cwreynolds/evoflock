@@ -301,31 +301,6 @@ public:
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();
-        
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250920 experimental curriculum learning
-        
-//        if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.4))
-//        if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.2))
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20250921 try evolving JUST speed
-
-//        if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.3))
-        if (EF::usingGP())
-        {
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250925 turn off curriculum learning experiment
-//            for (auto b : boids()) { b->setObsCollisionCount(0); }
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            
-        }
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         recordSeparationScorePerStep();
         recordSpeedScorePerStep();
         collectCurvatureStats();
@@ -387,36 +362,7 @@ public:
         double non_coll_steps = boidStepPerSim() - count;
         double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
         // Apply a very high exponent to ignore all but nearly perfect scores.
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250925 reduce speed on collision, but not to zero
-        //               plots at WolfAlpha: https://tinyurl.com/4vutsnar
-        
-//        return std::pow(norm_non_coll_steps, 500);
-//        return std::pow(norm_non_coll_steps, EF::usingGA() ? 500 : 5);
-        
-        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-        // TODO 20250928 change exponent in obstacleCollisionsScore()
-        
-//        return std::pow(norm_non_coll_steps, EF::usingGA() ? 500 : 1);
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20250928 change exponent in obstacleCollisionsScore()
-
-//        return std::pow(norm_non_coll_steps, EF::usingGA() ? 500 : 2);
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20250930 obstacle avoidance exponent back to 500 for GA and GP
-
-//        return std::pow(norm_non_coll_steps, EF::usingGA() ? 500 : 100);
         return std::pow(norm_non_coll_steps, 500);
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
@@ -454,29 +400,6 @@ public:
             double distance = b->distanceToNearestNeighbor();
             double score = parameterToWeightWithRamps(distance, d, s);
             b->xxx_temp_separation_score = score;  // temp for annotation
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250920 experimental curriculum learning
-            
-//            if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.2))
-//            if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.4))
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250921 try evolving JUST speed
-
-//            if (EF::usingGP() and (fractionOfSimulationElapsed() < 0.6))
-            if (EF::usingGP())
-            {
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                // TODO 20250925 turn off curriculum learning experiment
-//                score = 1;
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            }
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
-
             separation_score_sum_ += score;
         }
     }
@@ -567,43 +490,12 @@ public:
     }
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250920 experimental curriculum learning
-    
-//        double fractionOfSimulationElapsed() const
-//        {
-//            double c = clock().frameCounter();
-//            double m = fp().maxSimulationSteps();
-//    //            {
-//    //                grabPrintLock_evoflock();
-//    //    //            debugPrint(double(clock().frameCounter()) /
-//    //    //                       fp().maxSimulationSteps());
-//    //                debugPrint(c / m);
-//    //            }
-//    //        return clock().frameCounter() / boidStepPerSim();
-//    //        return clock().frameCounter() / fp().maxSimulationSteps();
-//            return c / m;
-//        }
-    
-//        double fractionOfSimulationElapsed() const
-//        {
-//    //        double c = clock().frameCounter();
-//    //        double m = fp().maxSimulationSteps();
-//    //        return c / m;
-//
-//            return double(clock().frameCounter()) / fp().maxSimulationSteps();
-//
-//        }
-
+    // Added to try experimental curriculum learning.
     double fractionOfSimulationElapsed() const
     {
         return double(clock().frameCounter()) / fp().maxSimulationSteps();
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250709 only called in printRunStats() replace with speedScore()?
     
@@ -614,41 +506,11 @@ public:
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20250915 for GP, apply score function to average speed (all steps, boids)
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250916 maybe bigger trees ARE better, revert speed score
-
     // Average speed for each Boid on each simulation step.
     double speedScore() const
     {
         return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
     }
-
-
-//    // Speed score for all boids on all steps.
-//    double speedScore() const
-//    {
-//        if (EF::usingGA())
-//        {
-//            return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
-//        }
-//        else
-//        {
-//            // TODO 20250915 very temp, apply score func to average speed
-//            return parameterToWeightWithRamps(averageSpeedPerBoidStep(),
-//                                                      {15, 19, 21, 25},
-//                                                      { 0,  1,  1,  0});
-//        }
-//    }
-
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
     
     double curvatureScore() const
     {
@@ -672,12 +534,7 @@ public:
             int preserve_collision_count = b->getObsCollisionCount();
             b->enforceObstacleConstraint();
             b->setObsCollisionCount(preserve_collision_count);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250925 turn off curriculum learning experiment
-//            b->setSpeed(0);
-//            b->setSpeed(20);
             b->setSpeedAfterObstacleCollision();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         };
         for_all_boids(enforce_one_boid_do_not_count);
     }

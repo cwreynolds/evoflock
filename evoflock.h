@@ -126,11 +126,7 @@ void runOneFlockEvolution()
 
     // The number of Individuals in a population for evolutionary optimization.
     // By default it is divided into sqrt(individuals) breeding sub-populations.
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-    // TODO 20251116 switch back to multithreading
-//    int individuals = 300;
-    int individuals = 150;
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    int individuals = 300;
     int subpops = std::round(std::sqrt(individuals));
     
     // Total number of Individual update steps. (Steady state update stepss. For
@@ -140,45 +136,19 @@ void runOneFlockEvolution()
     
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
 
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20250930 try version with ONLY GpFunc Speed_Control.
-
-#ifdef USE_ONLY_SPEED_CONTROL
-    int min_crossover_tree_size = EF::usingGP() ? 1 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 2 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 2 : ga_tree_size;
-#else  // USE_ONLY_SPEED_CONTROL
-    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
-#endif  // USE_ONLY_SPEED_CONTROL
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251115 trying to go back to "normal" GP FunctionSet
-
-//    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//    // TODO 20251107 try running with just GpFunc Avoid_Obstacle
-//    min_crossover_tree_size = EF::usingGP() ? 1 : 2;
-//    max_crossover_tree_size = EF::usingGP() ? 2 : ga_tree_size;
-//    max_initial_tree_size   = EF::usingGP() ? 2 : ga_tree_size;
-//    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-  
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-    // TODO 20251116 switch back to multithreading
-
-//    min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
+//
+//    min_crossover_tree_size = EF::usingGP() ?  5 : 2;
 //    max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
 //    max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
 
-//    min_crossover_tree_size = EF::usingGP() ?  5 : 2;
-//    max_crossover_tree_size = EF::usingGP() ? 25 : ga_tree_size;
-//    max_initial_tree_size   = EF::usingGP() ? 25 : ga_tree_size;
+        
+    int min_crossover_tree_size = EF::usingGP() ?  5 : 2;
+    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
 
-    min_crossover_tree_size = EF::usingGP() ?  5 : 2;
-    max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-    max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     

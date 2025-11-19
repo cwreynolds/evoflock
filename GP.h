@@ -1374,8 +1374,9 @@ LP::FunctionSet evoflock_gp_function_set()
         {
             { "Vec3" },
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20251015 verify Scalar type does not clip
-            { "Scalar", -10.0, 10.0 },
+            // TODO 20251118 make it be on [0, 10], negative values via subtract.
+//            { "Scalar", -10.0, 10.0 },
+            { "Scalar", 0.0, 10.0 },
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         },
 
@@ -1435,8 +1436,44 @@ LP::FunctionSet evoflock_gp_function_set()
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
             
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251115 trying to go back to "normal" GP FunctionSet
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251119 no fix from "extra large" runs, Interpolates seem unhelpful
+
+            
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20251115 trying to go back to "normal" GP FunctionSet
+//
+//                // Scalar functions:
+//                Abs, Add, Sub, Mult, Power,
+//
+//                // Vector functions:
+//                V3, Add_v3, Sub_v3, Scale_v3,
+//                Length, Normalize, Cross, Dot,
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//                // TODO 20251116 switch back to multithreading
+//    //            Parallel_Component, Perpendicular_Component,
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//                Interpolate, If_Pos,
+//
+//                // Boid API:
+//                Speed, Velocity, Acceleration, Forward,
+//                Neighbor_1_Velocity, Neighbor_1_Offset,
+//                First_Obs_Dist, First_Obs_Normal,
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//                // TODO 20251117 neo modern SpeedControl() GpFunc. Only medium cartoonish?
+//    //            To_Forward, To_Side,
+//                LocalScale,
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                // TODO 20251117 neo modern SpeedControl() GpFunc. Only medium cartoonish?
+//                SpeedControl,
+//                AdjustSeparation,
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+      
             
             // Scalar functions:
             Abs, Add, Sub, Mult, Power,
@@ -1444,30 +1481,22 @@ LP::FunctionSet evoflock_gp_function_set()
             // Vector functions:
             V3, Add_v3, Sub_v3, Scale_v3,
             Length, Normalize, Cross, Dot,
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-            // TODO 20251116 switch back to multithreading
-//            Parallel_Component, Perpendicular_Component,
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-            Interpolate, If_Pos,
-            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251119 Interpolate, If_Pos seem to ignore too much code.
+//            Interpolate, If_Pos,
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
             // Boid API:
             Speed, Velocity, Acceleration, Forward,
             Neighbor_1_Velocity, Neighbor_1_Offset,
             First_Obs_Dist, First_Obs_Normal,
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-            // TODO 20251117 neo modern SpeedControl() GpFunc. Only medium cartoonish?
-//            To_Forward, To_Side,
             LocalScale,
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20251117 neo modern SpeedControl() GpFunc. Only medium cartoonish?
-            SpeedControl,
-            AdjustSeparation,
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251119 remove SpeedControl and AdjustSeparation.
+//            SpeedControl,
+//            AdjustSeparation,
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         }
     };
 }

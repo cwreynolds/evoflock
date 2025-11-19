@@ -122,7 +122,11 @@ void runOneFlockEvolution()
     // TODO 20251118 reduce tree size, bigger evo pop, longer run
     
 //    int individuals = 300;
-    int individuals = 600;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251119 no fix from "extra large" runs.
+//    int individuals = 600;
+    int individuals = 300;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     int subpops = std::round(std::sqrt(individuals));
@@ -133,7 +137,11 @@ void runOneFlockEvolution()
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20251118 reduce tree size, bigger evo pop, longer run
 //    int max_evolution_steps = 30000;
-    int max_evolution_steps = 60000;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251119 no fix from "extra large" runs.
+//    int max_evolution_steps = 60000;
+    int max_evolution_steps = 30000;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
@@ -153,9 +161,15 @@ void runOneFlockEvolution()
 //    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
 
+//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 30 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 30 : ga_tree_size;
+
+    // TODO, no that run was disappointing, even though it was “extra large.”
+    
     int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 30 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 30 : ga_tree_size;
+    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

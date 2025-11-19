@@ -96,22 +96,14 @@ void runOneFlockEvolution()
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
     //EF::setUsingGA();
     EF::setUsingGP();
-//    EF::setUsingGA();
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251104 remind me, is frame count mismatch only in multithreading?
-//    enable_multithreading = true;
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-    // TODO 20251116 switch back to multithreading
 //    enable_multithreading = false;
     enable_multithreading = true;
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << "Use multithreading: " << std::boolalpha;
     std::cout << enable_multithreading << std::endl;
     
@@ -126,14 +118,24 @@ void runOneFlockEvolution()
 
     // The number of Individuals in a population for evolutionary optimization.
     // By default it is divided into sqrt(individuals) breeding sub-populations.
-    int individuals = 300;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251118 reduce tree size, bigger evo pop, longer run
+    
+//    int individuals = 300;
+    int individuals = 600;
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     int subpops = std::round(std::sqrt(individuals));
     
     // Total number of Individual update steps. (Steady state update stepss. For
     // a generational GA, this corresponds to (max_evolution_steps / individuals)
     // generations. So 30000 / 300 = 100 "generation equivalents.")
-    int max_evolution_steps = 30000;
-    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251118 reduce tree size, bigger evo pop, longer run
+//    int max_evolution_steps = 30000;
+    int max_evolution_steps = 60000;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
 
 //    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
@@ -144,10 +146,18 @@ void runOneFlockEvolution()
 //    max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
 //    max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
 
-        
-    int min_crossover_tree_size = EF::usingGP() ?  5 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251118 reduce tree size, bigger evo pop, longer run
+
+//    int min_crossover_tree_size = EF::usingGP() ?  5 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
+
+    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+    int max_crossover_tree_size = EF::usingGP() ? 30 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 30 : ga_tree_size;
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

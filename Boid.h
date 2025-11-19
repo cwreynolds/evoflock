@@ -257,15 +257,33 @@ public:
         return smooth;
     }
 
-    Vec3 steerForSpeedControl()
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251117 neo modern SpeedControl() GpFunc. Only medium cartoonish?
+
+//    Vec3 steerForSpeedControl()
+//    {
+//        // TODO TEMP WARNING FIX -- raw inline constants.
+//        double target_speed = 20;
+//                
+//        double fast = target_speed * 1.1;
+//        double slow = target_speed * 0.9;
+//        return forward() * util::remap_interval_clip(speed(), slow, fast, 1, -1);
+//    }
+
+    Vec3 steerForSpeedControl() const
     {
         // TODO TEMP WARNING FIX -- raw inline constants.
-        double target_speed = 20;
-                
+        return steerForSpeedControl(20);
+    }
+    
+    Vec3 steerForSpeedControl(double target_speed) const
+    {
         double fast = target_speed * 1.1;
         double slow = target_speed * 0.9;
         return forward() * util::remap_interval_clip(speed(), slow, fast, 1, -1);
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // Steering force component to move away from neighbors.
     Vec3 steer_to_separate(const BoidPtrList& neighbors)

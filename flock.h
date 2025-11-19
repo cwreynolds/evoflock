@@ -229,6 +229,7 @@ public:
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20251106 change initBoidPose(), do they end up elsewhere?
+    // TODO 20251118 oh jeez, this never got set back to the "good" init.
 
     // Random initial Boid "pose" (position and orientation). By default, they
     // will be in a spherical "clump" on the left/-x side of the big sphere
@@ -238,7 +239,8 @@ public:
         auto initForward = [&]()
         {
 //            return Vec3(1,0,0) + (rs.random_point_in_unit_radius_sphere() * 0.1);
-            return Vec3(-1,0,0) + (rs.random_point_in_unit_radius_sphere() * 0.1);
+//            return Vec3(-1,0,0) + (rs.random_point_in_unit_radius_sphere() * 0.1);
+            return Vec3(1,0,0) + (rs.random_point_in_unit_radius_sphere() * 0.1);
         };
         auto pointInClump = [&]()
         {
@@ -246,7 +248,8 @@ public:
             //      sphere obstacle, centered on the x axis, slid all the way to the
             //      "left" (-x) so the clump touches the leftmost part of big sphere.
 //            Vec3 center_of_clump = center + Vec3(radius * -0.66, 0, 0);
-            Vec3 center_of_clump = center + Vec3(radius * 0.66, 0, 0);
+//            Vec3 center_of_clump = center + Vec3(radius * 0.66, 0, 0);
+            Vec3 center_of_clump = center + Vec3(radius * -0.66, 0, 0);
             Vec3 offset_in_clump = (rs.random_point_in_unit_radius_sphere() *
                                     radius * 0.33);
             return center_of_clump + offset_in_clump;

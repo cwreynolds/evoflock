@@ -140,7 +140,15 @@ void runOneFlockEvolution()
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20251119 no fix from "extra large" runs.
 //    int max_evolution_steps = 60000;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251119 try 2x steps, smaller trees
+//    int max_evolution_steps = 30000;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251120 log function usage counts
+//    int max_evolution_steps = 60000;
     int max_evolution_steps = 30000;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -167,9 +175,22 @@ void runOneFlockEvolution()
 
     // TODO, no that run was disappointing, even though it was “extra large.”
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251119 try 2x steps, smaller trees
+    
+//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
+
+//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 30 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 30 : ga_tree_size;
+
     int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
+    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -219,6 +240,11 @@ void runOneFlockEvolution()
         std::cout << "Run evolution." << std::endl;
         util::Timer t("Run evolution.");
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251120 log function usage counts
+        LP::CountFunctionUsage usage;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         for (int i = 0; i < max_evolution_steps; i++)
         {
             // Exit if user interactively quits run.
@@ -229,6 +255,24 @@ void runOneFlockEvolution()
             {
                 LP::Individual* individual = population->bestFitness();
                 std::cout << individual->tree().to_string(true) << std::endl;
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20251120 log function usage counts
+                
+                usage.zeroEachCounter();
+                usage.count(*population);
+                auto log_count = [&](std::string name, int c)
+                {
+//                    std::string s = std::to_string(c);
+//                    s.insert(s.begin(), 4 - s.length(), ' ');
+//                    std::cout << s << " " << name << std::endl;
+                    std::string count = std::to_string(c);
+                    count.insert(count.begin(), 4 - count.length(), ' ');
+                    std::cout << count << " " << name << std::endl;
+                };
+                usage.applyToAllCounts(log_count);
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
             std::cout << std::endl;
             visualizeBestIfRequested(population);

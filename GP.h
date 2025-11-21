@@ -180,8 +180,10 @@ FlockParameters fp_from_ga_individual(LP::Individual* individual)
 
 
 // These "cleaners" are to avoid returning ludicrous values from evolved trees.
-double clean(double x) { return x; }
-Vec3 clean(Vec3 v) { return v; }
+//double clean(double x) { return x; }
+//Vec3 clean(Vec3 v) { return v; }
+
+// TODO remember to also clean up "maybe_localize()"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -262,17 +264,22 @@ void doOneRunDebugLogging(Boid& boid,
     }
 }
 
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-// TODO 20251111 any Individual whose GpTree always returns constant value?
-Vec3 constant_tree_value;
-bool any_constant_tree = true;
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//    // TODO 20251111 any Individual whose GpTree always returns constant value?
+//    Vec3 constant_tree_value;
+//    bool any_constant_tree = true;
+//    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 // If evolved steering seems numerically odd, substitute zero.
 inline Vec3 sanitizeEvolvedSteeringForce(Vec3 s)
 {
     auto bad = [](double x)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251120 more checks in sanitizeEvolvedSteeringForce
+        if (std::isnan(x)) { debugPrint(std::isnan(x))}
+        if (std::isinf(x)) { debugPrint(std::isinf(x))}
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO very ad hoc
         return not (x == 0 or util::between(std::abs(x), 0.0001, 1000));
     };
@@ -310,11 +317,11 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     int log_flock_selected_boid_steps = 0;
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20251111 any Individual whose GpTree always returns constant value?
-    constant_tree_value = Vec3::none();
-    any_constant_tree = true;
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//    // TODO 20251111 any Individual whose GpTree always returns constant value?
+//    constant_tree_value = Vec3::none();
+//    any_constant_tree = true;
+//    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     // Perform one simulation run, and record results.
     auto do_1_run = [&]()
@@ -345,43 +352,53 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                   
                 // Eval tree to get steering, optionally convert local to global
                 Vec3 steering_from_tree = std::any_cast<Vec3>(gp_tree.eval());
-                Vec3 steering = (EF::gp_tree_returns_local ?
-                                 boid.globalizeDirection(steering_from_tree) :
-                                 steering_from_tree);
-                steering = clean(steering);
                 
-                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-                // TODO 20251111 any Individual whose GpTree
-                //               always returns constant value?
-//                if (constant_tree_value == Vec3::none())
-                if (constant_tree_value.is_none())
-                {
-                    constant_tree_value = steering_from_tree;
-                }
-                if (constant_tree_value != steering_from_tree)
-                {
-                    any_constant_tree = false;
-                }
-                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-
-                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-                // I think this is obsolete, since we now normalize then scale.
-                //
-                // Ran a test in GA mode. Max steering force length was 1000.
-                // WIP reduce by an order of magnitude, close to max_force()
-                //
-                double max_steering_length = 100;
-                steering = steering.truncate(max_steering_length);
-                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-                // Add a small bit of noise to avoid perfect alignment.
-                steering += EF::RS().random_unit_vector() * 0.01;
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20251120 clean up run_flock_simulation, add push?
                 
-                // TODO -- OK try to brute force magnitude of steering force
-                // from GP evolved tree to be around 30 to 40, which is what
-                // I measured in the GA version.
-                steering = steering.normalize_or_0() * 35;
+                // TODO super ad hoc. Frustrated that so many move so slowly.
+//                if (boid.speed() < 18) { steering_from_tree += boid.forward() * 10;}
+                if (boid.speed() < 18) { steering_from_tree += boid.forward() * 50;}
+
+                
+                
+//                    Vec3 steering = (EF::gp_tree_returns_local ?
+//                                     boid.globalizeDirection(steering_from_tree) :
+//                                     steering_from_tree);
+//                    steering = clean(steering);
+//
+//    //                    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//    //                    // TODO 20251111 any Individual whose GpTree
+//    //                    //               always returns constant value?
+//    //    //                if (constant_tree_value == Vec3::none())
+//    //                    if (constant_tree_value.is_none())
+//    //                    {
+//    //                        constant_tree_value = steering_from_tree;
+//    //                    }
+//    //                    if (constant_tree_value != steering_from_tree)
+//    //                    {
+//    //                        any_constant_tree = false;
+//    //                    }
+//    //                    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//
+//
+//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//                    // I think this is obsolete, since we now normalize then scale.
+//                    //
+//                    // Ran a test in GA mode. Max steering force length was 1000.
+//                    // WIP reduce by an order of magnitude, close to max_force()
+//                    //
+//                    double max_steering_length = 100;
+//                    steering = steering.truncate(max_steering_length);
+//                    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//                    // Add a small bit of noise to avoid perfect alignment.
+//                    steering += EF::RS().random_unit_vector() * 0.01;
+//
+//                    // TODO -- OK try to brute force magnitude of steering force
+//                    // from GP evolved tree to be around 30 to 40, which is what
+//                    // I measured in the GA version.
+//                    steering = steering.normalize_or_0() * 35;
                 
                 doOneRunDebugLogging(boid,
                                      flock,
@@ -667,27 +684,26 @@ void save_fitness_time_series(LP::Population& population)
 Boid* getGpBoidNeighbor(int n)
 {
     assert(Boid::getGpPerThread());
-    
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20251104 remind me, is frame count mismatch only in multithreading?
-//
-//    //    BoidPtrList neighbors = nearest_neighbors();
-//        BoidPtrList neighbors_2 = Boid::getGpPerThread()->nearest_neighbors();
-//
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
     assert(Boid::getGpPerThread()->cached_nearest_neighbors().size() == 7);
     BoidPtrList neighbors = Boid::getGpPerThread()->cached_nearest_neighbors();
     assert(neighbors.size() >= n);
     return neighbors.at(n - 1);
 }
 
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20251120 de-clean
+//Vec3 ensure_unit_length(Vec3 v)
+//{
+//    Vec3 cv = clean(v);
+//    return (cv.is_unit_length() ? cv : Vec3(1, 0, 0));
+//}
 
 Vec3 ensure_unit_length(Vec3 v)
 {
-    Vec3 cv = clean(v);
-    return (cv.is_unit_length() ? cv : Vec3(1, 0, 0));
+    return (v.is_unit_length() ? v : Vec3(1, 0, 0));
 }
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 
 //------------------------------------------------------------------------------
@@ -699,7 +715,12 @@ inline LP::GpFunction Abs
   {"Scalar"},
   [](LP::GpTree& tree)
   {
-     return std::any(clean(std::abs(clean(tree.evalSubtree<double>(0)))));
+     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+     // TODO 20251120 de-clean
+//     return std::any(clean(std::abs(clean(tree.evalSubtree<double>(0)))));
+     return std::any(std::abs(tree.evalSubtree<double>(0)));
+     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+     // TODO 20251120 de-clean
  });
 
 inline LP::GpFunction Add
@@ -708,8 +729,9 @@ inline LP::GpFunction Add
   {"Scalar", "Scalar"},
   [](LP::GpTree& tree)
   {
-     return std::any(clean(clean(tree.evalSubtree<double>(0)) +
-                           clean(tree.evalSubtree<double>(1))));
+//     return std::any(clean(clean(tree.evalSubtree<double>(0)) +
+//                           clean(tree.evalSubtree<double>(1))));
+     return std::any(tree.evalSubtree<double>(0) + tree.evalSubtree<double>(1));
  });
 
 inline LP::GpFunction Sub
@@ -718,8 +740,9 @@ inline LP::GpFunction Sub
   {"Scalar", "Scalar"},
   [](LP::GpTree& tree)
   {
-     return std::any(clean(clean(tree.evalSubtree<double>(0)) -
-                           clean(tree.evalSubtree<double>(1))));
+//     return std::any(clean(clean(tree.evalSubtree<double>(0)) -
+//                           clean(tree.evalSubtree<double>(1))));
+     return std::any(tree.evalSubtree<double>(0) - tree.evalSubtree<double>(1));
  });
 
 inline LP::GpFunction Mult
@@ -728,8 +751,9 @@ inline LP::GpFunction Mult
  {"Scalar", "Scalar"},
  [](LP::GpTree& tree)
  {
-    return std::any(clean(clean(tree.evalSubtree<double>(0)) *
-                          clean(tree.evalSubtree<double>(1))));
+//    return std::any(clean(clean(tree.evalSubtree<double>(0)) *
+//                          clean(tree.evalSubtree<double>(1))));
+    return std::any(tree.evalSubtree<double>(0) * tree.evalSubtree<double>(1));
 });
 
 inline LP::GpFunction Power
@@ -739,9 +763,12 @@ inline LP::GpFunction Power
   {"Scalar", "Scalar"},
   [](LP::GpTree& tree)
   {
-      double base = clean(tree.evalSubtree<double>(0));
-      double expt = clean(tree.evalSubtree<double>(1));
-      return std::any(clean(std::pow(base, expt)));
+//      double base = clean(tree.evalSubtree<double>(0));
+//      double expt = clean(tree.evalSubtree<double>(1));
+//      return std::any(clean(std::pow(base, expt)));
+      double base = tree.evalSubtree<double>(0);
+      double expt = tree.evalSubtree<double>(1);
+      return std::any(std::pow(base, expt));
   });
 
 //------------------------------------------------------------------------------
@@ -755,10 +782,14 @@ inline LP::GpFunction V3
   {"Scalar", "Scalar", "Scalar"},
   [](LP::GpTree& tree)
   {
-      Vec3 v3(clean(tree.evalSubtree<double>(0)),
-              clean(tree.evalSubtree<double>(1)),
-              clean(tree.evalSubtree<double>(2)));
-      return std::any(clean(v3));
+//      Vec3 v3(clean(tree.evalSubtree<double>(0)),
+//              clean(tree.evalSubtree<double>(1)),
+//              clean(tree.evalSubtree<double>(2)));
+//      return std::any(clean(v3));
+      
+      return std::any(Vec3(tree.evalSubtree<double>(0),
+                           tree.evalSubtree<double>(1),
+                           tree.evalSubtree<double>(2)));
   }
   );
 
@@ -769,8 +800,7 @@ inline LP::GpFunction Add_v3
     {"Vec3", "Vec3"},
     [](LP::GpTree& tree)
     {
-        return std::any(tree.evalSubtree<Vec3>(0) +
-                        tree.evalSubtree<Vec3>(1));
+        return std::any(tree.evalSubtree<Vec3>(0) + tree.evalSubtree<Vec3>(1));
     });
 
 inline LP::GpFunction Sub_v3
@@ -780,8 +810,7 @@ inline LP::GpFunction Sub_v3
   {"Vec3", "Vec3"},
   [](LP::GpTree& tree)
   {
-      return std::any(tree.evalSubtree<Vec3>(0) -
-                      tree.evalSubtree<Vec3>(1));
+      return std::any(tree.evalSubtree<Vec3>(0) - tree.evalSubtree<Vec3>(1));
   });
 
 inline LP::GpFunction Scale_v3
@@ -791,8 +820,9 @@ inline LP::GpFunction Scale_v3
   {"Vec3", "Scalar"},
   [](LP::GpTree& tree)
   {
-      return std::any(clean(tree.evalSubtree<Vec3>(0)) *
-                      clean(tree.evalSubtree<double>(1)));
+//      return std::any(clean(tree.evalSubtree<Vec3>(0)) *
+//                      clean(tree.evalSubtree<double>(1)));
+      return std::any(tree.evalSubtree<Vec3>(0) * tree.evalSubtree<double>(1));
   });
 
 inline LP::GpFunction Length
@@ -812,7 +842,8 @@ inline LP::GpFunction Normalize
   {"Vec3"},
   [](LP::GpTree& tree)
   {
-      Vec3 v = clean(tree.evalSubtree<Vec3>(0));
+//      Vec3 v = clean(tree.evalSubtree<Vec3>(0));
+      Vec3 v = tree.evalSubtree<Vec3>(0);
       return std::any(v.normalize_or_0());
   });
 
@@ -896,10 +927,10 @@ inline LP::GpFunction If_Pos
 //           First_Obs_Dist, First_Obs_Normal, To_Forward, To_Side
 
 
-inline Vec3 maybe_localize(Boid& boid, Vec3 v)
-{
-    return EF::gp_tree_returns_local ? boid.localizeDirection(v) : v;
-}
+//    inline Vec3 maybe_localize(Boid& boid, Vec3 v)
+//    {
+//        return EF::gp_tree_returns_local ? boid.localizeDirection(v) : v;
+//    }
 
 
 inline LP::GpFunction Speed
@@ -922,7 +953,8 @@ inline LP::GpFunction Velocity
   {
       Boid& boid = *Boid::getGpPerThread();
 //      return std::any(boid.localizeDirection(boid.velocity()));
-      return std::any(maybe_localize(boid, boid.velocity()));
+//      return std::any(maybe_localize(boid, boid.velocity()));
+      return std::any(boid.velocity());
   });
 
 inline LP::GpFunction Acceleration
@@ -937,7 +969,8 @@ inline LP::GpFunction Acceleration
 //    //      return std::any(boid.localizeDirection(acceleration));
 //          return std::any(maybe_localize(boid, acceleration));
       Boid& boid = *Boid::getGpPerThread();
-      return std::any(maybe_localize(boid, boid.getAcceleration()));
+//      return std::any(maybe_localize(boid, boid.getAcceleration()));
+      return std::any(boid.getAcceleration());
   });
 
 inline LP::GpFunction Forward
@@ -949,7 +982,8 @@ inline LP::GpFunction Forward
   {
       Boid& boid = *Boid::getGpPerThread();
 //      return std::any(boid.forward());
-      return std::any(maybe_localize(boid, boid.forward()));
+//      return std::any(maybe_localize(boid, boid.forward()));
+      return std::any(boid.forward());
   });
 
 inline LP::GpFunction Neighbor_1_Velocity
@@ -959,10 +993,12 @@ inline LP::GpFunction Neighbor_1_Velocity
   {},
   [](LP::GpTree& t)
   {
-      Boid& boid = *Boid::getGpPerThread();
-      Vec3 nv = getGpBoidNeighbor(1)->velocity();
-//      return std::any(boid.localizeDirection(nv));
-      return std::any(maybe_localize(boid, nv));
+//    //      Boid& boid = *Boid::getGpPerThread();
+//          Vec3 nv = getGpBoidNeighbor(1)->velocity();
+//    //      return std::any(boid.localizeDirection(nv));
+//    //      return std::any(maybe_localize(boid, nv));
+//          return std::any(nv);
+      return std::any(getGpBoidNeighbor(1)->velocity());
   });
 
 inline LP::GpFunction Neighbor_1_Offset
@@ -975,9 +1011,14 @@ inline LP::GpFunction Neighbor_1_Offset
 //      Boid& b = *Boid::getGpPerThread();
 //      Vec3 no = getGpBoidNeighbor(1)->position() - b.position();
 //      return std::any(b.localizeDirection(no));
+      
+//      Boid& boid = *Boid::getGpPerThread();
+//      Vec3 no = getGpBoidNeighbor(1)->position() - boid.position();
+//      return std::any(maybe_localize(boid, no));
+
       Boid& boid = *Boid::getGpPerThread();
       Vec3 no = getGpBoidNeighbor(1)->position() - boid.position();
-      return std::any(maybe_localize(boid, no));
+      return std::any(no);
   });
 
 inline LP::GpFunction First_Obs_Dist
@@ -1010,7 +1051,7 @@ inline LP::GpFunction First_Obs_Normal
           const Collision& first_collision = collisions.front();
           normal = first_collision.normal_at_poi;
 //          normal = boid.localizeDirection(normal);
-          normal = maybe_localize(boid, normal);
+//          normal = maybe_localize(boid, normal);
       }
       return std::any(normal);
   });
@@ -1028,11 +1069,19 @@ inline LP::GpFunction To_Forward
 //      // Take component of "value" which is parallel to "forward".
 //      Vec3 parallel = value.parallel_component(b.forward());
 //      return std::any(b.localizeDirection(parallel));
-      Vec3 value = clean(tree.evalSubtree<Vec3>(0));
+      
+//      Vec3 value = clean(tree.evalSubtree<Vec3>(0));
+//      Boid& boid = *Boid::getGpPerThread();
+//      // Take component of "value" which is parallel to "forward".
+//      Vec3 parallel = value.parallel_component(boid.forward());
+//      return std::any(maybe_localize(boid, parallel));
+
+      Vec3 value = tree.evalSubtree<Vec3>(0);
       Boid& boid = *Boid::getGpPerThread();
       // Take component of "value" which is parallel to "forward".
       Vec3 parallel = value.parallel_component(boid.forward());
-      return std::any(maybe_localize(boid, parallel));
+//      return std::any(maybe_localize(boid, parallel));
+      return std::any(parallel);
   });
 
 inline LP::GpFunction To_Side
@@ -1047,11 +1096,13 @@ inline LP::GpFunction To_Side
 //      // Take component of "value" perpendicular to "forward".
 //      Vec3 perp = value.perpendicular_component(b.forward());
 //      return std::any(b.localizeDirection(perp));
-      Vec3 value = clean(tree.evalSubtree<Vec3>(0));
+//      Vec3 value = clean(tree.evalSubtree<Vec3>(0));
+      Vec3 value = tree.evalSubtree<Vec3>(0);
       Boid& boid = *Boid::getGpPerThread();
       // Take component of "value" perpendicular to "forward".
       Vec3 perpendicular = value.perpendicular_component(boid.forward());
-      return std::any(maybe_localize(boid, perpendicular));
+//      return std::any(maybe_localize(boid, perpendicular));
+      return std::any(perpendicular);
   });
 
 
@@ -1206,7 +1257,7 @@ inline LP::GpFunction Avoid_Obstacle
           {
               Vec3 normal = first_collision.normal_at_poi;
               avoidance = normal.parallel_component(boid.forward());
-              avoidance = maybe_localize(boid, avoidance);
+//              avoidance = maybe_localize(boid, avoidance);
           }
       }
       return std::any(avoidance);
@@ -1475,28 +1526,51 @@ LP::FunctionSet evoflock_gp_function_set()
 //                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
       
             
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // 20251120 continue to trim down FunctionSet
+            
+//                // Scalar functions:
+//                Abs, Add, Sub, Mult, Power,
+//
+//                // Vector functions:
+//                V3, Add_v3, Sub_v3, Scale_v3,
+//                Length, Normalize, Cross, Dot,
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                // TODO 20251119 Interpolate, If_Pos seem to ignore too much code.
+//    //            Interpolate, If_Pos,
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//                // Boid API:
+//                Speed, Velocity, Acceleration, Forward,
+//                Neighbor_1_Velocity, Neighbor_1_Offset,
+//                First_Obs_Dist, First_Obs_Normal,
+//                LocalScale,
+//
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                // TODO 20251119 remove SpeedControl and AdjustSeparation.
+//    //            SpeedControl,
+//    //            AdjustSeparation,
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+      
             // Scalar functions:
-            Abs, Add, Sub, Mult, Power,
+            Abs, Add, Sub, Mult,
+//            Power,
             
             // Vector functions:
             V3, Add_v3, Sub_v3, Scale_v3,
-            Length, Normalize, Cross, Dot,
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20251119 Interpolate, If_Pos seem to ignore too much code.
-//            Interpolate, If_Pos,
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            Length, Normalize,
+//            Cross,
+            Dot,
 
             // Boid API:
-            Speed, Velocity, Acceleration, Forward,
+            Speed, Velocity,
+//            Acceleration, Forward,
             Neighbor_1_Velocity, Neighbor_1_Offset,
             First_Obs_Dist, First_Obs_Normal,
             LocalScale,
-            
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20251119 remove SpeedControl and AdjustSeparation.
-//            SpeedControl,
-//            AdjustSeparation,
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         }
     };
 }

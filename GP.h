@@ -266,9 +266,26 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20251120 clean up run_flock_simulation, add push?
                 
-                // TODO super ad hoc. Frustrated that so many move so slowly.
-                if (boid.speed() < 18) { steering_from_tree += boid.forward() * 50;}
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20251122 all ops return Vec3, Scalar values all constants
+
+//                // TODO super ad hoc. Frustrated that so many move so slowly.
+//                if (boid.speed() < 18) { steering_from_tree += boid.forward() * 50;}
+
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                
+                
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+                // TODO 20251122 all ops return Vec3, Scalar values all constants
+                
+                // Since the magnitude of steering force returned by the evolved
+                // program is unbounded, use an ad hoc kinematic limit.
+                double max_steer_force = 80;
+                steering_from_tree = steering_from_tree.truncate(max_steer_force);
+
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+
 
                 doOneRunDebugLogging(boid,
                                      flock,
@@ -773,6 +790,49 @@ inline LP::GpFunction If_Pos
                       tree.evalSubtree<Vec3>(2));
   });
 
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20251122 all ops return Vec3, Scalar values all constants
+
+//    inline LP::GpFunction LengthAdjust
+//    (
+//     "LengthAdjust",
+//     "Vec3",
+//     {"Vec3", "Scalar", "Scalar"},  // ref vec, target length, strength
+//     [](LP::GpTree& tree)
+//     {
+//        Vec3 ref_vector = tree.evalSubtree<Vec3>(0);
+//        double target_length = tree.evalSubtree<double>(1);
+//        double strength = tree.evalSubtree<double>(1);
+//        double ref_length = ref_vector.length();
+//        bool adjust = strength * (ref_length < target_length ? 1 : -1);
+//        return std::any(ref_vector.normalize_or_0() * adjust);
+//    });
+
+inline LP::GpFunction LengthAdjust
+ (
+  "LengthAdjust",
+  "Vec3",
+  {"Vec3", "Scalar", "Scalar"},  // ref vec, target length, strength
+  [](LP::GpTree& tree)
+  {
+      Vec3 ref_vector = tree.evalSubtree<Vec3>(0);
+      
+      // TODO temporarily fix with an abs(), later with special Scalar def?
+//      double target_length = tree.evalSubtree<double>(1);
+//      double strength = tree.evalSubtree<double>(1);
+      double target_length = std::abs(tree.evalSubtree<double>(1));
+      double strength = std::abs(tree.evalSubtree<double>(1));
+      
+      bool adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
+      return std::any(ref_vector.normalize_or_0() * adjust);
+  });
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+
+
+
 //------------------------------------------------------------------------------
 // Boid API: Speed, Velocity, Acceleration, Forward,
 //           Neighbor_1_Velocity, Neighbor_1_Offset,
@@ -863,6 +923,36 @@ inline LP::GpFunction First_Obs_Dist
       }
       return std::any(distance);
   });
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20251122 all ops return Vec3, Scalar values all constants
+
+inline LP::GpFunction First_Obs_Offset
+(
+ "First_Obs_Offset",
+ "Vec3",
+ {},
+ [](LP::GpTree& t)
+ {
+    Boid& boid = *Boid::getGpPerThread();
+    
+//    double distance = std::numeric_limits<double>::infinity();
+    Vec3 offset;
+
+    auto collisions = boid.get_predicted_obstacle_collisions();
+    if (collisions.size() > 0)
+    {
+        const Collision& first_collision = collisions.front();
+        Vec3 poi = first_collision.point_of_impact;
+        
+//        distance = (poi - boid.position()).length();
+        offset = poi - boid.position();
+    }
+    return std::any(offset);
+});
+
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 inline LP::GpFunction First_Obs_Normal
  (
@@ -1018,6 +1108,66 @@ inline LP::GpFunction BeTheBoid
      return std::any(boid.steerToFlockForGA());
  });
 
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20251122 all ops return Vec3, Scalar values all constants
+
+//    // FunctionSet for the GP version of EvoFlock.
+//    LP::FunctionSet evoflock_gp_function_set()
+//    {
+//        return
+//        {
+//            // GpTypes
+//            {
+//                { "Vec3" },
+//                { "Scalar", -10.0, 10.0 },
+//            },
+//            // GpFunctions
+//            {
+//                // Scalar functions:
+//                Abs,
+//                Add,
+//                Sub,
+//                Mult,
+//                Div,
+//                // Power,
+//
+//                // Vector functions:
+//                V3,
+//                Add_v3,
+//                Sub_v3,
+//                Scale_v3,
+//                Div_v3,
+//                Length,
+//                Normalize,
+//                Dot,
+//                // Cross,
+//                // Parallel_Component,
+//                // Perpendicular_Component,
+//                // Interpolate,
+//                // If_Pos,
+//
+//                // Boid API:
+//                Speed,
+//                Velocity,
+//                // Acceleration,
+//                // Forward,
+//                Neighbor_1_Velocity,
+//                Neighbor_1_Offset,
+//                First_Obs_Dist,
+//                First_Obs_Normal,
+//                // To_Forward,
+//                // To_Side,
+//                LocalScale,
+//
+//                // Cartoonishly high level Boid API for debugging:
+//                // SpeedControl,
+//                // AvoidObstacle,
+//                // AdjustSeparation,
+//                // BeTheBoid,
+//            }
+//        };
+//    }
+
 
 // FunctionSet for the GP version of EvoFlock.
 LP::FunctionSet evoflock_gp_function_set()
@@ -1027,17 +1177,18 @@ LP::FunctionSet evoflock_gp_function_set()
         // GpTypes
         {
             { "Vec3" },
-            { "Scalar", -10.0, 10.0 },
+//            { "Scalar", -10.0, 10.0 },
+            { "Scalar", -100.0, 100.0 },
         },
         // GpFunctions
         {
-            // Scalar functions:
-            Abs,
-            Add,
-            Sub,
-            Mult,
-            Div,
-            // Power,
+//            // Scalar functions:
+//            Abs,
+//            Add,
+//            Sub,
+//            Mult,
+//            Div,
+//            // Power,
             
             // Vector functions:
             V3,
@@ -1045,24 +1196,26 @@ LP::FunctionSet evoflock_gp_function_set()
             Sub_v3,
             Scale_v3,
             Div_v3,
-            Length,
+//            Length,
             Normalize,
-            Dot,
+//            Dot,
             // Cross,
             // Parallel_Component,
             // Perpendicular_Component,
             // Interpolate,
             // If_Pos,
+            LengthAdjust,
             
             // Boid API:
-            Speed,
+//            Speed,
             Velocity,
             // Acceleration,
             // Forward,
             Neighbor_1_Velocity,
             Neighbor_1_Offset,
-            First_Obs_Dist,
+//            First_Obs_Dist,
             First_Obs_Normal,
+            First_Obs_Offset,
             // To_Forward,
             // To_Side,
             LocalScale,
@@ -1075,6 +1228,8 @@ LP::FunctionSet evoflock_gp_function_set()
         }
     };
 }
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -51,19 +51,6 @@ inline bool usingGA() { return using_GA_; }
 inline void setUsingGP() { using_GA_ = false; }
 inline void setUsingGA() { using_GA_ = true; }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251105 why did GP steering force get so small?
-
-// Is the steering value returned by a GP-mode tree expressed in local or global
-// space? Originally it was global, as in GA-mode. Then I decided local might be
-// "easier" for evolution so unconditionally changed the code. Now I have the
-// mysterious "boid are attracted to one quadrant(/octant?)" bug. I'd like to
-// see if going back to global mode makes that go away. Maybe its a bug in the
-// LS::localize/globalizeDirection() functions?
-//static inline bool gp_tree_returns_local = true;
-static inline bool gp_tree_returns_local = false;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 }  // end of namespace EvoFlock
 namespace EF = EvoFlock;
 
@@ -90,15 +77,10 @@ void visualizePreviouslyLoggedFlockParameters();
 
 void runOneFlockEvolution()
 {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251105 why did GP steering force get so small?
-
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
     //EF::setUsingGA();
     EF::setUsingGP();
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).

@@ -308,6 +308,10 @@ public:
         recordSpeedScorePerStep();
         collectCurvatureStats();
     }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251122 all ops return Vec3, Scalar values all constants
+    static inline double max_steer_mag = 0;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // Print a one line summary of metrics from this flock simulation.
     void printRunStats() const
@@ -328,6 +332,18 @@ public:
             std::cout << std::format(", c={:.3}", ac);
             std::cout << std::format(", maxc={:.3}", max_curvature_);
         }
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20251122 all ops return Vec3, Scalar values all constants
+        
+        double sum_of_force = selectedBoid()->sum_steer_mag_for_all_steps;
+        double average_force = sum_of_force / max_simulation_steps();
+        if (max_steer_mag < average_force) { max_steer_mag = average_force; }
+        std::cout << std::format(", average force = {:.3}", average_force);
+        std::cout << std::format(", max force = {:.3}", max_steer_mag);
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        
         std::cout << std::endl;
     }
 
@@ -589,6 +605,7 @@ public:
     // Returns pointer to the currently selected boid, the one that the tracking
     // camera tracks, for which steering force annotation is shown.
     Boid* selectedBoid() { return boids().at(selected_boid_index_); }
+    const Boid* selectedBoid() const { return boids().at(selected_boid_index_); }
 
     // Check if selected boid needs to be changed in response to "S" cmd in UI.
     void updateSelectedBoidForGUI()

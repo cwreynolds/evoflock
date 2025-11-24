@@ -225,6 +225,12 @@ public:
 
         // Probably unneeded since initial speed is zero, nevertheless:
         boid->setPreviousPosition(boid->position());
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20251122 why is initial boid speed always zero?
+        boid->setSpeed(20);  // SUPER TEMP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -553,7 +559,10 @@ public:
             int preserve_collision_count = b->getObsCollisionCount();
             b->enforceObstacleConstraint();
             b->setObsCollisionCount(preserve_collision_count);
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20251123 why is initial boid speed always zero?
             b->setSpeedAfterObstacleCollision();
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         };
         for_all_boids(enforce_one_boid_do_not_count);
     }

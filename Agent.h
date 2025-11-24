@@ -34,7 +34,27 @@ public:
     void setUp(Vec3 u) { ls_.setJ(u); }
     void setForward(Vec3 f) { ls_.setK(f); }
     void setPosition(Vec3 p) { ls_.setP(p); }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251123 why is initial boid speed always zero?
     void setSpeed(double speed) { speed_ = speed; }
+
+//    // TODO 20251123 super-duper temp:
+//    bool log_set_speed = false;
+    
+//    void setSpeed(double speed)
+//    {
+//        if (log_set_speed) { std::cout << "setSpeed(" << speed << ")" << std::endl;}
+//        speed_ = speed;
+//    }
+
+//    void setSpeed(double speed)
+//    {
+//        std::cout << "setSpeed(" << speed << ") on " << this << std::endl;
+//        assert(speed != 0);
+//        speed_ = speed;
+//    }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     void setMaxForce(double max_force) { max_force_ = max_force; }
 
     // Get current velocity vector.
@@ -75,6 +95,13 @@ public:
         time_step_memory_ = time_step;
         forward_memory_ = forward();
         acceleration_memory_ = acceleration;
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20251123 why is initial boid speed always zero?
+//        assert(new_speed != 0);
+        assert(not ((new_speed == 0) and (old_speed_memory_ != 0)));
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         setSpeed(new_speed);
         setPathCurvature(new_velocity);

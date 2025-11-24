@@ -77,17 +77,22 @@ void visualizePreviouslyLoggedFlockParameters();
 
 void runOneFlockEvolution()
 {
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251123 why is initial boid speed always zero?
+    
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-    //EF::setUsingGA();
+    // EF::setUsingGA();
     EF::setUsingGP();
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
-    // enable_multithreading = false;
-    enable_multithreading = true;
+    enable_multithreading = false;
+    // enable_multithreading = true;
     std::cout << "Use multithreading: " << std::boolalpha;
     std::cout << enable_multithreading << std::endl;
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     
     // Merge LP and EF RandomSequence, init from clock for unique runs, and log.
     setRS(LP::LPRS());

@@ -257,6 +257,31 @@ public:
         return smooth;
     }
 
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251123 why is initial boid speed always zero?
+    
+//    void setSpeed(double speed)
+//    {
+//        if (isSelected())
+//        {
+//            std::cout << "setSpeed(" << speed << ")" << std::endl;
+//            assert(speed == 0);
+//        }
+//        Agent::setSpeed(speed);
+//    }
+
+//        void setSpeed(double speed)
+//        {
+//    //        if (isSelected()) { Agent::log_set_speed = true; }
+//            Agent::log_set_speed = isSelected();
+//            Agent::setSpeed(speed);
+//            Agent::log_set_speed = false;
+//        }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+    
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20251117 neo modern SpeedControl() GpFunc. Only medium cartoonish?
 

@@ -257,6 +257,10 @@ private:
     //int boids_per_flock_ = 800;  // Even more.
     //int boids_per_flock_ = 1000;  // Kiloboid.
 
-    std::string use_obstacle_set = "SmallSpheresInBigSphere";
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251123 why is initial boid speed always zero?
+//    std::string use_obstacle_set = "SmallSpheresInBigSphere";
+    std::string use_obstacle_set = "BigSphere";
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     int fps_ = 30;
 };

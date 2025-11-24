@@ -159,7 +159,6 @@ FlockParameters fp_from_ga_individual(LP::Individual* individual)
 
 
 // New experiment, move a bunch of debugging crap out of do_1_run()
-//void doOneRunDebugLogging(Boid& b,
 void doOneRunDebugLogging(Boid& boid,
                           Flock& flock,
                           Vec3 steering_from_tree,
@@ -172,7 +171,16 @@ void doOneRunDebugLogging(Boid& boid,
         // Define first flock seen as the log_flock, guard for multithreading
         {
             std::lock_guard<std::mutex> lfm(log_flock_mutex);
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20251122 why is initial boid speed always zero?
+//            debugPrint(&log_flock);
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             if (log_flock == nullptr) { log_flock = &flock; }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20251122 why is initial boid speed always zero?
+//            debugPrint(&log_flock);
+//            util::thread_sleep_in_seconds(0.1);
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }
         // Log only for the log_flock.
         if (log_flock == &flock)
@@ -263,6 +271,18 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 // Eval tree to get steering, optionally convert local to global
                 Vec3 steering_from_tree = std::any_cast<Vec3>(gp_tree.eval());
                 
+                
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20251123 why is initial boid speed always zero?
+                int fc = flock.clock().frameCounter();
+                if (boid.isSelected() and fc < 10)
+                {
+                    std::cout << fc << ": ";
+                    debugPrint(boid.speed());
+                }
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+                
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20251120 clean up run_flock_simulation, add push?
                 
@@ -281,7 +301,12 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 
                 // Since the magnitude of steering force returned by the evolved
                 // program is unbounded, use an ad hoc kinematic limit.
-                double max_steer_force = 80;
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20251123 why is initial boid speed always zero?
+                //               Did a GA run and ave force was ~20.
+//                double max_steer_force = 80;
+                double max_steer_force = 40;
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
                 steering_from_tree = steering_from_tree.truncate(max_steer_force);
 
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
@@ -343,6 +368,10 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         for (int r = 0; r < runs; r++)
         {
             do_1_run();
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20251123 why is initial boid speed always zero?
+//            if (EF::usingGP()) { exit(EXIT_SUCCESS); }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             log_flock_selected_boid_steps = 0;
         }
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~

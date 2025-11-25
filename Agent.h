@@ -95,13 +95,6 @@ public:
         time_step_memory_ = time_step;
         forward_memory_ = forward();
         acceleration_memory_ = acceleration;
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20251123 why is initial boid speed always zero?
-//        assert(new_speed != 0);
-        assert(not ((new_speed == 0) and (old_speed_memory_ != 0)));
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         setSpeed(new_speed);
         setPathCurvature(new_velocity);

@@ -259,8 +259,8 @@ private:
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20251123 why is initial boid speed always zero?
-//    std::string use_obstacle_set = "SmallSpheresInBigSphere";
-    std::string use_obstacle_set = "BigSphere";
+    std::string use_obstacle_set = "SmallSpheresInBigSphere";
+//    std::string use_obstacle_set = "BigSphere";
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     int fps_ = 30;
 };

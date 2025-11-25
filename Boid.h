@@ -121,6 +121,12 @@ public:
     Vec3 getPreviousPosition() const { return previous_position_; }
     void setPreviousPosition(Vec3 prev_pos) { previous_position_ = prev_pos; }
     
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251124 API for "perverse_speed_control".
+    //               Possibly ill-considered(?) read-only experimental accessor
+    Vec3 nextSteer() const { return next_steer_; }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    
     // For GP mode: set to a lambda encapsulating the evolved steering function.
     // (Move within file? Add accessors?)
     std::function<Vec3()> override_steer_function_ = nullptr;
@@ -295,11 +301,22 @@ public:
 //        return forward() * util::remap_interval_clip(speed(), slow, fast, 1, -1);
 //    }
 
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251124 global default target speed.
+
+//    Vec3 steerForSpeedControl() const
+//    {
+//        // TODO TEMP WARNING FIX -- raw inline constants.
+//        return steerForSpeedControl(20);
+//    }
+
     Vec3 steerForSpeedControl() const
     {
-        // TODO TEMP WARNING FIX -- raw inline constants.
-        return steerForSpeedControl(20);
+        return steerForSpeedControl(EF::default_target_speed);
     }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     
     Vec3 steerForSpeedControl(double target_speed) const
     {

@@ -228,9 +228,10 @@ public:
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         // TODO 20251122 why is initial boid speed always zero?
-        boid->setSpeed(20);  // SUPER TEMP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // TODO 20251124 TEMP experiment: set all initial boid speeds to 20.
+//        if (EF::usingGP()) { boid->setSpeed(20); }
+        if (EF::usingGP()) { boid->setSpeed(EF::default_target_speed); }
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -313,6 +314,11 @@ public:
         recordSeparationScorePerStep();
         recordSpeedScorePerStep();
         collectCurvatureStats();
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20251124 API for "perverse_speed_control".
+        recordPerverseSpeedControlScorePerStep();
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20251122 all ops return Vec3, Scalar values all constants
@@ -346,9 +352,15 @@ public:
         double average_force = sum_of_force / max_simulation_steps();
         if (max_steer_mag < average_force) { max_steer_mag = average_force; }
         std::cout << std::format(", average force = {:.3}", average_force);
-        std::cout << std::format(", max force = {:.3}", max_steer_mag);
+//        std::cout << std::format(", max force = {:.3}", max_steer_mag);
         
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20251124 API for "perverse_speed_control".
+        std::cout << std::format(", perverse speed = {:.3}",
+                                 perverseSpeedControlScoreScore());
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         
         std::cout << std::endl;
     }
@@ -543,6 +555,37 @@ public:
         return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
     }
     
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251124 API for "perverse_speed_control".
+    
+    // Accumulators for speed score.
+    // TODO Relocate in file?
+    double sum_of_perverse_speed_control_scores_over_all_boid_steps_ = 0;
+
+    // Called each simulation step, records perverse_speed_control score.
+    void recordPerverseSpeedControlScorePerStep()
+    {
+        for (auto b : boids())
+        {
+            bool accelerating = (b->nextSteer().dot(b->forward()) > 0);
+            bool slow = b->speed() < EF::default_target_speed;
+            if ((slow and not accelerating) or (not slow and accelerating))
+            {
+                sum_of_perverse_speed_control_scores_over_all_boid_steps_++;
+            }
+        }
+    }
+
+    // Average speed for each Boid on each simulation step.
+    double perverseSpeedControlScoreScore() const
+    {
+        return (sum_of_perverse_speed_control_scores_over_all_boid_steps_ /
+                boidStepPerSim());
+    }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+    
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.
     void enforceObsBoidConstraints()
@@ -561,7 +604,13 @@ public:
             b->setObsCollisionCount(preserve_collision_count);
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             // TODO 20251123 why is initial boid speed always zero?
-            b->setSpeedAfterObstacleCollision();
+            //
+            // TODO 20251124 just commenting this out seems to fix the "why is
+            // initial boid speed always zero?" issue.
+            // But why? Since Boid::enforceObstacleConstraint() itself calls
+            // setSpeedAfterObstacleCollision(). Should we be saving/restoring
+            // the boid's speed
+//            b->setSpeedAfterObstacleCollision();
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         };
         for_all_boids(enforce_one_boid_do_not_count);

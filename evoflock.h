@@ -45,6 +45,12 @@ inline static double roll_rate = 0.99;
 // Global switch (temp?) enables 4th objective component for boosting curvature.
 inline static bool add_curvature_objective = false;
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20251124 global default target speed.
+// Global default target speed. Move to const section of FlockParameters?
+inline static double default_target_speed = 20;
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 static inline bool using_GA_ = true;
 inline bool usingGP() { return not using_GA_; }
 inline bool usingGA() { return using_GA_; }
@@ -87,8 +93,13 @@ void runOneFlockEvolution()
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
-    enable_multithreading = false;
-    // enable_multithreading = true;
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251124 global default target speed.
+    // enable_multithreading = false;
+    enable_multithreading = true;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     std::cout << "Use multithreading: " << std::boolalpha;
     std::cout << enable_multithreading << std::endl;
     

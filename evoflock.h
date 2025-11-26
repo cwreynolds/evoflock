@@ -47,8 +47,16 @@ inline static bool add_curvature_objective = false;
 
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 // TODO 20251124 global default target speed.
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251125 disable (return full score) for speed and separation
+
+//    // Global default target speed. Move to const section of FlockParameters?
+//    inline static double default_target_speed = 20;
+
 // Global default target speed. Move to const section of FlockParameters?
-inline static double default_target_speed = 20;
+inline static double default_target_speed = 0;
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 static inline bool using_GA_ = true;
@@ -138,9 +146,22 @@ void runOneFlockEvolution()
 //    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251125 I keep flip-flopping on max tree size
+
+//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+
+//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 30 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 30 : ga_tree_size;
+
     int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     debugPrint(min_crossover_tree_size);
     debugPrint(max_crossover_tree_size);

@@ -359,7 +359,7 @@ public:
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20251124 API for "perverse_speed_control".
         std::cout << std::format(", perverse speed = {:.3}",
-                                 perverseSpeedControlScoreScore());
+                                 perverseSpeedControlScore());
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         
         std::cout << std::endl;
@@ -392,15 +392,41 @@ public:
                 util::remap_interval(unit_score, x, 1, y, 1));
     }
 
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251125 disable (return full score) for speed and separation
+
+//    // Return a unit fitness component: quality of obstacle avoidance.
+//    double obstacleCollisionsScore() const
+//    {
+//        double count = getTotalObstacleCollisions();
+//        double non_coll_steps = boidStepPerSim() - count;
+//        double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
+//        // Apply a very high exponent to ignore all but nearly perfect scores.
+//        return std::pow(norm_non_coll_steps, 500);
+//    }
+
+//        // Return a unit fitness component: quality of obstacle avoidance.
+//        double obstacleCollisionsScore() const
+//        {
+//            double count = getTotalObstacleCollisions();
+//            double non_coll_steps = boidStepPerSim() - count;
+//            double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
+//            // Apply a very high exponent to ignore all but nearly perfect scores.
+//    //        return std::pow(norm_non_coll_steps, 500);
+//            double score = std::pow(norm_non_coll_steps, 500);
+//            // For curriculum learning.
+//            return (fractionOfSimulationElapsed() < 0.33 ? 1 : score);
+//        }
+
     // Return a unit fitness component: quality of obstacle avoidance.
     double obstacleCollisionsScore() const
     {
-        double count = getTotalObstacleCollisions();
-        double non_coll_steps = boidStepPerSim() - count;
-        double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
-        // Apply a very high exponent to ignore all but nearly perfect scores.
-        return std::pow(norm_non_coll_steps, 500);
+        // TODO 20251125 disable (return full score) for speed and separation
+        return 1;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20250511 maybe move to utility.h if kept
@@ -455,7 +481,13 @@ public:
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        return emphasizeHighScores(separationScorePerBoidStep(), 0.0);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251125 disable (return full score) for speed and separation
+        
+//        return emphasizeHighScores(separationScorePerBoidStep(), 0.0);
+
+        return 1;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
 
@@ -558,7 +590,7 @@ public:
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20251124 API for "perverse_speed_control".
     
-    // Accumulators for speed score.
+    // Accumulators for perverse_speed_control score.
     // TODO Relocate in file?
     double sum_of_perverse_speed_control_scores_over_all_boid_steps_ = 0;
 
@@ -568,7 +600,7 @@ public:
         for (auto b : boids())
         {
             bool accelerating = (b->nextSteer().dot(b->forward()) > 0);
-            bool slow = b->speed() < EF::default_target_speed;
+            bool slow = (b->speed() < EF::default_target_speed);
             if ((slow and not accelerating) or (not slow and accelerating))
             {
                 sum_of_perverse_speed_control_scores_over_all_boid_steps_++;
@@ -577,7 +609,7 @@ public:
     }
 
     // Average speed for each Boid on each simulation step.
-    double perverseSpeedControlScoreScore() const
+    double perverseSpeedControlScore() const
     {
         return (sum_of_perverse_speed_control_scores_over_all_boid_steps_ /
                 boidStepPerSim());
@@ -593,25 +625,17 @@ public:
         for_all_boids([&](Boid* b){ b->enforceObstacleConstraint(); });
     }
     
-    // Just like enforceObsBoidConstraints() but does not count constraint
-    // violation due to initial Boid position or when switching obstacle set.
+    // Like enforceObsBoidConstraints() but preserves boid's speed and obstacle
+    // collision count. Used after initBoidPose() or after obstacle set change.
     void enforceObsBoidConstraintsDoNotCount()
     {
         auto enforce_one_boid_do_not_count = [&](Boid* b)
         {
-            int preserve_collision_count = b->getObsCollisionCount();
+            double speed = b->speed();
+            int count = b->getObsCollisionCount();
             b->enforceObstacleConstraint();
-            b->setObsCollisionCount(preserve_collision_count);
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20251123 why is initial boid speed always zero?
-            //
-            // TODO 20251124 just commenting this out seems to fix the "why is
-            // initial boid speed always zero?" issue.
-            // But why? Since Boid::enforceObstacleConstraint() itself calls
-            // setSpeedAfterObstacleCollision(). Should we be saving/restoring
-            // the boid's speed
-//            b->setSpeedAfterObstacleCollision();
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            b->setObsCollisionCount(count);
+            b->setSpeed(speed);
         };
         for_all_boids(enforce_one_boid_do_not_count);
     }

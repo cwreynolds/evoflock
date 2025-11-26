@@ -1016,6 +1016,7 @@ inline LP::GpFunction To_Forward
       return std::any(parallel);
   });
 
+
 inline LP::GpFunction To_Side
  (
   "To_Side",
@@ -1048,6 +1049,27 @@ inline LP::GpFunction LocalScale
                            vector.dot(boid.side()) * side,
                            vector.dot(boid.up()) * side));
   });
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251125 add experimental GpFunc SideAndForward
+
+inline LP::GpFunction SideAndForward
+ (
+  "SideAndForward",
+  "Vec3",
+  {"Vec3", "Vec3"},  // side, forward
+  [](LP::GpTree& tree)
+  {
+      Vec3 side = tree.evalSubtree<Vec3>(0);
+      Vec3 forward = tree.evalSubtree<Vec3>(1);
+      Boid& boid = *Boid::getGpPerThread();
+      // Add perpendicular component of "side" to parallel of "forward".
+      return std::any(side.perpendicular_component(boid.forward()) +
+                      forward.parallel_component(boid.forward()));
+  });
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 //------------------------------------------------------------------------------
@@ -1247,8 +1269,13 @@ LP::FunctionSet evoflock_gp_function_set()
             First_Obs_Offset,
             // To_Forward,
             // To_Side,
-            LocalScale,
-            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251125 add experimental GpFunc SideAndForward
+            //               try replacing LocalScale with
+//            LocalScale,
+            SideAndForward,
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             // Cartoonishly high level Boid API for debugging:
             // SpeedControl,
             // AvoidObstacle,

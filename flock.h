@@ -120,16 +120,8 @@ public:
     // Run boids simulation.
     void run()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250908 assert FlockParameters only used in GA mode.
-
-//        // Log the FlockParameters object, but only for interactive drawing mode
-//        if (draw().enable()) { fp().print(); }
-
         // Log the FlockParameters object, but only for interactive drawing mode
         if (draw().enable() and EF::usingGA()) { fp().print(); }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         set_fixed_fps(fp().getFPS());
         clock().setFPS(fp().getFPS());
@@ -392,41 +384,15 @@ public:
                 util::remap_interval(unit_score, x, 1, y, 1));
     }
 
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251125 disable (return full score) for speed and separation
-
-//    // Return a unit fitness component: quality of obstacle avoidance.
-//    double obstacleCollisionsScore() const
-//    {
-//        double count = getTotalObstacleCollisions();
-//        double non_coll_steps = boidStepPerSim() - count;
-//        double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
-//        // Apply a very high exponent to ignore all but nearly perfect scores.
-//        return std::pow(norm_non_coll_steps, 500);
-//    }
-
-//        // Return a unit fitness component: quality of obstacle avoidance.
-//        double obstacleCollisionsScore() const
-//        {
-//            double count = getTotalObstacleCollisions();
-//            double non_coll_steps = boidStepPerSim() - count;
-//            double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
-//            // Apply a very high exponent to ignore all but nearly perfect scores.
-//    //        return std::pow(norm_non_coll_steps, 500);
-//            double score = std::pow(norm_non_coll_steps, 500);
-//            // For curriculum learning.
-//            return (fractionOfSimulationElapsed() < 0.33 ? 1 : score);
-//        }
-
     // Return a unit fitness component: quality of obstacle avoidance.
     double obstacleCollisionsScore() const
     {
-        // TODO 20251125 disable (return full score) for speed and separation
-        return 1;
+        double count = getTotalObstacleCollisions();
+        double non_coll_steps = boidStepPerSim() - count;
+        double norm_non_coll_steps = non_coll_steps / boidStepPerSim();
+        // Apply a very high exponent to ignore all but nearly perfect scores.
+        return std::pow(norm_non_coll_steps, 500);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20250511 maybe move to utility.h if kept
@@ -467,29 +433,11 @@ public:
         }
     }
     
-
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250601 saw this fail today, but no clue about the bad value.
-        if (not util::between(separationScorePerBoidStep(), 0, 1))
-        {
-            debugPrint(separation_score_sum_);
-            debugPrint(boidStepPerSim());
-            debugPrint(separation_score_sum_ / boidStepPerSim());
-        }
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251125 disable (return full score) for speed and separation
-        
-//        return emphasizeHighScores(separationScorePerBoidStep(), 0.0);
-
-        return 1;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        return emphasizeHighScores(separationScorePerBoidStep(), 0.0);
     }
-
 
     // Accumulators for speed score.
     // TODO Relocate in file?

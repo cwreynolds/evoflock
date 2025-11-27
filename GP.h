@@ -267,51 +267,12 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
             {
                 Boid& boid = *Boid::getGpPerThread();
                 LP::GpTree gp_tree = individual->tree();
-                  
                 // Eval tree to get steering, optionally convert local to global
                 Vec3 steering_from_tree = std::any_cast<Vec3>(gp_tree.eval());
-                
-                
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                // TODO 20251123 why is initial boid speed always zero?
-                int fc = flock.clock().frameCounter();
-                if (boid.isSelected() and fc < 10)
-                {
-                    std::cout << fc << ": ";
-                    debugPrint(boid.speed());
-                }
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20251120 clean up run_flock_simulation, add push?
-                
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                // TODO 20251122 all ops return Vec3, Scalar values all constants
-
-//                // TODO super ad hoc. Frustrated that so many move so slowly.
-//                if (boid.speed() < 18) { steering_from_tree += boid.forward() * 50;}
-
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                
-                
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-                // TODO 20251122 all ops return Vec3, Scalar values all constants
-                
                 // Since the magnitude of steering force returned by the evolved
                 // program is unbounded, use an ad hoc kinematic limit.
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                // TODO 20251123 why is initial boid speed always zero?
-                //               Did a GA run and ave force was ~20.
-//                double max_steer_force = 80;
-                double max_steer_force = 40;
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                double max_steer_force = 80;  // make some API for setting this.
                 steering_from_tree = steering_from_tree.truncate(max_steer_force);
-
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-
-
                 doOneRunDebugLogging(boid,
                                      flock,
                                      steering_from_tree,

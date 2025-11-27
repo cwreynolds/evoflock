@@ -13,10 +13,7 @@
 
 int main(int argc, const char * argv[])
 {
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251123 why is initial boid speed always zero?
     EF::unit_test();
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     EF::runOneFlockEvolution();
 //    EF::runFlockEvolutionLoop();

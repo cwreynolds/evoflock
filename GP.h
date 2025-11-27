@@ -171,28 +171,14 @@ void doOneRunDebugLogging(Boid& boid,
         // Define first flock seen as the log_flock, guard for multithreading
         {
             std::lock_guard<std::mutex> lfm(log_flock_mutex);
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20251122 why is initial boid speed always zero?
-//            debugPrint(&log_flock);
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             if (log_flock == nullptr) { log_flock = &flock; }
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20251122 why is initial boid speed always zero?
-//            debugPrint(&log_flock);
-//            util::thread_sleep_in_seconds(0.1);
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }
         // Log only for the log_flock.
         if (log_flock == &flock)
         {
             // set a temp variable on the boid for logging
             boid.log_flock = log_flock;
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20251112 verify that this Boid is in the supposed Flock.
             assert(boid.belongsToFlock(flock));
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
             // draw yellow line from selected boid in log_flock to origin,
             // to see if first obstacle is centered there.
             Vec3 a = boid.position();
@@ -329,10 +315,6 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         for (int r = 0; r < runs; r++)
         {
             do_1_run();
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20251123 why is initial boid speed always zero?
-//            if (EF::usingGP()) { exit(EXIT_SUCCESS); }
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             log_flock_selected_boid_steps = 0;
         }
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
@@ -780,25 +762,6 @@ inline LP::GpFunction If_Pos
                       tree.evalSubtree<Vec3>(2));
   });
 
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20251122 all ops return Vec3, Scalar values all constants
-
-//    inline LP::GpFunction LengthAdjust
-//    (
-//     "LengthAdjust",
-//     "Vec3",
-//     {"Vec3", "Scalar", "Scalar"},  // ref vec, target length, strength
-//     [](LP::GpTree& tree)
-//     {
-//        Vec3 ref_vector = tree.evalSubtree<Vec3>(0);
-//        double target_length = tree.evalSubtree<double>(1);
-//        double strength = tree.evalSubtree<double>(1);
-//        double ref_length = ref_vector.length();
-//        bool adjust = strength * (ref_length < target_length ? 1 : -1);
-//        return std::any(ref_vector.normalize_or_0() * adjust);
-//    });
-
 inline LP::GpFunction LengthAdjust
  (
   "LengthAdjust",
@@ -809,18 +772,12 @@ inline LP::GpFunction LengthAdjust
       Vec3 ref_vector = tree.evalSubtree<Vec3>(0);
       
       // TODO temporarily fix with an abs(), later with special Scalar def?
-//      double target_length = tree.evalSubtree<double>(1);
-//      double strength = tree.evalSubtree<double>(1);
       double target_length = std::abs(tree.evalSubtree<double>(1));
       double strength = std::abs(tree.evalSubtree<double>(1));
       
       bool adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
       return std::any(ref_vector.normalize_or_0() * adjust);
   });
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-
 
 
 //------------------------------------------------------------------------------
@@ -914,9 +871,6 @@ inline LP::GpFunction First_Obs_Dist
       return std::any(distance);
   });
 
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20251122 all ops return Vec3, Scalar values all constants
-
 inline LP::GpFunction First_Obs_Offset
 (
  "First_Obs_Offset",
@@ -925,24 +879,16 @@ inline LP::GpFunction First_Obs_Offset
  [](LP::GpTree& t)
  {
     Boid& boid = *Boid::getGpPerThread();
-    
-//    double distance = std::numeric_limits<double>::infinity();
     Vec3 offset;
-
     auto collisions = boid.get_predicted_obstacle_collisions();
     if (collisions.size() > 0)
     {
         const Collision& first_collision = collisions.front();
         Vec3 poi = first_collision.point_of_impact;
-        
-//        distance = (poi - boid.position()).length();
         offset = poi - boid.position();
     }
     return std::any(offset);
 });
-
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 inline LP::GpFunction First_Obs_Normal
  (
@@ -1012,9 +958,6 @@ inline LP::GpFunction LocalScale
   });
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251125 add experimental GpFunc SideAndForward
-
 inline LP::GpFunction SideAndForward
  (
   "SideAndForward",
@@ -1029,8 +972,6 @@ inline LP::GpFunction SideAndForward
       return std::any(side.perpendicular_component(boid.forward()) +
                       forward.parallel_component(boid.forward()));
   });
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 //------------------------------------------------------------------------------
@@ -1120,66 +1061,6 @@ inline LP::GpFunction BeTheBoid
      return std::any(boid.steerToFlockForGA());
  });
 
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20251122 all ops return Vec3, Scalar values all constants
-
-//    // FunctionSet for the GP version of EvoFlock.
-//    LP::FunctionSet evoflock_gp_function_set()
-//    {
-//        return
-//        {
-//            // GpTypes
-//            {
-//                { "Vec3" },
-//                { "Scalar", -10.0, 10.0 },
-//            },
-//            // GpFunctions
-//            {
-//                // Scalar functions:
-//                Abs,
-//                Add,
-//                Sub,
-//                Mult,
-//                Div,
-//                // Power,
-//
-//                // Vector functions:
-//                V3,
-//                Add_v3,
-//                Sub_v3,
-//                Scale_v3,
-//                Div_v3,
-//                Length,
-//                Normalize,
-//                Dot,
-//                // Cross,
-//                // Parallel_Component,
-//                // Perpendicular_Component,
-//                // Interpolate,
-//                // If_Pos,
-//
-//                // Boid API:
-//                Speed,
-//                Velocity,
-//                // Acceleration,
-//                // Forward,
-//                Neighbor_1_Velocity,
-//                Neighbor_1_Offset,
-//                First_Obs_Dist,
-//                First_Obs_Normal,
-//                // To_Forward,
-//                // To_Side,
-//                LocalScale,
-//
-//                // Cartoonishly high level Boid API for debugging:
-//                // SpeedControl,
-//                // AvoidObstacle,
-//                // AdjustSeparation,
-//                // BeTheBoid,
-//            }
-//        };
-//    }
-
 
 // FunctionSet for the GP version of EvoFlock.
 LP::FunctionSet evoflock_gp_function_set()
@@ -1194,14 +1075,6 @@ LP::FunctionSet evoflock_gp_function_set()
         },
         // GpFunctions
         {
-//            // Scalar functions:
-//            Abs,
-//            Add,
-//            Sub,
-//            Mult,
-//            Div,
-//            // Power,
-            
             // Vector functions:
             V3,
             Add_v3,
@@ -1230,12 +1103,7 @@ LP::FunctionSet evoflock_gp_function_set()
             First_Obs_Offset,
             // To_Forward,
             // To_Side,
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251125 add experimental GpFunc SideAndForward
-            //               try replacing LocalScale with
-//            LocalScale,
             SideAndForward,
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             // Cartoonishly high level Boid API for debugging:
             // SpeedControl,
@@ -1245,8 +1113,6 @@ LP::FunctionSet evoflock_gp_function_set()
         }
     };
 }
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

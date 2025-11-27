@@ -45,19 +45,8 @@ inline static double roll_rate = 0.99;
 // Global switch (temp?) enables 4th objective component for boosting curvature.
 inline static bool add_curvature_objective = false;
 
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20251124 global default target speed.
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251125 disable (return full score) for speed and separation
-
-//    // Global default target speed. Move to const section of FlockParameters?
-//    inline static double default_target_speed = 20;
-
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 0;
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 static inline bool using_GA_ = true;
 inline bool usingGP() { return not using_GA_; }
@@ -91,9 +80,6 @@ void visualizePreviouslyLoggedFlockParameters();
 
 void runOneFlockEvolution()
 {
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251123 why is initial boid speed always zero?
-    
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
     // EF::setUsingGA();
     EF::setUsingGP();
@@ -101,18 +87,12 @@ void runOneFlockEvolution()
 
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251124 global default target speed.
     // enable_multithreading = false;
     enable_multithreading = true;
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     std::cout << "Use multithreading: " << std::boolalpha;
     std::cout << enable_multithreading << std::endl;
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    
+
     // Merge LP and EF RandomSequence, init from clock for unique runs, and log.
     setRS(LP::LPRS());
     RS().setSeedFromClock();
@@ -213,7 +193,8 @@ void runOneFlockEvolution()
     };
 
     {
-        std::cout << "Run evolution." << std::endl;
+        std::cout << "Run evolution for " << max_evolution_steps;
+        std::cout << " steps." << std::endl;
         util::Timer t("Run evolution.");
         for (int i = 0; i < max_evolution_steps; i++)
         {

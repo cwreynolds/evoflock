@@ -218,12 +218,8 @@ public:
         // Probably unneeded since initial speed is zero, nevertheless:
         boid->setPreviousPosition(boid->position());
         
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20251122 why is initial boid speed always zero?
-        // TODO 20251124 TEMP experiment: set all initial boid speeds to 20.
-//        if (EF::usingGP()) { boid->setSpeed(20); }
+        // Init Boid speed to EF::default_target_speed. Why only in GP mode?
         if (EF::usingGP()) { boid->setSpeed(EF::default_target_speed); }
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

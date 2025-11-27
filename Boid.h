@@ -121,51 +121,24 @@ public:
     Vec3 getPreviousPosition() const { return previous_position_; }
     void setPreviousPosition(Vec3 prev_pos) { previous_position_ = prev_pos; }
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251124 API for "perverse_speed_control".
-    //               Possibly ill-considered(?) read-only experimental accessor
+    // Experimental, possibly ill-considered, read-only accessor, for debugging.
     Vec3 nextSteer() const { return next_steer_; }
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     
     // For GP mode: set to a lambda encapsulating the evolved steering function.
     // (Move within file? Add accessors?)
     std::function<Vec3()> override_steer_function_ = nullptr;
     
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251108 try to verify get/setGpPerThread() is correct
-
-//    // In the GP (vs GA) version, the evolved code is a per-frame steering function
-//    // for each Boid. This API supplies a "per thread global" which points to the
-//    // current Boid.
-//    static inline thread_local Boid* gp_boid_per_thread_ = nullptr;
-//    static void setGpPerThread(Boid* boid) { gp_boid_per_thread_ = boid; }
-//    static Boid* getGpPerThread()
-//    {
-//        assert(EF::usingGP());
-//        assert(gp_boid_per_thread_ && "Boid::gp_boid_per_thread_ is nullptr");
-//        return gp_boid_per_thread_;
-//    }
-
-    // In the GP (vs GA) version, the evolved code is a per-frame steering function
-    // for each Boid. This API supplies a "per thread global" which points to the
-    // current Boid.
+    // In the EF::usingGP() version, the evolved code is a per-frame steering
+    // function for each Boid. This API supplies a "per thread global" which
+    // points to the current Boid.
     static inline thread_local Boid* gp_boid_per_thread_ = nullptr;
-    static void setGpPerThread(Boid* boid)
-    {
-        // TODO 20251109 draw annotation in static camera mode at least for now
-//        std::cout << "???? in setGpPerThread(), boid=" << boid << std::endl;
-        gp_boid_per_thread_ = boid;
-    }
+    static void setGpPerThread(Boid* boid) { gp_boid_per_thread_ = boid; }
     static Boid* getGpPerThread()
     {
-        // TODO 20251109 draw annotation in static camera mode at least for now
-//        std::cout << "???? in getGpPerThread(): gp_boid_per_thread_=" << gp_boid_per_thread_ << std::endl;
         assert(EF::usingGP());
         assert(gp_boid_per_thread_ && "Boid::gp_boid_per_thread_ is nullptr");
         return gp_boid_per_thread_;
     }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // Constructor
     Boid() : Agent()
@@ -263,69 +236,17 @@ public:
         return smooth;
     }
 
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251123 why is initial boid speed always zero?
-    
-//    void setSpeed(double speed)
-//    {
-//        if (isSelected())
-//        {
-//            std::cout << "setSpeed(" << speed << ")" << std::endl;
-//            assert(speed == 0);
-//        }
-//        Agent::setSpeed(speed);
-//    }
-
-//        void setSpeed(double speed)
-//        {
-//    //        if (isSelected()) { Agent::log_set_speed = true; }
-//            Agent::log_set_speed = isSelected();
-//            Agent::setSpeed(speed);
-//            Agent::log_set_speed = false;
-//        }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251117 neo modern SpeedControl() GpFunc. Only medium cartoonish?
-
-//    Vec3 steerForSpeedControl()
-//    {
-//        // TODO TEMP WARNING FIX -- raw inline constants.
-//        double target_speed = 20;
-//                
-//        double fast = target_speed * 1.1;
-//        double slow = target_speed * 0.9;
-//        return forward() * util::remap_interval_clip(speed(), slow, fast, 1, -1);
-//    }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251124 global default target speed.
-
-//    Vec3 steerForSpeedControl() const
-//    {
-//        // TODO TEMP WARNING FIX -- raw inline constants.
-//        return steerForSpeedControl(20);
-//    }
-
+    // Steering force component to adjust speed toward target (typically 20 m/s).
     Vec3 steerForSpeedControl() const
     {
         return steerForSpeedControl(EF::default_target_speed);
     }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    
     Vec3 steerForSpeedControl(double target_speed) const
     {
         double fast = target_speed * 1.1;
         double slow = target_speed * 0.9;
         return forward() * util::remap_interval_clip(speed(), slow, fast, 1, -1);
     }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // Steering force component to move away from neighbors.
     Vec3 steer_to_separate(const BoidPtrList& neighbors)

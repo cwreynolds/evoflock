@@ -272,31 +272,19 @@ public:
         GpTree donor = exchange ? parent0 : parent1;
         // The offspring is initialized to a copy of the other parent.
         offspring = exchange ? parent1 : parent0;
+
+        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
+        // TODO 20251129 logging prior to "hoist" operator on GpTree
+        grabPrintLock();
+        std::cout << "[[[[[[[[[[[[[[[[[[[[[[[" << std::endl << std::endl;
+        std::cout << std::endl << "parent0:" << std::endl;
+        std::cout << parent0.to_string(true) << std::endl;
+        std::cout << std::endl << "parent1:" << std::endl;
+        std::cout << parent1.to_string(true) << std::endl;
+        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
+
         // Perform actual crossover.
         crossoverDonorRecipient(donor, offspring, min_size, max_size, fs_min_size);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20240621 GP error at start
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20251128 starting to think about "hoist" operator on GpTree
-        
-//        std::cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
-//        std::cout << parent0.to_string(true) << std::endl;
-//        std::cout << parent1.to_string(true) << std::endl;
-//        std::cout << offspring.to_string(true) << std::endl;
-//        std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
-
-        
-        grabPrintLock();
-        std::cout << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" << std::endl;
-        std::cout << parent0.to_string(true) << std::endl;
-        std::cout << parent1.to_string(true) << std::endl;
-        std::cout << offspring.to_string(true) << std::endl;
-        std::cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     static void crossoverDonorRecipient(GpTree& donor,
@@ -326,8 +314,29 @@ public:
                                                                  r_size_bias,
                                                                  donor_type);
             assert(d_subtree.getRootType() == r_subtree.getRootType());
+            
+            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
+            // TODO 20251129 logging prior to "hoist" operator on GpTree
+            std::cout << std::endl << "d_subtree:" << std::endl;
+            std::cout << d_subtree.to_string(true) << std::endl;
+            std::cout << std::endl << "r_subtree:" << std::endl;
+            std::cout << r_subtree.to_string(true) << std::endl;
+            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
+
             // Overwrite the recipient subtree with copy of donor subtree.
             r_subtree = d_subtree;
+            
+            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
+            // TODO 20251129 logging prior to "hoist" operator on GpTree
+            std::cout << std::endl << "recipient after crossover:" << std::endl;
+            std::cout << recipient.to_string(true) << std::endl;
+            std::cout << std::endl << "]]]]]]]]]]]]]]]]]]]]]]]" << std::endl;
+            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
+
+            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
+            // TODO 20251129 logging prior to "hoist" operator on GpTree
+            recipient.hoist();
+            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
         };
         // If "recipient" too big/small, try to fix via relative subtree size.
         // In each case, select random subtree from "donor" and "recipient"
@@ -348,6 +357,42 @@ public:
         }
     }
     
+    //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~
+    // TODO 20251129 prototype "hoist" operator on GpTree
+    //
+    // Should it be static like crossover?
+    // It happens to a single tree so maybe regular method / member function?
+    
+    //    static void hoist(GpTree& tree
+    //    void hoist(GpTree& tree
+    //                          ,
+    //                          int min_size,
+    //                          int max_size,
+    //                          int fs_min_size
+    //                      )
+    void hoist()
+    {
+        
+        
+        // maybe use selectCrossoverSubtree()
+        // to find "subtree to be replaced by sub-subtree"
+        
+        
+        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
+        // TODO 20251129 logging prior to "hoist" operator on GpTree
+        std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
+        
+        std::cout << std::endl << "before hoist:" << std::endl;
+        std::cout << to_string(true) << std::endl;
+        
+        std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
+        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
+        
+    }
+    
+    //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~
+    
+
     // Randomly select a subtree of this GpTree to be used for crossover. Its
     // size must be at least "min_size". Its root type must be a member of the
     // set "types". If "size_bias" is not zero, attempts to find a big (+1) or
@@ -395,7 +440,6 @@ public:
         return *result;
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     void print() const
     {
         std::cout << "GpTree:" << std::endl;
@@ -403,11 +447,6 @@ public:
         std::cout << "    root function: " << getRootFunction().name() << std::endl;
         std::cout << "    subtree count: " << subtrees().size() << std::endl;
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240716 add validity check
-    
     
     // For debugging: does this instance appear to be valid?
     bool is_valid() const
@@ -429,8 +468,6 @@ public:
         }
         return valid;
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 private:
     // NOTE: if any more data members are added, compare them in equals().

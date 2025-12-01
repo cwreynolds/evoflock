@@ -128,6 +128,57 @@ public:
     { return to_string_helper(indent, "", 0); }
     std::string to_string(bool indent, const std::string& prefix) const
     { return to_string_helper(indent, prefix, 0); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251130 "compile" source code as string to GpTree for FunctionSet.
+//    std::string to_string_helper(bool indent,
+//                                 const std::string& prefix,
+//                                 int indentation) const
+//    {
+//        std::string s;
+//        if (indentation == 0) s = prefix;
+//        auto new_line = [&]()
+//        {
+//            if (indent)
+//            {
+//                s += "\n";
+//                s += prefix;
+//                for (int i = 0; i < indentation; i++) s += " ";
+//            }
+//            else
+//            {
+//                s += " ";
+//            }
+//        };
+//        auto all_leaves = [&]()
+//        {
+//            bool all = true;
+//            for (auto& subtree : subtrees()) if (!subtree.isLeaf()) all = false;
+//            return all;
+//        };
+//        if (isLeaf())
+//        {
+//            s += getRootType()->to_string(getRootValue());
+//        }
+//        else
+//        {
+//            bool indent_before = indent;
+//            if (all_leaves()) { indent = false; }
+//            size_t additional_indent = getRootFunction().name().size() + 1;
+//            indentation += additional_indent;
+//            s += getRootFunction().name() + "(";
+//            bool comma = false;
+//            for (auto& subtree : subtrees())
+//            {
+//                if (comma) { s += ","; new_line(); } else { comma = true; }
+//                s += subtree.to_string_helper(indent, prefix, indentation);
+//            }
+//            s += ")";
+//            indentation -= additional_indent;
+//            indent = indent_before;
+//        }
+//        return s;
+//    }
+
     std::string to_string_helper(bool indent,
                                  const std::string& prefix,
                                  int indentation) const
@@ -153,30 +204,35 @@ public:
             for (auto& subtree : subtrees()) if (!subtree.isLeaf()) all = false;
             return all;
         };
-        if (isLeaf())
+        if (!empty())
         {
-            s += getRootType()->to_string(getRootValue());
-        }
-        else
-        {
-            bool indent_before = indent;
-            if (all_leaves()) { indent = false; }
-            size_t additional_indent = getRootFunction().name().size() + 1;
-            indentation += additional_indent;
-            s += getRootFunction().name() + "(";
-            bool comma = false;
-            for (auto& subtree : subtrees())
+            if (isLeaf())
             {
-                if (comma) { s += ","; new_line(); } else { comma = true; }
-                s += subtree.to_string_helper(indent, prefix, indentation);
+                s += getRootType()->to_string(getRootValue());
             }
-            s += ")";
-            indentation -= additional_indent;
-            indent = indent_before;
+            else
+            {
+                bool indent_before = indent;
+                if (all_leaves()) { indent = false; }
+                size_t additional_indent = getRootFunction().name().size() + 1;
+                indentation += additional_indent;
+                s += getRootFunction().name() + "(";
+                bool comma = false;
+                for (auto& subtree : subtrees())
+                {
+                    if (comma) { s += ","; new_line(); } else { comma = true; }
+                    s += subtree.to_string_helper(indent, prefix, indentation);
+                }
+                s += ")";
+                indentation -= additional_indent;
+                indent = indent_before;
+            }
         }
         return s;
     }
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Collect all subtrees into an std::vector. Recursively traverses tree from
     // this root down, storing pointers to each subtree into vector.
     // NOTE: assumes vector is empty before initial call.
@@ -469,6 +525,19 @@ public:
         return valid;
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251130 "compile" source code as string to GpTree for FunctionSet.
+
+    // Is this tree empty, same state as a newly created GpTree object?
+    bool empty() const
+    {
+        return ((root_function_ == nullptr) and
+                (root_type_ == nullptr) and
+                subtrees_.empty());
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
 private:
     // NOTE: if any more data members are added, compare them in equals().
     // Add (allocate) one subtree. addSubtrees() is external API.

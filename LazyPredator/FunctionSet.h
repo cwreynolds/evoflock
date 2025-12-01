@@ -531,6 +531,55 @@ public:
     {
         return crossover_function_hook_;
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251130 "compile" source code as string to GpTree for FunctionSet.
+    
+    GpTree compileSourceCodeToTree(const std::string& source_code) const
+    {
+        return newMakeRandomTree(2, 5);
+    }
+
+    static void tempTestCompile()
+    {
+        FunctionSet fs
+        {
+            {
+                { "Real", -100.0, 100.0 },
+            },
+            {
+                {
+                    "a", "Real", {"Real"},
+                    [](GpTree& tree)
+                    {
+                        return std::any(-tree.evalSubtree<double>(0));
+                    }
+                },
+                {
+                    "b", "Real", {"Real", "Real"},
+                    [](GpTree& tree)
+                    {
+                        return std::any(tree.evalSubtree<double>(0) +
+                                        tree.evalSubtree<double>(1));
+                    }
+                },
+                {
+                    "c", "Real", {"Real"},
+                    [](GpTree& tree)
+                    {
+                        return std::any(std::abs(tree.evalSubtree<double>(0)));
+                    }
+                },
+            }
+        };
+        std::string source = "a(b(5.2, c(-32)))";
+        GpTree tree = fs.compileSourceCodeToTree(source);
+        std::cout << "Source code as string: " << source << std::endl;
+        std::cout << "Tree: " << std::endl;
+        std::cout << tree.to_string(true) << std::endl;
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240808 utility to print "typical" trees from this FS.

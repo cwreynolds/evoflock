@@ -32,6 +32,11 @@
 #include "GpFunction.h"
 #include "GpTree.h"
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251201 "compile" source code as string to GpTree for FunctionSet.
+//#include  <ranges>
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 namespace LazyPredator
 {
 
@@ -533,13 +538,161 @@ public:
     }
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251130 "compile" source code as string to GpTree for FunctionSet.
-    
-    GpTree compileSourceCodeToTree(const std::string& source_code) const
+    // TODO 20251201 "compile" source code as string to GpTree for FunctionSet.
+
+//    GpTree compileSourceCodeToTree(const std::string& source_code) const
+//    {
+//        return newMakeRandomTree(2, 5);
+//    }
+
+//        // "compile" source code as std::string to a GpTree for this FunctionSet.
+//        GpTree compile(const std::string& source_code) const
+//        {
+//            std::string s = source_code;
+//
+//    //        std::string source = "a(b(5.2, c(-32)))";
+//
+//            s = findAndReplaceAllOccurrences("(", " [ ", s);
+//            s = findAndReplaceAllOccurrences(")", " ] ", s);
+//            s = findAndReplaceAllOccurrences(",", " ; ", s);
+//
+//            s = findAndReplaceAllOccurrences("[", "(", s);
+//            s = findAndReplaceAllOccurrences("]", ")", s);
+//            s = findAndReplaceAllOccurrences(";", ",", s);
+//
+//            s = findAndReplaceAllOccurrences("\\n", " ", s);
+//
+//            s = removeDuplicateWhitespace(s);
+//    //        debugPrint(s);
+//
+//
+//    //    //        for (const auto word : std::views::split(s, " "))
+//    //            for (const auto word : std::ranges::split_view(s, " "))
+//    //
+//    //            {
+//    //                // with string_view's C++23 range constructor:
+//    //    //            std::cout << std::quoted(std::string_view(word)) << ' ';
+//    //                std::cout << word << ' ';
+//    //            }
+//    //            std::cout << '\n';
+//
+//    //            size_t start = 0;
+//    //            size_t delim = s.find(" ", start);
+//    //    //        while (start != s.npos)
+//    //            while (start < s.size())
+//    //            {
+//    //    //            debugPrint(s.substr(start, delim - start));
+//    //                auto token = s.substr(start, delim - start);
+//    //
+//    //                std::cout << std::quoted(token) << std::endl;
+//    //
+//    //                start = delim + 1;
+//    //                delim = s.find(" ", start);
+//    //
+//    //                debugPrint(start);
+//    //                debugPrint(delim);
+//    //            }
+//
+//
+//            std::cout << std::endl << "source code:" << std::endl;
+//            std::cout << std::quoted(s) << std::endl << std::endl;
+//
+//            size_t start = 0;
+//            size_t delim = 0;
+//            while (start < s.size())
+//            {
+//                delim = s.find(" ", start);
+//                auto token = s.substr(start, delim - start);
+//                std::cout << std::quoted(token) << std::endl;
+//
+//                start = delim + 1;
+//    //            delim = s.find(" ", start);
+//    //            debugPrint(start);
+//    //            debugPrint(delim);
+//            }
+//
+//            return newMakeRandomTree(2, 5);
+//        }
+
+    // "compile" source code as std::string to a GpTree for this FunctionSet.
+    GpTree compile(const std::string& source_code) const
     {
+        // Preprocess source code to be uniformly delimited by single blanks.
+        std::string s = source_code;
+        s = findAndReplaceAllOccurrences("(", " [ ", s);
+        s = findAndReplaceAllOccurrences(")", " ] ", s);
+        s = findAndReplaceAllOccurrences(",", " ; ", s);
+        s = findAndReplaceAllOccurrences("[", "(", s);
+        s = findAndReplaceAllOccurrences("]", ")", s);
+        s = findAndReplaceAllOccurrences(";", ",", s);
+        s = findAndReplaceAllOccurrences("\\n", " ", s);
+        s = removeDuplicateWhitespace(s);
+
+        std::cout << std::endl << "source code:" << std::endl;
+        std::cout << std::quoted(s) << std::endl << std::endl;
+
+        std::vector<std::string> tokens;
+        size_t start = 0;
+        size_t delim = 0;
+        while (start < s.size())
+        {
+            delim = s.find(" ", start);
+            auto token = s.substr(start, delim - start);
+//            std::cout << std::quoted(token) << std::endl;
+            tokens.push_back(token);
+            start = delim + 1;
+        }
+        
+//        std::cout << vec_to_string(tokens) << std::endl;
+        for (auto t : tokens)
+        {
+            std::cout << std::quoted(t) << " ";
+        }
+        std::cout << std::endl;
+        
+        
+        
+        
         return newMakeRandomTree(2, 5);
     }
 
+    
+  
+    
+    // utilities for FS::compile()
+    static std::string findAndReplaceAllOccurrences(std::string from,
+                                                    std::string to,
+                                                    std::string string)
+    {
+        size_t pos = string.find(from);
+        while (pos != string.npos)
+        {
+            std::cout << std::quoted(string) << std::endl;
+            
+            string.erase(pos, from.length());
+            string.insert(pos, to);
+            pos = string.find(from);
+        }
+        std::cout << std::quoted(string) << std::endl;
+        return string;
+    }
+
+    static std::string removeDuplicateWhitespace(std::string string)
+    {
+        size_t size1 = 0;
+        size_t size2 = string.size();
+        
+        while (size1 != size2)
+        {
+            size1 = string.size();
+            string = findAndReplaceAllOccurrences("  ", " ", string);
+            size2 = string.size();
+        }
+        return string;
+    }
+    
+    
+    
     static void tempTestCompile()
     {
         FunctionSet fs
@@ -572,11 +725,20 @@ public:
                 },
             }
         };
-        std::string source = "a(b(5.2, c(-32)))";
-        GpTree tree = fs.compileSourceCodeToTree(source);
+//        std::string source = "a(b(5.2, c(-32)))";
+        std::string source = "a(b(5.2,\\n    c(-32)))";
+        GpTree tree = fs.compile(source);
         std::cout << "Source code as string: " << source << std::endl;
         std::cout << "Tree: " << std::endl;
         std::cout << tree.to_string(true) << std::endl;
+
+
+//        findAndReplaceAllOccurrences("zap",
+//                                     "x",
+//                                     "ding zap yadda zap quux zap");
+//        findAndReplaceAllOccurrences("zap",
+//                                     "zip-a-dee-doo-dah",
+//                                     "ding zap yadda zap quux zap");
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

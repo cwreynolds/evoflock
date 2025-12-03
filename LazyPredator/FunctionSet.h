@@ -31,42 +31,13 @@
 #include "GpType.h"
 #include "GpFunction.h"
 #include "GpTree.h"
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251201 "compile" source code as string to GpTree for FunctionSet.
-//#include  <ranges>
+// TODO 20251202 "compile" source code as string to GpTree for FunctionSet.
+#include <cctype>
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 namespace LazyPredator
 {
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20240330 WIP for multi-objective fitness
-
-//    // Used only below in FunctionSet, then undef-ed at end of file.
-//    #define name_lookup_util(name, map)               \
-//    [&]()                                             \
-//    {                                                 \
-//    auto it = map.find(name);                     \
-//    assert("unknown type" && (it != map.end()));  \
-//    return &(it->second);                         \
-//    }()
-
-// Used only below in FunctionSet, then undef-ed at end of file.
-#define name_lookup_util(name, map, category)                         \
-[&]()                                                                 \
-{                                                                     \
-    auto it = map.find(name);                                         \
-    bool found = it != map.end();                                     \
-    if (not found)                                                    \
-    {                                                                 \
-        std::cout << category << " not found: " << name << std::endl; \
-    }                                                                 \
-    assert("unknown type" && found);                                  \
-    return &(it->second);                                             \
-}()
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Defines the function set used in a STGP run. Consists of a collection of
 // GpTypes and one of GpFunctions. Supports creation of random program drawn
@@ -483,6 +454,21 @@ public:
         std::cout << std::endl;
     }
     
+    // Used only below in FunctionSet, then undef-ed at end of file.
+    // (TODO maybe rewrite this with templates?)
+    #define name_lookup_util(name, map, category)                         \
+    [&]()                                                                 \
+    {                                                                     \
+        auto it = map.find(name);                                         \
+        bool found = it != map.end();                                     \
+        if (not found)                                                    \
+        {                                                                 \
+            std::cout << category << " not found: " << name << std::endl; \
+        }                                                                 \
+        assert("unknown type" && found);                                  \
+        return &(it->second);                                             \
+    }()
+
     // Map string names to (pointers to) GpTypes/GpFunction objects, for both
     // const (public, read only) and non-const (private, writable, for internal
     // use only during constructor). Use macro to remove code duplication.
@@ -540,85 +526,82 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20251201 "compile" source code as string to GpTree for FunctionSet.
 
-//    GpTree compileSourceCodeToTree(const std::string& source_code) const
-//    {
-//        return newMakeRandomTree(2, 5);
-//    }
-
-//        // "compile" source code as std::string to a GpTree for this FunctionSet.
-//        GpTree compile(const std::string& source_code) const
-//        {
-//            std::string s = source_code;
-//
-//    //        std::string source = "a(b(5.2, c(-32)))";
-//
-//            s = findAndReplaceAllOccurrences("(", " [ ", s);
-//            s = findAndReplaceAllOccurrences(")", " ] ", s);
-//            s = findAndReplaceAllOccurrences(",", " ; ", s);
-//
-//            s = findAndReplaceAllOccurrences("[", "(", s);
-//            s = findAndReplaceAllOccurrences("]", ")", s);
-//            s = findAndReplaceAllOccurrences(";", ",", s);
-//
-//            s = findAndReplaceAllOccurrences("\\n", " ", s);
-//
-//            s = removeDuplicateWhitespace(s);
-//    //        debugPrint(s);
-//
-//
-//    //    //        for (const auto word : std::views::split(s, " "))
-//    //            for (const auto word : std::ranges::split_view(s, " "))
-//    //
-//    //            {
-//    //                // with string_view's C++23 range constructor:
-//    //    //            std::cout << std::quoted(std::string_view(word)) << ' ';
-//    //                std::cout << word << ' ';
-//    //            }
-//    //            std::cout << '\n';
-//
-//    //            size_t start = 0;
-//    //            size_t delim = s.find(" ", start);
-//    //    //        while (start != s.npos)
-//    //            while (start < s.size())
-//    //            {
-//    //    //            debugPrint(s.substr(start, delim - start));
-//    //                auto token = s.substr(start, delim - start);
-//    //
-//    //                std::cout << std::quoted(token) << std::endl;
-//    //
-//    //                start = delim + 1;
-//    //                delim = s.find(" ", start);
-//    //
-//    //                debugPrint(start);
-//    //                debugPrint(delim);
-//    //            }
-//
-//
-//            std::cout << std::endl << "source code:" << std::endl;
-//            std::cout << std::quoted(s) << std::endl << std::endl;
-//
-//            size_t start = 0;
-//            size_t delim = 0;
-//            while (start < s.size())
-//            {
-//                delim = s.find(" ", start);
-//                auto token = s.substr(start, delim - start);
-//                std::cout << std::quoted(token) << std::endl;
-//
-//                start = delim + 1;
-//    //            delim = s.find(" ", start);
-//    //            debugPrint(start);
-//    //            debugPrint(delim);
-//            }
-//
-//            return newMakeRandomTree(2, 5);
-//        }
-
     // "compile" source code as std::string to a GpTree for this FunctionSet.
     GpTree compile(const std::string& source_code) const
     {
+        GpTree tree;
+        std::vector<std::string> tokens = tokenizeTreeSource(source_code);
+        int token_index = 0;
+        compileTreeNode(tree, token_index, tokens);
+        return tree;
+    }
+    
+    GpTree compileTreeNode(GpTree& tree,
+                           int& token_index,
+                           const std::vector<std::string>& tokens) const
+    {
+        std::string first_token = tokens.at(token_index);
+        std::cout << "Enter compileTreeNode with token_index = " << token_index
+                  << " (" << std::quoted(first_token) << ")" << std::endl;
+        if (is_numeric(first_token))
+        {
+            const GpType* type = lookupGpTypeByName("Real"); // TEMP WORKAROUND
+            tree.setRootValue(std::any(std::stof(first_token)), *type);
+        }
+        else
+        {
+            const GpFunction* root_function = lookupGpFunctionByName(first_token);
+            tree.setRootFunction(*root_function);
+            tree.addSubtrees(root_function->parameterTypes().size());
+            
+            token_index++;
+            assert(tokens.at(token_index) == "(");
+            
+            size_t st_count = tree.subtrees().size();
+            for (int i = 0; i < st_count; i++)
+            {
+                token_index++;
+                GpTree& subtree = tree.subtrees().at(i);
+                compileTreeNode(subtree, token_index, tokens);
+                
+                if ((st_count > 1) and (i < (st_count - 1)))
+                {
+                    std::cout << "check for comma" << std::endl;
+                    token_index++;
+                    assert(tokens.at(token_index) == ",");
+                }
+            }
+            token_index++;
+            assert(tokens.at(token_index) == ")");
+        }
+        std::cout << "Exit compileTreeNode with token_index = " << token_index
+                  << " (" << std::quoted(tokens.at(token_index)) << ")"
+                  << std::endl;
+        return tree;
+    }
+
+    static bool is_numeric(std::string s)
+    {
+        bool n = true;
+        for (int i = 0; i < s.size(); i++)
+        {
+            unsigned char d = s[i];
+            if (not (std::isdigit(d) or d == '-' or d == '.')) { n = false; }
+        }
+        return n;
+    };
+
+    
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20251202 break tokenization off from compile()
+    
+    
+    static std::vector<std::string> tokenizeTreeSource(const std::string& source)
+    {
+        
         // Preprocess source code to be uniformly delimited by single blanks.
-        std::string s = source_code;
+        std::string s = source;
         s = findAndReplaceAllOccurrences("(", " [ ", s);
         s = findAndReplaceAllOccurrences(")", " ] ", s);
         s = findAndReplaceAllOccurrences(",", " ; ", s);
@@ -627,10 +610,10 @@ public:
         s = findAndReplaceAllOccurrences(";", ",", s);
         s = findAndReplaceAllOccurrences("\\n", " ", s);
         s = removeDuplicateWhitespace(s);
-
+        
         std::cout << std::endl << "source code:" << std::endl;
         std::cout << std::quoted(s) << std::endl << std::endl;
-
+        
         std::vector<std::string> tokens;
         size_t start = 0;
         size_t delim = 0;
@@ -638,27 +621,19 @@ public:
         {
             delim = s.find(" ", start);
             auto token = s.substr(start, delim - start);
-//            std::cout << std::quoted(token) << std::endl;
             tokens.push_back(token);
             start = delim + 1;
         }
         
-//        std::cout << vec_to_string(tokens) << std::endl;
-        for (auto t : tokens)
-        {
-            std::cout << std::quoted(t) << " ";
-        }
+        std::cout << "tokens:" << std::endl;
+        for (auto t : tokens) { std::cout << std::quoted(t) << " "; }
         std::cout << std::endl;
-        
-        
-        
-        
-        return newMakeRandomTree(2, 5);
-    }
 
+        return tokens;
+    }
     
-  
-    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
     // utilities for FS::compile()
     static std::string findAndReplaceAllOccurrences(std::string from,
                                                     std::string to,
@@ -702,14 +677,7 @@ public:
             },
             {
                 {
-                    "a", "Real", {"Real"},
-                    [](GpTree& tree)
-                    {
-                        return std::any(-tree.evalSubtree<double>(0));
-                    }
-                },
-                {
-                    "b", "Real", {"Real", "Real"},
+                    "plus", "Real", {"Real", "Real"},
                     [](GpTree& tree)
                     {
                         return std::any(tree.evalSubtree<double>(0) +
@@ -717,7 +685,15 @@ public:
                     }
                 },
                 {
-                    "c", "Real", {"Real"},
+                    "times", "Real", {"Real", "Real"},
+                    [](GpTree& tree)
+                    {
+                        return std::any(tree.evalSubtree<double>(0) *
+                                        tree.evalSubtree<double>(1));
+                    }
+                },
+                {
+                    "abs", "Real", {"Real"},
                     [](GpTree& tree)
                     {
                         return std::any(std::abs(tree.evalSubtree<double>(0)));
@@ -726,7 +702,14 @@ public:
             }
         };
 //        std::string source = "a(b(5.2, c(-32)))";
-        std::string source = "a(b(5.2,\\n    c(-32)))";
+//        std::string source = "a(b(5.2,\\n    c(-32)))";
+//        std::string source = "q(b(5.2, c(-32)))";
+//        std::string source = "a(b(5.2, c(-32)))";
+
+//        std::string source = "plus(times(2.5, c(-3)), plus(1, 2)";
+//        std::string source = "plus(times(2.5, abs(-3)), plus(1, 2)";
+        std::string source = "plus(times(2.5, abs(-3)), plus(1, 2))";
+
         GpTree tree = fs.compile(source);
         std::cout << "Source code as string: " << source << std::endl;
         std::cout << "Tree: " << std::endl;

@@ -533,6 +533,9 @@ public:
         std::vector<std::string> tokens = tokenizeTreeSource(source_code);
         int token_index = 0;
         compileTreeNode(tree, token_index, tokens);
+        debugPrint(token_index);
+        debugPrint(tokens.size());
+        assert (token_index == (tokens.size() - 1));
         return tree;
     }
     
@@ -545,8 +548,14 @@ public:
                   << " (" << std::quoted(first_token) << ")" << std::endl;
         if (is_numeric(first_token))
         {
-            const GpType* type = lookupGpTypeByName("Real"); // TEMP WORKAROUND
-            tree.setRootValue(std::any(std::stof(first_token)), *type);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251203 visualizePreviouslyLoggedFlockParameters() for GP as well as GA
+//            const GpType* type = lookupGpTypeByName("Real"); // TEMP WORKAROUND
+            const GpType* type = getRootType();
+            assert (type);
+//            tree.setRootValue(std::any(std::stof(first_token)), *type);
+            tree.setRootValue(std::any(std::stod(first_token)), *type);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         else
         {
@@ -714,8 +723,11 @@ public:
         std::cout << "Source code as string: " << source << std::endl;
         std::cout << "Tree: " << std::endl;
         std::cout << tree.to_string(true) << std::endl;
-
-
+        
+        std::cout << "Value: " << std::endl;
+        std::cout << std::any_cast<double>(tree.eval()) << std::endl;
+        // Can't we supply an eval()<> like evalSubtree()
+        
 //        findAndReplaceAllOccurrences("zap",
 //                                     "x",
 //                                     "ding zap yadda zap quux zap");
@@ -763,6 +775,13 @@ private:
     // TODO 20240305 adding crossover_function_hook_ for custom crossover.
     crossover_function_type crossover_function_hook_ = GpTree::crossover;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251203 visualizePreviouslyLoggedFlockParameters() for GP as well as GA
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 };
 
 #undef name_lookup_util

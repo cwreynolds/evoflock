@@ -611,7 +611,8 @@ inline LP::GpFunction Power
   });
 
 //------------------------------------------------------------------------------
-// Vector functions: V3, Add_v3, Sub_v3, Scale_v3, Length, Normalize, Cross,
+//    // Vector functions: V3, Add_v3, Sub_v3, Scale_v3, Length, Normalize, Cross,
+// Vector functions: V3, Add3, Sub3, Scale3, Length, Normalize, Cross,
 // Dot, Parallel_Component, Perpendicular_Component, Interpolate, If_Pos
 
 inline LP::GpFunction V3
@@ -626,9 +627,9 @@ inline LP::GpFunction V3
                            tree.evalSubtree<double>(2)));
   });
 
-inline LP::GpFunction Add_v3
+inline LP::GpFunction Add3
 (
-    "Add_v3",
+    "Add3",
     "Vec3",
     {"Vec3", "Vec3"},
     [](LP::GpTree& tree)
@@ -636,9 +637,9 @@ inline LP::GpFunction Add_v3
         return std::any(tree.evalSubtree<Vec3>(0) + tree.evalSubtree<Vec3>(1));
     });
 
-inline LP::GpFunction Sub_v3
+inline LP::GpFunction Sub3
  (
-  "Sub_v3",
+  "Sub3",
   "Vec3",
   {"Vec3", "Vec3"},
   [](LP::GpTree& tree)
@@ -646,9 +647,9 @@ inline LP::GpFunction Sub_v3
       return std::any(tree.evalSubtree<Vec3>(0) - tree.evalSubtree<Vec3>(1));
   });
 
-inline LP::GpFunction Scale_v3
+inline LP::GpFunction Scale3
  (
-  "Scale_v3",
+  "Scale3",
   "Vec3",
   {"Vec3", "Scalar"},
   [](LP::GpTree& tree)
@@ -656,9 +657,9 @@ inline LP::GpFunction Scale_v3
       return std::any(tree.evalSubtree<Vec3>(0) * tree.evalSubtree<double>(1));
   });
 
-inline LP::GpFunction Div_v3
+inline LP::GpFunction Div3
  (
-  "Div_v3",
+  "Div3",
   "Vec3",
   {"Vec3", "Scalar"},
   [](LP::GpTree& tree)
@@ -830,9 +831,9 @@ inline LP::GpFunction Forward
       return std::any(boid.forward());
   });
 
-inline LP::GpFunction Neighbor_1_Velocity
+inline LP::GpFunction NearestNeighborVelocity
  (
-  "Neighbor_1_Velocity",
+  "NearestNeighborVelocity",
   "Vec3",
   {},
   [](LP::GpTree& t)
@@ -840,9 +841,9 @@ inline LP::GpFunction Neighbor_1_Velocity
       return std::any(getGpBoidNeighbor(1)->velocity());
   });
 
-inline LP::GpFunction Neighbor_1_Offset
+inline LP::GpFunction NearestNeighborOffset
  (
-  "Neighbor_1_Offset",
+  "NearestNeighborOffset",
   "Vec3",
   {},
   [](LP::GpTree& t)
@@ -871,9 +872,9 @@ inline LP::GpFunction First_Obs_Dist
       return std::any(distance);
   });
 
-inline LP::GpFunction First_Obs_Offset
+inline LP::GpFunction FirstObstacleOffset
 (
- "First_Obs_Offset",
+ "FirstObstacleOffset",
  "Vec3",
  {},
  [](LP::GpTree& t)
@@ -890,9 +891,9 @@ inline LP::GpFunction First_Obs_Offset
     return std::any(offset);
 });
 
-inline LP::GpFunction First_Obs_Normal
+inline LP::GpFunction FirstObstacleNormal
  (
-  "First_Obs_Normal",
+  "FirstObstacleNormal",
   "Vec3",
   {},
   [](LP::GpTree& t)
@@ -1077,10 +1078,10 @@ LP::FunctionSet evoflock_gp_function_set()
         {
             // Vector functions:
             V3,
-            Add_v3,
-            Sub_v3,
-            Scale_v3,
-            Div_v3,
+            Add3,
+            Sub3,
+            Scale3,
+            Div3,
 //            Length,
             Normalize,
 //            Dot,
@@ -1095,12 +1096,12 @@ LP::FunctionSet evoflock_gp_function_set()
 //            Speed,
             Velocity,
             // Acceleration,
-            // Forward,
-            Neighbor_1_Velocity,
-            Neighbor_1_Offset,
+            Forward,
+            NearestNeighborVelocity,
+            NearestNeighborOffset,
 //            First_Obs_Dist,
-            First_Obs_Normal,
-            First_Obs_Offset,
+            FirstObstacleNormal,
+            FirstObstacleOffset,
             // To_Forward,
             // To_Side,
             SideAndForward,

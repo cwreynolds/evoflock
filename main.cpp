@@ -17,8 +17,8 @@ int main(int argc, const char * argv[])
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20251130 "compile" source code as string to GpTree for FunctionSet.
-    LP::FunctionSet::tempTestCompile();
-    exit(EXIT_SUCCESS);
+//    LP::FunctionSet::tempTestCompile();
+//    exit(EXIT_SUCCESS);
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     EF::runOneFlockEvolution();

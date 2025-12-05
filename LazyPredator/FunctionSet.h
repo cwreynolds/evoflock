@@ -565,7 +565,9 @@ public:
             
             token_index++;
             assert(tokens.at(token_index) == "(");
-            
+//            bool next_token_is_open_paren = tokens.at(token_index) == "(";
+//            assert(next_token_is_open_paren);
+
             size_t st_count = tree.subtrees().size();
             for (int i = 0; i < st_count; i++)
             {
@@ -578,10 +580,14 @@ public:
                     std::cout << "check for comma" << std::endl;
                     token_index++;
                     assert(tokens.at(token_index) == ",");
+//                    bool next_token_is_comma = tokens.at(token_index) == ",";
+//                    assert(next_token_is_comma);
                 }
             }
             token_index++;
             assert(tokens.at(token_index) == ")");
+//            bool next_token_is_close_paren = tokens.at(token_index) == ")";
+//            assert(next_token_is_close_paren);
         }
         std::cout << "Exit compileTreeNode with token_index = " << token_index
                   << " (" << std::quoted(tokens.at(token_index)) << ")"

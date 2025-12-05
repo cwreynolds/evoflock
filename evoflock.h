@@ -312,11 +312,28 @@ void visualizePreviouslyLoggedFlockParameters()
 //               Add3(Scale3(FirstObstacleNormal(),                100), \
 //                    Add3(LengthAdjust(Velocity(), 20,             30), \
 //                         LengthAdjust(NearestNeighborOffset(), 3, 30))))";
-    std::string gp_source =
-         "Add3(Scale3(Forward(),                                  66), \
-               Add3(Scale3(FirstObstacleNormal(),                100), \
-                    Add3(LengthAdjust(Velocity(), 20,             66), \
-                         LengthAdjust(NearestNeighborOffset(), 3, 33))))";
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251204 why does handmade program behave poorly?
+    
+//    std::string gp_source =
+//         "Add3(Scale3(Forward(),                                  66), \
+//               Add3(Scale3(FirstObstacleNormal(),                100), \
+//                    Add3(LengthAdjust(Velocity(), 20,             66), \
+//                         LengthAdjust(NearestNeighborOffset(), 3, 33))))";
+
+    
+//    std::string gp_source = "Scale3(Forward(), 66)";
+
+//    std::string gp_source = "LengthAdjust(Velocity(), 19, 66)";
+
+//    std::string gp_source = "Add3(Scale3(Forward(), 33), \
+//                                  LengthAdjust(Velocity(), 19, 100))";
+
+    std::string gp_source = "LengthAdjust(Velocity(), 20, 100)";
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     LP::FunctionSet fs = GP::evoflock_gp_function_set();
     LP::GpTree tree = fs.compile(gp_source);
     LP::Individual individual(tree);

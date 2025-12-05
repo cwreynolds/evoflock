@@ -763,6 +763,27 @@ inline LP::GpFunction If_Pos
                       tree.evalSubtree<Vec3>(2));
   });
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20251204 why does handmade program behave poorly?
+
+//    inline LP::GpFunction LengthAdjust
+//     (
+//      "LengthAdjust",
+//      "Vec3",
+//      {"Vec3", "Scalar", "Scalar"},  // ref vec, target length, strength
+//      [](LP::GpTree& tree)
+//      {
+//          Vec3 ref_vector = tree.evalSubtree<Vec3>(0);
+//
+//          // TODO temporarily fix with an abs(), later with special Scalar def?
+//          double target_length = std::abs(tree.evalSubtree<double>(1));
+//          double strength = std::abs(tree.evalSubtree<double>(1));
+//
+//          bool adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
+//          return std::any(ref_vector.normalize_or_0() * adjust);
+//      });
+
+
 inline LP::GpFunction LengthAdjust
  (
   "LengthAdjust",
@@ -774,11 +795,31 @@ inline LP::GpFunction LengthAdjust
       
       // TODO temporarily fix with an abs(), later with special Scalar def?
       double target_length = std::abs(tree.evalSubtree<double>(1));
-      double strength = std::abs(tree.evalSubtree<double>(1));
+      double strength = std::abs(tree.evalSubtree<double>(2));
+
+//      bool adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
+      bool adjust = strength * (ref_vector.length() > target_length ? 1 : -1);
       
-      bool adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
-      return std::any(ref_vector.normalize_or_0() * adjust);
+//      return std::any(ref_vector.normalize_or_0() * adjust);
+      
+      Vec3 result = ref_vector.normalize_or_0() * adjust;
+
+      if (Boid::getGpPerThread()->isSelected())
+      {
+          std::cout << std::endl;
+          debugPrint(ref_vector);
+          debugPrint(target_length);
+          debugPrint(strength);
+          debugPrint(ref_vector.length() < target_length ? 1 : -1);
+          debugPrint(adjust);
+          debugPrint(result);
+      }
+      
+      return std::any(result);
+
   });
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 
 //------------------------------------------------------------------------------

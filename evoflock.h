@@ -330,8 +330,57 @@ void visualizePreviouslyLoggedFlockParameters()
 //    std::string gp_source = "Add3(Scale3(Forward(), 33), \
 //                                  LengthAdjust(Velocity(), 19, 100))";
 
-    std::string gp_source = "LengthAdjust(Velocity(), 20, 100)";
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251205 rebuild hand-written GP example
+
+//    std::string gp_source = "LengthAdjust(Velocity(), 20, 100)";
+  
+//    std::string gp_source = "Add3(LengthAdjust(Velocity(), 20,   100), \
+//                                  Scale3(FirstObstacleNormal(),  100))";
+
+//    std::string gp_source =
+//        "SideAndForward(Scale3(FirstObstacleNormal(),  66), \
+//                        LengthAdjust(Velocity(), 20,  100))";
+
+//    std::string gp_source =
+//        "SideAndForward(Scale3(Normalize(FirstObstacleNormal()),  66), \
+//                        LengthAdjust(Velocity(), 20,  100))";
+
+//    std::string gp_source =
+//        "Add3(LengthAdjust(Velocity(), 20,                      33),  \
+//              Scale3(Normalize(ToSide(FirstObstacleNormal())), 100))";
+
+//    std::string gp_source =
+//        "Add3(LengthAdjust(Velocity(), 20,                           33), \
+//              Add3(LengthAdjust(NearestNeighborOffset(), 3,          66), \
+//                   Scale3(Normalize(ToSide(FirstObstacleNormal())), 100)))";
+
+//    std::string gp_source =
+//        "Add3(LengthAdjust(Velocity(), 20,                           10), \
+//              Add3(LengthAdjust(NearestNeighborOffset(), 3,          20), \
+//                   Scale3(Normalize(ToSide(FirstObstacleNormal())), 100)))";
+
+//    std::string gp_source =
+//        "Add3(LengthAdjust(Velocity(), 20,                           10), \
+//              Add3(LengthAdjust(NearestNeighborOffset(), 3,          20), \
+//                   Scale3(FirstObstacleNormal(),                    100)))";
+
+//    std::string gp_source =
+//        "Add3(LengthAdjust(Velocity(), 20,                           10), \
+//              Add3(LengthAdjust(NearestNeighborOffset(), 3,          20), \
+//                   Scale3(Normalize(ToSide(FirstObstacleNormal())), 200)))";
+
     
+//    std::string gp_source =
+//        "Add3(Scale3(Normalize(ToSide(FirstObstacleTimeLimitNormal(1))), 200), \
+//              Add3(LengthAdjust(NearestNeighborOffset(), 3,               20), \
+//                   LengthAdjust(Velocity(), 20,                           10)))";
+
+    std::string gp_source =
+        "Add3(Scale3(Normalize(ToSide(FirstObstacleTimeLimitNormal(1))), 200), \
+              Add3(LengthAdjust(NearestNeighborOffset(), 3,              100), \
+                   LengthAdjust(Velocity(), 20,                           10)))";
+
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     LP::FunctionSet fs = GP::evoflock_gp_function_set();

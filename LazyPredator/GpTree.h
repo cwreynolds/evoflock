@@ -331,12 +331,12 @@ public:
 
         //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
         // TODO 20251129 logging prior to "hoist" operator on GpTree
-        grabPrintLock();
-        std::cout << "[[[[[[[[[[[[[[[[[[[[[[[" << std::endl << std::endl;
-        std::cout << std::endl << "parent0:" << std::endl;
-        std::cout << parent0.to_string(true) << std::endl;
-        std::cout << std::endl << "parent1:" << std::endl;
-        std::cout << parent1.to_string(true) << std::endl;
+//        grabPrintLock();
+//        std::cout << "[[[[[[[[[[[[[[[[[[[[[[[" << std::endl << std::endl;
+//        std::cout << std::endl << "parent0:" << std::endl;
+//        std::cout << parent0.to_string(true) << std::endl;
+//        std::cout << std::endl << "parent1:" << std::endl;
+//        std::cout << parent1.to_string(true) << std::endl;
         //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
 
         // Perform actual crossover.
@@ -373,10 +373,10 @@ public:
             
             //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
             // TODO 20251129 logging prior to "hoist" operator on GpTree
-            std::cout << std::endl << "d_subtree:" << std::endl;
-            std::cout << d_subtree.to_string(true) << std::endl;
-            std::cout << std::endl << "r_subtree:" << std::endl;
-            std::cout << r_subtree.to_string(true) << std::endl;
+//            std::cout << std::endl << "d_subtree:" << std::endl;
+//            std::cout << d_subtree.to_string(true) << std::endl;
+//            std::cout << std::endl << "r_subtree:" << std::endl;
+//            std::cout << r_subtree.to_string(true) << std::endl;
             //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
 
             // Overwrite the recipient subtree with copy of donor subtree.
@@ -384,9 +384,9 @@ public:
             
             //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
             // TODO 20251129 logging prior to "hoist" operator on GpTree
-            std::cout << std::endl << "recipient after crossover:" << std::endl;
-            std::cout << recipient.to_string(true) << std::endl;
-            std::cout << std::endl << "]]]]]]]]]]]]]]]]]]]]]]]" << std::endl;
+//            std::cout << std::endl << "recipient after crossover:" << std::endl;
+//            std::cout << recipient.to_string(true) << std::endl;
+//            std::cout << std::endl << "]]]]]]]]]]]]]]]]]]]]]]]" << std::endl;
             //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
 
             //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
@@ -436,12 +436,12 @@ public:
         
         //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
         // TODO 20251129 logging prior to "hoist" operator on GpTree
-        std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
-        
-        std::cout << std::endl << "before hoist:" << std::endl;
-        std::cout << to_string(true) << std::endl;
-        
-        std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
+//        std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
+//        
+//        std::cout << std::endl << "before hoist:" << std::endl;
+//        std::cout << to_string(true) << std::endl;
+//        
+//        std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
         //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
         
     }

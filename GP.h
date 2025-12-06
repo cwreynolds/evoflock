@@ -784,6 +784,9 @@ inline LP::GpFunction If_Pos
 //      });
 
 
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20251205 local to GP fix for zero length Velocity?
+
 inline LP::GpFunction LengthAdjust
  (
   "LengthAdjust",
@@ -798,26 +801,31 @@ inline LP::GpFunction LengthAdjust
       double strength = std::abs(tree.evalSubtree<double>(2));
 
 //      bool adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
-      bool adjust = strength * (ref_vector.length() > target_length ? 1 : -1);
-      
+//      bool adjust = strength * (ref_vector.length() > target_length ? 1 : -1);
+//      double adjust = strength * (ref_vector.length() > target_length ? 1 : -1);
+      double adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
+
 //      return std::any(ref_vector.normalize_or_0() * adjust);
       
       Vec3 result = ref_vector.normalize_or_0() * adjust;
 
       if (Boid::getGpPerThread()->isSelected())
       {
-          std::cout << std::endl;
-          debugPrint(ref_vector);
-          debugPrint(target_length);
-          debugPrint(strength);
-          debugPrint(ref_vector.length() < target_length ? 1 : -1);
-          debugPrint(adjust);
-          debugPrint(result);
+//          std::cout << std::endl;
+//          debugPrint(ref_vector);
+//          debugPrint(ref_vector.length());
+//          debugPrint(target_length);
+//          debugPrint(strength);
+//          debugPrint(ref_vector.length() < target_length ? 1 : -1);
+//          debugPrint(adjust);
+//          debugPrint(result);
       }
       
       return std::any(result);
 
   });
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -825,7 +833,7 @@ inline LP::GpFunction LengthAdjust
 //------------------------------------------------------------------------------
 // Boid API: Speed, Velocity, Acceleration, Forward,
 //           Neighbor_1_Velocity, Neighbor_1_Offset,
-//           First_Obs_Dist, First_Obs_Normal, To_Forward, To_Side
+//           First_Obs_Dist, First_Obs_Normal, ToForward, ToSide
 
 
 inline LP::GpFunction Speed
@@ -839,16 +847,40 @@ inline LP::GpFunction Speed
   });
 
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20251205 local to GP fix for zero length Velocity?
+
+//    inline LP::GpFunction Velocity
+//     (
+//      "Velocity",
+//      "Vec3",
+//      {},
+//      [](LP::GpTree& t)
+//      {
+//          Boid& boid = *Boid::getGpPerThread();
+//          return std::any(boid.velocity());
+//      });
+
 inline LP::GpFunction Velocity
- (
-  "Velocity",
-  "Vec3",
-  {},
-  [](LP::GpTree& t)
-  {
-      Boid& boid = *Boid::getGpPerThread();
-      return std::any(boid.velocity());
-  });
+(
+ "Velocity",
+ "Vec3",
+ {},
+ [](LP::GpTree& t)
+ {
+    Boid& boid = *Boid::getGpPerThread();
+    double min_speed = 0.01;  // cf target speed usually 20.
+//    Vec3 v = ((boid.speed() < min_speed) ?
+//              boid.forward() * min_speed :
+//              boid.velocity());
+    
+    Vec3 v = boid.velocity();
+    if (boid.speed() < min_speed) { v = boid.forward() * min_speed; }
+
+    return std::any(v);
+});
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 inline LP::GpFunction Acceleration
  (
@@ -950,10 +982,38 @@ inline LP::GpFunction FirstObstacleNormal
       return std::any(normal);
   });
 
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20251205 try a new high level GpFunc
 
-inline LP::GpFunction To_Forward
+inline LP::GpFunction FirstObstacleTimeLimitNormal
+(
+ "FirstObstacleTimeLimitNormal",
+ "Vec3",
+ {"Scalar"}, // time_to_collision_threshold
+ [](LP::GpTree& tree)
+ {
+    double time_to_collision_threshold = tree.evalSubtree<double>(0);
+    Boid& boid = *Boid::getGpPerThread();
+    Vec3 normal;
+    auto collisions = boid.get_predicted_obstacle_collisions();
+    if (collisions.size() > 0)
+    {
+        const Collision& first_collision = collisions.front();
+//        normal = first_collision.normal_at_poi;
+        
+        if (first_collision.time_to_collision < time_to_collision_threshold)
+        {
+            normal = first_collision.normal_at_poi;
+        }
+    }
+    return std::any(normal);
+});
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+inline LP::GpFunction ToForward
  (
-  "To_Forward",
+  "ToForward",
   "Vec3",
   {"Vec3"},
   [](LP::GpTree& tree)
@@ -966,9 +1026,9 @@ inline LP::GpFunction To_Forward
   });
 
 
-inline LP::GpFunction To_Side
+inline LP::GpFunction ToSide
  (
-  "To_Side",
+  "ToSide",
   "Vec3",
   {"Vec3"},
   [](LP::GpTree& tree)
@@ -1143,8 +1203,17 @@ LP::FunctionSet evoflock_gp_function_set()
 //            First_Obs_Dist,
             FirstObstacleNormal,
             FirstObstacleOffset,
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251205 try a new high level GpFunc
+            FirstObstacleTimeLimitNormal,
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
             // To_Forward,
             // To_Side,
+            ToForward,
+            ToSide,
+
             SideAndForward,
 
             // Cartoonishly high level Boid API for debugging:

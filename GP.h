@@ -1188,7 +1188,12 @@ LP::FunctionSet evoflock_gp_function_set()
         {
             { "Vec3" },
 //            { "Scalar", -10.0, 10.0 },
-            { "Scalar", -100.0, 100.0 },
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20251207 inject hand-written code into population
+//            { "Scalar", -100.0, 100.0 },
+//            { "Scalar", -100.0, 100.0, jiggle_scale },
+            { "Scalar", -100.0, 100.0, 0.005 },
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         },
         // GpFunctions
         {

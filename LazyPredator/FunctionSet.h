@@ -548,14 +548,25 @@ public:
                   << " (" << std::quoted(first_token) << ")" << std::endl;
         if (is_numeric(first_token))
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251203 visualizePreviouslyLoggedFlockParameters() for GP as well as GA
-//            const GpType* type = lookupGpTypeByName("Real"); // TEMP WORKAROUND
-            const GpType* type = getRootType();
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20251207 the GpType SHOULD be passed into compileTreeNode(),
+            //               but making a temporary workaround right now:
+
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20251203 visualizePreviouslyLoggedFlockParameters() for GP as well as GA
+//    //            const GpType* type = lookupGpTypeByName("Real"); // TEMP WORKAROUND
+//                const GpType* type = getRootType();
+//                assert (type);
+//    //            tree.setRootValue(std::any(std::stof(first_token)), *type);
+//                tree.setRootValue(std::any(std::stod(first_token)), *type);
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+            const GpType* type = lookupGpTypeByName("Scalar");
             assert (type);
-//            tree.setRootValue(std::any(std::stof(first_token)), *type);
             tree.setRootValue(std::any(std::stod(first_token)), *type);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
         }
         else
         {

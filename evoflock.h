@@ -78,6 +78,37 @@ namespace EvoFlock
 void visualizeBestIfRequested(LP::Population* population);
 void visualizePreviouslyLoggedFlockParameters();
 
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20251207 inject hand-written code into population
+//               very ad hoc, needs work
+
+// Inject hand-written "approximate solution" code into population, for testing.
+void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
+                                         LP::Population* population)
+{
+    std::string gp_source =
+    "Add3(Scale3(Add3(Sub3(NearestNeighborVelocity(), Velocity()),             \
+                      Sub3(NearestNeighbor2Velocity(), Velocity())),    10),   \
+          Add3(Scale3(FirstObstacleTimeLimitNormal(1),                 100),   \
+               Add3(LengthAdjust(NearestNeighborOffset(), 10,           80),   \
+                    LengthAdjust(Velocity(), 20,                        40))))";
+    LP::GpTree tree = fs.compile(gp_source);
+    auto inject = [&](LP::Individual* individual)
+    {
+        if (EF::RS().randomBool(0.33))
+        {
+            tree.mutate();
+            individual->setTree(tree);
+            // std::cout << tree.to_string(true) << std::endl;
+        }
+    };
+    population->applyToAllIndividuals(inject);
+}
+
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 void runOneFlockEvolution()
 {
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
@@ -171,6 +202,13 @@ void runOneFlockEvolution()
         if (EF::usingGP())
         {
             population->explicit_treeValue_in_evolutionStep = false;
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20251207 inject hand-written code into population
+
+            injectHandWrittenCodeIntoPopulation(fs, population);
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         }
         else
         {
@@ -471,20 +509,20 @@ void visualizePreviouslyLoggedFlockParameters()
                     LengthAdjust(Velocity(), 20,                        40))))";
 
     
+//    LP::FunctionSet fs = GP::evoflock_gp_function_set();
+//    LP::GpTree tree = fs.compile(gp_source);
+//    LP::Individual individual(tree);
+//
+//    EF::enable_multithreading = false;
+//    Draw::getInstance().setEnable(true);
+//    while (true) { GP::run_flock_simulation(&individual, 1); }
+
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    LP::FunctionSet fs = GP::evoflock_gp_function_set();
-    LP::GpTree tree = fs.compile(gp_source);
-    LP::Individual individual(tree);
-    
-    EF::enable_multithreading = false;
-    Draw::getInstance().setEnable(true);
-    while (true) { GP::run_flock_simulation(&individual, 1); }
 }
 
 

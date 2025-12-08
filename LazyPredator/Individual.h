@@ -115,6 +115,14 @@ public:
     }
     // Read-only (const) access to this Individual's GpTree.
     const GpTree& tree() const { return tree_; }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251207 experimental, for debugging, for injecting hand written
+    // programs into population there may be better/safer ways to do this.
+    
+    // Overwrite this Individual's tree. Used for injecting hand written code.
+    void setTree(const GpTree& new_tree) { tree_ = new_tree; }
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // Return/cache the result of running/evaluating this Individual's GpTree.
     std::any treeValue()
     {

@@ -447,11 +447,32 @@ void visualizePreviouslyLoggedFlockParameters()
 //              Add3(LengthAdjust(Velocity(), 20,                         40), \
 //                   Scale3(Sub3(NearestNeighborVelocity(), Velocity()),  20))))";
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251207 try adding 2nd nearest neighbor velocity.
+    
+//    std::string gp_source =
+//    "Add3(Scale3(FirstObstacleTimeLimitNormal(1),                      100), \
+//         Add3(LengthAdjust(NearestNeighborOffset(), 10,                 60), \
+//              Add3(LengthAdjust(Velocity(), 20,                         40), \
+//                   Scale3(Sub3(NearestNeighborVelocity(), Velocity()),  20))))";
+
+//    std::string gp_source =
+//    "Add3(Scale3(Add3(Sub3(NearestNeighborVelocity(), Velocity()),             \
+//                     Sub3(NearestNeighbor2Velocity(), Velocity())),     20),   \
+//         Add3(Scale3(FirstObstacleTimeLimitNormal(1),                  100),   \
+//              Add3(LengthAdjust(NearestNeighborOffset(), 10,            60),   \
+//                   LengthAdjust(Velocity(), 20,                         40))))";
+
     std::string gp_source =
-    "Add3(Scale3(FirstObstacleTimeLimitNormal(1),                      100), \
-         Add3(LengthAdjust(NearestNeighborOffset(), 10,                 60), \
-              Add3(LengthAdjust(Velocity(), 20,                         40), \
-                   Scale3(Sub3(NearestNeighborVelocity(), Velocity()),  20))))";
+    "Add3(Scale3(Add3(Sub3(NearestNeighborVelocity(), Velocity()),             \
+                      Sub3(NearestNeighbor2Velocity(), Velocity())),    10),   \
+          Add3(Scale3(FirstObstacleTimeLimitNormal(1),                 100),   \
+               Add3(LengthAdjust(NearestNeighborOffset(), 10,           80),   \
+                    LengthAdjust(Velocity(), 20,                        40))))";
+
+    
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     

@@ -183,7 +183,7 @@ void doOneRunDebugLogging(Boid& boid,
             // to see if first obstacle is centered there.
             Vec3 a = boid.position();
             auto& d = Draw::getInstance();
-            d.addThickLineToAnimatedFrame(a, Vec3(), Color::magenta(), 0.02);
+//            d.addThickLineToAnimatedFrame(a, Vec3(), Color::magenta(), 0.02);
             // Cyan line from boid to predicted obstacle avoidance
             CollisionList cl = boid.get_predicted_obstacle_collisions();
             Collision first_collision = cl.at(0);
@@ -914,6 +914,21 @@ inline LP::GpFunction NearestNeighborVelocity
       return std::any(getGpBoidNeighbor(1)->velocity());
   });
 
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20251207 try adding 2nd nearest neighbor velocity.
+
+inline LP::GpFunction NearestNeighbor2Velocity
+ (
+  "NearestNeighbor2Velocity",
+  "Vec3",
+  {},
+  [](LP::GpTree& t)
+  {
+      return std::any(getGpBoidNeighbor(2)->velocity());
+  });
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 inline LP::GpFunction NearestNeighborOffset
  (
   "NearestNeighborOffset",
@@ -1200,6 +1215,13 @@ LP::FunctionSet evoflock_gp_function_set()
             Forward,
             NearestNeighborVelocity,
             NearestNeighborOffset,
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20251207 try adding 2nd nearest neighbor velocity.
+            NearestNeighbor2Velocity,
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+            
 //            First_Obs_Dist,
             FirstObstacleNormal,
             FirstObstacleOffset,

@@ -87,13 +87,25 @@ void visualizePreviouslyLoggedFlockParameters();
 void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
                                          LP::Population* population)
 {
-    std::string gp_source =
-    "Add3(Scale3(Add3(Sub3(NearestNeighborVelocity(), Velocity()),             \
-                      Sub3(NearestNeighbor2Velocity(), Velocity())),    10),   \
-          Add3(Scale3(FirstObstacleTimeLimitNormal(1),                 100),   \
-               Add3(LengthAdjust(NearestNeighborOffset(), 10,           80),   \
-                    LengthAdjust(Velocity(), 20,                        40))))";
-    LP::GpTree tree = fs.compile(gp_source);
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251208 2 clauses for velocity match for 2 nearest neighbors.
+
+//    std::string gp_source =
+//    "Add3(Scale3(Add3(Sub3(NearestNeighborVelocity(), Velocity()),             \
+//                      Sub3(NearestNeighbor2Velocity(), Velocity())),    10),   \
+//          Add3(Scale3(FirstObstacleTimeLimitNormal(1),                 100),   \
+//               Add3(LengthAdjust(NearestNeighborOffset(), 10,           80),   \
+//                    LengthAdjust(Velocity(), 20,                        40))))";
+
+    std::string hand_written_gp_source =
+    "Add3(Scale3(Sub3(NearestNeighborVelocity(), Velocity()),          20),   \
+          Add3(Scale3(Sub3(NearestNeighbor2Velocity(), Velocity()),    20),   \
+               Add3(Scale3(FirstObstacleTimeLimitNormal(1),           100),   \
+                    Add3(LengthAdjust(NearestNeighborOffset(), 10,     80),   \
+                         LengthAdjust(Velocity(), 20,                  40)))))";
+
+    LP::GpTree tree = fs.compile(hand_written_gp_source);
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     auto inject = [&](LP::Individual* individual)
     {
         if (EF::RS().randomBool(0.33))
@@ -135,7 +147,12 @@ void runOneFlockEvolution()
 
     // The number of Individuals in a population for evolutionary optimization.
     // By default it is divided into sqrt(individuals) breeding sub-populations.
-    int individuals = 300;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251208 after 20251207_gp_handmade_seeded, try bigger population.
+//    int individuals = 300;
+//    int individuals = 600;
+    int individuals = EF::usingGA() ? 300 : 600;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     int subpops = std::round(std::sqrt(individuals));
     
     // Total number of Individual update steps. (Steady state update stepss. For
@@ -501,21 +518,47 @@ void visualizePreviouslyLoggedFlockParameters()
 //              Add3(LengthAdjust(NearestNeighborOffset(), 10,            60),   \
 //                   LengthAdjust(Velocity(), 20,                         40))))";
 
-    std::string gp_source =
-    "Add3(Scale3(Add3(Sub3(NearestNeighborVelocity(), Velocity()),             \
-                      Sub3(NearestNeighbor2Velocity(), Velocity())),    10),   \
-          Add3(Scale3(FirstObstacleTimeLimitNormal(1),                 100),   \
-               Add3(LengthAdjust(NearestNeighborOffset(), 10,           80),   \
-                    LengthAdjust(Velocity(), 20,                        40))))";
+    // 20251207 version
+//    std::string gp_source =
+//    "Add3(Scale3(Add3(Sub3(NearestNeighborVelocity(), Velocity()),             \
+//                      Sub3(NearestNeighbor2Velocity(), Velocity())),    10),   \
+//          Add3(Scale3(FirstObstacleTimeLimitNormal(1),                 100),   \
+//               Add3(LengthAdjust(NearestNeighborOffset(), 10,           80),   \
+//                    LengthAdjust(Velocity(), 20,                        40))))";
 
     
-//    LP::FunctionSet fs = GP::evoflock_gp_function_set();
-//    LP::GpTree tree = fs.compile(gp_source);
-//    LP::Individual individual(tree);
-//
-//    EF::enable_multithreading = false;
-//    Draw::getInstance().setEnable(true);
-//    while (true) { GP::run_flock_simulation(&individual, 1); }
+    std::string gp_source =
+    "Add3(LengthAdjust(Velocity(),  \
+                      20.0929,  \
+                      38.6588),  \
+         Add3(Add3(LengthAdjust(Add3(Scale3(FirstObstacleTimeLimitNormal(0.881421),  \
+                                            92.1383),  \
+                                     Add3(NearestNeighborOffset(),  \
+                                          LengthAdjust(Add3(Add3(Scale3(FirstObstacleTimeLimitNormal(1.60754),  \
+                                                                        94.5695),  \
+                                                                 FirstObstacleTimeLimitNormal(90.9005)),  \
+                                                            Add3(Scale3(FirstObstacleTimeLimitNormal(1.05937),  \
+                                                                        96.9123),  \
+                                                                 Sub3(NearestNeighbor2Velocity(),  \
+                                                                      Velocity()))),  \
+                                                       14.7716,  \
+                                                       89.3373))),  \
+                                89.3431,  \
+                                15.7839),  \
+                   FirstObstacleTimeLimitNormal(0.0752863)),  \
+              Add3(Scale3(FirstObstacleTimeLimitNormal(0.835185),  \
+                          90.9535),  \
+                   Sub3(NearestNeighbor2Velocity(),  \
+                        Velocity()))))";
+    
+    
+    LP::FunctionSet fs = GP::evoflock_gp_function_set();
+    LP::GpTree tree = fs.compile(gp_source);
+    LP::Individual individual(tree);
+
+    EF::enable_multithreading = false;
+    Draw::getInstance().setEnable(true);
+    while (true) { GP::run_flock_simulation(&individual, 1); }
 
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~

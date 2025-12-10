@@ -307,6 +307,11 @@ public:
         // TODO 20251124 API for "perverse_speed_control".
         recordPerverseSpeedControlScorePerStep();
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20251208 score for boid alignment.
+        recordAlignmentScorePerStep();
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20251122 all ops return Vec3, Scalar values all constants
@@ -346,8 +351,8 @@ public:
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20251124 API for "perverse_speed_control".
-        std::cout << std::format(", perverse speed = {:.3}",
-                                 perverseSpeedControlScore());
+//        std::cout << std::format(", perverse speed = {:.3}",
+//                                 perverseSpeedControlScore());
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         
         std::cout << std::endl;
@@ -561,7 +566,38 @@ public:
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251208 score for boid alignment.
     
+    // Accumulators for alignment score.
+    // TODO Relocate in file?
+    double sum_of_alignment_scores_over_all_boid_steps_ = 0;
+
+    // Called each simulation step, records alignment score.
+    void recordAlignmentScorePerStep()
+    {
+        for (auto b : boids())
+        {
+            double sum_of_alignments = 0;
+            for (Boid* n : b->nearest_neighbors())
+            {
+                double d = Vec3::dot(b->forward(), n->forward());
+                sum_of_alignments += d;
+            }
+            sum_of_alignments = std::abs(sum_of_alignments);
+            sum_of_alignments /= b->nearest_neighbors().size();
+            sum_of_alignment_scores_over_all_boid_steps_ += sum_of_alignments;
+        }
+    }
+
+    // Average speed for each Boid on each simulation step.
+    double alignmentScore() const
+    {
+        return (sum_of_alignment_scores_over_all_boid_steps_ / boidStepPerSim());
+    }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.
     void enforceObsBoidConstraints()

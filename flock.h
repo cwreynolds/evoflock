@@ -368,7 +368,7 @@ public:
 
     // Given a unit fitness scores (on [0,1]), and an emphasis factor (also on
     // [0,1]), push down low and mid range scores. Uses a piecewise linear "knee"
-    // curve, something like exponentiating:0→0, 1→1, but 0.5 goes to something
+    // curve, something like exponentiating: 0→0, 1→1, but 0.5 goes to something
     // less than 0.5.  TODO 20250427 should this be in Utilities?
     static double emphasizeHighScores(double unit_score, double emphasis)
     {
@@ -437,7 +437,15 @@ public:
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
     {
-        return emphasizeHighScores(separationScorePerBoidStep(), 0.0);
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20251210 re-enable emphasizeHighScores() in separationScore()
+
+//        return emphasizeHighScores(separationScorePerBoidStep(), 0.0);
+
+        return emphasizeHighScores(separationScorePerBoidStep(),
+                                   EF::usingGA() ? 0 : 0.4);
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     }
 
     // Accumulators for speed score.
@@ -453,55 +461,66 @@ public:
             // Sum used for average speed over entire run.
             sum_of_speeds_over_all_boid_steps_ += b->speed();
             
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250914 VERY ad hoc work-around for zero speed issue
-            //               try getting rid of the wide flat "porch" where any
-            //               speed below 15 got the same score
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251210 all this folderol is obsolete, GP speed fine now
+            
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                // TODO 20250914 VERY ad hoc work-around for zero speed issue
+//                //               try getting rid of the wide flat "porch" where any
+//                //               speed below 15 got the same score
+//
+//                // Sum scores for "speed is in correct range".
+//                // TODO TEMP WARNING FIX -- raw inline constants.
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                // TODO 20250915 revert
+//    //                double score = parameterToWeightWithRamps(b->speed(),
+//    //    //                                                      {15, 19, 21, 25},
+//    //                                                          { 0, 19, 21, 25},
+//    //                                                          { 0,  1,  1,  0});
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20250920 experimental curriculum learning
+//
+//    //            double score = parameterToWeightWithRamps(b->speed(),
+//    //                                                      {15, 19, 21, 25},
+//    //                                                      { 0,  1,  1,  0});
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                // TODO 20250925 turn off curriculum learning experiment
+//
+//    //                double score = parameterToWeightWithRamps(b->speed(),
+//    //    //                                                      {15, 19, 21, 25},
+//    //                                                          { 0, 19, 21, 25},
+//    //                                                          { 0,  1,  1,  0});
+//
+//    //            double score = parameterToWeightWithRamps(b->speed(),
+//    //                                                      {15, 19, 21, 25},
+//    //                                                      { 0,  1,  1,  0});
+//
+//
+//                double score = parameterToWeightWithRamps(b->speed(),
+//    //                                                      {15, 19, 21, 25},
+//    //                                                      { 0, 19, 21, 25},
+//                                                          { 0, 18, 19, 21, 25},
+//                                                          { 0, .2, 1,  1,  0});
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
             // Sum scores for "speed is in correct range".
             // TODO TEMP WARNING FIX -- raw inline constants.
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20250915 revert
-//                double score = parameterToWeightWithRamps(b->speed(),
-//    //                                                      {15, 19, 21, 25},
-//                                                          { 0, 19, 21, 25},
-//                                                          { 0,  1,  1,  0});
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20250920 experimental curriculum learning
-
-//            double score = parameterToWeightWithRamps(b->speed(),
-//                                                      {15, 19, 21, 25},
-//                                                      { 0,  1,  1,  0});
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20250925 turn off curriculum learning experiment
-
-//                double score = parameterToWeightWithRamps(b->speed(),
-//    //                                                      {15, 19, 21, 25},
-//                                                          { 0, 19, 21, 25},
-//                                                          { 0,  1,  1,  0});
-
-//            double score = parameterToWeightWithRamps(b->speed(),
-//                                                      {15, 19, 21, 25},
-//                                                      { 0,  1,  1,  0});
-
-            
             double score = parameterToWeightWithRamps(b->speed(),
-//                                                      {15, 19, 21, 25},
-//                                                      { 0, 19, 21, 25},
-                                                      { 0, 18, 19, 21, 25},
-                                                      { 0, .2, 1,  1,  0});
+                                                      {15, 19, 21, 25},
+                                                      { 0,  1,  1,  0});
 
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             sum_of_speed_scores_over_all_boid_steps_ += score;
         }
@@ -584,7 +603,11 @@ public:
                 double d = Vec3::dot(b->forward(), n->forward());
                 sum_of_alignments += d;
             }
-            sum_of_alignments = std::abs(sum_of_alignments);
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20251210 oops, meant to clip, not abs.
+//            sum_of_alignments = std::abs(sum_of_alignments);
+            sum_of_alignments = std::max(0.0, sum_of_alignments);
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             sum_of_alignments /= b->nearest_neighbors().size();
             sum_of_alignment_scores_over_all_boid_steps_ += sum_of_alignments;
         }

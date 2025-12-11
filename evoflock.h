@@ -552,13 +552,13 @@ void visualizePreviouslyLoggedFlockParameters()
                         Velocity()))))";
     
     
-    LP::FunctionSet fs = GP::evoflock_gp_function_set();
-    LP::GpTree tree = fs.compile(gp_source);
-    LP::Individual individual(tree);
-
-    EF::enable_multithreading = false;
-    Draw::getInstance().setEnable(true);
-    while (true) { GP::run_flock_simulation(&individual, 1); }
+//    LP::FunctionSet fs = GP::evoflock_gp_function_set();
+//    LP::GpTree tree = fs.compile(gp_source);
+//    LP::Individual individual(tree);
+//
+//    EF::enable_multithreading = false;
+//    Draw::getInstance().setEnable(true);
+//    while (true) { GP::run_flock_simulation(&individual, 1); }
 
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~

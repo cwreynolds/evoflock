@@ -231,16 +231,21 @@ void doOneRunDebugLogging(Boid& boid,
             // set a temp variable on the boid for logging
             boid.log_flock = log_flock;
             assert(boid.belongsToFlock(flock));
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251211 refactor boid steering annotation for GP
+            
             // draw yellow line from selected boid in log_flock to origin,
             // to see if first obstacle is centered there.
-            Vec3 a = boid.position();
-            auto& d = Draw::getInstance();
+//            Vec3 a = boid.position();
+//            auto& d = Draw::getInstance();
+            
 //            d.addThickLineToAnimatedFrame(a, Vec3(), Color::magenta(), 0.02);
-            // Cyan line from boid to predicted obstacle avoidance
-            CollisionList cl = boid.get_predicted_obstacle_collisions();
-            Collision first_collision = cl.at(0);
-            Vec3 poi = first_collision.point_of_impact;
-            d.addThickLineToAnimatedFrame(a, poi, Color::cyan(), 0.02);
+//            // Cyan line from boid to predicted obstacle avoidance
+//            CollisionList cl = boid.get_predicted_obstacle_collisions();
+//            Collision first_collision = cl.at(0);
+//            Vec3 poi = first_collision.point_of_impact;
+//            d.addThickLineToAnimatedFrame(a, poi, Color::cyan(), 0.02);
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         }
     }
 }

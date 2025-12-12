@@ -96,12 +96,16 @@ public:
         return fp().boidsPerFlock() * fp().maxSimulationSteps();
     }
     
-    // Accumulator for separation score of each Boid on each simulation step.
-    double separationScorePerBoidStep() const
-    {
-        return separation_score_sum_ / boidStepPerSim();
-    }
-    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251211 remove separationScorePerBoidStep(), was only used once.
+
+//    // Accumulator for separation score of each Boid on each simulation step.
+//    double separationScorePerBoidStep() const
+//    {
+//        return separation_score_sum_ / boidStepPerSim();
+//    }
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     // TODO 20240131 since c++ has no keyword syntax, perhaps move to creating a
     // default Flock then using (eg) set_boid_count(500) to change things? Or
     // just list all of them in the call?!
@@ -442,9 +446,24 @@ public:
 
 //        return emphasizeHighScores(separationScorePerBoidStep(), 0.0);
 
-        return emphasizeHighScores(separationScorePerBoidStep(),
-                                   EF::usingGA() ? 0 : 0.4);
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20251211 remove temp experiment with emphasizeHighScores().
 
+//        return emphasizeHighScores(separationScorePerBoidStep(),
+//                                   EF::usingGA() ? 0 : 0.4);
+
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20251211 remove separationScorePerBoidStep(), was only used once.
+
+//        return separationScorePerBoidStep();
+        
+        return separation_score_sum_ / boidStepPerSim();
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     }
 

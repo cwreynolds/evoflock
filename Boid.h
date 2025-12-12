@@ -230,7 +230,11 @@ public:
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20251013 very experimental, reuse GA annotation for GP
-        saveAnnotation(forward() * 100, smooth, Vec3(), Vec3(), Vec3(), Vec3());
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20251211 refactor boid steering annotation for GP
+//        saveAnnotation(forward() * 100, smooth, Vec3(), Vec3(), Vec3(), Vec3());
+        saveAnnotation(smooth, Vec3(), Vec3(), Vec3(), Vec3(), Vec3());
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
         return smooth;

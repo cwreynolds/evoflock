@@ -97,24 +97,44 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
 //               Add3(LengthAdjust(NearestNeighborOffset(), 10,           80),   \
 //                    LengthAdjust(Velocity(), 20,                        40))))";
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251211 change NearestNeighborOffset() r=target from 10(!) to 5.
+
+//    std::string hand_written_gp_source =
+//    "Add3(Scale3(Sub3(NearestNeighborVelocity(), Velocity()),          20),   \
+//          Add3(Scale3(Sub3(NearestNeighbor2Velocity(), Velocity()),    20),   \
+//               Add3(Scale3(FirstObstacleTimeLimitNormal(1),           100),   \
+//                    Add3(LengthAdjust(NearestNeighborOffset(), 10,     80),   \
+//                         LengthAdjust(Velocity(), 20,                  40)))))";
+
     std::string hand_written_gp_source =
     "Add3(Scale3(Sub3(NearestNeighborVelocity(), Velocity()),          20),   \
           Add3(Scale3(Sub3(NearestNeighbor2Velocity(), Velocity()),    20),   \
                Add3(Scale3(FirstObstacleTimeLimitNormal(1),           100),   \
-                    Add3(LengthAdjust(NearestNeighborOffset(), 10,     80),   \
+                    Add3(LengthAdjust(NearestNeighborOffset(), 5,      80),   \
                          LengthAdjust(Velocity(), 20,                  40)))))";
 
-    LP::GpTree tree = fs.compile(hand_written_gp_source);
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251211 mutate each new tree from compiled version.
+
+//    LP::GpTree tree = fs.compile(hand_written_gp_source);
+    LP::GpTree compiled_tree = fs.compile(hand_written_gp_source);
+
     auto inject = [&](LP::Individual* individual)
     {
         if (EF::RS().randomBool(0.33))
         {
+            LP::GpTree tree = compiled_tree;
             tree.mutate();
             individual->setTree(tree);
-            // std::cout << tree.to_string(true) << std::endl;
         }
     };
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     population->applyToAllIndividuals(inject);
 }
 

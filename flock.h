@@ -441,30 +441,7 @@ public:
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
     {
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20251210 re-enable emphasizeHighScores() in separationScore()
-
-//        return emphasizeHighScores(separationScorePerBoidStep(), 0.0);
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20251211 remove temp experiment with emphasizeHighScores().
-
-//        return emphasizeHighScores(separationScorePerBoidStep(),
-//                                   EF::usingGA() ? 0 : 0.4);
-
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20251211 remove separationScorePerBoidStep(), was only used once.
-
-//        return separationScorePerBoidStep();
-        
         return separation_score_sum_ / boidStepPerSim();
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     }
 
     // Accumulators for speed score.

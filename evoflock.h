@@ -117,13 +117,26 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
 //                    Add3(LengthAdjust(NearestNeighborOffset(), 5,      80),   \
 //                         LengthAdjust(Velocity(), 20,                  40)))))";
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251212 fix target (AGAIN!) for center of separation range.
+
+//    std::string hand_written_gp_source =
+//    "Add3(Add3(Scale3(Sub3(NearestNeighborVelocity(),  Velocity()),  20),    \
+//               Scale3(Sub3(NearestNeighborVelocity2(), Velocity()),  20)),   \
+//          Add3(Add3(LengthAdjust(NearestNeighborOffset(),  5,        80),    \
+//                    LengthAdjust(NearestNeighborOffset2(), 5,        80)),   \
+//               Add3(Scale3(FirstObstacleTimeLimitNormal(1),         100),    \
+//                    LengthAdjust(Velocity(), 20,                     40))))";
+
     std::string hand_written_gp_source =
     "Add3(Add3(Scale3(Sub3(NearestNeighborVelocity(),  Velocity()),  20),    \
                Scale3(Sub3(NearestNeighborVelocity2(), Velocity()),  20)),   \
-          Add3(Add3(LengthAdjust(NearestNeighborOffset(),  5,        80),    \
-                    LengthAdjust(NearestNeighborOffset2(), 5,        80)),   \
+          Add3(Add3(LengthAdjust(NearestNeighborOffset(),  3,        80),    \
+                    LengthAdjust(NearestNeighborOffset2(), 3,        80)),   \
                Add3(Scale3(FirstObstacleTimeLimitNormal(1),         100),    \
                     LengthAdjust(Velocity(), 20,                     40))))";
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
@@ -220,14 +233,19 @@ void runOneFlockEvolution()
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20251212 add NearestNeighborOffset2, increase tree max size 40->60
+    // TODO 20251212 decrease tree max size 60->50
 
 //    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
 //    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
 
+//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+
     int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
@@ -265,7 +283,12 @@ void runOneFlockEvolution()
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             // TODO 20251207 inject hand-written code into population
 
-            injectHandWrittenCodeIntoPopulation(fs, population);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // 20251213_gp_try_without_hw_code
+            
+//            injectHandWrittenCodeIntoPopulation(fs, population);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         }

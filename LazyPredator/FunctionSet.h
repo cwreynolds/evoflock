@@ -533,8 +533,8 @@ public:
         std::vector<std::string> tokens = tokenizeTreeSource(source_code);
         int token_index = 0;
         compileTreeNode(tree, token_index, tokens);
-        debugPrint(token_index);
-        debugPrint(tokens.size());
+//        debugPrint(token_index);
+//        debugPrint(tokens.size());
         assert (token_index == (tokens.size() - 1));
         return tree;
     }
@@ -544,22 +544,13 @@ public:
                            const std::vector<std::string>& tokens) const
     {
         std::string first_token = tokens.at(token_index);
-        std::cout << "Enter compileTreeNode with token_index = " << token_index
-                  << " (" << std::quoted(first_token) << ")" << std::endl;
+//        std::cout << "Enter compileTreeNode with token_index = " << token_index
+//                  << " (" << std::quoted(first_token) << ")" << std::endl;
         if (is_numeric(first_token))
         {
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             // TODO 20251207 the GpType SHOULD be passed into compileTreeNode(),
             //               but making a temporary workaround right now:
-
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20251203 visualizePreviouslyLoggedFlockParameters() for GP as well as GA
-//    //            const GpType* type = lookupGpTypeByName("Real"); // TEMP WORKAROUND
-//                const GpType* type = getRootType();
-//                assert (type);
-//    //            tree.setRootValue(std::any(std::stof(first_token)), *type);
-//                tree.setRootValue(std::any(std::stod(first_token)), *type);
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       
             const GpType* type = lookupGpTypeByName("Scalar");
             assert (type);
@@ -576,8 +567,6 @@ public:
             
             token_index++;
             assert(tokens.at(token_index) == "(");
-//            bool next_token_is_open_paren = tokens.at(token_index) == "(";
-//            assert(next_token_is_open_paren);
 
             size_t st_count = tree.subtrees().size();
             for (int i = 0; i < st_count; i++)
@@ -588,21 +577,17 @@ public:
                 
                 if ((st_count > 1) and (i < (st_count - 1)))
                 {
-                    std::cout << "check for comma" << std::endl;
+//                    std::cout << "check for comma" << std::endl;
                     token_index++;
                     assert(tokens.at(token_index) == ",");
-//                    bool next_token_is_comma = tokens.at(token_index) == ",";
-//                    assert(next_token_is_comma);
                 }
             }
             token_index++;
             assert(tokens.at(token_index) == ")");
-//            bool next_token_is_close_paren = tokens.at(token_index) == ")";
-//            assert(next_token_is_close_paren);
         }
-        std::cout << "Exit compileTreeNode with token_index = " << token_index
-                  << " (" << std::quoted(tokens.at(token_index)) << ")"
-                  << std::endl;
+//        std::cout << "Exit compileTreeNode with token_index = " << token_index
+//                  << " (" << std::quoted(tokens.at(token_index)) << ")"
+//                  << std::endl;
         return tree;
     }
 
@@ -637,8 +622,8 @@ public:
         s = findAndReplaceAllOccurrences("\\n", " ", s);
         s = removeDuplicateWhitespace(s);
         
-        std::cout << std::endl << "source code:" << std::endl;
-        std::cout << std::quoted(s) << std::endl << std::endl;
+//        std::cout << std::endl << "source code:" << std::endl;
+//        std::cout << std::quoted(s) << std::endl << std::endl;
         
         std::vector<std::string> tokens;
         size_t start = 0;
@@ -651,9 +636,9 @@ public:
             start = delim + 1;
         }
         
-        std::cout << "tokens:" << std::endl;
-        for (auto t : tokens) { std::cout << std::quoted(t) << " "; }
-        std::cout << std::endl;
+//        std::cout << "tokens:" << std::endl;
+//        for (auto t : tokens) { std::cout << std::quoted(t) << " "; }
+//        std::cout << std::endl;
 
         return tokens;
     }
@@ -668,13 +653,13 @@ public:
         size_t pos = string.find(from);
         while (pos != string.npos)
         {
-            std::cout << std::quoted(string) << std::endl;
+//            std::cout << std::quoted(string) << std::endl;
             
             string.erase(pos, from.length());
             string.insert(pos, to);
             pos = string.find(from);
         }
-        std::cout << std::quoted(string) << std::endl;
+//        std::cout << std::quoted(string) << std::endl;
         return string;
     }
 

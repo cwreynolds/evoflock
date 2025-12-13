@@ -973,10 +973,21 @@ inline LP::GpFunction NearestNeighborVelocity
 
 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 // TODO 20251207 try adding 2nd nearest neighbor velocity.
+// TODO 20251212 move "2" to end of name
 
-inline LP::GpFunction NearestNeighbor2Velocity
+//    inline LP::GpFunction NearestNeighbor2Velocity
+//     (
+//      "NearestNeighbor2Velocity",
+//      "Vec3",
+//      {},
+//      [](LP::GpTree& t)
+//      {
+//          return std::any(getGpBoidNeighbor(2)->velocity());
+//      });
+
+inline LP::GpFunction NearestNeighborVelocity2
  (
-  "NearestNeighbor2Velocity",
+  "NearestNeighborVelocity2",
   "Vec3",
   {},
   [](LP::GpTree& t)
@@ -997,6 +1008,24 @@ inline LP::GpFunction NearestNeighborOffset
       Vec3 no = getGpBoidNeighbor(1)->position() - boid.position();
       return std::any(no);
   });
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20251212 move "2" to end of name
+
+inline LP::GpFunction NearestNeighborOffset2
+ (
+  "NearestNeighborOffset2",
+  "Vec3",
+  {},
+  [](LP::GpTree& t)
+  {
+      Boid& boid = *Boid::getGpPerThread();
+      Vec3 no = getGpBoidNeighbor(2)->position() - boid.position();
+      return std::any(no);
+  });
+
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 inline LP::GpFunction First_Obs_Dist
  (
@@ -1280,7 +1309,10 @@ LP::FunctionSet evoflock_gp_function_set()
             
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             // TODO 20251207 try adding 2nd nearest neighbor velocity.
-            NearestNeighbor2Velocity,
+//            NearestNeighbor2Velocity,
+            // TODO 20251212 move "2" to end of name
+            NearestNeighborVelocity2,
+            NearestNeighborOffset2,
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
             

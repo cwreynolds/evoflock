@@ -396,7 +396,14 @@ public:
         // TODO 20250919 increase tree size to avoid losing obstacle perceptions!
 
 //        return newMakeRandomTree(min_tree_size, max_tree_size, 200);
-        return newMakeRandomTree(min_tree_size, max_tree_size, 400);
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20251213 try making initial trees bigger for usingGP().
+
+//        return newMakeRandomTree(min_tree_size, max_tree_size, 400);
+        return newMakeRandomTree(min_tree_size, max_tree_size, 800);
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
 
@@ -424,6 +431,18 @@ public:
                 break;
             }
         }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20251213 try making initial trees bigger for usingGP().
+        int nts = new_tree.size();
+        if (smallest_init_tree_xxx > nts) { smallest_init_tree_xxx = nts;}
+        if (biggest_init_tree_xxx < nts) { biggest_init_tree_xxx = nts;}
+        std::cout << "new_tree.size() = " << nts;
+        std::cout << " " << smallest_init_tree_xxx;
+        std::cout << " " << biggest_init_tree_xxx;
+//        if (nts > max_tree_size) { std::cout << "    BIG";}
+//        if (nts < min_tree_size) { std::cout << "    SMALL";}
+        std::cout << std::endl;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         if (not size_ok(new_tree))
         {
             debugPrint(min_tree_size)
@@ -439,6 +458,12 @@ public:
         assert(size_ok(new_tree));
         return new_tree;
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251213 try making initial trees bigger for usingGP().
+    static inline int biggest_init_tree_xxx = -1;
+    static inline int smallest_init_tree_xxx = 1000;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

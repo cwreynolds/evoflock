@@ -708,7 +708,11 @@ inline LP::GpFunction Scale3
  (
   "Scale3",
   "Vec3",
-  {"Vec3", "Scalar"},
+  //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+  // TODO 20251213 simplify to be more like hand-written
+//  {"Vec3", "Scalar"},
+  {"Vec3", "Scalar_0_10"},
+  //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
   [](LP::GpTree& tree)
   {
       return std::any(tree.evalSubtree<Vec3>(0) * tree.evalSubtree<double>(1));
@@ -718,7 +722,11 @@ inline LP::GpFunction Div3
  (
   "Div3",
   "Vec3",
-  {"Vec3", "Scalar"},
+  //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+  // TODO 20251213 simplify to be more like hand-written
+  //  {"Vec3", "Scalar"},
+  {"Vec3", "Scalar_0_10"},
+  //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
   [](LP::GpTree& tree)
   {
       double d = tree.evalSubtree<double>(1);
@@ -848,7 +856,12 @@ inline LP::GpFunction LengthAdjust
  (
   "LengthAdjust",
   "Vec3",
-  {"Vec3", "Scalar", "Scalar"},  // ref vec, target length, strength
+  //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+  // TODO 20251213 simplify to be more like hand-written
+//  {"Vec3", "Scalar", "Scalar"},  // ref vec, target length, strength
+//  {"Vec3", "Scalar", "Scalar_0_10"},  // ref vec, target length, strength
+  {"Vec3", "Scalar_0_100", "Scalar_0_10"},  // ref vec, target length, strength
+  //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
   [](LP::GpTree& tree)
   {
       Vec3 ref_vector = tree.evalSubtree<Vec3>(0);
@@ -1090,7 +1103,11 @@ inline LP::GpFunction FirstObstacleTimeLimitNormal
 (
  "FirstObstacleTimeLimitNormal",
  "Vec3",
- {"Scalar"}, // time_to_collision_threshold
+ //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+ // TODO 20251213 simplify to be more like hand-written
+// {"Scalar"}, // time_to_collision_threshold
+ {"Scalar_0_1"}, // time_to_collision_threshold
+ //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
  [](LP::GpTree& tree)
  {
     double time_to_collision_threshold = tree.evalSubtree<double>(0);
@@ -1264,6 +1281,84 @@ inline LP::GpFunction BeTheBoid
      return std::any(boid.steerToFlockForGA());
  });
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251213 toward no hand-written, use a smaller FS like in hand-written.
+
+//    // FunctionSet for the GP version of EvoFlock.
+//    LP::FunctionSet evoflock_gp_function_set()
+//    {
+//        return
+//        {
+//            // GpTypes
+//            {
+//                { "Vec3" },
+//    //            { "Scalar", -10.0, 10.0 },
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                // TODO 20251207 inject hand-written code into population
+//    //            { "Scalar", -100.0, 100.0 },
+//    //            { "Scalar", -100.0, 100.0, jiggle_scale },
+//                { "Scalar", -100.0, 100.0, 0.005 },
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            },
+//            // GpFunctions
+//            {
+//                // Vector functions:
+//                V3,
+//                Add3,
+//                Sub3,
+//                Scale3,
+//                Div3,
+//    //            Length,
+//                Normalize,
+//    //            Dot,
+//                // Cross,
+//                // Parallel_Component,
+//                // Perpendicular_Component,
+//                // Interpolate,
+//                // If_Pos,
+//                LengthAdjust,
+//
+//                // Boid API:
+//    //            Speed,
+//                Velocity,
+//                // Acceleration,
+//                Forward,
+//                NearestNeighborVelocity,
+//                NearestNeighborOffset,
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                // TODO 20251207 try adding 2nd nearest neighbor velocity.
+//    //            NearestNeighbor2Velocity,
+//                // TODO 20251212 move "2" to end of name
+//                NearestNeighborVelocity2,
+//                NearestNeighborOffset2,
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//
+//    //            First_Obs_Dist,
+//                FirstObstacleNormal,
+//                FirstObstacleOffset,
+//
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                // TODO 20251205 try a new high level GpFunc
+//                FirstObstacleTimeLimitNormal,
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//                // To_Forward,
+//                // To_Side,
+//                ToForward,
+//                ToSide,
+//
+//                SideAndForward,
+//
+//                // Cartoonishly high level Boid API for debugging:
+//                // SpeedControl,
+//                // AvoidObstacle,
+//                // AdjustSeparation,
+//                // BeTheBoid,
+//            }
+//        };
+//    }
 
 // FunctionSet for the GP version of EvoFlock.
 LP::FunctionSet evoflock_gp_function_set()
@@ -1273,25 +1368,25 @@ LP::FunctionSet evoflock_gp_function_set()
         // GpTypes
         {
             { "Vec3" },
-//            { "Scalar", -10.0, 10.0 },
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20251207 inject hand-written code into population
-//            { "Scalar", -100.0, 100.0 },
-//            { "Scalar", -100.0, 100.0, jiggle_scale },
-            { "Scalar", -100.0, 100.0, 0.005 },
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            { "Scalar", -100.0, 100.0, 0.005 },  // min, max, jiggle scale
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251213 simplify to be more like hand-written
+            {"Scalar_0_1", 0.0, 1.0, 0.01},
+            {"Scalar_0_10", 0.0, 10.0, 0.1},
+            {"Scalar_0_100", 0.0, 100.0, 1.0},
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         },
         // GpFunctions
         {
             // Vector functions:
-            V3,
+            // V3,
             Add3,
             Sub3,
             Scale3,
             Div3,
-//            Length,
-            Normalize,
-//            Dot,
+            // Length,
+            // Normalize,
+            // Dot,
             // Cross,
             // Parallel_Component,
             // Perpendicular_Component,
@@ -1300,37 +1395,31 @@ LP::FunctionSet evoflock_gp_function_set()
             LengthAdjust,
             
             // Boid API:
-//            Speed,
+            // Speed,
             Velocity,
             // Acceleration,
-            Forward,
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251213 simplify to be more like hand-written
+            // Forward,
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             NearestNeighborVelocity,
             NearestNeighborOffset,
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20251207 try adding 2nd nearest neighbor velocity.
-//            NearestNeighbor2Velocity,
-            // TODO 20251212 move "2" to end of name
             NearestNeighborVelocity2,
             NearestNeighborOffset2,
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-            
-//            First_Obs_Dist,
-            FirstObstacleNormal,
-            FirstObstacleOffset,
-            
+            // First_Obs_Dist,
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20251205 try a new high level GpFunc
+            // TODO 20251213 simplify to be more like hand-written
+            // FirstObstacleNormal,
+            // FirstObstacleOffset,
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             FirstObstacleTimeLimitNormal,
+
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-            // To_Forward,
-            // To_Side,
-            ToForward,
-            ToSide,
-
-            SideAndForward,
+            // TODO 20251213 simplify to be more like hand-written
+            // ToForward,
+            // ToSide,
+            // SideAndForward,
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             // Cartoonishly high level Boid API for debugging:
             // SpeedControl,
@@ -1340,6 +1429,10 @@ LP::FunctionSet evoflock_gp_function_set()
         }
     };
 }
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

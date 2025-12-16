@@ -764,9 +764,6 @@ public:
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240808 utility to print "typical" trees from this FS.
     
     // Utility to print "typical" trees from this FS, to help inspect/debug.
     void print_typical_trees() { print_typical_trees(5, 10, 20); }
@@ -780,6 +777,178 @@ public:
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251215 require sensor functions in tree
+    
+    // Does given GpTree contain a reference to the given GpFunc?
+    
+//    bool isFunctionInTree(const GpFunction& function, const GpTree& tree) const
+//    {
+//        return ((&tree.getRootFunction() == &function) ?
+//                true :
+//                std::accumulate(tree.subtrees().begin(),
+//                                tree.subtrees().end(),
+//                                true,
+//                                [](const GpTree& t0, const GpTree& t1)
+//                                { return (isFunctionInTree(function) or
+//                                          isFunctionInTree(function, )); }));
+//    }
+    
+//        bool isFunctionInTree(const GpFunction& function, const GpTree& tree) const
+//        {
+//            auto at_root = [&](const GpTree& t)
+//            {
+//                return &t.getRootFunction() == &function;
+//            };
+//            auto in_subtrees = [&]()
+//            {
+//                bool in = false;
+//    //            for (const auto& st : tree.subtrees()) { in = in or at_root(st);}
+//                for (const auto& st : tree.subtrees())
+//                {
+//                    in = in or isFunctionInTree(function, st);
+//                }
+//                return in;
+//            };
+//            return at_root(tree) ? true : in_subtrees();
+//        }
+
+//        bool isFunctionInTree(const GpFunction& function, const GpTree& tree) const
+//        {
+//            bool in = false;
+//            auto in_subtrees = [&](const GpTree& tree)
+//            {
+//    //            bool in = false;
+//                for (const auto& st : tree.subtrees())
+//                {
+//                    in = in or isFunctionInTree(function, st);
+//                }
+//                return in;
+//            };
+//
+//            debugPrint(function.name());
+//            debugPrint(tree.getRootFunction().name());
+//
+//            return (&tree.getRootFunction() == &function ?
+//                    true :
+//                    in_subtrees(tree));
+//        }
+
+//        bool isFunctionInTree(const GpFunction& function, const GpTree& tree) const
+//        {
+//    //        debugPrint(function.name())
+//    //        debugPrint(tree.getRootFunction().name())
+//            if (&tree.getRootFunction() == &function)
+//            {
+//                return true;
+//            }
+//            else
+//            {
+//                for (const auto& st : tree.subtrees())
+//                {
+//                    if (isFunctionInTree(function, st)) { return true; }
+//                }
+//            }
+//            return false;
+//        }
+//
+//
+//
+//        // Same but specify the GpFunc by its string name.
+//        bool isFunctionInTree(const std::string& name, const GpTree& tree) const
+//        {
+//            return isFunctionInTree(*lookupGpFunctionByName(name), tree);
+//        }
+
+//        bool isFunctionInTree(const std::string& func_name, const GpTree& tree) const
+//        {
+//    //        if (&tree.getRootFunction() == &function)
+//            if (tree.getRootFunction().name() == func_name)
+//            {
+//                return true;
+//            }
+//            else
+//            {
+//                for (const auto& st : tree.subtrees())
+//                {
+//    //                if (isFunctionInTree(function, st)) { return true; }
+//                    if (isFunctionInTree(func_name, st)) { return true; }
+//                }
+//            }
+//            return false;
+//        }
+//
+//        // Same but specify the GpFunc by its string name.
+//    //    bool isFunctionInTree(const std::string& name, const GpTree& tree) const
+//        bool isFunctionInTree(const GpFunction& function, const GpTree& tree) const
+//
+//        {
+//    //        return isFunctionInTree(*lookupGpFunctionByName(name), tree);
+//            return isFunctionInTree(function.name(), tree);
+//        }
+
+    bool isFunctionInTree(const std::string& func_name, const GpTree& tree) const
+    {
+        if (tree.getRootFunction().name() == func_name)
+        {
+            return true;
+        }
+        else
+        {
+            for (const auto& st : tree.subtrees())
+            {
+                if (isFunctionInTree(func_name, st)) { return true; }
+            }
+        }
+        return false;
+    }
+
+//    // Same but specify the GpFunc by its string name.
+//    bool isFunctionInTree(const GpFunction& function, const GpTree& tree) const
+//    {
+//        return isFunctionInTree(function.name(), tree);
+//    }
+
+    // TODO 20251215
+    void isFunctionInTreeTest(const GpTree& tree) const
+    {
+        size_t size = nameToGpFunctionMap().size();
+        size_t index = EF::RS().randomN(size);
+        std::map<std::string, GpFunction>::const_iterator it( nameToGpFunctionMap().begin() );
+        std::advance( it, index );
+        GpFunction func = it->second;
+        
+//        std::cout << std::endl;
+//        debugPrint(size)
+//        debugPrint(index)
+//        debugPrint(func.name())
+//        debugPrint(isFunctionInTree(func, tree));
+//        std::cout << "tree = " << std::endl;
+//        std::cout << tree.to_string(true) << std::endl;
+        
+//        debugPrint(size)
+//        debugPrint(index)
+//        debugPrint(func.name())
+//        debugPrint(tree.getRootFunction().name())
+//        isFunctionInTree(func, tree);
+
+        
+//        std::cout << func.name() << &func << std::endl;
+//        std::cout << tree.getRootFunction().name() << &tree.getRootFunction() << std::endl;
+
+//        std::cout << &func << func.name() << std::endl;
+//        std::cout << &(tree.getRootFunction())
+//                  << tree.getRootFunction().name() << std::endl;
+//        debugPrint(isFunctionInTree(func, tree));
+
+        
+        debugPrint(func.name())
+        debugPrint(tree.getRootFunction().name())
+        std::cout << "tree = " << std::endl;
+        std::cout << tree.to_string(true) << std::endl;
+        debugPrint(isFunctionInTree(func.name(), tree));
+    }
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 private:

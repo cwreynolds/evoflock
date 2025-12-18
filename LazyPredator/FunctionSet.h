@@ -399,7 +399,15 @@ public:
         // Is this GpTree in the the correct size range?
         auto size_ok = [&](const GpTree& tree)
         {
-            return util::between(tree.size(), min_tree_size, max_tree_size);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251217 add get/setValidateTreeFunction()
+
+//            return util::between(tree.size(), min_tree_size, max_tree_size);
+
+            return (util::between(tree.size(), min_tree_size, max_tree_size) and
+                    getValidateTreeFunction()(tree, *this));
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         };
         // Make up to "retries" attempts to find a tree of the correct size.
         for (int i = 0; i < retries; i++)
@@ -792,6 +800,29 @@ public:
         debugPrint(isFunctionInTree(func.name(), tree));
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251217 add get/setValidateTreeFunction()
+    
+    // "Hook" for application-specific constraints on GpTrees, beyond size.
+    typedef std::function<bool(const GpTree& tree, const FunctionSet& fs)>
+        validate_tree_function_type;
+    
+    void setValidateTreeFunction(validate_tree_function_type vtf)
+    {
+        validate_tree_function_hook_ = vtf;
+    }
+    
+    validate_tree_function_type getValidateTreeFunction() const
+    {
+        return validate_tree_function_hook_;
+    }
+    
+    // TODO there is probably a better way to do this:
+//    validate_tree_function_type validate_tree_function_hook_ = nullptr;
+    validate_tree_function_type validate_tree_function_hook_ =
+        [](const GpTree&, const FunctionSet&){return true;};
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 private:
     // These maps are used both to store the GpType and GpFunction objects,
     // plus to look up those objects from their character string names.
@@ -812,13 +843,6 @@ private:
     // TODO 20240305 adding crossover_function_hook_ for custom crossover.
     crossover_function_type crossover_function_hook_ = GpTree::crossover;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251203 visualizePreviouslyLoggedFlockParameters() for GP as well as GA
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 };
 
 #undef name_lookup_util

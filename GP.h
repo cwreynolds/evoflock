@@ -1436,6 +1436,32 @@ LP::FunctionSet evoflock_gp_function_set()
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251217 add get/setValidateTreeFunction()
+
+// Constraint to keep the "sensor" API in population, by requiring each tree to
+// have >=1 call to each of the sensor GpFuncs. This tests for valid trees.
+inline bool evoflockGpValidateTree(const LP::GpTree& tree,
+                                   const LP::FunctionSet& fs)
+{
+    bool ok = true;
+    std::vector<std::string> required_gp_funcs =
+    {
+        "Velocity",
+        "NearestNeighborVelocity",
+        "NearestNeighborOffset",
+        "FirstObstacleTimeLimitNormal",
+    };
+    for (auto& name : required_gp_funcs)
+    {
+        if (not fs.isFunctionInTree(name, tree)) { ok = false; }
+    }
+    return ok;
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240707 WIP on a prototype unit test for this GP module
 
 void test_First_Obs_GpFuncs()

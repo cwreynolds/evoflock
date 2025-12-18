@@ -138,12 +138,43 @@ public:
         // Create new offspring tree by crossing-over these two parents.
         GpTree new_tree;
         auto crossover = getFunctionSet()->getCrossoverFunction();
-        crossover(parent0->tree(),
-                  parent1->tree(),
-                  new_tree,
-                  getMinCrossoverTreeSize(),
-                  getMaxCrossoverTreeSize(),
-                  getFunctionSet()->getCrossoverMinSize());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251217 add get/setValidateTreeFunction()
+
+//        crossover(parent0->tree(),
+//                  parent1->tree(),
+//                  new_tree,
+//                  getMinCrossoverTreeSize(),
+//                  getMaxCrossoverTreeSize(),
+//                  getFunctionSet()->getCrossoverMinSize());
+
+        for (int retry = 0; retry < 10000; retry++)
+        {
+            crossover(parent0->tree(),
+                      parent1->tree(),
+                      new_tree,
+                      getMinCrossoverTreeSize(),
+                      getMaxCrossoverTreeSize(),
+                      getFunctionSet()->getCrossoverMinSize());
+            
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20251217 add get/setValidateTreeFunction()
+//            {
+//                grabPrintLock();
+//                const FunctionSet& fs = *getFunctionSet();
+//                debugPrint(fs.getValidateTreeFunction()(new_tree, fs));
+//            }
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+//            const FunctionSet& fs = *getFunctionSet();
+//            if (fs.getValidateTreeFunction()(new_tree, fs)) { break; }
+
+            const FunctionSet& fs = *getFunctionSet();
+            bool ok = fs.getValidateTreeFunction()(new_tree, fs);
+            std::cout << retry << ": " << ok << std::endl;
+            if (ok) { break; }
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Mutate constants in new tree.
         new_tree.mutate();
         // Create new offspring Individual from new tree.

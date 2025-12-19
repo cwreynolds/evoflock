@@ -364,6 +364,23 @@ public:
         }
     }
     
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+    
+    // watch out for use of "valid" re GpTree::is_valid()
+    
+    // Is this GpTree valid and in the correct size range?
+    bool isTreeOK(const GpTree& tree,
+                  // are these instance variable? if not shouldn't they be?
+                  int min_tree_size,
+                  int max_tree_size) const
+    {
+        return (getValidateTreeFunction()(tree, *this) and
+                util::between(tree.size(), min_tree_size, max_tree_size));
+    };
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240715 WIP new approach to tree generation.
     
@@ -396,26 +413,38 @@ public:
                              int retries) const
     {
         GpTree new_tree;
-        // Is this GpTree in the the correct size range?
-        auto size_ok = [&](const GpTree& tree)
-        {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251217 add get/setValidateTreeFunction()
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
 
-//            return util::between(tree.size(), min_tree_size, max_tree_size);
+//            // Is this GpTree in the the correct size range?
+//            auto size_ok = [&](const GpTree& tree)
+//            {
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20251217 add get/setValidateTreeFunction()
+//
+//    //            return util::between(tree.size(), min_tree_size, max_tree_size);
+//
+//                return (util::between(tree.size(), min_tree_size, max_tree_size) and
+//                        getValidateTreeFunction()(tree, *this));
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            };
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
-            return (util::between(tree.size(), min_tree_size, max_tree_size) and
-                    getValidateTreeFunction()(tree, *this));
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        };
         // Make up to "retries" attempts to find a tree of the correct size.
         for (int i = 0; i < retries; i++)
         {
             GpTree temp_tree;
             makeRandomTree(max_tree_size, temp_tree);
             // Save temp_tree if size is OK, or this is the last retry.
-            if (size_ok(temp_tree) or (i == retries - 1))
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+//            if (size_ok(temp_tree) or (i == retries - 1))
+            if ((i == retries - 1) or
+                isTreeOK(temp_tree, min_tree_size, max_tree_size))
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             {
                 new_tree = temp_tree;
                 break;
@@ -431,7 +460,12 @@ public:
         std::cout << " " << biggest_init_tree_xxx;
         std::cout << std::endl;
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        if (not size_ok(new_tree))
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+//        if (not size_ok(new_tree))
+        if (not isTreeOK(new_tree, min_tree_size, max_tree_size))
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         {
             debugPrint(min_tree_size)
             debugPrint(max_tree_size)
@@ -443,7 +477,11 @@ public:
                       << " 'retries'." << std::endl;
         }
         assert(new_tree.is_valid());
-        assert(size_ok(new_tree));
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+//        assert(size_ok(new_tree));
+        assert(isTreeOK(new_tree, min_tree_size, max_tree_size));
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         return new_tree;
     }
 
@@ -822,6 +860,16 @@ public:
     validate_tree_function_type validate_tree_function_hook_ =
         [](const GpTree&, const FunctionSet&){return true;};
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+    
+    bool empty() const
+    {
+        return nameToGpFunctionMap().empty() and nameToGpFunctionMap().empty();
+    }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 private:
     // These maps are used both to store the GpType and GpFunction objects,

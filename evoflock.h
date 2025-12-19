@@ -266,7 +266,11 @@ void runOneFlockEvolution()
     
     LP::Population* population = nullptr;
     LP::FunctionSet fs = (EF::usingGP() ?
-                          GP::evoflock_gp_function_set() :
+                          //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+                          // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+//                          GP::evoflock_gp_function_set() :
+                          GP::evoflockGpFunctionSet() :
+                          //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
                           GP::evoflock_ga_function_set());
     fs.print();
     

@@ -51,6 +51,13 @@ inline double scalarize_fitness_hyperVolume(MOF mof) {return mof.hyperVolume();}
 //inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+
+// FunctionSet for the GP version of EvoFlock. (forward reference)
+LP::FunctionSet& evoflockGpFunctionSet();
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 // TODO 20251208 score for boid alignment.
@@ -251,6 +258,34 @@ void doOneRunDebugLogging(Boid& boid,
 }
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251217 add get/setValidateTreeFunction()
+
+// Constraint to keep the "sensor" API in population, by requiring each tree to
+// have >=1 call to each of the sensor GpFuncs. This tests for valid trees.
+inline bool evoflockGpValidateTree(const LP::GpTree& tree,
+                                   const LP::FunctionSet& fs)
+{
+    bool ok = true;
+    std::vector<std::string> required_gp_funcs =
+    {
+        "Velocity",
+        "NearestNeighborVelocity",
+        "NearestNeighborOffset",
+        "FirstObstacleTimeLimitNormal",
+    };
+    for (auto& name : required_gp_funcs)
+    {
+        if (not fs.isFunctionInTree(name, tree)) { ok = false; }
+    }
+    return ok;
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+
+
 // If evolved steering seems numerically odd, substitute zero.
 inline Vec3 sanitizeEvolvedSteeringForce(Vec3 s)
 {
@@ -377,6 +412,34 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
     
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+    
+    
+    // cache the FunctionSet here in GP, or pass it into this function, so that
+    // we can run evoflockGpValidateTree() and if invalid, reduce (say by half)
+    // the fitness components of this individual.
+    
+//    inline bool evoflockGpValidateTree(const LP::GpTree& tree,
+//                                       const LP::FunctionSet& fs)
+//
+//    evoflockGpValidateTree
+    
+    
+    if (not evoflockGpValidateTree(individual->tree(), evoflockGpFunctionSet()))
+    {
+//        std::cout << "===========================================" << std::endl;
+//        std::cout << "least_mof = " << least_mof.to_string() << std::endl;
+//        least_mof.scaleObjectives(0.5);
+        least_mof.scaleObjectives(0.1);
+//        std::cout << "least_mof = " << least_mof.to_string() << std::endl;
+//        std::cout << "===========================================" << std::endl;
+    }
+        
+        
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     assert(scalar_fits.size() == runs);
     fitness_logger(least_mof);
     std::cout << "    min composite "<< least_scalar_fitness;
@@ -1360,105 +1423,155 @@ inline LP::GpFunction BeTheBoid
 //        };
 //    }
 
-// FunctionSet for the GP version of EvoFlock.
-LP::FunctionSet evoflock_gp_function_set()
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+
+//    // FunctionSet for the GP version of EvoFlock.
+//    LP::FunctionSet evoflock_gp_function_set()
+//    {
+//        return
+//        {
+//            // GpTypes
+//            {
+//                { "Vec3" },
+//                { "Scalar", -100.0, 100.0, 0.005 },  // min, max, jiggle scale
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                // TODO 20251213 simplify to be more like hand-written
+//                {"Scalar_0_1", 0.0, 1.0, 0.01},
+//                {"Scalar_0_10", 0.0, 10.0, 0.1},
+//                {"Scalar_0_100", 0.0, 100.0, 1.0},
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//            },
+//            // GpFunctions
+//            {
+//                // Vector functions:
+//                // V3,
+//                Add3,
+//                Sub3,
+//                Scale3,
+//                Div3,
+//                // Length,
+//                // Normalize,
+//                // Dot,
+//                // Cross,
+//                // Parallel_Component,
+//                // Perpendicular_Component,
+//                // Interpolate,
+//                // If_Pos,
+//                LengthAdjust,
+//
+//                // Boid API:
+//                // Speed,
+//                Velocity,
+//                // Acceleration,
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                // TODO 20251213 simplify to be more like hand-written
+//                // Forward,
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                NearestNeighborVelocity,
+//                NearestNeighborOffset,
+//                NearestNeighborVelocity2,
+//                NearestNeighborOffset2,
+//                // First_Obs_Dist,
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                // TODO 20251213 simplify to be more like hand-written
+//                // FirstObstacleNormal,
+//                // FirstObstacleOffset,
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                FirstObstacleTimeLimitNormal,
+//
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                // TODO 20251213 simplify to be more like hand-written
+//                // ToForward,
+//                // ToSide,
+//                // SideAndForward,
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//                // Cartoonishly high level Boid API for debugging:
+//                // SpeedControl,
+//                // AvoidObstacle,
+//                // AdjustSeparation,
+//                // BeTheBoid,
+//            }
+//        };
+//    }
+
+LP::FunctionSet evoflock_gp_function_set_cached_ =
 {
-    return
+    // GpTypes
     {
-        // GpTypes
-        {
-            { "Vec3" },
-            { "Scalar", -100.0, 100.0, 0.005 },  // min, max, jiggle scale
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20251213 simplify to be more like hand-written
-            {"Scalar_0_1", 0.0, 1.0, 0.01},
-            {"Scalar_0_10", 0.0, 10.0, 0.1},
-            {"Scalar_0_100", 0.0, 100.0, 1.0},
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        },
-        // GpFunctions
-        {
-            // Vector functions:
-            // V3,
-            Add3,
-            Sub3,
-            Scale3,
-            Div3,
-            // Length,
-            // Normalize,
-            // Dot,
-            // Cross,
-            // Parallel_Component,
-            // Perpendicular_Component,
-            // Interpolate,
-            // If_Pos,
-            LengthAdjust,
-            
-            // Boid API:
-            // Speed,
-            Velocity,
-            // Acceleration,
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20251213 simplify to be more like hand-written
-            // Forward,
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            NearestNeighborVelocity,
-            NearestNeighborOffset,
-            NearestNeighborVelocity2,
-            NearestNeighborOffset2,
-            // First_Obs_Dist,
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20251213 simplify to be more like hand-written
-            // FirstObstacleNormal,
-            // FirstObstacleOffset,
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            FirstObstacleTimeLimitNormal,
-
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20251213 simplify to be more like hand-written
-            // ToForward,
-            // ToSide,
-            // SideAndForward,
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-            // Cartoonishly high level Boid API for debugging:
-            // SpeedControl,
-            // AvoidObstacle,
-            // AdjustSeparation,
-            // BeTheBoid,
-        }
-    };
-}
-
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251217 add get/setValidateTreeFunction()
-
-// Constraint to keep the "sensor" API in population, by requiring each tree to
-// have >=1 call to each of the sensor GpFuncs. This tests for valid trees.
-inline bool evoflockGpValidateTree(const LP::GpTree& tree,
-                                   const LP::FunctionSet& fs)
-{
-    bool ok = true;
-    std::vector<std::string> required_gp_funcs =
+        { "Vec3" },
+        { "Scalar", -100.0, 100.0, 0.005 },  // min, max, jiggle scale
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20251213 simplify to be more like hand-written
+        {"Scalar_0_1", 0.0, 1.0, 0.01},
+        {"Scalar_0_10", 0.0, 10.0, 0.1},
+        {"Scalar_0_100", 0.0, 100.0, 1.0},
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    },
+    // GpFunctions
     {
-        "Velocity",
-        "NearestNeighborVelocity",
-        "NearestNeighborOffset",
-        "FirstObstacleTimeLimitNormal",
-    };
-    for (auto& name : required_gp_funcs)
-    {
-        if (not fs.isFunctionInTree(name, tree)) { ok = false; }
+        // Vector functions:
+        // V3,
+        Add3,
+        Sub3,
+        Scale3,
+        Div3,
+        // Length,
+        // Normalize,
+        // Dot,
+        // Cross,
+        // Parallel_Component,
+        // Perpendicular_Component,
+        // Interpolate,
+        // If_Pos,
+        LengthAdjust,
+        
+        // Boid API:
+        // Speed,
+        Velocity,
+        // Acceleration,
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20251213 simplify to be more like hand-written
+        // Forward,
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        NearestNeighborVelocity,
+        NearestNeighborOffset,
+        NearestNeighborVelocity2,
+        NearestNeighborOffset2,
+        // First_Obs_Dist,
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20251213 simplify to be more like hand-written
+        // FirstObstacleNormal,
+        // FirstObstacleOffset,
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        FirstObstacleTimeLimitNormal,
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20251213 simplify to be more like hand-written
+        // ToForward,
+        // ToSide,
+        // SideAndForward,
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        
+        // Cartoonishly high level Boid API for debugging:
+        // SpeedControl,
+        // AvoidObstacle,
+        // AdjustSeparation,
+        // BeTheBoid,
     }
-    return ok;
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+};
 
+// FunctionSet for the GP version of EvoFlock.
+LP::FunctionSet& evoflockGpFunctionSet()
+{
+    return evoflock_gp_function_set_cached_;
+}
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1466,7 +1579,8 @@ inline bool evoflockGpValidateTree(const LP::GpTree& tree,
 
 void test_First_Obs_GpFuncs()
 {
-    const LP::FunctionSet fs = evoflock_gp_function_set();
+//    const LP::FunctionSet fs = evoflock_gp_function_set();
+    const LP::FunctionSet& fs = evoflockGpFunctionSet();
     const LP::GpFunction* fod = fs.lookupGpFunctionByName("First_Obs_Dist");
     const LP::GpFunction* fon = fs.lookupGpFunctionByName("First_Obs_Normal");
 

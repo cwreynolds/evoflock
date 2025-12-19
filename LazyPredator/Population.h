@@ -148,7 +148,13 @@ public:
 //                  getMaxCrossoverTreeSize(),
 //                  getFunctionSet()->getCrossoverMinSize());
 
-        for (int retry = 0; retry < 10000; retry++)
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+//        for (int retry = 0; retry < 10000; retry++)
+//        for (int retry = 0; retry < 100; retry++)
+        int retries = 100;
+        for (int r = 0; r < retries; r++)
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         {
             crossover(parent0->tree(),
                       parent1->tree(),
@@ -156,23 +162,21 @@ public:
                       getMinCrossoverTreeSize(),
                       getMaxCrossoverTreeSize(),
                       getFunctionSet()->getCrossoverMinSize());
-            
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20251217 add get/setValidateTreeFunction()
-//            {
-//                grabPrintLock();
-//                const FunctionSet& fs = *getFunctionSet();
-//                debugPrint(fs.getValidateTreeFunction()(new_tree, fs));
-//            }
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
+                        
 //            const FunctionSet& fs = *getFunctionSet();
 //            if (fs.getValidateTreeFunction()(new_tree, fs)) { break; }
 
             const FunctionSet& fs = *getFunctionSet();
-            bool ok = fs.getValidateTreeFunction()(new_tree, fs);
-            std::cout << retry << ": " << ok << std::endl;
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+//            bool ok = fs.getValidateTreeFunction()(new_tree, fs);
+            bool ok = fs.isTreeOK(new_tree,
+                                  getMinCrossoverTreeSize(),
+                                  getMaxCrossoverTreeSize());
+//            std::cout << retry << ": " << ok << std::endl;
             if (ok) { break; }
+            if (r == (retries - 1)) {std::cout << "bad crossover" << std::endl;}
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // Mutate constants in new tree.

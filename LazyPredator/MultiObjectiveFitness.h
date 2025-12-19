@@ -43,6 +43,14 @@ public:
                                                 std::multiplies()); }
     std::string to_string() const { return vec_to_string(mof_); }
     const std::vector<double> as_vector() const { return mof_; }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20251023 align counters / no drawing for multithreading.
+    
+    void scaleObjectives(double factor) { for (auto& o : mof_) { o *= factor; } }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
     // Scalerize fitness using hypervolume. Insists on normalized fitness. Remap
     // each fitness from [0, 1] to [0.01, 1] so that a zero component does not

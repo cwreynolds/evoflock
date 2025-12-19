@@ -399,14 +399,18 @@ public:
     //
     // Supports min and max tree size. Now I think I want one target size, not a
     // range, which the tree generator should “take seriously.” Probably the
-    // 2020 version was orignally intended to do that, but I settled for a
+    // 2020 version was originally intended to do that, but I settled for a
     // result size somewhere between 1 and max_tree_size.
     //
     GpTree newMakeRandomTree(int min_tree_size,
                              int max_tree_size) const
     {
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20251219 what is wrong with crossover loop?
         // 2000 retries is WAY more than enough, want to avoid confusing fails.
-        return newMakeRandomTree(min_tree_size, max_tree_size, 2000);
+//        return newMakeRandomTree(min_tree_size, max_tree_size, 2000);
+        return newMakeRandomTree(min_tree_size, max_tree_size, 10000);
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
     GpTree newMakeRandomTree(int min_tree_size,
                              int max_tree_size,

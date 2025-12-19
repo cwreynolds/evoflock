@@ -45,9 +45,15 @@ public:
     const std::vector<double> as_vector() const { return mof_; }
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251023 align counters / no drawing for multithreading.
-    
+    // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+
     void scaleObjectives(double factor) { for (auto& o : mof_) { o *= factor; } }
+    
+    
+    // TODO 20251219 *= operator for MOF
+    
+    MultiObjectiveFitness operator*=(double s){scaleObjectives(s); return *this;}
+
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

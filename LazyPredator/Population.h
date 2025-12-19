@@ -152,7 +152,13 @@ public:
         // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
 //        for (int retry = 0; retry < 10000; retry++)
 //        for (int retry = 0; retry < 100; retry++)
-        int retries = 100;
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20251219 what is wrong with crossover loop?
+//        int retries = 100;
+        int retries = 10000;
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         for (int r = 0; r < retries; r++)
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         {
@@ -173,9 +179,43 @@ public:
             bool ok = fs.isTreeOK(new_tree,
                                   getMinCrossoverTreeSize(),
                                   getMaxCrossoverTreeSize());
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20251219 what is wrong with crossover loop?
+            
 //            std::cout << retry << ": " << ok << std::endl;
-            if (ok) { break; }
-            if (r == (retries - 1)) {std::cout << "bad crossover" << std::endl;}
+            
+            if ((retries - r) < 10)
+            {
+                bool valid = fs.getValidateTreeFunction()(new_tree, fs);
+                std::cout << r << ": " << ok;
+                std::cout << ", valid=" << valid;
+                std::cout << ", size=" << new_tree.size();
+                std::cout << ", min=" << getMinCrossoverTreeSize();
+                std::cout << ", max=" << getMaxCrossoverTreeSize();
+                std::cout << std::endl;
+                //            if (not valid)
+                //            {
+                //                std::cout << new_tree.to_string(true);
+                //                std::cout << std::endl << std::endl;
+                //            }
+            }
+
+//            if (ok) { break; }
+//            if (r == (retries - 1)) {std::cout << "bad crossover" << std::endl;}
+
+            if (ok)
+            {
+                std::cout << "good crossover" << std::endl;
+                break;
+            }
+            if (r == (retries - 1))
+            {
+                std::cout << "bad crossover" << std::endl;
+            }
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

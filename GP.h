@@ -278,6 +278,20 @@ inline bool evoflockGpValidateTree(const LP::GpTree& tree,
     {
         if (not fs.isFunctionInTree(name, tree)) { ok = false; }
     }
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251219 what is wrong with crossover loop?
+    if (ok)
+    {
+        grabPrintLock_evoflock();
+        static int counter = 0;
+        counter++;
+        std::cout << counter << " trees OK in GP::evoflockGpValidateTree" << std::endl;
+        std::cout << tree.to_string(true) << std::endl;
+    }
+//    assert(not ok);
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     return ok;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -430,8 +444,11 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     {
 //        std::cout << "===========================================" << std::endl;
 //        std::cout << "least_mof = " << least_mof.to_string() << std::endl;
+
 //        least_mof.scaleObjectives(0.5);
-        least_mof.scaleObjectives(0.1);
+//        least_mof.scaleObjectives(0.1);
+        least_mof *= 0.1;
+
 //        std::cout << "least_mof = " << least_mof.to_string() << std::endl;
 //        std::cout << "===========================================" << std::endl;
     }

@@ -369,15 +369,39 @@ public:
     
     // watch out for use of "valid" re GpTree::is_valid()
     
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20251220 refactor: only preserve sensor API not size
+
     // Is this GpTree valid and in the correct size range?
     bool isTreeOK(const GpTree& tree,
                   // are these instance variable? if not shouldn't they be?
                   int min_tree_size,
                   int max_tree_size) const
     {
-        return (getValidateTreeFunction()(tree, *this) and
-                util::between(tree.size(), min_tree_size, max_tree_size));
+//        return (getValidateTreeFunction()(tree, *this) and
+//        return (treeConstraintsOK(tree) and
+//                util::between(tree.size(), min_tree_size, max_tree_size));
+        return (treeConstraintsOK(tree) and
+                treeSizeOK(tree, min_tree_size, max_tree_size));
     };
+
+
+    bool treeConstraintsOK(const GpTree& tree) const
+    {
+        const auto& test_func = getValidateTreeFunction();
+//        return getValidateTreeFunction()(tree, *this);
+        return test_func(tree, *this);
+    }
+    
+    bool treeSizeOK(const GpTree& tree,
+                    // are these instance variable? if not shouldn't they be?
+                    int min_tree_size,
+                    int max_tree_size) const
+    {
+        return util::between(tree.size(), min_tree_size, max_tree_size);
+    };
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -409,32 +433,43 @@ public:
         // TODO 20251219 what is wrong with crossover loop?
         // 2000 retries is WAY more than enough, want to avoid confusing fails.
 //        return newMakeRandomTree(min_tree_size, max_tree_size, 2000);
-        return newMakeRandomTree(min_tree_size, max_tree_size, 10000);
+//        return newMakeRandomTree(min_tree_size, max_tree_size, 10000);
+//        return newMakeRandomTree(min_tree_size, max_tree_size, 1000);
+//        return newMakeRandomTree(min_tree_size, max_tree_size, 10000);
+//        return newMakeRandomTree(min_tree_size, max_tree_size, 50000);
+        return newMakeRandomTree(min_tree_size, max_tree_size, 1000);
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20251220 refactor: only preserve sensor API not size
+
+    
+    static double distFromInterval(double x, double min, double max)
+    {
+        return x > max ? x - max : (min > x ? min - x : 0);
+    }
+    
+    
     GpTree newMakeRandomTree(int min_tree_size,
                              int max_tree_size,
                              int retries) const
     {
         GpTree new_tree;
+        double least_size_error = std::numeric_limits<double>::infinity();
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
-
 //            // Is this GpTree in the the correct size range?
 //            auto size_ok = [&](const GpTree& tree)
 //            {
 //                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                // TODO 20251217 add get/setValidateTreeFunction()
-//
 //    //            return util::between(tree.size(), min_tree_size, max_tree_size);
-//
 //                return (util::between(tree.size(), min_tree_size, max_tree_size) and
 //                        getValidateTreeFunction()(tree, *this));
-//
 //                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //            };
-        
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
         // Make up to "retries" attempts to find a tree of the correct size.
@@ -442,17 +477,86 @@ public:
         {
             GpTree temp_tree;
             makeRandomTree(max_tree_size, temp_tree);
+            
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20251220 refactor: only preserve sensor API not size
+            
+
+//                // Save temp_tree if size is OK, or this is the last retry.
+//    //            if (size_ok(temp_tree) or (i == retries - 1))
+//                if ((i == retries - 1) or
+//                    isTreeOK(temp_tree, min_tree_size, max_tree_size))
+//    //            if (treeConstraintsOK(temp_tree) or (i == retries - 1))
+//                {
+//                    new_tree = temp_tree;
+//                    break;
+//                }
+
             // Save temp_tree if size is OK, or this is the last retry.
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
-//            if (size_ok(temp_tree) or (i == retries - 1))
-            if ((i == retries - 1) or
-                isTreeOK(temp_tree, min_tree_size, max_tree_size))
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            if ((i == retries - 1) or
+//                isTreeOK(temp_tree, min_tree_size, max_tree_size))
+//            {
+//                new_tree = temp_tree;
+//                break;
+//            }
+            
+//            if (isTreeOK(temp_tree, min_tree_size, max_tree_size))
+//            {
+//                new_tree = temp_tree;
+//                break;
+//            }
+
+            if (treeSizeOK(temp_tree, min_tree_size, max_tree_size))
             {
                 new_tree = temp_tree;
                 break;
             }
+
+            // Save the temp_tree which has least size error so far.
+            size_t size = temp_tree.size();
+//            double size_error = (size > max_tree_size ?
+//                                 size - max_tree_size :
+//                                 (size < min_tree_size?
+//                                  min_tree_size - size :
+//                                  0));
+            double size_error = distFromInterval(size,
+                                                 min_tree_size,
+                                                 max_tree_size);
+
+            
+//            std::cout << std::endl << "retry = " << i << std::endl;
+//            debugPrint(size);
+//            debugPrint(size_error);
+//            debugPrint(least_size_error);
+//            debugPrint(treeConstraintsOK(temp_tree));
+//            debugPrint(treeConstraintsOK(new_tree));
+            
+//            if (least_size_error > size_error)
+//            {
+//                new_tree = temp_tree;
+//                least_size_error = size_error;
+//            }
+
+//                if (least_size_error > size_error)
+//                {
+//    //                if (new_tree.empty() or treeConstraintsOK(temp_tree))
+//                    if (new_tree.empty() or
+//                        size_error == 0 or
+//                        treeConstraintsOK(temp_tree))
+//                    {
+//                        new_tree = temp_tree;
+//                        least_size_error = size_error;
+//                    }
+//                }
+
+            if (least_size_error > size_error)
+            {
+                new_tree = temp_tree;
+                least_size_error = size_error;
+            }
+
+
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20251213 try making initial trees bigger for usingGP().
@@ -462,32 +566,48 @@ public:
         std::cout << "new_tree.size() = " << nts;
         std::cout << " " << smallest_init_tree_xxx;
         std::cout << " " << biggest_init_tree_xxx;
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20251220 refactor: only preserve sensor API not size
+
+//        std::cout << "    treeConstraintsOK(tree) = " << treeConstraintsOK(new_tree);
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         std::cout << std::endl;
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
-//        if (not size_ok(new_tree))
-        if (not isTreeOK(new_tree, min_tree_size, max_tree_size))
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        {
-            debugPrint(min_tree_size)
-            debugPrint(max_tree_size)
-
-            debugPrint(new_tree.size());
-            std::cout << new_tree.to_string(true) << std::endl;
-            std::cout << "consider using a wider range between min_tree_size"
-                      << " and max_tree_size, or increasing the value of"
-                      << " 'retries'." << std::endl;
-        }
+//    //        if (not size_ok(new_tree))
+//            if (not isTreeOK(new_tree, min_tree_size, max_tree_size))
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//            {
+//                debugPrint(min_tree_size)
+//                debugPrint(max_tree_size)
+//
+//                debugPrint(new_tree.size());
+//                std::cout << new_tree.to_string(true) << std::endl;
+//                std::cout << "consider using a wider range between min_tree_size"
+//                          << " and max_tree_size, or increasing the value of"
+//                          << " 'retries'." << std::endl;
+//            }
         assert(new_tree.is_valid());
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
 //        assert(size_ok(new_tree));
-        assert(isTreeOK(new_tree, min_tree_size, max_tree_size));
+//        assert(isTreeOK(new_tree, min_tree_size, max_tree_size));
+        
+//        std::cout << "new_tree.size=" << new_tree.size();
+//        std::cout << " max/min=" << min_tree_size << "," << max_tree_size  << std::endl;
+        
+        assert(treeSizeOK(new_tree, min_tree_size, max_tree_size));
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         return new_tree;
     }
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20251213 try making initial trees bigger for usingGP().

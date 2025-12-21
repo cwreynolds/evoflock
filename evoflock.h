@@ -278,46 +278,66 @@ void runOneFlockEvolution()
         std::cout << "Create population, individuals = " << individuals;
         std::cout << ", subpops/demes = " << subpops << std::endl;
         util::Timer t("Create population.");
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20240713 experiment with increasing initial tree size.
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20251220 refactor: only preserve sensor API not size
+
         LP::Individual::increasing_initial_tree_size = true;
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        
+        
+        if (EF::usingGP())
+        {
+            fs.setValidateTreeFunction(GP::evoflockGpValidateTree);
+        }
+        else
+        {
+            fs.setCrossoverFunction(GP::evoflock_ga_crossover);
+        }
+
+        
         population = new LazyPredator::Population(individuals,
                                                   subpops,
                                                   max_initial_tree_size,
                                                   min_crossover_tree_size,
                                                   max_crossover_tree_size,
                                                   fs);
-        // TODO experimental_GP_stub
+//            // TODO experimental_GP_stub
+//            if (EF::usingGP())
+//            {
+//                population->explicit_treeValue_in_evolutionStep = false;
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                // TODO 20251207 inject hand-written code into population
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // 20251213_gp_try_without_hw_code
+//
+//    //            injectHandWrittenCodeIntoPopulation(fs, population);
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20251217 add get/setValidateTreeFunction()
+//
+//                fs.setValidateTreeFunction(GP::evoflockGpValidateTree);
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            }
+//            else
+//            {
+//                fs.setCrossoverFunction(GP::evoflock_ga_crossover);
+//            }
+
         if (EF::usingGP())
         {
             population->explicit_treeValue_in_evolutionStep = false;
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20251207 inject hand-written code into population
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // 20251213_gp_try_without_hw_code
-            
-//            injectHandWrittenCodeIntoPopulation(fs, population);
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251217 add get/setValidateTreeFunction()
-            
-            fs.setValidateTreeFunction(GP::evoflockGpValidateTree);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        }
-        else
-        {
-            fs.setCrossoverFunction(GP::evoflock_ga_crossover);
+            // injectHandWrittenCodeIntoPopulation(fs, population);
         }
     }
-    
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
     LP::CountFunctionUsage usage;
     auto log_usage_counts = [&]()
     {

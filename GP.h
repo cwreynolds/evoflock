@@ -447,7 +447,14 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 
 //        least_mof.scaleObjectives(0.5);
 //        least_mof.scaleObjectives(0.1);
-        least_mof *= 0.1;
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20251220 refactor: only preserve sensor API not size
+
+//        least_mof *= 0.1;
+        least_mof *= 0.5;
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 //        std::cout << "least_mof = " << least_mof.to_string() << std::endl;
 //        std::cout << "===========================================" << std::endl;

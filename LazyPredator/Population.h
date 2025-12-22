@@ -121,212 +121,6 @@ public:
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     // TODO 20251220 refactor: only preserve sensor API not size
 
-//        // Perform one step of the "steady state" evolutionary computation. Three
-//        // Individuals are selected randomly, from a random subpopulation. Holds a
-//        // "tournament" to determine their relative fitness ordering. The "loser" is
-//        // removed from the Population and replaced by a new "offspring" created by
-//        // crossing over the two "winners" and mutating the result. Handle migration
-//        // between subpopulations and maintain sorted index of Individuals.
-//        void evolutionStep(TournamentGroup ranked_group, SubPop& subpop)
-//        {
-//            Individual* loser = ranked_group.worstIndividual();
-//            int loser_index = ranked_group.worstIndex();
-//            assert(loser);
-//            // Other two become parents of new offspring.
-//            Individual* parent0 = ranked_group.secondBestIndividual();
-//            Individual* parent1 = ranked_group.bestIndividual();
-//            // Both parent's rank increases because they survived the tournament.
-//            parent0->incrementTournamentsSurvived();
-//            parent1->incrementTournamentsSurvived();
-//            // Create new offspring tree by crossing-over these two parents.
-//            GpTree new_tree;
-//            auto crossover = getFunctionSet()->getCrossoverFunction();
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20251217 add get/setValidateTreeFunction()
-//
-//    //        crossover(parent0->tree(),
-//    //                  parent1->tree(),
-//    //                  new_tree,
-//    //                  getMinCrossoverTreeSize(),
-//    //                  getMaxCrossoverTreeSize(),
-//    //                  getFunctionSet()->getCrossoverMinSize());
-//
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//            // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
-//    //        for (int retry = 0; retry < 10000; retry++)
-//    //        for (int retry = 0; retry < 100; retry++)
-//
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//            // TODO 20251219 what is wrong with crossover loop?
-//    //        int retries = 100;
-//            int retries = 10000;
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//            for (int r = 0; r < retries; r++)
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//            {
-//                crossover(parent0->tree(),
-//                          parent1->tree(),
-//                          new_tree,
-//                          getMinCrossoverTreeSize(),
-//                          getMaxCrossoverTreeSize(),
-//                          getFunctionSet()->getCrossoverMinSize());
-//
-//    //            const FunctionSet& fs = *getFunctionSet();
-//    //            if (fs.getValidateTreeFunction()(new_tree, fs)) { break; }
-//
-//                const FunctionSet& fs = *getFunctionSet();
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
-//    //            bool ok = fs.getValidateTreeFunction()(new_tree, fs);
-//                bool ok = fs.isTreeOK(new_tree,
-//                                      getMinCrossoverTreeSize(),
-//                                      getMaxCrossoverTreeSize());
-//
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                // TODO 20251219 what is wrong with crossover loop?
-//
-//    //            std::cout << retry << ": " << ok << std::endl;
-//
-//                if ((retries - r) < 10)
-//                {
-//                    bool valid = fs.getValidateTreeFunction()(new_tree, fs);
-//                    std::cout << r << ": " << ok;
-//                    std::cout << ", valid=" << valid;
-//                    std::cout << ", size=" << new_tree.size();
-//                    std::cout << ", min=" << getMinCrossoverTreeSize();
-//                    std::cout << ", max=" << getMaxCrossoverTreeSize();
-//                    std::cout << std::endl;
-//                    //            if (not valid)
-//                    //            {
-//                    //                std::cout << new_tree.to_string(true);
-//                    //                std::cout << std::endl << std::endl;
-//                    //            }
-//                }
-//
-//    //            if (ok) { break; }
-//    //            if (r == (retries - 1)) {std::cout << "bad crossover" << std::endl;}
-//
-//                if (ok)
-//                {
-//                    std::cout << "good crossover" << std::endl;
-//                    break;
-//                }
-//                if (r == (retries - 1))
-//                {
-//                    std::cout << "bad crossover" << std::endl;
-//                }
-//
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//            }
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // Mutate constants in new tree.
-//            new_tree.mutate();
-//            // Create new offspring Individual from new tree.
-//            Individual* offspring = new Individual(new_tree);
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20240625 hmm is really necessary, or more a "maybe a good idea"?
-//            //               invalid "invalid Boid::gp_boid_per_thread_" in evoflock
-//            //               GP mode causes an
-//            //
-//            //               generally It seems like evaluating fitness should not
-//            //               be done as a side effect of creating a new tree, so I
-//            //               prefer to make it “lazy” if possible
-//
-//    //        // Construct and cache the result of evaluating new offspring's GpTree.
-//    //        offspring->treeValue();
-//    //        // If group has custom_eval function run it on offspring (esp for MOF).
-//    //        if (ranked_group.custom_eval) { ranked_group.custom_eval(offspring); }
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//            // Delete tournament loser from Population, replace with new offspring.
-//            replaceIndividual(loser_index, offspring, subpop);
-//            // Occasionally migrate Individuals between subpopulations.
-//            subpopulationMigration();
-//        }
-
-//        // Perform one step of the "steady state" evolutionary computation. Three
-//        // Individuals are selected randomly, from a random subpopulation. Holds a
-//        // "tournament" to determine their relative fitness ordering. The "loser" is
-//        // removed from the Population and replaced by a new "offspring" created by
-//        // crossing over the two "winners" and mutating the result. Handle migration
-//        // between subpopulations and maintain sorted index of Individuals.
-//        void evolutionStep(TournamentGroup ranked_group, SubPop& subpop)
-//        {
-//            Individual* loser = ranked_group.worstIndividual();
-//            int loser_index = ranked_group.worstIndex();
-//            assert(loser);
-//            // Other two become parents of new offspring.
-//            Individual* parent0 = ranked_group.secondBestIndividual();
-//            Individual* parent1 = ranked_group.bestIndividual();
-//            // Both parent's rank increases because they survived the tournament.
-//            parent0->incrementTournamentsSurvived();
-//            parent1->incrementTournamentsSurvived();
-//            // Create new offspring tree by crossing-over these two parents.
-//            GpTree new_tree;
-//            auto crossover = getFunctionSet()->getCrossoverFunction();
-//            double least_size_error = std::numeric_limits<double>::infinity();
-//
-//
-//            const FunctionSet& fs = *getFunctionSet();
-//            debugPrint(fs.treeConstraintsOK(parent0->tree()));
-//            debugPrint(fs.treeConstraintsOK(parent1->tree()));
-//    //        int retries = 10000;
-//    //        int retries = 20;
-//            int retries = 100;
-//            for (int r = 0; r < retries; r++)
-//            {
-//                crossover(parent0->tree(),
-//                          parent1->tree(),
-//                          new_tree,
-//                          getMinCrossoverTreeSize(),
-//                          getMaxCrossoverTreeSize(),
-//                          getFunctionSet()->getCrossoverMinSize());
-//
-//    //            const FunctionSet& fs = *getFunctionSet();
-//    //            bool ok = fs.isTreeOK(new_tree,
-//    //                                  getMinCrossoverTreeSize(),
-//    //                                  getMaxCrossoverTreeSize());
-//                bool ok = fs.treeConstraintsOK(new_tree);
-//
-//    //            if ((retries - r) < 10)
-//                {
-//    //                bool valid = fs.getValidateTreeFunction()(new_tree, fs);
-//                    bool valid = fs.treeConstraintsOK(new_tree);
-//                    std::cout << r << ": " << ok;
-//                    std::cout << ", valid=" << valid;
-//                    std::cout << ", size=" << new_tree.size();
-//                    std::cout << ", min=" << getMinCrossoverTreeSize();
-//                    std::cout << ", max=" << getMaxCrossoverTreeSize();
-//                    std::cout << std::endl;
-//                }
-//                if (ok)
-//                {
-//                    std::cout << "good crossover" << std::endl;
-//                    break;
-//                }
-//                if (r == (retries - 1))
-//                {
-//                    std::cout << "bad crossover" << std::endl;
-//                }
-//            }
-//
-//
-//            // Mutate constants in new tree.
-//            new_tree.mutate();
-//            // Create new offspring Individual from new tree.
-//            Individual* offspring = new Individual(new_tree);
-//
-//            // Delete tournament loser from Population, replace with new offspring.
-//            replaceIndividual(loser_index, offspring, subpop);
-//            // Occasionally migrate Individuals between subpopulations.
-//            subpopulationMigration();
-//        }
-
     // Perform one step of the "steady state" evolutionary computation. Three
     // Individuals are selected randomly, from a random subpopulation. Holds a
     // "tournament" to determine their relative fitness ordering. The "loser" is
@@ -349,25 +143,23 @@ public:
         auto crossover = getFunctionSet()->getCrossoverFunction();
         double least_size_error = std::numeric_limits<double>::infinity();
 
-        
         const FunctionSet& fs = *getFunctionSet();
         debugPrint(fs.treeConstraintsOK(parent0->tree()));
         debugPrint(fs.treeConstraintsOK(parent1->tree()));
-//        int retries = 10000;
-//        int retries = 20;
-//        int retries = 100;
         int retries = 1000;
         for (int r = 0; r < retries; r++)
         {
             GpTree temp_tree;
             crossover(parent0->tree(),
                       parent1->tree(),
-//                      new_tree,
                       temp_tree,
                       getMinCrossoverTreeSize(),
                       getMaxCrossoverTreeSize(),
-                      getFunctionSet()->getCrossoverMinSize());
-            
+//                      getFunctionSet()->getCrossoverMinSize());
+                      fs.getCrossoverMinSize());
+
+            // NOTE: this same code pattern in FS::newMakeRandomTree().
+            // When we find one that meets the size constraint exit retry loop.
             if (fs.treeSizeOK(temp_tree,
                               getMinCrossoverTreeSize(),
                               getMaxCrossoverTreeSize()))
@@ -376,42 +168,22 @@ public:
                 break;
             }
 
+            // Save the temp_tree which has least size error so far.
             size_t size = temp_tree.size();
             double size_error = fs.distFromInterval(size,
                                                     getMinCrossoverTreeSize(),
                                                     getMaxCrossoverTreeSize());
-
             if (least_size_error > size_error)
             {
                 new_tree = temp_tree;
                 least_size_error = size_error;
             }
-
-            
-//                bool ok = fs.treeConstraintsOK(new_tree);
-//    //            if ((retries - r) < 10)
-//                {
-//                    bool valid = fs.treeConstraintsOK(new_tree);
-//                    std::cout << r << ": " << ok;
-//                    std::cout << ", valid=" << valid;
-//                    std::cout << ", size=" << new_tree.size();
-//                    std::cout << ", min=" << getMinCrossoverTreeSize();
-//                    std::cout << ", max=" << getMaxCrossoverTreeSize();
-//                    std::cout << std::endl;
-//                }
-//                if (ok)
-//                {
-//                    std::cout << "good crossover" << std::endl;
-//                    break;
-//                }
-//                if (r == (retries - 1))
-//                {
-//                    std::cout << "bad crossover" << std::endl;
-//                }
         }
-        
-        debugPrint(fs.treeConstraintsOK(new_tree));
 
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20251221 change logging for population sensor API.
+        debugPrint(fs.treeConstraintsOK(new_tree));
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         // Mutate constants in new tree.
         new_tree.mutate();

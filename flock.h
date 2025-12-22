@@ -348,7 +348,7 @@ public:
         double sum_of_force = selectedBoid()->sum_steer_mag_for_all_steps;
         double average_force = sum_of_force / max_simulation_steps();
         if (max_steer_mag < average_force) { max_steer_mag = average_force; }
-        std::cout << std::format(", average force = {:.3}", average_force);
+//        std::cout << std::format(", average force = {:.3}", average_force);
 //        std::cout << std::format(", max force = {:.3}", max_steer_mag);
         
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~

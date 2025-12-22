@@ -279,24 +279,88 @@ inline bool evoflockGpValidateTree(const LP::GpTree& tree,
         if (not fs.isFunctionInTree(name, tree)) { ok = false; }
     }
     
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20251219 what is wrong with crossover loop?
-    if (ok)
-    {
-        grabPrintLock_evoflock();
-        static int counter = 0;
-        counter++;
-        std::cout << counter << " trees OK in GP::evoflockGpValidateTree" << std::endl;
-        std::cout << tree.to_string(true) << std::endl;
-    }
-//    assert(not ok);
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251221 change logging for population sensor API.
+    
+//        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//        // TODO 20251219 what is wrong with crossover loop?
+//        if (ok)
+//        {
+//            grabPrintLock_evoflock();
+//            static int counter = 0;
+//            counter++;
+//            std::cout << counter << " trees OK in GP::evoflockGpValidateTree" << std::endl;
+//            std::cout << tree.to_string(true) << std::endl;
+//        }
+//    //    assert(not ok);
+//        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     return ok;
 }
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20251221 change logging for population sensor API.
+
+//double measureUsageSensorAPI(const LP::Population& population)
+//{
+//    int individuals_with_full_sensor_usage = 0;
+//    auto measure_sensor_api_usage = [&](LP::Individual* individual)
+//    {
+//        const LP::GpTree& tree = individual->tree();
+//        const LP::FunctionSet& fs = evoflockGpFunctionSet();
+//        bool full_usage = evoflockGpValidateTree(tree, fs);
+//        if (full_usage) { individuals_with_full_sensor_usage++; }
+//    };
+//    population.applyToAllIndividuals(measure_sensor_api_usage);
+//    return individuals_with_full_sensor_usage / population.getIndividualCount();
+//}
+
+//    double measureUsageSensorAPI(const LP::Population& population)
+//    {
+//        double individuals_with_full_sensor_usage = 0;
+//        auto measure_sensor_api_usage = [&](LP::Individual* individual)
+//        {
+//            const LP::GpTree& tree = individual->tree();
+//            const LP::FunctionSet& fs = evoflockGpFunctionSet();
+//            bool full_usage = evoflockGpValidateTree(tree, fs);
+//            if (full_usage) { individuals_with_full_sensor_usage++; }
+//        };
+//        population.applyToAllIndividuals(measure_sensor_api_usage);
+//        return individuals_with_full_sensor_usage / population.getIndividualCount();
+//    }
+
+double measureUsageSensorAPI(const LP::Population& population)
+{
+    double trees_using_full_sensor_api = 0;
+    auto measure_sensor_api_usage = [&](LP::Individual* individual)
+    {
+        const LP::GpTree& tree = individual->tree();
+        const LP::FunctionSet& fs = evoflockGpFunctionSet();
+        bool full_usage = evoflockGpValidateTree(tree, fs);
+        if (full_usage) { trees_using_full_sensor_api++; }
+    };
+    population.applyToAllIndividuals(measure_sensor_api_usage);
+    return trees_using_full_sensor_api / population.getIndividualCount();
+}
+
+void logUsageSensorAPI(const LP::Population& population)
+{
+    double usage = measureUsageSensorAPI(population);
+    double count = population.getIndividualCount();
+    std::cout << std::endl;
+    std::cout << "    ";  // "log_prefix"
+    std::cout << std::round(usage * 100) << "% (";
+    std::cout << std::round(usage * count);
+    std::cout << " of " << count << " individuals)";
+    std::cout << " use full sensor API.";
+    std::cout << std::endl;
+}
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
 

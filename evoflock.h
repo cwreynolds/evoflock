@@ -197,7 +197,13 @@ void runOneFlockEvolution()
     // TODO 20251208 after 20251207_gp_handmade_seeded, try bigger population.
 //    int individuals = 300;
 //    int individuals = 600;
-    int individuals = EF::usingGA() ? 300 : 600;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251221 change logging for population sensor API.
+    
+//    int individuals = EF::usingGA() ? 300 : 600;
+    int individuals = EF::usingGA() ? 300 : 300;
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     int subpops = std::round(std::sqrt(individuals));
     
@@ -250,9 +256,22 @@ void runOneFlockEvolution()
 //    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
   
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251221 change logging for population sensor API.
+
+//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+
+//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
+
     int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -292,43 +311,12 @@ void runOneFlockEvolution()
         {
             fs.setCrossoverFunction(GP::evoflock_ga_crossover);
         }
-
-        
         population = new LazyPredator::Population(individuals,
                                                   subpops,
                                                   max_initial_tree_size,
                                                   min_crossover_tree_size,
                                                   max_crossover_tree_size,
                                                   fs);
-//            // TODO experimental_GP_stub
-//            if (EF::usingGP())
-//            {
-//                population->explicit_treeValue_in_evolutionStep = false;
-//
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//                // TODO 20251207 inject hand-written code into population
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // 20251213_gp_try_without_hw_code
-//
-//    //            injectHandWrittenCodeIntoPopulation(fs, population);
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20251217 add get/setValidateTreeFunction()
-//
-//                fs.setValidateTreeFunction(GP::evoflockGpValidateTree);
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//            }
-//            else
-//            {
-//                fs.setCrossoverFunction(GP::evoflock_ga_crossover);
-//            }
-
         if (EF::usingGP())
         {
             population->explicit_treeValue_in_evolutionStep = false;
@@ -368,6 +356,12 @@ void runOneFlockEvolution()
                 std::cout << individual->tree().to_string(true) << std::endl;
                 log_usage_counts();
             }
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20251221 change logging for population sensor API.
+            
+            GP::logUsageSensorAPI(*population);
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             std::cout << std::endl;
             visualizeBestIfRequested(population);
         }

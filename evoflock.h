@@ -284,13 +284,45 @@ void runOneFlockEvolution()
     debugPrint(max_initial_tree_size);
     
     LP::Population* population = nullptr;
-    LP::FunctionSet fs = (EF::usingGP() ?
-                          //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-                          // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
-//                          GP::evoflock_gp_function_set() :
-                          GP::evoflockGpFunctionSet() :
-                          //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-                          GP::evoflock_ga_function_set());
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251222 why no sensor check during create population?
+    
+//    const LP::FunctionSet& fs = (EF::usingGP() ?
+//                          //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//                          // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
+//                          //                          GP::evoflock_gp_function_set() :
+//                          GP::evoflockGpFunctionSet() :
+//                          //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//                          GP::evoflock_ga_function_set());
+    
+
+//    LP::FunctionSet fs = (EF::usingGP() ?
+//                          GP::evoflockGpFunctionSet() :
+//                          GP::evoflock_ga_function_set());
+  
+//    LP::FunctionSet fs = (EF::usingGP() ?
+//                          GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
+//                          GP::evoflock_ga_function_set());
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20251222 hack to fix sometimes-it-works/sometimes-it-doesn't problem
+    // with GP::evoflockGpValidateTree(). I had been copying the FS so I could
+    // modify its mode (separately for GA and GP). Here I changed it to save a
+    // reference to the FS instead (first saving a copy of the GA FS). This
+    // seems to work but I don't know why. Need to test GA for regression.
+    LP::FunctionSet fs_ga = GP::evoflock_ga_function_set();
+    LP::FunctionSet& fs = (EF::usingGP() ?
+                           GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
+                           fs_ga);
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    LP::FunctionSet::xxx_current_fs = &fs;
+    
+    debugPrint(LP::FunctionSet::xxx_current_fs);
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     fs.print();
     
     {
@@ -305,7 +337,18 @@ void runOneFlockEvolution()
         
         if (EF::usingGP())
         {
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251222 why no sensor check during create population?
+
+            auto before = fs.getValidateTreeFunction();
+            debugPrint(&before)
+
             fs.setValidateTreeFunction(GP::evoflockGpValidateTree);
+
+            auto after = fs.getValidateTreeFunction();
+            debugPrint(&after)
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         else
         {

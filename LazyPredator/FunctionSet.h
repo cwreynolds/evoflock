@@ -639,6 +639,15 @@ public:
 //            return new_tree;
 //        }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251222 why no sensor check during create population?
+    
+    static inline FunctionSet* xxx_current_fs = nullptr;
+        
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+
+    
     GpTree newMakeRandomTree(int min_tree_size,
                              int max_tree_size,
                              int retries) const

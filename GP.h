@@ -259,13 +259,19 @@ void doOneRunDebugLogging(Boid& boid,
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251217 add get/setValidateTreeFunction()
+// TODO 20251222 why no sensor check during create population?
 
 // Constraint to keep the "sensor" API in population, by requiring each tree to
 // have >=1 call to each of the sensor GpFuncs. This tests for valid trees.
 inline bool evoflockGpValidateTree(const LP::GpTree& tree,
                                    const LP::FunctionSet& fs)
 {
+//    std::cout << std::endl;
+//    std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+//    std::cout << "enter evoflockGpValidateTree" << std::endl;
+
+    assert(&fs == LP::FunctionSet::xxx_current_fs);
+
     bool ok = true;
     std::vector<std::string> required_gp_funcs =
     {
@@ -279,26 +285,23 @@ inline bool evoflockGpValidateTree(const LP::GpTree& tree,
         if (not fs.isFunctionInTree(name, tree)) { ok = false; }
     }
     
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251221 change logging for population sensor API.
+//    static int total_trees = 0;
+//    static int good_trees = 0;
+//    total_trees++;
+//    if (ok) { good_trees++; }
+//    debugPrint(ok);
+//    debugPrint(&fs);
+//    debugPrint(good_trees);
+//    debugPrint(total_trees);
+//    std::cout << tree.to_string(true) << std::endl;
     
-//        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//        // TODO 20251219 what is wrong with crossover loop?
-//        if (ok)
-//        {
-//            grabPrintLock_evoflock();
-//            static int counter = 0;
-//            counter++;
-//            std::cout << counter << " trees OK in GP::evoflockGpValidateTree" << std::endl;
-//            std::cout << tree.to_string(true) << std::endl;
-//        }
-//    //    assert(not ok);
-//        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//    std::cout << "exit  evoflockGpValidateTree" << std::endl;
+//    std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
 
     return ok;
 }
+
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -339,7 +342,13 @@ double measureUsageSensorAPI(const LP::Population& population)
     auto measure_sensor_api_usage = [&](LP::Individual* individual)
     {
         const LP::GpTree& tree = individual->tree();
-        const LP::FunctionSet& fs = evoflockGpFunctionSet();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251222 why no sensor check during create population?
+
+//        const LP::FunctionSet& fs = evoflockGpFunctionSet();
+        const LP::FunctionSet& fs = *LP::FunctionSet::xxx_current_fs;
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         bool full_usage = evoflockGpValidateTree(tree, fs);
         if (full_usage) { trees_using_full_sensor_api++; }
     };
@@ -503,28 +512,38 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 //
 //    evoflockGpValidateTree
     
-    
-    if (not evoflockGpValidateTree(individual->tree(), evoflockGpFunctionSet()))
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251222 why no sensor check during create population?
+
+//        if (not evoflockGpValidateTree(individual->tree(), evoflockGpFunctionSet()))
+//        {
+//    //        std::cout << "===========================================" << std::endl;
+//    //        std::cout << "least_mof = " << least_mof.to_string() << std::endl;
+//
+//    //        least_mof.scaleObjectives(0.5);
+//    //        least_mof.scaleObjectives(0.1);
+//
+//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//            // TODO 20251220 refactor: only preserve sensor API not size
+//
+//    //        least_mof *= 0.1;
+//            least_mof *= 0.5;
+//
+//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//
+//    //        std::cout << "least_mof = " << least_mof.to_string() << std::endl;
+//    //        std::cout << "===========================================" << std::endl;
+//        }
+      
+//    if (not evoflockGpValidateTree(individual->tree(), evoflockGpFunctionSet()))
+    if (not evoflockGpValidateTree(individual->tree(),
+                                   *LP::FunctionSet::xxx_current_fs))
     {
-//        std::cout << "===========================================" << std::endl;
-//        std::cout << "least_mof = " << least_mof.to_string() << std::endl;
-
-//        least_mof.scaleObjectives(0.5);
-//        least_mof.scaleObjectives(0.1);
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20251220 refactor: only preserve sensor API not size
-
-//        least_mof *= 0.1;
         least_mof *= 0.5;
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-//        std::cout << "least_mof = " << least_mof.to_string() << std::endl;
-//        std::cout << "===========================================" << std::endl;
     }
-        
-        
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -1665,23 +1684,23 @@ LP::FunctionSet& evoflockGpFunctionSet()
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20240707 WIP on a prototype unit test for this GP module
 
-void test_First_Obs_GpFuncs()
-{
-//    const LP::FunctionSet fs = evoflock_gp_function_set();
-    const LP::FunctionSet& fs = evoflockGpFunctionSet();
-    const LP::GpFunction* fod = fs.lookupGpFunctionByName("First_Obs_Dist");
-    const LP::GpFunction* fon = fs.lookupGpFunctionByName("First_Obs_Normal");
-
-    LP::GpTree gp_tree_fod;
-    gp_tree_fod.setRootFunction(*fod);
-    double distance = std::any_cast<double>(gp_tree_fod.eval());
-    debugPrint(distance)
-    
-    LP::GpTree gp_tree_fon;
-    gp_tree_fon.setRootFunction(*fon);
-    Vec3 normal = std::any_cast<Vec3>(gp_tree_fon.eval());
-    debugPrint(normal)
-}
+//    void test_First_Obs_GpFuncs()
+//    {
+//    //    const LP::FunctionSet fs = evoflock_gp_function_set();
+//        const LP::FunctionSet& fs = evoflockGpFunctionSet();
+//        const LP::GpFunction* fod = fs.lookupGpFunctionByName("First_Obs_Dist");
+//        const LP::GpFunction* fon = fs.lookupGpFunctionByName("First_Obs_Normal");
+//
+//        LP::GpTree gp_tree_fod;
+//        gp_tree_fod.setRootFunction(*fod);
+//        double distance = std::any_cast<double>(gp_tree_fod.eval());
+//        debugPrint(distance)
+//
+//        LP::GpTree gp_tree_fon;
+//        gp_tree_fon.setRootFunction(*fon);
+//        Vec3 normal = std::any_cast<Vec3>(gp_tree_fon.eval());
+//        debugPrint(normal)
+//    }
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -169,11 +169,16 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
 
 void runOneFlockEvolution()
 {
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251223 GA regression test
+    
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-    // EF::setUsingGA();
-    EF::setUsingGP();
+    EF::setUsingGA();
+    // EF::setUsingGP();
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
     // enable_multithreading = false;
@@ -402,7 +407,15 @@ void runOneFlockEvolution()
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             // TODO 20251221 change logging for population sensor API.
             
-            GP::logUsageSensorAPI(*population);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251223 GA regression test
+            
+//            GP::logUsageSensorAPI(*population);
+
+            if (EF::usingGP()) { GP::logUsageSensorAPI(*population); }
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             std::cout << std::endl;

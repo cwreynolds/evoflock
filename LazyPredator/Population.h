@@ -144,8 +144,19 @@ public:
         double least_size_error = std::numeric_limits<double>::infinity();
 
         const FunctionSet& fs = *getFunctionSet();
-        debugPrint(fs.treeConstraintsOK(parent0->tree()));
-        debugPrint(fs.treeConstraintsOK(parent1->tree()));
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251223 GA regression test
+
+//        debugPrint(fs.treeConstraintsOK(parent0->tree()));
+//        debugPrint(fs.treeConstraintsOK(parent1->tree()));
+
+        if (EF::usingGP())
+        {
+            debugPrint(fs.treeConstraintsOK(parent0->tree()));
+            debugPrint(fs.treeConstraintsOK(parent1->tree()));
+        }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         int retries = 1000;
         for (int r = 0; r < retries; r++)
         {
@@ -178,11 +189,24 @@ public:
                 new_tree = temp_tree;
                 least_size_error = size_error;
             }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251223 GA regression test
+//            debugPrint(r)
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20251221 change logging for population sensor API.
-        debugPrint(fs.treeConstraintsOK(new_tree));
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251223 GA regression test
+        
+//        debugPrint(fs.treeConstraintsOK(new_tree));
+
+        if (EF::usingGP()) { debugPrint(fs.treeConstraintsOK(new_tree)); }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         // Mutate constants in new tree.

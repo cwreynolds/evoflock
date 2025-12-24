@@ -442,7 +442,16 @@ public:
 
 //        return newMakeRandomTree(min_tree_size, max_tree_size, 1000);
 //        return newMakeRandomTree(min_tree_size, max_tree_size, 5000);
-        return newMakeRandomTree(min_tree_size, max_tree_size, 2000);
+        
+        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
+        // TODO 20251222 try again considering sensor as well as size
+
+//        return newMakeRandomTree(min_tree_size, max_tree_size, 2000);
+//        return newMakeRandomTree(min_tree_size, max_tree_size, 5000);
+//        return newMakeRandomTree(min_tree_size, max_tree_size, 10000);
+        return newMakeRandomTree(min_tree_size, max_tree_size, 20000);
+
+        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -659,7 +668,14 @@ public:
         for (int i = 0; i < retries; i++)
         {
             GpTree temp_tree;
-            makeRandomTree(max_tree_size, temp_tree);
+            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
+            // TODO 20251222 what happens if we overestimate the max size.
+//            makeRandomTree(max_tree_size, temp_tree);
+//            makeRandomTree(max_tree_size * 1.5, temp_tree);
+//            makeRandomTree(max_tree_size * 1.2, temp_tree);
+//            makeRandomTree(max_tree_size, temp_tree);
+            makeRandomTree(max_tree_size * 2, temp_tree);
+            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
 
             // NOTE: this same code pattern in Population::evolutionStep().
             // When we find one that meets the size constraint exit retry loop.
@@ -674,7 +690,12 @@ public:
             double size_error = distFromInterval(size,
                                                  min_tree_size,
                                                  max_tree_size);
-            if (least_size_error > size_error)
+            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
+            // TODO 20251222 try again considering sensor as well as size
+//            if (least_size_error > size_error)
+            if ((least_size_error > size_error) and
+                (treeConstraintsOK(temp_tree)))
+            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
             {
                 new_tree = temp_tree;
                 least_size_error = size_error;

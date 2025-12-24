@@ -536,8 +536,17 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 //        }
       
 //    if (not evoflockGpValidateTree(individual->tree(), evoflockGpFunctionSet()))
-    if (not evoflockGpValidateTree(individual->tree(),
-                                   *LP::FunctionSet::xxx_current_fs))
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251223 GA regression test
+
+//    if (not evoflockGpValidateTree(individual->tree(),
+//                                   *LP::FunctionSet::xxx_current_fs))
+
+    auto fs = *LP::FunctionSet::xxx_current_fs;
+    if (EF::usingGP() and  not evoflockGpValidateTree(individual->tree(), fs))
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
         least_mof *= 0.5;
     }

@@ -198,18 +198,8 @@ void runOneFlockEvolution()
 
     // The number of Individuals in a population for evolutionary optimization.
     // By default it is divided into sqrt(individuals) breeding sub-populations.
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251208 after 20251207_gp_handmade_seeded, try bigger population.
-//    int individuals = 300;
-//    int individuals = 600;
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251221 change logging for population sensor API.
-    
 //    int individuals = EF::usingGA() ? 300 : 600;
     int individuals = EF::usingGA() ? 300 : 300;
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     int subpops = std::round(std::sqrt(individuals));
     
     // Total number of Individual update steps. (Steady state update stepss. For
@@ -218,49 +208,7 @@ void runOneFlockEvolution()
     int max_evolution_steps = 30000;
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
-    
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
-
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 30 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 30 : ga_tree_size;
-
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251125 I keep flip-flopping on max tree size
-
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
-
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 30 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 30 : ga_tree_size;
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251212 add NearestNeighborOffset2, increase tree max size 40->60
-    // TODO 20251212 decrease tree max size 60->50
-
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
-
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251213 try making initial trees bigger for usingGP().
-
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
-  
+      
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20251221 change logging for population sensor API.
 
@@ -277,12 +225,6 @@ void runOneFlockEvolution()
     int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     debugPrint(min_crossover_tree_size);
     debugPrint(max_crossover_tree_size);
@@ -334,26 +276,10 @@ void runOneFlockEvolution()
         std::cout << "Create population, individuals = " << individuals;
         std::cout << ", subpops/demes = " << subpops << std::endl;
         util::Timer t("Create population.");
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20251220 refactor: only preserve sensor API not size
-
         LP::Individual::increasing_initial_tree_size = true;
-        
-        
         if (EF::usingGP())
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251222 why no sensor check during create population?
-
-            auto before = fs.getValidateTreeFunction();
-            debugPrint(&before)
-
             fs.setValidateTreeFunction(GP::evoflockGpValidateTree);
-
-            auto after = fs.getValidateTreeFunction();
-            debugPrint(&after)
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         else
         {
@@ -371,8 +297,6 @@ void runOneFlockEvolution()
             // injectHandWrittenCodeIntoPopulation(fs, population);
         }
     }
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     LP::CountFunctionUsage usage;
     auto log_usage_counts = [&]()
@@ -404,20 +328,7 @@ void runOneFlockEvolution()
                 std::cout << individual->tree().to_string(true) << std::endl;
                 log_usage_counts();
             }
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20251221 change logging for population sensor API.
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251223 GA regression test
-            
-//            GP::logUsageSensorAPI(*population);
-
             if (EF::usingGP()) { GP::logUsageSensorAPI(*population); }
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             std::cout << std::endl;
             visualizeBestIfRequested(population);
         }

@@ -258,20 +258,13 @@ void doOneRunDebugLogging(Boid& boid,
 }
 
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251222 why no sensor check during create population?
-
 // Constraint to keep the "sensor" API in population, by requiring each tree to
 // have >=1 call to each of the sensor GpFuncs. This tests for valid trees.
 inline bool evoflockGpValidateTree(const LP::GpTree& tree,
                                    const LP::FunctionSet& fs)
 {
-//    std::cout << std::endl;
-//    std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-//    std::cout << "enter evoflockGpValidateTree" << std::endl;
-
-    assert(&fs == LP::FunctionSet::xxx_current_fs);
-
+    assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
+    
     bool ok = true;
     std::vector<std::string> required_gp_funcs =
     {
@@ -284,57 +277,9 @@ inline bool evoflockGpValidateTree(const LP::GpTree& tree,
     {
         if (not fs.isFunctionInTree(name, tree)) { ok = false; }
     }
-    
-//    static int total_trees = 0;
-//    static int good_trees = 0;
-//    total_trees++;
-//    if (ok) { good_trees++; }
-//    debugPrint(ok);
-//    debugPrint(&fs);
-//    debugPrint(good_trees);
-//    debugPrint(total_trees);
-//    std::cout << tree.to_string(true) << std::endl;
-    
-//    std::cout << "exit  evoflockGpValidateTree" << std::endl;
-//    std::cout << "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-
     return ok;
 }
 
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20251221 change logging for population sensor API.
-
-//double measureUsageSensorAPI(const LP::Population& population)
-//{
-//    int individuals_with_full_sensor_usage = 0;
-//    auto measure_sensor_api_usage = [&](LP::Individual* individual)
-//    {
-//        const LP::GpTree& tree = individual->tree();
-//        const LP::FunctionSet& fs = evoflockGpFunctionSet();
-//        bool full_usage = evoflockGpValidateTree(tree, fs);
-//        if (full_usage) { individuals_with_full_sensor_usage++; }
-//    };
-//    population.applyToAllIndividuals(measure_sensor_api_usage);
-//    return individuals_with_full_sensor_usage / population.getIndividualCount();
-//}
-
-//    double measureUsageSensorAPI(const LP::Population& population)
-//    {
-//        double individuals_with_full_sensor_usage = 0;
-//        auto measure_sensor_api_usage = [&](LP::Individual* individual)
-//        {
-//            const LP::GpTree& tree = individual->tree();
-//            const LP::FunctionSet& fs = evoflockGpFunctionSet();
-//            bool full_usage = evoflockGpValidateTree(tree, fs);
-//            if (full_usage) { individuals_with_full_sensor_usage++; }
-//        };
-//        population.applyToAllIndividuals(measure_sensor_api_usage);
-//        return individuals_with_full_sensor_usage / population.getIndividualCount();
-//    }
 
 double measureUsageSensorAPI(const LP::Population& population)
 {
@@ -368,9 +313,6 @@ void logUsageSensorAPI(const LP::Population& population)
     std::cout << " use full sensor API.";
     std::cout << std::endl;
 }
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
 
 
 // If evolved steering seems numerically odd, substitute zero.
@@ -498,45 +440,7 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         }
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
-    
-    
-    // cache the FunctionSet here in GP, or pass it into this function, so that
-    // we can run evoflockGpValidateTree() and if invalid, reduce (say by half)
-    // the fitness components of this individual.
-    
-//    inline bool evoflockGpValidateTree(const LP::GpTree& tree,
-//                                       const LP::FunctionSet& fs)
-//
-//    evoflockGpValidateTree
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251222 why no sensor check during create population?
-
-//        if (not evoflockGpValidateTree(individual->tree(), evoflockGpFunctionSet()))
-//        {
-//    //        std::cout << "===========================================" << std::endl;
-//    //        std::cout << "least_mof = " << least_mof.to_string() << std::endl;
-//
-//    //        least_mof.scaleObjectives(0.5);
-//    //        least_mof.scaleObjectives(0.1);
-//
-//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//            // TODO 20251220 refactor: only preserve sensor API not size
-//
-//    //        least_mof *= 0.1;
-//            least_mof *= 0.5;
-//
-//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//
-//    //        std::cout << "least_mof = " << least_mof.to_string() << std::endl;
-//    //        std::cout << "===========================================" << std::endl;
-//        }
-      
-//    if (not evoflockGpValidateTree(individual->tree(), evoflockGpFunctionSet()))
-    
+        
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20251223 GA regression test
 
@@ -544,16 +448,13 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 //                                   *LP::FunctionSet::xxx_current_fs))
 
     auto fs = *LP::FunctionSet::xxx_current_fs;
-    if (EF::usingGP() and  not evoflockGpValidateTree(individual->tree(), fs))
+    if (EF::usingGP() and not evoflockGpValidateTree(individual->tree(), fs))
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     {
         least_mof *= 0.5;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     assert(scalar_fits.size() == runs);

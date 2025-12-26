@@ -43,20 +43,11 @@ public:
                                                 std::multiplies()); }
     std::string to_string() const { return vec_to_string(mof_); }
     const std::vector<double> as_vector() const { return mof_; }
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
 
+    // Modify MOF by scaling all components by a given factor
     void scaleObjectives(double factor) { for (auto& o : mof_) { o *= factor; } }
-    
-    
-    // TODO 20251219 *= operator for MOF
-    
+    // *= operator for MOF
     MultiObjectiveFitness operator*=(double s){scaleObjectives(s); return *this;}
-
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
 
     // Scalerize fitness using hypervolume. Insists on normalized fitness. Remap
     // each fitness from [0, 1] to [0.01, 1] so that a zero component does not

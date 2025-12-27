@@ -161,16 +161,20 @@ inline void init_flock(Flock& flock)
     flock.log_prefix = "    ";
 }
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251226 no longer used? Now done inside MOF::hyperVolume().
 
-// Adjust weight of one objective's fitness for "product of objective fitnesses".
-// Each objective fitness is on [0, 1] and serves to modulate (decrease) other
-// objective fitnesses. This reduces the range of decrease by mapping the input
-// fitness from [0, 1] to [1-w, 1], that is, restricting it to the top of the
-// range, hence limiting its contribution for smaller weights.
-double fitness_product_weight_01(double fitness, double weight)
-{
-    return util::remap_interval_clip(fitness, 0, 1, 1 - weight, 1);
-};
+//    // Adjust weight of one objective's fitness for "product of objective fitnesses".
+//    // Each objective fitness is on [0, 1] and serves to modulate (decrease) other
+//    // objective fitnesses. This reduces the range of decrease by mapping the input
+//    // fitness from [0, 1] to [1-w, 1], that is, restricting it to the top of the
+//    // range, hence limiting its contribution for smaller weights.
+//    double fitness_product_weight_01(double fitness, double weight)
+//    {
+//        return util::remap_interval_clip(fitness, 0, 1, 1 - weight, 1);
+//    };
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 inline void fitness_logger(const MOF& mof)
 {

@@ -510,11 +510,43 @@ public:
 //
 //                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20251226 trying to fix low fitness GA since about Nov 25
+            
+//            // Sum scores for "speed is in correct range".
+//            // TODO TEMP WARNING FIX -- raw inline constants.
+//            double score = parameterToWeightWithRamps(b->speed(),
+//                                                      {15, 19, 21, 25},
+//                                                      { 0,  1,  1,  0});
+
+//            // Sum scores for "speed is in correct range".
+//            // TODO TEMP WARNING FIX -- raw inline constants.
+//            double score = parameterToWeightWithRamps(b->speed(),
+//                                                      { 0, 18, 19, 21, 25},
+//                                                      { 0, .2, 1,  1,  0});
+            
+//            // Sum scores for "speed is in correct range".
+//            // TODO TEMP WARNING FIX -- raw inline constants.
+//            double score = parameterToWeightWithRamps(b->speed(),
+//                                                      {15, 19, 21, 25},
+//                                                      { 0,  1,  1,  0});
+//            if (util::between(b->speed(), 19, 21)) { assert(score > 0); }
+//            if ((b->speed() < 15) or (b->speed() > 25))
+//            {
+//                if (not (score == 0))
+//                {
+//                    debugPrint(b->speed());
+//                    debugPrint(score);
+//                }
+//                assert(score == 0);
+//            }
+
             // Sum scores for "speed is in correct range".
             // TODO TEMP WARNING FIX -- raw inline constants.
-            double score = parameterToWeightWithRamps(b->speed(),
-                                                      {15, 19, 21, 25},
-                                                      { 0,  1,  1,  0});
+//            double score = ((b->speed() > 18) and ((b->speed() < 22))) ? 1 : 0;
+            double score = ((b->speed() > 15) and ((b->speed() < 25))) ? 1 : 0;
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

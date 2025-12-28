@@ -45,8 +45,16 @@ inline static double roll_rate = 0.99;
 // Global switch (temp?) enables 4th objective component for boosting curvature.
 inline static bool add_curvature_objective = false;
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20251227 Wait, what?! Confusion with default INITIAL speed?!
+
+//    // Global default target speed. Move to const section of FlockParameters?
+//    inline static double default_target_speed = 0;
+
 // Global default target speed. Move to const section of FlockParameters?
-inline static double default_target_speed = 0;
+inline static double default_target_speed = 20;
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 static inline bool using_GA_ = true;
 inline bool usingGP() { return not using_GA_; }

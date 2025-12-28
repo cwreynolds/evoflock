@@ -309,7 +309,8 @@ public:
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20251124 API for "perverse_speed_control".
-        recordPerverseSpeedControlScorePerStep();
+        // TODO 20251227 no useful insight from perverse_speed_control -- remove
+//        recordPerverseSpeedControlScorePerStep();
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -448,6 +449,115 @@ public:
     // TODO Relocate in file?
     double sum_of_speeds_over_all_boid_steps_ = 0;
     double sum_of_speed_scores_over_all_boid_steps_ = 0;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251227 go back to historic speed score function
+    
+//        // Called each simulation step, records stats for the speed score.
+//        void recordSpeedScorePerStep()
+//        {
+//            for (auto b : boids())
+//            {
+//                // Sum used for average speed over entire run.
+//                sum_of_speeds_over_all_boid_steps_ += b->speed();
+//
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                // TODO 20251210 all this folderol is obsolete, GP speed fine now
+//
+//    //                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//    //                // TODO 20250914 VERY ad hoc work-around for zero speed issue
+//    //                //               try getting rid of the wide flat "porch" where any
+//    //                //               speed below 15 got the same score
+//    //
+//    //                // Sum scores for "speed is in correct range".
+//    //                // TODO TEMP WARNING FIX -- raw inline constants.
+//    //
+//    //                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//    //                // TODO 20250915 revert
+//    //    //                double score = parameterToWeightWithRamps(b->speed(),
+//    //    //    //                                                      {15, 19, 21, 25},
+//    //    //                                                          { 0, 19, 21, 25},
+//    //    //                                                          { 0,  1,  1,  0});
+//    //
+//    //                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //                // TODO 20250920 experimental curriculum learning
+//    //
+//    //    //            double score = parameterToWeightWithRamps(b->speed(),
+//    //    //                                                      {15, 19, 21, 25},
+//    //    //                                                      { 0,  1,  1,  0});
+//    //
+//    //                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//    //                // TODO 20250925 turn off curriculum learning experiment
+//    //
+//    //    //                double score = parameterToWeightWithRamps(b->speed(),
+//    //    //    //                                                      {15, 19, 21, 25},
+//    //    //                                                          { 0, 19, 21, 25},
+//    //    //                                                          { 0,  1,  1,  0});
+//    //
+//    //    //            double score = parameterToWeightWithRamps(b->speed(),
+//    //    //                                                      {15, 19, 21, 25},
+//    //    //                                                      { 0,  1,  1,  0});
+//    //
+//    //
+//    //                double score = parameterToWeightWithRamps(b->speed(),
+//    //    //                                                      {15, 19, 21, 25},
+//    //    //                                                      { 0, 19, 21, 25},
+//    //                                                          { 0, 18, 19, 21, 25},
+//    //                                                          { 0, .2, 1,  1,  0});
+//    //
+//    //                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//    //
+//    //                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //
+//    //                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//    //
+//    //
+//    //                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20251226 trying to fix low fitness GA since about Nov 25
+//
+//    //            // Sum scores for "speed is in correct range".
+//    //            // TODO TEMP WARNING FIX -- raw inline constants.
+//    //            double score = parameterToWeightWithRamps(b->speed(),
+//    //                                                      {15, 19, 21, 25},
+//    //                                                      { 0,  1,  1,  0});
+//
+//    //            // Sum scores for "speed is in correct range".
+//    //            // TODO TEMP WARNING FIX -- raw inline constants.
+//    //            double score = parameterToWeightWithRamps(b->speed(),
+//    //                                                      { 0, 18, 19, 21, 25},
+//    //                                                      { 0, .2, 1,  1,  0});
+//
+//    //            // Sum scores for "speed is in correct range".
+//    //            // TODO TEMP WARNING FIX -- raw inline constants.
+//    //            double score = parameterToWeightWithRamps(b->speed(),
+//    //                                                      {15, 19, 21, 25},
+//    //                                                      { 0,  1,  1,  0});
+//    //            if (util::between(b->speed(), 19, 21)) { assert(score > 0); }
+//    //            if ((b->speed() < 15) or (b->speed() > 25))
+//    //            {
+//    //                if (not (score == 0))
+//    //                {
+//    //                    debugPrint(b->speed());
+//    //                    debugPrint(score);
+//    //                }
+//    //                assert(score == 0);
+//    //            }
+//
+//                // Sum scores for "speed is in correct range".
+//                // TODO TEMP WARNING FIX -- raw inline constants.
+//    //            double score = ((b->speed() > 18) and ((b->speed() < 22))) ? 1 : 0;
+//                double score = ((b->speed() > 15) and ((b->speed() < 25))) ? 1 : 0;
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//                sum_of_speed_scores_over_all_boid_steps_ += score;
+//            }
+//        }
+
     
     // Called each simulation step, records stats for the speed score.
     void recordSpeedScorePerStep()
@@ -457,103 +567,23 @@ public:
             // Sum used for average speed over entire run.
             sum_of_speeds_over_all_boid_steps_ += b->speed();
             
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20251210 all this folderol is obsolete, GP speed fine now
-            
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//                // TODO 20250914 VERY ad hoc work-around for zero speed issue
-//                //               try getting rid of the wide flat "porch" where any
-//                //               speed below 15 got the same score
-//
 //                // Sum scores for "speed is in correct range".
 //                // TODO TEMP WARNING FIX -- raw inline constants.
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                // TODO 20250915 revert
-//    //                double score = parameterToWeightWithRamps(b->speed(),
-//    //    //                                                      {15, 19, 21, 25},
-//    //                                                          { 0, 19, 21, 25},
-//    //                                                          { 0,  1,  1,  0});
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20250920 experimental curriculum learning
-//
-//    //            double score = parameterToWeightWithRamps(b->speed(),
-//    //                                                      {15, 19, 21, 25},
-//    //                                                      { 0,  1,  1,  0});
-//
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//                // TODO 20250925 turn off curriculum learning experiment
-//
-//    //                double score = parameterToWeightWithRamps(b->speed(),
-//    //    //                                                      {15, 19, 21, 25},
-//    //                                                          { 0, 19, 21, 25},
-//    //                                                          { 0,  1,  1,  0});
-//
-//    //            double score = parameterToWeightWithRamps(b->speed(),
-//    //                                                      {15, 19, 21, 25},
-//    //                                                      { 0,  1,  1,  0});
-//
-//
-//                double score = parameterToWeightWithRamps(b->speed(),
-//    //                                                      {15, 19, 21, 25},
-//    //                                                      { 0, 19, 21, 25},
-//                                                          { 0, 18, 19, 21, 25},
-//                                                          { 0, .2, 1,  1,  0});
-//
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//
-//
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251226 trying to fix low fitness GA since about Nov 25
-            
-//            // Sum scores for "speed is in correct range".
-//            // TODO TEMP WARNING FIX -- raw inline constants.
-//            double score = parameterToWeightWithRamps(b->speed(),
-//                                                      {15, 19, 21, 25},
-//                                                      { 0,  1,  1,  0});
-
-//            // Sum scores for "speed is in correct range".
-//            // TODO TEMP WARNING FIX -- raw inline constants.
-//            double score = parameterToWeightWithRamps(b->speed(),
-//                                                      { 0, 18, 19, 21, 25},
-//                                                      { 0, .2, 1,  1,  0});
-            
-//            // Sum scores for "speed is in correct range".
-//            // TODO TEMP WARNING FIX -- raw inline constants.
-//            double score = parameterToWeightWithRamps(b->speed(),
-//                                                      {15, 19, 21, 25},
-//                                                      { 0,  1,  1,  0});
-//            if (util::between(b->speed(), 19, 21)) { assert(score > 0); }
-//            if ((b->speed() < 15) or (b->speed() > 25))
-//            {
-//                if (not (score == 0))
-//                {
-//                    debugPrint(b->speed());
-//                    debugPrint(score);
-//                }
-//                assert(score == 0);
-//            }
+//    //            double score = ((b->speed() > 18) and ((b->speed() < 22))) ? 1 : 0;
+//                double score = ((b->speed() > 15) and ((b->speed() < 25))) ? 1 : 0;
 
             // Sum scores for "speed is in correct range".
             // TODO TEMP WARNING FIX -- raw inline constants.
-//            double score = ((b->speed() > 18) and ((b->speed() < 22))) ? 1 : 0;
-            double score = ((b->speed() > 15) and ((b->speed() < 25))) ? 1 : 0;
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            double score = parameterToWeightWithRamps(b->speed(),
+                                                      {15, 19, 21, 25},
+                                                      { 0,  1,  1,  0});
 
             sum_of_speed_scores_over_all_boid_steps_ += score;
         }
     }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Added to try experimental curriculum learning.
     double fractionOfSimulationElapsed() const
@@ -585,31 +615,32 @@ public:
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20251124 API for "perverse_speed_control".
+    // TODO 20251227 no useful insight from perverse_speed_control -- remove
     
-    // Accumulators for perverse_speed_control score.
-    // TODO Relocate in file?
-    double sum_of_perverse_speed_control_scores_over_all_boid_steps_ = 0;
-
-    // Called each simulation step, records perverse_speed_control score.
-    void recordPerverseSpeedControlScorePerStep()
-    {
-        for (auto b : boids())
-        {
-            bool accelerating = (b->nextSteer().dot(b->forward()) > 0);
-            bool slow = (b->speed() < EF::default_target_speed);
-            if ((slow and not accelerating) or (not slow and accelerating))
-            {
-                sum_of_perverse_speed_control_scores_over_all_boid_steps_++;
-            }
-        }
-    }
-
-    // Average speed for each Boid on each simulation step.
-    double perverseSpeedControlScore() const
-    {
-        return (sum_of_perverse_speed_control_scores_over_all_boid_steps_ /
-                boidStepPerSim());
-    }
+//    // Accumulators for perverse_speed_control score.
+//    // TODO Relocate in file?
+//    double sum_of_perverse_speed_control_scores_over_all_boid_steps_ = 0;
+//
+//    // Called each simulation step, records perverse_speed_control score.
+//    void recordPerverseSpeedControlScorePerStep()
+//    {
+//        for (auto b : boids())
+//        {
+//            bool accelerating = (b->nextSteer().dot(b->forward()) > 0);
+//            bool slow = (b->speed() < EF::default_target_speed);
+//            if ((slow and not accelerating) or (not slow and accelerating))
+//            {
+//                sum_of_perverse_speed_control_scores_over_all_boid_steps_++;
+//            }
+//        }
+//    }
+//
+//    // Average speed for each Boid on each simulation step.
+//    double perverseSpeedControlScore() const
+//    {
+//        return (sum_of_perverse_speed_control_scores_over_all_boid_steps_ /
+//                boidStepPerSim());
+//    }
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

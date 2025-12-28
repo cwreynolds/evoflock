@@ -267,8 +267,16 @@ void doOneRunDebugLogging(Boid& boid,
 inline bool evoflockGpValidateTree(const LP::GpTree& tree,
                                    const LP::FunctionSet& fs)
 {
-    assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251227 Wait, what?! Confusion with default INITIAL speed?!
+    if (not (&fs == LP::FunctionSet::xxx_current_fs))
+    {
+        debugPrint(&fs);
+        debugPrint(LP::FunctionSet::xxx_current_fs);
+        assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     bool ok = true;
     std::vector<std::string> required_gp_funcs =
     {

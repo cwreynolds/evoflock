@@ -454,18 +454,41 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     }
         
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251223 GA regression test
+    // TODO 20251228 switch back to GP mode
 
 //    if (not evoflockGpValidateTree(individual->tree(),
 //                                   *LP::FunctionSet::xxx_current_fs))
 
-    auto fs = *LP::FunctionSet::xxx_current_fs;
-    if (EF::usingGP() and not evoflockGpValidateTree(individual->tree(), fs))
+//    auto fs = *LP::FunctionSet::xxx_current_fs;
+//    std::cout << "in GP::run_flock_simulation(): xxx_current_fs = "
+//              << LP::FunctionSet::xxx_current_fs << std::endl;
+//    if (EF::usingGP() and
+//        not evoflockGpValidateTree(individual->tree(), fs))
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    LP::FunctionSet& fs = *LP::FunctionSet::xxx_current_fs;
+//    if (EF::usingGP() and not evoflockGpValidateTree(individual->tree(), fs))
+//
+//    {
+//        least_mof *= 0.5;
+//    }
+    
+//    if (EF::usingGP())
+//    {
+//        if (not evoflockGpValidateTree(individual->tree(),
+//                                       *LP::FunctionSet::xxx_current_fs))
+//        {
+//            least_mof *= 0.5;
+//        }
+//    }
+
+    if (EF::usingGP() and
+        not evoflockGpValidateTree(individual->tree(),
+                                   *LP::FunctionSet::xxx_current_fs))
     {
         least_mof *= 0.5;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

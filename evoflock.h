@@ -178,11 +178,11 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
 void runOneFlockEvolution()
 {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251223 GA regression test
+    // TODO 20251228 switch back to GP mode
     
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-    EF::setUsingGA();
-    // EF::setUsingGP();
+    // EF::setUsingGA();
+    EF::setUsingGP();
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

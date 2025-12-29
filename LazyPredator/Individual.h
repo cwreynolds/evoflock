@@ -17,19 +17,19 @@ namespace LazyPredator
 class Individual
 {
 public:
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240619 WIP first GP_not_GA run
-    // VERY TEMP
-    std::string tree_to_string() const
-    {
-        return tree_.to_string(true);
-    }
-    
-    int pop_position = 0;  // temp, for debugging, to track one instance
-
-//    int qqq_count = 0;
-    GpTree duplicate_tree;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20240619 WIP first GP_not_GA run
+//        // VERY TEMP
+//        std::string tree_to_string() const
+//        {
+//            return tree_.to_string(true);
+//        }
+//
+//        int pop_position = 0;  // temp, for debugging, to track one instance
+//
+//    //    int qqq_count = 0;
+//        GpTree duplicate_tree;
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     Individual()
     {

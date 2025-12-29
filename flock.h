@@ -675,7 +675,11 @@ public:
     // Average speed for each Boid on each simulation step.
     double alignmentScore() const
     {
-        return (sum_of_alignment_scores_over_all_boid_steps_ / boidStepPerSim());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20251228 switch back to GP mode, try disable alignmentScore()
+//        return (sum_of_alignment_scores_over_all_boid_steps_ / boidStepPerSim());
+        return 1;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~

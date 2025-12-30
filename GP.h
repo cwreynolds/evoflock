@@ -161,20 +161,6 @@ inline void init_flock(Flock& flock)
     flock.log_prefix = "    ";
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251226 no longer used? Now done inside MOF::hyperVolume().
-
-//    // Adjust weight of one objective's fitness for "product of objective fitnesses".
-//    // Each objective fitness is on [0, 1] and serves to modulate (decrease) other
-//    // objective fitnesses. This reduces the range of decrease by mapping the input
-//    // fitness from [0, 1] to [1-w, 1], that is, restricting it to the top of the
-//    // range, hence limiting its contribution for smaller weights.
-//    double fitness_product_weight_01(double fitness, double weight)
-//    {
-//        return util::remap_interval_clip(fitness, 0, 1, 1 - weight, 1);
-//    };
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 inline void fitness_logger(const MOF& mof)
 {
@@ -278,13 +264,26 @@ inline bool evoflockGpValidateTree(const LP::GpTree& tree,
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     bool ok = true;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251229 new GpFuncs for average neighborhood velocity and offset
+
+//    std::vector<std::string> required_gp_funcs =
+//    {
+//        "Velocity",
+//        "NearestNeighborVelocity",
+//        "NearestNeighborOffset",
+//        "FirstObstacleTimeLimitNormal",
+//    };
+
     std::vector<std::string> required_gp_funcs =
     {
         "Velocity",
-        "NearestNeighborVelocity",
-        "NearestNeighborOffset",
+        "NeighborhoodVelocity",
+        "NeighborhoodOffset",
         "FirstObstacleTimeLimitNormal",
     };
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     for (auto& name : required_gp_funcs)
     {
         if (not fs.isFunctionInTree(name, tree)) { ok = false; }
@@ -1099,21 +1098,7 @@ inline LP::GpFunction NearestNeighborVelocity
       return std::any(getGpBoidNeighbor(1)->velocity());
   });
 
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20251207 try adding 2nd nearest neighbor velocity.
-// TODO 20251212 move "2" to end of name
-
-//    inline LP::GpFunction NearestNeighbor2Velocity
-//     (
-//      "NearestNeighbor2Velocity",
-//      "Vec3",
-//      {},
-//      [](LP::GpTree& t)
-//      {
-//          return std::any(getGpBoidNeighbor(2)->velocity());
-//      });
-
-inline LP::GpFunction NearestNeighborVelocity2
+inline LP::GpFunction NearestNeighborVelocity2  // 2nd nearest neighbor
  (
   "NearestNeighborVelocity2",
   "Vec3",
@@ -1122,8 +1107,6 @@ inline LP::GpFunction NearestNeighborVelocity2
   {
       return std::any(getGpBoidNeighbor(2)->velocity());
   });
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 inline LP::GpFunction NearestNeighborOffset
  (
@@ -1137,10 +1120,8 @@ inline LP::GpFunction NearestNeighborOffset
       return std::any(no);
   });
 
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20251212 move "2" to end of name
 
-inline LP::GpFunction NearestNeighborOffset2
+inline LP::GpFunction NearestNeighborOffset2  // 2nd nearest neighbor
  (
   "NearestNeighborOffset2",
   "Vec3",
@@ -1150,6 +1131,50 @@ inline LP::GpFunction NearestNeighborOffset2
       Boid& boid = *Boid::getGpPerThread();
       Vec3 no = getGpBoidNeighbor(2)->position() - boid.position();
       return std::any(no);
+  });
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20251229 new GpFuncs for average neighborhood velocity and offset
+
+inline LP::GpFunction NeighborhoodVelocity
+ (
+  "NeighborhoodVelocity",
+  "Vec3",
+  {"Scalar_0_10"},  // falloff exponent
+  [](LP::GpTree& tree)
+  {
+      Vec3 sum;
+      Boid& me = *Boid::getGpPerThread();
+      double exponent = tree.evalSubtree<double>(0);
+      for (int i = 1; i < 7; i++)
+      {
+          Boid& b = *getGpBoidNeighbor(i);
+          Vec3 offset = b.position() - me.position();
+          double distance = offset.length();
+          sum += b.velocity() * (1.0 / std::pow(distance, exponent));
+      }
+      return std::any(sum);;
+  });
+
+
+inline LP::GpFunction NeighborhoodOffset
+ (
+  "NeighborhoodOffset",
+  "Vec3",
+  {"Scalar_0_10"},  // falloff exponent
+  [](LP::GpTree& tree)
+  {
+      Vec3 sum;
+      Boid& me = *Boid::getGpPerThread();
+      double exponent = tree.evalSubtree<double>(0);
+      for (int i = 1; i < 7; i++)
+      {
+          Boid& b = *getGpBoidNeighbor(i);
+          Vec3 offset = b.position() - me.position();
+          double distance = offset.length();
+          sum += offset * (1.0 / std::pow(distance, exponent));
+      }
+      return std::any(sum);;
   });
 
 
@@ -1396,157 +1421,6 @@ inline LP::GpFunction BeTheBoid
      return std::any(boid.steerToFlockForGA());
  });
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251213 toward no hand-written, use a smaller FS like in hand-written.
-
-//    // FunctionSet for the GP version of EvoFlock.
-//    LP::FunctionSet evoflock_gp_function_set()
-//    {
-//        return
-//        {
-//            // GpTypes
-//            {
-//                { "Vec3" },
-//    //            { "Scalar", -10.0, 10.0 },
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//                // TODO 20251207 inject hand-written code into population
-//    //            { "Scalar", -100.0, 100.0 },
-//    //            { "Scalar", -100.0, 100.0, jiggle_scale },
-//                { "Scalar", -100.0, 100.0, 0.005 },
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//            },
-//            // GpFunctions
-//            {
-//                // Vector functions:
-//                V3,
-//                Add3,
-//                Sub3,
-//                Scale3,
-//                Div3,
-//    //            Length,
-//                Normalize,
-//    //            Dot,
-//                // Cross,
-//                // Parallel_Component,
-//                // Perpendicular_Component,
-//                // Interpolate,
-//                // If_Pos,
-//                LengthAdjust,
-//
-//                // Boid API:
-//    //            Speed,
-//                Velocity,
-//                // Acceleration,
-//                Forward,
-//                NearestNeighborVelocity,
-//                NearestNeighborOffset,
-//
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//                // TODO 20251207 try adding 2nd nearest neighbor velocity.
-//    //            NearestNeighbor2Velocity,
-//                // TODO 20251212 move "2" to end of name
-//                NearestNeighborVelocity2,
-//                NearestNeighborOffset2,
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//
-//
-//    //            First_Obs_Dist,
-//                FirstObstacleNormal,
-//                FirstObstacleOffset,
-//
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                // TODO 20251205 try a new high level GpFunc
-//                FirstObstacleTimeLimitNormal,
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//                // To_Forward,
-//                // To_Side,
-//                ToForward,
-//                ToSide,
-//
-//                SideAndForward,
-//
-//                // Cartoonishly high level Boid API for debugging:
-//                // SpeedControl,
-//                // AvoidObstacle,
-//                // AdjustSeparation,
-//                // BeTheBoid,
-//            }
-//        };
-//    }
-
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20251218 WIP on general purpose "is this tree OK" predicate.
-
-//    // FunctionSet for the GP version of EvoFlock.
-//    LP::FunctionSet evoflock_gp_function_set()
-//    {
-//        return
-//        {
-//            // GpTypes
-//            {
-//                { "Vec3" },
-//                { "Scalar", -100.0, 100.0, 0.005 },  // min, max, jiggle scale
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                // TODO 20251213 simplify to be more like hand-written
-//                {"Scalar_0_1", 0.0, 1.0, 0.01},
-//                {"Scalar_0_10", 0.0, 10.0, 0.1},
-//                {"Scalar_0_100", 0.0, 100.0, 1.0},
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//            },
-//            // GpFunctions
-//            {
-//                // Vector functions:
-//                // V3,
-//                Add3,
-//                Sub3,
-//                Scale3,
-//                Div3,
-//                // Length,
-//                // Normalize,
-//                // Dot,
-//                // Cross,
-//                // Parallel_Component,
-//                // Perpendicular_Component,
-//                // Interpolate,
-//                // If_Pos,
-//                LengthAdjust,
-//
-//                // Boid API:
-//                // Speed,
-//                Velocity,
-//                // Acceleration,
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                // TODO 20251213 simplify to be more like hand-written
-//                // Forward,
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                NearestNeighborVelocity,
-//                NearestNeighborOffset,
-//                NearestNeighborVelocity2,
-//                NearestNeighborOffset2,
-//                // First_Obs_Dist,
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                // TODO 20251213 simplify to be more like hand-written
-//                // FirstObstacleNormal,
-//                // FirstObstacleOffset,
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                FirstObstacleTimeLimitNormal,
-//
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                // TODO 20251213 simplify to be more like hand-written
-//                // ToForward,
-//                // ToSide,
-//                // SideAndForward,
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//                // Cartoonishly high level Boid API for debugging:
-//                // SpeedControl,
-//                // AvoidObstacle,
-//                // AdjustSeparation,
-//                // BeTheBoid,
-//            }
-//        };
-//    }
 
 LP::FunctionSet evoflock_gp_function_set_cached_ =
 {
@@ -1583,28 +1457,27 @@ LP::FunctionSet evoflock_gp_function_set_cached_ =
         // Speed,
         Velocity,
         // Acceleration,
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20251213 simplify to be more like hand-written
         // Forward,
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        NearestNeighborVelocity,
-        NearestNeighborOffset,
-        NearestNeighborVelocity2,
-        NearestNeighborOffset2,
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+        // TODO 20251229 new GpFuncs for average neighborhood velocity and offset
+
+//        NearestNeighborVelocity,
+//        NearestNeighborOffset,
+//        NearestNeighborVelocity2,
+//        NearestNeighborOffset2,
+
+        NeighborhoodVelocity,
+        NeighborhoodOffset,
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
         // First_Obs_Dist,
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20251213 simplify to be more like hand-written
         // FirstObstacleNormal,
         // FirstObstacleOffset,
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         FirstObstacleTimeLimitNormal,
         
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20251213 simplify to be more like hand-written
         // ToForward,
         // ToSide,
         // SideAndForward,
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         
         // Cartoonishly high level Boid API for debugging:
         // SpeedControl,
@@ -1619,11 +1492,6 @@ LP::FunctionSet& evoflockGpFunctionSet()
 {
     return evoflock_gp_function_set_cached_;
 }
-
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

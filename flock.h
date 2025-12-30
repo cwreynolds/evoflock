@@ -677,8 +677,23 @@ public:
     {
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20251228 switch back to GP mode, try disable alignmentScore()
+        
 //        return (sum_of_alignment_scores_over_all_boid_steps_ / boidStepPerSim());
+        
+//        return 1;
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20251229 reduce max tree size from 50 to 40
+
+//        double score = (sum_of_alignment_scores_over_all_boid_steps_ /
+//                        boidStepPerSim());
+//        double remap = util::remap_interval(score, 0, 1, 0.8, 1);
+//        return util::remap_interval(score, 0, 1, 0.8, 1);
+
         return 1;
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 

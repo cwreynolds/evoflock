@@ -439,11 +439,26 @@ public:
         }
     }
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20251231 after surprisingly good run last night, emphasize sep score
+
+//    // Return a unit fitness component: maintaining proper separation distance.
+//    double separationScore() const
+//    {
+//        return separation_score_sum_ / boidStepPerSim();
+//    }
+    
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
     {
-        return separation_score_sum_ / boidStepPerSim();
+        double average_score = separation_score_sum_ / boidStepPerSim();
+//        return std::pow(average_score, 2);
+//        return std::pow(average_score, 1.5);
+        return average_score;
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 
     // Accumulators for speed score.
     // TODO Relocate in file?
@@ -695,10 +710,15 @@ public:
 
 //        return 1;
 
+//        double score = (sum_of_alignment_scores_over_all_boid_steps_ /
+//                        boidStepPerSim());
+//        return util::remap_interval(score, 0, 1, 0.5, 1);
+
         double score = (sum_of_alignment_scores_over_all_boid_steps_ /
                         boidStepPerSim());
-        return util::remap_interval(score, 0, 1, 0.5, 1);
+        return score;
 
+        
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~

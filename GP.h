@@ -275,13 +275,26 @@ inline bool evoflockGpValidateTree(const LP::GpTree& tree,
 //        "FirstObstacleTimeLimitNormal",
 //    };
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20251230 rename FirstObstacleTimeLimitNormal to ObstacleCollisionNormal
+
+//    std::vector<std::string> required_gp_funcs =
+//    {
+//        "Velocity",
+//        "NeighborhoodVelocity",
+//        "NeighborhoodOffset",
+//        "FirstObstacleTimeLimitNormal",
+//    };
+
     std::vector<std::string> required_gp_funcs =
     {
         "Velocity",
         "NeighborhoodVelocity",
         "NeighborhoodOffset",
-        "FirstObstacleTimeLimitNormal",
+        "ObstacleCollisionNormal",
     };
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     for (auto& name : required_gp_funcs)
@@ -480,12 +493,26 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
 //        }
 //    }
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20251230 scale fitness by 0.5, not 0.5 ^ mof.size()
+
+//    if (EF::usingGP() and
+//        not evoflockGpValidateTree(individual->tree(),
+//                                   *LP::FunctionSet::xxx_current_fs))
+//    {
+//        least_mof *= 0.5;
+//    }
+
     if (EF::usingGP() and
         not evoflockGpValidateTree(individual->tree(),
                                    *LP::FunctionSet::xxx_current_fs))
     {
-        least_mof *= 0.5;
+//        debugPrint(least_mof.hyperVolume())
+        least_mof *= std::pow(0.5, 1.0 / least_mof.size());
+//        debugPrint(least_mof.hyperVolume())
     }
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1140,7 +1167,11 @@ inline LP::GpFunction NeighborhoodVelocity
  (
   "NeighborhoodVelocity",
   "Vec3",
-  {"Scalar_0_10"},  // falloff exponent
+  //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+  // TODO 20251230 inv_exp GpType
+//  {"Scalar_0_10"},  // falloff exponent
+  {"Scalar_0.5_2"},  // falloff exponent
+  //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
   [](LP::GpTree& tree)
   {
       Vec3 sum;
@@ -1161,7 +1192,11 @@ inline LP::GpFunction NeighborhoodOffset
  (
   "NeighborhoodOffset",
   "Vec3",
-  {"Scalar_0_10"},  // falloff exponent
+  //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+  // TODO 20251230 inv_exp GpType
+  //  {"Scalar_0_10"},  // falloff exponent
+  {"Scalar_0.5_2"},  // falloff exponent
+  //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
   [](LP::GpTree& tree)
   {
       Vec3 sum;
@@ -1236,36 +1271,37 @@ inline LP::GpFunction FirstObstacleNormal
       return std::any(normal);
   });
 
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20251205 try a new high level GpFunc
 
-inline LP::GpFunction FirstObstacleTimeLimitNormal
-(
- "FirstObstacleTimeLimitNormal",
- "Vec3",
- //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
- // TODO 20251213 simplify to be more like hand-written
-// {"Scalar"}, // time_to_collision_threshold
- {"Scalar_0_1"}, // time_to_collision_threshold
- //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
- [](LP::GpTree& tree)
- {
-    double time_to_collision_threshold = tree.evalSubtree<double>(0);
-    Boid& boid = *Boid::getGpPerThread();
-    Vec3 normal;
-    auto collisions = boid.get_predicted_obstacle_collisions();
-    if (collisions.size() > 0)
-    {
-        const Collision& first_collision = collisions.front();
-//        normal = first_collision.normal_at_poi;
-        
-        if (first_collision.time_to_collision < time_to_collision_threshold)
-        {
-            normal = first_collision.normal_at_poi;
-        }
-    }
-    return std::any(normal);
-});
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+// TODO 20251230 rename FirstObstacleTimeLimitNormal to ObstacleCollisionNormal
+
+//    inline LP::GpFunction FirstObstacleTimeLimitNormal
+//     (
+//      "FirstObstacleTimeLimitNormal",
+inline LP::GpFunction ObstacleCollisionNormal
+ (
+  "ObstacleCollisionNormal",
+  "Vec3",
+  {"Scalar_0_1"}, // time_to_collision_threshold
+  [](LP::GpTree& tree)
+  {
+      double time_to_collision_threshold = tree.evalSubtree<double>(0);
+      Boid& boid = *Boid::getGpPerThread();
+      Vec3 normal;
+      auto collisions = boid.get_predicted_obstacle_collisions();
+      if (collisions.size() > 0)
+      {
+          const Collision& first_collision = collisions.front();
+          if (first_collision.time_to_collision < time_to_collision_threshold)
+          {
+              normal = first_collision.normal_at_poi;
+          }
+      }
+      return std::any(normal);
+  });
+
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
 
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -1428,12 +1464,14 @@ LP::FunctionSet evoflock_gp_function_set_cached_ =
     {
         { "Vec3" },
         { "Scalar", -100.0, 100.0, 0.005 },  // min, max, jiggle scale
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20251213 simplify to be more like hand-written
         {"Scalar_0_1", 0.0, 1.0, 0.01},
         {"Scalar_0_10", 0.0, 10.0, 0.1},
         {"Scalar_0_100", 0.0, 100.0, 1.0},
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20251230 inv_exp GpType
+        // To see plot of falloff curves: https://tinyurl.com/3p4jv7dx
+        {"Scalar_0.5_2", 0.5, 2.0, 0.02},  // for inverse exponential falloff.
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     },
     // GpFunctions
     {
@@ -1473,8 +1511,13 @@ LP::FunctionSet evoflock_gp_function_set_cached_ =
         // First_Obs_Dist,
         // FirstObstacleNormal,
         // FirstObstacleOffset,
-        FirstObstacleTimeLimitNormal,
         
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20251230 rename FirstObstacleTimeLimitNormal to ObstacleCollisionNormal
+//        FirstObstacleTimeLimitNormal,
+        ObstacleCollisionNormal,
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         // ToForward,
         // ToSide,
         // SideAndForward,

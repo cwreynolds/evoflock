@@ -235,9 +235,18 @@ void runOneFlockEvolution()
 //    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20251230 increase max tree size from 40 to 60
+
+//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
+
     int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
+    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

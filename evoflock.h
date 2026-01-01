@@ -206,14 +206,23 @@ void runOneFlockEvolution()
 
     // The number of Individuals in a population for evolutionary optimization.
     // By default it is divided into sqrt(individuals) breeding sub-populations.
-//    int individuals = EF::usingGA() ? 300 : 600;
-    int individuals = EF::usingGA() ? 300 : 300;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260101 try 2x run with neighborhood sensors.
+    
+//    int individuals = EF::usingGA() ? 300 : 300;
+    int individuals = EF::usingGA() ? 300 : 600;
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     int subpops = std::round(std::sqrt(individuals));
     
     // Total number of Individual update steps. (Steady state update stepss. For
     // a generational GA, this corresponds to (max_evolution_steps / individuals)
     // generations. So 30000 / 300 = 100 "generation equivalents.")
-    int max_evolution_steps = 30000;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260101 try 2x run with neighborhood sensors.
+//    int max_evolution_steps = 30000;
+    int max_evolution_steps = 60000;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
       

@@ -213,8 +213,17 @@ void runOneFlockEvolution()
     
     // TODO 20260102_gp_300_pop_60000_steps
 //    int individuals = EF::usingGA() ? 300 : 600;
-    int individuals = EF::usingGA() ? 300 : 300;
+    
+    // TODO 20260102_gp_150_pop_30000_steps
 
+//    int individuals = EF::usingGA() ? 300 : 300;
+    
+    // TODO 20260102_gp_200_pop_30000_steps
+//    int individuals = EF::usingGA() ? 300 : 150;
+//    int individuals = EF::usingGA() ? 300 : 200;
+
+    int individuals = EF::usingGA() ? 300 : 300;
+    
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     int subpops = std::round(std::sqrt(individuals));
     
@@ -224,7 +233,13 @@ void runOneFlockEvolution()
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20260101 try 2x run with neighborhood sensors.
 //    int max_evolution_steps = 30000;
-    int max_evolution_steps = 60000;
+
+    // TODO 20260102_gp_150_pop_30000_steps
+
+//    int max_evolution_steps = 60000;
+    
+    int max_evolution_steps = 30000;
+
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
@@ -254,9 +269,15 @@ void runOneFlockEvolution()
 //    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
 
+    // TODO 20260103_gp_try_smaller_trees (again)
+    
+//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+
     int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+    int max_crossover_tree_size = EF::usingGP() ? 35 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 35 : ga_tree_size;
 
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 

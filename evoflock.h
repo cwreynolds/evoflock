@@ -210,7 +210,10 @@ void runOneFlockEvolution()
     // TODO 20260101 try 2x run with neighborhood sensors.
     
 //    int individuals = EF::usingGA() ? 300 : 300;
-    int individuals = EF::usingGA() ? 300 : 600;
+    
+    // TODO 20260102_gp_300_pop_60000_steps
+//    int individuals = EF::usingGA() ? 300 : 600;
+    int individuals = EF::usingGA() ? 300 : 300;
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     int subpops = std::round(std::sqrt(individuals));

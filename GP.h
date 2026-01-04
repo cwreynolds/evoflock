@@ -51,35 +51,11 @@ inline double scalarize_fitness_hyperVolume(MOF mof) {return mof.hyperVolume();}
 //inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
 
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20251218 WIP on general purpose "is this tree OK" predicate.
-
 // FunctionSet for the GP version of EvoFlock. (forward reference)
 LP::FunctionSet& evoflockGpFunctionSet();
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20251208 score for boid alignment.
-
-//inline std::vector<std::string> mof_names()
-//{
-//    return (EF::add_curvature_objective ?
-//             std::vector<std::string>(
-//                                      {
-//                                          "avoid",
-//                                          "separate",
-//                                          "speed",
-//                                          "curvature"
-//                                      }) :
-//             std::vector<std::string>(
-//                                      {
-//                                          "avoid",
-//                                          "separate",
-//                                          "speed"
-//                                      }));
-//}
-
+// Component names for MOF (multi-objective fitness) values (by mode settings).
 inline std::vector<std::string> mof_names()
 {
     return (EF::add_curvature_objective ?
@@ -109,7 +85,6 @@ inline std::vector<std::string> mof_names()
              ));
 }
 
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 // After a Flock's simulation has been run, it is passed here to build its multi
 // objective fitness object from metrics saved inside the Flock object.
@@ -264,28 +239,6 @@ inline bool evoflockGpValidateTree(const LP::GpTree& tree,
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     bool ok = true;
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251229 new GpFuncs for average neighborhood velocity and offset
-
-//    std::vector<std::string> required_gp_funcs =
-//    {
-//        "Velocity",
-//        "NearestNeighborVelocity",
-//        "NearestNeighborOffset",
-//        "FirstObstacleTimeLimitNormal",
-//    };
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20251230 rename FirstObstacleTimeLimitNormal to ObstacleCollisionNormal
-
-//    std::vector<std::string> required_gp_funcs =
-//    {
-//        "Velocity",
-//        "NeighborhoodVelocity",
-//        "NeighborhoodOffset",
-//        "FirstObstacleTimeLimitNormal",
-//    };
-
     std::vector<std::string> required_gp_funcs =
     {
         "Velocity",
@@ -293,10 +246,6 @@ inline bool evoflockGpValidateTree(const LP::GpTree& tree,
         "NeighborhoodOffset",
         "ObstacleCollisionNormal",
     };
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     for (auto& name : required_gp_funcs)
     {
         if (not fs.isFunctionInTree(name, tree)) { ok = false; }
@@ -313,10 +262,7 @@ double measureUsageSensorAPI(const LP::Population& population)
         const LP::GpTree& tree = individual->tree();
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20251222 why no sensor check during create population?
-
-//        const LP::FunctionSet& fs = evoflockGpFunctionSet();
         const LP::FunctionSet& fs = *LP::FunctionSet::xxx_current_fs;
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         bool full_usage = evoflockGpValidateTree(tree, fs);
         if (full_usage) { trees_using_full_sensor_api++; }
@@ -465,58 +411,13 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
         
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251228 switch back to GP mode
-
-//    if (not evoflockGpValidateTree(individual->tree(),
-//                                   *LP::FunctionSet::xxx_current_fs))
-
-//    auto fs = *LP::FunctionSet::xxx_current_fs;
-//    std::cout << "in GP::run_flock_simulation(): xxx_current_fs = "
-//              << LP::FunctionSet::xxx_current_fs << std::endl;
-//    if (EF::usingGP() and
-//        not evoflockGpValidateTree(individual->tree(), fs))
-
-//    LP::FunctionSet& fs = *LP::FunctionSet::xxx_current_fs;
-//    if (EF::usingGP() and not evoflockGpValidateTree(individual->tree(), fs))
-//
-//    {
-//        least_mof *= 0.5;
-//    }
-    
-//    if (EF::usingGP())
-//    {
-//        if (not evoflockGpValidateTree(individual->tree(),
-//                                       *LP::FunctionSet::xxx_current_fs))
-//        {
-//            least_mof *= 0.5;
-//        }
-//    }
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20251230 scale fitness by 0.5, not 0.5 ^ mof.size()
-
-//    if (EF::usingGP() and
-//        not evoflockGpValidateTree(individual->tree(),
-//                                   *LP::FunctionSet::xxx_current_fs))
-//    {
-//        least_mof *= 0.5;
-//    }
 
     if (EF::usingGP() and
         not evoflockGpValidateTree(individual->tree(),
                                    *LP::FunctionSet::xxx_current_fs))
     {
-//        debugPrint(least_mof.hyperVolume())
         least_mof *= std::pow(0.5, 1.0 / least_mof.size());
-//        debugPrint(least_mof.hyperVolume())
     }
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     assert(scalar_fits.size() == runs);
     fitness_logger(least_mof);
@@ -849,11 +750,7 @@ inline LP::GpFunction Scale3
  (
   "Scale3",
   "Vec3",
-  //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-  // TODO 20251213 simplify to be more like hand-written
-//  {"Vec3", "Scalar"},
   {"Vec3", "Scalar_0_10"},
-  //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
   [](LP::GpTree& tree)
   {
       return std::any(tree.evalSubtree<Vec3>(0) * tree.evalSubtree<double>(1));
@@ -863,11 +760,7 @@ inline LP::GpFunction Div3
  (
   "Div3",
   "Vec3",
-  //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-  // TODO 20251213 simplify to be more like hand-written
-  //  {"Vec3", "Scalar"},
   {"Vec3", "Scalar_0_10"},
-  //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
   [](LP::GpTree& tree)
   {
       double d = tree.evalSubtree<double>(1);
@@ -969,76 +862,25 @@ inline LP::GpFunction If_Pos
                       tree.evalSubtree<Vec3>(2));
   });
 
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20251204 why does handmade program behave poorly?
-
-//    inline LP::GpFunction LengthAdjust
-//     (
-//      "LengthAdjust",
-//      "Vec3",
-//      {"Vec3", "Scalar", "Scalar"},  // ref vec, target length, strength
-//      [](LP::GpTree& tree)
-//      {
-//          Vec3 ref_vector = tree.evalSubtree<Vec3>(0);
-//
-//          // TODO temporarily fix with an abs(), later with special Scalar def?
-//          double target_length = std::abs(tree.evalSubtree<double>(1));
-//          double strength = std::abs(tree.evalSubtree<double>(1));
-//
-//          bool adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
-//          return std::any(ref_vector.normalize_or_0() * adjust);
-//      });
-
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20251205 local to GP fix for zero length Velocity?
-
 inline LP::GpFunction LengthAdjust
  (
   "LengthAdjust",
   "Vec3",
-  //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-  // TODO 20251213 simplify to be more like hand-written
-//  {"Vec3", "Scalar", "Scalar"},  // ref vec, target length, strength
-//  {"Vec3", "Scalar", "Scalar_0_10"},  // ref vec, target length, strength
   {"Vec3", "Scalar_0_100", "Scalar_0_10"},  // ref vec, target length, strength
-  //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
   [](LP::GpTree& tree)
   {
       Vec3 ref_vector = tree.evalSubtree<Vec3>(0);
       
       // TODO temporarily fix with an abs(), later with special Scalar def?
-      double target_length = std::abs(tree.evalSubtree<double>(1));
-      double strength = std::abs(tree.evalSubtree<double>(2));
+//      double target_length = std::abs(tree.evalSubtree<double>(1));
+//      double strength = std::abs(tree.evalSubtree<double>(2));
+      double target_length = tree.evalSubtree<double>(1);
+      double strength = tree.evalSubtree<double>(2);
 
-//      bool adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
-//      bool adjust = strength * (ref_vector.length() > target_length ? 1 : -1);
-//      double adjust = strength * (ref_vector.length() > target_length ? 1 : -1);
       double adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
-
-//      return std::any(ref_vector.normalize_or_0() * adjust);
-      
       Vec3 result = ref_vector.normalize_or_0() * adjust;
-
-      if (Boid::getGpPerThread()->isSelected())
-      {
-//          std::cout << std::endl;
-//          debugPrint(ref_vector);
-//          debugPrint(ref_vector.length());
-//          debugPrint(target_length);
-//          debugPrint(strength);
-//          debugPrint(ref_vector.length() < target_length ? 1 : -1);
-//          debugPrint(adjust);
-//          debugPrint(result);
-      }
-      
       return std::any(result);
-
   });
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 
 //------------------------------------------------------------------------------
@@ -1058,20 +900,6 @@ inline LP::GpFunction Speed
   });
 
 
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20251205 local to GP fix for zero length Velocity?
-
-//    inline LP::GpFunction Velocity
-//     (
-//      "Velocity",
-//      "Vec3",
-//      {},
-//      [](LP::GpTree& t)
-//      {
-//          Boid& boid = *Boid::getGpPerThread();
-//          return std::any(boid.velocity());
-//      });
-
 inline LP::GpFunction Velocity
 (
  "Velocity",
@@ -1081,17 +909,11 @@ inline LP::GpFunction Velocity
  {
     Boid& boid = *Boid::getGpPerThread();
     double min_speed = 0.01;  // cf target speed usually 20.
-//    Vec3 v = ((boid.speed() < min_speed) ?
-//              boid.forward() * min_speed :
-//              boid.velocity());
-    
     Vec3 v = boid.velocity();
     if (boid.speed() < min_speed) { v = boid.forward() * min_speed; }
-
     return std::any(v);
 });
 
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 inline LP::GpFunction Acceleration
  (
@@ -1160,18 +982,11 @@ inline LP::GpFunction NearestNeighborOffset2  // 2nd nearest neighbor
       return std::any(no);
   });
 
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20251229 new GpFuncs for average neighborhood velocity and offset
-
 inline LP::GpFunction NeighborhoodVelocity
  (
   "NeighborhoodVelocity",
   "Vec3",
-  //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-  // TODO 20251230 inv_exp GpType
-//  {"Scalar_0_10"},  // falloff exponent
   {"Scalar_0.5_2"},  // falloff exponent
-  //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
   [](LP::GpTree& tree)
   {
       Vec3 sum;
@@ -1192,11 +1007,7 @@ inline LP::GpFunction NeighborhoodOffset
  (
   "NeighborhoodOffset",
   "Vec3",
-  //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-  // TODO 20251230 inv_exp GpType
-  //  {"Scalar_0_10"},  // falloff exponent
   {"Scalar_0.5_2"},  // falloff exponent
-  //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
   [](LP::GpTree& tree)
   {
       Vec3 sum;
@@ -1272,12 +1083,6 @@ inline LP::GpFunction FirstObstacleNormal
   });
 
 
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-// TODO 20251230 rename FirstObstacleTimeLimitNormal to ObstacleCollisionNormal
-
-//    inline LP::GpFunction FirstObstacleTimeLimitNormal
-//     (
-//      "FirstObstacleTimeLimitNormal",
 inline LP::GpFunction ObstacleCollisionNormal
  (
   "ObstacleCollisionNormal",
@@ -1299,8 +1104,6 @@ inline LP::GpFunction ObstacleCollisionNormal
       }
       return std::any(normal);
   });
-
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -1467,11 +1270,8 @@ LP::FunctionSet evoflock_gp_function_set_cached_ =
         {"Scalar_0_1", 0.0, 1.0, 0.01},
         {"Scalar_0_10", 0.0, 10.0, 0.1},
         {"Scalar_0_100", 0.0, 100.0, 1.0},
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20251230 inv_exp GpType
         // To see plot of falloff curves: https://tinyurl.com/3p4jv7dx
         {"Scalar_0.5_2", 0.5, 2.0, 0.02},  // for inverse exponential falloff.
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     },
     // GpFunctions
     {
@@ -1496,27 +1296,18 @@ LP::FunctionSet evoflock_gp_function_set_cached_ =
         Velocity,
         // Acceleration,
         // Forward,
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-        // TODO 20251229 new GpFuncs for average neighborhood velocity and offset
-
-//        NearestNeighborVelocity,
-//        NearestNeighborOffset,
-//        NearestNeighborVelocity2,
-//        NearestNeighborOffset2,
-
+        // NearestNeighborVelocity,
+        // NearestNeighborOffset,
+        // NearestNeighborVelocity2,
+        // NearestNeighborOffset2,
         NeighborhoodVelocity,
         NeighborhoodOffset,
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
         // First_Obs_Dist,
         // FirstObstacleNormal,
         // FirstObstacleOffset,
         
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20251230 rename FirstObstacleTimeLimitNormal to ObstacleCollisionNormal
-//        FirstObstacleTimeLimitNormal,
+        // FirstObstacleTimeLimitNormal,
         ObstacleCollisionNormal,
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
         // ToForward,
         // ToSide,

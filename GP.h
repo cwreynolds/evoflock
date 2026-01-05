@@ -1060,7 +1060,11 @@ inline LP::GpFunction NeighborhoodVelocityDiff
           velocity_sum += b.velocity() * weight;
           weight_sum += weight;
       }
-      return std::any((velocity_sum / weight_sum) - me.velocity());
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      // TODO 20260105 sanity check, is this backwards? Should I allow negative weights?
+//      return std::any((velocity_sum / weight_sum) - me.velocity());
+      return std::any(me.velocity() - (velocity_sum / weight_sum));
+      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   });
 
 

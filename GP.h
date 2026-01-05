@@ -242,7 +242,11 @@ inline bool evoflockGpValidateTree(const LP::GpTree& tree,
     std::vector<std::string> required_gp_funcs =
     {
         "Velocity",
-        "NeighborhoodVelocity",
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260103 replace NeighborhoodVelocity with NeighborhoodVelocityDiff.
+//        "NeighborhoodVelocity",
+        "NeighborhoodVelocityDiff",
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         "NeighborhoodOffset",
         "ObstacleCollisionNormal",
     };
@@ -982,6 +986,30 @@ inline LP::GpFunction NearestNeighborOffset2  // 2nd nearest neighbor
       return std::any(no);
   });
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20260103 replace NeighborhoodVelocity with NeighborhoodVelocityDiff.
+//               also normalize by weight.
+
+//    inline LP::GpFunction NeighborhoodVelocity
+//     (
+//      "NeighborhoodVelocity",
+//      "Vec3",
+//      {"Scalar_0.5_2"},  // falloff exponent
+//      [](LP::GpTree& tree)
+//      {
+//          Vec3 sum;
+//          Boid& me = *Boid::getGpPerThread();
+//          double exponent = tree.evalSubtree<double>(0);
+//          for (int i = 1; i < 7; i++)
+//          {
+//              Boid& b = *getGpBoidNeighbor(i);
+//              Vec3 offset = b.position() - me.position();
+//              double distance = offset.length();
+//              sum += b.velocity() * (1.0 / std::pow(distance, exponent));
+//          }
+//          return std::any(sum);;
+//      });
+
 inline LP::GpFunction NeighborhoodVelocity
  (
   "NeighborhoodVelocity",
@@ -989,7 +1017,10 @@ inline LP::GpFunction NeighborhoodVelocity
   {"Scalar_0.5_2"},  // falloff exponent
   [](LP::GpTree& tree)
   {
-      Vec3 sum;
+//      Vec3 sum;
+      Vec3 velocity_sum;
+      double weight_sum = 0;
+
       Boid& me = *Boid::getGpPerThread();
       double exponent = tree.evalSubtree<double>(0);
       for (int i = 1; i < 7; i++)
@@ -997,11 +1028,62 @@ inline LP::GpFunction NeighborhoodVelocity
           Boid& b = *getGpBoidNeighbor(i);
           Vec3 offset = b.position() - me.position();
           double distance = offset.length();
-          sum += b.velocity() * (1.0 / std::pow(distance, exponent));
+//          sum += b.velocity() * (1.0 / std::pow(distance, exponent));
+          
+          double weight = 1.0 / std::pow(distance, exponent);
+          velocity_sum += b.velocity() * weight;
+          weight_sum += weight;
       }
-      return std::any(sum);;
+//      return std::any(sum);;
+      return std::any(velocity_sum / weight_sum);
   });
 
+
+// "Pre subtracts" from this boid's velocity. We want to drive this to zero.
+inline LP::GpFunction NeighborhoodVelocityDiff
+ (
+  "NeighborhoodVelocityDiff",
+  "Vec3",
+  {"Scalar_0.5_2"},  // falloff exponent
+  [](LP::GpTree& tree)
+  {
+      Vec3 velocity_sum;
+      double weight_sum = 0;
+      Boid& me = *Boid::getGpPerThread();
+      double exponent = tree.evalSubtree<double>(0);
+      for (int i = 1; i < 7; i++)
+      {
+          Boid& b = *getGpBoidNeighbor(i);
+          Vec3 offset = b.position() - me.position();
+          double distance = offset.length();
+          double weight = 1.0 / std::pow(distance, exponent);
+          velocity_sum += b.velocity() * weight;
+          weight_sum += weight;
+      }
+      return std::any((velocity_sum / weight_sum) - me.velocity());
+  });
+
+
+
+//    inline LP::GpFunction NeighborhoodOffset
+//     (
+//      "NeighborhoodOffset",
+//      "Vec3",
+//      {"Scalar_0.5_2"},  // falloff exponent
+//      [](LP::GpTree& tree)
+//      {
+//          Vec3 sum;
+//          Boid& me = *Boid::getGpPerThread();
+//          double exponent = tree.evalSubtree<double>(0);
+//          for (int i = 1; i < 7; i++)
+//          {
+//              Boid& b = *getGpBoidNeighbor(i);
+//              Vec3 offset = b.position() - me.position();
+//              double distance = offset.length();
+//              sum += offset * (1.0 / std::pow(distance, exponent));
+//          }
+//          return std::any(sum);;
+//      });
 
 inline LP::GpFunction NeighborhoodOffset
  (
@@ -1010,7 +1092,9 @@ inline LP::GpFunction NeighborhoodOffset
   {"Scalar_0.5_2"},  // falloff exponent
   [](LP::GpTree& tree)
   {
-      Vec3 sum;
+//      Vec3 sum;
+      Vec3 offset_sum;
+      double weight_sum = 0;
       Boid& me = *Boid::getGpPerThread();
       double exponent = tree.evalSubtree<double>(0);
       for (int i = 1; i < 7; i++)
@@ -1018,13 +1102,18 @@ inline LP::GpFunction NeighborhoodOffset
           Boid& b = *getGpBoidNeighbor(i);
           Vec3 offset = b.position() - me.position();
           double distance = offset.length();
-          sum += offset * (1.0 / std::pow(distance, exponent));
+//          sum += offset * (1.0 / std::pow(distance, exponent));
+          
+          double weight = 1.0 / std::pow(distance, exponent);
+          offset_sum += offset * weight;
+          weight_sum += weight;
+
       }
-      return std::any(sum);;
+//      return std::any(sum);;
+      return std::any(offset_sum / weight_sum);
   });
 
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 inline LP::GpFunction First_Obs_Dist
  (
@@ -1300,7 +1389,11 @@ LP::FunctionSet evoflock_gp_function_set_cached_ =
         // NearestNeighborOffset,
         // NearestNeighborVelocity2,
         // NearestNeighborOffset2,
-        NeighborhoodVelocity,
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260103 replace NeighborhoodVelocity with NeighborhoodVelocityDiff.
+//        NeighborhoodVelocity,
+        NeighborhoodVelocityDiff,
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         NeighborhoodOffset,
         // First_Obs_Dist,
         // FirstObstacleNormal,

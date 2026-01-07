@@ -223,6 +223,120 @@ void doOneRunDebugLogging(Boid& boid,
 }
 
 
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20260106 make evoflockGpValidateTree() use AND of ORs.
+
+typedef std::vector<std::vector<std::string>> vecOfVecOfStrings;
+
+// Check if a given collection of GpFunction names are contained in the given
+// GpTree. The collection is an "and of or", a vector of vectors of strings:
+// std::vector<std::vector<std::string>>. The tree must contain one function
+// named in the first sub-vector, and one from each other sub-vector. So for
+// example: {{"a", "aa", "aaa"}, {"b", "bb", "bbb"}, {"c", "cc", "ccc"}} would
+// match a tree containing functions: aa, b, and ccc.
+
+
+inline bool areFuncsInTree(const LP::GpTree& tree,
+                           const vecOfVecOfStrings& names,
+                           const LP::FunctionSet& fs)
+{
+    bool ok = true;
+    for (auto& alternatives : names)
+    {
+        bool at_least_one_found = false;
+        for (auto& name : alternatives)
+        {
+            if (fs.isFunctionInTree(name, tree)) { at_least_one_found = true; }
+        }
+        if (not at_least_one_found) { ok = false; }
+    }
+    return ok;
+}
+
+
+//    // Constraint to keep the "sensor" API in population, by requiring each tree to
+//    // have >=1 call to each of the sensor GpFuncs. This tests for valid trees.
+//    inline bool evoflockGpValidateTree(const LP::GpTree& tree,
+//                                       const LP::FunctionSet& fs)
+//    {
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20251227 Wait, what?! Confusion with default INITIAL speed?!
+//        if (not (&fs == LP::FunctionSet::xxx_current_fs))
+//        {
+//            debugPrint(&fs);
+//            debugPrint(LP::FunctionSet::xxx_current_fs);
+//            assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
+//        }
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//        bool ok = true;
+//        std::vector<std::string> required_gp_funcs =
+//        {
+//            "Velocity",
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20260103 replace NeighborhoodVelocity with NeighborhoodVelocityDiff.
+//    //        "NeighborhoodVelocity",
+//            "NeighborhoodVelocityDiff",
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            "NeighborhoodOffset",
+//            "ObstacleCollisionNormal",
+//        };
+//        for (auto& name : required_gp_funcs)
+//        {
+//            if (not fs.isFunctionInTree(name, tree)) { ok = false; }
+//        }
+//        return ok;
+//    }
+
+
+//    // Constraint to keep the "sensor" API in population, by requiring each tree to
+//    // have >=1 call to each of the sensor GpFuncs. This tests for valid trees.
+//    inline bool evoflockGpValidateTree(const LP::GpTree& tree,
+//                                       const LP::FunctionSet& fs)
+//    {
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20251227 Wait, what?! Confusion with default INITIAL speed?!
+//        if (not (&fs == LP::FunctionSet::xxx_current_fs))
+//        {
+//            debugPrint(&fs);
+//            debugPrint(LP::FunctionSet::xxx_current_fs);
+//            assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
+//        }
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//    //    bool ok = true;
+//    //        std::vector<std::string> required_gp_funcs =
+//    //        {
+//    //            "Velocity",
+//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //            // TODO 20260103 replace NeighborhoodVelocity with NeighborhoodVelocityDiff.
+//    //    //        "NeighborhoodVelocity",
+//    //            "NeighborhoodVelocityDiff",
+//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//    //            "NeighborhoodOffset",
+//    //            "ObstacleCollisionNormal",
+//    //        };
+//
+//        vecOfVecOfStrings required_gp_funcs =
+//        {
+//            { "Velocity" },
+//            { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
+//            { "NeighborhoodOffset" },
+//            { "ObstacleCollisionNormal" }
+//        };
+//
+//
+//    //    for (auto& name : required_gp_funcs)
+//    //    {
+//    //        if (not fs.isFunctionInTree(name, tree)) { ok = false; }
+//    //    }
+//    //    return ok;
+//
+//
+//        return areFuncsInTree(tree, required_gp_funcs, fs);
+//    }
+
+
 // Constraint to keep the "sensor" API in population, by requiring each tree to
 // have >=1 call to each of the sensor GpFuncs. This tests for valid trees.
 inline bool evoflockGpValidateTree(const LP::GpTree& tree,
@@ -237,25 +351,18 @@ inline bool evoflockGpValidateTree(const LP::GpTree& tree,
         assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    bool ok = true;
-    std::vector<std::string> required_gp_funcs =
+    vecOfVecOfStrings required_gp_funcs =
     {
-        "Velocity",
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260103 replace NeighborhoodVelocity with NeighborhoodVelocityDiff.
-//        "NeighborhoodVelocity",
-        "NeighborhoodVelocityDiff",
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        "NeighborhoodOffset",
-        "ObstacleCollisionNormal",
+        { "Velocity" },
+        { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
+        { "NeighborhoodOffset" },
+        { "ObstacleCollisionNormal" }
     };
-    for (auto& name : required_gp_funcs)
-    {
-        if (not fs.isFunctionInTree(name, tree)) { ok = false; }
-    }
-    return ok;
+    return areFuncsInTree(tree, required_gp_funcs, fs);
 }
+
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
 double measureUsageSensorAPI(const LP::Population& population)
@@ -1063,7 +1170,9 @@ inline LP::GpFunction NeighborhoodVelocityDiff
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       // TODO 20260105 sanity check, is this backwards? Should I allow negative weights?
 //      return std::any((velocity_sum / weight_sum) - me.velocity());
-      return std::any(me.velocity() - (velocity_sum / weight_sum));
+//      return std::any(me.velocity() - (velocity_sum / weight_sum));
+      // TODO 20260105 now unreverse with bigger trees
+      return std::any((velocity_sum / weight_sum) - me.velocity());
       //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   });
 
@@ -1389,14 +1498,23 @@ LP::FunctionSet evoflock_gp_function_set_cached_ =
         Velocity,
         // Acceleration,
         // Forward,
+        
+
         // NearestNeighborVelocity,
         // NearestNeighborOffset,
         // NearestNeighborVelocity2,
         // NearestNeighborOffset2,
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260103 replace NeighborhoodVelocity with NeighborhoodVelocityDiff.
-//        NeighborhoodVelocity,
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260106 make evoflockGpValidateTree() use AND of ORs.
+
+        NeighborhoodVelocity,
         NeighborhoodVelocityDiff,
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         NeighborhoodOffset,
         // First_Obs_Dist,

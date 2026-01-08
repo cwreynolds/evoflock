@@ -1223,6 +1223,15 @@ inline LP::GpFunction NeighborhoodOffset
 
       }
 //      return std::any(sum);;
+      //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+      // TODO 20260107 annotation for NeighborhoodOffset
+      
+      auto& draw = Draw::getInstance();
+      Vec3 me_pos = me.position();
+      Vec3 center = me_pos + (offset_sum / weight_sum);
+      draw.addThickLineToAnimatedFrame(me_pos, center, Color::green(), 0.02);
+
+      //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
       return std::any(offset_sum / weight_sum);
   });
 

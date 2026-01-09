@@ -136,13 +136,42 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
 //               Add3(Scale3(FirstObstacleTimeLimitNormal(1),         100),    \
 //                    LengthAdjust(Velocity(), 20,                     40))))";
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260108 try new handwritten tree using "neighborhood" GpFuncs
+
+//    std::string hand_written_gp_source =
+//    "Add3(Add3(Scale3(Sub3(NearestNeighborVelocity(),  Velocity()),  20),    \
+//               Scale3(Sub3(NearestNeighborVelocity2(), Velocity()),  20)),   \
+//          Add3(Add3(LengthAdjust(NearestNeighborOffset(),  3,        80),    \
+//                    LengthAdjust(NearestNeighborOffset2(), 3,        80)),   \
+//               Add3(Scale3(FirstObstacleTimeLimitNormal(1),         100),    \
+//                    LengthAdjust(Velocity(), 20,                     40))))";
+
+//    std::string hand_written_gp_source =
+//    "Add3(LengthAdjust(NeighborhoodVelocityDiff(1.2), 0, 100),  \
+//          Add3(LengthAdjust(NeighborhoodOffset(1.2), 6,   90),  \
+//               Add3(Scale3(ObstacleCollisionNormal(1),    80),  \
+//                    LengthAdjust(Velocity(), 20,          70))))";
+
+//    std::string hand_written_gp_source =
+//    "Add3(LengthAdjust(NeighborhoodVelocityDiff(1.2), 0,  80),  \
+//          Add3(LengthAdjust(NeighborhoodOffset(1.2), 6,   70),  \
+//               Add3(Scale3(ObstacleCollisionNormal(1),   100),  \
+//                    LengthAdjust(Velocity(), 20,          90))))";
+
+//    std::string hand_written_gp_source =
+//    "Add3(LengthAdjust(NeighborhoodVelocityDiff(1.2), 0,  8),  \
+//          Add3(LengthAdjust(NeighborhoodOffset(1.2), 6,   7),  \
+//               Add3(Scale3(ObstacleCollisionNormal(1),   10),  \
+//                    LengthAdjust(Velocity(), 20,          9))))";
+
     std::string hand_written_gp_source =
-    "Add3(Add3(Scale3(Sub3(NearestNeighborVelocity(),  Velocity()),  20),    \
-               Scale3(Sub3(NearestNeighborVelocity2(), Velocity()),  20)),   \
-          Add3(Add3(LengthAdjust(NearestNeighborOffset(),  3,        80),    \
-                    LengthAdjust(NearestNeighborOffset2(), 3,        80)),   \
-               Add3(Scale3(FirstObstacleTimeLimitNormal(1),         100),    \
-                    LengthAdjust(Velocity(), 20,                     40))))";
+    "Add3(LengthAdjust(NeighborhoodVelocityDiff(1.2), 0,  3),  \
+          Add3(LengthAdjust(NeighborhoodOffset(1.2), 6,   2),  \
+               Add3(Scale3(ObstacleCollisionNormal(1),   10),  \
+                    LengthAdjust(Velocity(), 20,          1))))";
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -160,12 +189,32 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
 
     auto inject = [&](LP::Individual* individual)
     {
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260108 try new handwritten tree using "neighborhood" GpFuncs
+        
+//        if (EF::RS().randomBool(0.33))
+//        {
+//            LP::GpTree tree = compiled_tree;
+//            tree.mutate();
+//            individual->setTree(tree);
+//        }
+
+        
+//        if (EF::RS().randomBool(0.33))
+        {
+            LP::GpTree tree = compiled_tree;
+//            tree.mutate();
+            individual->setTree(tree);
+        }
+        
         if (EF::RS().randomBool(0.33))
         {
             LP::GpTree tree = compiled_tree;
             tree.mutate();
             individual->setTree(tree);
         }
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     };
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -362,7 +411,7 @@ void runOneFlockEvolution()
         if (EF::usingGP())
         {
             population->explicit_treeValue_in_evolutionStep = false;
-            // injectHandWrittenCodeIntoPopulation(fs, population);
+            injectHandWrittenCodeIntoPopulation(fs, population);
         }
     }
 

@@ -759,6 +759,50 @@ Vec3 ensure_unit_length(Vec3 v)
 }
 
 
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+// TODO 20260108 break off utility code for NeighborhoodOffset and LengthAdjust
+
+inline Vec3 lengthAdjustUtility(Vec3 ref_vector,
+                                double target_length,
+                                double strength)
+{
+    double adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
+    Vec3 result = ref_vector.normalize_or_0() * adjust;
+    return result;
+}
+
+
+// Compute a distance-weighted offset from current boid to its neighbors.
+
+inline Vec3 neighborhoodOffsetUtility(double exponent)
+{
+    Vec3 offset_sum;
+    double weight_sum = 0;
+    Boid& me = *Boid::getGpPerThread();
+    for (int i = 1; i < 7; i++)
+    {
+        Boid& b = *getGpBoidNeighbor(i);
+        Vec3 offset = b.position() - me.position();
+        double distance = offset.length();
+        double weight = 1.0 / std::pow(distance, exponent);
+        offset_sum += offset * weight;
+        weight_sum += weight;
+    }
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    // TODO 20260107 annotation for NeighborhoodOffset
+    auto& draw = Draw::getInstance();
+    Vec3 me_pos = me.position();
+    Vec3 center = me_pos + (offset_sum / weight_sum);
+    draw.addThickLineToAnimatedFrame(me_pos, center, Color::green(), 0.02);
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    
+    return offset_sum / weight_sum;
+}
+
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+
 //------------------------------------------------------------------------------
 // Scalar functions: abs, add, subtract, multiply, exponentiation.
 
@@ -973,25 +1017,44 @@ inline LP::GpFunction If_Pos
                       tree.evalSubtree<Vec3>(2));
   });
 
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+// TODO 20260108 break off utility code for NeighborhoodOffset and LengthAdjust
+
+//    inline LP::GpFunction LengthAdjust
+//     (
+//      "LengthAdjust",
+//      "Vec3",
+//      {"Vec3", "Scalar_0_100", "Scalar_0_10"},  // ref vec, target length, strength
+//      [](LP::GpTree& tree)
+//      {
+//          Vec3 ref_vector = tree.evalSubtree<Vec3>(0);
+//
+//          // TODO temporarily fix with an abs(), later with special Scalar def?
+//    //      double target_length = std::abs(tree.evalSubtree<double>(1));
+//    //      double strength = std::abs(tree.evalSubtree<double>(2));
+//          double target_length = tree.evalSubtree<double>(1);
+//          double strength = tree.evalSubtree<double>(2);
+//
+//          double adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
+//          Vec3 result = ref_vector.normalize_or_0() * adjust;
+//          return std::any(result);
+//      });
+
 inline LP::GpFunction LengthAdjust
  (
   "LengthAdjust",
   "Vec3",
-  {"Vec3", "Scalar_0_100", "Scalar_0_10"},  // ref vec, target length, strength
+//  {"Vec3", "Scalar_0_100", "Scalar_0_10"},  // ref vec, target length, strength
+  {"Vec3", "Scalar_0_100", "Scalar"},  // ref vec, target length, strength
   [](LP::GpTree& tree)
   {
-      Vec3 ref_vector = tree.evalSubtree<Vec3>(0);
-      
-      // TODO temporarily fix with an abs(), later with special Scalar def?
-//      double target_length = std::abs(tree.evalSubtree<double>(1));
-//      double strength = std::abs(tree.evalSubtree<double>(2));
-      double target_length = tree.evalSubtree<double>(1);
-      double strength = tree.evalSubtree<double>(2);
-
-      double adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
-      Vec3 result = ref_vector.normalize_or_0() * adjust;
-      return std::any(result);
+      // ref_vector, target_length, strength
+      return std::any(lengthAdjustUtility(tree.evalSubtree<Vec3>(0),
+                                          tree.evalSubtree<double>(1),
+                                          tree.evalSubtree<double>(2)));
   });
+
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 
 //------------------------------------------------------------------------------
@@ -1198,6 +1261,47 @@ inline LP::GpFunction NeighborhoodVelocityDiff
 //          return std::any(sum);;
 //      });
 
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+// TODO 20260108 break off utility code for NeighborhoodOffset and LengthAdjust
+
+//    inline LP::GpFunction NeighborhoodOffset
+//     (
+//      "NeighborhoodOffset",
+//      "Vec3",
+//      {"Scalar_0.5_2"},  // falloff exponent
+//      [](LP::GpTree& tree)
+//      {
+//    //      Vec3 sum;
+//          Vec3 offset_sum;
+//          double weight_sum = 0;
+//          Boid& me = *Boid::getGpPerThread();
+//          double exponent = tree.evalSubtree<double>(0);
+//          for (int i = 1; i < 7; i++)
+//          {
+//              Boid& b = *getGpBoidNeighbor(i);
+//              Vec3 offset = b.position() - me.position();
+//              double distance = offset.length();
+//    //          sum += offset * (1.0 / std::pow(distance, exponent));
+//
+//              double weight = 1.0 / std::pow(distance, exponent);
+//              offset_sum += offset * weight;
+//              weight_sum += weight;
+//
+//          }
+//    //      return std::any(sum);;
+//          //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//          // TODO 20260107 annotation for NeighborhoodOffset
+//
+//          auto& draw = Draw::getInstance();
+//          Vec3 me_pos = me.position();
+//          Vec3 center = me_pos + (offset_sum / weight_sum);
+//          draw.addThickLineToAnimatedFrame(me_pos, center, Color::green(), 0.02);
+//
+//          //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//          return std::any(offset_sum / weight_sum);
+//      });
+
+
 inline LP::GpFunction NeighborhoodOffset
  (
   "NeighborhoodOffset",
@@ -1205,35 +1309,10 @@ inline LP::GpFunction NeighborhoodOffset
   {"Scalar_0.5_2"},  // falloff exponent
   [](LP::GpTree& tree)
   {
-//      Vec3 sum;
-      Vec3 offset_sum;
-      double weight_sum = 0;
-      Boid& me = *Boid::getGpPerThread();
-      double exponent = tree.evalSubtree<double>(0);
-      for (int i = 1; i < 7; i++)
-      {
-          Boid& b = *getGpBoidNeighbor(i);
-          Vec3 offset = b.position() - me.position();
-          double distance = offset.length();
-//          sum += offset * (1.0 / std::pow(distance, exponent));
-          
-          double weight = 1.0 / std::pow(distance, exponent);
-          offset_sum += offset * weight;
-          weight_sum += weight;
-
-      }
-//      return std::any(sum);;
-      //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-      // TODO 20260107 annotation for NeighborhoodOffset
-      
-      auto& draw = Draw::getInstance();
-      Vec3 me_pos = me.position();
-      Vec3 center = me_pos + (offset_sum / weight_sum);
-      draw.addThickLineToAnimatedFrame(me_pos, center, Color::green(), 0.02);
-
-      //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-      return std::any(offset_sum / weight_sum);
+      return std::any(neighborhoodOffsetUtility(tree.evalSubtree<double>(0)));
   });
+
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

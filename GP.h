@@ -457,10 +457,16 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 LP::GpTree gp_tree = individual->tree();
                 // Eval tree to get steering, optionally convert local to global
                 Vec3 steering_from_tree = std::any_cast<Vec3>(gp_tree.eval());
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20260109 try just goosing this up 2x.
+                
                 // Since the magnitude of steering force returned by the evolved
                 // program is unbounded, use an ad hoc kinematic limit.
-                double max_steer_force = 80;  // make some API for setting this.
+//                double max_steer_force = 80;  // make some API for setting this.
+                double max_steer_force = 160;  // make some API for setting this.
                 steering_from_tree = steering_from_tree.truncate(max_steer_force);
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 doOneRunDebugLogging(boid,
                                      flock,
                                      steering_from_tree,

@@ -686,45 +686,62 @@ public:
             sum_of_alignment_scores_over_all_boid_steps_ += sum_of_alignments;
         }
     }
+    
+    //~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~
+    // TODO 20260109 like yesterday's HW-injection run, but disable align score.
 
+//        // Average speed for each Boid on each simulation step.
+//        double alignmentScore() const
+//        {
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20251228 switch back to GP mode, try disable alignmentScore()
+//
+//    //        return (sum_of_alignment_scores_over_all_boid_steps_ / boidStepPerSim());
+//
+//    //        return 1;
+//
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            // TODO 20251229 reduce max tree size from 50 to 40
+//
+//    //        double score = (sum_of_alignment_scores_over_all_boid_steps_ /
+//    //                        boidStepPerSim());
+//    //        double remap = util::remap_interval(score, 0, 1, 0.8, 1);
+//    //        return util::remap_interval(score, 0, 1, 0.8, 1);
+//
+//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//            // TODO 20251230 re-enable Flock::alignmentScore() on [0.5 1.0]
+//
+//    //        return 1;
+//
+//    //        double score = (sum_of_alignment_scores_over_all_boid_steps_ /
+//    //                        boidStepPerSim());
+//    //        return util::remap_interval(score, 0, 1, 0.5, 1);
+//
+//            double score = (sum_of_alignment_scores_over_all_boid_steps_ /
+//                            boidStepPerSim());
+//            return score;
+//
+//
+//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        }
+    
+    
     // Average speed for each Boid on each simulation step.
     double alignmentScore() const
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251228 switch back to GP mode, try disable alignmentScore()
-        
-//        return (sum_of_alignment_scores_over_all_boid_steps_ / boidStepPerSim());
-        
-//        return 1;
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20251229 reduce max tree size from 50 to 40
-
 //        double score = (sum_of_alignment_scores_over_all_boid_steps_ /
 //                        boidStepPerSim());
-//        double remap = util::remap_interval(score, 0, 1, 0.8, 1);
-//        return util::remap_interval(score, 0, 1, 0.8, 1);
+//        return score;
 
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20251230 re-enable Flock::alignmentScore() on [0.5 1.0]
-
-//        return 1;
-
-//        double score = (sum_of_alignment_scores_over_all_boid_steps_ /
-//                        boidStepPerSim());
-//        return util::remap_interval(score, 0, 1, 0.5, 1);
-
-        double score = (sum_of_alignment_scores_over_all_boid_steps_ /
-                        boidStepPerSim());
-        return score;
-
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        return 1;
     }
+
+    //~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~~~  ~~
+
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

@@ -459,12 +459,18 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 Vec3 steering_from_tree = std::any_cast<Vec3>(gp_tree.eval());
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20260109 try just goosing this up 2x.
+                //               and then back to infinity: no limit at all.
+                //               got fits 0.71-0.73 while using HW injection
                 
-                // Since the magnitude of steering force returned by the evolved
-                // program is unbounded, use an ad hoc kinematic limit.
+//                // Since the magnitude of steering force returned by the evolved
+//                // program is unbounded, use an ad hoc kinematic limit.
 //                double max_steer_force = 80;  // make some API for setting this.
-                double max_steer_force = 160;  // make some API for setting this.
-                steering_from_tree = steering_from_tree.truncate(max_steer_force);
+//                steering_from_tree = steering_from_tree.truncate(max_steer_force);
+
+//                // Since the magnitude of steering force returned by the evolved
+//                // program is unbounded, use an ad hoc kinematic limit.
+//                double max_steer_force = 160;  // make some API for setting this.
+//                steering_from_tree = steering_from_tree.truncate(max_steer_force);
 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 doOneRunDebugLogging(boid,
@@ -797,10 +803,10 @@ inline Vec3 neighborhoodOffsetUtility(double exponent)
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     // TODO 20260107 annotation for NeighborhoodOffset
-    auto& draw = Draw::getInstance();
-    Vec3 me_pos = me.position();
-    Vec3 center = me_pos + (offset_sum / weight_sum);
-    draw.addThickLineToAnimatedFrame(me_pos, center, Color::green(), 0.02);
+//    auto& draw = Draw::getInstance();
+//    Vec3 me_pos = me.position();
+//    Vec3 center = me_pos + (offset_sum / weight_sum);
+//    draw.addThickLineToAnimatedFrame(me_pos, center, Color::green(), 0.02);
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     
     return offset_sum / weight_sum;

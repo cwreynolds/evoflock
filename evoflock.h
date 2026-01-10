@@ -165,6 +165,7 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
 //               Add3(Scale3(ObstacleCollisionNormal(1),   10),  \
 //                    LengthAdjust(Velocity(), 20,          9))))";
 
+    // 20260108
     std::string hand_written_gp_source =
     "Add3(LengthAdjust(NeighborhoodVelocityDiff(1.2), 0,  3),  \
           Add3(LengthAdjust(NeighborhoodOffset(1.2), 6,   2),  \
@@ -181,43 +182,16 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20251211 mutate each new tree from compiled version.
-
-//    LP::GpTree tree = fs.compile(hand_written_gp_source);
     LP::GpTree compiled_tree = fs.compile(hand_written_gp_source);
-
     auto inject = [&](LP::Individual* individual)
     {
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260108 try new handwritten tree using "neighborhood" GpFuncs
-        
-//        if (EF::RS().randomBool(0.33))
-//        {
-//            LP::GpTree tree = compiled_tree;
-//            tree.mutate();
-//            individual->setTree(tree);
-//        }
-
-        
-//        if (EF::RS().randomBool(0.33))
-        {
-            LP::GpTree tree = compiled_tree;
-//            tree.mutate();
-            individual->setTree(tree);
-        }
-        
         if (EF::RS().randomBool(0.33))
         {
             LP::GpTree tree = compiled_tree;
             tree.mutate();
             individual->setTree(tree);
         }
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     };
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
     population->applyToAllIndividuals(inject);
 }
 
@@ -411,7 +385,7 @@ void runOneFlockEvolution()
         if (EF::usingGP())
         {
             population->explicit_treeValue_in_evolutionStep = false;
-            injectHandWrittenCodeIntoPopulation(fs, population);
+            // injectHandWrittenCodeIntoPopulation(fs, population);
         }
     }
 
@@ -565,6 +539,32 @@ void visualizePreviouslyLoggedFlockParameters()
 //                      8.84354), \
 //               2.09311)";
 //
+    
+    // 20260110
+    std::string gp_source =
+    "Add3(LengthAdjust(Velocity(),  \
+                      18.4136,  \
+                      20.7732),  \
+         Add3(LengthAdjust(NeighborhoodOffset(-0.762564),  \
+                           19.7924,  \
+                           -0.688828),  \
+              Add3(Scale3(Add3(LengthAdjust(NeighborhoodVelocityDiff(1.47306),  \
+                                            0.559172,  \
+                                            -2.23372),  \
+                               Add3(LengthAdjust(NeighborhoodOffset(8.79137),  \
+                                                 2.62476,  \
+                                                 -0.899679),  \
+                                    Add3(Scale3(ObstacleCollisionNormal(0.408902),  \
+                                                10.4109),  \
+                                         LengthAdjust(Velocity(),  \
+                                                      20.8701,  \
+                                                      4.28683)))),  \
+                          14.7764),  \
+                   LengthAdjust(NeighborhoodVelocityDiff(2.90797),  \
+                                2.13027,  \
+                                -1.23851))))";
+
+    
 //        // TODO 20251230 very temp needs cleanup
 //    //    LP::FunctionSet fs = GP::evoflock_gp_function_set();
 //        LP::FunctionSet fs = GP::evoflock_gp_function_set_cached_;

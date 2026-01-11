@@ -181,6 +181,41 @@ FlockParameters fp_from_ga_individual(LP::Individual* individual)
     return fp_from_ga_tree(tree);
 }
 
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20260111 fix ownership of "current fs"
+
+// For forward reference.
+LP::FunctionSet evoflock_ga_function_set();
+
+
+//LP::GpTree ga_tree_from_fp(const FlockParameters& fp)
+LP::GpTree gaTreeFromFP(const FlockParameters& fp)
+{
+    assert(EF::usingGA());
+    LP::GpTree tree;
+    const LP::FunctionSet& fs = evoflock_ga_function_set();
+    
+    // Get name of the first/only GpFunction in the FS.
+    std::string gp_function_name = fs.nameToGpFunctionMap().begin()->first;
+
+    // Set the tree's root function to be that one/only GpFunction.
+    tree.setRootFunction(*fs.lookupGpFunctionByName(gp_function_name));
+    
+    tree.addSubtrees(FlockParameters::tunableParameterCount());
+    
+    auto& type = *fs.lookupGpTypeByName("Real_0_100");
+
+    for (int i = 0; i < FlockParameters::tunableParameterCount(); i++)
+    {
+        double value = fp.getTuningParameter(i);
+        tree.getSubtree(i).setRootValue(std::any(value), type);
+    }
+    return tree;
+}
+
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 
 // New experiment, move a bunch of debugging crap out of do_1_run()
 void doOneRunDebugLogging(Boid& boid,

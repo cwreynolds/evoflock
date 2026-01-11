@@ -239,6 +239,16 @@ public:
         indent(); debugPrint(minTimeToCollide());
     }
     
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260111 fix ownership of "current fs"
+    
+    // TODO experimental reconsider design.
+    
+    // Get i-th tuning parameter
+    double getTuningParameter(int i) const { return tuning_parameters.at(i); }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 private:
     // Parameters for tuning:
     std::vector<double> tuning_parameters = hand_tuned_parameters;

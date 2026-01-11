@@ -84,7 +84,11 @@ namespace EF = EvoFlock;
 namespace EvoFlock
 {
 void visualizeBestIfRequested(LP::Population* population);
-void visualizePreviouslyLoggedFlockParameters();
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20260111 fix ownership of "current fs"
+//void visualizePreviouslyLoggedFlockParameters();
+void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs);
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 
 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -200,16 +204,16 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
 
 void runOneFlockEvolution()
 {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251228 switch back to GP mode
-    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260111 fix ownership of "current fs"
+
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-    // EF::setUsingGA();
-    EF::setUsingGP();
+    EF::setUsingGA();
+//    EF::setUsingGP();
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
     // enable_multithreading = false;
@@ -223,9 +227,12 @@ void runOneFlockEvolution()
     RS().setSeedFromClock();
     std::cout << "RandomSequence seed = " << RS().getSeed() << std::endl;
     
-    // WIP/HACK runs flock sim, with graphics, for the FlockParameters written
-    // inline in this function's source code, above.
-    visualizePreviouslyLoggedFlockParameters();
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260111 fix ownership of "current fs"
+//    // WIP/HACK runs flock sim, with graphics, for the FlockParameters written
+//    // inline in this function's source code, above.
+//    visualizePreviouslyLoggedFlockParameters();
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     // The number of Individuals in a population for evolutionary optimization.
     // By default it is divided into sqrt(individuals) breeding sub-populations.
@@ -261,7 +268,12 @@ void runOneFlockEvolution()
 
 //    int max_evolution_steps = 60000;
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260110 stop HW inject, tree size from 20-50 to 5-60, 60000 steps.
+//    int max_evolution_steps = 30000;
+//    int max_evolution_steps = 60000;
     int max_evolution_steps = 30000;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -305,9 +317,18 @@ void runOneFlockEvolution()
 //    int max_crossover_tree_size = EF::usingGP() ? 35 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ? 35 : ga_tree_size;
 
-    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260110 stop HW inject, tree size from 20-50 to 5-60, 60000 steps.
+    
+//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
+
+    int min_crossover_tree_size = EF::usingGP() ?  5 : 2;
+    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
@@ -360,6 +381,19 @@ void runOneFlockEvolution()
     debugPrint(LP::FunctionSet::xxx_current_fs);
 
 
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260111 fix ownership of "current fs"
+    
+    // Hack to optionally visualize a previously loggged result. Runs flock sim,
+    // with graphics, for the GA FlockParameters or GP source code written
+    // inline in this function's definition.
+    visualizePreviouslyLoggedFlockParameters(fs);
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     fs.print();
     
@@ -491,84 +525,114 @@ void visualizeBestIfRequested(LP::Population* population)
     }
 }
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251203 visualizePreviouslyLoggedFlockParameters() for GP as well as GA
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20260111 fix ownership of "current fs"
 
-// Tool for visualizing a logged set of FlockParameters.
-// To visualize a given set of FlockParameters. Cut/paste from log, compile.
-// Comment out body of this function for normal evolution run.
-void visualizePreviouslyLoggedFlockParameters()
-{
-    //    // To use the hand-tuned parameters:
-    //    // FlockParameters fp;
-    //
-    //    // Saved FP values from a previous run (20250728_curve_0_10pc_80pc_1)
-    //    FlockParameters fp(98.0539, 92.3707, 56.2517, 51.0097, 29.2962, 96.414,
-    //                       94.4825, 2.74096, 24.305, 34.2467, -0.880103,
-    //                       -0.856635, 0.2645, 3.96972, 1.24912);
-    
-    //    EF::enable_multithreading = false;
-    //    while (true) { GP::run_flock_simulation(fp, 1); }
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251231 for run 20251230_gp_same_full_range_align
-        
-//        // run 20251230_gp_same_full_range_align
-//        std::string gp_source =
-//        "Scale3(Scale3(Sub3(LengthAdjust(LengthAdjust(ObstacleCollisionNormal(0.967375), \
-//                                                     98.3067, \
-//                                                     2.86499), \
-//                                        57.4317, \
-//                                        4.46489), \
-//                           Div3(Add3(Div3(Velocity(), \
-//                                          4.68352), \
-//                                     Sub3(Add3(Div3(Velocity(), \
-//                                                    4.63576), \
-//                                               Sub3(NeighborhoodOffset(1.9779), \
-//                                                    LengthAdjust(Scale3(NeighborhoodVelocity(1.95049), \
-//                                                                        0.67775), \
-//                                                                 59.2661, \
-//                                                                 7.29023))), \
-//                                          LengthAdjust(LengthAdjust(Scale3(NeighborhoodVelocity(1.9436), \
-//                                                                           0.345667), \
-//                                                                    92.6927, \
-//                                                                    6.64604), \
-//                                                       82.4551, \
-//                                                       1.81472))), \
-//                                2.37041)), \
-//                      8.84354), \
-//               2.09311)";
+//    //    // Tool for visualizing a logged set of FlockParameters.
+//    //    // To visualize a given set of FlockParameters. Cut/paste from log, compile.
+//    //    // Comment out body of this function for normal evolution run.
+//    //    void visualizePreviouslyLoggedFlockParameters()
 //
-    
-    // 20260110
-    std::string gp_source =
-    "Add3(LengthAdjust(Velocity(),  \
-                      18.4136,  \
-                      20.7732),  \
-         Add3(LengthAdjust(NeighborhoodOffset(-0.762564),  \
-                           19.7924,  \
-                           -0.688828),  \
-              Add3(Scale3(Add3(LengthAdjust(NeighborhoodVelocityDiff(1.47306),  \
-                                            0.559172,  \
-                                            -2.23372),  \
-                               Add3(LengthAdjust(NeighborhoodOffset(8.79137),  \
-                                                 2.62476,  \
-                                                 -0.899679),  \
-                                    Add3(Scale3(ObstacleCollisionNormal(0.408902),  \
-                                                10.4109),  \
-                                         LengthAdjust(Velocity(),  \
-                                                      20.8701,  \
-                                                      4.28683)))),  \
-                          14.7764),  \
-                   LengthAdjust(NeighborhoodVelocityDiff(2.90797),  \
-                                2.13027,  \
-                                -1.23851))))";
-
-    
-//        // TODO 20251230 very temp needs cleanup
-//    //    LP::FunctionSet fs = GP::evoflock_gp_function_set();
-//        LP::FunctionSet fs = GP::evoflock_gp_function_set_cached_;
-//        LP::FunctionSet::xxx_current_fs = &fs;
+//    // Tool to (optionally) visualize a previous logged result. For example, after
+//    // an overnight evolution has completed, a result can be copied and pasted from
+//    // the log into this function. Works for either GA FlockParameters or for GP
+//    // tree/program's "source code." To visualize a given result: cut/paste from log
+//    // into the body of this function (following the examples below) and comment out
+//    // the "return" statement at the top. This function will then loop forever
+//    // running the logged result.
+//    void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
+//
+//    {
+//        // For normal run: return without doing anything. Comment this out to post-
+//        // visualize a logged result from a previous run.
+//        return;
+//    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//        //    // To use the hand-tuned parameters:
+//        //    // FlockParameters fp;
+//        //
+//        //    // Saved FP values from a previous run (20250728_curve_0_10pc_80pc_1)
+//        //    FlockParameters fp(98.0539, 92.3707, 56.2517, 51.0097, 29.2962, 96.414,
+//        //                       94.4825, 2.74096, 24.305, 34.2467, -0.880103,
+//        //                       -0.856635, 0.2645, 3.96972, 1.24912);
+//
+//        //    EF::enable_multithreading = false;
+//        //    while (true) { GP::run_flock_simulation(fp, 1); }
+//
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        // TODO 20251231 for run 20251230_gp_same_full_range_align
+//
+//    //        // run 20251230_gp_same_full_range_align
+//    //        std::string gp_source =
+//    //        "Scale3(Scale3(Sub3(LengthAdjust(LengthAdjust(ObstacleCollisionNormal(0.967375), \
+//    //                                                     98.3067, \
+//    //                                                     2.86499), \
+//    //                                        57.4317, \
+//    //                                        4.46489), \
+//    //                           Div3(Add3(Div3(Velocity(), \
+//    //                                          4.68352), \
+//    //                                     Sub3(Add3(Div3(Velocity(), \
+//    //                                                    4.63576), \
+//    //                                               Sub3(NeighborhoodOffset(1.9779), \
+//    //                                                    LengthAdjust(Scale3(NeighborhoodVelocity(1.95049), \
+//    //                                                                        0.67775), \
+//    //                                                                 59.2661, \
+//    //                                                                 7.29023))), \
+//    //                                          LengthAdjust(LengthAdjust(Scale3(NeighborhoodVelocity(1.9436), \
+//    //                                                                           0.345667), \
+//    //                                                                    92.6927, \
+//    //                                                                    6.64604), \
+//    //                                                       82.4551, \
+//    //                                                       1.81472))), \
+//    //                                2.37041)), \
+//    //                      8.84354), \
+//    //               2.09311)";
+//    //
+//
+//        // 20260110
+//        std::string gp_source =
+//        "Add3(LengthAdjust(Velocity(),  \
+//                          18.4136,  \
+//                          20.7732),  \
+//             Add3(LengthAdjust(NeighborhoodOffset(-0.762564),  \
+//                               19.7924,  \
+//                               -0.688828),  \
+//                  Add3(Scale3(Add3(LengthAdjust(NeighborhoodVelocityDiff(1.47306),  \
+//                                                0.559172,  \
+//                                                -2.23372),  \
+//                                   Add3(LengthAdjust(NeighborhoodOffset(8.79137),  \
+//                                                     2.62476,  \
+//                                                     -0.899679),  \
+//                                        Add3(Scale3(ObstacleCollisionNormal(0.408902),  \
+//                                                    10.4109),  \
+//                                             LengthAdjust(Velocity(),  \
+//                                                          20.8701,  \
+//                                                          4.28683)))),  \
+//                              14.7764),  \
+//                       LengthAdjust(NeighborhoodVelocityDiff(2.90797),  \
+//                                    2.13027,  \
+//                                    -1.23851))))";
+//
+//        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//        // TODO 20260111 fix ownership of "current fs"
+//
+//    //        // TODO 20251230 very temp needs cleanup
+//    //    //    LP::FunctionSet fs = GP::evoflock_gp_function_set();
+//    //        LP::FunctionSet fs = GP::evoflock_gp_function_set_cached_;
+//    //        LP::FunctionSet::xxx_current_fs = &fs;
+//    //
+//    //        LP::GpTree tree = fs.compile(gp_source);
+//    //        LP::Individual individual(tree);
+//    //
+//    //        EF::enable_multithreading = false;
+//    //        Draw::getInstance().setEnable(true);
+//    //        while (true) { GP::run_flock_simulation(&individual, 1); }
+//
+//
+//    //        // TODO 20251230 very temp needs cleanup
+//    //    //    LP::FunctionSet fs = GP::evoflock_gp_function_set();
+//    //        LP::FunctionSet fs = GP::evoflock_gp_function_set_cached_;
+//    //        LP::FunctionSet::xxx_current_fs = &fs;
 //
 //        LP::GpTree tree = fs.compile(gp_source);
 //        LP::Individual individual(tree);
@@ -576,13 +640,135 @@ void visualizePreviouslyLoggedFlockParameters()
 //        EF::enable_multithreading = false;
 //        Draw::getInstance().setEnable(true);
 //        while (true) { GP::run_flock_simulation(&individual, 1); }
+//
+//        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//    }
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
+//    // Tool to (optionally) visualize a previous logged result. For example, after
+//    // an overnight evolution has completed, a result can be copied and pasted from
+//    // the log into this function. Works for either GA FlockParameters or for GP
+//    // tree/program's "source code." To visualize a given result: cut/paste from log
+//    // into the body of this function (following the examples below) and comment out
+//    // the "return" statement at the top. This function will then loop forever
+//    // running the logged result.
+//    void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
+//
+//    {
+//        // For normal run: return without doing anything. Comment this out to post-
+//        // visualize a logged result from a previous run.
+//    //    return;
+//
+//        // To visualize FlockParameters from a previous GA run
+//
+//        //    // Saved FP values from a previous run (20250728_curve_0_10pc_80pc_1)
+//        //    FlockParameters fp(98.0539, 92.3707, 56.2517, 51.0097, 29.2962, 96.414,
+//        //                       94.4825, 2.74096, 24.305, 34.2467, -0.880103,
+//        //                       -0.856635, 0.2645, 3.96972, 1.24912);
+//
+//        //    EF::enable_multithreading = false;
+//        //    while (true) { GP::run_flock_simulation(fp, 1); }
+//
+//        // To visualize a GpTree (source code) from a previous GP run.
+//
+//        // 20260110
+//        std::string gp_source =
+//        "Add3(LengthAdjust(Velocity(),  \
+//                          18.4136,  \
+//                          20.7732),  \
+//             Add3(LengthAdjust(NeighborhoodOffset(-0.762564),  \
+//                               19.7924,  \
+//                               -0.688828),  \
+//                  Add3(Scale3(Add3(LengthAdjust(NeighborhoodVelocityDiff(1.47306),  \
+//                                                0.559172,  \
+//                                                -2.23372),  \
+//                                   Add3(LengthAdjust(NeighborhoodOffset(8.79137),  \
+//                                                     2.62476,  \
+//                                                     -0.899679),  \
+//                                        Add3(Scale3(ObstacleCollisionNormal(0.408902),  \
+//                                                    10.4109),  \
+//                                             LengthAdjust(Velocity(),  \
+//                                                          20.8701,  \
+//                                                          4.28683)))),  \
+//                              14.7764),  \
+//                       LengthAdjust(NeighborhoodVelocityDiff(2.90797),  \
+//                                    2.13027,  \
+//                                    -1.23851))))";
+//        LP::GpTree tree = fs.compile(gp_source);
+//        LP::Individual individual(tree);
+//        EF::enable_multithreading = false;
+//        Draw::getInstance().setEnable(true);
+//        while (true) { GP::run_flock_simulation(&individual, 1); }
+//    }
+
+
+// Tool to (optionally) visualize a previous logged result. For example, after
+// an overnight evolution has completed, a result can be copied and pasted from
+// the log into this function. Works for either GA FlockParameters or for GP
+// tree/program's "source code." To visualize a given result: cut/paste from log
+// into the body of this function (following the examples below) and comment out
+// the "return" statement at the top. This function will then loop forever
+// running the logged result.
+void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
+
+{
+    return;  // For normal EF run: return without doing anything. Comment this
+             // out to post-visualize a logged result from a previous run.
+
+    if (EF::usingGA())
+    {
+        // To visualize FlockParameters from a previous GA run
+        
+        // Saved FP values from a previous run (20250728_curve_0_10pc_80pc_1)
+        FlockParameters fp(98.0539, 92.3707, 56.2517, 51.0097, 29.2962, 96.414,
+                           94.4825, 2.74096, 24.305, 34.2467, -0.880103,
+                           -0.856635, 0.2645, 3.96972, 1.24912);
+        
+        EF::enable_multithreading = false;
+        Draw::getInstance().setEnable(true);
+        LP::Individual individual(GP::gaTreeFromFP(fp));
+        while (true) { GP::run_flock_simulation(&individual, 1); }
+    }
+    else
+    {
+        // To visualize a GpTree (source code) from a previous GP run.
+        
+        // 20260110
+        std::string gp_source =
+        "Add3(LengthAdjust(Velocity(),  \
+                          18.4136,  \
+                          20.7732),  \
+             Add3(LengthAdjust(NeighborhoodOffset(-0.762564),  \
+                               19.7924,  \
+                               -0.688828),  \
+                  Add3(Scale3(Add3(LengthAdjust(NeighborhoodVelocityDiff(1.47306),  \
+                                                0.559172,  \
+                                                -2.23372),  \
+                                   Add3(LengthAdjust(NeighborhoodOffset(8.79137),  \
+                                                     2.62476,  \
+                                                     -0.899679),  \
+                                        Add3(Scale3(ObstacleCollisionNormal(0.408902),  \
+                                                    10.4109),  \
+                                             LengthAdjust(Velocity(),  \
+                                                          20.8701,  \
+                                                          4.28683)))),  \
+                              14.7764),  \
+                       LengthAdjust(NeighborhoodVelocityDiff(2.90797),  \
+                                    2.13027,  \
+                                    -1.23851))))";
+
+        LP::GpTree tree = fs.compile(gp_source);
+        LP::Individual individual(tree);
+        EF::enable_multithreading = false;
+        Draw::getInstance().setEnable(true);
+        while (true) { GP::run_flock_simulation(&individual, 1); }
+    }
 }
 
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 // Run unit tests in all modules
 void unit_test()

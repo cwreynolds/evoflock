@@ -31,10 +31,7 @@
 #include "GpType.h"
 #include "GpFunction.h"
 #include "GpTree.h"
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20251202 "compile" source code as string to GpTree for FunctionSet.
 #include <cctype>
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 namespace LazyPredator
 {
@@ -598,23 +595,106 @@ public:
         return crossover_function_hook_;
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251201 "compile" source code as string to GpTree for FunctionSet.
+    //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
+    // TODO 20260111 use correct GpTypes for constants in FS::compile()
+    
+//    // "Compile" source code as std::string to a GpTree for this FunctionSet.
+//    GpTree compile(const std::string& source_code) const
+//    {
+//        GpTree tree;
+//        std::vector<std::string> tokens = tokenizeTreeSource(source_code);
+//        int token_index = 0;
+//        compileTreeNode(tree, token_index, tokens);
+//        //    debugPrint(token_index);
+//        //    debugPrint(tokens.size());
+//        assert (token_index == (tokens.size() - 1));
+//        return tree;
+//    }
+    
+//        GpTree compileTreeNode(GpTree& tree,
+//                               int& token_index,
+//                               const std::vector<std::string>& tokens) const
+//        {
+//            std::string first_token = tokens.at(token_index);
+//    //        std::cout << "Enter compileTreeNode with token_index = " << token_index
+//    //                  << " (" << std::quoted(first_token) << ")" << std::endl;
+//            if (is_numeric(first_token))
+//            {
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                // TODO 20251207 the GpType SHOULD be passed into compileTreeNode(),
+//                //               but making a temporary workaround right now:
+//
+//                const GpType* type = lookupGpTypeByName("Scalar");
+//                assert (type);
+//                tree.setRootValue(std::any(std::stod(first_token)), *type);
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//            }
+//            else
+//            {
+//                const GpFunction* root_function = lookupGpFunctionByName(first_token);
+//                tree.setRootFunction(*root_function);
+//                tree.addSubtrees(root_function->parameterTypes().size());
+//
+//                token_index++;
+//                assert(tokens.at(token_index) == "(");
+//
+//                size_t st_count = tree.subtrees().size();
+//                for (int i = 0; i < st_count; i++)
+//                {
+//                    token_index++;
+//                    GpTree& subtree = tree.subtrees().at(i);
+//                    compileTreeNode(subtree, token_index, tokens);
+//
+//                    if ((st_count > 1) and (i < (st_count - 1)))
+//                    {
+//    //                    std::cout << "check for comma" << std::endl;
+//                        token_index++;
+//                        assert(tokens.at(token_index) == ",");
+//                    }
+//                }
+//                token_index++;
+//                assert(tokens.at(token_index) == ")");
+//            }
+//    //        std::cout << "Exit compileTreeNode with token_index = " << token_index
+//    //                  << " (" << std::quoted(tokens.at(token_index)) << ")"
+//    //                  << std::endl;
+//            return tree;
+//        }
+//
+//        static bool is_numeric(std::string s)
+//        {
+//            bool n = true;
+//            for (int i = 0; i < s.size(); i++)
+//            {
+//                unsigned char d = s[i];
+//                if (not (std::isdigit(d) or d == '-' or d == '.')) { n = false; }
+//            }
+//            return n;
+//        };
 
-    // "compile" source code as std::string to a GpTree for this FunctionSet.
+  
+    // "Compile" source code as std::string to a GpTree for this FunctionSet.
     GpTree compile(const std::string& source_code) const
     {
         GpTree tree;
         std::vector<std::string> tokens = tokenizeTreeSource(source_code);
         int token_index = 0;
-        compileTreeNode(tree, token_index, tokens);
-//        debugPrint(token_index);
-//        debugPrint(tokens.size());
+        
+//        compileTreeNode(tree, token_index, tokens);
+        compileTreeNode(tree, getRootType(), token_index, tokens);
+
+        //    debugPrint(token_index);
+        //    debugPrint(tokens.size());
         assert (token_index == (tokens.size() - 1));
         return tree;
     }
-    
+
     GpTree compileTreeNode(GpTree& tree,
+                           
+                           const GpType* type,
+                           
                            int& token_index,
                            const std::vector<std::string>& tokens) const
     {
@@ -627,7 +707,11 @@ public:
             // TODO 20251207 the GpType SHOULD be passed into compileTreeNode(),
             //               but making a temporary workaround right now:
       
-            const GpType* type = lookupGpTypeByName("Scalar");
+//            const GpType* type = lookupGpTypeByName("Scalar");
+//            assert (type);
+//            tree.setRootValue(std::any(std::stod(first_token)), *type);
+
+//            const GpType* type = lookupGpTypeByName("Scalar");
             assert (type);
             tree.setRootValue(std::any(std::stod(first_token)), *type);
 
@@ -648,8 +732,16 @@ public:
             {
                 token_index++;
                 GpTree& subtree = tree.subtrees().at(i);
-                compileTreeNode(subtree, token_index, tokens);
                 
+//                compileTreeNode(subtree, token_index, tokens);
+                
+//                compileTreeNode(subtree,
+//                                root_function->parameterTypes().at(i),
+//                                token_index, tokens);
+                
+                const GpType* st_type = root_function->parameterTypes().at(i);
+                compileTreeNode(subtree, st_type, token_index, tokens);
+
                 if ((st_count > 1) and (i < (st_count - 1)))
                 {
 //                    std::cout << "check for comma" << std::endl;
@@ -677,12 +769,8 @@ public:
         return n;
     };
 
-    
+    //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
 
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20251202 break tokenization off from compile()
-    
-    
     static std::vector<std::string> tokenizeTreeSource(const std::string& source)
     {
         
@@ -751,9 +839,7 @@ public:
         }
         return string;
     }
-    
-    
-    
+
     static void tempTestCompile()
     {
         FunctionSet fs
@@ -812,7 +898,6 @@ public:
 //                                     "zip-a-dee-doo-dah",
 //                                     "ding zap yadda zap quux zap");
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
     // Utility to print "typical" trees from this FS, to help inspect/debug.

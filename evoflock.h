@@ -186,6 +186,14 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260111 fix ownership of "current fs"
+
+    assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     LP::GpTree compiled_tree = fs.compile(hand_written_gp_source);
     auto inject = [&](LP::Individual* individual)
     {
@@ -208,8 +216,8 @@ void runOneFlockEvolution()
     // TODO 20260111 fix ownership of "current fs"
 
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-    EF::setUsingGA();
-//    EF::setUsingGP();
+    // EF::setUsingGA();
+    EF::setUsingGP();
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -419,7 +427,7 @@ void runOneFlockEvolution()
         if (EF::usingGP())
         {
             population->explicit_treeValue_in_evolutionStep = false;
-            // injectHandWrittenCodeIntoPopulation(fs, population);
+            injectHandWrittenCodeIntoPopulation(fs, population);
         }
     }
 
@@ -722,14 +730,19 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
     {
         // To visualize FlockParameters from a previous GA run
         
-        // Saved FP values from a previous run (20250728_curve_0_10pc_80pc_1)
-        FlockParameters fp(98.0539, 92.3707, 56.2517, 51.0097, 29.2962, 96.414,
-                           94.4825, 2.74096, 24.305, 34.2467, -0.880103,
-                           -0.856635, 0.2645, 3.96972, 1.24912);
+        //// Saved FP values from run (20250728_curve_0_10pc_80pc_1)
+        //FlockParameters fp(98.0539, 92.3707, 56.2517, 51.0097, 29.2962,
+        //                   96.414, 94.4825, 2.74096, 24.305, 34.2467,
+        //                   -0.880103, -0.856635, 0.2645, 3.96972, 1.24912);
+        
+        // Saved FP values from run 20260111_ga_regress_test (best fit 0.83)
+        FlockParameters fp(63.744, 81.2466, 43.4222, 28.0775, 16.4975,
+                           91.6614, 81.1959, 2.53281, 6.47123, 10.1784,
+                           -0.980982, -0.878616, 0.238952, 5.23155, 1.70729);
         
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);
-        LP::Individual individual(GP::gaTreeFromFP(fp));
+        LP::Individual individual(GP::gaTreeFromFP(fp, fs));
         while (true) { GP::run_flock_simulation(&individual, 1); }
     }
     else

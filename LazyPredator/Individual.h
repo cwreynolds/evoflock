@@ -31,10 +31,22 @@ public:
 //        GpTree duplicate_tree;
 //        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
+    // Default constructor
     Individual()
     {
         constructor_count_++;
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260112 fix ownership of "current fs"
+        
+//        // causes problems in legacy_unit_test()
+//        assert(getFunctionSet());
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     }
+
+
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240712 experiment with increasing initial tree size.
     
@@ -49,6 +61,11 @@ public:
     
     Individual(int max_tree_size, const FunctionSet& fs) : Individual()
     {
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260112 fix ownership of "current fs"
+        setFunctionSet(&fs);
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         if (not increasing_initial_tree_size)
         {
             fs.makeRandomTree(max_tree_size, tree_);
@@ -82,6 +99,11 @@ public:
                int max_crossover_tree_size,
                const FunctionSet& fs) : Individual()
     {
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260112 fix ownership of "current fs"
+        setFunctionSet(&fs);
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         if (not increasing_initial_tree_size)
         {
             fs.makeRandomTree(max_tree_size, tree_);
@@ -115,7 +137,21 @@ public:
     //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Individual(const GpTree& gp_tree) : Individual() { tree_ = gp_tree; }
+    
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260112 fix ownership of "current fs"
+
+//    Individual(const GpTree& gp_tree) : Individual() { tree_ = gp_tree; }
+   
+    Individual(const GpTree& gp_tree, const FunctionSet& fs) : Individual()
+    {
+        tree_ = gp_tree;
+        setFunctionSet(&fs);
+    }
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
     
     virtual ~Individual()
     {
@@ -215,6 +251,16 @@ public:
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260112 fix ownership of "current fs"
+
+    // Get/set this Individual's FunctionSet. (Same api as Population.)
+    const FunctionSet* getFunctionSet() const { return function_set_; }
+    void setFunctionSet(const FunctionSet* fs) { function_set_ = fs; }
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
 private:
     GpTree tree_;
     // Resettable cache for result of tree evaluation.
@@ -235,6 +281,11 @@ private:
     bool has_fitness_ = false;
     MultiObjectiveFitness multi_objective_fitness_;
     bool has_multi_objective_fitness_ = false;
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260112 fix ownership of "current fs"
+    // Const pointer to this Individual's FunctionSet. (Same api as Population.)
+    const FunctionSet* function_set_ = nullptr;
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     // Leak check. Count constructor/destructor calls. Must match at end of run.
     static inline int constructor_count_ = 0;
     static inline int destructor_count_ = 0;

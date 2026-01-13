@@ -439,7 +439,17 @@ double measureUsageSensorAPI(const LP::Population& population)
         const LP::GpTree& tree = individual->tree();
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20251222 why no sensor check during create population?
-        const LP::FunctionSet& fs = *LP::FunctionSet::xxx_current_fs;
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260112 fix ownership of "current fs"
+
+//        const LP::FunctionSet& fs = *LP::FunctionSet::xxx_current_fs;
+
+        const LP::FunctionSet& fs = *population.getFunctionSet();
+        assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         bool full_usage = evoflockGpValidateTree(tree, fs);
         if (full_usage) { trees_using_full_sensor_api++; }
@@ -601,12 +611,38 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
     }
         
 
-    if (EF::usingGP() and
-        not evoflockGpValidateTree(individual->tree(),
-                                   *LP::FunctionSet::xxx_current_fs))
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260112 fix ownership of "current fs"
+    
+//    setFunctionSet(&fs);
+    
+
+//        if (EF::usingGP() and
+//            not evoflockGpValidateTree(individual->tree(),
+//    //                                   *LP::FunctionSet::xxx_current_fs))
+//                                       *individual->getFunctionSet()))
+//        {
+//            least_mof *= std::pow(0.5, 1.0 / least_mof.size());
+//        }
+    
+    
+    
+    const LP::FunctionSet& fs = *individual->getFunctionSet();
+    
+    if (not (&fs == LP::FunctionSet::xxx_current_fs))  // TEMP for debugging
+    {
+        debugPrint(&fs);
+        debugPrint(LP::FunctionSet::xxx_current_fs);
+    }
+    
+    assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
+    if (EF::usingGP() and not evoflockGpValidateTree(individual->tree(), fs))
     {
         least_mof *= std::pow(0.5, 1.0 / least_mof.size());
     }
+
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     assert(scalar_fits.size() == runs);
     fitness_logger(least_mof);

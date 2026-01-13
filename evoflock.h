@@ -427,7 +427,7 @@ void runOneFlockEvolution()
         if (EF::usingGP())
         {
             population->explicit_treeValue_in_evolutionStep = false;
-            injectHandWrittenCodeIntoPopulation(fs, population);
+            // injectHandWrittenCodeIntoPopulation(fs, population);
         }
     }
 
@@ -742,7 +742,11 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);
-        LP::Individual individual(GP::gaTreeFromFP(fp, fs));
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260112 fix ownership of "current fs"
+//        LP::Individual individual(GP::gaTreeFromFP(fp, fs));
+        LP::Individual individual(GP::gaTreeFromFP(fp, fs), fs);
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         while (true) { GP::run_flock_simulation(&individual, 1); }
     }
     else
@@ -774,7 +778,11 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
                                     -1.23851))))";
 
         LP::GpTree tree = fs.compile(gp_source);
-        LP::Individual individual(tree);
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260112 fix ownership of "current fs"
+//        LP::Individual individual(tree);
+        LP::Individual individual(tree, fs);
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);
         while (true) { GP::run_flock_simulation(&individual, 1); }

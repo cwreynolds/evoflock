@@ -54,6 +54,12 @@ public:
                int max_crossover_tree_size,
                const FunctionSet* fs)
     {
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260112 fix ownership of "current fs"
+        debugPrint(max_init_tree_size);
+//        assert(max_init_tree_size > 0);
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         setFunctionSet(fs);
         setMaxInitTreeSize(max_init_tree_size);
         setMinCrossoverTreeSize(min_crossover_tree_size);
@@ -203,7 +209,11 @@ public:
         // Mutate constants in new tree.
         new_tree.mutate();
         // Create new offspring Individual from new tree.
-        Individual* offspring = new Individual(new_tree);
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260112 fix ownership of "current fs"
+//        Individual* offspring = new Individual(new_tree);
+        Individual* offspring = new Individual(new_tree, fs);
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
         // Delete tournament loser from Population, replace with new offspring.
         replaceIndividual(loser_index, offspring, subpop);

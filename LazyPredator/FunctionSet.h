@@ -425,12 +425,7 @@ public:
     {
         return x > max ? x - max : (min > x ? min - x : 0);
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251222 why no sensor check during create population?
-    static inline FunctionSet* xxx_current_fs = nullptr;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
+        
     GpTree newMakeRandomTree(int min_tree_size,
                              int max_tree_size,
                              int retries) const
@@ -595,128 +590,29 @@ public:
         return crossover_function_hook_;
     }
     
-    //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
-    // TODO 20260111 use correct GpTypes for constants in FS::compile()
-    
-//    // "Compile" source code as std::string to a GpTree for this FunctionSet.
-//    GpTree compile(const std::string& source_code) const
-//    {
-//        GpTree tree;
-//        std::vector<std::string> tokens = tokenizeTreeSource(source_code);
-//        int token_index = 0;
-//        compileTreeNode(tree, token_index, tokens);
-//        //    debugPrint(token_index);
-//        //    debugPrint(tokens.size());
-//        assert (token_index == (tokens.size() - 1));
-//        return tree;
-//    }
-    
-//        GpTree compileTreeNode(GpTree& tree,
-//                               int& token_index,
-//                               const std::vector<std::string>& tokens) const
-//        {
-//            std::string first_token = tokens.at(token_index);
-//    //        std::cout << "Enter compileTreeNode with token_index = " << token_index
-//    //                  << " (" << std::quoted(first_token) << ")" << std::endl;
-//            if (is_numeric(first_token))
-//            {
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//                // TODO 20251207 the GpType SHOULD be passed into compileTreeNode(),
-//                //               but making a temporary workaround right now:
-//
-//                const GpType* type = lookupGpTypeByName("Scalar");
-//                assert (type);
-//                tree.setRootValue(std::any(std::stod(first_token)), *type);
-//
-//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//
-//            }
-//            else
-//            {
-//                const GpFunction* root_function = lookupGpFunctionByName(first_token);
-//                tree.setRootFunction(*root_function);
-//                tree.addSubtrees(root_function->parameterTypes().size());
-//
-//                token_index++;
-//                assert(tokens.at(token_index) == "(");
-//
-//                size_t st_count = tree.subtrees().size();
-//                for (int i = 0; i < st_count; i++)
-//                {
-//                    token_index++;
-//                    GpTree& subtree = tree.subtrees().at(i);
-//                    compileTreeNode(subtree, token_index, tokens);
-//
-//                    if ((st_count > 1) and (i < (st_count - 1)))
-//                    {
-//    //                    std::cout << "check for comma" << std::endl;
-//                        token_index++;
-//                        assert(tokens.at(token_index) == ",");
-//                    }
-//                }
-//                token_index++;
-//                assert(tokens.at(token_index) == ")");
-//            }
-//    //        std::cout << "Exit compileTreeNode with token_index = " << token_index
-//    //                  << " (" << std::quoted(tokens.at(token_index)) << ")"
-//    //                  << std::endl;
-//            return tree;
-//        }
-//
-//        static bool is_numeric(std::string s)
-//        {
-//            bool n = true;
-//            for (int i = 0; i < s.size(); i++)
-//            {
-//                unsigned char d = s[i];
-//                if (not (std::isdigit(d) or d == '-' or d == '.')) { n = false; }
-//            }
-//            return n;
-//        };
-
-  
     // "Compile" source code as std::string to a GpTree for this FunctionSet.
     GpTree compile(const std::string& source_code) const
     {
         GpTree tree;
         std::vector<std::string> tokens = tokenizeTreeSource(source_code);
         int token_index = 0;
-        
-//        compileTreeNode(tree, token_index, tokens);
         compileTreeNode(tree, getRootType(), token_index, tokens);
-
-        //    debugPrint(token_index);
-        //    debugPrint(tokens.size());
+        // debugPrint(token_index);
+        // debugPrint(tokens.size());
         assert (token_index == (tokens.size() - 1));
         return tree;
     }
 
     GpTree compileTreeNode(GpTree& tree,
-                           
                            const GpType* type,
-                           
                            int& token_index,
                            const std::vector<std::string>& tokens) const
     {
+        assert (type);
         std::string first_token = tokens.at(token_index);
-//        std::cout << "Enter compileTreeNode with token_index = " << token_index
-//                  << " (" << std::quoted(first_token) << ")" << std::endl;
         if (is_numeric(first_token))
         {
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20251207 the GpType SHOULD be passed into compileTreeNode(),
-            //               but making a temporary workaround right now:
-      
-//            const GpType* type = lookupGpTypeByName("Scalar");
-//            assert (type);
-//            tree.setRootValue(std::any(std::stod(first_token)), *type);
-
-//            const GpType* type = lookupGpTypeByName("Scalar");
-            assert (type);
             tree.setRootValue(std::any(std::stod(first_token)), *type);
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
         }
         else
         {
@@ -732,19 +628,11 @@ public:
             {
                 token_index++;
                 GpTree& subtree = tree.subtrees().at(i);
-                
-//                compileTreeNode(subtree, token_index, tokens);
-                
-//                compileTreeNode(subtree,
-//                                root_function->parameterTypes().at(i),
-//                                token_index, tokens);
-                
                 const GpType* st_type = root_function->parameterTypes().at(i);
                 compileTreeNode(subtree, st_type, token_index, tokens);
-
+                // Check for comma.
                 if ((st_count > 1) and (i < (st_count - 1)))
                 {
-//                    std::cout << "check for comma" << std::endl;
                     token_index++;
                     assert(tokens.at(token_index) == ",");
                 }
@@ -752,9 +640,6 @@ public:
             token_index++;
             assert(tokens.at(token_index) == ")");
         }
-//        std::cout << "Exit compileTreeNode with token_index = " << token_index
-//                  << " (" << std::quoted(tokens.at(token_index)) << ")"
-//                  << std::endl;
         return tree;
     }
 
@@ -769,8 +654,6 @@ public:
         return n;
     };
 
-    //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
-
     static std::vector<std::string> tokenizeTreeSource(const std::string& source)
     {
         
@@ -784,10 +667,7 @@ public:
         s = findAndReplaceAllOccurrences(";", ",", s);
         s = findAndReplaceAllOccurrences("\\n", " ", s);
         s = removeDuplicateWhitespace(s);
-        
-//        std::cout << std::endl << "source code:" << std::endl;
-//        std::cout << std::quoted(s) << std::endl << std::endl;
-        
+
         std::vector<std::string> tokens;
         size_t start = 0;
         size_t delim = 0;
@@ -798,16 +678,9 @@ public:
             tokens.push_back(token);
             start = delim + 1;
         }
-        
-//        std::cout << "tokens:" << std::endl;
-//        for (auto t : tokens) { std::cout << std::quoted(t) << " "; }
-//        std::cout << std::endl;
-
         return tokens;
     }
     
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
     // utilities for FS::compile()
     static std::string findAndReplaceAllOccurrences(std::string from,
                                                     std::string to,
@@ -816,13 +689,10 @@ public:
         size_t pos = string.find(from);
         while (pos != string.npos)
         {
-//            std::cout << std::quoted(string) << std::endl;
-            
             string.erase(pos, from.length());
             string.insert(pos, to);
             pos = string.find(from);
         }
-//        std::cout << std::quoted(string) << std::endl;
         return string;
     }
 

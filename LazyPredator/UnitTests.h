@@ -284,34 +284,7 @@ static void legacy_unit_test()
         bool match_target_count = false;
         // These brackets serve to delimit the lifetime of Population "p".
         {
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-            // TODO 20260112 fix ownership of "current fs"
-            
-//            Population p(target_count);
-            
-//            int max_init_tree_size = 10;
-//            FunctionSet function_set = TestFS::treeEval();
-//            function_set.print();
-//            Population p(target_count, max_init_tree_size, function_set);
-
-//            int max_init_tree_size = 10;
-//            Population p(target_count, max_init_tree_size, TestFS::treeEval());
-
-//            int max_init_tree_size = 10;
-//            FunctionSet function_set = TestFS::treeEval();
-//            function_set.print();
-//            Population p(target_count, max_init_tree_size, function_set);
-            
-            FunctionSet function_set = TestFS::treeEval();
-            Population p(target_count,
-                         0,
-                         10,
-                         1,
-                         10,
-                         &function_set);
-
-
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            Population p(target_count);
             match_target_count = (st(p.getIndividualCount() == target_count) &&
                                   st(Individual::getLeakCount() == target_count));
         }

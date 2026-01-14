@@ -17,55 +17,17 @@ namespace LazyPredator
 class Individual
 {
 public:
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20240619 WIP first GP_not_GA run
-//        // VERY TEMP
-//        std::string tree_to_string() const
-//        {
-//            return tree_.to_string(true);
-//        }
-//
-//        int pop_position = 0;  // temp, for debugging, to track one instance
-//
-//    //    int qqq_count = 0;
-//        GpTree duplicate_tree;
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
     // Default constructor
-    Individual()
-    {
-        constructor_count_++;
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260112 fix ownership of "current fs"
-        
-//        // causes problems in legacy_unit_test()
-//        assert(getFunctionSet());
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    }
-
-
+    Individual() { constructor_count_++; }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240712 experiment with increasing initial tree size.
-    
-//    Individual(int max_tree_size, const FunctionSet& fs) : Individual()
-//    {
-//        fs.makeRandomTree(max_tree_size, tree_);
-//    }
-
 
     static inline bool increasing_initial_tree_size = false;
-//    static inline int iits_counter = 0;
     
     Individual(int max_tree_size, const FunctionSet& fs) : Individual()
     {
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260112 fix ownership of "current fs"
         setFunctionSet(&fs);
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
         if (not increasing_initial_tree_size)
         {
             fs.makeRandomTree(max_tree_size, tree_);
@@ -83,75 +45,33 @@ public:
     
     //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
     // TODO 20250919 increase tree size to avoid losing obstacle perceptions!
-    //
-    // TODO -- it looks like 
-    
-    
-//    new Individual(max_init_tree_size,
-//                   
-//                   min_crossover_tree_size,
-//                   max_crossover_tree_size,
-//                   
-//                   *fs));
 
     Individual(int max_tree_size,
                int min_crossover_tree_size,
                int max_crossover_tree_size,
                const FunctionSet& fs) : Individual()
     {
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260112 fix ownership of "current fs"
         setFunctionSet(&fs);
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
         if (not increasing_initial_tree_size)
         {
             fs.makeRandomTree(max_tree_size, tree_);
         }
         else
         {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240715 WIP new approach to tree generation.
-            
-//            tree_ = fs.newMakeRandomTree(max_tree_size / 2, max_tree_size);
-
             tree_ = fs.newMakeRandomTree(min_crossover_tree_size,
                                          max_crossover_tree_size);
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            
-
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//            // TODO 20251215 require sensor functions in tree
-//
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//            // TODO 20251216 still broken after I remove isFunctionInTreeTest
-//
-//            fs.isFunctionInTreeTest(tree_);
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         }
     }
 
     //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20260112 fix ownership of "current fs"
 
-//    Individual(const GpTree& gp_tree) : Individual() { tree_ = gp_tree; }
-   
     Individual(const GpTree& gp_tree, const FunctionSet& fs) : Individual()
     {
         tree_ = gp_tree;
         setFunctionSet(&fs);
     }
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
     
     virtual ~Individual()
     {
@@ -252,14 +172,9 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20260112 fix ownership of "current fs"
-
-    // Get/set this Individual's FunctionSet. (Same api as Population.)
+    // Get/set this Individual's FunctionSet. (Same API as Population.)
     const FunctionSet* getFunctionSet() const { return function_set_; }
     void setFunctionSet(const FunctionSet* fs) { function_set_ = fs; }
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 private:
     GpTree tree_;
@@ -281,11 +196,8 @@ private:
     bool has_fitness_ = false;
     MultiObjectiveFitness multi_objective_fitness_;
     bool has_multi_objective_fitness_ = false;
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20260112 fix ownership of "current fs"
-    // Const pointer to this Individual's FunctionSet. (Same api as Population.)
+    // Const pointer to this Individual's FunctionSet. (Same API as Population.)
     const FunctionSet* function_set_ = nullptr;
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     // Leak check. Count constructor/destructor calls. Must match at end of run.
     static inline int constructor_count_ = 0;
     static inline int destructor_count_ = 0;

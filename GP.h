@@ -181,53 +181,16 @@ FlockParameters fp_from_ga_individual(LP::Individual* individual)
     return fp_from_ga_tree(tree);
 }
 
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20260111 fix ownership of "current fs"
 
 // For forward reference.
 LP::FunctionSet evoflock_ga_function_set();
 
 
-//    //LP::GpTree ga_tree_from_fp(const FlockParameters& fp)
-//    LP::GpTree gaTreeFromFP(const FlockParameters& fp)
-//    {
-//        assert(EF::usingGA());
-//        LP::GpTree tree;
-//        const LP::FunctionSet& fs = evoflock_ga_function_set();
-//
-//        // Get name and pointer to the first/only GpFunction in the FS.
-//        std::string gp_function_name = fs.nameToGpFunctionMap().begin()->first;
-//        const LP::GpFunction& gp_function = fs.nameToGpFunctionMap().begin()->second;
-//
-//        // Set the tree's root function to be that one/only GpFunction.
-//        tree.setRootFunction(*fs.lookupGpFunctionByName(gp_function_name));
-//
-//        tree.addSubtrees(FlockParameters::tunableParameterCount());
-//
-//    //    auto& type = *fs.lookupGpTypeByName("Real_0_100");
-//
-//        for (int i = 0; i < FlockParameters::tunableParameterCount(); i++)
-//        {
-//            double value = fp.getTuningParameter(i);
-//
-//
-//            const LP::GpType& type = *gp_function.parameterTypes().at(i);
-//
-//
-//            tree.getSubtree(i).setRootValue(std::any(value), type);
-//        }
-//        return tree;
-//    }
-
-//LP::GpTree ga_tree_from_fp(const FlockParameters& fp)
 LP::GpTree gaTreeFromFP(const FlockParameters& fp,
                         const LP::FunctionSet& fs)
 {
     assert(EF::usingGA());
     LP::GpTree tree;
-//    const LP::FunctionSet& fs = evoflock_ga_function_set();
-    assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
-    
     // Get name and pointer to the first/only GpFunction in the FS.
     std::string gp_function_name = fs.nameToGpFunctionMap().begin()->first;
     const LP::GpFunction& gp_function = fs.nameToGpFunctionMap().begin()->second;
@@ -243,9 +206,6 @@ LP::GpTree gaTreeFromFP(const FlockParameters& fp,
     }
     return tree;
 }
-
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 
 // New experiment, move a bunch of debugging crap out of do_1_run()
@@ -289,9 +249,6 @@ void doOneRunDebugLogging(Boid& boid,
 }
 
 
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20260106 make evoflockGpValidateTree() use AND of ORs.
-
 typedef std::vector<std::vector<std::string>> vecOfVecOfStrings;
 
 // Check if a given collection of GpFunction names are contained in the given
@@ -300,8 +257,6 @@ typedef std::vector<std::vector<std::string>> vecOfVecOfStrings;
 // named in the first sub-vector, and one from each other sub-vector. So for
 // example: {{"a", "aa", "aaa"}, {"b", "bb", "bbb"}, {"c", "cc", "ccc"}} would
 // match a tree containing functions: aa, b, and ccc.
-
-
 inline bool areFuncsInTree(const LP::GpTree& tree,
                            const vecOfVecOfStrings& names,
                            const LP::FunctionSet& fs)
@@ -319,116 +274,21 @@ inline bool areFuncsInTree(const LP::GpTree& tree,
     return ok;
 }
 
-
-//    // Constraint to keep the "sensor" API in population, by requiring each tree to
-//    // have >=1 call to each of the sensor GpFuncs. This tests for valid trees.
-//    inline bool evoflockGpValidateTree(const LP::GpTree& tree,
-//                                       const LP::FunctionSet& fs)
-//    {
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20251227 Wait, what?! Confusion with default INITIAL speed?!
-//        if (not (&fs == LP::FunctionSet::xxx_current_fs))
-//        {
-//            debugPrint(&fs);
-//            debugPrint(LP::FunctionSet::xxx_current_fs);
-//            assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
-//        }
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//        bool ok = true;
-//        std::vector<std::string> required_gp_funcs =
-//        {
-//            "Velocity",
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20260103 replace NeighborhoodVelocity with NeighborhoodVelocityDiff.
-//    //        "NeighborhoodVelocity",
-//            "NeighborhoodVelocityDiff",
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            "NeighborhoodOffset",
-//            "ObstacleCollisionNormal",
-//        };
-//        for (auto& name : required_gp_funcs)
-//        {
-//            if (not fs.isFunctionInTree(name, tree)) { ok = false; }
-//        }
-//        return ok;
-//    }
-
-
-//    // Constraint to keep the "sensor" API in population, by requiring each tree to
-//    // have >=1 call to each of the sensor GpFuncs. This tests for valid trees.
-//    inline bool evoflockGpValidateTree(const LP::GpTree& tree,
-//                                       const LP::FunctionSet& fs)
-//    {
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20251227 Wait, what?! Confusion with default INITIAL speed?!
-//        if (not (&fs == LP::FunctionSet::xxx_current_fs))
-//        {
-//            debugPrint(&fs);
-//            debugPrint(LP::FunctionSet::xxx_current_fs);
-//            assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
-//        }
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//    //    bool ok = true;
-//    //        std::vector<std::string> required_gp_funcs =
-//    //        {
-//    //            "Velocity",
-//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //            // TODO 20260103 replace NeighborhoodVelocity with NeighborhoodVelocityDiff.
-//    //    //        "NeighborhoodVelocity",
-//    //            "NeighborhoodVelocityDiff",
-//    //            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //            "NeighborhoodOffset",
-//    //            "ObstacleCollisionNormal",
-//    //        };
-//
-//        vecOfVecOfStrings required_gp_funcs =
-//        {
-//            { "Velocity" },
-//            { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
-//            { "NeighborhoodOffset" },
-//            { "ObstacleCollisionNormal" }
-//        };
-//
-//
-//    //    for (auto& name : required_gp_funcs)
-//    //    {
-//    //        if (not fs.isFunctionInTree(name, tree)) { ok = false; }
-//    //    }
-//    //    return ok;
-//
-//
-//        return areFuncsInTree(tree, required_gp_funcs, fs);
-//    }
-
-
 // Constraint to keep the "sensor" API in population, by requiring each tree to
 // have >=1 call to each of the sensor GpFuncs. This tests for valid trees.
 inline bool evoflockGpValidateTree(const LP::GpTree& tree,
                                    const LP::FunctionSet& fs)
 {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251227 Wait, what?! Confusion with default INITIAL speed?!
-    if (not (&fs == LP::FunctionSet::xxx_current_fs))
-    {
-        debugPrint(&fs);
-        debugPrint(LP::FunctionSet::xxx_current_fs);
-        assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
-    }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     vecOfVecOfStrings required_gp_funcs =
     {
         { "Velocity" },
-        { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
+//        { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
+        { "NeighborhoodVelocityDiff", /* "NeighborhoodVelocity", */ },
         { "NeighborhoodOffset" },
         { "ObstacleCollisionNormal" }
     };
     return areFuncsInTree(tree, required_gp_funcs, fs);
 }
-
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
 double measureUsageSensorAPI(const LP::Population& population)
@@ -437,20 +297,7 @@ double measureUsageSensorAPI(const LP::Population& population)
     auto measure_sensor_api_usage = [&](LP::Individual* individual)
     {
         const LP::GpTree& tree = individual->tree();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251222 why no sensor check during create population?
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260112 fix ownership of "current fs"
-
-//        const LP::FunctionSet& fs = *LP::FunctionSet::xxx_current_fs;
-
         const LP::FunctionSet& fs = *population.getFunctionSet();
-        assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         bool full_usage = evoflockGpValidateTree(tree, fs);
         if (full_usage) { trees_using_full_sensor_api++; }
     };
@@ -610,39 +457,11 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
         
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20260112 fix ownership of "current fs"
-    
-//    setFunctionSet(&fs);
-    
-
-//        if (EF::usingGP() and
-//            not evoflockGpValidateTree(individual->tree(),
-//    //                                   *LP::FunctionSet::xxx_current_fs))
-//                                       *individual->getFunctionSet()))
-//        {
-//            least_mof *= std::pow(0.5, 1.0 / least_mof.size());
-//        }
-    
-    
-    
     const LP::FunctionSet& fs = *individual->getFunctionSet();
-    
-    if (not (&fs == LP::FunctionSet::xxx_current_fs))  // TEMP for debugging
-    {
-        debugPrint(&fs);
-        debugPrint(LP::FunctionSet::xxx_current_fs);
-    }
-    
-    assert(&fs == LP::FunctionSet::xxx_current_fs);  // TEMP for debugging
     if (EF::usingGP() and not evoflockGpValidateTree(individual->tree(), fs))
     {
         least_mof *= std::pow(0.5, 1.0 / least_mof.size());
     }
-
-    
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     assert(scalar_fits.size() == runs);
     fitness_logger(least_mof);

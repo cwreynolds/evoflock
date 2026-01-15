@@ -43,6 +43,13 @@ namespace LazyPredator
 class FunctionSet
 {
 public:
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260115 the day after I deleted this, I realized I still needed it
+    
+    // TODO 20251222 why no sensor check during create population?
+    static inline FunctionSet* xxx_current_fs = nullptr;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     FunctionSet(){}
     // New constructor using vectors of GpType and GpFunction.
     // TODO eventually this needs to be rewritten to be smaller.
@@ -374,7 +381,27 @@ public:
     // Does this GpTree meet any application-specific constraints?
     bool treeConstraintsOK(const GpTree& tree) const
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260115 the day after I deleted this, I realized I still needed it
+        assert((xxx_current_fs == this) or
+               (xxx_current_fs) == nullptr);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260115 the day after I deleted this, I realized I still needed it
+//        if (treeValidatorCustomized())
+//        {
+//            debugPrint(lookupGpFunctionByName("Velocity"));
+//        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         const auto& test_function = getValidateTreeFunction();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260115 the day after I deleted this, I realized I still needed it
+//        if (test_function(tree, *this))
+//        {
+//            std::cout << tree.to_string(true) << std::endl;
+//        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         return test_function(tree, *this);
     }
     
@@ -479,7 +506,19 @@ public:
         std::cout << " " << biggest_init_tree_xxx;
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20251221 change logging for population sensor API.
-        if (treeConstraintsOK(new_tree)) { std::cout << "    full API usage!!"; }
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260114 assume increasing_initial_tree_size is true.
+
+//        if (treeConstraintsOK(new_tree)) { std::cout << "    full API usage!!"; }
+        
+        if (treeValidatorCustomized() and treeConstraintsOK(new_tree))
+        {
+            std::cout << "    full API usage!!";
+        }
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         std::cout << std::endl;
         
@@ -505,6 +544,15 @@ public:
     // TODO 20251213 try making initial trees bigger for usingGP().
     static inline int biggest_init_tree_xxx = -1;
     static inline int smallest_init_tree_xxx = 1000;
+    
+    static void reset_smallest_init_tree_xxx()
+    {
+        biggest_init_tree_xxx = -1;
+        smallest_init_tree_xxx = 1000;
+        
+        debugPrint(biggest_init_tree_xxx);
+        debugPrint(smallest_init_tree_xxx);
+    }
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -820,6 +868,10 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20251217 add get/setValidateTreeFunction()
     
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260114 assume increasing_initial_tree_size is true.
+
+    
     // "Hook" for application-specific constraints on GpTrees, beyond size.
     typedef std::function<bool(const GpTree& tree, const FunctionSet& fs)>
         validate_tree_function_type;
@@ -827,17 +879,37 @@ public:
     void setValidateTreeFunction(validate_tree_function_type vtf)
     {
         validate_tree_function_hook_ = vtf;
+        tree_validator_customized_ = true;
     }
     
     validate_tree_function_type getValidateTreeFunction() const
     {
         return validate_tree_function_hook_;
     }
+
+//        // TODO there is probably a better way to do this:
+//    //    validate_tree_function_type validate_tree_function_hook_ = nullptr;
+//        validate_tree_function_type validate_tree_function_hook_ =
+//            [](const GpTree&, const FunctionSet&){return true;};
+
+    static bool tree_always_valid(const GpTree&, const FunctionSet&)
+    {
+        return true;
+    }
     
-    // TODO there is probably a better way to do this:
-//    validate_tree_function_type validate_tree_function_hook_ = nullptr;
-    validate_tree_function_type validate_tree_function_hook_ =
-        [](const GpTree&, const FunctionSet&){return true;};
+    bool treeValidatorCustomized() const
+    {
+        return tree_validator_customized_;
+    }
+    
+    // The tree validator defaults to "always true" but can be customized
+    validate_tree_function_type validate_tree_function_hook_ = tree_always_valid;
+    
+    // Actually just records that tree validator has been
+    bool tree_validator_customized_ = false;
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~

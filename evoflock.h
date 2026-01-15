@@ -240,17 +240,64 @@ void runOneFlockEvolution()
 //                          GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
 //                          GP::evoflock_ga_function_set());
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260115 the day after I deleted this, I realized I still needed it
+
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20251222 hack to fix sometimes-it-works/sometimes-it-doesn't problem
     // with GP::evoflockGpValidateTree(). I had been copying the FS so I could
     // modify its mode (separately for GA and GP). Here I changed it to save a
     // reference to the FS instead (first saving a copy of the GA FS). This
     // seems to work but I don't know why. Need to test GA for regression.
-    LP::FunctionSet fs_ga = GP::evoflock_ga_function_set();
-    LP::FunctionSet& fs = (EF::usingGP() ?
-                           GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
-                           fs_ga);
+//    LP::FunctionSet fs_ga = GP::evoflock_ga_function_set();
+//    LP::FunctionSet& fs = (EF::usingGP() ?
+//                           GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
+//                           fs_ga);
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    
+//    LP::FunctionSet fs_ga = GP::evoflock_ga_function_set();
+//    LP::FunctionSet fs = (EF::usingGP() ?
+//                          GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
+//                          fs_ga);
+
+//    LP::FunctionSet fs = (EF::usingGP() ?
+//                          GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
+//                          GP::evoflock_ga_function_set());
+
+//    LP::FunctionSet fs = (EF::usingGP() ?
+//                          GP::evoflockGpFunctionSet() :
+//                          GP::evoflock_ga_function_set());
+    
+//    LP::FunctionSet fs = (EF::usingGP() ?
+//                          GP::evoflockGpFunctionSet() :
+//                          GP::evoflock_ga_function_set());
+
+
+
+    // 11:30am trying to get back to working
+//    LP::FunctionSet fs_ga = GP::evoflock_ga_function_set();
+
+    //    LP::FunctionSet& fs = (EF::usingGP() ?
+//                           GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
+//                           fs_ga);
+
+    LP::FunctionSet fs_ga = GP::evoflock_ga_function_set();
+    LP::FunctionSet& fs = EF::usingGP() ? GP::evoflockGpFunctionSet() : fs_ga;
+
+    LP::FunctionSet::xxx_current_fs = &fs;
+    
+    LP::FunctionSet::reset_smallest_init_tree_xxx();
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260115 the day after I deleted this, I realized I still needed it
+    assert(LP::FunctionSet::xxx_current_fs == &fs);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
     // Hack to optionally visualize a previously logged result. Runs flock sim,
     // with graphics, for the GA FlockParameters or GP source code written
@@ -265,15 +312,26 @@ void runOneFlockEvolution()
         std::cout << "Create population, individuals = " << individuals;
         std::cout << ", subpops/demes = " << subpops << std::endl;
         util::Timer t("Create population.");
-        LP::Individual::increasing_initial_tree_size = true;
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260114 assume increasing_initial_tree_size is true.
+//        LP::Individual::increasing_initial_tree_size = true;
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         if (EF::usingGP())
         {
-            fs.setValidateTreeFunction(GP::evoflockGpValidateTree);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260115 the day after I deleted this, I realized I still needed it
+            assert(LP::FunctionSet::xxx_current_fs == &fs);
+
+//            fs.setValidateTreeFunction(GP::evoflockGpValidateTree);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         else
         {
             fs.setCrossoverFunction(GP::evoflock_ga_crossover);
         }
+        
+        
         population = new LazyPredator::Population(individuals,
                                                   subpops,
                                                   max_initial_tree_size,

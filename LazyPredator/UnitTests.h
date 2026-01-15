@@ -591,7 +591,31 @@ static void legacy_unit_test()
         // Block to contain lifetime of Population "p".
         {
             // Make a Population of Individuals from FunctionSet "treeEvalObjects".
-            Population p(individuals, max_tree_size, TestFS::treeEvalObjects());
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20260114 assume increasing_initial_tree_size is true.
+
+//            Population p(individuals, max_tree_size, TestFS::treeEvalObjects());
+
+
+            const FunctionSet fs = TestFS::treeEvalObjects();
+//            Population p(individuals,
+//                         1,
+//                         max_tree_size,
+//                         max_tree_size / 2,
+//                         max_tree_size,
+//                         &fs);
+//            Population p(individuals,
+//                         1,
+//                         max_tree_size,
+//                         0,
+//                         max_tree_size,
+//                         &fs);
+
+//            Population p(individuals, 1, max_tree_size, 0, max_tree_size, &fs);
+
+            Population p(individuals, 6, max_tree_size, 0, max_tree_size, &fs);
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // Force early evaluation of each Individual's GpTree.
             p.applyToAllIndividuals([](Individual* i){ i->treeValue(); });
             // Verify instances of ClassA have been constructed.

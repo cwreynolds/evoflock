@@ -22,25 +22,32 @@ public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20240712 experiment with increasing initial tree size.
-
-    static inline bool increasing_initial_tree_size = false;
     
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260114 assume increasing_initial_tree_size is true.
+
+//    static inline bool increasing_initial_tree_size = false;
+
     Individual(int max_tree_size, const FunctionSet& fs) : Individual()
     {
         setFunctionSet(&fs);
-        if (not increasing_initial_tree_size)
-        {
-            fs.makeRandomTree(max_tree_size, tree_);
-        }
-        else
-        {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20240715 WIP new approach to tree generation.
-                        
-            tree_ = fs.newMakeRandomTree(max_tree_size / 2, max_tree_size);
+        
+//        if (not increasing_initial_tree_size)
+//        {
+//            fs.makeRandomTree(max_tree_size, tree_);
+//        }
+//        else
+//        {
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20240715 WIP new approach to tree generation.
+//                        
+//            tree_ = fs.newMakeRandomTree(max_tree_size / 2, max_tree_size);
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        }
 
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        }
+            
+        tree_ = fs.newMakeRandomTree(max_tree_size / 2, max_tree_size);
     }
     
     //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
@@ -52,16 +59,24 @@ public:
                const FunctionSet& fs) : Individual()
     {
         setFunctionSet(&fs);
-        if (not increasing_initial_tree_size)
-        {
-            fs.makeRandomTree(max_tree_size, tree_);
-        }
-        else
-        {
-            tree_ = fs.newMakeRandomTree(min_crossover_tree_size,
-                                         max_crossover_tree_size);
-        }
+        
+//        if (not increasing_initial_tree_size)
+//        {
+//            fs.makeRandomTree(max_tree_size, tree_);
+//        }
+//        else
+//        {
+//            tree_ = fs.newMakeRandomTree(min_crossover_tree_size,
+//                                         max_crossover_tree_size);
+//        }
+        
+        
+        tree_ = fs.newMakeRandomTree(min_crossover_tree_size,
+                                     max_crossover_tree_size);
+
     }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
 
@@ -172,9 +187,28 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260115 the day after I deleted this, I realized I still needed it
+
+//    // Get/set this Individual's FunctionSet. (Same API as Population.)
+//    const FunctionSet* getFunctionSet() const { return function_set_; }
+//    void setFunctionSet(const FunctionSet* fs) { function_set_ = fs; }
+
     // Get/set this Individual's FunctionSet. (Same API as Population.)
-    const FunctionSet* getFunctionSet() const { return function_set_; }
-    void setFunctionSet(const FunctionSet* fs) { function_set_ = fs; }
+    const FunctionSet* getFunctionSet() const
+    {
+        assert((function_set_ == FunctionSet::xxx_current_fs) or
+               (nullptr == FunctionSet::xxx_current_fs));
+        return function_set_;
+    }
+    void setFunctionSet(const FunctionSet* fs)
+    {
+        function_set_ = fs;
+        assert((function_set_ == FunctionSet::xxx_current_fs) or
+               (nullptr == FunctionSet::xxx_current_fs));
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 private:
     GpTree tree_;

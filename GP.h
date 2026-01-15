@@ -51,9 +51,14 @@ inline double scalarize_fitness_hyperVolume(MOF mof) {return mof.hyperVolume();}
 //inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20260115 the day after I deleted this, I realized I still needed it
+
 // FunctionSet for the GP version of EvoFlock. (forward reference)
 LP::FunctionSet& evoflockGpFunctionSet();
+//LP::FunctionSet evoflockGpFunctionSet();
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Component names for MOF (multi-objective fitness) values (by mode settings).
 inline std::vector<std::string> mof_names()
@@ -257,10 +262,27 @@ typedef std::vector<std::vector<std::string>> vecOfVecOfStrings;
 // named in the first sub-vector, and one from each other sub-vector. So for
 // example: {{"a", "aa", "aaa"}, {"b", "bb", "bbb"}, {"c", "cc", "ccc"}} would
 // match a tree containing functions: aa, b, and ccc.
-inline bool areFuncsInTree(const LP::GpTree& tree,
+//inline bool areFuncsInTree(const LP::GpTree& tree,
+//                           const vecOfVecOfStrings& names,
+//                           const LP::FunctionSet& fs)
+bool areFuncsInTree(const LP::GpTree& tree,
                            const vecOfVecOfStrings& names,
                            const LP::FunctionSet& fs)
 {
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260115 the day after I deleted this, I realized I still needed it
+//    assert((LP::FunctionSet::xxx_current_fs == &fs) or
+//           (LP::FunctionSet::xxx_current_fs) == nullptr);
+    assert(LP::FunctionSet::xxx_current_fs == &fs);
+    
+//    std::cout << "areFuncsInTree()" << std::endl;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260115 the day after I deleted this, I realized I still needed it
+//    debugPrint(fs.lookupGpFunctionByName("Velocity"));
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     bool ok = true;
     for (auto& alternatives : names)
     {
@@ -276,9 +298,19 @@ inline bool areFuncsInTree(const LP::GpTree& tree,
 
 // Constraint to keep the "sensor" API in population, by requiring each tree to
 // have >=1 call to each of the sensor GpFuncs. This tests for valid trees.
-inline bool evoflockGpValidateTree(const LP::GpTree& tree,
-                                   const LP::FunctionSet& fs)
+//inline bool evoflockGpValidateTree(const LP::GpTree& tree,
+//                                   const LP::FunctionSet& fs)
+bool evoflockGpValidateTree(const LP::GpTree& tree,
+                            const LP::FunctionSet& fs)
 {
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260115 the day after I deleted this, I realized I still needed it
+//    assert((LP::FunctionSet::xxx_current_fs == &fs) or
+//           (LP::FunctionSet::xxx_current_fs) == nullptr);
+    assert(LP::FunctionSet::xxx_current_fs == &fs);
+//    std::cout << "evoflockGpValidateTree()" << std::endl;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     vecOfVecOfStrings required_gp_funcs =
     {
         { "Velocity" },
@@ -739,7 +771,7 @@ inline Vec3 neighborhoodOffsetUtility(double exponent)
 //------------------------------------------------------------------------------
 // Scalar functions: abs, add, subtract, multiply, exponentiation.
 
-inline LP::GpFunction Abs
+/*inline*/ LP::GpFunction Abs
  ("Abs",
   "Scalar",
   {"Scalar"},
@@ -748,7 +780,7 @@ inline LP::GpFunction Abs
      return std::any(std::abs(tree.evalSubtree<double>(0)));
  });
 
-inline LP::GpFunction Add
+/*inline*/ LP::GpFunction Add
  ("Add",
   "Scalar",
   {"Scalar", "Scalar"},
@@ -757,7 +789,7 @@ inline LP::GpFunction Add
      return std::any(tree.evalSubtree<double>(0) + tree.evalSubtree<double>(1));
  });
 
-inline LP::GpFunction Sub
+/*inline*/ LP::GpFunction Sub
  ("Sub",
   "Scalar",
   {"Scalar", "Scalar"},
@@ -766,7 +798,7 @@ inline LP::GpFunction Sub
      return std::any(tree.evalSubtree<double>(0) - tree.evalSubtree<double>(1));
  });
 
-inline LP::GpFunction Mult
+/*inline*/ LP::GpFunction Mult
  ("Mult",
   "Scalar",
   {"Scalar", "Scalar"},
@@ -775,7 +807,7 @@ inline LP::GpFunction Mult
      return std::any(tree.evalSubtree<double>(0) * tree.evalSubtree<double>(1));
  });
 
-inline LP::GpFunction Div
+/*inline*/ LP::GpFunction Div
  ("Div",
   "Scalar",
   {"Scalar", "Scalar"},
@@ -785,7 +817,7 @@ inline LP::GpFunction Div
      return std::any(tree.evalSubtree<double>(0) / (d == 0 ? 1 : d));
  });
 
-inline LP::GpFunction Power
+/*inline*/ LP::GpFunction Power
  (
   "Power",
   "Scalar",
@@ -802,7 +834,7 @@ inline LP::GpFunction Power
 // Vector functions: V3, Add3, Sub3, Scale3, Length, Normalize, Cross,
 // Dot, Parallel_Component, Perpendicular_Component, Interpolate, If_Pos
 
-inline LP::GpFunction V3
+/*inline*/ LP::GpFunction V3
  (
   "Vec3",
   "Vec3",
@@ -814,7 +846,7 @@ inline LP::GpFunction V3
                            tree.evalSubtree<double>(2)));
   });
 
-inline LP::GpFunction Add3
+/*inline*/ LP::GpFunction Add3
 (
     "Add3",
     "Vec3",
@@ -824,7 +856,7 @@ inline LP::GpFunction Add3
         return std::any(tree.evalSubtree<Vec3>(0) + tree.evalSubtree<Vec3>(1));
     });
 
-inline LP::GpFunction Sub3
+/*inline*/ LP::GpFunction Sub3
  (
   "Sub3",
   "Vec3",
@@ -834,7 +866,7 @@ inline LP::GpFunction Sub3
       return std::any(tree.evalSubtree<Vec3>(0) - tree.evalSubtree<Vec3>(1));
   });
 
-inline LP::GpFunction Scale3
+/*inline*/ LP::GpFunction Scale3
  (
   "Scale3",
   "Vec3",
@@ -844,7 +876,7 @@ inline LP::GpFunction Scale3
       return std::any(tree.evalSubtree<Vec3>(0) * tree.evalSubtree<double>(1));
   });
 
-inline LP::GpFunction Div3
+/*inline*/ LP::GpFunction Div3
  (
   "Div3",
   "Vec3",
@@ -855,7 +887,7 @@ inline LP::GpFunction Div3
       return std::any(tree.evalSubtree<Vec3>(0) / (d == 0 ? 1 : d));
   });
 
-inline LP::GpFunction Length
+/*inline*/ LP::GpFunction Length
  (
   "Length",
   "Scalar",
@@ -865,7 +897,7 @@ inline LP::GpFunction Length
       return std::any(tree.evalSubtree<Vec3>(0).length());
   });
 
-inline LP::GpFunction Normalize
+/*inline*/ LP::GpFunction Normalize
  (
   "Normalize",
   "Vec3",
@@ -876,7 +908,7 @@ inline LP::GpFunction Normalize
       return std::any(v.normalize_or_0());
   });
 
-inline LP::GpFunction Cross
+/*inline*/ LP::GpFunction Cross
  (
   "Cross",
   "Vec3",
@@ -887,7 +919,7 @@ inline LP::GpFunction Cross
                                   tree.evalSubtree<Vec3>(1)));
   });
 
-inline LP::GpFunction Dot
+/*inline*/ LP::GpFunction Dot
  (
   "Dot",
   "Scalar",
@@ -898,7 +930,7 @@ inline LP::GpFunction Dot
                                 tree.evalSubtree<Vec3>(1)));
   });
 
-inline LP::GpFunction Parallel_Component
+/*inline*/ LP::GpFunction Parallel_Component
  (
   "Parallel_Component",
   "Vec3",
@@ -911,7 +943,7 @@ inline LP::GpFunction Parallel_Component
       return std::any(value.parallel_component(unit_basis));
   });
 
-inline LP::GpFunction Perpendicular_Component
+/*inline*/ LP::GpFunction Perpendicular_Component
  (
   "Perpendicular_Component",
   "Vec3",
@@ -924,7 +956,7 @@ inline LP::GpFunction Perpendicular_Component
       return std::any(value.perpendicular_component(unit_basis));
   });
 
-inline LP::GpFunction Interpolate
+/*inline*/ LP::GpFunction Interpolate
  (
   "Interpolate",
   "Vec3",
@@ -938,7 +970,7 @@ inline LP::GpFunction Interpolate
       return std::any(util::interpolate(i, a, b));
   });
 
-inline LP::GpFunction If_Pos
+/*inline*/ LP::GpFunction If_Pos
  (
   "If_Pos",
   "Vec3",
@@ -950,34 +982,11 @@ inline LP::GpFunction If_Pos
                       tree.evalSubtree<Vec3>(2));
   });
 
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-// TODO 20260108 break off utility code for NeighborhoodOffset and LengthAdjust
 
-//    inline LP::GpFunction LengthAdjust
-//     (
-//      "LengthAdjust",
-//      "Vec3",
-//      {"Vec3", "Scalar_0_100", "Scalar_0_10"},  // ref vec, target length, strength
-//      [](LP::GpTree& tree)
-//      {
-//          Vec3 ref_vector = tree.evalSubtree<Vec3>(0);
-//
-//          // TODO temporarily fix with an abs(), later with special Scalar def?
-//    //      double target_length = std::abs(tree.evalSubtree<double>(1));
-//    //      double strength = std::abs(tree.evalSubtree<double>(2));
-//          double target_length = tree.evalSubtree<double>(1);
-//          double strength = tree.evalSubtree<double>(2);
-//
-//          double adjust = strength * (ref_vector.length() < target_length ? 1 : -1);
-//          Vec3 result = ref_vector.normalize_or_0() * adjust;
-//          return std::any(result);
-//      });
-
-inline LP::GpFunction LengthAdjust
+/*inline*/ LP::GpFunction LengthAdjust
  (
   "LengthAdjust",
   "Vec3",
-//  {"Vec3", "Scalar_0_100", "Scalar_0_10"},  // ref vec, target length, strength
   {"Vec3", "Scalar_0_100", "Scalar"},  // ref vec, target length, strength
   [](LP::GpTree& tree)
   {
@@ -987,7 +996,6 @@ inline LP::GpFunction LengthAdjust
                                           tree.evalSubtree<double>(2)));
   });
 
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 
 //------------------------------------------------------------------------------
@@ -996,7 +1004,7 @@ inline LP::GpFunction LengthAdjust
 //           First_Obs_Dist, First_Obs_Normal, ToForward, ToSide
 
 
-inline LP::GpFunction Speed
+/*inline*/ LP::GpFunction Speed
  (
   "Speed",
   "Scalar",
@@ -1007,7 +1015,7 @@ inline LP::GpFunction Speed
   });
 
 
-inline LP::GpFunction Velocity
+/*inline*/ LP::GpFunction Velocity
 (
  "Velocity",
  "Vec3",
@@ -1022,7 +1030,7 @@ inline LP::GpFunction Velocity
 });
 
 
-inline LP::GpFunction Acceleration
+/*inline*/ LP::GpFunction Acceleration
  (
   "Acceleration",
   "Vec3",
@@ -1033,7 +1041,7 @@ inline LP::GpFunction Acceleration
       return std::any(boid.getAcceleration());
   });
 
-inline LP::GpFunction Forward
+/*inline*/ LP::GpFunction Forward
  (
   "Forward",
   "Vec3",
@@ -1044,7 +1052,7 @@ inline LP::GpFunction Forward
       return std::any(boid.forward());
   });
 
-inline LP::GpFunction NearestNeighborVelocity
+/*inline*/ LP::GpFunction NearestNeighborVelocity
  (
   "NearestNeighborVelocity",
   "Vec3",
@@ -1054,7 +1062,7 @@ inline LP::GpFunction NearestNeighborVelocity
       return std::any(getGpBoidNeighbor(1)->velocity());
   });
 
-inline LP::GpFunction NearestNeighborVelocity2  // 2nd nearest neighbor
+/*inline*/ LP::GpFunction NearestNeighborVelocity2  // 2nd nearest neighbor
  (
   "NearestNeighborVelocity2",
   "Vec3",
@@ -1064,7 +1072,7 @@ inline LP::GpFunction NearestNeighborVelocity2  // 2nd nearest neighbor
       return std::any(getGpBoidNeighbor(2)->velocity());
   });
 
-inline LP::GpFunction NearestNeighborOffset
+/*inline*/ LP::GpFunction NearestNeighborOffset
  (
   "NearestNeighborOffset",
   "Vec3",
@@ -1077,7 +1085,7 @@ inline LP::GpFunction NearestNeighborOffset
   });
 
 
-inline LP::GpFunction NearestNeighborOffset2  // 2nd nearest neighbor
+/*inline*/ LP::GpFunction NearestNeighborOffset2  // 2nd nearest neighbor
  (
   "NearestNeighborOffset2",
   "Vec3",
@@ -1089,31 +1097,8 @@ inline LP::GpFunction NearestNeighborOffset2  // 2nd nearest neighbor
       return std::any(no);
   });
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20260103 replace NeighborhoodVelocity with NeighborhoodVelocityDiff.
-//               also normalize by weight.
 
-//    inline LP::GpFunction NeighborhoodVelocity
-//     (
-//      "NeighborhoodVelocity",
-//      "Vec3",
-//      {"Scalar_0.5_2"},  // falloff exponent
-//      [](LP::GpTree& tree)
-//      {
-//          Vec3 sum;
-//          Boid& me = *Boid::getGpPerThread();
-//          double exponent = tree.evalSubtree<double>(0);
-//          for (int i = 1; i < 7; i++)
-//          {
-//              Boid& b = *getGpBoidNeighbor(i);
-//              Vec3 offset = b.position() - me.position();
-//              double distance = offset.length();
-//              sum += b.velocity() * (1.0 / std::pow(distance, exponent));
-//          }
-//          return std::any(sum);;
-//      });
-
-inline LP::GpFunction NeighborhoodVelocity
+/*inline*/ LP::GpFunction NeighborhoodVelocity
  (
   "NeighborhoodVelocity",
   "Vec3",
@@ -1143,7 +1128,7 @@ inline LP::GpFunction NeighborhoodVelocity
 
 
 // "Pre subtracts" from this boid's velocity. We want to drive this to zero.
-inline LP::GpFunction NeighborhoodVelocityDiff
+/*inline*/ LP::GpFunction NeighborhoodVelocityDiff
  (
   "NeighborhoodVelocityDiff",
   "Vec3",
@@ -1174,68 +1159,7 @@ inline LP::GpFunction NeighborhoodVelocityDiff
 
 
 
-//    inline LP::GpFunction NeighborhoodOffset
-//     (
-//      "NeighborhoodOffset",
-//      "Vec3",
-//      {"Scalar_0.5_2"},  // falloff exponent
-//      [](LP::GpTree& tree)
-//      {
-//          Vec3 sum;
-//          Boid& me = *Boid::getGpPerThread();
-//          double exponent = tree.evalSubtree<double>(0);
-//          for (int i = 1; i < 7; i++)
-//          {
-//              Boid& b = *getGpBoidNeighbor(i);
-//              Vec3 offset = b.position() - me.position();
-//              double distance = offset.length();
-//              sum += offset * (1.0 / std::pow(distance, exponent));
-//          }
-//          return std::any(sum);;
-//      });
-
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-// TODO 20260108 break off utility code for NeighborhoodOffset and LengthAdjust
-
-//    inline LP::GpFunction NeighborhoodOffset
-//     (
-//      "NeighborhoodOffset",
-//      "Vec3",
-//      {"Scalar_0.5_2"},  // falloff exponent
-//      [](LP::GpTree& tree)
-//      {
-//    //      Vec3 sum;
-//          Vec3 offset_sum;
-//          double weight_sum = 0;
-//          Boid& me = *Boid::getGpPerThread();
-//          double exponent = tree.evalSubtree<double>(0);
-//          for (int i = 1; i < 7; i++)
-//          {
-//              Boid& b = *getGpBoidNeighbor(i);
-//              Vec3 offset = b.position() - me.position();
-//              double distance = offset.length();
-//    //          sum += offset * (1.0 / std::pow(distance, exponent));
-//
-//              double weight = 1.0 / std::pow(distance, exponent);
-//              offset_sum += offset * weight;
-//              weight_sum += weight;
-//
-//          }
-//    //      return std::any(sum);;
-//          //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-//          // TODO 20260107 annotation for NeighborhoodOffset
-//
-//          auto& draw = Draw::getInstance();
-//          Vec3 me_pos = me.position();
-//          Vec3 center = me_pos + (offset_sum / weight_sum);
-//          draw.addThickLineToAnimatedFrame(me_pos, center, Color::green(), 0.02);
-//
-//          //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-//          return std::any(offset_sum / weight_sum);
-//      });
-
-
-inline LP::GpFunction NeighborhoodOffset
+/*inline*/ LP::GpFunction NeighborhoodOffset
  (
   "NeighborhoodOffset",
   "Vec3",
@@ -1245,11 +1169,10 @@ inline LP::GpFunction NeighborhoodOffset
       return std::any(neighborhoodOffsetUtility(tree.evalSubtree<double>(0)));
   });
 
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-inline LP::GpFunction First_Obs_Dist
+/*inline*/ LP::GpFunction First_Obs_Dist
  (
   "First_Obs_Dist",
   "Scalar",
@@ -1268,7 +1191,7 @@ inline LP::GpFunction First_Obs_Dist
       return std::any(distance);
   });
 
-inline LP::GpFunction FirstObstacleOffset
+/*inline*/ LP::GpFunction FirstObstacleOffset
 (
  "FirstObstacleOffset",
  "Vec3",
@@ -1287,7 +1210,7 @@ inline LP::GpFunction FirstObstacleOffset
     return std::any(offset);
 });
 
-inline LP::GpFunction FirstObstacleNormal
+/*inline*/ LP::GpFunction FirstObstacleNormal
  (
   "FirstObstacleNormal",
   "Vec3",
@@ -1306,7 +1229,7 @@ inline LP::GpFunction FirstObstacleNormal
   });
 
 
-inline LP::GpFunction ObstacleCollisionNormal
+/*inline*/ LP::GpFunction ObstacleCollisionNormal
  (
   "ObstacleCollisionNormal",
   "Vec3",
@@ -1331,7 +1254,7 @@ inline LP::GpFunction ObstacleCollisionNormal
 
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-inline LP::GpFunction ToForward
+/*inline*/ LP::GpFunction ToForward
  (
   "ToForward",
   "Vec3",
@@ -1346,7 +1269,7 @@ inline LP::GpFunction ToForward
   });
 
 
-inline LP::GpFunction ToSide
+/*inline*/ LP::GpFunction ToSide
  (
   "ToSide",
   "Vec3",
@@ -1363,7 +1286,7 @@ inline LP::GpFunction ToSide
 
 // Given two scalars and a Vec3, "stretch" the vector along the Boids' local
 // forward and lateral directions.
-inline LP::GpFunction LocalScale
+/*inline*/ LP::GpFunction LocalScale
  (
   "LocalScale",
   "Vec3",
@@ -1380,7 +1303,7 @@ inline LP::GpFunction LocalScale
   });
 
 
-inline LP::GpFunction SideAndForward
+/*inline*/ LP::GpFunction SideAndForward
  (
   "SideAndForward",
   "Vec3",
@@ -1401,7 +1324,7 @@ inline LP::GpFunction SideAndForward
 // SpeedControl, AvoidObstacle, AdjustSeparation, and BeTheBoid
 
 // New SpeedControl(target_speed, strength). Only medium cartoonish?
-inline LP::GpFunction SpeedControl
+/*inline*/ LP::GpFunction SpeedControl
  ("SpeedControl",
   "Vec3",
   {"Scalar", "Scalar"},
@@ -1418,7 +1341,7 @@ inline LP::GpFunction SpeedControl
  });
 
 
-inline LP::GpFunction AvoidObstacle
+/*inline*/ LP::GpFunction AvoidObstacle
  (
   "Avoid_Obstacle",
   "Vec3",
@@ -1444,7 +1367,7 @@ inline LP::GpFunction AvoidObstacle
   });
 
 
-inline LP::GpFunction AdjustSeparation
+/*inline*/ LP::GpFunction AdjustSeparation
  (
   "AdjustSeparation",
   "Vec3",
@@ -1469,7 +1392,7 @@ inline LP::GpFunction AdjustSeparation
   });
 
 
-inline LP::GpFunction BeTheBoid
+/*inline*/ LP::GpFunction BeTheBoid
  ("BeTheBoid",
   "Vec3",
   {},
@@ -1557,11 +1480,31 @@ LP::FunctionSet evoflock_gp_function_set_cached_ =
     }
 };
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20260115 the day after I deleted this, I realized I still needed it
+
+//    // FunctionSet for the GP version of EvoFlock.
+//    LP::FunctionSet evoflockGpFunctionSet()
+//    {
+//
+//        evoflock_gp_function_set_cached_.setValidateTreeFunction(evoflockGpValidateTree);
+//
+//
+//        return evoflock_gp_function_set_cached_;
+//    }
+
 // FunctionSet for the GP version of EvoFlock.
 LP::FunctionSet& evoflockGpFunctionSet()
 {
+    
+    evoflock_gp_function_set_cached_.setValidateTreeFunction(evoflockGpValidateTree);
+    
+    
     return evoflock_gp_function_set_cached_;
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -51,14 +51,6 @@ inline double scalarize_fitness_hyperVolume(MOF mof) {return mof.hyperVolume();}
 //inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20260115 the day after I deleted this, I realized I still needed it
-
-// FunctionSet for the GP version of EvoFlock. (forward reference)
-LP::FunctionSet& evoflockGpFunctionSet();
-//LP::FunctionSet evoflockGpFunctionSet();
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Component names for MOF (multi-objective fitness) values (by mode settings).
 inline std::vector<std::string> mof_names()
@@ -187,10 +179,6 @@ FlockParameters fp_from_ga_individual(LP::Individual* individual)
 }
 
 
-// For forward reference.
-LP::FunctionSet evoflock_ga_function_set();
-
-
 LP::GpTree gaTreeFromFP(const FlockParameters& fp,
                         const LP::FunctionSet& fs)
 {
@@ -269,20 +257,6 @@ bool areFuncsInTree(const LP::GpTree& tree,
                            const vecOfVecOfStrings& names,
                            const LP::FunctionSet& fs)
 {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260115 the day after I deleted this, I realized I still needed it
-//    assert((LP::FunctionSet::xxx_current_fs == &fs) or
-//           (LP::FunctionSet::xxx_current_fs) == nullptr);
-    assert(LP::FunctionSet::xxx_current_fs == &fs);
-    
-//    std::cout << "areFuncsInTree()" << std::endl;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260115 the day after I deleted this, I realized I still needed it
-//    debugPrint(fs.lookupGpFunctionByName("Velocity"));
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     bool ok = true;
     for (auto& alternatives : names)
     {
@@ -303,19 +277,11 @@ bool areFuncsInTree(const LP::GpTree& tree,
 bool evoflockGpValidateTree(const LP::GpTree& tree,
                             const LP::FunctionSet& fs)
 {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260115 the day after I deleted this, I realized I still needed it
-//    assert((LP::FunctionSet::xxx_current_fs == &fs) or
-//           (LP::FunctionSet::xxx_current_fs) == nullptr);
-    assert(LP::FunctionSet::xxx_current_fs == &fs);
-//    std::cout << "evoflockGpValidateTree()" << std::endl;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     vecOfVecOfStrings required_gp_funcs =
     {
         { "Velocity" },
-//        { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
-        { "NeighborhoodVelocityDiff", /* "NeighborhoodVelocity", */ },
+        { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
+//        { "NeighborhoodVelocityDiff", /* "NeighborhoodVelocity", */ },
         { "NeighborhoodOffset" },
         { "ObstacleCollisionNormal" }
     };
@@ -412,22 +378,6 @@ inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
                 LP::GpTree gp_tree = individual->tree();
                 // Eval tree to get steering, optionally convert local to global
                 Vec3 steering_from_tree = std::any_cast<Vec3>(gp_tree.eval());
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20260109 try just goosing this up 2x.
-                //               and then back to infinity: no limit at all.
-                //               got fits 0.71-0.73 while using HW injection
-                
-//                // Since the magnitude of steering force returned by the evolved
-//                // program is unbounded, use an ad hoc kinematic limit.
-//                double max_steer_force = 80;  // make some API for setting this.
-//                steering_from_tree = steering_from_tree.truncate(max_steer_force);
-
-//                // Since the magnitude of steering force returned by the evolved
-//                // program is unbounded, use an ad hoc kinematic limit.
-//                double max_steer_force = 160;  // make some API for setting this.
-//                steering_from_tree = steering_from_tree.truncate(max_steer_force);
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 doOneRunDebugLogging(boid,
                                      flock,
                                      steering_from_tree,
@@ -557,66 +507,69 @@ void replace_scalar_fitness_metric(LP::Population& population,
 // The default (in GpType::defaultJiggleScale()) is 0.05
 double jiggle_scale = 0.05;
 
+
 // This is a degenerate GP function set, for what is essentially a GA problem:
 // selecting a set of real number parameters for a flock simulation, via an
 // absolute and fixed fitness metric. There is only one function, all GpTrees
 // are exactly one function deep, differing only in their parameter values.
-//LazyPredator::FunctionSet evoflock_ga_function_set_normal()
-LazyPredator::FunctionSet evoflock_ga_function_set()
+LazyPredator::FunctionSet static_ga_fs_ =
 {
-    return
+    {
+        { "Flock_Parameters" },
+        { "Real_0_1",    0.0,   1.0, jiggle_scale },
+        { "Real_0_10",   0.0,  10.0, jiggle_scale },
+        { "Real_0_100",  0.0, 100.0, jiggle_scale },
+        { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
+    },
     {
         {
-            { "Flock_Parameters" },
-            { "Real_0_1",    0.0,   1.0, jiggle_scale },
-            { "Real_0_10",   0.0,  10.0, jiggle_scale },
-            { "Real_0_100",  0.0, 100.0, jiggle_scale },
-            { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
-        },
-        {
+            // GP function name:
+            "Run_Flock",
+            
+            // Return type: a FlockParameters object.
+            "Flock_Parameters",
+            
+            // Function parameter type list, cf FlockParameters for details
             {
-                // GP function name:
-                "Run_Flock",
-
-                // Return type: a FlockParameters object.
-                "Flock_Parameters",
-
-                // Function parameter type list, cf FlockParameters for details
-                {
-                    "Real_0_100",  // max_force
-
-                    "Real_0_100",  // weight_forward
-                    "Real_0_100",  // weight_separate
-                    "Real_0_100",  // weight_align
-                    "Real_0_100",  // weight_cohere
-
-                    "Real_0_100",  // weightAvoidPredict
-                    "Real_0_100",  // weightAvoidStatic
-
-                    "Real_0_100",  // max_dist_separate
-                    "Real_0_100",  // max_dist_align
-                    "Real_0_100",  // max_dist_cohere
-
-                    // Cosine of threshold angle (max angle from forward to be seen)
-                    "Real_m1_p1",  // angle_separate
-                    "Real_m1_p1",  // angle_align
-                    "Real_m1_p1",  // angle_cohere
-                    
-                    "Real_0_100", // fly_away_max_dist
-                    "Real_0_10",  // min_time_to_collide
-                },
-                                
-                // Evaluation function, which runs a flock simulation with the given
-                // parameters and returns the fitness.
-                [](LazyPredator::GpTree& t)
-                {
-                    // TODO should the body of fp_from_ga_tree() be written
-                    // inline here? or is it used elsewhere?
-                    return std::any(fp_from_ga_tree(t));
-                }
+                "Real_0_100",  // max_force
+                
+                "Real_0_100",  // weight_forward
+                "Real_0_100",  // weight_separate
+                "Real_0_100",  // weight_align
+                "Real_0_100",  // weight_cohere
+                
+                "Real_0_100",  // weightAvoidPredict
+                "Real_0_100",  // weightAvoidStatic
+                
+                "Real_0_100",  // max_dist_separate
+                "Real_0_100",  // max_dist_align
+                "Real_0_100",  // max_dist_cohere
+                
+                // Cosine of threshold angle (max angle from forward to be seen)
+                "Real_m1_p1",  // angle_separate
+                "Real_m1_p1",  // angle_align
+                "Real_m1_p1",  // angle_cohere
+                
+                "Real_0_100", // fly_away_max_dist
+                "Real_0_10",  // min_time_to_collide
+            },
+            
+            // Evaluation function, which runs a flock simulation with the given
+            // parameters and returns the fitness.
+            [](LazyPredator::GpTree& t)
+            {
+                // TODO should the body of fp_from_ga_tree() be written
+                // inline here? or is it used elsewhere?
+                return std::any(fp_from_ga_tree(t));
             }
         }
-    };
+    }
+};
+
+LazyPredator::FunctionSet& evoflockGaFunctionSet()
+{
+    static_ga_fs_.setCrossoverFunction(evoflock_ga_crossover);
+    return static_ga_fs_;
 }
 
 
@@ -724,9 +677,7 @@ Vec3 ensure_unit_length(Vec3 v)
 }
 
 
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-// TODO 20260108 break off utility code for NeighborhoodOffset and LengthAdjust
-
+// Break off utility code for LengthAdjust.
 inline Vec3 lengthAdjustUtility(Vec3 ref_vector,
                                 double target_length,
                                 double strength)
@@ -738,7 +689,6 @@ inline Vec3 lengthAdjustUtility(Vec3 ref_vector,
 
 
 // Compute a distance-weighted offset from current boid to its neighbors.
-
 inline Vec3 neighborhoodOffsetUtility(double exponent)
 {
     Vec3 offset_sum;
@@ -764,8 +714,6 @@ inline Vec3 neighborhoodOffsetUtility(double exponent)
     
     return offset_sum / weight_sum;
 }
-
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 
 //------------------------------------------------------------------------------
@@ -1148,13 +1096,7 @@ inline Vec3 neighborhoodOffsetUtility(double exponent)
           velocity_sum += b.velocity() * weight;
           weight_sum += weight;
       }
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      // TODO 20260105 sanity check, is this backwards? Should I allow negative weights?
-//      return std::any((velocity_sum / weight_sum) - me.velocity());
-//      return std::any(me.velocity() - (velocity_sum / weight_sum));
-      // TODO 20260105 now unreverse with bigger trees
       return std::any((velocity_sum / weight_sum) - me.velocity());
-      //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   });
 
 
@@ -1407,17 +1349,30 @@ inline Vec3 neighborhoodOffsetUtility(double exponent)
  });
 
 
-LP::FunctionSet evoflock_gp_function_set_cached_ =
+// FunctionSet for the GP version of EvoFlock.
+LP::FunctionSet static_gp_fs_ =
 {
     // GpTypes
     {
-        { "Vec3" },
-        { "Scalar", -100.0, 100.0, 0.005 },  // min, max, jiggle scale
-        {"Scalar_0_1", 0.0, 1.0, 0.01},
-        {"Scalar_0_10", 0.0, 10.0, 0.1},
-        {"Scalar_0_100", 0.0, 100.0, 1.0},
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // 20260116 readjust GP jiggle_scale which seemed way wrong.
+        
+//        { "Vec3" },
+//        { "Scalar", -100.0, 100.0, 0.005 },  // min, max, jiggle scale
+//        {"Scalar_0_1", 0.0, 1.0, 0.01},
+//        {"Scalar_0_10", 0.0, 10.0, 0.1},
+//        {"Scalar_0_100", 0.0, 100.0, 1.0},
+//        // To see plot of falloff curves: https://tinyurl.com/3p4jv7dx
+//        {"Scalar_0.5_2", 0.5, 2.0, 0.02},  // for inverse exponential falloff.
+
+        {"Vec3"},
+        {"Scalar", -100.0, 100.0, jiggle_scale },  // min, max, jiggle scale
+        {"Scalar_0_1", 0.0, 1.0, jiggle_scale},
+        {"Scalar_0_10", 0.0, 10.0, jiggle_scale},
+        {"Scalar_0_100", 0.0, 100.0, jiggle_scale},
         // To see plot of falloff curves: https://tinyurl.com/3p4jv7dx
-        {"Scalar_0.5_2", 0.5, 2.0, 0.02},  // for inverse exponential falloff.
+        {"Scalar_0.5_2", 0.5, 2.0, jiggle_scale},  // for inverse expt falloff.
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     },
     // GpFunctions
     {
@@ -1480,31 +1435,13 @@ LP::FunctionSet evoflock_gp_function_set_cached_ =
     }
 };
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20260115 the day after I deleted this, I realized I still needed it
-
-//    // FunctionSet for the GP version of EvoFlock.
-//    LP::FunctionSet evoflockGpFunctionSet()
-//    {
-//
-//        evoflock_gp_function_set_cached_.setValidateTreeFunction(evoflockGpValidateTree);
-//
-//
-//        return evoflock_gp_function_set_cached_;
-//    }
 
 // FunctionSet for the GP version of EvoFlock.
 LP::FunctionSet& evoflockGpFunctionSet()
 {
-    
-    evoflock_gp_function_set_cached_.setValidateTreeFunction(evoflockGpValidateTree);
-    
-    
-    return evoflock_gp_function_set_cached_;
+    static_gp_fs_.setValidateTreeFunction(evoflockGpValidateTree);
+    return static_gp_fs_;
 }
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

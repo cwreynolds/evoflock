@@ -585,37 +585,13 @@ static void legacy_unit_test()
     // gp_type_deleter
     {
         int individuals = 100;
-        int max_tree_size = 100;
         LPRS().setSeed(65053574);
         bool constructed, destructed;
         // Block to contain lifetime of Population "p".
         {
             // Make a Population of Individuals from FunctionSet "treeEvalObjects".
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20260114 assume increasing_initial_tree_size is true.
-
-//            Population p(individuals, max_tree_size, TestFS::treeEvalObjects());
-
-
-            const FunctionSet fs = TestFS::treeEvalObjects();
-//            Population p(individuals,
-//                         1,
-//                         max_tree_size,
-//                         max_tree_size / 2,
-//                         max_tree_size,
-//                         &fs);
-//            Population p(individuals,
-//                         1,
-//                         max_tree_size,
-//                         0,
-//                         max_tree_size,
-//                         &fs);
-
-//            Population p(individuals, 1, max_tree_size, 0, max_tree_size, &fs);
-
-            Population p(individuals, 6, max_tree_size, 0, max_tree_size, &fs);
-
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // 100 Individuals, 1 subpop, all trees size 6, fs: treeEvalObjects.
+            Population p(individuals, 1, 6, 6, 6, &TestFS::treeEvalObjects());
             // Force early evaluation of each Individual's GpTree.
             p.applyToAllIndividuals([](Individual* i){ i->treeValue(); });
             // Verify instances of ClassA have been constructed.
@@ -625,8 +601,6 @@ static void legacy_unit_test()
         destructed = st(TestFS::ClassA::getLeakCount() == 0);
         assert(constructed && destructed && maybe_log("gp_type_deleter"));
     }
-
-
 
     // subpopulation_and_stats
     {

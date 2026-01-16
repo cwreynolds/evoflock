@@ -19,69 +19,20 @@ class Individual
 public:
     // Default constructor
     Individual() { constructor_count_++; }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240712 experiment with increasing initial tree size.
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260114 assume increasing_initial_tree_size is true.
-
-//    static inline bool increasing_initial_tree_size = false;
-
     Individual(int max_tree_size, const FunctionSet& fs) : Individual()
     {
         setFunctionSet(&fs);
-        
-//        if (not increasing_initial_tree_size)
-//        {
-//            fs.makeRandomTree(max_tree_size, tree_);
-//        }
-//        else
-//        {
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20240715 WIP new approach to tree generation.
-//                        
-//            tree_ = fs.newMakeRandomTree(max_tree_size / 2, max_tree_size);
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        }
-
-            
         tree_ = fs.newMakeRandomTree(max_tree_size / 2, max_tree_size);
     }
-    
-    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-    // TODO 20250919 increase tree size to avoid losing obstacle perceptions!
-
     Individual(int max_tree_size,
                int min_crossover_tree_size,
                int max_crossover_tree_size,
                const FunctionSet& fs) : Individual()
     {
         setFunctionSet(&fs);
-        
-//        if (not increasing_initial_tree_size)
-//        {
-//            fs.makeRandomTree(max_tree_size, tree_);
-//        }
-//        else
-//        {
-//            tree_ = fs.newMakeRandomTree(min_crossover_tree_size,
-//                                         max_crossover_tree_size);
-//        }
-        
-        
         tree_ = fs.newMakeRandomTree(min_crossover_tree_size,
                                      max_crossover_tree_size);
-
     }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     Individual(const GpTree& gp_tree, const FunctionSet& fs) : Individual()
     {
         tree_ = gp_tree;
@@ -98,14 +49,10 @@ public:
     }
     // Read-only (const) access to this Individual's GpTree.
     const GpTree& tree() const { return tree_; }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251207 experimental, for debugging, for injecting hand written
-    // programs into population there may be better/safer ways to do this.
     
     // Overwrite this Individual's tree. Used for injecting hand written code.
     void setTree(const GpTree& new_tree) { tree_ = new_tree; }
     
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // Return/cache the result of running/evaluating this Individual's GpTree.
     std::any treeValue()
     {
@@ -186,29 +133,9 @@ public:
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260115 the day after I deleted this, I realized I still needed it
-
-//    // Get/set this Individual's FunctionSet. (Same API as Population.)
-//    const FunctionSet* getFunctionSet() const { return function_set_; }
-//    void setFunctionSet(const FunctionSet* fs) { function_set_ = fs; }
-
     // Get/set this Individual's FunctionSet. (Same API as Population.)
-    const FunctionSet* getFunctionSet() const
-    {
-        assert((function_set_ == FunctionSet::xxx_current_fs) or
-               (nullptr == FunctionSet::xxx_current_fs));
-        return function_set_;
-    }
-    void setFunctionSet(const FunctionSet* fs)
-    {
-        function_set_ = fs;
-        assert((function_set_ == FunctionSet::xxx_current_fs) or
-               (nullptr == FunctionSet::xxx_current_fs));
-    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    const FunctionSet* getFunctionSet() const { return function_set_; }
+    void setFunctionSet(const FunctionSet* fs) { function_set_ = fs; }
 
 private:
     GpTree tree_;

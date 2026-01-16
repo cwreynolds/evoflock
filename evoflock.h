@@ -112,226 +112,45 @@ void runOneFlockEvolution()
     
     // The number of Individuals in a population for evolutionary optimization.
     // By default it is divided into sqrt(individuals) breeding sub-populations.
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260101 try 2x run with neighborhood sensors.
-    
-//    int individuals = EF::usingGA() ? 300 : 300;
-    
-    // TODO 20260102_gp_300_pop_60000_steps
-//    int individuals = EF::usingGA() ? 300 : 600;
-    
-    // TODO 20260102_gp_150_pop_30000_steps
-
-//    int individuals = EF::usingGA() ? 300 : 300;
-    
-    // TODO 20260102_gp_200_pop_30000_steps
-//    int individuals = EF::usingGA() ? 300 : 150;
-//    int individuals = EF::usingGA() ? 300 : 200;
-
     int individuals = EF::usingGA() ? 300 : 300;
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     int subpops = std::round(std::sqrt(individuals));
     
     // Total number of Individual update steps. (Steady state update stepss. For
     // a generational GA, this corresponds to (max_evolution_steps / individuals)
     // generations. So 30000 / 300 = 100 "generation equivalents.")
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260101 try 2x run with neighborhood sensors.
-//    int max_evolution_steps = 30000;
-
-    // TODO 20260102_gp_150_pop_30000_steps
-
-//    int max_evolution_steps = 60000;
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260110 stop HW inject, tree size from 20-50 to 5-60, 60000 steps.
-//    int max_evolution_steps = 30000;
-//    int max_evolution_steps = 60000;
     int max_evolution_steps = 30000;
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
-      
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251221 change logging for population sensor API.
 
-//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
-
-//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251229 reduce max tree size from 50 to 40
-
-//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20251230 increase max tree size from 40 to 60
-
-//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 40 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 40 : ga_tree_size;
-
-    // TODO 20260103_gp_try_smaller_trees (again)
-    
-//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20260105 trying bigger trees again
-    
-//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 35 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 35 : ga_tree_size;
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260110 stop HW inject, tree size from 20-50 to 5-60, 60000 steps.
-    
-//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 50 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 50 : ga_tree_size;
-
-    int min_crossover_tree_size = EF::usingGP() ?  5 : 2;
+    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
     int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
     int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     debugPrint(min_crossover_tree_size);
     debugPrint(max_crossover_tree_size);
     debugPrint(max_initial_tree_size);
     
     LP::Population* population = nullptr;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251222 why no sensor check during create population?
-    
-//    const LP::FunctionSet& fs = (EF::usingGP() ?
-//                          //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-//                          // TODO 20251218 WIP on general purpose "is this tree OK" predicate.
-//                          //                          GP::evoflock_gp_function_set() :
-//                          GP::evoflockGpFunctionSet() :
-//                          //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-//                          GP::evoflock_ga_function_set());
-    
 
-//    LP::FunctionSet fs = (EF::usingGP() ?
-//                          GP::evoflockGpFunctionSet() :
-//                          GP::evoflock_ga_function_set());
-  
-//    LP::FunctionSet fs = (EF::usingGP() ?
-//                          GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
-//                          GP::evoflock_ga_function_set());
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260115 the day after I deleted this, I realized I still needed it
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20251222 hack to fix sometimes-it-works/sometimes-it-doesn't problem
-    // with GP::evoflockGpValidateTree(). I had been copying the FS so I could
-    // modify its mode (separately for GA and GP). Here I changed it to save a
-    // reference to the FS instead (first saving a copy of the GA FS). This
-    // seems to work but I don't know why. Need to test GA for regression.
-//    LP::FunctionSet fs_ga = GP::evoflock_ga_function_set();
-//    LP::FunctionSet& fs = (EF::usingGP() ?
-//                           GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
-//                           fs_ga);
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    
-//    LP::FunctionSet fs_ga = GP::evoflock_ga_function_set();
-//    LP::FunctionSet fs = (EF::usingGP() ?
-//                          GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
-//                          fs_ga);
-
-//    LP::FunctionSet fs = (EF::usingGP() ?
-//                          GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
-//                          GP::evoflock_ga_function_set());
-
-//    LP::FunctionSet fs = (EF::usingGP() ?
-//                          GP::evoflockGpFunctionSet() :
-//                          GP::evoflock_ga_function_set());
-    
-//    LP::FunctionSet fs = (EF::usingGP() ?
-//                          GP::evoflockGpFunctionSet() :
-//                          GP::evoflock_ga_function_set());
-
-
-
-    // 11:30am trying to get back to working
-//    LP::FunctionSet fs_ga = GP::evoflock_ga_function_set();
-
-    //    LP::FunctionSet& fs = (EF::usingGP() ?
-//                           GP::evoflock_gp_function_set_cached_ : // !!!!!!!!!!!!!!!
-//                           fs_ga);
-
-    LP::FunctionSet fs_ga = GP::evoflock_ga_function_set();
-    LP::FunctionSet& fs = EF::usingGP() ? GP::evoflockGpFunctionSet() : fs_ga;
-
-    LP::FunctionSet::xxx_current_fs = &fs;
-    
+    // I would have just copied the FunctionSet objects, but that caused a
+    // mysterious bug where GP::evoflockGpValidateTree() seemed to always
+    // classify as not valid. Ended up changing the GA/GP side to return a
+    // reference to ab FS object with modes pre-set.
+    LP::FunctionSet& fs = (EF::usingGP() ?
+                           GP::evoflockGpFunctionSet() :
+                           GP::evoflockGaFunctionSet());
     LP::FunctionSet::reset_smallest_init_tree_xxx();
+    fs.print();
 
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260115 the day after I deleted this, I realized I still needed it
-    assert(LP::FunctionSet::xxx_current_fs == &fs);
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    
     // Hack to optionally visualize a previously logged result. Runs flock sim,
     // with graphics, for the GA FlockParameters or GP source code written
     // inline in this function's definition.
     visualizePreviouslyLoggedFlockParameters(fs);
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    fs.print();
-    
+
     {
         std::cout << "Create population, individuals = " << individuals;
         std::cout << ", subpops/demes = " << subpops << std::endl;
         util::Timer t("Create population.");
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260114 assume increasing_initial_tree_size is true.
-//        LP::Individual::increasing_initial_tree_size = true;
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        if (EF::usingGP())
-        {
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20260115 the day after I deleted this, I realized I still needed it
-            assert(LP::FunctionSet::xxx_current_fs == &fs);
-
-//            fs.setValidateTreeFunction(GP::evoflockGpValidateTree);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        }
-        else
-        {
-            fs.setCrossoverFunction(GP::evoflock_ga_crossover);
-        }
-        
-        
         population = new LazyPredator::Population(individuals,
                                                   subpops,
                                                   max_initial_tree_size,

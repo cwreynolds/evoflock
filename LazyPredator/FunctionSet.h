@@ -417,7 +417,11 @@ public:
 //        return newMakeRandomTree(min_tree_size, max_tree_size, 2000);
 //        return newMakeRandomTree(min_tree_size, max_tree_size, 5000);
 //        return newMakeRandomTree(min_tree_size, max_tree_size, 10000);
-        return newMakeRandomTree(min_tree_size, max_tree_size, 20000);
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260118 oops, I suspect this was just a "up to 11" experiment
+//        return newMakeRandomTree(min_tree_size, max_tree_size, 20000);
+        return newMakeRandomTree(min_tree_size, max_tree_size, 1000);
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
     }
     

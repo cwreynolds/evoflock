@@ -714,10 +714,10 @@ inline Vec3 neighborhoodOffsetUtility(double exponent)
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     // TODO 20260107 annotation for NeighborhoodOffset
-//    auto& draw = Draw::getInstance();
-//    Vec3 me_pos = me.position();
-//    Vec3 center = me_pos + (offset_sum / weight_sum);
-//    draw.addThickLineToAnimatedFrame(me_pos, center, Color::green(), 0.02);
+    auto& draw = Draw::getInstance();
+    Vec3 me_pos = me.position();
+    Vec3 center = me_pos + (offset_sum / weight_sum);
+    draw.addThickLineToAnimatedFrame(me_pos, center, Color::green(), 0.02);
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     
     return offset_sum / weight_sum;
@@ -1405,29 +1405,12 @@ LP::FunctionSet static_gp_fs_ =
         Velocity,
         // Acceleration,
         // Forward,
-        
-
         // NearestNeighborVelocity,
         // NearestNeighborOffset,
         // NearestNeighborVelocity2,
         // NearestNeighborOffset2,
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260103 replace NeighborhoodVelocity with NeighborhoodVelocityDiff.
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260106 make evoflockGpValidateTree() use AND of ORs.
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20260117 very experimental, until right size OR "valid"
-
-//        NeighborhoodVelocity,
+        // NeighborhoodVelocity,
         NeighborhoodVelocityDiff,
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         NeighborhoodOffset,
         // First_Obs_Dist,
         // FirstObstacleNormal,

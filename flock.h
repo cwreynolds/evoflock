@@ -687,6 +687,8 @@ public:
         }
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     // Average speed for each Boid on each simulation step.
     // Disabled, always returns 1.
     double alignmentScore() const
@@ -694,8 +696,14 @@ public:
 //        double score = (sum_of_alignment_scores_over_all_boid_steps_ /
 //                        boidStepPerSim());
 //        return score;
-        return 1;
-    }
+
+//        return 1;
+        
+        return (sum_of_alignment_scores_over_all_boid_steps_ /
+                boidStepPerSim());
+}
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.

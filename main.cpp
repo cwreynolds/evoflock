@@ -14,27 +14,43 @@
 int main(int argc, const char * argv[])
 {
     EF::unit_test();
-
-//    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//    // TODO 20251210 test emphasizeHighScores(), unit test?, reuse for sep score
-//    
-//    for (double emphasis = 0; emphasis <= 1; emphasis += 0.1)
-//    {
-//        debugPrint(emphasis);
-//        for (double score = 0; score <= 1; score += 0.1)
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20260116 what distribution of tree sizes for give max size?
+    
+//        const LP::FunctionSet& fs = GP::evoflockGpFunctionSet();
+//        fs.reset_smallest_init_tree_xxx();
+//        
+//        int tree_count = 1000;
+//        double sum_of_sizes = 0;
+//        
+//        std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+//
+//        for (int i = 0; i < tree_count; i++)
 //        {
-//            double s2 = Flock::emphasizeHighScores(score, emphasis);
-//            std::cout << std::format("{:.2}→{:.2}, ", score, s2);
+//            LP::GpTree tree;
+//            
+//    //        fs.makeRandomTree(max_size, tree);
+//    //        tree = fs.newMakeRandomTree(50, 100);
+//    //        tree = fs.newMakeRandomTree(10, 25);
+//    //        tree = fs.newMakeRandomTree(15, 25);
+//    //        fs.makeRandomTree(200, tree);
+//    //        fs.makeRandomTree(1000, tree);
+//            tree = fs.newMakeRandomTree(20, 100);
+//            
+//            sum_of_sizes += tree.size();
+//    //        debugPrint(tree.size());
 //        }
-//        std::cout << std::endl << std::endl;
-//    }
-//    exit(EXIT_SUCCESS);
-//    
-//    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//        
+//        std::cout << "Size average over " << tree_count << " trees = ";
+//        std::cout << sum_of_sizes / tree_count << std::endl;
+//        exit(EXIT_SUCCESS);
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
 
     EF::runOneFlockEvolution();
-//    EF::runFlockEvolutionLoop();
-//    best_fits_histogram();
+    // EF::runFlockEvolutionLoop();
     
     Draw::deleteInstance();
     return EXIT_SUCCESS;

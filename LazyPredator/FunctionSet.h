@@ -443,7 +443,16 @@ public:
 //            makeRandomTree(max_tree_size * 1.5, temp_tree);
 //            makeRandomTree(max_tree_size * 1.2, temp_tree);
 //            makeRandomTree(max_tree_size, temp_tree);
-            makeRandomTree(max_tree_size * 2, temp_tree);
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20260116 what distribution of tree sizes for give max size?
+
+//            makeRandomTree(max_tree_size * 2, temp_tree);
+            makeRandomTree(max_tree_size * 10, temp_tree);
+//            makeRandomTree(max_tree_size * 50, temp_tree);
+//            makeRandomTree(max_tree_size * 100, temp_tree);
+//            makeRandomTree(max_tree_size * 1000, temp_tree);
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
 
             // NOTE: this same code pattern in Population::evolutionStep().
@@ -453,6 +462,18 @@ public:
                 new_tree = temp_tree;
                 break;
             }
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20260117 very experimental, until right size OR "valid"
+            
+            if (treeValidatorCustomized() and treeConstraintsOK(temp_tree))
+            {
+                new_tree = temp_tree;
+                break;
+            }
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
             // Save the temp_tree which has least size error so far.
             size_t size = temp_tree.size();
@@ -492,7 +513,17 @@ public:
             debugPrint(min_tree_size);
             debugPrint(max_tree_size);
         }
-        assert(size_ok);
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20260117 very experimental, until right size OR "valid"
+        
+//        assert(size_ok);
+
+        assert(size_ok or
+               (treeValidatorCustomized() and treeConstraintsOK(new_tree)));
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
         return new_tree;
     }
 

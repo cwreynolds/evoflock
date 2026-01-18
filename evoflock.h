@@ -122,9 +122,18 @@ void runOneFlockEvolution()
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
 
-    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20260117 very experimental, until right size OR "valid"
+
+//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+
+    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
     int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
     int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     debugPrint(min_crossover_tree_size);
     debugPrint(max_crossover_tree_size);
@@ -339,75 +348,12 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
                                          LP::Population* population)
 {
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251208 2 clauses for velocity match for 2 nearest neighbors.
 
-//    std::string gp_source =
-//    "Add3(Scale3(Add3(Sub3(NearestNeighborVelocity(), Velocity()),             \
-//                      Sub3(NearestNeighbor2Velocity(), Velocity())),    10),   \
-//          Add3(Scale3(FirstObstacleTimeLimitNormal(1),                 100),   \
-//               Add3(LengthAdjust(NearestNeighborOffset(), 10,           80),   \
-//                    LengthAdjust(Velocity(), 20,                        40))))";
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20251211 change NearestNeighborOffset() r=target from 10(!) to 5.
-
-//    std::string hand_written_gp_source =
-//    "Add3(Scale3(Sub3(NearestNeighborVelocity(), Velocity()),          20),   \
-//          Add3(Scale3(Sub3(NearestNeighbor2Velocity(), Velocity()),    20),   \
-//               Add3(Scale3(FirstObstacleTimeLimitNormal(1),           100),   \
-//                    Add3(LengthAdjust(NearestNeighborOffset(), 10,     80),   \
-//                         LengthAdjust(Velocity(), 20,                  40)))))";
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251212 add NearestNeighborOffset2
-
-//    std::string hand_written_gp_source =
-//    "Add3(Scale3(Sub3(NearestNeighborVelocity(), Velocity()),          20),   \
-//          Add3(Scale3(Sub3(NearestNeighbor2Velocity(), Velocity()),    20),   \
-//               Add3(Scale3(FirstObstacleTimeLimitNormal(1),           100),   \
-//                    Add3(LengthAdjust(NearestNeighborOffset(), 5,      80),   \
-//                         LengthAdjust(Velocity(), 20,                  40)))))";
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251212 fix target (AGAIN!) for center of separation range.
-
-//    std::string hand_written_gp_source =
-//    "Add3(Add3(Scale3(Sub3(NearestNeighborVelocity(),  Velocity()),  20),    \
-//               Scale3(Sub3(NearestNeighborVelocity2(), Velocity()),  20)),   \
-//          Add3(Add3(LengthAdjust(NearestNeighborOffset(),  5,        80),    \
-//                    LengthAdjust(NearestNeighborOffset2(), 5,        80)),   \
-//               Add3(Scale3(FirstObstacleTimeLimitNormal(1),         100),    \
-//                    LengthAdjust(Velocity(), 20,                     40))))";
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20260108 try new handwritten tree using "neighborhood" GpFuncs
-
-//    std::string hand_written_gp_source =
-//    "Add3(Add3(Scale3(Sub3(NearestNeighborVelocity(),  Velocity()),  20),    \
-//               Scale3(Sub3(NearestNeighborVelocity2(), Velocity()),  20)),   \
-//          Add3(Add3(LengthAdjust(NearestNeighborOffset(),  3,        80),    \
-//                    LengthAdjust(NearestNeighborOffset2(), 3,        80)),   \
-//               Add3(Scale3(FirstObstacleTimeLimitNormal(1),         100),    \
-//                    LengthAdjust(Velocity(), 20,                     40))))";
-
-//    std::string hand_written_gp_source =
-//    "Add3(LengthAdjust(NeighborhoodVelocityDiff(1.2), 0, 100),  \
-//          Add3(LengthAdjust(NeighborhoodOffset(1.2), 6,   90),  \
-//               Add3(Scale3(ObstacleCollisionNormal(1),    80),  \
-//                    LengthAdjust(Velocity(), 20,          70))))";
-
-//    std::string hand_written_gp_source =
-//    "Add3(LengthAdjust(NeighborhoodVelocityDiff(1.2), 0,  80),  \
-//          Add3(LengthAdjust(NeighborhoodOffset(1.2), 6,   70),  \
-//               Add3(Scale3(ObstacleCollisionNormal(1),   100),  \
-//                    LengthAdjust(Velocity(), 20,          90))))";
-
-//    std::string hand_written_gp_source =
-//    "Add3(LengthAdjust(NeighborhoodVelocityDiff(1.2), 0,  8),  \
-//          Add3(LengthAdjust(NeighborhoodOffset(1.2), 6,   7),  \
-//               Add3(Scale3(ObstacleCollisionNormal(1),   10),  \
-//                    LengthAdjust(Velocity(), 20,          9))))";
+    // std::string hand_written_gp_source =
+    // "Add3(LengthAdjust(NeighborhoodVelocityDiff(1.2), 0,  8),  \
+    //       Add3(LengthAdjust(NeighborhoodOffset(1.2), 6,   7),  \
+    //            Add3(Scale3(ObstacleCollisionNormal(1),   10),  \
+    //                 LengthAdjust(Velocity(), 20,          9))))";
 
     // 20260108
     std::string hand_written_gp_source =
@@ -415,16 +361,6 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
           Add3(LengthAdjust(NeighborhoodOffset(1.2), 6,   2),  \
                Add3(Scale3(ObstacleCollisionNormal(1),   10),  \
                     LengthAdjust(Velocity(), 20,          1))))";
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     LP::GpTree compiled_tree = fs.compile(hand_written_gp_source);
     auto inject = [&](LP::Individual* individual)

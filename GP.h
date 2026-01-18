@@ -280,8 +280,16 @@ bool evoflockGpValidateTree(const LP::GpTree& tree,
     vecOfVecOfStrings required_gp_funcs =
     {
         { "Velocity" },
-        { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20260117 very experimental, until right size OR "valid"
+
+//        { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
 //        { "NeighborhoodVelocityDiff", /* "NeighborhoodVelocity", */ },
+//        { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
+
+        { "NeighborhoodVelocityDiff" },
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         { "NeighborhoodOffset" },
         { "ObstacleCollisionNormal" }
     };
@@ -1409,9 +1417,14 @@ LP::FunctionSet static_gp_fs_ =
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20260106 make evoflockGpValidateTree() use AND of ORs.
 
-        NeighborhoodVelocity,
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20260117 very experimental, until right size OR "valid"
+
+//        NeighborhoodVelocity,
         NeighborhoodVelocityDiff,
-        
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

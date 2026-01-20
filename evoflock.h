@@ -311,30 +311,104 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
     {
         // To visualize a GpTree (source code) from a previous GP run.
         
-        // 20260110
-        std::string gp_source =
-        "Add3(LengthAdjust(Velocity(),  \
-                          18.4136,  \
-                          20.7732),  \
-             Add3(LengthAdjust(NeighborhoodOffset(-0.762564),  \
-                               19.7924,  \
-                               -0.688828),  \
-                  Add3(Scale3(Add3(LengthAdjust(NeighborhoodVelocityDiff(1.47306),  \
-                                                0.559172,  \
-                                                -2.23372),  \
-                                   Add3(LengthAdjust(NeighborhoodOffset(8.79137),  \
-                                                     2.62476,  \
-                                                     -0.899679),  \
-                                        Add3(Scale3(ObstacleCollisionNormal(0.408902),  \
-                                                    10.4109),  \
-                                             LengthAdjust(Velocity(),  \
-                                                          20.8701,  \
-                                                          4.28683)))),  \
-                              14.7764),  \
-                       LengthAdjust(NeighborhoodVelocityDiff(2.90797),  \
-                                    2.13027,  \
-                                    -1.23851))))";
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260118 add today's best.
+        
+//        // 20260110
+//        std::string gp_source =
+//        "Add3(LengthAdjust(Velocity(),  \
+//                          18.4136,  \
+//                          20.7732),  \
+//             Add3(LengthAdjust(NeighborhoodOffset(-0.762564),  \
+//                               19.7924,  \
+//                               -0.688828),  \
+//                  Add3(Scale3(Add3(LengthAdjust(NeighborhoodVelocityDiff(1.47306),  \
+//                                                0.559172,  \
+//                                                -2.23372),  \
+//                                   Add3(LengthAdjust(NeighborhoodOffset(8.79137),  \
+//                                                     2.62476,  \
+//                                                     -0.899679),  \
+//                                        Add3(Scale3(ObstacleCollisionNormal(0.408902),  \
+//                                                    10.4109),  \
+//                                             LengthAdjust(Velocity(),  \
+//                                                          20.8701,  \
+//                                                          4.28683)))),  \
+//                              14.7764),  \
+//                       LengthAdjust(NeighborhoodVelocityDiff(2.90797),  \
+//                                    2.13027,  \
+//                                    -1.23851))))";
 
+//        // 20260117_gp_re-enable_alignment -- 20260118_gp_fewer_retry_tree_init
+//        std::string gp_source =
+//        "Add3(Div3(Add3(LengthAdjust(Div3(Scale3(Div3(LengthAdjust(NeighborhoodOffset(1.14937), \
+//                                                                  13.0763, \
+//                                                                  88.5217), \
+//                                                     2.45265), \
+//                                                1.91974), \
+//                                         2.41891), \
+//                                    26.7903, \
+//                                    36.0278), \
+//                       Velocity()), \
+//                  3.37266), \
+//             Add3(Sub3(Sub3(Sub3(NeighborhoodVelocityDiff(1.36538), \
+//                                 LengthAdjust(Sub3(NeighborhoodVelocityDiff(1.28684), \
+//                                                   LengthAdjust(Scale3(Div3(LengthAdjust(Velocity(), \
+//                                                                                         20.1294, \
+//                                                                                         51.9071), \
+//                                                                            3.1816), \
+//                                                                       5.22176), \
+//                                                                11.1512, \
+//                                                                29.2247)), \
+//                                              2.54187, \
+//                                              41.6189)), \
+//                            Div3(Velocity(), \
+//                                 5.7574)), \
+//                       LengthAdjust(ObstacleCollisionNormal(0.903173), \
+//                                    85.3268, \
+//                                    -60.5663)), \
+//                  LengthAdjust(Div3(LengthAdjust(ObstacleCollisionNormal(0.358852), \
+//                                                 67.4465, \
+//                                                 33.6657), \
+//                                    4.3167), \
+//                               18.6311, \
+//                               74.6501)))";
+  
+//        // 20260118_gp_exponentiate
+//        std::string gp_source = "Sub3(Sub3(Scale3(LengthAdjust(Scale3(Div3(ObstacleCollisionNormal(0.50754), 2.2431), 9.86361), 55.8529, 72.8472), 4.11306), LengthAdjust(Scale3(Sub3(Scale3(Scale3(Div3(Sub3(NeighborhoodVelocityDiff(1.29208), LengthAdjust(LengthAdjust(Velocity(), 20.1216, 83.6724), 60.3436, 21.1387)), 1.80084), 5.56177), 7.40495), LengthAdjust(Div3(Div3(NeighborhoodOffset(1.98051), 6.95959), 9.88759), 12.129, 58.0658)), 2.63974), 39.4009, 87.1055)), Div3(NeighborhoodOffset(1.64434), 9.09468))";
+
+        // 20260119_gp_only_expt_separation_2
+        std::string gp_source =
+        "Add3(Sub3(Add3(Scale3(NeighborhoodVelocityDiff(0.981347), \
+                              8.81377), \
+                       Add3(Sub3(Sub3(Add3(LengthAdjust(LengthAdjust(Velocity(), \
+                                                                     8.11177, \
+                                                                     -11.4987), \
+                                                        24.0162, \
+                                                        -49.1329), \
+                                           Add3(Sub3(LengthAdjust(LengthAdjust(Velocity(), \
+                                                                               20.9619, \
+                                                                               -17.6903), \
+                                                                  26.7431, \
+                                                                  -92.4291), \
+                                                     Scale3(LengthAdjust(ObstacleCollisionNormal(0.617278), \
+                                                                         7.00654, \
+                                                                         -43.2003), \
+                                                            9.15498)), \
+                                                NeighborhoodVelocityDiff(1.11207))), \
+                                      LengthAdjust(NeighborhoodOffset(1.34865), \
+                                                   29.0255, \
+                                                   0.912394)), \
+                                 LengthAdjust(NeighborhoodOffset(1.26283), \
+                                              40.5006, \
+                                              24.6023)), \
+                            NeighborhoodVelocityDiff(1.05209))), \
+                  LengthAdjust(NeighborhoodOffset(0.957626), \
+                               13.7668, \
+                               -3.53544)), \
+             Scale3(NeighborhoodOffset(1.00308), \
+                    4.01942))";
+
+        
         LP::GpTree tree = fs.compile(gp_source);
         LP::Individual individual(tree, fs);
         EF::enable_multithreading = false;

@@ -454,7 +454,17 @@ public:
         double average_score = separation_score_sum_ / boidStepPerSim();
 //        return std::pow(average_score, 2);
 //        return std::pow(average_score, 1.5);
-        return average_score;
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260118 expt separate fitness, speed fitness, alignment fitness
+//        return average_score;
+        
+//        return std::pow(average_score, 3);
+        
+        // TODO 20260119 expt separate fitness (3->2), undo speed and alignment.
+//        return std::pow(average_score, 2);
+        return std::pow(average_score, 1.5);
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -619,7 +629,17 @@ public:
     // Average speed for each Boid on each simulation step.
     double speedScore() const
     {
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260118 expt separate fitness, speed fitness, alignment fitness
+        
+//        return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
+        
+//        double score = (sum_of_speed_scores_over_all_boid_steps_ /
+//                        boidStepPerSim());
+//        return std::pow(score, 3);
+        
         return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
     
     double curvatureScore() const
@@ -693,15 +713,29 @@ public:
     // Disabled, always returns 1.
     double alignmentScore() const
     {
+        //        double score = (sum_of_alignment_scores_over_all_boid_steps_ /
+        //                        boidStepPerSim());
+        //        return score;
+        
+        //        return 1;
+        
+        //        return (sum_of_alignment_scores_over_all_boid_steps_ /
+        //                boidStepPerSim());
+        
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260118 expt separate fitness, speed fitness, alignment fitness
+        
 //        double score = (sum_of_alignment_scores_over_all_boid_steps_ /
 //                        boidStepPerSim());
-//        return score;
-
-//        return 1;
+//        return std::pow(score, 3);
+        
         
         return (sum_of_alignment_scores_over_all_boid_steps_ /
                 boidStepPerSim());
-}
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

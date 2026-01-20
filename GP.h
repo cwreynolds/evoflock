@@ -712,13 +712,13 @@ inline Vec3 neighborhoodOffsetUtility(double exponent)
         weight_sum += weight;
     }
     
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-    // TODO 20260107 annotation for NeighborhoodOffset
-    auto& draw = Draw::getInstance();
-    Vec3 me_pos = me.position();
-    Vec3 center = me_pos + (offset_sum / weight_sum);
-    draw.addThickLineToAnimatedFrame(me_pos, center, Color::green(), 0.02);
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//    // TODO 20260107 annotation for NeighborhoodOffset
+//    auto& draw = Draw::getInstance();
+//    Vec3 me_pos = me.position();
+//    Vec3 center = me_pos + (offset_sum / weight_sum);
+//    draw.addThickLineToAnimatedFrame(me_pos, center, Color::green(), 0.02);
+//    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     
     return offset_sum / weight_sum;
 }

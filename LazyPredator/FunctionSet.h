@@ -459,6 +459,12 @@ public:
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
 
+            if (treeValidatorCustomized() and treeConstraintsOK(temp_tree))
+            {
+                new_tree = temp_tree;
+                break;
+            }
+            
             // NOTE: this same code pattern in Population::evolutionStep().
             // When we find one that meets the size constraint exit retry loop.
             if (treeSizeOK(temp_tree, min_tree_size, max_tree_size))
@@ -466,18 +472,6 @@ public:
                 new_tree = temp_tree;
                 break;
             }
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20260117 very experimental, until right size OR "valid"
-            
-            if (treeValidatorCustomized() and treeConstraintsOK(temp_tree))
-            {
-                new_tree = temp_tree;
-                break;
-            }
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
 
             // Save the temp_tree which has least size error so far.
             size_t size = temp_tree.size();

@@ -682,30 +682,77 @@ public:
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20251208 score for boid alignment.
     
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20260121 this sums signed dot products, then clips off negative
+    // values -- is that correct? should the clip be BEFORE the sum?
+    // This change is 20260121_gp_change_curvature_score
+    
+//        // Accumulators for alignment score.
+//        // TODO Relocate in file?
+//        double sum_of_alignment_scores_over_all_boid_steps_ = 0;
+//
+//        // Called each simulation step, records alignment score.
+//        void recordAlignmentScorePerStep()
+//        {
+//            for (auto b : boids())
+//            {
+//                double sum_of_alignments = 0;
+//                for (Boid* n : b->nearest_neighbors())
+//                {
+//                    double d = Vec3::dot(b->forward(), n->forward());
+//                    sum_of_alignments += d;
+//                }
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//                // TODO 20251210 oops, meant to clip, not abs.
+//    //            sum_of_alignments = std::abs(sum_of_alignments);
+//                sum_of_alignments = std::max(0.0, sum_of_alignments);
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//                sum_of_alignments /= b->nearest_neighbors().size();
+//                sum_of_alignment_scores_over_all_boid_steps_ += sum_of_alignments;
+//            }
+//        }
+    
     // Accumulators for alignment score.
     // TODO Relocate in file?
     double sum_of_alignment_scores_over_all_boid_steps_ = 0;
+
+//        // Called each simulation step, records alignment score.
+//        void recordAlignmentScorePerStep()
+//        {
+//            for (auto b : boids())
+//            {
+//                double sum_of_alignments = 0;
+//                for (Boid* n : b->nearest_neighbors())
+//                {
+//                    double d = Vec3::dot(b->forward(), n->forward());
+//    //                sum_of_alignments += d;
+//                    sum_of_alignments += std::max(0.0, d);  // sum dot prod > 0
+//                }
+//    //            sum_of_alignments = std::max(0.0, sum_of_alignments);
+//                sum_of_alignments /= b->nearest_neighbors().size();
+//                sum_of_alignment_scores_over_all_boid_steps_ += sum_of_alignments;
+//            }
+//        }
 
     // Called each simulation step, records alignment score.
     void recordAlignmentScorePerStep()
     {
         for (auto b : boids())
         {
-            double sum_of_alignments = 0;
+            double sum_pos_aligns = 0;
             for (Boid* n : b->nearest_neighbors())
             {
                 double d = Vec3::dot(b->forward(), n->forward());
-                sum_of_alignments += d;
+//                sum_pos_aligns += std::max(0.0, d);  // sum dot prod > 0
+                if (d > 0) { sum_pos_aligns += d; }
             }
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20251210 oops, meant to clip, not abs.
-//            sum_of_alignments = std::abs(sum_of_alignments);
-            sum_of_alignments = std::max(0.0, sum_of_alignments);
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            sum_of_alignments /= b->nearest_neighbors().size();
-            sum_of_alignment_scores_over_all_boid_steps_ += sum_of_alignments;
+            sum_pos_aligns /= b->nearest_neighbors().size();  // ave pos align
+            sum_of_alignment_scores_over_all_boid_steps_ += sum_pos_aligns;
         }
     }
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     

@@ -52,66 +52,157 @@ inline double scalarize_fitness_hyperVolume(MOF mof) {return mof.hyperVolume();}
 inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
 
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20260121 use EF::add_curvature_objective for GP MOFs
+
+//    // Component names for MOF (multi-objective fitness) values (by mode settings).
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (EF::add_curvature_objective ?
+//                 std::vector<std::string>(
+//                                          {
+//                                              "avoid",
+//                                              "separate",
+//                                              "speed",
+//                                              "curvature"
+//                                          }) :
+//
+//                (EF::usingGA() ?
+//                 std::vector<std::string>(
+//                                          {
+//                                              "avoid",
+//                                              "separate",
+//                                              "speed"
+//                                          }) :
+//
+//                 std::vector<std::string>(
+//                                          {
+//                                              "avoid",
+//                                              "separate",
+//                                              "speed",
+//                                              "alignment"
+//                                          })
+//                 ));
+//    }
+
 // Component names for MOF (multi-objective fitness) values (by mode settings).
 inline std::vector<std::string> mof_names()
 {
-    return (EF::add_curvature_objective ?
+    return (EF::usingGA() ?
+            // GA
+            (EF::add_curvature_objective ?
+             // GA with curvature
              std::vector<std::string>(
                                       {
                                           "avoid",
                                           "separate",
                                           "speed",
                                           "curvature"
-                                      }) :
-            
-            (EF::usingGA() ?
+                                      }):
+             // GA without curvature
              std::vector<std::string>(
                                       {
                                           "avoid",
                                           "separate",
                                           "speed"
-                                      }) :
-             
-             std::vector<std::string>(
-                                      {
-                                          "avoid",
-                                          "separate",
-                                          "speed",
-                                          "alignment"
-                                      })
-             ));
+                                      })) :
+             // GP
+             (EF::add_curvature_objective ?
+              // GP with curvature
+              std::vector<std::string>(
+                                       {
+                                           "avoid",
+                                           "separate",
+                                           "speed",
+                                           "alignment",
+                                           "curvature"
+                                       }) :
+              // GP without curvature
+              std::vector<std::string>(
+                                       {
+                                           "avoid",
+                                           "separate",
+                                           "speed",
+                                           "alignment",
+                                       })));
 }
 
+
+//    // After a Flock's simulation has been run, it is passed here to build its multi
+//    // objective fitness object from metrics saved inside the Flock object.
+//    inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
+//    {
+//        return (EF::add_curvature_objective ?
+//                MOF(
+//                   {
+//                       flock.obstacleCollisionsScore(),
+//                       flock.separationScore(),
+//                       flock.speedScore(),
+//                       flock.curvatureScore()
+//                   }) :
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                // TODO 20251208 score for boid alignment.
+//    //            MOF(
+//    //                {
+//    //                    flock.obstacleCollisionsScore(),
+//    //                    flock.separationScore(),
+//    //                    flock.speedScore()
+//    //                })
+//    //            );
+//
+//                (EF::usingGA() ?
+//                 MOF(
+//                     {
+//                         flock.obstacleCollisionsScore(),
+//                         flock.separationScore(),
+//                         flock.speedScore()
+//                     }) :
+//                 MOF(
+//                     {
+//                         flock.obstacleCollisionsScore(),
+//                         flock.separationScore(),
+//                         flock.speedScore(),
+//                         flock.alignmentScore()
+//                     })
+//                 ));
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//    }
 
 // After a Flock's simulation has been run, it is passed here to build its multi
 // objective fitness object from metrics saved inside the Flock object.
 inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 {
-    return (EF::add_curvature_objective ?
-            MOF(
-               {
-                   flock.obstacleCollisionsScore(),
-                   flock.separationScore(),
-                   flock.speedScore(),
-                   flock.curvatureScore()
-               }) :
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20251208 score for boid alignment.
-//            MOF(
-//                {
-//                    flock.obstacleCollisionsScore(),
-//                    flock.separationScore(),
-//                    flock.speedScore()
-//                })
-//            );
-            
-            (EF::usingGA() ?
+    return (EF::usingGA() ?
+            // GA
+            (EF::add_curvature_objective ?
+             // GA with curvature
              MOF(
                  {
                      flock.obstacleCollisionsScore(),
                      flock.separationScore(),
-                     flock.speedScore()
+                     flock.speedScore(),
+                     flock.curvatureScore()
                  }) :
+             // GA without curvature
+             MOF(
+                 {
+                     flock.obstacleCollisionsScore(),
+                     flock.separationScore(),
+                     flock.speedScore(),
+                 })
+             ) :
+            // GP
+            (EF::add_curvature_objective ?
+             // GP with curvature
+             MOF(
+                 {
+                     flock.obstacleCollisionsScore(),
+                     flock.separationScore(),
+                     flock.speedScore(),
+                     flock.alignmentScore(),
+                     flock.curvatureScore()
+                 }) :
+             // GP without curvature
              MOF(
                  {
                      flock.obstacleCollisionsScore(),
@@ -120,8 +211,9 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
                      flock.alignmentScore()
                  })
              ));
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 }
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Initialize basic run parameters of Flock object
 inline void init_flock(Flock& flock)

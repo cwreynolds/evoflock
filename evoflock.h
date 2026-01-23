@@ -47,7 +47,8 @@ inline static double roll_rate = 0.99;
 
 // Global switch (temp?) enables 4th objective component for boosting curvature.
 //inline static bool add_curvature_objective = false;
-inline static bool add_curvature_objective = true;
+//inline static bool add_curvature_objective = true;
+inline static bool add_curvature_objective = false;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -127,9 +128,18 @@ void runOneFlockEvolution()
 //    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
 //    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
 
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+    // TODO 20260122 start-end max tree size
+    
+    // Oh, this is for crossover, which does not yet use FS::genericTreeMaker()
+    double start_max_tree_size = 30;
+    double end_max_tree_size = 60;
+
     int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
     int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
     int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+    
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -146,6 +156,11 @@ void runOneFlockEvolution()
     LP::FunctionSet& fs = (EF::usingGP() ?
                            GP::evoflockGpFunctionSet() :
                            GP::evoflockGaFunctionSet());
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+    // TODO 20260122 new generic tree maker with size and style constraints
+    fs.setMinTreeSize(min_crossover_tree_size);
+    fs.setMaxTreeSize(max_crossover_tree_size);
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
     LP::FunctionSet::reset_smallest_init_tree_xxx();
     fs.print();
 
@@ -193,6 +208,16 @@ void runOneFlockEvolution()
         {
             // Exit if user interactively quits run.
             if (Draw::getInstance().exitFromRun()) { break; }
+            //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
+            // TODO 20260122 start-end max tree size
+
+            // Oh, this is for crossover, which does not yet use FS::genericTreeMaker()
+            
+//            fs.setMaxTreeSize(util::interpolate(float(i) / max_evolution_steps,
+//                                                float(start_max_tree_size),
+//                                                float(end_max_tree_size)));
+            
+            //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
             GP::save_fitness_time_series(*population);
             population->evolutionStep(GP::fitnessFunction, GP::scalarize_fitness);
             if ((population->getStepCount() % 100) == 0)
@@ -374,38 +399,67 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 //        // 20260118_gp_exponentiate
 //        std::string gp_source = "Sub3(Sub3(Scale3(LengthAdjust(Scale3(Div3(ObstacleCollisionNormal(0.50754), 2.2431), 9.86361), 55.8529, 72.8472), 4.11306), LengthAdjust(Scale3(Sub3(Scale3(Scale3(Div3(Sub3(NeighborhoodVelocityDiff(1.29208), LengthAdjust(LengthAdjust(Velocity(), 20.1216, 83.6724), 60.3436, 21.1387)), 1.80084), 5.56177), 7.40495), LengthAdjust(Div3(Div3(NeighborhoodOffset(1.98051), 6.95959), 9.88759), 12.129, 58.0658)), 2.63974), 39.4009, 87.1055)), Div3(NeighborhoodOffset(1.64434), 9.09468))";
 
-        // 20260119_gp_only_expt_separation_2
-        std::string gp_source =
-        "Add3(Sub3(Add3(Scale3(NeighborhoodVelocityDiff(0.981347), \
-                              8.81377), \
-                       Add3(Sub3(Sub3(Add3(LengthAdjust(LengthAdjust(Velocity(), \
-                                                                     8.11177, \
-                                                                     -11.4987), \
-                                                        24.0162, \
-                                                        -49.1329), \
-                                           Add3(Sub3(LengthAdjust(LengthAdjust(Velocity(), \
-                                                                               20.9619, \
-                                                                               -17.6903), \
-                                                                  26.7431, \
-                                                                  -92.4291), \
-                                                     Scale3(LengthAdjust(ObstacleCollisionNormal(0.617278), \
-                                                                         7.00654, \
-                                                                         -43.2003), \
-                                                            9.15498)), \
-                                                NeighborhoodVelocityDiff(1.11207))), \
-                                      LengthAdjust(NeighborhoodOffset(1.34865), \
-                                                   29.0255, \
-                                                   0.912394)), \
-                                 LengthAdjust(NeighborhoodOffset(1.26283), \
-                                              40.5006, \
-                                              24.6023)), \
-                            NeighborhoodVelocityDiff(1.05209))), \
-                  LengthAdjust(NeighborhoodOffset(0.957626), \
-                               13.7668, \
-                               -3.53544)), \
-             Scale3(NeighborhoodOffset(1.00308), \
-                    4.01942))";
+//        // 20260119_gp_only_expt_separation_2
+//        std::string gp_source =
+//        "Add3(Sub3(Add3(Scale3(NeighborhoodVelocityDiff(0.981347), \
+//                              8.81377), \
+//                       Add3(Sub3(Sub3(Add3(LengthAdjust(LengthAdjust(Velocity(), \
+//                                                                     8.11177, \
+//                                                                     -11.4987), \
+//                                                        24.0162, \
+//                                                        -49.1329), \
+//                                           Add3(Sub3(LengthAdjust(LengthAdjust(Velocity(), \
+//                                                                               20.9619, \
+//                                                                               -17.6903), \
+//                                                                  26.7431, \
+//                                                                  -92.4291), \
+//                                                     Scale3(LengthAdjust(ObstacleCollisionNormal(0.617278), \
+//                                                                         7.00654, \
+//                                                                         -43.2003), \
+//                                                            9.15498)), \
+//                                                NeighborhoodVelocityDiff(1.11207))), \
+//                                      LengthAdjust(NeighborhoodOffset(1.34865), \
+//                                                   29.0255, \
+//                                                   0.912394)), \
+//                                 LengthAdjust(NeighborhoodOffset(1.26283), \
+//                                              40.5006, \
+//                                              24.6023)), \
+//                            NeighborhoodVelocityDiff(1.05209))), \
+//                  LengthAdjust(NeighborhoodOffset(0.957626), \
+//                               13.7668, \
+//                               -3.53544)), \
+//             Scale3(NeighborhoodOffset(1.00308), \
+//                    4.01942))";
 
+        // 20260122_gp_genericTreeMaker
+        std::string gp_source =
+        "Add3(Add3(Add3(NeighborhoodOffset(1.47095), \
+                       Sub3(Add3(Add3(NeighborhoodOffset(1.33325), \
+                                      Sub3(Add3(NeighborhoodOffset(1.09238), \
+                                                Sub3(Add3(Add3(NeighborhoodVelocityDiff(1.33661), \
+                                                               Sub3(Velocity(), \
+                                                                    LengthAdjust(Velocity(), \
+                                                                                 19.4879, \
+                                                                                 -59.8654))), \
+                                                          Div3(Add3(Add3(NeighborhoodOffset(1.73836), \
+                                                                         NeighborhoodOffset(1.6515)), \
+                                                                    ObstacleCollisionNormal(0.442421)), \
+                                                               5.64864)), \
+                                                     LengthAdjust(Velocity(), \
+                                                                  16.7502, \
+                                                                  -70.9157))), \
+                                           LengthAdjust(Velocity(), \
+                                                        28.3767, \
+                                                        -52.804))), \
+                                 NeighborhoodVelocityDiff(1.20695)), \
+                            LengthAdjust(NeighborhoodOffset(1.68827), \
+                                         28.4728, \
+                                         14.4578))), \
+                  NeighborhoodVelocityDiff(1.27099)), \
+             Scale3(LengthAdjust(ObstacleCollisionNormal(0.640166), \
+                                 77.5608, \
+                                 27.6224), \
+                    9.66235))";
         
         LP::GpTree tree = fs.compile(gp_source);
         LP::Individual individual(tree, fs);

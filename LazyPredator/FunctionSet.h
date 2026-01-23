@@ -361,6 +361,10 @@ public:
         }
     }
 
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+    // TODO 20260122 new generic tree maker with size and style constraints
+
+    // OLD (delete eventually?):
     // Is this GpTree valid and in the correct size range?
     bool isTreeOK(const GpTree& tree,
                   // are these instance variable? if not shouldn't they be?
@@ -370,6 +374,13 @@ public:
         return (treeConstraintsOK(tree) and
                 treeSizeOK(tree, min_tree_size, max_tree_size));
     };
+    
+    // NEW
+    // Is this GpTree valid and in the correct size range?
+    bool isTreeOK(const GpTree& tree) const
+    {
+        return treeConstraintsOK(tree) and treeSizeOK(tree);
+    };
 
     // Does this GpTree meet any application-specific constraints?
     bool treeConstraintsOK(const GpTree& tree) const
@@ -378,6 +389,7 @@ public:
         return test_function(tree, *this);
     }
     
+    // OLD (delete eventually?):
     // Is this GpTree in the correct size range?
     bool treeSizeOK(const GpTree& tree,
                     // are these instance variable? if not shouldn't they be?
@@ -386,6 +398,15 @@ public:
     {
         return util::between(tree.size(), min_tree_size, max_tree_size);
     };
+    
+    // NEW
+    // Is this GpTree in the correct size range?
+    bool treeSizeOK(const GpTree& tree) const
+    {
+        return util::between(tree.size(), getMinTreeSize(), getMaxTreeSize());
+    };
+    
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -433,7 +454,23 @@ public:
     GpTree newMakeRandomTree(int min_tree_size,
                              int max_tree_size,
                              int retries) const
+//    GpTree newMakeRandomTree(int , int , int) const
     {
+        //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+        // TODO 20260122 new generic tree maker with size and style constraints
+        
+        generic_tree_maker_function_type raw_tree_generator = [&]()
+        {
+            GpTree tree;
+//            makeRandomTree(getMaxTreeSize() * 10, tree);
+//            makeRandomTree(getMaxTreeSize() * 5, tree);
+            makeRandomTree(getMaxTreeSize(), tree);
+            return tree;
+        };
+        return genericTreeMaker(raw_tree_generator);
+        
+        //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+
         GpTree new_tree;
         double least_size_error = std::numeric_limits<double>::infinity();
         
@@ -525,6 +562,109 @@ public:
         return new_tree;
     }
 
+    
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+    // TODO 20260122 new generic tree maker with size and style constraints
+    
+    typedef std::function<GpTree()> generic_tree_maker_function_type;
+        
+    GpTree genericTreeMaker(generic_tree_maker_function_type maker_func) const
+    {
+        return genericTreeMaker(maker_func, 50, 1000);
+    }
+
+    GpTree genericTreeMaker(generic_tree_maker_function_type maker_func,
+                            int retries_for_style,
+                            int retries_for_size) const
+    {
+
+        GpTree new_tree;
+        double least_size_error = std::numeric_limits<double>::infinity();
+        
+        // Make up to 1/3 retries attempts to find tree of the correct "style".
+        if (treeValidatorCustomized())
+        {
+//            for (int i = 0; i < retries * 0.33; i++)
+//            for (int i = 0; i < retries * 0.1; i++)
+//            for (int i = 0; i < retries * 0.02; i++)
+//            for (int i = 0; i < retries * 0.05; i++)
+            for (int i = 0; i < retries_for_style; i++)
+            {
+                GpTree candidate = maker_func();
+                if (treeConstraintsOK(candidate))
+                {
+                    new_tree = candidate;
+                    break;
+                }
+            }
+        }
+        
+        // Make up to 2/3 retries attempts to find tree near the correct size.
+        if (new_tree.empty())
+        {
+//            for (int i = 0; i < retries * 0.66; i++)
+//            for (int i = 0; i < retries * 0.9; i++)
+//            for (int i = 0; i < retries * 0.98; i++)
+//            for (int i = 0; i < retries * 0.95; i++)
+            for (int i = 0; i < retries_for_size; i++)
+            {
+                GpTree candidate = maker_func();
+                if (treeSizeOK(candidate))
+                {
+                    new_tree = candidate;
+                    break;
+                }
+                // Save the candidate which has least size error so far.
+                size_t size = candidate.size();
+                double size_error = distFromInterval(size,
+                                                     getMinTreeSize(),
+                                                     getMaxTreeSize());
+                if (least_size_error > size_error)
+                {
+                    new_tree = candidate;
+                    least_size_error = size_error;
+                }
+            }
+        }
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        debugPrint(retries_for_style)
+//        debugPrint(retries_for_size)
+        int nts = new_tree.size();
+        if (smallest_init_tree_xxx > nts) { smallest_init_tree_xxx = nts;}
+        if (biggest_init_tree_xxx < nts) { biggest_init_tree_xxx = nts;}
+        std::cout << "new_tree.size() = " << nts;
+        std::cout << " " << smallest_init_tree_xxx;
+        std::cout << " " << biggest_init_tree_xxx;
+        if (treeValidatorCustomized() and treeConstraintsOK(new_tree))
+        {
+            std::cout << "    full API usage!!";
+        }
+        std::cout << std::endl;
+        
+        assert(new_tree.is_valid());
+//        bool size_ok = treeSizeOK(new_tree, min_tree_size, max_tree_size);
+//        bool size_ok = treeSizeOK(new_tree, getMinTreeSize(), getMaxTreeSize());
+        bool size_ok = treeSizeOK(new_tree);
+        if (not size_ok)
+        {
+            std::cout << new_tree.to_string(true) << std::endl;
+            debugPrint(new_tree.size());
+            debugPrint(getMinTreeSize());
+            debugPrint(getMaxTreeSize());
+        }
+        assert(size_ok or
+               (treeValidatorCustomized() and
+                treeConstraintsOK(new_tree)));
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        
+        return new_tree;
+    }
+    
+    
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+    
+    
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20251213 try making initial trees bigger for usingGP().
@@ -887,6 +1027,22 @@ public:
         return nameToGpFunctionMap().empty() and nameToGpFunctionMap().empty();
     }
 
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+    // TODO 20260122 new generic tree maker with size and style constraints
+    void setMinTreeSize(int min_size) { min_tree_size_ = min_size; }
+    void setMaxTreeSize(int max_size) { max_tree_size_ = max_size; }
+    int getMinTreeSize() const
+    {
+        assert(min_tree_size_ >= 0);
+        return min_tree_size_;
+    }
+    int getMaxTreeSize() const
+    {
+        assert(max_tree_size_ >= 0);
+        return max_tree_size_;
+    }
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+
 private:
     // These maps are used both to store the GpType and GpFunction objects,
     // plus to look up those objects from their character string names.
@@ -907,6 +1063,21 @@ private:
     // TODO 20240305 adding crossover_function_hook_ for custom crossover.
     crossover_function_type crossover_function_hook_ = GpTree::crossover;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+    // TODO 20260122 new generic tree maker with size and style constraints
+    // Using these “null” values is to make sure are set before use. Maybe temp?
+    
+    // this version got assert fails (duh) in LP::legacy_unit_test()
+//    int min_tree_size_ = -1;
+//    int max_tree_size_ = -1;
+    
+    // do it this way for now
+    int min_tree_size_ = 1;
+    int max_tree_size_ = 100;
+
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+
 };
 
 #undef name_lookup_util

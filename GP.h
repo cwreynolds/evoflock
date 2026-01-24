@@ -414,6 +414,17 @@ void logUsageSensorAPI(const LP::Population& population)
     std::cout << " of " << count << " individuals)";
     std::cout << " use full sensor API.";
     std::cout << std::endl;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260123 use FS::genericTreeMaker() to wrap crossover
+    
+    std::cout << "    ";  // "log_prefix"
+    std::cout << "min tree size = " << population.getMinCrossoverTreeSize();
+    std::cout << std::endl;
+    std::cout << "    ";  // "log_prefix"
+    std::cout << "max tree size = " << population.getMaxCrossoverTreeSize();
+//    std::cout << std::endl;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 

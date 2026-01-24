@@ -141,59 +141,78 @@ public:
         // Create new offspring tree by crossing-over these two parents.
         GpTree new_tree;
         auto crossover = getFunctionSet()->getCrossoverFunction();
-        double least_size_error = std::numeric_limits<double>::infinity();
-
+//        double least_size_error = std::numeric_limits<double>::infinity();
         const FunctionSet& fs = *getFunctionSet();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251223 GA regression test
-
-//        debugPrint(fs.treeConstraintsOK(parent0->tree()));
-//        debugPrint(fs.treeConstraintsOK(parent1->tree()));
-
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20251221 change logging for population sensor API.
         if (EF::usingGP())
         {
             debugPrint(fs.treeConstraintsOK(parent0->tree()));
             debugPrint(fs.treeConstraintsOK(parent1->tree()));
         }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        int retries = 1000;
-        for (int r = 0; r < retries; r++)
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260123 use FS::genericTreeMaker() to wrap crossover
+        
+//        double least_size_error = std::numeric_limits<double>::infinity();
+//        int retries = 1000;
+//        for (int r = 0; r < retries; r++)
+//        {
+//            GpTree temp_tree;
+//            crossover(parent0->tree(),
+//                      parent1->tree(),
+//                      temp_tree,
+//                      getMinCrossoverTreeSize(),
+//                      getMaxCrossoverTreeSize(),
+//                      fs.getCrossoverMinSize());
+//
+//            // NOTE: this same code pattern in FS::newMakeRandomTree().
+//            // When we find one that meets the size constraint exit retry loop.
+//            if (fs.treeSizeOK(temp_tree,
+//                              getMinCrossoverTreeSize(),
+//                              getMaxCrossoverTreeSize()))
+//            {
+//                new_tree = temp_tree;
+//                break;
+//            }
+//
+//            // Save the temp_tree which has least size error so far.
+//            size_t size = temp_tree.size();
+//            double size_error = fs.distFromInterval(size,
+//                                                    getMinCrossoverTreeSize(),
+//                                                    getMaxCrossoverTreeSize());
+//            if (least_size_error > size_error)
+//            {
+//                new_tree = temp_tree;
+//                least_size_error = size_error;
+//            }
+//        }
+        
+        FunctionSet::generic_tree_maker_function_type raw_tree_generator = [&]()
         {
-            GpTree temp_tree;
+            GpTree tree;
             crossover(parent0->tree(),
                       parent1->tree(),
-                      temp_tree,
-                      getMinCrossoverTreeSize(),
-                      getMaxCrossoverTreeSize(),
-//                      getFunctionSet()->getCrossoverMinSize());
-                      fs.getCrossoverMinSize());
+                      tree,
+                      
+//                      getMinCrossoverTreeSize(),
+//                      getMaxCrossoverTreeSize(),
+//                      fs.getCrossoverMinSize()
+                      
+                      fs.getMinTreeSize(),
+                      fs.getMaxTreeSize(),
+                      fs.getMinTreeSize()
 
-            // NOTE: this same code pattern in FS::newMakeRandomTree().
-            // When we find one that meets the size constraint exit retry loop.
-            if (fs.treeSizeOK(temp_tree,
-                              getMinCrossoverTreeSize(),
-                              getMaxCrossoverTreeSize()))
-            {
-                new_tree = temp_tree;
-                break;
-            }
+                      );
+            return tree;
+        };
+        new_tree = fs.genericTreeMaker(raw_tree_generator);
 
-            // Save the temp_tree which has least size error so far.
-            size_t size = temp_tree.size();
-            double size_error = fs.distFromInterval(size,
-                                                    getMinCrossoverTreeSize(),
-                                                    getMaxCrossoverTreeSize());
-            if (least_size_error > size_error)
-            {
-                new_tree = temp_tree;
-                least_size_error = size_error;
-            }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20251223 GA regression test
-//            debugPrint(r)
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20251221 change logging for population sensor API.

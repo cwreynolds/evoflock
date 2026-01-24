@@ -213,9 +213,16 @@ void runOneFlockEvolution()
 
             // Oh, this is for crossover, which does not yet use FS::genericTreeMaker()
             
-//            fs.setMaxTreeSize(util::interpolate(float(i) / max_evolution_steps,
-//                                                float(start_max_tree_size),
-//                                                float(end_max_tree_size)));
+            double fraction = float(i) / max_evolution_steps;
+            double max_tree_size = util::interpolate(fraction,
+                                                     float(start_max_tree_size),
+                                                     float(end_max_tree_size));
+            fs.setMaxTreeSize(max_tree_size);
+            population->setMaxCrossoverTreeSize(max_tree_size);
+            
+            std::cout << "    ";  // "log_prefix"
+            debugPrint(max_tree_size);
+            std::cout << std::endl;
             
             //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
             GP::save_fitness_time_series(*population);

@@ -454,7 +454,6 @@ public:
     GpTree newMakeRandomTree(int min_tree_size,
                              int max_tree_size,
                              int retries) const
-//    GpTree newMakeRandomTree(int , int , int) const
     {
         //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
         // TODO 20260122 new generic tree maker with size and style constraints
@@ -462,8 +461,6 @@ public:
         generic_tree_maker_function_type raw_tree_generator = [&]()
         {
             GpTree tree;
-//            makeRandomTree(getMaxTreeSize() * 10, tree);
-//            makeRandomTree(getMaxTreeSize() * 5, tree);
             makeRandomTree(getMaxTreeSize(), tree);
             return tree;
         };

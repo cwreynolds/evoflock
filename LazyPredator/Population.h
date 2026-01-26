@@ -438,6 +438,36 @@ public:
         return total / getIndividualCount();
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260124 show pop tree size as min/ave/max
+
+    int minTreeSize() const
+    {
+        int min = std::numeric_limits<int>::max();
+        auto f = [&](Individual* i)
+        {
+            int size = i->tree().size();
+            if (min > size) { min = size; }
+        };
+        applyToAllIndividuals(f);
+        return min;
+    }
+    
+    int maxTreeSize() const
+    {
+        int max = std::numeric_limits<int>::lowest();
+        auto f = [&](Individual* i)
+        {
+            int size = i->tree().size();
+            if (max < size) { max = size; }
+        };
+        applyToAllIndividuals(f);
+        return max;
+    }
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Average of "tournaments survived" (or abs fitness) over all Individuals.
     float averageFitness() const
     {
@@ -503,7 +533,15 @@ public:
         std::cout << p.getStepCount() << ": t=";
         std::cout << std::setprecision(3) << elapsed_time.count() << ", ";
         std::cout << std::setprecision(default_precision);
-        std::cout << "pop ave size=" << p.averageTreeSize();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260124 show pop tree size as min/ave/max
+        
+//      std::cout << "pop ave size=" << p.averageTreeSize();
+        std::cout << "size min/ave/max=" << p.minTreeSize();
+        std::cout << "/" << p.averageTreeSize();
+        std::cout << "/" << p.maxTreeSize();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         float af = p.averageFitness();
         std::cout << " fit=";
         if (af < 100) { std::cout << af; } else { std::cout << int(af); }

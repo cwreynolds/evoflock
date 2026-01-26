@@ -564,31 +564,123 @@ public:
     // TODO 20260122 new generic tree maker with size and style constraints
     
     typedef std::function<GpTree()> generic_tree_maker_function_type;
-        
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260124 change "style" retry loop to respect size constraints
+
     GpTree genericTreeMaker(generic_tree_maker_function_type maker_func) const
     {
-        return genericTreeMaker(maker_func, 50, 1000);
+//        return genericTreeMaker(maker_func, 50, 1000);
+//        return genericTreeMaker(maker_func, 25, 2000);
+        return genericTreeMaker(maker_func, 25, 1000);
     }
 
+    
+//        GpTree genericTreeMaker(generic_tree_maker_function_type maker_func,
+//                                int retries_for_style,
+//                                int retries_for_size) const
+//        {
+//
+//            GpTree new_tree;
+//            double least_size_error = std::numeric_limits<double>::infinity();
+//
+//            // Make up to 1/3 retries attempts to find tree of the correct "style".
+//            if (treeValidatorCustomized())
+//            {
+//    //            for (int i = 0; i < retries * 0.33; i++)
+//    //            for (int i = 0; i < retries * 0.1; i++)
+//    //            for (int i = 0; i < retries * 0.02; i++)
+//    //            for (int i = 0; i < retries * 0.05; i++)
+//                for (int i = 0; i < retries_for_style; i++)
+//                {
+//                    GpTree candidate = maker_func();
+//                    if (treeConstraintsOK(candidate))
+//                    {
+//                        new_tree = candidate;
+//                        break;
+//                    }
+//                }
+//            }
+//
+//            // Make up to 2/3 retries attempts to find tree near the correct size.
+//            if (new_tree.empty())
+//            {
+//    //            for (int i = 0; i < retries * 0.66; i++)
+//    //            for (int i = 0; i < retries * 0.9; i++)
+//    //            for (int i = 0; i < retries * 0.98; i++)
+//    //            for (int i = 0; i < retries * 0.95; i++)
+//                for (int i = 0; i < retries_for_size; i++)
+//                {
+//                    GpTree candidate = maker_func();
+//                    if (treeSizeOK(candidate))
+//                    {
+//                        new_tree = candidate;
+//                        break;
+//                    }
+//                    // Save the candidate which has least size error so far.
+//                    size_t size = candidate.size();
+//                    double size_error = distFromInterval(size,
+//                                                         getMinTreeSize(),
+//                                                         getMaxTreeSize());
+//                    if (least_size_error > size_error)
+//                    {
+//                        new_tree = candidate;
+//                        least_size_error = size_error;
+//                    }
+//                }
+//            }
+//
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//    //        debugPrint(retries_for_style)
+//    //        debugPrint(retries_for_size)
+//            int nts = new_tree.size();
+//            if (smallest_init_tree_xxx > nts) { smallest_init_tree_xxx = nts;}
+//            if (biggest_init_tree_xxx < nts) { biggest_init_tree_xxx = nts;}
+//            std::cout << "new_tree.size() = " << nts;
+//            std::cout << " " << smallest_init_tree_xxx;
+//            std::cout << " " << biggest_init_tree_xxx;
+//            if (treeValidatorCustomized() and treeConstraintsOK(new_tree))
+//            {
+//                std::cout << "    full API usage!!";
+//            }
+//            std::cout << std::endl;
+//
+//            assert(new_tree.is_valid());
+//    //        bool size_ok = treeSizeOK(new_tree, min_tree_size, max_tree_size);
+//    //        bool size_ok = treeSizeOK(new_tree, getMinTreeSize(), getMaxTreeSize());
+//            bool size_ok = treeSizeOK(new_tree);
+//            if (not size_ok)
+//            {
+//                std::cout << new_tree.to_string(true) << std::endl;
+//                debugPrint(new_tree.size());
+//                debugPrint(getMinTreeSize());
+//                debugPrint(getMaxTreeSize());
+//            }
+//            assert(size_ok or
+//                   (treeValidatorCustomized() and
+//                    treeConstraintsOK(new_tree)));
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//            return new_tree;
+//        }
+
+    
     GpTree genericTreeMaker(generic_tree_maker_function_type maker_func,
                             int retries_for_style,
                             int retries_for_size) const
     {
 
         GpTree new_tree;
-        double least_size_error = std::numeric_limits<double>::infinity();
+//        double least_size_error = std::numeric_limits<double>::infinity();
         
         // Make up to 1/3 retries attempts to find tree of the correct "style".
         if (treeValidatorCustomized())
         {
-//            for (int i = 0; i < retries * 0.33; i++)
-//            for (int i = 0; i < retries * 0.1; i++)
-//            for (int i = 0; i < retries * 0.02; i++)
-//            for (int i = 0; i < retries * 0.05; i++)
             for (int i = 0; i < retries_for_style; i++)
             {
                 GpTree candidate = maker_func();
-                if (treeConstraintsOK(candidate))
+//                if (treeConstraintsOK(candidate))
+                if (treeConstraintsOK(candidate) and treeSizeOK(candidate))
                 {
                     new_tree = candidate;
                     break;
@@ -599,10 +691,7 @@ public:
         // Make up to 2/3 retries attempts to find tree near the correct size.
         if (new_tree.empty())
         {
-//            for (int i = 0; i < retries * 0.66; i++)
-//            for (int i = 0; i < retries * 0.9; i++)
-//            for (int i = 0; i < retries * 0.98; i++)
-//            for (int i = 0; i < retries * 0.95; i++)
+            double least_size_error = std::numeric_limits<double>::infinity();
             for (int i = 0; i < retries_for_size; i++)
             {
                 GpTree candidate = maker_func();
@@ -612,8 +701,9 @@ public:
                     break;
                 }
                 // Save the candidate which has least size error so far.
-                size_t size = candidate.size();
-                double size_error = distFromInterval(size,
+//                size_t size = candidate.size();
+//                double size_error = distFromInterval(size,
+                double size_error = distFromInterval(candidate.size(),
                                                      getMinTreeSize(),
                                                      getMaxTreeSize());
                 if (least_size_error > size_error)
@@ -625,8 +715,6 @@ public:
         }
         
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//        debugPrint(retries_for_style)
-//        debugPrint(retries_for_size)
         int nts = new_tree.size();
         if (smallest_init_tree_xxx > nts) { smallest_init_tree_xxx = nts;}
         if (biggest_init_tree_xxx < nts) { biggest_init_tree_xxx = nts;}
@@ -640,8 +728,6 @@ public:
         std::cout << std::endl;
         
         assert(new_tree.is_valid());
-//        bool size_ok = treeSizeOK(new_tree, min_tree_size, max_tree_size);
-//        bool size_ok = treeSizeOK(new_tree, getMinTreeSize(), getMaxTreeSize());
         bool size_ok = treeSizeOK(new_tree);
         if (not size_ok)
         {
@@ -657,7 +743,9 @@ public:
         
         return new_tree;
     }
+
     
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     
     //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
     

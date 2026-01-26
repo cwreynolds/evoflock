@@ -131,9 +131,25 @@ void runOneFlockEvolution()
     //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
     // TODO 20260122 start-end max tree size
     
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260124 change "style" retry loop to respect size constraints
+
     // Oh, this is for crossover, which does not yet use FS::genericTreeMaker()
-    double start_max_tree_size = 30;
+//    double start_max_tree_size = 30;
+//    double end_max_tree_size = 60;
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20260124 trying to time travel back to 20260121?
+    
+//    double start_max_tree_size = 40;
+//    double end_max_tree_size = 80;
+
+    double start_max_tree_size = 60;
     double end_max_tree_size = 60;
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
     int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;

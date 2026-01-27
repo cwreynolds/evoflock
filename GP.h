@@ -428,22 +428,49 @@ void logUsageSensorAPI(const LP::Population& population)
 }
 
 
-// If evolved steering seems numerically odd, substitute zero.
-inline Vec3 sanitizeEvolvedSteeringForce(Vec3 s)
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20260126 refactor GP::sanitizeEvolvedSteeringForce()
+
+//    // If evolved steering seems numerically odd, substitute zero.
+//    inline Vec3 sanitizeEvolvedSteeringForce(Vec3 s)
+//    {
+//        auto bad = [](double x)
+//        {
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20251120 more checks in sanitizeEvolvedSteeringForce
+//            if (std::isnan(x)) { debugPrint(std::isnan(x))}
+//            if (std::isinf(x)) { debugPrint(std::isinf(x))}
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO very ad hoc
+//            return not (x == 0 or util::between(std::abs(x), 0.0001, 1000));
+//        };
+//        if (bad(s.x()) or bad(s.y()) or bad(s.z())) { s = {};}
+//        return s;
+//    }
+
+
+// Detect troublesome numbers produced by an evolved program.
+inline bool troublesome(double x)
 {
-    auto bad = [](double x)
-    {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251120 more checks in sanitizeEvolvedSteeringForce
-        if (std::isnan(x)) { debugPrint(std::isnan(x))}
-        if (std::isinf(x)) { debugPrint(std::isinf(x))}
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO very ad hoc
-        return not (x == 0 or util::between(std::abs(x), 0.0001, 1000));
-    };
-    if (bad(s.x()) or bad(s.y()) or bad(s.z())) { s = {};}
-    return s;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20251120 more checks in sanitizeEvolvedSteeringForce
+    if (std::isnan(x)) { debugPrint(std::isnan(x))}
+    if (std::isinf(x)) { debugPrint(std::isinf(x))}
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO very ad hoc
+    return not (x == 0 or util::between(std::abs(x), 0.0001, 1000));
 }
+
+// If evolved steering seems numerically odd, substitute zero.
+inline Vec3 sanitizeEvolvedSteeringForce(Vec3 v)
+{
+    if (troublesome(v.x())) { return {}; }
+    if (troublesome(v.y())) { return {}; }
+    if (troublesome(v.z())) { return {}; }
+    return v;
+}
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 // Run flock simulation(s) described by the given evolutionary LP::Individual.
 // Makes "runs" simulations, in parallel if EF::enable_multithreading is set to

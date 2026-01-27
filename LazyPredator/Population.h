@@ -204,9 +204,20 @@ public:
                       
                       fs.getMinTreeSize(),
                       fs.getMaxTreeSize(),
-                      fs.getMinTreeSize()
+                      
+                      //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+                      // TODO 20260126 think I guessed wrong about changing this.
+
+//                      fs.getMinTreeSize()
+                      fs.getCrossoverMinSize()
+                      //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
                       );
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//            // TODO 20260126 think I guessed wrong about changing this.
+//            debugPrint(fs.getMinTreeSize());
+//            debugPrint(fs.getCrossoverMinSize());
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
             return tree;
         };
         new_tree = fs.genericTreeMaker(raw_tree_generator);

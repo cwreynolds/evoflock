@@ -144,17 +144,40 @@ void runOneFlockEvolution()
 //    double start_max_tree_size = 40;
 //    double end_max_tree_size = 80;
 
-    double start_max_tree_size = 60;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260126 change start/end max tree size from 60/60 to 20/60
+
+//    double start_max_tree_size = 60;
+//    double end_max_tree_size = 60;
+
+//    // 20260126_gp_mts_60_60_to_20_60
+//    double start_max_tree_size = 20;
+//    double end_max_tree_size = 60;
+    
+    // 20260126_gp_mts_20_60_to_30_60
+    double start_max_tree_size = 30;
     double end_max_tree_size = 60;
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260126 change start/end max tree size from 60/60 to 20/60
     
+//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
+//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
+//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
+
+    double smts = start_max_tree_size;
+    int min_crossover_tree_size = EF::usingGP() ?   10 : 2;
+    int max_crossover_tree_size = EF::usingGP() ? smts : ga_tree_size;
+    int max_initial_tree_size   = EF::usingGP() ? smts : ga_tree_size;
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~

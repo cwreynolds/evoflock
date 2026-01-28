@@ -154,10 +154,19 @@ void runOneFlockEvolution()
 //    double start_max_tree_size = 20;
 //    double end_max_tree_size = 60;
     
-    // 20260126_gp_mts_20_60_to_30_60
-    double start_max_tree_size = 30;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260127 fiddle with min/max tree size
+
+//    // 20260126_gp_mts_20_60_to_30_60
+//    double start_max_tree_size = 30;
+//    double end_max_tree_size = 60;
+  
+    // 20260127_gp_mts_30_60_to_40_60
+    double start_max_tree_size = 40;
     double end_max_tree_size = 60;
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
@@ -250,19 +259,25 @@ void runOneFlockEvolution()
             //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
             // TODO 20260122 start-end max tree size
 
-            // Oh, this is for crossover, which does not yet use FS::genericTreeMaker()
-            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260127 fiddle with min/max tree size
+
             double fraction = float(i) / max_evolution_steps;
             double max_tree_size = util::interpolate(fraction,
                                                      float(start_max_tree_size),
                                                      float(end_max_tree_size));
-            fs.setMaxTreeSize(max_tree_size);
-            population->setMaxCrossoverTreeSize(max_tree_size);
-            
+//            fs.setMaxTreeSize(max_tree_size);
+//            population->setMaxCrossoverTreeSize(max_tree_size);
+            fs.setMaxTreeSize(std::round(max_tree_size));
+            population->setMaxCrossoverTreeSize(std::round(max_tree_size));
+
             std::cout << "    ";  // "log_prefix"
             debugPrint(max_tree_size);
             std::cout << std::endl;
-            
+
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
             //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
             GP::save_fitness_time_series(*population);
             population->evolutionStep(GP::fitnessFunction, GP::scalarize_fitness);

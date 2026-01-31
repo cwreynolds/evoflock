@@ -109,27 +109,16 @@ void runOneFlockEvolution()
     RS().setSeedFromClock();
     std::cout << "RandomSequence seed = " << RS().getSeed() << std::endl;
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260128_gp_evo_pop_300_to_600
 
     // The number of Individuals in a population for evolutionary optimization.
     // By default it is divided into sqrt(individuals) breeding sub-populations.
-//    int individuals = EF::usingGA() ? 300 : 300;
-    int individuals = EF::usingGA() ? 300 : 600;
+    int individuals = EF::usingGA() ? 300 : 300;
     int subpops = std::round(std::sqrt(individuals));
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260129_gp_pop_600_steps_60000
     
     // Total number of Individual update steps. (Steady state update stepss. For
     // a generational GA, this corresponds to (max_evolution_steps / individuals)
     // generations. So 30000 / 300 = 100 "generation equivalents.")
-//    int max_evolution_steps = 30000;
-    int max_evolution_steps = 60000;
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    int max_evolution_steps = 30000;
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
 

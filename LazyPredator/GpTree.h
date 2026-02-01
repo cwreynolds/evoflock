@@ -341,6 +341,11 @@ public:
 
         // Perform actual crossover.
         crossoverDonorRecipient(donor, offspring, min_size, max_size, fs_min_size);
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260201 move hoist back to crossover.
+        offspring.hoist();
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }
     
     static void crossoverDonorRecipient(GpTree& donor,
@@ -391,12 +396,17 @@ public:
 
             //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
             // TODO 20251129 logging prior to "hoist" operator on GpTree
+            
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
             // TODO 20260130 prototype "hoist" operator on GpTree
             
-            recipient.hoist();
-//            recipient = recipient.hoist();
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20260131 move hoist() from GpTree::crossoverDonorRecipient()
+            //               to Population::evolutionStep(TournamentGroup)
 
+//            recipient.hoist();
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
             //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
         };
@@ -445,7 +455,29 @@ public:
     
 //    static inline double likelihood_of_hoist_ = 0.02;
 //    static inline double likelihood_of_hoist_ = 0.05;
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260131 move hoist() from GpTree::crossoverDonorRecipient()
+    //               to Population::evolutionStep(TournamentGroup)
+
+//    static inline double likelihood_of_hoist_ = 0.10;
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260201 likelihood_of_hoist_ from 0.05 to 0.10
+
+//    static inline double likelihood_of_hoist_ = 0.05;
     static inline double likelihood_of_hoist_ = 0.10;
+    
+
+    // after run 20260131_gp_wip_hoist_5 looks like 1552
+    // bumped likelihood from 0.05 to 0.10
+
+    static inline double hoist_per_run_counter_ = 0;
+
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     void hoist()
     {
@@ -457,6 +489,15 @@ public:
         if (LPRS().randomBool(likelihood_of_hoist_))
         {
             std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20260201 add counter for hoists per run
+            hoist_per_run_counter_++;
+            debugPrint(hoist_per_run_counter_)
+            
+            int init_size = size();
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            
             std::cout << std::endl << "before hoist, size=" << size()
                       << ":" << std::endl;
             std::cout << to_string(true) << std::endl;
@@ -487,6 +528,12 @@ public:
             std::cout << std::endl << "after hoist, size=" << size()
                       << ":" << std::endl;
             std::cout << to_string(true) << std::endl;
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20260201 d-size logging
+            
+            std::cout << std::endl << init_size - size();
+            std::cout << " size reduction due to hoist()" << std::endl;
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
         }
     }

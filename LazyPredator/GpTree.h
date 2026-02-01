@@ -436,140 +436,59 @@ public:
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20260130 prototype "hoist" operator on GpTree
     
-//        void hoist()
-//        {
-//
-//
-//            // maybe use selectCrossoverSubtree()
-//            // to find "subtree to be replaced by sub-subtree"
-//
-//
-//            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
-//            // TODO 20251129 logging prior to "hoist" operator on GpTree
-//    //        std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
-//    //
-//    //        std::cout << std::endl << "before hoist:" << std::endl;
-//    //        std::cout << to_string(true) << std::endl;
-//    //
-//    //        std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
-//            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
-//
-//        }
-
-    // maybe use selectCrossoverSubtree()
-    // to find "subtree to be replaced by sub-subtree"
-
     // TODO do I mean likelihood or probability???
 //    static inline double likelihood_of_hoist_ = 0.01;
-    static inline double likelihood_of_hoist_ = 0.1;
+//    static inline double likelihood_of_hoist_ = 0.1;
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260131 use all GpTypes in GpTree
+    
+//    static inline double likelihood_of_hoist_ = 0.02;
+//    static inline double likelihood_of_hoist_ = 0.05;
+    static inline double likelihood_of_hoist_ = 0.10;
 
-//    //    void hoist()
-//        GpTree hoist() const
-//        {
-//            GpTree before = *this;
-//
-//            if (LPRS().randomBool(likelihood_of_hoist_))
-//            {
-//                std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
-//
-//                std::cout << std::endl << "before hoist:" << std::endl;
-//                std::cout << this->to_string(true) << std::endl;
-//
-//                std::cout << std::endl << "before hoist:" << std::endl;
-//                std::cout << before.to_string(true) << std::endl;
-//
-//                std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
-//
-//            }
-//            return before;
-//        }
-
-//        void hoist()
-//    //    GpTree hoist() const
-//        {
-//    //        GpTree before = *this;
-//
-//            if (LPRS().randomBool(likelihood_of_hoist_))
-//            {
-//                std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
-//
-//                std::cout << std::endl << "before hoist:" << std::endl;
-//                std::cout << this->to_string(true) << std::endl;
-//
-//    //            std::cout << std::endl << "before hoist:" << std::endl;
-//    //            std::cout << before.to_string(true) << std::endl;
-//
-//                std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
-//
-//            }
-//    //        return before;
-//        }
-
-//    GpTree hoist() const
-//    GpTree hoist()
     void hoist()
     {
-//        GpTree before = *this;
-//        GpTree after;
-
-        
         // Find set of GpTypes in this tree (utility from crossover)
-//        std::set<const GpType*> types;
-//        GpTree::sharedSetOfTypes(before, before, types);
-//        assert(!types.empty());
-        
-        // Maybe using sharedSetOfTypes() is correct, but simplify for now:
-        std::set<const GpType*> types = {getRootType()};
+        std::set<const GpType*> types;
+        GpTree::sharedSetOfTypes(*this, *this, types);
+        assert(!types.empty());
 
         if (LPRS().randomBool(likelihood_of_hoist_))
         {
             std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
-            
-//            std::cout << std::endl << "before hoist, size=" << this->size()
-//                      << ":" << std::endl;
-//            std::cout << this->to_string(true) << std::endl;
-
             std::cout << std::endl << "before hoist, size=" << size()
                       << ":" << std::endl;
             std::cout << to_string(true) << std::endl;
-
-//            int hr_size = before.size() / 4;  // ad hoc inline constant
-            int hr_size = size() / 4;  // ad hoc inline constant: 1/4 of full size
-//            GpTree& hoist_root = before.selectCrossoverSubtree(hr_size, 0, types);
-            GpTree& hoist_root = selectCrossoverSubtree(hr_size, 0, types);
             
-            // TODO copy instead
-//            GpTree& hoist_donor = hoist_root.selectCrossoverSubtree(1, 0, types);
-            GpTree hoist_donor = hoist_root.selectCrossoverSubtree(1, 0, types);
+//            for (auto type : types) { debugPrint(type->name()); }
+
+            int hr_size = size() / 6.0;  // ad hoc inline constant: 1/6 of full size
+            GpTree& hoist_root = selectCrossoverSubtree(hr_size, 0, types);
+                        
+            // Search inside hoist_root for sub-sub-tree with same type as root.
+            const GpType* hrt = hoist_root.getRootType();
+//            debugPrint(hrt->name());
+            
+            // Make temp copy of that sub-sub-tree as "donor".
+            GpTree hoist_donor = hoist_root.selectCrossoverSubtree(1, 0, {hrt});
 
             std::cout << std::endl << "hoist_root, size="
                       << hoist_root.size() << ":" << std::endl;
             std::cout << hoist_root.to_string(true) << std::endl;
-            
             std::cout << std::endl << "hoist_donor, size="
                       << hoist_donor.size() << ":" << std::endl;
             std::cout << hoist_donor.to_string(true) << std::endl;
 
-            
-            
+            // Overwrite hoist_root with hoist_donor, whole tree <= orig size.
             hoist_root = hoist_donor;
-            
             assert(is_valid());
 
-
-            
-//            std::cout << std::endl << "after hoist, size=" << before.size()
-//                      << ":" << std::endl;
             std::cout << std::endl << "after hoist, size=" << size()
                       << ":" << std::endl;
-//            std::cout << before.to_string(true) << std::endl;
             std::cout << to_string(true) << std::endl;
-
             std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
-            
         }
-//        return before;
-//        return *this;
     }
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~

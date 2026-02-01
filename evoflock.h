@@ -523,33 +523,58 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 //                                 27.6224), \
 //                    9.66235))";
         
-        // 20260128_gp_sep_score_exp_1.5_to_1
+//        // 20260128_gp_sep_score_exp_1.5_to_1
+//        std::string gp_source =
+//        "Add3(Add3(Div3(NeighborhoodVelocityDiff(0.518534), \
+//                        0.526287), \
+//                   Sub3(Add3(Div3(Sub3(NeighborhoodVelocityDiff(0.648968), \
+//                                       LengthAdjust(Div3(Scale3(Velocity(), \
+//                                                                9.62188), \
+//                                                         2.45326), \
+//                                                    81.183, \
+//                                                    -79.8588)), \
+//                                  1.99148), \
+//                             LengthAdjust(ObstacleCollisionNormal(0.552556), \
+//                                          49.129, \
+//                                          77.7599)), \
+//                        LengthAdjust(NeighborhoodOffset(1.83964), \
+//                                     9.50483, \
+//                                     20.1819))), \
+//              Add3(NeighborhoodVelocityDiff(1.54523), \
+//                   Add3(Add3(Add3(NeighborhoodVelocityDiff(1.48169), \
+//                                  Add3(Add3(Add3(LengthAdjust(ObstacleCollisionNormal(0.708356), \
+//                                                              84.1532, \
+//                                                              79.3612), \
+//                                                 NeighborhoodOffset(1.44192)), \
+//                                            NeighborhoodOffset(1.93117)), \
+//                                       NeighborhoodOffset(0.628169))), \
+//                             NeighborhoodOffset(1.84771)), \
+//                        NeighborhoodOffset(0.615739))))";
+
+        // 20260130_gp_wip_hoist_2
         std::string gp_source =
-        "Add3(Add3(Div3(NeighborhoodVelocityDiff(0.518534), \
-                        0.526287), \
-                   Sub3(Add3(Div3(Sub3(NeighborhoodVelocityDiff(0.648968), \
-                                       LengthAdjust(Div3(Scale3(Velocity(), \
-                                                                9.62188), \
-                                                         2.45326), \
-                                                    81.183, \
-                                                    -79.8588)), \
-                                  1.99148), \
-                             LengthAdjust(ObstacleCollisionNormal(0.552556), \
-                                          49.129, \
-                                          77.7599)), \
-                        LengthAdjust(NeighborhoodOffset(1.83964), \
-                                     9.50483, \
-                                     20.1819))), \
-              Add3(NeighborhoodVelocityDiff(1.54523), \
-                   Add3(Add3(Add3(NeighborhoodVelocityDiff(1.48169), \
-                                  Add3(Add3(Add3(LengthAdjust(ObstacleCollisionNormal(0.708356), \
-                                                              84.1532, \
-                                                              79.3612), \
-                                                 NeighborhoodOffset(1.44192)), \
-                                            NeighborhoodOffset(1.93117)), \
-                                       NeighborhoodOffset(0.628169))), \
-                             NeighborhoodOffset(1.84771)), \
-                        NeighborhoodOffset(0.615739))))";
+        "Add3(LengthAdjust(ObstacleCollisionNormal(0.760695), \
+                           5.93495, \
+                           76.8379), \
+              Div3(Add3(LengthAdjust(ObstacleCollisionNormal(0.834561), \
+                                     11.8691, \
+                                     97.3668), \
+                        Div3(Sub3(NeighborhoodOffset(0.737614), \
+                                  Add3(ObstacleCollisionNormal(0.867631), \
+                                       Sub3(ObstacleCollisionNormal(0.747136), \
+                                            Add3(Sub3(Scale3(NeighborhoodVelocityDiff(1.90785), \
+                                                             5.1093), \
+                                                      LengthAdjust(Div3(Div3(NeighborhoodOffset(1.74604), \
+                                                                             2.63401), \
+                                                                        7.60497), \
+                                                                   92.7019, \
+                                                                   13.9075)), \
+                                                 LengthAdjust(Sub3(ObstacleCollisionNormal(0.752927), \
+                                                                   Velocity()), \
+                                                              19.7722, \
+                                                              -58.0037))))), \
+                             1.52315)), \
+                   0.767777))";
         
         LP::GpTree tree = fs.compile(gp_source);
         LP::Individual individual(tree, fs);

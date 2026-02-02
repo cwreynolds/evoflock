@@ -466,8 +466,15 @@ public:
     // TODO 20260201 likelihood_of_hoist_ from 0.05 to 0.10
 
 //    static inline double likelihood_of_hoist_ = 0.05;
-    static inline double likelihood_of_hoist_ = 0.10;
     
+    //~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~
+    // TODO 20260201 likelihood_of_hoist_ from 0.10 to 0.05
+
+//    static inline double likelihood_of_hoist_ = 0.10;
+    static inline double likelihood_of_hoist_ = 0.05;
+
+    //~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~~  ~~ ~
+
 
     // after run 20260131_gp_wip_hoist_5 looks like 1552
     // bumped likelihood from 0.05 to 0.10

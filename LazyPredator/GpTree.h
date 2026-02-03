@@ -313,6 +313,40 @@ public:
         for (auto& subtree : subtrees()) subtree.deleteCachedValues();
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260202 instead of occasionally doing hoist after crossover, try
+    //               doing crossover half the time and hoist (on a randomly
+    //               selected parent) the other half
+    
+//    // Perform random GP crossover between the two given parents to produce a
+//    // new offspring, which is written into the third parameter.
+//    static void crossover(const GpTree& parent0,
+//                          const GpTree& parent1,
+//                          GpTree& offspring,
+//                          int min_size,
+//                          int max_size,
+//                          int fs_min_size)
+//    {
+//        // Randomly assign parent0/parent1 to donor/recipient roles.
+//        bool exchange = LPRS().randomBool();
+//        // The "donor" is a copy of one parent, selected randomly.
+//        GpTree donor = exchange ? parent0 : parent1;
+//        // The offspring is initialized to a copy of the other parent.
+//        offspring = exchange ? parent1 : parent0;
+//
+//        // Perform actual crossover.
+//        crossoverDonorRecipient(donor, offspring, min_size, max_size, fs_min_size);
+//        
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        // TODO 20260201 move hoist back to crossover.
+//        offspring.hoist();
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//    }
+
+    // TODO just for temporary test
+    static inline double likelihood_of_crossover_ = 1.0;
+
+    
     // Perform random GP crossover between the two given parents to produce a
     // new offspring, which is written into the third parameter.
     static void crossover(const GpTree& parent0,
@@ -329,25 +363,34 @@ public:
         // The offspring is initialized to a copy of the other parent.
         offspring = exchange ? parent1 : parent0;
 
-        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
-        // TODO 20251129 logging prior to "hoist" operator on GpTree
-//        grabPrintLock();
-//        std::cout << "[[[[[[[[[[[[[[[[[[[[[[[" << std::endl << std::endl;
-//        std::cout << std::endl << "parent0:" << std::endl;
-//        std::cout << parent0.to_string(true) << std::endl;
-//        std::cout << std::endl << "parent1:" << std::endl;
-//        std::cout << parent1.to_string(true) << std::endl;
-        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
+//        // Perform actual crossover.
+//        crossoverDonorRecipient(donor, offspring, min_size, max_size, fs_min_size);
+//        
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        // TODO 20260201 move hoist back to crossover.
+//        offspring.hoist();
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
-        // Perform actual crossover.
-        crossoverDonorRecipient(donor, offspring, min_size, max_size, fs_min_size);
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260201 move hoist back to crossover.
-        offspring.hoist();
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+        // Instead of occasionally doing hoist after crossover,
+        // try doing crossover half the time and hoist (on a
+        // randomly selected parent) the other half.
+//        if (LPRS().randomBool(0.5))
+        if (LPRS().randomBool(likelihood_of_crossover_))
+        {
+            crossoverDonorRecipient(donor, offspring, min_size, max_size, fs_min_size);
+        }
+        else
+        {
+            // TODO just for temporary test
+            likelihood_of_hoist_ = 1;
+            offspring.hoist();
+        }
     }
-    
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     static void crossoverDonorRecipient(GpTree& donor,
                                         GpTree& recipient,
                                         int min_size,

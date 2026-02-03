@@ -96,6 +96,10 @@ void runOneFlockEvolution()
     EF::setUsingGP();
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
 
+    // Set likelihood of crossover versus hoist (on a randomly selected parent).
+    LP::GpTree::likelihood_of_crossover_ = EF::usingGP() ? 0.9 : 1.0;
+    debugPrint(LP::GpTree::likelihood_of_crossover_);
+
     // Enable multiprocessing (run 4 Flock simulations in parallel, process
     // Flock's boids in parallel).
     // enable_multithreading = false;

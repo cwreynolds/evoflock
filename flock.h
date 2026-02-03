@@ -95,16 +95,6 @@ public:
     {
         return fp().boidsPerFlock() * fp().maxSimulationSteps();
     }
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20251211 remove separationScorePerBoidStep(), was only used once.
-
-//    // Accumulator for separation score of each Boid on each simulation step.
-//    double separationScorePerBoidStep() const
-//    {
-//        return separation_score_sum_ / boidStepPerSim();
-//    }
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     // TODO 20240131 since c++ has no keyword syntax, perhaps move to creating a
     // default Flock then using (eg) set_boid_count(500) to change things? Or
@@ -225,10 +215,6 @@ public:
         // Init Boid speed to EF::default_target_speed. Why only in GP mode?
         if (EF::usingGP()) { boid->setSpeed(EF::default_target_speed); }
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251106 change initBoidPose(), do they end up elsewhere?
-    // TODO 20251118 oh jeez, this never got set back to the "good" init.
 
     // Random initial Boid "pose" (position and orientation). By default, they
     // will be in a spherical "clump" on the left/-x side of the big sphere
@@ -237,8 +223,6 @@ public:
     {
         auto initForward = [&]()
         {
-//            return Vec3(1,0,0) + (rs.random_point_in_unit_radius_sphere() * 0.1);
-//            return Vec3(-1,0,0) + (rs.random_point_in_unit_radius_sphere() * 0.1);
             return Vec3(1,0,0) + (rs.random_point_in_unit_radius_sphere() * 0.1);
         };
         auto pointInClump = [&]()
@@ -246,8 +230,6 @@ public:
             // TODO "historically" the clump has been 1/3 the diameter of the big
             //      sphere obstacle, centered on the x axis, slid all the way to the
             //      "left" (-x) so the clump touches the leftmost part of big sphere.
-//            Vec3 center_of_clump = center + Vec3(radius * -0.66, 0, 0);
-//            Vec3 center_of_clump = center + Vec3(radius * 0.66, 0, 0);
             Vec3 center_of_clump = center + Vec3(radius * -0.66, 0, 0);
             Vec3 offset_in_clump = (rs.random_point_in_unit_radius_sphere() *
                                     radius * 0.33);
@@ -275,8 +257,6 @@ public:
         };
         return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Collect flock curvature stats
     double min_curvature_ = +std::numeric_limits<double>::infinity();
@@ -306,13 +286,7 @@ public:
         recordSeparationScorePerStep();
         recordSpeedScorePerStep();
         collectCurvatureStats();
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20251124 API for "perverse_speed_control".
-        // TODO 20251227 no useful insight from perverse_speed_control -- remove
-//        recordPerverseSpeedControlScorePerStep();
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        
+                
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         // TODO 20251208 score for boid alignment.
         recordAlignmentScorePerStep();
@@ -342,7 +316,6 @@ public:
             std::cout << std::format(", c={:.3}", ac);
             std::cout << std::format(", maxc={:.3}", max_curvature_);
         }
-        
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20251122 all ops return Vec3, Scalar values all constants
         
@@ -353,13 +326,6 @@ public:
 //        std::cout << std::format(", max force = {:.3}", max_steer_mag);
         
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20251124 API for "perverse_speed_control".
-//        std::cout << std::format(", perverse speed = {:.3}",
-//                                 perverseSpeedControlScore());
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        
         std::cout << std::endl;
     }
 
@@ -438,64 +404,13 @@ public:
             separation_score_sum_ += score;
         }
     }
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20251231 after surprisingly good run last night, emphasize sep score
 
-//    // Return a unit fitness component: maintaining proper separation distance.
-//    double separationScore() const
-//    {
-//        return separation_score_sum_ / boidStepPerSim();
-//    }
-    
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
     {
         double average_score = separation_score_sum_ / boidStepPerSim();
-//        return std::pow(average_score, 2);
-//        return std::pow(average_score, 1.5);
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260118 expt separate fitness, speed fitness, alignment fitness
-//        return average_score;
-        
-//        return std::pow(average_score, 3);
-        
-        // TODO 20260119 expt separate fitness (3->2), undo speed and alignment.
-//        return std::pow(average_score, 2);
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260125 rejigger exponent in separationScore()
-        
-//        return std::pow(average_score, 1.5);
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260126 separationScore() exponent from 3 to 2
-        
-//        return std::pow(average_score, 3);
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260127 separationScore() exponent from 2 back to 1.5 (again!)
-        
-//        return std::pow(average_score, 2);
-        
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260128 separationScore() exponent from 1.5 back to 1 (none).
-        
-//        return std::pow(average_score, 1.5);
-
         return average_score;
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
     // Accumulators for speed score.
@@ -503,115 +418,6 @@ public:
     double sum_of_speeds_over_all_boid_steps_ = 0;
     double sum_of_speed_scores_over_all_boid_steps_ = 0;
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20251227 go back to historic speed score function
-    
-//        // Called each simulation step, records stats for the speed score.
-//        void recordSpeedScorePerStep()
-//        {
-//            for (auto b : boids())
-//            {
-//                // Sum used for average speed over entire run.
-//                sum_of_speeds_over_all_boid_steps_ += b->speed();
-//
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                // TODO 20251210 all this folderol is obsolete, GP speed fine now
-//
-//    //                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//    //                // TODO 20250914 VERY ad hoc work-around for zero speed issue
-//    //                //               try getting rid of the wide flat "porch" where any
-//    //                //               speed below 15 got the same score
-//    //
-//    //                // Sum scores for "speed is in correct range".
-//    //                // TODO TEMP WARNING FIX -- raw inline constants.
-//    //
-//    //                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//    //                // TODO 20250915 revert
-//    //    //                double score = parameterToWeightWithRamps(b->speed(),
-//    //    //    //                                                      {15, 19, 21, 25},
-//    //    //                                                          { 0, 19, 21, 25},
-//    //    //                                                          { 0,  1,  1,  0});
-//    //
-//    //                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //                // TODO 20250920 experimental curriculum learning
-//    //
-//    //    //            double score = parameterToWeightWithRamps(b->speed(),
-//    //    //                                                      {15, 19, 21, 25},
-//    //    //                                                      { 0,  1,  1,  0});
-//    //
-//    //                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//    //                // TODO 20250925 turn off curriculum learning experiment
-//    //
-//    //    //                double score = parameterToWeightWithRamps(b->speed(),
-//    //    //    //                                                      {15, 19, 21, 25},
-//    //    //                                                          { 0, 19, 21, 25},
-//    //    //                                                          { 0,  1,  1,  0});
-//    //
-//    //    //            double score = parameterToWeightWithRamps(b->speed(),
-//    //    //                                                      {15, 19, 21, 25},
-//    //    //                                                      { 0,  1,  1,  0});
-//    //
-//    //
-//    //                double score = parameterToWeightWithRamps(b->speed(),
-//    //    //                                                      {15, 19, 21, 25},
-//    //    //                                                      { 0, 19, 21, 25},
-//    //                                                          { 0, 18, 19, 21, 25},
-//    //                                                          { 0, .2, 1,  1,  0});
-//    //
-//    //                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//    //
-//    //                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//    //
-//    //                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//    //
-//    //
-//    //                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20251226 trying to fix low fitness GA since about Nov 25
-//
-//    //            // Sum scores for "speed is in correct range".
-//    //            // TODO TEMP WARNING FIX -- raw inline constants.
-//    //            double score = parameterToWeightWithRamps(b->speed(),
-//    //                                                      {15, 19, 21, 25},
-//    //                                                      { 0,  1,  1,  0});
-//
-//    //            // Sum scores for "speed is in correct range".
-//    //            // TODO TEMP WARNING FIX -- raw inline constants.
-//    //            double score = parameterToWeightWithRamps(b->speed(),
-//    //                                                      { 0, 18, 19, 21, 25},
-//    //                                                      { 0, .2, 1,  1,  0});
-//
-//    //            // Sum scores for "speed is in correct range".
-//    //            // TODO TEMP WARNING FIX -- raw inline constants.
-//    //            double score = parameterToWeightWithRamps(b->speed(),
-//    //                                                      {15, 19, 21, 25},
-//    //                                                      { 0,  1,  1,  0});
-//    //            if (util::between(b->speed(), 19, 21)) { assert(score > 0); }
-//    //            if ((b->speed() < 15) or (b->speed() > 25))
-//    //            {
-//    //                if (not (score == 0))
-//    //                {
-//    //                    debugPrint(b->speed());
-//    //                    debugPrint(score);
-//    //                }
-//    //                assert(score == 0);
-//    //            }
-//
-//                // Sum scores for "speed is in correct range".
-//                // TODO TEMP WARNING FIX -- raw inline constants.
-//    //            double score = ((b->speed() > 18) and ((b->speed() < 22))) ? 1 : 0;
-//                double score = ((b->speed() > 15) and ((b->speed() < 25))) ? 1 : 0;
-//
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//                sum_of_speed_scores_over_all_boid_steps_ += score;
-//            }
-//        }
-
-    
     // Called each simulation step, records stats for the speed score.
     void recordSpeedScorePerStep()
     {
@@ -620,23 +426,14 @@ public:
             // Sum used for average speed over entire run.
             sum_of_speeds_over_all_boid_steps_ += b->speed();
             
-//                // Sum scores for "speed is in correct range".
-//                // TODO TEMP WARNING FIX -- raw inline constants.
-//    //            double score = ((b->speed() > 18) and ((b->speed() < 22))) ? 1 : 0;
-//                double score = ((b->speed() > 15) and ((b->speed() < 25))) ? 1 : 0;
-
             // Sum scores for "speed is in correct range".
             // TODO TEMP WARNING FIX -- raw inline constants.
             double score = parameterToWeightWithRamps(b->speed(),
                                                       {15, 19, 21, 25},
                                                       { 0,  1,  1,  0});
-
             sum_of_speed_scores_over_all_boid_steps_ += score;
         }
     }
-    
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Added to try experimental curriculum learning.
     double fractionOfSimulationElapsed() const
@@ -657,17 +454,7 @@ public:
     // Average speed for each Boid on each simulation step.
     double speedScore() const
     {
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260118 expt separate fitness, speed fitness, alignment fitness
-        
-//        return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
-        
-//        double score = (sum_of_speed_scores_over_all_boid_steps_ /
-//                        boidStepPerSim());
-//        return std::pow(score, 3);
-        
         return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
     
     double curvatureScore() const
@@ -675,94 +462,12 @@ public:
         double average_curvature = sum_curvature_ / boidStepPerSim();
         return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
     }
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20251124 API for "perverse_speed_control".
-    // TODO 20251227 no useful insight from perverse_speed_control -- remove
-    
-//    // Accumulators for perverse_speed_control score.
-//    // TODO Relocate in file?
-//    double sum_of_perverse_speed_control_scores_over_all_boid_steps_ = 0;
-//
-//    // Called each simulation step, records perverse_speed_control score.
-//    void recordPerverseSpeedControlScorePerStep()
-//    {
-//        for (auto b : boids())
-//        {
-//            bool accelerating = (b->nextSteer().dot(b->forward()) > 0);
-//            bool slow = (b->speed() < EF::default_target_speed);
-//            if ((slow and not accelerating) or (not slow and accelerating))
-//            {
-//                sum_of_perverse_speed_control_scores_over_all_boid_steps_++;
-//            }
-//        }
-//    }
-//
-//    // Average speed for each Boid on each simulation step.
-//    double perverseSpeedControlScore() const
-//    {
-//        return (sum_of_perverse_speed_control_scores_over_all_boid_steps_ /
-//                boidStepPerSim());
-//    }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20251208 score for boid alignment.
-    
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20260121 this sums signed dot products, then clips off negative
-    // values -- is that correct? should the clip be BEFORE the sum?
-    // This change is 20260121_gp_change_curvature_score
-    
-//        // Accumulators for alignment score.
-//        // TODO Relocate in file?
-//        double sum_of_alignment_scores_over_all_boid_steps_ = 0;
-//
-//        // Called each simulation step, records alignment score.
-//        void recordAlignmentScorePerStep()
-//        {
-//            for (auto b : boids())
-//            {
-//                double sum_of_alignments = 0;
-//                for (Boid* n : b->nearest_neighbors())
-//                {
-//                    double d = Vec3::dot(b->forward(), n->forward());
-//                    sum_of_alignments += d;
-//                }
-//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//                // TODO 20251210 oops, meant to clip, not abs.
-//    //            sum_of_alignments = std::abs(sum_of_alignments);
-//                sum_of_alignments = std::max(0.0, sum_of_alignments);
-//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//                sum_of_alignments /= b->nearest_neighbors().size();
-//                sum_of_alignment_scores_over_all_boid_steps_ += sum_of_alignments;
-//            }
-//        }
-    
+        
     // Accumulators for alignment score.
     // TODO Relocate in file?
     double sum_of_alignment_scores_over_all_boid_steps_ = 0;
 
-//        // Called each simulation step, records alignment score.
-//        void recordAlignmentScorePerStep()
-//        {
-//            for (auto b : boids())
-//            {
-//                double sum_of_alignments = 0;
-//                for (Boid* n : b->nearest_neighbors())
-//                {
-//                    double d = Vec3::dot(b->forward(), n->forward());
-//    //                sum_of_alignments += d;
-//                    sum_of_alignments += std::max(0.0, d);  // sum dot prod > 0
-//                }
-//    //            sum_of_alignments = std::max(0.0, sum_of_alignments);
-//                sum_of_alignments /= b->nearest_neighbors().size();
-//                sum_of_alignment_scores_over_all_boid_steps_ += sum_of_alignments;
-//            }
-//        }
-
-    // Called each simulation step, records alignment score.
+    // Called each simulation step, record alignment score. Sums pos dot product.
     void recordAlignmentScorePerStep()
     {
         for (auto b : boids())
@@ -771,48 +476,20 @@ public:
             for (Boid* n : b->nearest_neighbors())
             {
                 double d = Vec3::dot(b->forward(), n->forward());
-//                sum_pos_aligns += std::max(0.0, d);  // sum dot prod > 0
                 if (d > 0) { sum_pos_aligns += d; }
             }
             sum_pos_aligns /= b->nearest_neighbors().size();  // ave pos align
             sum_of_alignment_scores_over_all_boid_steps_ += sum_pos_aligns;
         }
     }
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     // Average speed for each Boid on each simulation step.
     // Disabled, always returns 1.
     double alignmentScore() const
     {
-        //        double score = (sum_of_alignment_scores_over_all_boid_steps_ /
-        //                        boidStepPerSim());
-        //        return score;
-        
-        //        return 1;
-        
-        //        return (sum_of_alignment_scores_over_all_boid_steps_ /
-        //                boidStepPerSim());
-        
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260118 expt separate fitness, speed fitness, alignment fitness
-        
-//        double score = (sum_of_alignment_scores_over_all_boid_steps_ /
-//                        boidStepPerSim());
-//        return std::pow(score, 3);
-        
-        
         return (sum_of_alignment_scores_over_all_boid_steps_ /
                 boidStepPerSim());
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.
@@ -865,8 +542,6 @@ public:
         }
         else
         {
-            // TODO 20240625 when we switch back to multithreading, need to make
-            // sure new thread gets same Boid::getGpPerThread() as main thread.
             chunk_func(0, boid_count);
         }
     };
@@ -909,7 +584,6 @@ public:
         {
             if (boids()[i] == boid) { setSelectedBoid(i); }
         }
-
     }
     
     // Find index into obstacleSets() (obstacle_sets_) for a given string name.

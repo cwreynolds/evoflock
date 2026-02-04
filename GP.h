@@ -382,7 +382,13 @@ bool evoflockGpValidateTree(const LP::GpTree& tree,
         { "NeighborhoodVelocityDiff" },
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        { "NeighborhoodOffset" },
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260203 bring back the pre-neighborhood NearestNeighborOffset
+//        { "NeighborhoodOffset" },
+        { "NeighborhoodOffset", "NearestNeighborOffset" },
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         { "ObstacleCollisionNormal" }
     };
     return areFuncsInTree(tree, required_gp_funcs, fs);
@@ -1514,7 +1520,11 @@ LP::FunctionSet static_gp_fs_ =
         // Acceleration,
         // Forward,
         // NearestNeighborVelocity,
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260203 bring back the pre-neighborhood NearestNeighborOffset
         // NearestNeighborOffset,
+        NearestNeighborOffset,
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // NearestNeighborVelocity2,
         // NearestNeighborOffset2,
         // NeighborhoodVelocity,

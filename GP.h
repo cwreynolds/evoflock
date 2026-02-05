@@ -379,7 +379,15 @@ bool evoflockGpValidateTree(const LP::GpTree& tree,
 //        { "NeighborhoodVelocityDiff", /* "NeighborhoodVelocity", */ },
 //        { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
 
-        { "NeighborhoodVelocityDiff" },
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260204 NearestNeighborVelocityDiff combines
+        //               NearestNeighborVelocity with NeighborhoodVelocityDiff.
+
+//        { "NeighborhoodVelocityDiff" },
+
+        { "NeighborhoodVelocityDiff", "NearestNeighborVelocityDiff" },
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -1221,7 +1229,25 @@ inline Vec3 neighborhoodOffsetUtility(double exponent)
       return std::any((velocity_sum / weight_sum) - me.velocity());
   });
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20260204 NearestNeighborVelocityDiff combines NearestNeighborVelocity
+//               with NeighborhoodVelocityDiff.
 
+// "Pre subtracts" from this boid's velocity. We want to drive this to zero.
+
+/*inline*/ LP::GpFunction NearestNeighborVelocityDiff
+ (
+  "NearestNeighborVelocityDiff",
+  "Vec3",
+  {},
+  [](LP::GpTree& tree)
+  {
+      Vec3 nearest_neighbor_velocity = getGpBoidNeighbor(1)->velocity();
+      Vec3 my_velocity = Boid::getGpPerThread()->velocity();
+      return std::any(nearest_neighbor_velocity - my_velocity);
+  });
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 /*inline*/ LP::GpFunction NeighborhoodOffset
  (
@@ -1520,6 +1546,12 @@ LP::FunctionSet static_gp_fs_ =
         // Acceleration,
         // Forward,
         // NearestNeighborVelocity,
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260204 NearestNeighborVelocityDiff combines
+        //               NearestNeighborVelocity with NeighborhoodVelocityDiff.
+        NearestNeighborVelocityDiff,
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260203 bring back the pre-neighborhood NearestNeighborOffset
         // NearestNeighborOffset,

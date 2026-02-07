@@ -385,7 +385,16 @@ bool evoflockGpValidateTree(const LP::GpTree& tree,
 
 //        { "NeighborhoodVelocityDiff" },
 
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260205 no NeighborhoodVelocityDiff NeighborhoodOffset for test
+
+//        { "NeighborhoodVelocityDiff", "NearestNeighborVelocityDiff" },
+
+//        { "NearestNeighborVelocityDiff" },
+
         { "NeighborhoodVelocityDiff", "NearestNeighborVelocityDiff" },
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -394,7 +403,17 @@ bool evoflockGpValidateTree(const LP::GpTree& tree,
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260203 bring back the pre-neighborhood NearestNeighborOffset
 //        { "NeighborhoodOffset" },
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260205 no NeighborhoodVelocityDiff NeighborhoodOffset for test
+
+//        { "NeighborhoodOffset", "NearestNeighborOffset" },
+//        { "NearestNeighborOffset" },
+
         { "NeighborhoodOffset", "NearestNeighborOffset" },
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         { "ObstacleCollisionNormal" }
@@ -1560,8 +1579,13 @@ LP::FunctionSet static_gp_fs_ =
         // NearestNeighborVelocity2,
         // NearestNeighborOffset2,
         // NeighborhoodVelocity,
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260205 no NeighborhoodVelocityDiff NeighborhoodOffset for test
+//        NeighborhoodVelocityDiff,
+//        NeighborhoodOffset,
         NeighborhoodVelocityDiff,
         NeighborhoodOffset,
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // First_Obs_Dist,
         // FirstObstacleNormal,
         // FirstObstacleOffset,

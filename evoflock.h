@@ -166,8 +166,12 @@ void runOneFlockEvolution()
 //    double start_max_tree_size = 30;
 //    double end_max_tree_size = 60;
   
-    // 20260127_gp_mts_30_60_to_40_60
-    double start_max_tree_size = 40;
+//    // 20260127_gp_mts_30_60_to_40_60
+//    double start_max_tree_size = 40;
+//    double end_max_tree_size = 60;
+    
+    // 20260205_gp_mts_40_60_to_60_60
+    double start_max_tree_size = 60;
     double end_max_tree_size = 60;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

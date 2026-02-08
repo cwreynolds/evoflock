@@ -372,50 +372,8 @@ bool evoflockGpValidateTree(const LP::GpTree& tree,
     vecOfVecOfStrings required_gp_funcs =
     {
         { "Velocity" },
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20260117 very experimental, until right size OR "valid"
-
-//        { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
-//        { "NeighborhoodVelocityDiff", /* "NeighborhoodVelocity", */ },
-//        { "NeighborhoodVelocity", "NeighborhoodVelocityDiff" },
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260204 NearestNeighborVelocityDiff combines
-        //               NearestNeighborVelocity with NeighborhoodVelocityDiff.
-
-//        { "NeighborhoodVelocityDiff" },
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260205 no NeighborhoodVelocityDiff NeighborhoodOffset for test
-
-//        { "NeighborhoodVelocityDiff", "NearestNeighborVelocityDiff" },
-
-//        { "NearestNeighborVelocityDiff" },
-
         { "NeighborhoodVelocityDiff", "NearestNeighborVelocityDiff" },
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260203 bring back the pre-neighborhood NearestNeighborOffset
-//        { "NeighborhoodOffset" },
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260205 no NeighborhoodVelocityDiff NeighborhoodOffset for test
-
-//        { "NeighborhoodOffset", "NearestNeighborOffset" },
-//        { "NearestNeighborOffset" },
-
         { "NeighborhoodOffset", "NearestNeighborOffset" },
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         { "ObstacleCollisionNormal" }
     };
     return areFuncsInTree(tree, required_gp_funcs, fs);
@@ -1565,27 +1523,13 @@ LP::FunctionSet static_gp_fs_ =
         // Acceleration,
         // Forward,
         // NearestNeighborVelocity,
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260204 NearestNeighborVelocityDiff combines
-        //               NearestNeighborVelocity with NeighborhoodVelocityDiff.
         NearestNeighborVelocityDiff,
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260203 bring back the pre-neighborhood NearestNeighborOffset
-        // NearestNeighborOffset,
         NearestNeighborOffset,
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // NearestNeighborVelocity2,
         // NearestNeighborOffset2,
         // NeighborhoodVelocity,
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260205 no NeighborhoodVelocityDiff NeighborhoodOffset for test
-//        NeighborhoodVelocityDiff,
-//        NeighborhoodOffset,
         NeighborhoodVelocityDiff,
         NeighborhoodOffset,
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // First_Obs_Dist,
         // FirstObstacleNormal,
         // FirstObstacleOffset,

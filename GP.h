@@ -1206,9 +1206,6 @@ inline Vec3 neighborhoodOffsetUtility(double exponent)
       return std::any((velocity_sum / weight_sum) - me.velocity());
   });
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20260204 NearestNeighborVelocityDiff combines NearestNeighborVelocity
-//               with NeighborhoodVelocityDiff.
 
 // "Pre subtracts" from this boid's velocity. We want to drive this to zero.
 
@@ -1224,7 +1221,6 @@ inline Vec3 neighborhoodOffsetUtility(double exponent)
       return std::any(nearest_neighbor_velocity - my_velocity);
   });
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 /*inline*/ LP::GpFunction NeighborhoodOffset
  (

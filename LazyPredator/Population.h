@@ -144,14 +144,14 @@ public:
 //        double least_size_error = std::numeric_limits<double>::infinity();
         const FunctionSet& fs = *getFunctionSet();
         
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20251221 change logging for population sensor API.
-        if (EF::usingGP())
-        {
-            debugPrint(fs.treeConstraintsOK(parent0->tree()));
-            debugPrint(fs.treeConstraintsOK(parent1->tree()));
-        }
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        // TODO 20251221 change logging for population sensor API.
+//        if (EF::usingGP())
+//        {
+//            debugPrint(fs.treeConstraintsOK(parent0->tree()));
+//            debugPrint(fs.treeConstraintsOK(parent1->tree()));
+//        }
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

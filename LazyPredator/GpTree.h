@@ -424,7 +424,61 @@ public:
     }
         
 
-    static inline double hoist_per_run_counter_ = 0;
+//    static inline double hoist_per_run_counter_ = 0;
+
+//    // Pick random subtree A, within it pick random subtree B, replace A with B.
+//    void hoist()
+//    {
+//        // Find set of GpTypes in this tree (utility from crossover)
+//        std::set<const GpType*> types;
+//        GpTree::sharedSetOfTypes(*this, *this, types);
+//        assert(!types.empty());
+//        
+//        std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
+//        
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        // TODO 20260201 add counter for hoists per run
+//        hoist_per_run_counter_++;
+//        debugPrint(hoist_per_run_counter_)
+//        
+//        int init_size = size();
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        
+//        std::cout << std::endl << "before hoist, size=" << size()
+//        << ":" << std::endl;
+//        std::cout << to_string(true) << std::endl;
+//        
+//        int hr_size = size() / 6.0;  // ad hoc inline constant: 1/6 of full size
+//        GpTree& hoist_root = selectCrossoverSubtree(hr_size, 0, types);
+//        
+//        // Search inside hoist_root for sub-sub-tree with same type as root.
+//        const GpType* hrt = hoist_root.getRootType();
+//        
+//        // Make temp copy of that sub-sub-tree as "donor".
+//        GpTree hoist_donor = hoist_root.selectCrossoverSubtree(1, 0, {hrt});
+//        
+//        std::cout << std::endl << "hoist_root, size="
+//        << hoist_root.size() << ":" << std::endl;
+//        std::cout << hoist_root.to_string(true) << std::endl;
+//        std::cout << std::endl << "hoist_donor, size="
+//        << hoist_donor.size() << ":" << std::endl;
+//        std::cout << hoist_donor.to_string(true) << std::endl;
+//        
+//        // Overwrite hoist_root with hoist_donor, whole tree <= orig size.
+//        hoist_root = hoist_donor;
+//        assert(is_valid());
+//        
+//        std::cout << std::endl << "after hoist, size=" << size()
+//        << ":" << std::endl;
+//        std::cout << to_string(true) << std::endl;
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        // TODO 20260201 d-size logging
+//        
+//        std::cout << std::endl << init_size - size();
+//        std::cout << " size reduction due to hoist()" << std::endl;
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
+//    }
 
     // Pick random subtree A, within it pick random subtree B, replace A with B.
     void hoist()
@@ -434,19 +488,19 @@ public:
         GpTree::sharedSetOfTypes(*this, *this, types);
         assert(!types.empty());
         
-        std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
+//        std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
+//        
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        // TODO 20260201 add counter for hoists per run
+//        hoist_per_run_counter_++;
+//        debugPrint(hoist_per_run_counter_)
+//        
+//        int init_size = size();
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260201 add counter for hoists per run
-        hoist_per_run_counter_++;
-        debugPrint(hoist_per_run_counter_)
-        
-        int init_size = size();
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        
-        std::cout << std::endl << "before hoist, size=" << size()
-        << ":" << std::endl;
-        std::cout << to_string(true) << std::endl;
+//        std::cout << std::endl << "before hoist, size=" << size()
+//        << ":" << std::endl;
+//        std::cout << to_string(true) << std::endl;
         
         int hr_size = size() / 6.0;  // ad hoc inline constant: 1/6 of full size
         GpTree& hoist_root = selectCrossoverSubtree(hr_size, 0, types);
@@ -457,27 +511,27 @@ public:
         // Make temp copy of that sub-sub-tree as "donor".
         GpTree hoist_donor = hoist_root.selectCrossoverSubtree(1, 0, {hrt});
         
-        std::cout << std::endl << "hoist_root, size="
-        << hoist_root.size() << ":" << std::endl;
-        std::cout << hoist_root.to_string(true) << std::endl;
-        std::cout << std::endl << "hoist_donor, size="
-        << hoist_donor.size() << ":" << std::endl;
-        std::cout << hoist_donor.to_string(true) << std::endl;
+//        std::cout << std::endl << "hoist_root, size="
+//        << hoist_root.size() << ":" << std::endl;
+//        std::cout << hoist_root.to_string(true) << std::endl;
+//        std::cout << std::endl << "hoist_donor, size="
+//        << hoist_donor.size() << ":" << std::endl;
+//        std::cout << hoist_donor.to_string(true) << std::endl;
         
         // Overwrite hoist_root with hoist_donor, whole tree <= orig size.
         hoist_root = hoist_donor;
         assert(is_valid());
         
-        std::cout << std::endl << "after hoist, size=" << size()
-        << ":" << std::endl;
-        std::cout << to_string(true) << std::endl;
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260201 d-size logging
-        
-        std::cout << std::endl << init_size - size();
-        std::cout << " size reduction due to hoist()" << std::endl;
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
+//        std::cout << std::endl << "after hoist, size=" << size()
+//        << ":" << std::endl;
+//        std::cout << to_string(true) << std::endl;
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        // TODO 20260201 d-size logging
+//        
+//        std::cout << std::endl << init_size - size();
+//        std::cout << " size reduction due to hoist()" << std::endl;
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
     }
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~

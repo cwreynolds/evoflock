@@ -370,39 +370,8 @@ public:
                                                                  donor_type);
             assert(d_subtree.getRootType() == r_subtree.getRootType());
             
-            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
-            // TODO 20251129 logging prior to "hoist" operator on GpTree
-//            std::cout << std::endl << "d_subtree:" << std::endl;
-//            std::cout << d_subtree.to_string(true) << std::endl;
-//            std::cout << std::endl << "r_subtree:" << std::endl;
-//            std::cout << r_subtree.to_string(true) << std::endl;
-            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
-
             // Overwrite the recipient subtree with copy of donor subtree.
             r_subtree = d_subtree;
-            
-            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
-            // TODO 20251129 logging prior to "hoist" operator on GpTree
-//            std::cout << std::endl << "recipient after crossover:" << std::endl;
-//            std::cout << recipient.to_string(true) << std::endl;
-//            std::cout << std::endl << "]]]]]]]]]]]]]]]]]]]]]]]" << std::endl;
-            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
-
-            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
-            // TODO 20251129 logging prior to "hoist" operator on GpTree
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-            // TODO 20260130 prototype "hoist" operator on GpTree
-            
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20260131 move hoist() from GpTree::crossoverDonorRecipient()
-            //               to Population::evolutionStep(TournamentGroup)
-
-//            recipient.hoist();
-
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~
         };
         // If "recipient" too big/small, try to fix via relative subtree size.
         // In each case, select random subtree from "donor" and "recipient"
@@ -422,63 +391,6 @@ public:
             crosser(0, 0);       // Otherwise uniform random subtree selection.
         }
     }
-        
-
-//    static inline double hoist_per_run_counter_ = 0;
-
-//    // Pick random subtree A, within it pick random subtree B, replace A with B.
-//    void hoist()
-//    {
-//        // Find set of GpTypes in this tree (utility from crossover)
-//        std::set<const GpType*> types;
-//        GpTree::sharedSetOfTypes(*this, *this, types);
-//        assert(!types.empty());
-//        
-//        std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
-//        
-//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//        // TODO 20260201 add counter for hoists per run
-//        hoist_per_run_counter_++;
-//        debugPrint(hoist_per_run_counter_)
-//        
-//        int init_size = size();
-//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//        
-//        std::cout << std::endl << "before hoist, size=" << size()
-//        << ":" << std::endl;
-//        std::cout << to_string(true) << std::endl;
-//        
-//        int hr_size = size() / 6.0;  // ad hoc inline constant: 1/6 of full size
-//        GpTree& hoist_root = selectCrossoverSubtree(hr_size, 0, types);
-//        
-//        // Search inside hoist_root for sub-sub-tree with same type as root.
-//        const GpType* hrt = hoist_root.getRootType();
-//        
-//        // Make temp copy of that sub-sub-tree as "donor".
-//        GpTree hoist_donor = hoist_root.selectCrossoverSubtree(1, 0, {hrt});
-//        
-//        std::cout << std::endl << "hoist_root, size="
-//        << hoist_root.size() << ":" << std::endl;
-//        std::cout << hoist_root.to_string(true) << std::endl;
-//        std::cout << std::endl << "hoist_donor, size="
-//        << hoist_donor.size() << ":" << std::endl;
-//        std::cout << hoist_donor.to_string(true) << std::endl;
-//        
-//        // Overwrite hoist_root with hoist_donor, whole tree <= orig size.
-//        hoist_root = hoist_donor;
-//        assert(is_valid());
-//        
-//        std::cout << std::endl << "after hoist, size=" << size()
-//        << ":" << std::endl;
-//        std::cout << to_string(true) << std::endl;
-//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//        // TODO 20260201 d-size logging
-//        
-//        std::cout << std::endl << init_size - size();
-//        std::cout << " size reduction due to hoist()" << std::endl;
-//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//        std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
-//    }
 
     // Pick random subtree A, within it pick random subtree B, replace A with B.
     void hoist()
@@ -487,21 +399,7 @@ public:
         std::set<const GpType*> types;
         GpTree::sharedSetOfTypes(*this, *this, types);
         assert(!types.empty());
-        
-//        std::cout << std::endl << "(((((((((((((((((((((((" << std::endl;
-//        
-//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//        // TODO 20260201 add counter for hoists per run
-//        hoist_per_run_counter_++;
-//        debugPrint(hoist_per_run_counter_)
-//        
-//        int init_size = size();
-//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        
-//        std::cout << std::endl << "before hoist, size=" << size()
-//        << ":" << std::endl;
-//        std::cout << to_string(true) << std::endl;
-        
+
         int hr_size = size() / 6.0;  // ad hoc inline constant: 1/6 of full size
         GpTree& hoist_root = selectCrossoverSubtree(hr_size, 0, types);
         
@@ -510,34 +408,11 @@ public:
         
         // Make temp copy of that sub-sub-tree as "donor".
         GpTree hoist_donor = hoist_root.selectCrossoverSubtree(1, 0, {hrt});
-        
-//        std::cout << std::endl << "hoist_root, size="
-//        << hoist_root.size() << ":" << std::endl;
-//        std::cout << hoist_root.to_string(true) << std::endl;
-//        std::cout << std::endl << "hoist_donor, size="
-//        << hoist_donor.size() << ":" << std::endl;
-//        std::cout << hoist_donor.to_string(true) << std::endl;
-        
+
         // Overwrite hoist_root with hoist_donor, whole tree <= orig size.
         hoist_root = hoist_donor;
         assert(is_valid());
-        
-//        std::cout << std::endl << "after hoist, size=" << size()
-//        << ":" << std::endl;
-//        std::cout << to_string(true) << std::endl;
-//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//        // TODO 20260201 d-size logging
-//        
-//        std::cout << std::endl << init_size - size();
-//        std::cout << " size reduction due to hoist()" << std::endl;
-//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//        std::cout << std::endl << ")))))))))))))))))))))))" << std::endl;
     }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~
-    
 
     // Randomly select a subtree of this GpTree to be used for crossover. Its
     // size must be at least "min_size". Its root type must be a member of the

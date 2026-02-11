@@ -61,23 +61,16 @@ public:
         if (subpopulation_count == 0) { subpopulation_count = 1; } // Default.
         assert(subpopulation_count > 0);
         subpopulations_.resize(subpopulation_count);
-        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-        // TODO 20250919 increase tree size to avoid losing obstacle perceptions!
         for (int i = 0; i < individual_count; i++)
         {
             Individual* new_individual = ((max_init_tree_size == 0) ?
                                           new Individual :
-//                                          new Individual(max_init_tree_size,
-//                                                         *fs));
                                           new Individual(max_init_tree_size,
-                                                         
                                                          min_crossover_tree_size,
                                                          max_crossover_tree_size,
-
                                                          *fs));
             subpopulation(i % subpopulation_count).push_back(new_individual);
         }
-        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
         updateSortedCollectionOfIndividuals();
         idle_time_ = TimeDuration::zero();
         // TODO keep, remove, or move to unit tests?
@@ -117,9 +110,6 @@ public:
         incrementStepCount();
         logger();
     }
-    
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20251220 refactor: only preserve sensor API not size
 
     // Perform one step of the "steady state" evolutionary computation. Three
     // Individuals are selected randomly, from a random subpopulation. Holds a
@@ -141,55 +131,7 @@ public:
         // Create new offspring tree by crossing-over these two parents.
         GpTree new_tree;
         auto crossover = getFunctionSet()->getCrossoverFunction();
-//        double least_size_error = std::numeric_limits<double>::infinity();
         const FunctionSet& fs = *getFunctionSet();
-        
-//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//        // TODO 20251221 change logging for population sensor API.
-//        if (EF::usingGP())
-//        {
-//            debugPrint(fs.treeConstraintsOK(parent0->tree()));
-//            debugPrint(fs.treeConstraintsOK(parent1->tree()));
-//        }
-//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260123 use FS::genericTreeMaker() to wrap crossover
-        
-//        double least_size_error = std::numeric_limits<double>::infinity();
-//        int retries = 1000;
-//        for (int r = 0; r < retries; r++)
-//        {
-//            GpTree temp_tree;
-//            crossover(parent0->tree(),
-//                      parent1->tree(),
-//                      temp_tree,
-//                      getMinCrossoverTreeSize(),
-//                      getMaxCrossoverTreeSize(),
-//                      fs.getCrossoverMinSize());
-//
-//            // NOTE: this same code pattern in FS::newMakeRandomTree().
-//            // When we find one that meets the size constraint exit retry loop.
-//            if (fs.treeSizeOK(temp_tree,
-//                              getMinCrossoverTreeSize(),
-//                              getMaxCrossoverTreeSize()))
-//            {
-//                new_tree = temp_tree;
-//                break;
-//            }
-//
-//            // Save the temp_tree which has least size error so far.
-//            size_t size = temp_tree.size();
-//            double size_error = fs.distFromInterval(size,
-//                                                    getMinCrossoverTreeSize(),
-//                                                    getMaxCrossoverTreeSize());
-//            if (least_size_error > size_error)
-//            {
-//                new_tree = temp_tree;
-//                least_size_error = size_error;
-//            }
-//        }
         
         FunctionSet::generic_tree_maker_function_type raw_tree_generator = [&]()
         {
@@ -197,46 +139,12 @@ public:
             crossover(parent0->tree(),
                       parent1->tree(),
                       tree,
-                      
-//                      getMinCrossoverTreeSize(),
-//                      getMaxCrossoverTreeSize(),
-//                      fs.getCrossoverMinSize()
-                      
                       fs.getMinTreeSize(),
                       fs.getMaxTreeSize(),
-                      
-                      //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-                      // TODO 20260126 think I guessed wrong about changing this.
-
-//                      fs.getMinTreeSize()
-                      fs.getCrossoverMinSize()
-                      //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-
-                      );
-//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-//            // TODO 20260126 think I guessed wrong about changing this.
-//            debugPrint(fs.getMinTreeSize());
-//            debugPrint(fs.getCrossoverMinSize());
-//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+                      fs.getCrossoverMinSize());
             return tree;
         };
         new_tree = fs.genericTreeMaker(raw_tree_generator);
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260131 move hoist() from GpTree::crossoverDonorRecipient()
-        //               to Population::evolutionStep(TournamentGroup)
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260201 move hoist back to crossover.
-
-//        new_tree.hoist();
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20251221 change logging for population sensor API.
@@ -252,8 +160,6 @@ public:
         // Occasionally migrate Individuals between subpopulations.
         subpopulationMigration();
     }
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     // Perform one step of the "steady state" evolutionary computation using
     // "absolute fitness" (rather than "relative tournament-based fitness").
@@ -462,9 +368,6 @@ public:
         return total / getIndividualCount();
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260124 show pop tree size as min/ave/max
-
     int minTreeSize() const
     {
         int min = std::numeric_limits<int>::max();
@@ -488,9 +391,6 @@ public:
         applyToAllIndividuals(f);
         return max;
     }
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Average of "tournaments survived" (or abs fitness) over all Individuals.
     float averageFitness() const

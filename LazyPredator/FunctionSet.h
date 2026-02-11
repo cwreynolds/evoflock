@@ -523,23 +523,6 @@ public:
                 least_size_error = size_error;
             }
         }
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20260130 prototype "hoist" operator on GpTree
-
-//        int nts = new_tree.size();
-//        if (smallest_init_tree_xxx > nts) { smallest_init_tree_xxx = nts;}
-//        if (biggest_init_tree_xxx < nts) { biggest_init_tree_xxx = nts;}
-//        std::cout << "new_tree.size() = " << nts;
-//        std::cout << " " << smallest_init_tree_xxx;
-//        std::cout << " " << biggest_init_tree_xxx;
-//        if (treeValidatorCustomized() and treeConstraintsOK(new_tree))
-//        {
-//            std::cout << "    full API usage!!";
-//        }
-//        std::cout << std::endl;
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         assert(new_tree.is_valid());
         bool size_ok = treeSizeOK(new_tree, min_tree_size, max_tree_size);
@@ -674,9 +657,7 @@ public:
                             int retries_for_style,
                             int retries_for_size) const
     {
-
         GpTree new_tree;
-//        double least_size_error = std::numeric_limits<double>::infinity();
         
         // Make up to 1/3 retries attempts to find tree of the correct "style".
         if (treeValidatorCustomized())
@@ -684,7 +665,6 @@ public:
             for (int i = 0; i < retries_for_style; i++)
             {
                 GpTree candidate = maker_func();
-//                if (treeConstraintsOK(candidate))
                 if (treeConstraintsOK(candidate) and treeSizeOK(candidate))
                 {
                     new_tree = candidate;
@@ -706,8 +686,6 @@ public:
                     break;
                 }
                 // Save the candidate which has least size error so far.
-//                size_t size = candidate.size();
-//                double size_error = distFromInterval(size,
                 double size_error = distFromInterval(candidate.size(),
                                                      getMinTreeSize(),
                                                      getMaxTreeSize());
@@ -718,26 +696,6 @@ public:
                 }
             }
         }
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260130 prototype "hoist" operator on GpTree
-
-//        int nts = new_tree.size();
-//        if (smallest_init_tree_xxx > nts) { smallest_init_tree_xxx = nts;}
-//        if (biggest_init_tree_xxx < nts) { biggest_init_tree_xxx = nts;}
-//        std::cout << "new_tree.size() = " << nts;
-//        std::cout << " " << smallest_init_tree_xxx;
-//        std::cout << " " << biggest_init_tree_xxx;
-//        if (treeValidatorCustomized() and treeConstraintsOK(new_tree))
-//        {
-//            std::cout << "    full API usage!!";
-//        }
-//        std::cout << std::endl;
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        
 
         assert(new_tree.is_valid());
         bool size_ok = treeSizeOK(new_tree);
@@ -751,8 +709,6 @@ public:
         assert(size_ok or
                (treeValidatorCustomized() and
                 treeConstraintsOK(new_tree)));
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        
         return new_tree;
     }
 

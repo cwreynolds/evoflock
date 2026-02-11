@@ -537,17 +537,10 @@ static void legacy_unit_test()
             ok = ok && st((count == 0) || (count == 1));
         }
         float p_to_q_ratio = float(total_P) / float(total_Q);
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260130 prototype "hoist" operator on GpTree
-
-//        ok = ok && st(between(p_to_q_ratio, 0.75, 1.25));
-        
         // Ad hoc, approximate, historical repeat ability test: "are we
         // getting roughly the value this code got some time in the past."
         // I think I have fudged this twice over several years.
         ok = ok && st(between(p_to_q_ratio, 0.60, 1.25));
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         FunctionSet::function_filter = nullptr;
         debugPrint(total_P)
         debugPrint(total_Q)

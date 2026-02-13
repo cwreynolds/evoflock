@@ -43,12 +43,11 @@ inline static bool enable_multithreading = true;
 inline static double roll_rate = 0.99;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20260121 use EF::add_curvature_objective for GP MOFs
+// TODO 20260213 use EF::add_curvature_objective for no obstacles run
 
 // Global switch (temp?) enables 4th objective component for boosting curvature.
 //inline static bool add_curvature_objective = false;
-//inline static bool add_curvature_objective = true;
-inline static bool add_curvature_objective = false;
+inline static bool add_curvature_objective = true;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

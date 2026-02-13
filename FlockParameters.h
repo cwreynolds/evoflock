@@ -261,6 +261,10 @@ private:
     //int boids_per_flock_ = 800;  // Even more.
     //int boids_per_flock_ = 1000;  // Kiloboid.
 
-    std::string use_obstacle_set = "SmallSpheresInBigSphere";
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260213 try flocking trained on open space, no obstacles.
+//    std::string use_obstacle_set = "SmallSpheresInBigSphere";
+    std::string use_obstacle_set = "NoObstacles";
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int fps_ = 30;
 };

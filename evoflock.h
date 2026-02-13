@@ -92,8 +92,10 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs, LP::Population* p)
 void runOneFlockEvolution()
 {
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-    // EF::setUsingGA();
-    EF::setUsingGP();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    EF::setUsingGA();
+    // EF::setUsingGP();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
 
     // Set likelihood of crossover versus hoist (on a randomly selected parent).
@@ -283,7 +285,13 @@ void runOneFlockEvolution()
             std::cout << "    ";  // "log_prefix"
             debugPrint(max_tree_size);
             std::cout << std::endl;
-
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20260212 log GpTree::likelihood_of_crossover_
+//            std::cout << "    ";  // "log_prefix"
+//            debugPrint(LP::GpTree::likelihood_of_crossover_);
+//            std::cout << std::endl;
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

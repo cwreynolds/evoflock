@@ -175,11 +175,6 @@ public:
     // GA/GP versions, respectively for parameter evolution and model evolution.
     Vec3 steerToFlock()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251104 remind me, is frame count mismatch only in multithreading?
-//        BoidPtrList neighbors = nearest_neighbors();
-//        flush_cache_of_predicted_obstacle_collisions();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if (EF::usingGA())
         {
             return steerToFlockForGA();
@@ -205,6 +200,17 @@ public:
         Vec3 ap = steer_for_predictive_avoidance() * fp().weightAvoidPredict();
         Vec3 as = fly_away_from_obstacles()        * fp().weightAvoidStatic();
         Vec3 combined_steering = smoothed_steering(f + s + a + c + ap + as);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260214 return_to_center VERY TEMPORARY IMPLEMENTATION !!!!
+        //               global flag for this?
+        //               do it only if there are no obstacles?
+        
+        double outsideness = position().length() - fp().sphereRadius();
+        double weight = 1;
+        Vec3 return_to_center = position().normalize() * (-outsideness * weight);
+        combined_steering += return_to_center;
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         saveAnnotation(s, a, c, ap, as, combined_steering);
         return combined_steering;
     }

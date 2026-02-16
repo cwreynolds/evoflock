@@ -260,6 +260,7 @@ private:
     //int boids_per_flock_ = 400;  // More.
     //int boids_per_flock_ = 800;  // Even more.
     //int boids_per_flock_ = 1000;  // Kiloboid.
+    //int boids_per_flock_ = 2500;  // for NoObstacles
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260213 try flocking trained on open space, no obstacles.

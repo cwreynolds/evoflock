@@ -460,7 +460,26 @@ public:
     double curvatureScore() const
     {
         double average_curvature = sum_curvature_ / boidStepPerSim();
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260214 tweak curvatureScore VERY TEMPORARY IMPLEMENTATION !!!!
+        //               global flag for this?
+
+//        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
+        
+        // 20260214_ga_no_obs_tweak_curvature
+//        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
+        
+        // 20260214_ga_no_obs_tweak_curvature_2
+//        return util::remap_interval_clip(average_curvature, 0, 0.05, 0.5, 1);
+//        return util::remap_interval_clip(average_curvature, 0, 0.2, 0.5, 1);
+
+        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
+        // TODO 20260215 back to previous curvature score
         return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
+        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
         
     // Accumulators for alignment score.

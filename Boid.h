@@ -205,11 +205,28 @@ public:
         //               global flag for this?
         //               do it only if there are no obstacles?
         
-        double outsideness = position().length() - fp().sphereRadius();
-        double weight = 1;
-        Vec3 return_to_center = position().normalize() * (-outsideness * weight);
-        combined_steering += return_to_center;
+        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
+        // TODO 20260215 make radius smaller for viewing convenience
         
+//    //        double outsideness = position().length() - fp().sphereRadius();
+//            double outsideness = position().length() - fp().sphereRadius() * 0.5;
+//            double weight = 1;
+//            Vec3 return_to_center = position().normalize() * (-outsideness * weight);
+//            combined_steering += return_to_center;
+      
+        {
+            double outsideness = position().length() - fp().sphereRadius() * 0.5;
+            if (outsideness > 0)
+            {
+                double weight = 1;
+//                double weight = 0.5;
+                Vec3 return_to_center = (position().normalize() *
+                                         (-outsideness * weight));
+                combined_steering += return_to_center;
+            }
+        }
+        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         saveAnnotation(s, a, c, ap, as, combined_steering);
         return combined_steering;

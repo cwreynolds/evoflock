@@ -47,7 +47,15 @@ inline static double roll_rate = 0.99;
 
 // Global switch (temp?) enables 4th objective component for boosting curvature.
 //inline static bool add_curvature_objective = false;
+
+// ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
+// TODO 20260215 make radius smaller for viewing convenience
+
 inline static bool add_curvature_objective = true;
+
+//inline static bool add_curvature_objective = false;
+
+// ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -397,10 +405,15 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                   96.414, 94.4825, 2.74096, 24.305, 34.2467,
         //                   -0.880103, -0.856635, 0.2645, 3.96972, 1.24912);
         
-        // Saved FP values from run 20260111_ga_regress_test (best fit 0.83)
-        FlockParameters fp(63.744, 81.2466, 43.4222, 28.0775, 16.4975,
-                           91.6614, 81.1959, 2.53281, 6.47123, 10.1784,
-                           -0.980982, -0.878616, 0.238952, 5.23155, 1.70729);
+        // // Saved FP values from run 20260111_ga_regress_test (best fit 0.83)
+        // FlockParameters fp(63.744, 81.2466, 43.4222, 28.0775, 16.4975,
+        //                    91.6614, 81.1959, 2.53281, 6.47123, 10.1784,
+        //                    -0.980982, -0.878616, 0.238952, 5.23155, 1.70729);
+        
+        // Saved FP values from run 20260214_ga_no_obs_tweak_curvature_2
+        FlockParameters fp(96.1906, 93.11, 63.5963, 99.1355, 30.6651, 68.6572,
+                           54.5162, 3.27533, 53.5294, 39.3137, -0.579767,
+                           0.00972851, -0.825164, 27.2047, 1.90221);
         
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);

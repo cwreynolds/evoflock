@@ -255,7 +255,31 @@ public:
             }
             return point;
         };
+        
+        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
+        // TODO 20260215 for NoObstacle tests max_force 100 -> 200
+
+//        return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20260216 add EF::no_obstacles_mode
+
+//        return LocalSpace::fromTo(rs.random_point_in_unit_radius_sphere() * 60,
+//                                  rs.randomUnitVector());
+        
+        if (EF::no_obstacles_mode)
+        {
+//            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 60;
+//            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 20;
+//            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 30;
+            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 50;
+            return LocalSpace::fromTo(pos, rs.randomUnitVector());
+        }
+        
         return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
     }
 
     // Collect flock curvature stats
@@ -476,7 +500,8 @@ public:
 
         // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
         // TODO 20260215 back to previous curvature score
-        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
+//        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
+        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
         // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

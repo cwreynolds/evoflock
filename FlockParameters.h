@@ -256,16 +256,42 @@ private:
     //int max_simulation_steps_ = 2000;   // ~66 seconds: for obs collision test
     //int max_simulation_steps_ = 9000;  // 5 minutes for demo mode
     
-    int boids_per_flock_ = 200;  // Normal, for evolution runs.
+    // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
+    // TODO 20260215 for NoObstacle tests max_force 100 -> 200
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20260216 add EF::no_obstacles_mode
+
+//    int boids_per_flock_ = 200;  // Normal, for evolution runs.
+  
+    int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
+                            EF::override_boids_per_flock :
+                            200);  // Normal, for evolution runs.
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     //int boids_per_flock_ = 400;  // More.
     //int boids_per_flock_ = 800;  // Even more.
     //int boids_per_flock_ = 1000;  // Kiloboid.
     //int boids_per_flock_ = 2500;  // for NoObstacles
+    //int boids_per_flock_ = 1000;  // for NoObstacles
+    //int boids_per_flock_ = 1200;  // for NoObstacles
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260213 try flocking trained on open space, no obstacles.
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20260216 add EF::no_obstacles_mode
+
 //    std::string use_obstacle_set = "SmallSpheresInBigSphere";
-    std::string use_obstacle_set = "NoObstacles";
+//    std::string use_obstacle_set = "NoObstacles";
+  
+    std::string use_obstacle_set = (EF::no_obstacles_mode ?
+                                    "NoObstacles" :
+                                    "SmallSpheresInBigSphere");
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int fps_ = 30;
 };

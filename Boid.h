@@ -214,17 +214,36 @@ public:
 //            Vec3 return_to_center = position().normalize() * (-outsideness * weight);
 //            combined_steering += return_to_center;
       
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20260216 add EF::no_obstacles_mode
+
+//            {
+//                double outsideness = position().length() - fp().sphereRadius() * 0.5;
+//                if (outsideness > 0)
+//                {
+//                    double weight = 1;
+//    //                double weight = 0.5;
+//                    Vec3 return_to_center = (position().normalize() *
+//                                             (-outsideness * weight));
+//                    combined_steering += return_to_center;
+//                }
+//            }
+
+        if (EF::no_obstacles_mode)
         {
-            double outsideness = position().length() - fp().sphereRadius() * 0.5;
+//            double outsideness = position().length() - fp().sphereRadius() * 0.5;
+            double outsideness = position().length() - fp().sphereRadius() * 0.6;
             if (outsideness > 0)
             {
                 double weight = 1;
-//                double weight = 0.5;
                 Vec3 return_to_center = (position().normalize() *
                                          (-outsideness * weight));
                 combined_steering += return_to_center;
             }
         }
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
         // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

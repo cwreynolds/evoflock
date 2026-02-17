@@ -51,13 +51,30 @@ inline static double roll_rate = 0.99;
 // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
 // TODO 20260215 make radius smaller for viewing convenience
 
-inline static bool add_curvature_objective = true;
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20260216 add EF::no_obstacles_mode
 
-//inline static bool add_curvature_objective = false;
+//inline static bool add_curvature_objective = true;
+inline static bool add_curvature_objective = false;
+
+// experimental / temp?
+inline static int override_boids_per_flock = -1;
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20260216 add EF::no_obstacles_mode
+
+//inline static bool no_obstacles_mode = false;
+inline static bool no_obstacles_mode = true;
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -376,7 +393,20 @@ void visualizeBestIfRequested(LP::Population* population)
         
         bool previous_draw_enable_state = Draw::getInstance().enable();
         Draw::getInstance().setEnable(true);
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20260216 add EF::no_obstacles_mode
+        int previous_obpf = override_boids_per_flock;
+        override_boids_per_flock = 1200;
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
         GP::run_flock_simulation(individual, 1);
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20260216 add EF::no_obstacles_mode
+        override_boids_per_flock = previous_obpf;
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
         Draw::getInstance().setEnable(previous_draw_enable_state);
         enable_multithreading = previous_emt_state;
         draw.clearVisBestMode();
@@ -410,10 +440,15 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                    91.6614, 81.1959, 2.53281, 6.47123, 10.1784,
         //                    -0.980982, -0.878616, 0.238952, 5.23155, 1.70729);
         
-        // Saved FP values from run 20260214_ga_no_obs_tweak_curvature_2
-        FlockParameters fp(96.1906, 93.11, 63.5963, 99.1355, 30.6651, 68.6572,
-                           54.5162, 3.27533, 53.5294, 39.3137, -0.579767,
-                           0.00972851, -0.825164, 27.2047, 1.90221);
+        // // Saved FP values from run 20260214_ga_no_obs_tweak_curvature_2
+        // FlockParameters fp(96.1906, 93.11, 63.5963, 99.1355, 30.6651, 68.6572,
+        //                    54.5162, 3.27533, 53.5294, 39.3137, -0.579767,
+        //                 0.00972851, -0.825164, 27.2047, 1.90221);
+        
+        // Saved FP values from run 20260215_ga_no_obs_more_wip
+        FlockParameters fp(91.1072, 98.6429, 51.8598, 94.8959, 21.8851, 22.2565,
+                           5.87154, 2.96989, 92.1022, 12.3065, -0.805401,
+                           -0.112003, -0.74847, 63.9714, 3.51265);
         
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);

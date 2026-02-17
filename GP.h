@@ -552,11 +552,6 @@ LazyPredator::FunctionSet static_ga_fs_ =
         { "Real_0_1",    0.0,   1.0, jiggle_scale },
         { "Real_0_10",   0.0,  10.0, jiggle_scale },
         { "Real_0_100",  0.0, 100.0, jiggle_scale },
-        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
-        // TODO 20260215 for NoObstacle tests max_force 100 -> 200
-        // VERY TEMP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        { "Real_0_200",  0.0, 200.0, jiggle_scale },
-        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
         { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
     },
     {
@@ -569,12 +564,7 @@ LazyPredator::FunctionSet static_ga_fs_ =
             
             // Function parameter type list, cf FlockParameters for details
             {
-                // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
-                // TODO 20260215 for NoObstacle tests max_force 100 -> 200
-                // VERY TEMP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//                "Real_0_100",  // max_force
-                "Real_0_200",  // max_force
-                // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
+                "Real_0_100",  // max_force
 
                 "Real_0_100",  // weight_forward
                 "Real_0_100",  // weight_separate

@@ -55,7 +55,14 @@ inline static double roll_rate = 0.99;
 // TODO 20260216 add EF::no_obstacles_mode
 
 //inline static bool add_curvature_objective = true;
-inline static bool add_curvature_objective = false;
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20260218 use curvature objective less strength
+
+//inline static bool add_curvature_objective = false;
+inline static bool add_curvature_objective = true;
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 // experimental / temp?
 inline static int override_boids_per_flock = -1;
@@ -423,8 +430,8 @@ void visualizeBestIfRequested(LP::Population* population)
 // running the logged result.
 void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 {
-//    return;  // For normal EF run: return without doing anything. Comment this
-//             // out to post-visualize a logged result from a previous run.
+    return;  // For normal EF run: return without doing anything. Comment this
+             // out to post-visualize a logged result from a previous run.
 
     if (EF::usingGA())
     {

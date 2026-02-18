@@ -264,11 +264,22 @@ private:
 
 //    int boids_per_flock_ = 200;  // Normal, for evolution runs.
   
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260218 use curvature objective less strength
+
+//        int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
+//                                EF::override_boids_per_flock :
+//    //                            200);  // Normal, for evolution runs.
+//                                1200);  // more.
+//    //                            2500);  // more more..
+
     int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
                             EF::override_boids_per_flock :
-//                            200);  // Normal, for evolution runs.
-                            1200);  // more.
+                            200);  // Normal, for evolution runs.
+//                            1200);  // more.
 //                            2500);  // more more..
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

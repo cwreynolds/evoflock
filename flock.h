@@ -144,7 +144,7 @@ public:
                 fly_boids(fdt);
                 update_fps();
 
-                debugPrint(selectedBoid()->speed());
+//                debugPrint(selectedBoid()->speed());
 
             }
             // Draw all Boid bodies, whether sim was paused or not.
@@ -514,7 +514,19 @@ public:
         // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
         // TODO 20260215 back to previous curvature score
 //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
-        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260218 use curvature objective less strength
+
+//        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
+
+        double max_penalty = EF::no_obstacles_mode ? 0.1 : 0.2;
+        return util::remap_interval_clip(average_curvature,
+                                         0, 0.1,
+                                         1 - max_penalty, 1);
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

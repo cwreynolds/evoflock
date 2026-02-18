@@ -232,7 +232,9 @@ public:
         if (EF::no_obstacles_mode)
         {
 //            double outsideness = position().length() - fp().sphereRadius() * 0.5;
-            double outsideness = position().length() - fp().sphereRadius() * 0.6;
+//            double outsideness = position().length() - fp().sphereRadius() * 0.6;
+//            double outsideness = position().length() - fp().sphereRadius() * 0.4;
+            double outsideness = position().length() - fp().sphereRadius() * 0.3;
             if (outsideness > 0)
             {
                 double weight = 1;

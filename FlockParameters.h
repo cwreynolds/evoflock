@@ -266,7 +266,9 @@ private:
   
     int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
                             EF::override_boids_per_flock :
-                            200);  // Normal, for evolution runs.
+//                            200);  // Normal, for evolution runs.
+                            1200);  // more.
+//                            2500);  // more more..
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

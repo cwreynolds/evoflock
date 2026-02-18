@@ -423,8 +423,8 @@ void visualizeBestIfRequested(LP::Population* population)
 // running the logged result.
 void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 {
-    return;  // For normal EF run: return without doing anything. Comment this
-             // out to post-visualize a logged result from a previous run.
+//    return;  // For normal EF run: return without doing anything. Comment this
+//             // out to post-visualize a logged result from a previous run.
 
     if (EF::usingGA())
     {
@@ -446,10 +446,15 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                 0.00972851, -0.825164, 27.2047, 1.90221);
         
         // Saved FP values from run 20260215_ga_no_obs_more_wip
-        FlockParameters fp(91.1072, 98.6429, 51.8598, 94.8959, 21.8851, 22.2565,
-                           5.87154, 2.96989, 92.1022, 12.3065, -0.805401,
-                           -0.112003, -0.74847, 63.9714, 3.51265);
+        // FlockParameters fp(91.1072, 98.6429, 51.8598, 94.8959, 21.8851, 22.2565,
+        //                    5.87154, 2.96989, 92.1022, 12.3065, -0.805401,
+        //                    -0.112003, -0.74847, 63.9714, 3.51265);
         
+        // Saved FP values from run 20260216_ga_no_obs_no_curve
+        FlockParameters fp(94.7771, 94.2979, 42.4511, 71.7522, 23.1819, 8.37409,
+                           82.8308, 3.31166, 98.9976, 9.43775, -0.932242,
+                           -0.702709, -0.867646, 68.5945, 3.52568);
+
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);
         LP::Individual individual(GP::gaTreeFromFP(fp, fs), fs);

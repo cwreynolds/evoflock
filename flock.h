@@ -143,6 +143,9 @@ public:
                 // time matched the draw frame time.
                 fly_boids(fdt);
                 update_fps();
+
+                debugPrint(selectedBoid()->speed());
+
             }
             // Draw all Boid bodies, whether sim was paused or not.
             for_all_boids([&](Boid* b){ b->draw_body();});
@@ -208,6 +211,15 @@ public:
                 
         // Randomize the Boid's position and orientation.
         boid->set_ls(initBoidPose(radius, center, rs));
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20260216 add EF::no_obstacles_mode
+        if (EF::no_obstacles_mode)
+        {
+            double target_speed = 20;
+            boid->setSpeed(target_speed * rs.frandom01());
+        }
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
         // Probably unneeded since initial speed is zero, nevertheless:
         boid->setPreviousPosition(boid->position());
@@ -272,7 +284,8 @@ public:
 //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 60;
 //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 20;
 //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 30;
-            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 50;
+//            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 50;
+            Vec3 pos = rs.randomUnitVector() * 50;
             return LocalSpace::fromTo(pos, rs.randomUnitVector());
         }
         

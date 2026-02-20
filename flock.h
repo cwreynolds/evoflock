@@ -212,20 +212,41 @@ public:
         // Randomize the Boid's position and orientation.
         boid->set_ls(initBoidPose(radius, center, rs));
         
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260216 add EF::no_obstacles_mode
-        if (EF::no_obstacles_mode)
-        {
-            double target_speed = 20;
-            boid->setSpeed(target_speed * rs.frandom01());
-        }
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//        // TODO 20260216 add EF::no_obstacles_mode
+//        if (EF::no_obstacles_mode)
+//        {
+//            double target_speed = 20;
+//            boid->setSpeed(target_speed * rs.frandom01());
+//        }
+//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
         // Probably unneeded since initial speed is zero, nevertheless:
         boid->setPreviousPosition(boid->position());
+  
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20260218 init Boid speed for EF::no_obstacles_mode
         
-        // Init Boid speed to EF::default_target_speed. Why only in GP mode?
-        if (EF::usingGP()) { boid->setSpeed(EF::default_target_speed); }
+        
+//        // Init Boid speed to EF::default_target_speed. Why only in GP mode?
+//        if (EF::usingGP()) { boid->setSpeed(EF::default_target_speed); }
+
+        // Init Boid speed to EF::default_target_speed.
+        boid->setSpeed(EF::default_target_speed);
+
+//        if (EF::no_obstacles_mode)
+//        {
+//            double target_speed = 20;
+//            boid->setSpeed(target_speed * rs.frandom01());
+//        }
+
+        if (EF::no_obstacles_mode)
+        {
+            boid->setSpeed(EF::default_target_speed * rs.frandom01());
+        }
+
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
 
     // Random initial Boid "pose" (position and orientation). By default, they
@@ -285,7 +306,17 @@ public:
 //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 20;
 //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 30;
 //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 50;
-            Vec3 pos = rs.randomUnitVector() * 50;
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20260219 more fiddling with init pose for no_obstacles_mode
+//            Vec3 pos = rs.randomUnitVector() * 50;
+//            Vec3 pos = rs.randomUnitVector() * fp().sphereRadius() * 0.6;
+//            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
+//                        fp().sphereRadius() * 0.6);
+//            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
+//                        fp().sphereRadius() * 0.4);
+            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
+                        fp().sphereRadius());
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             return LocalSpace::fromTo(pos, rs.randomUnitVector());
         }
         

@@ -252,9 +252,19 @@ private:
     double sphere_radius_ = 50;
     Vec3 sphere_center_;
     
-    int max_simulation_steps_ = 500;    // ~17 seconds: for evolution run
-    //int max_simulation_steps_ = 2000;   // ~66 seconds: for obs collision test
-    //int max_simulation_steps_ = 9000;  // 5 minutes for demo mode
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260220 add EF::visualize_previous_results_mode
+
+//    int max_simulation_steps_ = 500;    // ~17 seconds: for evolution run
+//    //int max_simulation_steps_ = 2000;   // ~66 seconds: for obs collision test
+//    //int max_simulation_steps_ = 9000;  // 5 minutes for demo mode
+
+    int max_simulation_steps_ = (EF::visualize_previous_results_mode ?
+                                 1000 :  // ~30 seconds viz prev results.
+                                 500);   // ~17 seconds: for evolution run.
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     
     // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
     // TODO 20260215 for NoObstacle tests max_force 100 -> 200
@@ -273,11 +283,28 @@ private:
 //                                1200);  // more.
 //    //                            2500);  // more more..
 
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20260220 add EF::visualize_previous_results_mode
+
+//        int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
+//                                EF::override_boids_per_flock :
+//                                200);  // Normal, for evolution runs.
+//    //                            1200);  // more.
+//    //                            2500);  // more more..
+
     int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
                             EF::override_boids_per_flock :
-                            200);  // Normal, for evolution runs.
+                            (EF::visualize_previous_results_mode ?
+                             1200 :  // for viz prev results.
+                             200));  // Normal, for evolution runs.
+    
+    
+    
+    
 //                            1200);  // more.
 //                            2500);  // more more..
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

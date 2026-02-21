@@ -464,6 +464,19 @@ public:
         // Piecewise linear function of distance to score
         std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
         std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260220 add EF::visualize_previous_results_mode
+
+        // Increase high end of allowable separation distance
+        if (EF::no_obstacles_mode)
+        {
+//            double more = 4;
+            double more = 2;
+            d.at(3) += more;
+            d.at(4) += more;
+        }
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         for (auto b : boids())
         {
             double distance = b->distanceToNearestNeighbor();

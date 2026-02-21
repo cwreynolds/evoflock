@@ -229,20 +229,42 @@ public:
 //                }
 //            }
 
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260221 return_to_center only for boids pointing away
+        
+//            if (EF::no_obstacles_mode)
+//            {
+//    //            double outsideness = position().length() - fp().sphereRadius() * 0.5;
+//    //            double outsideness = position().length() - fp().sphereRadius() * 0.6;
+//    //            double outsideness = position().length() - fp().sphereRadius() * 0.4;
+//                double outsideness = position().length() - fp().sphereRadius() * 0.3;
+//                if (outsideness > 0)
+//                {
+//                    double weight = 1;
+//                    Vec3 return_to_center = (position().normalize() *
+//                                             (-outsideness * weight));
+//                    combined_steering += return_to_center;
+//                }
+//            }
+      
         if (EF::no_obstacles_mode)
         {
-//            double outsideness = position().length() - fp().sphereRadius() * 0.5;
-//            double outsideness = position().length() - fp().sphereRadius() * 0.6;
-//            double outsideness = position().length() - fp().sphereRadius() * 0.4;
-            double outsideness = position().length() - fp().sphereRadius() * 0.3;
-            if (outsideness > 0)
+            double dist = position().length();
+//            double outsideness = position().length() - fp().sphereRadius() * 0.3;
+            double outsideness = dist - fp().sphereRadius() * 0.3;
+//            if (outsideness > 0)
+            if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
             {
-                double weight = 1;
+//                double weight = 1;
+                double weight = 0.5;
                 Vec3 return_to_center = (position().normalize() *
                                          (-outsideness * weight));
                 combined_steering += return_to_center;
             }
         }
+
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 

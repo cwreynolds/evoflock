@@ -86,6 +86,8 @@ inline static bool no_obstacles_mode = true;
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 // TODO 20260220 add EF::visualize_previous_results_mode
 
+//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
 inline static bool visualize_previous_results_mode = true;
 
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -484,10 +486,15 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                    -0.702709, -0.867646, 68.5945, 3.52568);
         
         // Saved FP values from run 20260219_ga_no_obs_rand_init_vel_3
-        FlockParameters fp(80.8611, 96.1782, 43.7249, 88.7047, 13.5773,
-                           43.4836,25.946, 2.92637, 93.1734, 18.2696,
-                           -0.919836, -0.757193, -0.193814, 77.0225, 3.97704);
+        // FlockParameters fp(80.8611, 96.1782, 43.7249, 88.7047, 13.5773,
+        //                    43.4836,25.946, 2.92637, 93.1734, 18.2696,
+        //                    -0.919836, -0.757193, -0.193814, 77.0225, 3.97704);
 
+        // Saved FP values from run 20260221_ga_new_ret_to_center
+        FlockParameters fp(93.6905, 96.6739, 50.5408, 79.4269, 5.37308,
+                           31.3867, 5.28867, 3.95184, 77.7457, 94.3708,
+                           -0.799625, -0.381311, 0.459778, 89.8753, 7.80046);
+        
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);
         LP::Individual individual(GP::gaTreeFromFP(fp, fs), fs);

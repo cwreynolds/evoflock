@@ -247,23 +247,31 @@ public:
 //                }
 //            }
       
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260222 increase return_to_center outside distance
+
         if (EF::no_obstacles_mode)
         {
             double dist = position().length();
-//            double outsideness = position().length() - fp().sphereRadius() * 0.3;
-            double outsideness = dist - fp().sphereRadius() * 0.3;
-//            if (outsideness > 0)
+//            double outsideness = dist - fp().sphereRadius() * 0.3;
+//            double outsideness = dist - fp().sphereRadius() * 0.6;
+//            double outsideness = dist - fp().sphereRadius() * 0.5;
+            double outsideness = dist - fp().sphereRadius() * 0.7;
             if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
             {
-//                double weight = 1;
-                double weight = 0.5;
-                Vec3 return_to_center = (position().normalize() *
-                                         (-outsideness * weight));
+//                double weight = 0.5;
+//                double weight = 0.65;
+                double weight = 0.75;
+//                Vec3 return_to_center = (position().normalize() *
+//                                         (-outsideness * weight));
+                Vec3 return_to_center = (-position().normalize() *
+                                         (outsideness * weight));
                 combined_steering += return_to_center;
             }
         }
 
-        
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~

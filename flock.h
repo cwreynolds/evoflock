@@ -240,10 +240,16 @@ public:
 //            boid->setSpeed(target_speed * rs.frandom01());
 //        }
 
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260222 increase return_to_center outside distance
+
         if (EF::no_obstacles_mode)
         {
-            boid->setSpeed(EF::default_target_speed * rs.frandom01());
+//            boid->setSpeed(EF::default_target_speed * rs.frandom01());
+            boid->setSpeed(EF::default_target_speed * rs.frandom2(0.9, 1.1));
         }
+        
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
@@ -294,34 +300,51 @@ public:
 
 //        return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
 
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20260216 add EF::no_obstacles_mode
 
 //        return LocalSpace::fromTo(rs.random_point_in_unit_radius_sphere() * 60,
 //                                  rs.randomUnitVector());
         
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260222 clean up
+
+//            if (EF::no_obstacles_mode)
+//            {
+//    //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 60;
+//    //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 20;
+//    //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 30;
+//    //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 50;
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                // TODO 20260219 more fiddling with init pose for no_obstacles_mode
+//    //            Vec3 pos = rs.randomUnitVector() * 50;
+//    //            Vec3 pos = rs.randomUnitVector() * fp().sphereRadius() * 0.6;
+//    //            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
+//    //                        fp().sphereRadius() * 0.6);
+//    //            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
+//    //                        fp().sphereRadius() * 0.4);
+//                Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
+//                            fp().sphereRadius());
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                return LocalSpace::fromTo(pos, rs.randomUnitVector());
+//            }
+      
         if (EF::no_obstacles_mode)
         {
-//            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 60;
-//            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 20;
-//            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 30;
-//            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 50;
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20260219 more fiddling with init pose for no_obstacles_mode
-//            Vec3 pos = rs.randomUnitVector() * 50;
-//            Vec3 pos = rs.randomUnitVector() * fp().sphereRadius() * 0.6;
 //            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
-//                        fp().sphereRadius() * 0.6);
-//            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
-//                        fp().sphereRadius() * 0.4);
-            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
-                        fp().sphereRadius());
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            return LocalSpace::fromTo(pos, rs.randomUnitVector());
+//                        fp().sphereRadius());
+//            return LocalSpace::fromTo(pos, rs.randomUnitVector());
+
+            return LocalSpace::fromTo((rs.random_point_in_unit_radius_sphere() *
+                                       fp().sphereRadius()),
+                                      rs.randomUnitVector());
         }
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
         
         return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
         // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
     }
@@ -466,15 +489,39 @@ public:
         std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         // TODO 20260220 add EF::visualize_previous_results_mode
+        
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260222 also increase low end of allowable separation distance
 
-        // Increase high end of allowable separation distance
+//            // Increase high end of allowable separation distance
+//            if (EF::no_obstacles_mode)
+//            {
+//    //            double more = 4;
+//                double more = 2;
+//                d.at(3) += more;
+//                d.at(4) += more;
+//            }
+      
+//            // In no_obstacles_mode, slide up allowable separation interval
+//            if (EF::no_obstacles_mode)
+//            {
+//    //            double more = 2;
+//    //            d.at(3) += more;
+//    //            d.at(4) += more;
+//
+//                double more = 3;
+//                for (int i = 1; i < d.size(); i++) { d.at(i) += more; }
+//            }
+
+        // In no_obstacles_mode, slide up allowable separation interval
         if (EF::no_obstacles_mode)
         {
-//            double more = 4;
+//            double more = 3;
             double more = 2;
-            d.at(3) += more;
-            d.at(4) += more;
+            for (int i = 1; i < d.size(); i++) { d.at(i) += more; }
         }
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         for (auto b : boids())

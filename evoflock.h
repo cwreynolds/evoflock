@@ -88,8 +88,13 @@ inline static bool no_obstacles_mode = true;
 
 //inline static bool visualize_previous_results_mode = true;
 //inline static bool visualize_previous_results_mode = false;
-inline static bool visualize_previous_results_mode = true;
-
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+// TODO 20260222 fix for EF::visualize_previous_results_mode
+//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+//inline static bool visualize_previous_results_mode = true;
+inline static bool visualize_previous_results_mode = false;
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 // Global default target speed. Move to const section of FlockParameters?
@@ -439,10 +444,14 @@ void visualizeBestIfRequested(LP::Population* population)
 // running the logged result.
 void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 {
-    // For normal EF run: return without doing anything. Comment out this
-    // return to instead post-visualize a logged result from a previous run.
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20260222 fix for EF::visualize_previous_results_mode
+    
+//    // For normal EF run: return without doing anything. Comment out this
+//    // return to instead post-visualize a logged result from a previous run.
 //    return;
     
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20260220 add EF::visualize_previous_results_mode
@@ -491,9 +500,14 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                    -0.919836, -0.757193, -0.193814, 77.0225, 3.97704);
 
         // Saved FP values from run 20260221_ga_new_ret_to_center
-        FlockParameters fp(93.6905, 96.6739, 50.5408, 79.4269, 5.37308,
-                           31.3867, 5.28867, 3.95184, 77.7457, 94.3708,
-                           -0.799625, -0.381311, 0.459778, 89.8753, 7.80046);
+        // FlockParameters fp(93.6905, 96.6739, 50.5408, 79.4269, 5.37308,
+        //                    31.3867, 5.28867, 3.95184, 77.7457, 94.3708,
+        //                    -0.799625, -0.381311, 0.459778, 89.8753, 7.80046);
+        
+        // Saved FP values from run 20260222_ga_new_sep_interval
+        FlockParameters fp(94.7861, 97.4638, 80.4171, 98.9001, 4.41346,
+                           4.37725, 3.68332, 5.16365, 41.8653, 72.6479,
+                           -0.959596, -0.644678, -0.922466, 23.399, 9.32508);
         
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);

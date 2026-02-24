@@ -58,14 +58,40 @@ inline std::vector<std::string> mof_names()
     return (EF::usingGA() ?
             // GA
             (EF::add_curvature_objective ?
-             // GA with curvature
+             
+             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+             // TODO 20260223 bring back cluster counting
+
+//             // GA with curvature
+//             std::vector<std::string>(
+//                                      {
+//                                          "avoid",
+//                                          "separate",
+//                                          "speed",
+//                                          "curvature"
+//                                      }):
+
+             (EF::add_curvature_AND_cluster_objectives ?
+
+              // GA with curvature AND cluster
+             std::vector<std::string>(
+                                      {
+                                          "avoid",
+                                          "separate",
+                                          "speed",
+                                          "curvature",
+                                          "cluster"
+                                      }):
+              // GA with JUST curvature
              std::vector<std::string>(
                                       {
                                           "avoid",
                                           "separate",
                                           "speed",
                                           "curvature"
-                                      }):
+                                      }))
+             :
+             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
              // GA without curvature
              std::vector<std::string>(
                                       {
@@ -102,14 +128,46 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
     return (EF::usingGA() ?
             // GA
             (EF::add_curvature_objective ?
-             // GA with curvature
-             MOF(
-                 {
-                     flock.obstacleCollisionsScore(),
-                     flock.separationScore(),
-                     flock.speedScore(),
-                     flock.curvatureScore()
-                 }) :
+             
+             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+             // TODO 20260223 bring back cluster counting
+             
+//             // GA with curvature
+//             MOF(
+//                 {
+//                     flock.obstacleCollisionsScore(),
+//                     flock.separationScore(),
+//                     flock.speedScore(),
+//                     flock.curvatureScore()
+//                 }) :
+
+             // TODO 20260223 this is obviously ad hoc, need to refactor the way
+             //               objectives are added/removed from a given run.
+             // inline static bool add_curvature_AND_cluster_objectives = true;
+             
+             (EF::add_curvature_AND_cluster_objectives ?
+              // GA with curvature AND cluster
+              MOF(
+                  {
+                      flock.obstacleCollisionsScore(),
+                      flock.separationScore(),
+                      flock.speedScore(),
+                      flock.curvatureScore(),
+                      flock.clusterScore()
+                  })
+              :
+              // GA with JUST curvature
+              MOF(
+                  {
+                      flock.obstacleCollisionsScore(),
+                      flock.separationScore(),
+                      flock.speedScore(),
+                      flock.curvatureScore()
+                  })
+              )
+             :
+             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
              // GA without curvature
              MOF(
                  {

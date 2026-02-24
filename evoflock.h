@@ -64,6 +64,15 @@ inline static bool add_curvature_objective = true;
 
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20260223 bring back cluster counting
+
+// TODO 20260223 this is obviously ad hoc, need to refactor the way
+//               objectives are added/removed from a given run.
+inline static bool add_curvature_AND_cluster_objectives = true;
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 // experimental / temp?
 inline static int override_boids_per_flock = -1;
 
@@ -93,7 +102,11 @@ inline static bool no_obstacles_mode = true;
 //inline static bool visualize_previous_results_mode = true;
 //inline static bool visualize_previous_results_mode = false;
 //inline static bool visualize_previous_results_mode = true;
-inline static bool visualize_previous_results_mode = false;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20260223 bring back cluster counting
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -505,9 +518,14 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                    -0.799625, -0.381311, 0.459778, 89.8753, 7.80046);
         
         // Saved FP values from run 20260222_ga_new_sep_interval
-        FlockParameters fp(94.7861, 97.4638, 80.4171, 98.9001, 4.41346,
-                           4.37725, 3.68332, 5.16365, 41.8653, 72.6479,
-                           -0.959596, -0.644678, -0.922466, 23.399, 9.32508);
+        // FlockParameters fp(94.7861, 97.4638, 80.4171, 98.9001, 4.41346,
+        //                    4.37725, 3.68332, 5.16365, 41.8653, 72.6479,
+        //                    -0.959596, -0.644678, -0.922466, 23.399, 9.32508);
+        
+        // Saved FP values from run 20260223_ga_no_obs_with_clusters
+        FlockParameters fp(97.8651, 85.5172, 53.1979, 35.4656, 18.1132,
+                           70.676, 37.4797, 4.60951, 9.27746, 11.7462,
+                           -0.802592, -0.763088, -0.319223, 23.1518, 3.91158);
         
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);

@@ -382,6 +382,14 @@ public:
         // TODO 20251208 score for boid alignment.
         recordAlignmentScorePerStep();
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260223 bring back cluster counting
+        
+//        debugPrint(count_clusters())
+        recordClusterScorePerStep();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20251122 all ops return Vec3, Scalar values all constants
@@ -643,13 +651,68 @@ public:
         }
     }
     
-    // Average speed for each Boid on each simulation step.
-    // Disabled, always returns 1.
+    // Average alignment for each Boid with 7 neighbors on each simulation step.
     double alignmentScore() const
     {
         return (sum_of_alignment_scores_over_all_boid_steps_ /
                 boidStepPerSim());
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260223 bring back cluster counting
+    
+    
+    // Accumulators for cluster score.
+    // TODO Relocate in file?
+    double sum_of_cluster_counts_over_all_sim_steps_ = 0;
+
+    // Called once per simulation step.
+    void recordClusterScorePerStep()
+    {
+//        double max_cluster_count = 8;  // Perfect score for 8 or more clusters.
+        double max_cluster_count = 6;  // Perfect score for 6 or more clusters.
+        double cc = countClusters();
+//        double cc_score = std::pow(util::clip01(cc / max_cluster_count), 0.5);
+        double cc_score = std::pow(util::clip01(cc / max_cluster_count), 0.3);
+
+//        debugPrint(cc);
+//        debugPrint(cc_score);
+
+        sum_of_cluster_counts_over_all_sim_steps_ += cc_score;
+    }
+    
+    // Average alignment for each Boid with 7 neighbors on each simulation step.
+    double clusterScore() const
+    {
+        return (sum_of_cluster_counts_over_all_sim_steps_ /
+                fp().maxSimulationSteps());
+    }
+    
+    // Count the number of boid clusters using a version of DBSCAN algorithm.
+    int countClusters() const
+    {
+        // Clustering parameters.
+        //        int dbscan_min_points = 4;
+        //        double dbscan_epsilon = 5;
+        int dbscan_min_points = 5;
+        double dbscan_epsilon = 8;
+        // Copy Boid positions into a vector of DBSCAN::Point.
+        size_t boid_count = boids().size();
+        std::vector<DBSCAN::Point> points(boid_count);
+        for (int i = 0; i < boid_count; i++)
+        {
+            const Vec3& bp = boids()[i]->position();
+            points[i].x = bp.x();
+            points[i].y = bp.y();
+            points[i].z = bp.z();
+        }
+        // Run DBSCAN clustering algorithm.
+        DBSCAN dbscan(dbscan_min_points, dbscan_epsilon, points);
+        // Return number of clusters found.
+        return dbscan.getClusterCount();
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.

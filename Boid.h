@@ -250,25 +250,62 @@ public:
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         // TODO 20260222 increase return_to_center outside distance
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260223 bring back cluster counting
+
+//            if (EF::no_obstacles_mode)
+//            {
+//                double dist = position().length();
+//    //            double outsideness = dist - fp().sphereRadius() * 0.3;
+//    //            double outsideness = dist - fp().sphereRadius() * 0.6;
+//    //            double outsideness = dist - fp().sphereRadius() * 0.5;
+//                double outsideness = dist - fp().sphereRadius() * 0.7;
+//                if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
+//                {
+//    //                double weight = 0.5;
+//    //                double weight = 0.65;
+//                    double weight = 0.75;
+//    //                Vec3 return_to_center = (position().normalize() *
+//    //                                         (-outsideness * weight));
+//                    Vec3 return_to_center = (-position().normalize() *
+//                                             (outsideness * weight));
+//                    combined_steering += return_to_center;
+//                }
+//            }
+
+//            if (EF::no_obstacles_mode)
+//            {
+//                double dist = position().length();
+//    //            double outsideness = dist - fp().sphereRadius() * 0.7;
+//                double outsideness = dist - fp().sphereRadius() * 0.5;
+//                if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
+//                {
+//    //                double weight = 0.75;
+//                    double weight = 1.0;
+//                    Vec3 return_to_center = (-position().normalize() *
+//                                             (outsideness * weight));
+//                    combined_steering += return_to_center;
+//                }
+//            }
+
         if (EF::no_obstacles_mode)
         {
             double dist = position().length();
-//            double outsideness = dist - fp().sphereRadius() * 0.3;
-//            double outsideness = dist - fp().sphereRadius() * 0.6;
+//            double outsideness = dist - fp().sphereRadius() * 0.7;
 //            double outsideness = dist - fp().sphereRadius() * 0.5;
             double outsideness = dist - fp().sphereRadius() * 0.7;
             if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
             {
-//                double weight = 0.5;
-//                double weight = 0.65;
-                double weight = 0.75;
-//                Vec3 return_to_center = (position().normalize() *
-//                                         (-outsideness * weight));
+//                double weight = 0.75;
+//                double weight = 1.0;
+                double weight = 0.8;
                 Vec3 return_to_center = (-position().normalize() *
                                          (outsideness * weight));
                 combined_steering += return_to_center;
             }
         }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 

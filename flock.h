@@ -521,13 +521,18 @@ public:
 //                for (int i = 1; i < d.size(); i++) { d.at(i) += more; }
 //            }
 
-        // In no_obstacles_mode, slide up allowable separation interval
-        if (EF::no_obstacles_mode)
-        {
-//            double more = 3;
-            double more = 2;
-            for (int i = 1; i < d.size(); i++) { d.at(i) += more; }
-        }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260223 do I even need this anymore after adding cluster score?
+        
+//            // In no_obstacles_mode, slide up allowable separation interval
+//            if (EF::no_obstacles_mode)
+//            {
+//    //            double more = 3;
+//                double more = 2;
+//                for (int i = 1; i < d.size(); i++) { d.at(i) += more; }
+//            }
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         

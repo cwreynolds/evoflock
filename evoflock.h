@@ -523,9 +523,14 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                    -0.959596, -0.644678, -0.922466, 23.399, 9.32508);
         
         // Saved FP values from run 20260223_ga_no_obs_with_clusters
-        FlockParameters fp(97.8651, 85.5172, 53.1979, 35.4656, 18.1132,
-                           70.676, 37.4797, 4.60951, 9.27746, 11.7462,
-                           -0.802592, -0.763088, -0.319223, 23.1518, 3.91158);
+        // FlockParameters fp(97.8651, 85.5172, 53.1979, 35.4656, 18.1132,
+        //                    70.676, 37.4797, 4.60951, 9.27746, 11.7462,
+        //                    -0.802592, -0.763088, -0.319223, 23.1518, 3.91158);
+        
+        // Saved FP values from run 20260223_ga_no_obs_with_clusters_2
+        FlockParameters fp(57.9653, 97.7476, 45.4349, 46.2576, 26.0211,
+                           83.7814, 67.2956, 2.29827, 7.20329, 11.3791,
+                           -0.768295, -0.859752, -0.775641, 85.0299, 3.03248);
         
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);

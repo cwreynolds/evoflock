@@ -336,7 +336,11 @@ public:
 //            return LocalSpace::fromTo(pos, rs.randomUnitVector());
 
             return LocalSpace::fromTo((rs.random_point_in_unit_radius_sphere() *
-                                       fp().sphereRadius()),
+                                       //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                                       // TODO 20260225 start near center.
+//                                       fp().sphereRadius()),
+                                       fp().sphereRadius() * 0.2),
+                                      //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                                       rs.randomUnitVector());
         }
 

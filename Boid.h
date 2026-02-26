@@ -326,23 +326,50 @@ public:
 //                }
 //            }
         
-        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260225 back off on return_to_center compression
+
+//            if (EF::no_obstacles_mode)
+//            {
+//                double dist = position().length();
+//    //            double outsideness = dist - fp().sphereRadius() * 0.6;
+//    //            double outsideness = dist - fp().sphereRadius() * 0.3;
+//                double outsideness = dist - fp().sphereRadius() * 0.2;
+//                if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
+//                {
+//    //                double weight = 1.35;
+//    //                double weight = 2;
+//                    double weight = 3;
+//                    Vec3 return_to_center = (-position().normalize() *
+//                                             (outsideness * weight));
+//                    combined_steering += return_to_center;
+//                }
+//            }
+      
         if (EF::no_obstacles_mode)
         {
             double dist = position().length();
 //            double outsideness = dist - fp().sphereRadius() * 0.6;
 //            double outsideness = dist - fp().sphereRadius() * 0.3;
-            double outsideness = dist - fp().sphereRadius() * 0.2;
+//            double outsideness = dist - fp().sphereRadius() * 0.2;
+//            double outsideness = dist - fp().sphereRadius() * 0.3;
+//            double outsideness = dist - fp().sphereRadius() * 0.1;
+            double outsideness = dist - fp().sphereRadius() * 0.25;
             if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
             {
 //                double weight = 1.35;
 //                double weight = 2;
-                double weight = 3;
+//                double weight = 3;
+//                double weight = 1.5;
+//                double weight = 2.5;
+                double weight = 3.5;
                 Vec3 return_to_center = (-position().normalize() *
                                          (outsideness * weight));
                 combined_steering += return_to_center;
             }
         }
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 

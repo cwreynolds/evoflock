@@ -329,20 +329,36 @@ public:
 //                return LocalSpace::fromTo(pos, rs.randomUnitVector());
 //            }
       
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260226 DomeAndGround obstacle
+
+//            if (EF::no_obstacles_mode)
+//            {
+//    //            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
+//    //                        fp().sphereRadius());
+//    //            return LocalSpace::fromTo(pos, rs.randomUnitVector());
+//
+//                return LocalSpace::fromTo((rs.random_point_in_unit_radius_sphere() *
+//                                           //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                                           // TODO 20260225 start near center.
+//    //                                       fp().sphereRadius()),
+//                                           fp().sphereRadius() * 0.2),
+//                                          //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                                          rs.randomUnitVector());
+//            }
+
         if (EF::no_obstacles_mode)
         {
-//            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
-//                        fp().sphereRadius());
-//            return LocalSpace::fromTo(pos, rs.randomUnitVector());
-
-            return LocalSpace::fromTo((rs.random_point_in_unit_radius_sphere() *
-                                       //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                                       // TODO 20260225 start near center.
-//                                       fp().sphereRadius()),
-                                       fp().sphereRadius() * 0.2),
-                                      //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                                      rs.randomUnitVector());
+            double radius = fp().sphereRadius() * 0.2;
+//            Vec3 center;
+            Vec3 center(0, radius, 0);
+            Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
+            Vec3 boid_position = center + (rand_in_unit_sphere * radius);
+            Vec3 boid_heading = rs.randomUnitVector();
+            return LocalSpace::fromTo(boid_position, boid_heading);
         }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
@@ -910,6 +926,16 @@ public:
                                                      obs));
             }
             
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20260226 DomeAndGround obstacle
+            
+//            Obstacle* low_sphere = new SphereObstacle(sr, {0, -15, 0}, oside);
+            Obstacle* low_sphere = new SphereObstacle(sr, {0, -20, 0}, oside);
+            obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
+                                                 {low_sphere, plane}));
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
             // Set 6: no obstacles.
             obstacle_sets_.push_back(ObstacleSet("NoObstacles", {}));
             

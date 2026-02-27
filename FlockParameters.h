@@ -327,7 +327,11 @@ private:
 //    std::string use_obstacle_set = "NoObstacles";
   
     std::string use_obstacle_set = (EF::no_obstacles_mode ?
-                                    "NoObstacles" :
+                                    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                                    // TODO 20260226 DomeAndGround obstacle
+//                                    "NoObstacles" :
+                                    "DomeAndGround" :
+                                    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                                     "SmallSpheresInBigSphere");
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~

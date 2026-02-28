@@ -346,28 +346,47 @@ public:
 //                }
 //            }
       
-        if (EF::no_obstacles_mode)
-        {
-            double dist = position().length();
-//            double outsideness = dist - fp().sphereRadius() * 0.6;
-//            double outsideness = dist - fp().sphereRadius() * 0.3;
-//            double outsideness = dist - fp().sphereRadius() * 0.2;
-//            double outsideness = dist - fp().sphereRadius() * 0.3;
-//            double outsideness = dist - fp().sphereRadius() * 0.1;
-            double outsideness = dist - fp().sphereRadius() * 0.25;
-            if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
-            {
-//                double weight = 1.35;
-//                double weight = 2;
-//                double weight = 3;
-//                double weight = 1.5;
-//                double weight = 2.5;
-                double weight = 3.5;
-                Vec3 return_to_center = (-position().normalize() *
-                                         (outsideness * weight));
-                combined_steering += return_to_center;
-            }
-        }
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260227 switch from return_to_center to obstacle avoidance
+        
+//            if (EF::no_obstacles_mode)
+//            {
+//                double dist = position().length();
+//    //            double outsideness = dist - fp().sphereRadius() * 0.6;
+//    //            double outsideness = dist - fp().sphereRadius() * 0.3;
+//    //            double outsideness = dist - fp().sphereRadius() * 0.2;
+//    //            double outsideness = dist - fp().sphereRadius() * 0.3;
+//    //            double outsideness = dist - fp().sphereRadius() * 0.1;
+//                double outsideness = dist - fp().sphereRadius() * 0.25;
+//                if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
+//                {
+//    //                double weight = 1.35;
+//    //                double weight = 2;
+//    //                double weight = 3;
+//    //                double weight = 1.5;
+//    //                double weight = 2.5;
+//                    double weight = 3.5;
+//                    Vec3 return_to_center = (-position().normalize() *
+//                                             (outsideness * weight));
+//                    combined_steering += return_to_center;
+//                }
+//            }
+      
+//        if (EF::no_obstacles_mode)
+//        {
+//            double dist = position().length();
+//            double outsideness = dist - fp().sphereRadius() * 0.25;
+//            if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
+//            {
+//                double weight = 3.5;
+//                Vec3 return_to_center = (-position().normalize() *
+//                                         (outsideness * weight));
+//                combined_steering += return_to_center;
+//            }
+//        }
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

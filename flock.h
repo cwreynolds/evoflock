@@ -928,11 +928,36 @@ public:
             
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // TODO 20260226 DomeAndGround obstacle
+
+            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+            // TODO 20260228 testing murmuration in DomeAndGround
+
+
+//    //            Obstacle* low_sphere = new SphereObstacle(sr, {0, -15, 0}, oside);
+//                Obstacle* low_sphere = new SphereObstacle(sr, {0, -20, 0}, oside);
+//                obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
+
             
-//            Obstacle* low_sphere = new SphereObstacle(sr, {0, -15, 0}, oside);
-            Obstacle* low_sphere = new SphereObstacle(sr, {0, -20, 0}, oside);
-            obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
-                                                 {low_sphere, plane}));
+            {
+                double r = sr * 1.5;
+                Vec3 lower(0, -30, 0);
+                Vec3 up(0, 1, 0);
+                Obstacle* low_sphere = new SphereObstacle(r, lower, oside);
+                
+//                Obstacle* plane = new PlaneObstacle(Vec3(0,1,0), sc, sr, sr * 0.001);
+//                PlaneObstacle(const Vec3& normal,
+//                              const Vec3& center,
+//                              double visible_radius,
+//                              double visible_thickness)
+
+                Obstacle* low_plane = new PlaneObstacle(up,
+                                                        sc,
+//                                                        sc + lower,
+                                                        r, r * 0.001);
+                obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
+                                                     {low_sphere, low_plane}));
+            }
+            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
 
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

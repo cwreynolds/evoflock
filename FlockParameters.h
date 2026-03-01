@@ -285,37 +285,27 @@ private:
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20260220 add EF::visualize_previous_results_mode
+    
+    //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+    // TODO 20260228 testing murmuration in DomeAndGround
 
+//    //        int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
+//    //                                EF::override_boids_per_flock :
+//    //                                200);  // Normal, for evolution runs.
+//    //    //                            1200);  // more.
+//    //    //                            2500);  // more more..
+//
 //        int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
 //                                EF::override_boids_per_flock :
-//                                200);  // Normal, for evolution runs.
+//                                (EF::visualize_previous_results_mode ?
+//                                 1200 :  // for viz prev results.
+//                                 200));  // Normal, for evolution runs.
+//
+//
+//
+//
 //    //                            1200);  // more.
 //    //                            2500);  // more more..
-
-    int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
-                            EF::override_boids_per_flock :
-                            (EF::visualize_previous_results_mode ?
-                             1200 :  // for viz prev results.
-                             200));  // Normal, for evolution runs.
-    
-    
-    
-    
-//                            1200);  // more.
-//                            2500);  // more more..
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //int boids_per_flock_ = 400;  // More.
-    //int boids_per_flock_ = 800;  // Even more.
-    //int boids_per_flock_ = 1000;  // Kiloboid.
-    //int boids_per_flock_ = 2500;  // for NoObstacles
-    //int boids_per_flock_ = 1000;  // for NoObstacles
-    //int boids_per_flock_ = 1200;  // for NoObstacles
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260213 try flocking trained on open space, no obstacles.
@@ -337,5 +327,54 @@ private:
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
+    int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
+                            EF::override_boids_per_flock :
+                            (EF::visualize_previous_results_mode ?
+                             1200 :    // For viz prev results.
+                             
+                             ((use_obstacle_set == "DomeAndGround") ?
+//                              800 :    // For murmuration in DomeAndGround
+                              400 :    // For murmuration in DomeAndGround
+                              200)));  // Normal, for evolution runs.
+                              
+    
+
+    //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+    //int boids_per_flock_ = 400;  // More.
+    //int boids_per_flock_ = 800;  // Even more.
+    //int boids_per_flock_ = 1000;  // Kiloboid.
+    //int boids_per_flock_ = 2500;  // for NoObstacles
+    //int boids_per_flock_ = 1000;  // for NoObstacles
+    //int boids_per_flock_ = 1200;  // for NoObstacles
+
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20260213 try flocking trained on open space, no obstacles.
+//
+//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//        // TODO 20260216 add EF::no_obstacles_mode
+//
+//    //    std::string use_obstacle_set = "SmallSpheresInBigSphere";
+//    //    std::string use_obstacle_set = "NoObstacles";
+//
+//        std::string use_obstacle_set = (EF::no_obstacles_mode ?
+//                                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                                        // TODO 20260226 DomeAndGround obstacle
+//    //                                    "NoObstacles" :
+//                                        "DomeAndGround" :
+//                                        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                                        "SmallSpheresInBigSphere");
+//
+//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     int fps_ = 30;
 };

@@ -336,7 +336,13 @@ private:
                              
                              ((use_obstacle_set == "DomeAndGround") ?
 //                              800 :    // For murmuration in DomeAndGround
-                              400 :    // For murmuration in DomeAndGround
+                              //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+                              // TODO 20260301 temp disable curvatureScore()
+                              //               and clusterScore().
+//                              400 :    // For murmuration in DomeAndGround
+                              200 :    // For murmuration in DomeAndGround
+                              //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
                               200)));  // Normal, for evolution runs.
                               
     

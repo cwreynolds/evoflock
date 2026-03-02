@@ -644,10 +644,17 @@ public:
 
 //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
 
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260301 temp disable curvatureScore() and clusterScore().
+        
+        return 1;
+        
         double max_penalty = EF::no_obstacles_mode ? 0.1 : 0.2;
         return util::remap_interval_clip(average_curvature,
                                          0, 0.1,
                                          1 - max_penalty, 1);
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -706,12 +713,19 @@ public:
         sum_of_cluster_counts_over_all_sim_steps_ += cc_score;
     }
     
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260301 temp disable curvatureScore() and clusterScore().
+    
     // Average alignment for each Boid with 7 neighbors on each simulation step.
     double clusterScore() const
     {
+        return 1;
+
         return (sum_of_cluster_counts_over_all_sim_steps_ /
                 fp().maxSimulationSteps());
     }
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     
     // Count the number of boid clusters using a version of DBSCAN algorithm.
     int countClusters() const
@@ -938,18 +952,39 @@ public:
 //                obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
 
             
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20260301 temp disable curvatureScore()
+            
+
+//                {
+//                    double r = sr * 1.5;
+//                    Vec3 lower(0, -30, 0);
+//                    Vec3 up(0, 1, 0);
+//                    Obstacle* low_sphere = new SphereObstacle(r, lower, oside);
+//
+//    //                Obstacle* plane = new PlaneObstacle(Vec3(0,1,0), sc, sr, sr * 0.001);
+//    //                PlaneObstacle(const Vec3& normal,
+//    //                              const Vec3& center,
+//    //                              double visible_radius,
+//    //                              double visible_thickness)
+//
+//                    Obstacle* low_plane = new PlaneObstacle(up,
+//                                                            sc,
+//    //                                                        sc + lower,
+//                                                            r, r * 0.001);
+//                    obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
+//                                                         {low_sphere, low_plane}));
+//                }
+      
+            
             {
-                double r = sr * 1.5;
-                Vec3 lower(0, -30, 0);
+//                double r = sr * 1.5;
+                double r = sr * 1.0;
+//                Vec3 lower(0, -30, 0);
+//                Vec3 lower(0, 20 - sr, 0);
+                Vec3 lower(0, 10 - sr, 0);
                 Vec3 up(0, 1, 0);
                 Obstacle* low_sphere = new SphereObstacle(r, lower, oside);
-                
-//                Obstacle* plane = new PlaneObstacle(Vec3(0,1,0), sc, sr, sr * 0.001);
-//                PlaneObstacle(const Vec3& normal,
-//                              const Vec3& center,
-//                              double visible_radius,
-//                              double visible_thickness)
-
                 Obstacle* low_plane = new PlaneObstacle(up,
                                                         sc,
 //                                                        sc + lower,
@@ -957,6 +992,9 @@ public:
                 obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
                                                      {low_sphere, low_plane}));
             }
+
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
             //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
 
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~

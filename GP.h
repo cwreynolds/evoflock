@@ -51,152 +51,203 @@ inline double scalarize_fitness_hyperVolume(MOF mof) {return mof.hyperVolume();}
 //inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_min;
 inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVolume;
 
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20260303 more wip with DomeAndGround, try alignmentScore()?
+//               refactor GP::mof_names() and GP::multiObjectiveFitnessOfFlock()
+
+
+//    // Component names for MOF (multi-objective fitness) values (by mode settings).
+//    inline std::vector<std::string> mof_names()
+//    {
+//        return (EF::usingGA() ?
+//                // GA
+//                (EF::add_curvature_objective ?
+//
+//                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                 // TODO 20260223 bring back cluster counting
+//
+//    //             // GA with curvature
+//    //             std::vector<std::string>(
+//    //                                      {
+//    //                                          "avoid",
+//    //                                          "separate",
+//    //                                          "speed",
+//    //                                          "curvature"
+//    //                                      }):
+//
+//                 (EF::add_curvature_AND_cluster_objectives ?
+//
+//                  // GA with curvature AND cluster
+//                 std::vector<std::string>(
+//                                          {
+//                                              "avoid",
+//                                              "separate",
+//                                              "speed",
+//                                              "curvature",
+//                                              "cluster"
+//                                          }):
+//                  // GA with JUST curvature
+//                 std::vector<std::string>(
+//                                          {
+//                                              "avoid",
+//                                              "separate",
+//                                              "speed",
+//                                              "curvature"
+//                                          }))
+//                 :
+//                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                 // GA without curvature
+//                 std::vector<std::string>(
+//                                          {
+//                                              "avoid",
+//                                              "separate",
+//                                              "speed"
+//                                          })) :
+//                 // GP
+//                 (EF::add_curvature_objective ?
+//                  // GP with curvature
+//                  std::vector<std::string>(
+//                                           {
+//                                               "avoid",
+//                                               "separate",
+//                                               "speed",
+//                                               "alignment",
+//                                               "curvature"
+//                                           }) :
+//                  // GP without curvature
+//                  std::vector<std::string>(
+//                                           {
+//                                               "avoid",
+//                                               "separate",
+//                                               "speed",
+//                                               "alignment",
+//                                           })));
+//    }
 
 // Component names for MOF (multi-objective fitness) values (by mode settings).
 inline std::vector<std::string> mof_names()
 {
-    return (EF::usingGA() ?
-            // GA
-            (EF::add_curvature_objective ?
-             
-             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-             // TODO 20260223 bring back cluster counting
-
-//             // GA with curvature
-//             std::vector<std::string>(
-//                                      {
-//                                          "avoid",
-//                                          "separate",
-//                                          "speed",
-//                                          "curvature"
-//                                      }):
-
-             (EF::add_curvature_AND_cluster_objectives ?
-
-              // GA with curvature AND cluster
-             std::vector<std::string>(
-                                      {
-                                          "avoid",
-                                          "separate",
-                                          "speed",
-                                          "curvature",
-                                          "cluster"
-                                      }):
-              // GA with JUST curvature
-             std::vector<std::string>(
-                                      {
-                                          "avoid",
-                                          "separate",
-                                          "speed",
-                                          "curvature"
-                                      }))
-             :
-             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-             // GA without curvature
-             std::vector<std::string>(
-                                      {
-                                          "avoid",
-                                          "separate",
-                                          "speed"
-                                      })) :
-             // GP
-             (EF::add_curvature_objective ?
-              // GP with curvature
-              std::vector<std::string>(
-                                       {
-                                           "avoid",
-                                           "separate",
-                                           "speed",
-                                           "alignment",
-                                           "curvature"
-                                       }) :
-              // GP without curvature
-              std::vector<std::string>(
-                                       {
-                                           "avoid",
-                                           "separate",
-                                           "speed",
-                                           "alignment",
-                                       })));
+    std::vector<std::string> strings;
+    if (EF::use_avoid_objective)     { strings.push_back("avoid"); }
+    if (EF::use_separate_objective)  { strings.push_back("separate"); }
+    if (EF::use_speed_objective)     { strings.push_back("speed"); }
+    if (EF::use_curvature_objective) { strings.push_back("curvature"); }
+    if (EF::use_alignment_objective) { strings.push_back("alignment"); }
+    if (EF::use_cluster_objective)   { strings.push_back("cluster"); }
+    return strings;
 }
+
+
+//    // After a Flock's simulation has been run, it is passed here to build its multi
+//    // objective fitness object from metrics saved inside the Flock object.
+//    inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
+//    {
+//        return (EF::usingGA() ?
+//                // GA
+//                (EF::add_curvature_objective ?
+//
+//                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                 // TODO 20260223 bring back cluster counting
+//
+//    //             // GA with curvature
+//    //             MOF(
+//    //                 {
+//    //                     flock.obstacleCollisionsScore(),
+//    //                     flock.separationScore(),
+//    //                     flock.speedScore(),
+//    //                     flock.curvatureScore()
+//    //                 }) :
+//
+//                 // TODO 20260223 this is obviously ad hoc, need to refactor the way
+//                 //               objectives are added/removed from a given run.
+//                 // inline static bool add_curvature_AND_cluster_objectives = true;
+//
+//                 (EF::add_curvature_AND_cluster_objectives ?
+//                  // GA with curvature AND cluster
+//                  MOF(
+//                      {
+//                          flock.obstacleCollisionsScore(),
+//                          flock.separationScore(),
+//                          flock.speedScore(),
+//                          flock.curvatureScore(),
+//                          flock.clusterScore()
+//                      })
+//                  :
+//                  // GA with JUST curvature
+//                  MOF(
+//                      {
+//                          flock.obstacleCollisionsScore(),
+//                          flock.separationScore(),
+//                          flock.speedScore(),
+//                          flock.curvatureScore()
+//                      })
+//                  )
+//                 :
+//                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                 // GA without curvature
+//                 MOF(
+//                     {
+//                         flock.obstacleCollisionsScore(),
+//                         flock.separationScore(),
+//                         flock.speedScore(),
+//                     })
+//                 ) :
+//                // GP
+//                (EF::add_curvature_objective ?
+//                 // GP with curvature
+//                 MOF(
+//                     {
+//                         flock.obstacleCollisionsScore(),
+//                         flock.separationScore(),
+//                         flock.speedScore(),
+//                         flock.alignmentScore(),
+//                         flock.curvatureScore()
+//                     }) :
+//                 // GP without curvature
+//                 MOF(
+//                     {
+//                         flock.obstacleCollisionsScore(),
+//                         flock.separationScore(),
+//                         flock.speedScore(),
+//                         flock.alignmentScore()
+//                     })
+//                 ));
+//    }
+
+
+//    // Component names for MOF (multi-objective fitness) values (by mode settings).
+//    inline std::vector<std::string> mof_names()
+
+//    MultiObjectiveFitness(const std::vector<double>& multi_objective_fitness,
+//                          const std::vector<std::string>& names)
 
 
 // After a Flock's simulation has been run, it is passed here to build its multi
 // objective fitness object from metrics saved inside the Flock object.
 inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
 {
-    return (EF::usingGA() ?
-            // GA
-            (EF::add_curvature_objective ?
-             
-             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-             // TODO 20260223 bring back cluster counting
-             
-//             // GA with curvature
-//             MOF(
-//                 {
-//                     flock.obstacleCollisionsScore(),
-//                     flock.separationScore(),
-//                     flock.speedScore(),
-//                     flock.curvatureScore()
-//                 }) :
-
-             // TODO 20260223 this is obviously ad hoc, need to refactor the way
-             //               objectives are added/removed from a given run.
-             // inline static bool add_curvature_AND_cluster_objectives = true;
-             
-             (EF::add_curvature_AND_cluster_objectives ?
-              // GA with curvature AND cluster
-              MOF(
-                  {
-                      flock.obstacleCollisionsScore(),
-                      flock.separationScore(),
-                      flock.speedScore(),
-                      flock.curvatureScore(),
-                      flock.clusterScore()
-                  })
-              :
-              // GA with JUST curvature
-              MOF(
-                  {
-                      flock.obstacleCollisionsScore(),
-                      flock.separationScore(),
-                      flock.speedScore(),
-                      flock.curvatureScore()
-                  })
-              )
-             :
-             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-             // GA without curvature
-             MOF(
-                 {
-                     flock.obstacleCollisionsScore(),
-                     flock.separationScore(),
-                     flock.speedScore(),
-                 })
-             ) :
-            // GP
-            (EF::add_curvature_objective ?
-             // GP with curvature
-             MOF(
-                 {
-                     flock.obstacleCollisionsScore(),
-                     flock.separationScore(),
-                     flock.speedScore(),
-                     flock.alignmentScore(),
-                     flock.curvatureScore()
-                 }) :
-             // GP without curvature
-             MOF(
-                 {
-                     flock.obstacleCollisionsScore(),
-                     flock.separationScore(),
-                     flock.speedScore(),
-                     flock.alignmentScore()
-                 })
-             ));
+//    std::vector<std::string> strings;
+//    if (EF::use_avoid_objective)     { strings.push_back("avoid"); }
+//    if (EF::use_separate_objective)  { strings.push_back("separate"); }
+//    if (EF::use_speed_objective)     { strings.push_back("speed"); }
+//    if (EF::use_curvature_objective) { strings.push_back("curvature"); }
+//    if (EF::use_alignment_objective) { strings.push_back("alignment"); }
+//    if (EF::use_cluster_objective)   { strings.push_back("cluster"); }
+//    return strings;
+    
+    std::vector<double> o;
+    auto a = [&](double d){ o.push_back(d); };
+    if (EF::use_avoid_objective)     { a(flock.obstacleCollisionsScore()); }
+    if (EF::use_separate_objective)  { a(flock.separationScore()); }
+    if (EF::use_speed_objective)     { a(flock.speedScore()); }
+    if (EF::use_curvature_objective) { a(flock.curvatureScore()); }
+    if (EF::use_alignment_objective) { a(flock.alignmentScore()); }
+    if (EF::use_cluster_objective)   { a(flock.clusterScore()); }
+    return MOF(o, mof_names());
 }
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
 // Initialize basic run parameters of Flock object

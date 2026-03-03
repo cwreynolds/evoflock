@@ -73,6 +73,19 @@ inline static bool add_curvature_AND_cluster_objectives = true;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+// TODO 20260303 more wip with DomeAndGround, try alignmentScore()?
+//               refactor GP::mof_names() and GP::multiObjectiveFitnessOfFlock()
+inline static bool use_avoid_objective     = true;
+inline static bool use_separate_objective  = true;
+inline static bool use_speed_objective     = true;
+inline static bool use_curvature_objective = false;
+inline static bool use_alignment_objective = true;
+inline static bool use_cluster_objective   = false;
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+
 // experimental / temp?
 inline static int override_boids_per_flock = -1;
 
@@ -104,8 +117,11 @@ inline static bool no_obstacles_mode = true;
 //inline static bool visualize_previous_results_mode = true;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20260223 bring back cluster counting
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20260303 move wip with DomeAndGround, try alignmentScore()?
 inline static bool visualize_previous_results_mode = false;
 //inline static bool visualize_previous_results_mode = true;
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -533,9 +549,14 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                    -0.802592, -0.763088, -0.319223, 23.1518, 3.91158);
         
         // Saved FP values from run 20260223_ga_no_obs_with_clusters_2
-        FlockParameters fp(57.9653, 97.7476, 45.4349, 46.2576, 26.0211,
-                           83.7814, 67.2956, 2.29827, 7.20329, 11.3791,
-                           -0.768295, -0.859752, -0.775641, 85.0299, 3.03248);
+        // FlockParameters fp(57.9653, 97.7476, 45.4349, 46.2576, 26.0211,
+        //                    83.7814, 67.2956, 2.29827, 7.20329, 11.3791,
+        //                    -0.768295, -0.859752, -0.775641, 85.0299, 3.03248);
+        
+        // Saved FP values from run 20260302_ga_no_obs_fix_PO
+        FlockParameters fp(93.7918, 97.5165, 83.4214, 1.16525, 41.807,
+                           96.9971, 72.9859, 3.73492, 69.2881, 52.8236,
+                           -0.37416, 0.813266, 0.448999, 56.8067, 1.5802);
         
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);

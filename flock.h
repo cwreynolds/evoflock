@@ -350,8 +350,13 @@ public:
         if (EF::no_obstacles_mode)
         {
             double radius = fp().sphereRadius() * 0.2;
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20260303 more wip with DomeAndGround, try alignmentScore()?
+            //               refactor GP::mof_names() and GP::multiObjectiveFitnessOfFlock()
 //            Vec3 center;
-            Vec3 center(0, radius, 0);
+//            Vec3 center(0, radius, 0);
+            Vec3 center;
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
             Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
             Vec3 boid_position = center + (rand_in_unit_sphere * radius);
             Vec3 boid_heading = rs.randomUnitVector();
@@ -515,48 +520,6 @@ public:
         // Piecewise linear function of distance to score
         std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
         std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260220 add EF::visualize_previous_results_mode
-        
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260222 also increase low end of allowable separation distance
-
-//            // Increase high end of allowable separation distance
-//            if (EF::no_obstacles_mode)
-//            {
-//    //            double more = 4;
-//                double more = 2;
-//                d.at(3) += more;
-//                d.at(4) += more;
-//            }
-      
-//            // In no_obstacles_mode, slide up allowable separation interval
-//            if (EF::no_obstacles_mode)
-//            {
-//    //            double more = 2;
-//    //            d.at(3) += more;
-//    //            d.at(4) += more;
-//
-//                double more = 3;
-//                for (int i = 1; i < d.size(); i++) { d.at(i) += more; }
-//            }
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260223 do I even need this anymore after adding cluster score?
-        
-//            // In no_obstacles_mode, slide up allowable separation interval
-//            if (EF::no_obstacles_mode)
-//            {
-//    //            double more = 3;
-//                double more = 2;
-//                for (int i = 1; i < d.size(); i++) { d.at(i) += more; }
-//            }
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         for (auto b : boids())
         {
             double distance = b->distanceToNearestNeighbor();

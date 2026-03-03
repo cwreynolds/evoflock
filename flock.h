@@ -976,22 +976,75 @@ public:
 //                                                         {low_sphere, low_plane}));
 //                }
       
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260302 fix PlaneObstacle bug when not centered at origin
             
+//                {
+//    //                double r = sr * 1.5;
+//                    double r = sr * 1.0;
+//    //                Vec3 lower(0, -30, 0);
+//    //                Vec3 lower(0, 20 - sr, 0);
+//                    Vec3 lower(0, 10 - sr, 0);
+//                    Vec3 up(0, 1, 0);
+//                    Obstacle* low_sphere = new SphereObstacle(r, lower, oside);
+//                    Obstacle* low_plane = new PlaneObstacle(up,
+//                                                            sc,
+//    //                                                        sc + lower,
+//                                                            r, r * 0.001);
+//                    obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
+//                                                         {low_sphere, low_plane}));
+//                }
+
+//                {
+//                    double r = sr * 1.0;
+//                    double d = 10;
+//    //                Vec3 lower(0, 10 - sr, 0);
+//                    Vec3 up(0, 1, 0);
+//                    Vec3 ls_center = up * (d - sr);
+//                    Vec3 lp_center = up * -d;
+//
+//    //                Obstacle* low_sphere = new SphereObstacle(r, lower, oside);
+//                    Obstacle* low_sphere = new SphereObstacle(r, ls_center, oside);
+//                    Obstacle* low_plane = new PlaneObstacle(up,
+//    //                                                        sc,
+//    //                                                        sc + lower,
+//    //                                                        sc + lower + Vec3(0,r,0),
+//    //                                                        lower + up * r,
+//                                                            lp_center,
+//                                                            r, r * 0.001);
+//                    obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
+//                                                         {low_sphere, low_plane}));
+//                }
+
+//                {
+//                    double d = 10;
+//                    double r = sr * 1.0;
+//                    double thick = r * 0.001;
+//                    Vec3 up(0, 1, 0);
+//                    Vec3 lp_center = up * -d;
+//                    Vec3 ls_center = up * (d - sr);
+//                    Obstacle* low_sphere = new SphereObstacle(r, ls_center, oside);
+//    //                Obstacle* low_plane = new PlaneObstacle(up, lp_center,
+//    //                                                        r, r * 0.001);
+//                    Obstacle* low_plane = new PlaneObstacle(up, lp_center, r, thick);
+//                    obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
+//                                                         {low_sphere, low_plane}));
+//                }
+
             {
-//                double r = sr * 1.5;
+                double d = 10;
                 double r = sr * 1.0;
-//                Vec3 lower(0, -30, 0);
-//                Vec3 lower(0, 20 - sr, 0);
-                Vec3 lower(0, 10 - sr, 0);
+                double thin = r * 0.001;
                 Vec3 up(0, 1, 0);
-                Obstacle* low_sphere = new SphereObstacle(r, lower, oside);
-                Obstacle* low_plane = new PlaneObstacle(up,
-                                                        sc,
-//                                                        sc + lower,
-                                                        r, r * 0.001);
+                Vec3 lp_center = up * -d;
+                Vec3 ls_center = up * (d - sr);
+                Obstacle* low_sphere = new SphereObstacle(r, ls_center, oside);
+                Obstacle* low_plane = new PlaneObstacle(up, lp_center, r, thin);
                 obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
                                                      {low_sphere, low_plane}));
             }
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 

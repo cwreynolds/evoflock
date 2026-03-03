@@ -278,9 +278,25 @@ private:
 class PlaneObstacle : public Obstacle
 {
 public:
-    PlaneObstacle()
-      : Obstacle(), normal_(Vec3(0, 1, 0)), center_(Vec3()) {}
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260302 fix PlaneObstacle bug when not centered at origin
     
+//    PlaneObstacle()
+//      : Obstacle(), normal_(Vec3(0, 1, 0)), center_(Vec3()) {}
+//    PlaneObstacle()
+//      : Obstacle(), normal_(Vec3(0, 1, 0)), center_(Vec3())
+//    {
+//        setColor({0.7, 0.7, 0.8});
+//    }
+    
+    PlaneObstacle()
+      : Obstacle(),
+        normal_(Vec3(0, 1, 0)),
+        center_(Vec3())
+    {
+        setColor({0.7, 0.7, 0.8});
+    }
+
     PlaneObstacle(const Vec3& normal, const Vec3& center)
       : Obstacle(), normal_(normal), center_(center) {}
     
@@ -295,11 +311,14 @@ public:
                   const Vec3& center,
                   double visible_radius,
                   double visible_thickness)
-      : Obstacle(),
-        normal_(normal),
-        center_(center),
-        visible_radius_(visible_radius),
-        visible_thickness_(visible_thickness) {}
+      : PlaneObstacle(normal.normalize(), center)
+    {
+        setColor({0.7, 0.7, 0.8});
+        visible_radius_ = visible_radius;
+        visible_thickness_ = visible_thickness;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 rayIntersection(const Vec3& origin,
@@ -362,9 +381,26 @@ public:
         return from_plane_to_query_point.dot(normal_);
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260302 fix PlaneObstacle bug when not centered at origin
+
+//    void addToScene() const override
+//    {
+//        Vec3 ep_offset = center_ + normal_ * visible_thickness_;
+//        auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
+//                                                   center_ + ep_offset,
+//                                                   center_ - ep_offset,
+//                                                   getColor(),
+//                                                   true,
+//                                                   false, // don't evert
+//                                                   500);
+//        Draw::brightnessSpecklePerVertex(0.7, 1.0, getColor(), mesh);
+//        Draw::getInstance().addTriMeshToStaticScene(mesh);
+//    }
+
     void addToScene() const override
     {
-        Vec3 ep_offset = center_ + normal_ * visible_thickness_;
+        Vec3 ep_offset = normal_ * visible_thickness_;
         auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
                                                    center_ + ep_offset,
                                                    center_ - ep_offset,
@@ -375,6 +411,8 @@ public:
         Draw::brightnessSpecklePerVertex(0.7, 1.0, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     std::string to_string() const override { return "PlaneObstacle"; }
 

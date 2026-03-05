@@ -347,9 +347,21 @@ public:
 //                                          rs.randomUnitVector());
 //            }
 
+        // For DomeAndGround.
         if (EF::no_obstacles_mode)
         {
-            double radius = fp().sphereRadius() * 0.2;
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20260304 DomeAndGround: smaller dome, plane at equator
+            //               needs to be linked to code in obstacleSets()
+            //               seems off by factor of 2
+
+//            double radius = fp().sphereRadius() * 0.2;
+//            double radius = fp().sphereRadius() * 0.3;
+            double radius = fp().sphereRadius() * 0.15;
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
             // TODO 20260303 more wip with DomeAndGround, try alignmentScore()?
             //               refactor GP::mof_names() and GP::multiObjectiveFitnessOfFlock()
@@ -994,18 +1006,46 @@ public:
 //                                                         {low_sphere, low_plane}));
 //                }
 
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20260304 DomeAndGround: smaller dome, plane at equator
+            
+//                {
+//    //                double d = 10;
+//                    double vert_dist_from_center = 10;
+//    //                double r = sr * 1.0;
+//    //                double r = sr * 0.2;
+//                    double r = sr * 0.4;  // Sphere radius will be 20
+//                    double thin = r * 0.001;
+//                    Vec3 up(0, 1, 0);
+//    //                Vec3 lp_center = up * -d;
+//                    Vec3 lp_center = up * -vert_dist_from_center;
+//    //                Vec3 ls_center = up * (d - sr);
+//    //                Vec3 ls_center = up * (d - r);
+//                    Vec3 ls_center = up * (vert_dist_from_center - r);
+//                    Obstacle* low_sphere = new SphereObstacle(r, ls_center, oside);
+//                    Obstacle* low_plane = new PlaneObstacle(up, lp_center, r, thin);
+//                    obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
+//                                                         {low_sphere, low_plane}));
+//                }
+        
             {
-                double d = 10;
-                double r = sr * 1.0;
+//                double vert_dist_from_center = 10;
+//                double r = sr * 0.4;  // Sphere radius will be 20
+//                double r = sr * 0.2;  // Sphere radius will be 10
+                double r = sr * 0.3;  // Sphere radius will be 30
                 double thin = r * 0.001;
                 Vec3 up(0, 1, 0);
-                Vec3 lp_center = up * -d;
-                Vec3 ls_center = up * (d - sr);
+//                Vec3 lp_center = up * -vert_dist_from_center;
+//                Vec3 ls_center = up * (vert_dist_from_center - r);
+                Vec3 lp_center = up * (r * -0.5);
+                Vec3 ls_center = up * (r * -0.5);
                 Obstacle* low_sphere = new SphereObstacle(r, ls_center, oside);
                 Obstacle* low_plane = new PlaneObstacle(up, lp_center, r, thin);
                 obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
                                                      {low_sphere, low_plane}));
             }
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

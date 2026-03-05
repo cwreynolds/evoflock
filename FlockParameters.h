@@ -329,23 +329,40 @@ private:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260303 more wip with DomeAndGround, try alignmentScore()?
+    //               refactor GP::mof_names() and GP::multiObjectiveFitnessOfFlock()
+
+    
+//        int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
+//                                EF::override_boids_per_flock :
+//                                (EF::visualize_previous_results_mode ?
+//                                 1200 :    // For viz prev results.
+//
+//                                 ((use_obstacle_set == "DomeAndGround") ?
+//    //                              800 :    // For murmuration in DomeAndGround
+//                                  //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//                                  // TODO 20260301 temp disable curvatureScore()
+//                                  //               and clusterScore().
+//    //                              400 :    // For murmuration in DomeAndGround
+//                                  200 :    // For murmuration in DomeAndGround
+//                                  //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//
+//                                  200)));  // Normal, for evolution runs.
+      
     int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
                             EF::override_boids_per_flock :
                             (EF::visualize_previous_results_mode ?
                              1200 :    // For viz prev results.
-                             
                              ((use_obstacle_set == "DomeAndGround") ?
-//                              800 :    // For murmuration in DomeAndGround
-                              //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-                              // TODO 20260301 temp disable curvatureScore()
-                              //               and clusterScore().
+//                              400 :    // For murmuration in DomeAndGround
+//                              200 :    // For murmuration in DomeAndGround
 //                              400 :    // For murmuration in DomeAndGround
                               200 :    // For murmuration in DomeAndGround
-                              //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
                               200)));  // Normal, for evolution runs.
-                              
+
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
 

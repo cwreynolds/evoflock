@@ -81,7 +81,11 @@ inline static bool use_avoid_objective     = true;
 inline static bool use_separate_objective  = true;
 inline static bool use_speed_objective     = true;
 inline static bool use_curvature_objective = false;
-inline static bool use_alignment_objective = true;
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20260305 double volume of DomeAndGround.
+//inline static bool use_alignment_objective = true;
+inline static bool use_alignment_objective = false;
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 inline static bool use_cluster_objective   = false;
 //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 

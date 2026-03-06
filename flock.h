@@ -402,6 +402,36 @@ public:
         for_all_boids(ccs);
     }
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260305 use new global flags to disable recording data for score
+    
+//        // Fly each boid in flock for one simulation step. Consists of two sequential
+//        // steps to avoid artifacts from order of boids. First a "sense/plan" phase
+//        // which computes the desired steering based on current state. Then an "act"
+//        // phase which actually moves the boids. Finally statistics are collected.
+//        void fly_boids(double time_step)
+//        {
+//            for_all_boids([&](Boid* b){ b->plan_next_steer();});
+//            for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
+//            enforceObsBoidConstraints();
+//            recordSeparationScorePerStep();
+//            recordSpeedScorePerStep();
+//            collectCurvatureStats();
+//
+//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//            // TODO 20251208 score for boid alignment.
+//            recordAlignmentScorePerStep();
+//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20260223 bring back cluster counting
+//
+//    //        debugPrint(count_clusters())
+//            recordClusterScorePerStep();
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        }
+
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
     // which computes the desired steering based on current state. Then an "act"
@@ -411,23 +441,17 @@ public:
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();
-        recordSeparationScorePerStep();
-        recordSpeedScorePerStep();
-        collectCurvatureStats();
-                
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20251208 score for boid alignment.
-        recordAlignmentScorePerStep();
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260223 bring back cluster counting
-        
-//        debugPrint(count_clusters())
-        recordClusterScorePerStep();
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if (EF::use_separate_objective ) { recordSeparationScorePerStep(); }
+        if (EF::use_speed_objective    ) { recordSpeedScorePerStep();      }
+        if (EF::use_curvature_objective) { collectCurvatureStats();        }
+        if (EF::use_alignment_objective) { recordAlignmentScorePerStep();  }
+        if (EF::use_cluster_objective  ) { recordClusterScorePerStep();    }
     }
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+    
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20251122 all ops return Vec3, Scalar values all constants
     static inline double max_steer_mag = 0;
@@ -1028,15 +1052,35 @@ public:
 //                                                         {low_sphere, low_plane}));
 //                }
         
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20260305 double volume of DomeAndGround.
+            
+//                {
+//    //                double vert_dist_from_center = 10;
+//    //                double r = sr * 0.4;  // Sphere radius will be 20
+//    //                double r = sr * 0.2;  // Sphere radius will be 10
+//                    double r = sr * 0.3;  // Sphere radius will be 30
+//                    double thin = r * 0.001;
+//                    Vec3 up(0, 1, 0);
+//    //                Vec3 lp_center = up * -vert_dist_from_center;
+//    //                Vec3 ls_center = up * (vert_dist_from_center - r);
+//                    Vec3 lp_center = up * (r * -0.5);
+//                    Vec3 ls_center = up * (r * -0.5);
+//                    Obstacle* low_sphere = new SphereObstacle(r, ls_center, oside);
+//                    Obstacle* low_plane = new PlaneObstacle(up, lp_center, r, thin);
+//                    obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
+//                                                         {low_sphere, low_plane}));
+//                }
+
             {
-//                double vert_dist_from_center = 10;
-//                double r = sr * 0.4;  // Sphere radius will be 20
-//                double r = sr * 0.2;  // Sphere radius will be 10
-                double r = sr * 0.3;  // Sphere radius will be 30
+//                // Dome will have 30% the radius of BigSphere
+//                double r = sr * 0.3;
+//                // Dome has 30% the radius of BigSphere, then double volume
+//                double r = sr * 0.3 * std::pow(2.0, 0.333);
+                // Dome has 30% the radius of BigSphere, then 4x volume
+                double r = sr * 0.3 * std::pow(4.0, 0.333);
                 double thin = r * 0.001;
                 Vec3 up(0, 1, 0);
-//                Vec3 lp_center = up * -vert_dist_from_center;
-//                Vec3 ls_center = up * (vert_dist_from_center - r);
                 Vec3 lp_center = up * (r * -0.5);
                 Vec3 ls_center = up * (r * -0.5);
                 Obstacle* low_sphere = new SphereObstacle(r, ls_center, oside);
@@ -1044,6 +1088,8 @@ public:
                 obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
                                                      {low_sphere, low_plane}));
             }
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

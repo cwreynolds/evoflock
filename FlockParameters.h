@@ -353,7 +353,15 @@ private:
     int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
                             EF::override_boids_per_flock :
                             (EF::visualize_previous_results_mode ?
-                             1200 :    // For viz prev results.
+                             
+                             // TODO 20260306 VERY TEMP
+//                             1200 :    // For viz prev results.
+//                             400 :    // For viz prev results.
+//                             800 :    // For viz prev results.
+//                             1200 :    // For viz prev results.
+                             1400 :    // For viz prev results.
+
+
                              ((use_obstacle_set == "DomeAndGround") ?
 //                              400 :    // For murmuration in DomeAndGround
 //                              200 :    // For murmuration in DomeAndGround

@@ -646,7 +646,7 @@ public:
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         // TODO 20260301 temp disable curvatureScore() and clusterScore().
         
-        return 1;
+//        return 1;
         
         double max_penalty = EF::no_obstacles_mode ? 0.1 : 0.2;
         return util::remap_interval_clip(average_curvature,
@@ -718,7 +718,7 @@ public:
     // Average alignment for each Boid with 7 neighbors on each simulation step.
     double clusterScore() const
     {
-        return 1;
+//        return 1;
 
         return (sum_of_cluster_counts_over_all_sim_steps_ /
                 fp().maxSimulationSteps());
@@ -1077,8 +1077,17 @@ public:
 //                double r = sr * 0.3;
 //                // Dome has 30% the radius of BigSphere, then double volume
 //                double r = sr * 0.3 * std::pow(2.0, 0.333);
-                // Dome has 30% the radius of BigSphere, then 4x volume
-                double r = sr * 0.3 * std::pow(4.0, 0.333);
+//                // Dome has 30% the radius of BigSphere, then 4x volume
+//                double r = sr * 0.3 * std::pow(4.0, 0.333);
+                // Dome has 30% the radius of BigSphere, then 8x volume
+                double r = sr * 0.3 * std::pow(8.0, 0.333);
+                
+                // TODO 20260306 VERY TEMP
+//                r = sr * 0.3 * std::pow(20, 0.333);
+                // note: for 40x, r = 51.2362, which is to say, same as default.
+                r = sr * 0.3 * std::pow(40, 0.333);
+                std::cout << "DomeAndGround radius = " << r << std::endl;
+                
                 double thin = r * 0.001;
                 Vec3 up(0, 1, 0);
                 Vec3 lp_center = up * (r * -0.5);

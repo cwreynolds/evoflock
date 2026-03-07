@@ -77,16 +77,25 @@ inline static bool add_curvature_AND_cluster_objectives = true;
 //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 // TODO 20260303 more wip with DomeAndGround, try alignmentScore()?
 //               refactor GP::mof_names() and GP::multiObjectiveFitnessOfFlock()
+
+//    inline static bool use_avoid_objective     = true;
+//    inline static bool use_separate_objective  = true;
+//    inline static bool use_speed_objective     = true;
+//    inline static bool use_curvature_objective = false;
+//    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//    // TODO 20260305 double volume of DomeAndGround.
+//    //inline static bool use_alignment_objective = true;
+//    inline static bool use_alignment_objective = false;
+//    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//    inline static bool use_cluster_objective   = false;
+
 inline static bool use_avoid_objective     = true;
 inline static bool use_separate_objective  = true;
 inline static bool use_speed_objective     = true;
-inline static bool use_curvature_objective = false;
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20260305 double volume of DomeAndGround.
-//inline static bool use_alignment_objective = true;
+inline static bool use_curvature_objective = true;
 inline static bool use_alignment_objective = false;
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-inline static bool use_cluster_objective   = false;
+inline static bool use_cluster_objective   = true;
+
 //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 
@@ -123,8 +132,8 @@ inline static bool no_obstacles_mode = true;
 // TODO 20260223 bring back cluster counting
 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 // TODO 20260303 move wip with DomeAndGround, try alignmentScore()?
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
@@ -558,10 +567,20 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                    -0.768295, -0.859752, -0.775641, 85.0299, 3.03248);
         
         // Saved FP values from run 20260302_ga_no_obs_fix_PO
-        FlockParameters fp(93.7918, 97.5165, 83.4214, 1.16525, 41.807,
-                           96.9971, 72.9859, 3.73492, 69.2881, 52.8236,
-                           -0.37416, 0.813266, 0.448999, 56.8067, 1.5802);
+        // FlockParameters fp(93.7918, 97.5165, 83.4214, 1.16525, 41.807,
+        //                    96.9971, 72.9859, 3.73492, 69.2881, 52.8236,
+        //                    -0.37416, 0.813266, 0.448999, 56.8067, 1.5802);
         
+        // Saved FP values from run 20260305_ga_murm+curve+cluster
+        // FlockParameters fp(97.3895, 94.8641, 67.1557, 10.691, 78.6854,
+        //                    92.6751, 84.6933, 36.453, 26.2615, 70.0312,
+        //                    0.479107, 0.93305, -0.770313, 8.49056, 0.721249);
+        
+        // Saved FP values from run 20260306_ga_murm_40x_vol+curve+cluster
+        FlockParameters fp(70.4853, 91.1533, 60.5059, 45.6154, 34.6533,
+                           91.0774, 96.0671, 2.73925, 4.86185, 20.5608,
+                           -0.62327, 0.2073, 0.340471, 6.76677, 1.19798);
+
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);
         LP::Individual individual(GP::gaTreeFromFP(fp, fs), fs);

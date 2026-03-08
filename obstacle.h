@@ -278,17 +278,6 @@ private:
 class PlaneObstacle : public Obstacle
 {
 public:
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260302 fix PlaneObstacle bug when not centered at origin
-    
-//    PlaneObstacle()
-//      : Obstacle(), normal_(Vec3(0, 1, 0)), center_(Vec3()) {}
-//    PlaneObstacle()
-//      : Obstacle(), normal_(Vec3(0, 1, 0)), center_(Vec3())
-//    {
-//        setColor({0.7, 0.7, 0.8});
-//    }
-    
     PlaneObstacle()
       : Obstacle(),
         normal_(Vec3(0, 1, 0)),
@@ -301,7 +290,7 @@ public:
       : Obstacle(), normal_(normal), center_(center) {}
     
     PlaneObstacle(const Vec3& normal, const Vec3& center, ExcludeFrom ef)
-      : PlaneObstacle(normal, center)
+      : PlaneObstacle(normal.normalize(), center)
     {
         setExcludeFrom(ef);
         setColor({0.7, 0.7, 0.8});
@@ -311,14 +300,12 @@ public:
                   const Vec3& center,
                   double visible_radius,
                   double visible_thickness)
-      : PlaneObstacle(normal.normalize(), center)
+      : PlaneObstacle(normal, center)
     {
         setColor({0.7, 0.7, 0.8});
         visible_radius_ = visible_radius;
         visible_thickness_ = visible_thickness;
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 rayIntersection(const Vec3& origin,
@@ -381,23 +368,6 @@ public:
         return from_plane_to_query_point.dot(normal_);
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260302 fix PlaneObstacle bug when not centered at origin
-
-//    void addToScene() const override
-//    {
-//        Vec3 ep_offset = center_ + normal_ * visible_thickness_;
-//        auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
-//                                                   center_ + ep_offset,
-//                                                   center_ - ep_offset,
-//                                                   getColor(),
-//                                                   true,
-//                                                   false, // don't evert
-//                                                   500);
-//        Draw::brightnessSpecklePerVertex(0.7, 1.0, getColor(), mesh);
-//        Draw::getInstance().addTriMeshToStaticScene(mesh);
-//    }
-
     void addToScene() const override
     {
         Vec3 ep_offset = normal_ * visible_thickness_;
@@ -411,8 +381,6 @@ public:
         Draw::brightnessSpecklePerVertex(0.7, 1.0, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     std::string to_string() const override { return "PlaneObstacle"; }
 
@@ -541,6 +509,65 @@ private:
     Vec3 tangent_;
     double length_;
 };
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20260307 wip add BoxObstacle
+
+class BoxObstacle : public Obstacle
+{
+public:
+    // Box with given center and orientation/size.
+    BoxObstacle(const Vec3& center,
+                const Vec3& x_edge,
+                const Vec3& y_edge,
+                const Vec3& z_edge)
+      : Obstacle(),
+        xp(x_edge, center + (x_edge / 2)),
+        xm(x_edge, center - (x_edge / 2)),
+        yp(y_edge, center + (y_edge / 2)),
+        ym(y_edge, center - (y_edge / 2)),
+        zp(z_edge, center + (z_edge / 2)),
+        zm(z_edge, center - (z_edge / 2))
+    {
+        // Require box not parallelepiped.
+        assert(x_edge.normalize().is_perpendicular(y_edge.normalize()));
+        assert(y_edge.normalize().is_perpendicular(z_edge.normalize()));
+        assert(z_edge.normalize().is_perpendicular(x_edge.normalize()));
+        center_ = center;
+        x_edge_ = x_edge;
+        y_edge_ = y_edge;
+        z_edge_ = z_edge;
+        setColor({0.8, 0.7, 0.7});
+    }
+    
+    // Axis aligned version: center and size along global axes.
+    BoxObstacle(const Vec3& center,
+                double x_size,
+                double y_size,
+                double z_size)
+      : BoxObstacle(center,
+                    Vec3(1, 0, 0) * x_size,
+                    Vec3(0, 1, 0) * y_size,
+                    Vec3(0, 0, 1) * z_size) {}
+    
+    std::string to_string() const override { return "BoxObstacle"; }
+    
+private:
+    Vec3 center_;
+    Vec3 x_edge_;
+    Vec3 y_edge_;
+    Vec3 z_edge_;
+    // PlaneObstacle for 6 faces: plus and minus side of each axis.
+    PlaneObstacle xp;
+    PlaneObstacle xm;
+    PlaneObstacle yp;
+    PlaneObstacle ym;
+    PlaneObstacle zp;
+    PlaneObstacle zm;
+};
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 // Class to contain statistics of a predicted collision with an Obstacle.
@@ -714,4 +741,11 @@ inline void Obstacle::unit_test()
         SphereObstacle so_n(5, Vec3(0, -5, 0), ExcludeFrom::neither);
         six_way_exclude_from(so_i, so_o, so_n);
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260307 wip add BoxObstacle
+    
+    BoxObstacle bo(Vec3(2, 4, 6), 1, 2, 3);
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

@@ -1087,7 +1087,12 @@ public:
                 // note: for 40x, r = 51.2362, which is to say, same as default.
                 r = sr * 0.3 * std::pow(40, 0.333);
                 std::cout << "DomeAndGround radius = " << r << std::endl;
-                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20260307 VERY TEMP
+                double DomeAndGround_volume = 4.0/3.0 * 3.14 * r * r * r / 2;
+                debugPrint(DomeAndGround_volume);
+                debugPrint(std::pow(DomeAndGround_volume, 0.333));
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 double thin = r * 0.001;
                 Vec3 up(0, 1, 0);
                 Vec3 lp_center = up * (r * -0.5);

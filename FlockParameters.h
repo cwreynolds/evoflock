@@ -320,7 +320,12 @@ private:
                                     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                                     // TODO 20260226 DomeAndGround obstacle
 //                                    "NoObstacles" :
-                                    "DomeAndGround" :
+                                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                                    // TODO 20260309 wip BoxObstacle
+//                                    "DomeAndGround" :
+                                    "BoxObstacle" :
+                                    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                                     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                                     "SmallSpheresInBigSphere");
 

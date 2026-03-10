@@ -1114,6 +1114,21 @@ public:
             //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
 
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260309 wip add BoxObstacle
+            
+            
+            {
+                double s = 41;
+                Obstacle* bo = new BoxObstacle({}, s * 2, s, s * 2);
+                obstacle_sets_.push_back(ObstacleSet("BoxObstacle", {bo}));
+            }
+            
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
             // Set 6: no obstacles.
             obstacle_sets_.push_back(ObstacleSet("NoObstacles", {}));

@@ -550,25 +550,78 @@ public:
                     Vec3(1, 0, 0) * x_size,
                     Vec3(0, 1, 0) * y_size,
                     Vec3(0, 0, 1) * z_size) {}
-    
+
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20260308 wip on BoxObstacle::rayIntersection().
+    // TODO 20260309 wip on BoxObstacle::rayIntersection().
     
+    // Structure for data about a ray intersection determination.
+    class IntersectionData
+    {
+    public:
+        Vec3 ray_intersection = Vec3::none();
+        const PlaneObstacle* intersected_plane = nullptr;
+    };
+    
+    // Utility to find nearest plane intersection.
+    IntersectionData ri_util(const Vec3& origin,
+                             const Vec3& tangent,
+                             double body_radius) const
+    {
+        IntersectionData id;
+        
+        // Start with "unrolled" version
+        Vec3 ri = Vec3::none();
+        double nearest_distance = -1;
+        auto test_one_plane = [&](const PlaneObstacle& po)
+        {
+            Vec3 pri = po.rayIntersection(origin, tangent, body_radius);
+            if (not pri.is_none())
+            {
+                double pri_distance = (pri - origin).length();
+                if (nearest_distance < pri_distance)
+                {
+                    nearest_distance = pri_distance;
+                    ri = pri;
+                    
+                    id.intersected_plane = &po;
+                }
+            }
+        };
+        test_one_plane(xp);
+        test_one_plane(xm);
+        test_one_plane(yp);
+        test_one_plane(ym);
+        test_one_plane(zp);
+        test_one_plane(zm);
+        return id;
+    }
+
+    
+
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 rayIntersection(const Vec3& origin,
                          const Vec3& tangent,
                          double body_radius) const override
     {
-        
-        Vec3 a = xp.rayIntersection(origin, tangent, body_radius);
-        Vec3 b = xm.rayIntersection(origin, tangent, body_radius);
-        Vec3 c = yp.rayIntersection(origin, tangent, body_radius);
-        Vec3 d = ym.rayIntersection(origin, tangent, body_radius);
-        Vec3 e = zp.rayIntersection(origin, tangent, body_radius);
-        Vec3 f = zm.rayIntersection(origin, tangent, body_radius);
-
-        return Vec3::none();
+        IntersectionData id = ri_util(origin, tangent, body_radius);
+        return id.ray_intersection;
     }
+    
+    
+//    // Abstract normal for a given position. Points toward the +SDF side.
+//    Vec3 normal(const Vec3& poi) const override
+//    {
+//        IntersectionData id = ri_util(origin, tangent, body_radius);
+//        return id.intersected_plane.normal();
+//    }
+
+    
+//    unimplemented normal()
+//    unimplemented nearest_point()
+//    unimplemented fly_away()
+
+    // should we have a virtual volume() function on Obstacle?
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
@@ -766,7 +819,12 @@ inline void Obstacle::unit_test()
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260307 wip add BoxObstacle
     
-    BoxObstacle bo(Vec3(2, 4, 6), 1, 2, 3);
+//    BoxObstacle bo(Vec3(2, 4, 6), 1, 2, 3);
+    
+    double s = 41;
+//    Obstacle* bo = new BoxObstacle bo(Vec3(), s * 2, s, s * 2);
+    BoxObstacle bo(Vec3(), s * 2, s, s * 2);
+
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }

@@ -292,57 +292,23 @@ public:
         visualizer().AddGeometry(tri_mesh);
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20241221 square panels on cylinders
-    
-//    // Make cylinder: returns shared pointer to tri mesh with given parameters.
-//    static sp_tri_mesh_t constructCylinderTriMesh(double radius,
-//                                                  const Vec3& endpoint0,
-//                                                  const Vec3& endpoint1,
-//                                                  const Vec3& color,
-//                                                  bool compute_normals,
-//                                                  bool evert,
-//                                                  int subdivision)
-//    {
-//        auto cyl_mesh = constructO3dCylinder(radius,
-//                                             vec3ToEv3d(endpoint0),
-//                                             vec3ToEv3d(endpoint1),
-//                                             subdivision);
-//        cyl_mesh->PaintUniformColor(vec3ToEv3d(color));
-//        if (compute_normals) { cyl_mesh->ComputeVertexNormals(); }
-//        if (evert) { evertTriangleMesh(*cyl_mesh); }
-//        return cyl_mesh;
-//    }
-
     // Make cylinder: returns shared pointer to tri mesh with given parameters.
     static sp_tri_mesh_t constructCylinderTriMesh(double radius,
                                                   const Vec3& endpoint0,
                                                   const Vec3& endpoint1,
-//                                                  const Vec3& color,
                                                   const Color& color,
                                                   bool compute_normals,
                                                   bool evert,
                                                   int subdivision)
     {
         double height = (endpoint0 - endpoint1).length();
-//        double circumference = 2 * lp::util::pi * radius;
-//        double circumference = 2 * 3.14159 * radius;
         double circumference = 2 * util::pi * radius;
         double chord = circumference / subdivision;
         auto cyl_mesh = constructO3dCylinder(radius,
                                              vec3ToEv3d(endpoint0),
                                              vec3ToEv3d(endpoint1),
-//                                             subdivision);
                                              subdivision,
-                                             
-//                                             height / 100
-//                                             height
-//                                             height * 3
-//                                             height * 4
-//                                             height / chord
-                                             std::max(1.0, height / chord)
-
-                                             );
+                                             std::max(1.0, height / chord));
         cyl_mesh->PaintUniformColor(vec3ToEv3d(color));
         if (compute_normals) { cyl_mesh->ComputeVertexNormals(); }
         if (evert) { evertTriangleMesh(*cyl_mesh); }
@@ -366,6 +332,51 @@ public:
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260310 wip draw box
+    
+    
+//    /// Factory function to create a box mesh (TriangleMeshFactory.cpp)
+//    /// The left bottom corner on the front will be placed at (0, 0, 0).
+//    /// \param width is x-directional length.
+//    /// \param height is y-directional length.
+//    /// \param depth is z-directional length.
+//    /// \param create_uv_map add default UV map to the shape.
+//    /// \param map_texture_to_each_face if true, maps the entire texture image
+//    /// to each face. If false, sets the default uv map to the mesh.
+//    static std::shared_ptr<TriangleMesh> CreateBox(
+//                                                   double width = 1.0,
+//                                                   double height = 1.0,
+//                                                   double depth = 1.0,
+//                                                   bool create_uv_map = false,
+//                                                   bool map_texture_to_each_face = false);
+
+    
+    // Make sphere: returns shared pointer to tri mesh with given parameters.
+//    static sp_tri_mesh_t constructSphereTriMesh(double radius,
+    static sp_tri_mesh_t constructBoxTriMesh(double width,
+                                             double height,
+                                             double depth,
+                                             const Vec3& center,
+                                             const Color& color,
+                                             bool compute_normals,
+                                             bool evert,
+                                             int subdivision)
+    {
+//        auto mesh = tri_mesh_t::CreateSphere(radius, subdivision);
+        auto mesh = tri_mesh_t::CreateBox(width, height, depth);
+
+//        mesh->Translate(vec3ToEv3d(center));
+        Vec3 offset(width / 2, height / 2, depth / 2);
+        mesh->Translate(vec3ToEv3d(center - offset));
+
+        mesh->PaintUniformColor(vec3ToEv3d(color));
+        if (compute_normals) { mesh->ComputeVertexNormals(); }
+        if (evert) { evertTriangleMesh(*mesh); }
+        return mesh;
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }

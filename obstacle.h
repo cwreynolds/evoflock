@@ -513,6 +513,9 @@ private:
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20260307 wip add BoxObstacle
+// TODO 20260308 wip on BoxObstacle::rayIntersection().
+// TODO 20260309 wip on BoxObstacle::rayIntersection().
+// TODO 20260310 ...
 
 class BoxObstacle : public Obstacle
 {
@@ -538,6 +541,9 @@ public:
         x_edge_ = x_edge;
         y_edge_ = y_edge;
         z_edge_ = z_edge;
+        // Collection of pointers to planes for iterating over them.
+        planes_ = {&xp, &xm, &yp, &ym, &zp, &zm};
+        // Base color.
         setColor({0.8, 0.7, 0.7});
     }
     
@@ -551,71 +557,164 @@ public:
                     Vec3(0, 1, 0) * y_size,
                     Vec3(0, 0, 1) * z_size) {}
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260308 wip on BoxObstacle::rayIntersection().
-    // TODO 20260309 wip on BoxObstacle::rayIntersection().
     
-    // Structure for data about a ray intersection determination.
-    class IntersectionData
-    {
-    public:
-        Vec3 ray_intersection = Vec3::none();
-        const PlaneObstacle* intersected_plane = nullptr;
-    };
+//    // Structure for data about a ray intersection determination.
+//    class IntersectionData
+//    {
+//    public:
+//        Vec3 ray_intersection = Vec3::none();
+//        const PlaneObstacle* intersected_plane = nullptr;
+//    };
+//    
+//    // Utility to find nearest plane intersection.
+//    IntersectionData ri_util(const Vec3& origin,
+//                             const Vec3& tangent,
+//                             double body_radius) const
+//    {
+//        IntersectionData id;
+//        
+//        // Start with "unrolled" version
+//        Vec3 ri = Vec3::none();
+//        double nearest_distance = -1;
+//        auto test_one_plane = [&](const PlaneObstacle& po)
+//        {
+//            Vec3 pri = po.rayIntersection(origin, tangent, body_radius);
+//            if (not pri.is_none())
+//            {
+//                double pri_distance = (pri - origin).length();
+//                if (nearest_distance < pri_distance)
+//                {
+//                    nearest_distance = pri_distance;
+//                    ri = pri;
+//                    
+//                    id.intersected_plane = &po;
+//                }
+//            }
+//        };
+//        test_one_plane(xp);
+//        test_one_plane(xm);
+//        test_one_plane(yp);
+//        test_one_plane(ym);
+//        test_one_plane(zp);
+//        test_one_plane(zm);
+//        return id;
+//    }
+//
+//    
+//
+//    // Where a ray (Agent's path) will intersect the obstacle, or None.
+//    Vec3 rayIntersection(const Vec3& origin,
+//                         const Vec3& tangent,
+//                         double body_radius) const override
+//    {
+//        IntersectionData id = ri_util(origin, tangent, body_radius);
+//        return id.ray_intersection;
+//    }
     
-    // Utility to find nearest plane intersection.
-    IntersectionData ri_util(const Vec3& origin,
-                             const Vec3& tangent,
-                             double body_radius) const
-    {
-        IntersectionData id;
         
-        // Start with "unrolled" version
-        Vec3 ri = Vec3::none();
-        double nearest_distance = -1;
-        auto test_one_plane = [&](const PlaneObstacle& po)
-        {
-            Vec3 pri = po.rayIntersection(origin, tangent, body_radius);
-            if (not pri.is_none())
-            {
-                double pri_distance = (pri - origin).length();
-                if (nearest_distance < pri_distance)
-                {
-                    nearest_distance = pri_distance;
-                    ri = pri;
-                    
-                    id.intersected_plane = &po;
-                }
-            }
-        };
-        test_one_plane(xp);
-        test_one_plane(xm);
-        test_one_plane(yp);
-        test_one_plane(ym);
-        test_one_plane(zp);
-        test_one_plane(zm);
-        return id;
-    }
-
-    
+//    // Where a ray (Agent's path) will intersect the obstacle, or None.
+//    Vec3 rayIntersection(const Vec3& origin,
+//                         const Vec3& tangent,
+//                         double body_radius) const override
+//    {
+//        Vec3 nearest_ri;
+//        double nearest_distance = std::numeric_limits<double>::infinity();
+//        for (auto p : planes_)
+//        {
+//            Vec3 ri = p->rayIntersection(origin, tangent, body_radius);
+//            double dist = (ri - origin).length();
+//            if (nearest_distance > dist)
+//            {
+//                nearest_distance = dist;
+//                nearest_ri = ri;
+//            }
+//        }
+//        return nearest_ri;
+//    }
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 rayIntersection(const Vec3& origin,
                          const Vec3& tangent,
                          double body_radius) const override
     {
-        IntersectionData id = ri_util(origin, tangent, body_radius);
-        return id.ray_intersection;
+        Vec3 nearest_ri;
+        double nearest_distance = std::numeric_limits<double>::infinity();
+        for (auto p : planes_)
+        {
+            Vec3 ri = p->rayIntersection(origin, tangent, body_radius);
+            if (not ri.is_none())
+            {
+                double dist = (ri - origin).length();
+                if (nearest_distance > dist)
+                {
+                    nearest_distance = dist;
+                    nearest_ri = ri;
+                }
+            }
+        }
+        return nearest_ri;
+    }
+
+
+
+    // Abstract normal for a given position. Points toward the +SDF side.
+    Vec3 normal(const Vec3& poi) const override
+    {
+        Vec3 normal;
+        double nearest_distance = std::numeric_limits<double>::infinity();
+        for (auto p : planes_)
+        {
+            Vec3 np = p->nearest_point(poi);
+            double dist = (np - poi).length();
+            if (nearest_distance > dist)
+            {
+                nearest_distance = dist;
+                normal = p->normal(poi);
+            }
+        }
+        return normal;
     }
     
-    
-//    // Abstract normal for a given position. Points toward the +SDF side.
-//    Vec3 normal(const Vec3& poi) const override
-//    {
-//        IntersectionData id = ri_util(origin, tangent, body_radius);
-//        return id.intersected_plane.normal();
-//    }
+    // Point on surface of obstacle nearest the given query_point.
+    Vec3 nearest_point(const Vec3& query_point) const override
+    {
+        Vec3 nearest_point;
+        double nearest_distance = std::numeric_limits<double>::infinity();
+        for (auto p : planes_)
+        {
+            Vec3 np = p->nearest_point(query_point);
+            double dist = (np - query_point).length();
+            if (nearest_distance > dist)
+            {
+                nearest_distance = dist;
+                nearest_point = np;
+            }
+        }
+        return nearest_point;
+    }
 
+    // Compute direction for agent's static avoidance of nearby obstacles.
+    Vec3 fly_away(const Vec3& agent_position,
+                  const Vec3& agent_forward,
+                  double max_distance,
+                  double body_radius) const override
+    {
+        Vec3 nearest_fa;
+        double nearest_distance = std::numeric_limits<double>::infinity();
+        for (auto p : planes_)
+        {
+            Vec3 np = p->nearest_point(agent_position);
+            double dist = (np - agent_position).length();
+            if (nearest_distance > dist)
+            {
+                nearest_distance = dist;
+                nearest_fa = p->fly_away(agent_position, agent_forward,
+                                         max_distance, body_radius);
+            }
+        }
+        return nearest_fa;
+
+    }
     
 //    unimplemented normal()
 //    unimplemented nearest_point()
@@ -623,7 +722,23 @@ public:
 
     // should we have a virtual volume() function on Obstacle?
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    
+    void addToScene() const override
+    {
+//        auto mesh = Draw::constructSphereTriMesh(radius(),
+//                                                 center(),
+        auto mesh = Draw::constructBoxTriMesh(x_edge_.length(),
+                                              y_edge_.length(),
+                                              z_edge_.length(),
+                                              center_,
+                                              getColor(),
+                                              true,
+                                              getExcludeFrom() == outside,
+                                              500);
+        Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
+        Draw::getInstance().addTriMeshToStaticScene(mesh);
+    }
+
 
     std::string to_string() const override { return "BoxObstacle"; }
     
@@ -639,6 +754,7 @@ private:
     PlaneObstacle ym;
     PlaneObstacle zp;
     PlaneObstacle zm;
+    std::vector<PlaneObstacle*> planes_;
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

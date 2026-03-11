@@ -211,48 +211,20 @@ public:
                 
         // Randomize the Boid's position and orientation.
         boid->set_ls(initBoidPose(radius, center, rs));
-        
-//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-//        // TODO 20260216 add EF::no_obstacles_mode
-//        if (EF::no_obstacles_mode)
-//        {
-//            double target_speed = 20;
-//            boid->setSpeed(target_speed * rs.frandom01());
-//        }
-//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
         // Probably unneeded since initial speed is zero, nevertheless:
         boid->setPreviousPosition(boid->position());
   
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260218 init Boid speed for EF::no_obstacles_mode
-        
-        
-//        // Init Boid speed to EF::default_target_speed. Why only in GP mode?
-//        if (EF::usingGP()) { boid->setSpeed(EF::default_target_speed); }
-
         // Init Boid speed to EF::default_target_speed.
         boid->setSpeed(EF::default_target_speed);
 
-//        if (EF::no_obstacles_mode)
-//        {
-//            double target_speed = 20;
-//            boid->setSpeed(target_speed * rs.frandom01());
-//        }
-
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         // TODO 20260222 increase return_to_center outside distance
-
         if (EF::no_obstacles_mode)
         {
-//            boid->setSpeed(EF::default_target_speed * rs.frandom01());
             boid->setSpeed(EF::default_target_speed * rs.frandom2(0.9, 1.1));
         }
-        
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
 
     // Random initial Boid "pose" (position and orientation). By default, they
@@ -295,95 +267,18 @@ public:
             return point;
         };
         
-        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
-        // TODO 20260215 for NoObstacle tests max_force 100 -> 200
-
-//        return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260216 add EF::no_obstacles_mode
-
-//        return LocalSpace::fromTo(rs.random_point_in_unit_radius_sphere() * 60,
-//                                  rs.randomUnitVector());
-        
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260222 clean up
-
-//            if (EF::no_obstacles_mode)
-//            {
-//    //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 60;
-//    //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 20;
-//    //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 30;
-//    //            Vec3 pos = rs.random_point_in_unit_radius_sphere() * 50;
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                // TODO 20260219 more fiddling with init pose for no_obstacles_mode
-//    //            Vec3 pos = rs.randomUnitVector() * 50;
-//    //            Vec3 pos = rs.randomUnitVector() * fp().sphereRadius() * 0.6;
-//    //            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
-//    //                        fp().sphereRadius() * 0.6);
-//    //            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
-//    //                        fp().sphereRadius() * 0.4);
-//                Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
-//                            fp().sphereRadius());
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                return LocalSpace::fromTo(pos, rs.randomUnitVector());
-//            }
-      
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260226 DomeAndGround obstacle
-
-//            if (EF::no_obstacles_mode)
-//            {
-//    //            Vec3 pos = (rs.random_point_in_unit_radius_sphere() *
-//    //                        fp().sphereRadius());
-//    //            return LocalSpace::fromTo(pos, rs.randomUnitVector());
-//
-//                return LocalSpace::fromTo((rs.random_point_in_unit_radius_sphere() *
-//                                           //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                                           // TODO 20260225 start near center.
-//    //                                       fp().sphereRadius()),
-//                                           fp().sphereRadius() * 0.2),
-//                                          //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                                          rs.randomUnitVector());
-//            }
-
-        // For DomeAndGround.
+        // For DomeAndGround / NoObstacle / BoxObstacle
         if (EF::no_obstacles_mode)
         {
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20260304 DomeAndGround: smaller dome, plane at equator
-            //               needs to be linked to code in obstacleSets()
-            //               seems off by factor of 2
-
-//            double radius = fp().sphereRadius() * 0.2;
-//            double radius = fp().sphereRadius() * 0.3;
             double radius = fp().sphereRadius() * 0.15;
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-            // TODO 20260303 more wip with DomeAndGround, try alignmentScore()?
-            //               refactor GP::mof_names() and GP::multiObjectiveFitnessOfFlock()
-//            Vec3 center;
-//            Vec3 center(0, radius, 0);
             Vec3 center;
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
             Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
             Vec3 boid_position = center + (rand_in_unit_sphere * radius);
             Vec3 boid_heading = rs.randomUnitVector();
             return LocalSpace::fromTo(boid_position, boid_heading);
         }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
         
         return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
-        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
     }
 
     // Collect flock curvature stats
@@ -617,51 +512,71 @@ public:
         return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260311 cleanup
+
+//        double curvatureScore() const
+//        {
+//            double average_curvature = sum_curvature_ / boidStepPerSim();
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20260214 tweak curvatureScore VERY TEMPORARY IMPLEMENTATION !!!!
+//            //               global flag for this?
+//
+//    //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
+//
+//            // 20260214_ga_no_obs_tweak_curvature
+//    //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
+//
+//            // 20260214_ga_no_obs_tweak_curvature_2
+//    //        return util::remap_interval_clip(average_curvature, 0, 0.05, 0.5, 1);
+//    //        return util::remap_interval_clip(average_curvature, 0, 0.2, 0.5, 1);
+//
+//            // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
+//            // TODO 20260215 back to previous curvature score
+//    //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
+//
+//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//            // TODO 20260218 use curvature objective less strength
+//
+//    //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
+//
+//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//            // TODO 20260301 temp disable curvatureScore() and clusterScore().
+//
+//    //        return 1;
+//
+//            double max_penalty = EF::no_obstacles_mode ? 0.1 : 0.2;
+//            return util::remap_interval_clip(average_curvature,
+//                                             0, 0.1,
+//                                             1 - max_penalty, 1);
+//
+//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//
+//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//            // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        }
+
     double curvatureScore() const
     {
-        double average_curvature = sum_curvature_ / boidStepPerSim();
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260311 work aroud curvature NaN
+        debugPrint(sum_curvature_)
+        double temp_sc = std::isnan(sum_curvature_) ? 0 : sum_curvature_;
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260214 tweak curvatureScore VERY TEMPORARY IMPLEMENTATION !!!!
-        //               global flag for this?
-
-//        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
-        
-        // 20260214_ga_no_obs_tweak_curvature
-//        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
-        
-        // 20260214_ga_no_obs_tweak_curvature_2
-//        return util::remap_interval_clip(average_curvature, 0, 0.05, 0.5, 1);
-//        return util::remap_interval_clip(average_curvature, 0, 0.2, 0.5, 1);
-
-        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
-        // TODO 20260215 back to previous curvature score
-//        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260218 use curvature objective less strength
-
-//        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260301 temp disable curvatureScore() and clusterScore().
-        
-//        return 1;
-        
+        double average_curvature = temp_sc / boidStepPerSim();
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         double max_penalty = EF::no_obstacles_mode ? 0.1 : 0.2;
         return util::remap_interval_clip(average_curvature,
                                          0, 0.1,
                                          1 - max_penalty, 1);
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
-        
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Accumulators for alignment score.
     // TODO Relocate in file?
     double sum_of_alignment_scores_over_all_boid_steps_ = 0;
@@ -942,157 +857,23 @@ public:
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // TODO 20260226 DomeAndGround obstacle
 
-            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
             // TODO 20260228 testing murmuration in DomeAndGround
-
-
-//    //            Obstacle* low_sphere = new SphereObstacle(sr, {0, -15, 0}, oside);
-//                Obstacle* low_sphere = new SphereObstacle(sr, {0, -20, 0}, oside);
-//                obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
-
-            
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
             // TODO 20260301 temp disable curvatureScore()
-            
-
-//                {
-//                    double r = sr * 1.5;
-//                    Vec3 lower(0, -30, 0);
-//                    Vec3 up(0, 1, 0);
-//                    Obstacle* low_sphere = new SphereObstacle(r, lower, oside);
-//
-//    //                Obstacle* plane = new PlaneObstacle(Vec3(0,1,0), sc, sr, sr * 0.001);
-//    //                PlaneObstacle(const Vec3& normal,
-//    //                              const Vec3& center,
-//    //                              double visible_radius,
-//    //                              double visible_thickness)
-//
-//                    Obstacle* low_plane = new PlaneObstacle(up,
-//                                                            sc,
-//    //                                                        sc + lower,
-//                                                            r, r * 0.001);
-//                    obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
-//                                                         {low_sphere, low_plane}));
-//                }
-      
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20260302 fix PlaneObstacle bug when not centered at origin
-            
-//                {
-//    //                double r = sr * 1.5;
-//                    double r = sr * 1.0;
-//    //                Vec3 lower(0, -30, 0);
-//    //                Vec3 lower(0, 20 - sr, 0);
-//                    Vec3 lower(0, 10 - sr, 0);
-//                    Vec3 up(0, 1, 0);
-//                    Obstacle* low_sphere = new SphereObstacle(r, lower, oside);
-//                    Obstacle* low_plane = new PlaneObstacle(up,
-//                                                            sc,
-//    //                                                        sc + lower,
-//                                                            r, r * 0.001);
-//                    obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
-//                                                         {low_sphere, low_plane}));
-//                }
-
-//                {
-//                    double r = sr * 1.0;
-//                    double d = 10;
-//    //                Vec3 lower(0, 10 - sr, 0);
-//                    Vec3 up(0, 1, 0);
-//                    Vec3 ls_center = up * (d - sr);
-//                    Vec3 lp_center = up * -d;
-//
-//    //                Obstacle* low_sphere = new SphereObstacle(r, lower, oside);
-//                    Obstacle* low_sphere = new SphereObstacle(r, ls_center, oside);
-//                    Obstacle* low_plane = new PlaneObstacle(up,
-//    //                                                        sc,
-//    //                                                        sc + lower,
-//    //                                                        sc + lower + Vec3(0,r,0),
-//    //                                                        lower + up * r,
-//                                                            lp_center,
-//                                                            r, r * 0.001);
-//                    obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
-//                                                         {low_sphere, low_plane}));
-//                }
-
-//                {
-//                    double d = 10;
-//                    double r = sr * 1.0;
-//                    double thick = r * 0.001;
-//                    Vec3 up(0, 1, 0);
-//                    Vec3 lp_center = up * -d;
-//                    Vec3 ls_center = up * (d - sr);
-//                    Obstacle* low_sphere = new SphereObstacle(r, ls_center, oside);
-//    //                Obstacle* low_plane = new PlaneObstacle(up, lp_center,
-//    //                                                        r, r * 0.001);
-//                    Obstacle* low_plane = new PlaneObstacle(up, lp_center, r, thick);
-//                    obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
-//                                                         {low_sphere, low_plane}));
-//                }
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20260304 DomeAndGround: smaller dome, plane at equator
-            
-//                {
-//    //                double d = 10;
-//                    double vert_dist_from_center = 10;
-//    //                double r = sr * 1.0;
-//    //                double r = sr * 0.2;
-//                    double r = sr * 0.4;  // Sphere radius will be 20
-//                    double thin = r * 0.001;
-//                    Vec3 up(0, 1, 0);
-//    //                Vec3 lp_center = up * -d;
-//                    Vec3 lp_center = up * -vert_dist_from_center;
-//    //                Vec3 ls_center = up * (d - sr);
-//    //                Vec3 ls_center = up * (d - r);
-//                    Vec3 ls_center = up * (vert_dist_from_center - r);
-//                    Obstacle* low_sphere = new SphereObstacle(r, ls_center, oside);
-//                    Obstacle* low_plane = new PlaneObstacle(up, lp_center, r, thin);
-//                    obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
-//                                                         {low_sphere, low_plane}));
-//                }
-        
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // TODO 20260305 double volume of DomeAndGround.
-            
-//                {
-//    //                double vert_dist_from_center = 10;
-//    //                double r = sr * 0.4;  // Sphere radius will be 20
-//    //                double r = sr * 0.2;  // Sphere radius will be 10
-//                    double r = sr * 0.3;  // Sphere radius will be 30
-//                    double thin = r * 0.001;
-//                    Vec3 up(0, 1, 0);
-//    //                Vec3 lp_center = up * -vert_dist_from_center;
-//    //                Vec3 ls_center = up * (vert_dist_from_center - r);
-//                    Vec3 lp_center = up * (r * -0.5);
-//                    Vec3 ls_center = up * (r * -0.5);
-//                    Obstacle* low_sphere = new SphereObstacle(r, ls_center, oside);
-//                    Obstacle* low_plane = new PlaneObstacle(up, lp_center, r, thin);
-//                    obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
-//                                                         {low_sphere, low_plane}));
-//                }
-
             {
-//                // Dome will have 30% the radius of BigSphere
-//                double r = sr * 0.3;
-//                // Dome has 30% the radius of BigSphere, then double volume
-//                double r = sr * 0.3 * std::pow(2.0, 0.333);
-//                // Dome has 30% the radius of BigSphere, then 4x volume
-//                double r = sr * 0.3 * std::pow(4.0, 0.333);
                 // Dome has 30% the radius of BigSphere, then 8x volume
                 double r = sr * 0.3 * std::pow(8.0, 0.333);
                 
-                // TODO 20260306 VERY TEMP
-//                r = sr * 0.3 * std::pow(20, 0.333);
                 // note: for 40x, r = 51.2362, which is to say, same as default.
                 r = sr * 0.3 * std::pow(40, 0.333);
                 std::cout << "DomeAndGround radius = " << r << std::endl;
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20260307 VERY TEMP
-                double DomeAndGround_volume = 4.0/3.0 * 3.14 * r * r * r / 2;
-                debugPrint(DomeAndGround_volume);
-                debugPrint(std::pow(DomeAndGround_volume, 0.333));
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20260307 VERY TEMP
+//                double DomeAndGround_volume = 4.0/3.0 * 3.14 * r * r * r / 2;
+//                debugPrint(DomeAndGround_volume);
+//                debugPrint(std::pow(DomeAndGround_volume, 0.333));
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 double thin = r * 0.001;
                 Vec3 up(0, 1, 0);
                 Vec3 lp_center = up * (r * -0.5);
@@ -1102,17 +883,6 @@ public:
                 obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
                                                      {low_sphere, low_plane}));
             }
-
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
-
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             
             
@@ -1121,7 +891,8 @@ public:
             
             
             {
-                double s = 41;
+//                double s = 41;
+                double s = 410;
                 Obstacle* bo = new BoxObstacle({}, s * 2, s, s * 2);
                 obstacle_sets_.push_back(ObstacleSet("BoxObstacle", {bo}));
             }

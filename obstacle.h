@@ -723,20 +723,46 @@ public:
     // should we have a virtual volume() function on Obstacle?
 
     
+//        void addToScene() const override
+//        {
+//    //        auto mesh = Draw::constructSphereTriMesh(radius(),
+//    //                                                 center(),
+//            auto mesh = Draw::constructBoxTriMesh(x_edge_.length(),
+//                                                  y_edge_.length(),
+//                                                  z_edge_.length(),
+//                                                  center_,
+//                                                  getColor(),
+//                                                  true,
+//                                                  getExcludeFrom() == outside,
+//                                                  500);
+//            Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
+//            Draw::getInstance().addTriMeshToStaticScene(mesh);
+//        }
+
     void addToScene() const override
     {
-//        auto mesh = Draw::constructSphereTriMesh(radius(),
-//                                                 center(),
+        debugPrint(getExcludeFrom() == outside)
+        
         auto mesh = Draw::constructBoxTriMesh(x_edge_.length(),
                                               y_edge_.length(),
                                               z_edge_.length(),
                                               center_,
                                               getColor(),
                                               true,
-                                              getExcludeFrom() == outside,
+                                              
+//                                              getExcludeFrom() == outside,
+//                                              true,
+                                              getExcludeFrom() != outside,
+
                                               500);
         Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
+        
+        
+        for (auto p : planes_)
+        {
+            p->addToScene();
+        }
     }
 
 

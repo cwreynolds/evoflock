@@ -111,33 +111,14 @@ inline static int override_boids_per_flock = -1;
 
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 // TODO 20260216 add EF::no_obstacles_mode
-
+// TODO 20260311 this should be renamed something like "murmuration_mode"
 //inline static bool no_obstacles_mode = false;
 inline static bool no_obstacles_mode = true;
-
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20260220 add EF::visualize_previous_results_mode
-
+// Simple replay previous results in visualizePreviouslyLoggedFlockParameters.
+inline static bool visualize_previous_results_mode = false;
 //inline static bool visualize_previous_results_mode = true;
-//inline static bool visualize_previous_results_mode = false;
-//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-// TODO 20260222 fix for EF::visualize_previous_results_mode
-//inline static bool visualize_previous_results_mode = true;
-//inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20260223 bring back cluster counting
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20260303 move wip with DomeAndGround, try alignmentScore()?
-//inline static bool visualize_previous_results_mode = false;
-inline static bool visualize_previous_results_mode = true;
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;

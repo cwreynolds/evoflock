@@ -109,6 +109,14 @@
 		843278062B50594E00CF4AEC /* LocalSpace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalSpace.h; sourceTree = "<group>"; };
 		843CA0DE2E21EB5300778963 /* temp_evo_update.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_evo_update.png; sourceTree = "<group>"; };
 		843CA0DF2E233DE900778963 /* temp_fit_plot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = temp_fit_plot.png; sourceTree = "<group>"; };
+		8443E3F12F63A07E00FAAA03 /* evo_update.pages */ = {isa = PBXFileReference; lastKnownFileType = file; path = evo_update.pages; sourceTree = "<group>"; };
+		8443E3F22F63A07E00FAAA03 /* evo_update.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = evo_update.pdf; sourceTree = "<group>"; };
+		8443E3F32F63A07E00FAAA03 /* MOF_HV.pages */ = {isa = PBXFileReference; lastKnownFileType = file; path = MOF_HV.pages; sourceTree = "<group>"; };
+		8443E3F42F63A07E00FAAA03 /* MOF_HV.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = MOF_HV.pdf; sourceTree = "<group>"; };
+		8443E3F52F63A07E00FAAA03 /* seed_variance.pages */ = {isa = PBXFileReference; lastKnownFileType = file; path = seed_variance.pages; sourceTree = "<group>"; };
+		8443E3F62F63A07E00FAAA03 /* seed_variance.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = seed_variance.pdf; sourceTree = "<group>"; };
+		8443E3F72F63A07E00FAAA03 /* system_blocks.pages */ = {isa = PBXFileReference; lastKnownFileType = file; path = system_blocks.pages; sourceTree = "<group>"; };
+		8443E3F82F63A07E00FAAA03 /* system_blocks.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = system_blocks.pdf; sourceTree = "<group>"; };
 		845F845D2D90E397000BF13C /* FlockParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FlockParameters.h; sourceTree = "<group>"; };
 		847454BE2B6195F000214306 /* obstacle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = obstacle.h; sourceTree = "<group>"; };
 		847454BF2B65BE9C00214306 /* Boid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Boid.h; sourceTree = "<group>"; };
@@ -283,6 +291,7 @@
 				849817952E077C11002B4548 /* fitness_plot_template.numbers */,
 				847C8CF32E4180F100DBC072 /* 20250806_UCSC_inverse_flocks.pdf */,
 				847ED7422E554320005909CD /* seed_induced_variation.numbers */,
+				8443E3F92F63A07E00FAAA03 /* EF PDF figs */,
 			);
 			path = doc;
 			sourceTree = "<group>";
@@ -320,6 +329,21 @@
 				841F3D552B49E90000483276 /* evoflock */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		8443E3F92F63A07E00FAAA03 /* EF PDF figs */ = {
+			isa = PBXGroup;
+			children = (
+				8443E3F12F63A07E00FAAA03 /* evo_update.pages */,
+				8443E3F22F63A07E00FAAA03 /* evo_update.pdf */,
+				8443E3F32F63A07E00FAAA03 /* MOF_HV.pages */,
+				8443E3F42F63A07E00FAAA03 /* MOF_HV.pdf */,
+				8443E3F52F63A07E00FAAA03 /* seed_variance.pages */,
+				8443E3F62F63A07E00FAAA03 /* seed_variance.pdf */,
+				8443E3F72F63A07E00FAAA03 /* system_blocks.pages */,
+				8443E3F82F63A07E00FAAA03 /* system_blocks.pdf */,
+			);
+			path = "EF PDF figs";
 			sourceTree = "<group>";
 		};
 		848101F52C7666CA00433168 /* Frameworks */ = {

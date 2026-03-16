@@ -516,6 +516,7 @@ private:
 // TODO 20260308 wip on BoxObstacle::rayIntersection().
 // TODO 20260309 wip on BoxObstacle::rayIntersection().
 // TODO 20260310 ...
+// TODO 20260316 ...
 
 class BoxObstacle : public Obstacle
 {
@@ -524,7 +525,9 @@ public:
     BoxObstacle(const Vec3& center,
                 const Vec3& x_edge,
                 const Vec3& y_edge,
-                const Vec3& z_edge)
+//                const Vec3& z_edge)
+                const Vec3& z_edge,
+                ExcludeFrom ef)
       : Obstacle(),
         xp(x_edge, center + (x_edge / 2)),
         xm(x_edge, center - (x_edge / 2)),
@@ -545,8 +548,32 @@ public:
         planes_ = {&xp, &xm, &yp, &ym, &zp, &zm};
         // Base color.
         setColor({0.8, 0.7, 0.7});
+        // Set ExcludeFrom in base class.
+        setExcludeFrom(ef);
     }
     
+//    // Axis aligned version: center and size along global axes.
+//    BoxObstacle(const Vec3& center,
+//                double x_size,
+//                double y_size,
+//                double z_size)
+//      : BoxObstacle(center,
+//                    Vec3(1, 0, 0) * x_size,
+//                    Vec3(0, 1, 0) * y_size,
+//                    Vec3(0, 0, 1) * z_size) {}
+
+    // Axis aligned version: center and size along global axes.
+    BoxObstacle(const Vec3& center,
+                double x_size,
+                double y_size,
+                double z_size,
+                ExcludeFrom ef)
+      : BoxObstacle(center,
+                    Vec3(1, 0, 0) * x_size,
+                    Vec3(0, 1, 0) * y_size,
+                    Vec3(0, 0, 1) * z_size,
+                    ef) {}
+
     // Axis aligned version: center and size along global axes.
     BoxObstacle(const Vec3& center,
                 double x_size,
@@ -555,7 +582,8 @@ public:
       : BoxObstacle(center,
                     Vec3(1, 0, 0) * x_size,
                     Vec3(0, 1, 0) * y_size,
-                    Vec3(0, 0, 1) * z_size) {}
+                    Vec3(0, 0, 1) * z_size,
+                    ExcludeFrom::inside) {}
 
     
 //    // Structure for data about a ray intersection determination.
@@ -752,13 +780,14 @@ public:
                                               
 //                                              getExcludeFrom() == outside,
 //                                              true,
-                                              getExcludeFrom() != outside,
+//                                              getExcludeFrom() != outside,
+                                              getExcludeFrom() == outside,
 
                                               500);
         Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
         
-        
+        // TODO DEBUG TEMP. Why so thick along cylinder axis? Why black?
         for (auto p : planes_)
         {
             p->addToScene();

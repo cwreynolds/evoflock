@@ -893,7 +893,11 @@ public:
             {
 //                double s = 41;
                 double s = 410;
-                Obstacle* bo = new BoxObstacle({}, s * 2, s, s * 2);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20260316 BoxObstacle ExcludeFrom
+//                Obstacle* bo = new BoxObstacle({}, s * 2, s, s * 2);
+                Obstacle* bo = new BoxObstacle({}, s * 2, s, s * 2, oside);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 obstacle_sets_.push_back(ObstacleSet("BoxObstacle", {bo}));
             }
             

@@ -273,7 +273,12 @@ private:
                                     // TODO 20260226 DomeAndGround obstacle
 //                                    "NoObstacles" :
 //                                    "DomeAndGround" :
+                                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                    // TODO 20260316 BoxObstacle ExcludeFrom
+//                                    "BoxObstacle" :
+//                                    "DomeAndGround" :
                                     "BoxObstacle" :
+                                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                                     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                                     "SmallSpheresInBigSphere");
 

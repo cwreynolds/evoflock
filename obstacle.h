@@ -278,6 +278,9 @@ private:
 class PlaneObstacle : public Obstacle
 {
 public:
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
+    
     PlaneObstacle()
       : Obstacle(),
         normal_(Vec3(0, 1, 0)),
@@ -286,9 +289,11 @@ public:
         setColor({0.7, 0.7, 0.8});
     }
 
+//    PlaneObstacle(const Vec3& normal, const Vec3& center)
+//      : Obstacle(), normal_(normal), center_(center) {}
     PlaneObstacle(const Vec3& normal, const Vec3& center)
-      : Obstacle(), normal_(normal), center_(center) {}
-    
+      : Obstacle(), normal_(normal.normalize()), center_(center) {}
+
     PlaneObstacle(const Vec3& normal, const Vec3& center, ExcludeFrom ef)
       : PlaneObstacle(normal.normalize(), center)
     {
@@ -300,12 +305,15 @@ public:
                   const Vec3& center,
                   double visible_radius,
                   double visible_thickness)
-      : PlaneObstacle(normal, center)
+//      : PlaneObstacle(normal, center)
+      : PlaneObstacle(normal.normalize(), center)
     {
         setColor({0.7, 0.7, 0.8});
         visible_radius_ = visible_radius;
         visible_thickness_ = visible_thickness;
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 rayIntersection(const Vec3& origin,
@@ -370,6 +378,14 @@ public:
     
     void addToScene() const override
     {
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+        // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
+        std::cout << "PlaneObstacle::addToScene()" ;
+        std::cout << "===========================================" << std::endl;
+        debugPrint(visible_radius_)
+        debugPrint(visible_thickness_)
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+
         Vec3 ep_offset = normal_ * visible_thickness_;
         auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
                                                    center_ + ep_offset,
@@ -383,6 +399,12 @@ public:
     }
 
     std::string to_string() const override { return "PlaneObstacle"; }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+    // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
+    void setVisibleRadius(double vr) { visible_radius_ = vr; }
+    void setVisibleThickness(double vt) { visible_thickness_ = vt; }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
 private:
     Vec3 normal_;
@@ -546,10 +568,29 @@ public:
         z_edge_ = z_edge;
         // Collection of pointers to planes for iterating over them.
         planes_ = {&xp, &xm, &yp, &ym, &zp, &zm};
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+        // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
+
+//        double min_edge = std::min(x_edge.length(),
+//                                   std::min(y_edge.length(), z_edge.length()));
+        double min_edge = std::min({x_edge.length(),
+                                    y_edge.length(),
+                                    z_edge.length()});
+        for (auto p : planes_)
+        {
+            p->setVisibleRadius(min_edge / 2);
+            p->setVisibleThickness(min_edge * 0.001);
+
+        }
         // Base color.
         setColor({0.8, 0.7, 0.7});
         // Set ExcludeFrom in base class.
         setExcludeFrom(ef);
+        
+        std::cout << "BoxObstacle constuctor" ;
+        std::cout << "===========================================" << std::endl;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     }
     
 //    // Axis aligned version: center and size along global axes.
@@ -767,10 +808,41 @@ public:
 //            Draw::getInstance().addTriMeshToStaticScene(mesh);
 //        }
 
+//        void addToScene() const override
+//        {
+//            debugPrint(getExcludeFrom() == outside)
+//
+//            auto mesh = Draw::constructBoxTriMesh(x_edge_.length(),
+//                                                  y_edge_.length(),
+//                                                  z_edge_.length(),
+//                                                  center_,
+//                                                  getColor(),
+//                                                  true,
+//
+//    //                                              getExcludeFrom() == outside,
+//    //                                              true,
+//    //                                              getExcludeFrom() != outside,
+//                                                  getExcludeFrom() == outside,
+//
+//                                                  500);
+//            Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
+//            Draw::getInstance().addTriMeshToStaticScene(mesh);
+//
+//            // TODO DEBUG TEMP. Why so thick along cylinder axis? Why black?
+//            for (auto p : planes_)
+//            {
+//                p->addToScene();
+//            }
+//        }
+
     void addToScene() const override
     {
-        debugPrint(getExcludeFrom() == outside)
-        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+        // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
+        std::cout << "BoxObstacle::addToScene()" ;
+        std::cout << "===========================================" << std::endl;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+
         auto mesh = Draw::constructBoxTriMesh(x_edge_.length(),
                                               y_edge_.length(),
                                               z_edge_.length(),

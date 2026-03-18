@@ -2,9 +2,12 @@
 
 %
 % "EvoFlock: evolved inverse design of multi-agent motion"
-% speculative draft paper
+% draft paper for submission to ALIFE 2026 
+% "Full Papers are 3 to 8 pages long
+% (not including references or acknowledgments)"
 %
 % May 29, 2025  Begin draft.
+% Mar  1, 2026  Begin draft 3 for submission.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -12,10 +15,10 @@
 \usepackage{natbib,alifeconf}
 
 % Used for ALife, not sure I still need them.
-\usepackage{calc}
-\usepackage[hyphens]{xurl}
+% \usepackage{calc}
+% \usepackage[hyphens]{xurl}
 \usepackage{hyperref}
-\usepackage{tabularx}
+% \usepackage{tabularx}
 
 % Added 20230421 to allow SIGGRAPH-style “teaser figure'' under title.
 \usepackage{authblk}
@@ -50,7 +53,7 @@
 
 \begin{document}
 
-\title{{\tiny draft 2: \today}\\EvoFlock: evolved inverse design of multi-agent motion}
+\title{{\tiny draft 3: \today}\\EvoFlock: evolved inverse design of multi-agent motion}
 
 \author{Craig Reynolds\authorcr
     unaffiliated researcher\authorcr 
@@ -86,7 +89,8 @@
 
 \begin{figure*}
     \centering
-    \includegraphics[width=0.9\textwidth]{images/temp_MOF_HV.png}
+    % \includegraphics[width=0.9\textwidth]{images/temp_MOF_HV.png}
+    \includegraphics[width=0.9\textwidth]{images/MOF_HV.pdf}
     \caption{(A) Normalized multi-objective fitness space. For two objectives, a unit square. (B) The \textit{Pareto front} for two mutually conflicting objectives. (Like \textit{reliability} and \textit{affordability} in the hypothetical bridge design example.) The objectives can not all be fully satisfied at any point along the front. Visually, this is the ``distance'' from (1, 1) to the red curve. (C) Two ``mostly compatible'' objectives, more typical of criteria for flock tuning. Here, the Pareto front passes near the global optimum. (D) Scalarization of a multiple-objective fitness value, using \textit{hypervolume}: the product of all objective scores. In this 2D example it is the blue rectangle's \textit{area}. Solving a multi-objective problem using scalarized fitness works best for problems of type (C).}
     \label{fig:MOF_HV}
 \end{figure*}
@@ -108,14 +112,15 @@ In the past, flock models have been tuned manually, often a frustrating and time
 
 This paper is about automating that adjustment process using metrics of flock quality and an optimization process. The metrics use multiple objectives. The nature of those objectives and how to add new ones will be described in sections \nameref{sec:FlockingObjective} and \nameref{sec:add_objective}. The optimization process used in these experiments is a genetic algorithm, described in section \nameref{subsec:Optimization_with_GA}.
 
-A summary of (``hyper'')parameters for this framework is given in Table \ref{table:HyperParameters}. See \href{https://anonymous.4open.science/r/evoflock-9B09/}{anonymized c++ code} for this project. See \href{https://drive.google.com/file/d/1ZbanvWVfapnH2TpTqamypWFoXuMeoY9b/view?usp=sharing}{Video 1} of flock simulations based on this approach.
+A summary of (``hyper'')parameters for this framework is given in Table \ref{table:HyperParameters}. See \href{https://anonymous.4open.science/r/evoflock-1F6F/}{anonymized c++ code} for this project. See \href{https://drive.google.com/file/d/1ZbanvWVfapnH2TpTqamypWFoXuMeoY9b/view?usp=sharing}{Video 1} of flock simulations based on this approach.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{figure*}
     \centering
-    \includegraphics[width=0.7\textwidth]{images/temp_evo_update.png}
-    \caption{One update step of the (SSGA) evolutionary optimization process, using a 3-way tournament: (a) uniformly select one of the \textit{sub-populations}, (b) from that sub-population, uniformly select three \textit{individuals}, each holding a flock parameter set, (c) get fitness for each, either by running flock simulations (green), or using the fitness cached from previous tournaments (orange), (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g,h) that new individual replaces the worst of the three back in the population. Removing the worst individuals, rather than promoting the best, is a form of \textit{negative selection} which tends to preserve diversity in the population.}
+    % \includegraphics[width=0.7\textwidth]{images/temp_evo_update.png}
+    \includegraphics[width=0.7\textwidth]{images/evo_update.pdf}
+    \caption{One update step of the (SSGA) evolutionary optimization process, using a 3-way tournament: (a) uniformly select one of the \textit{sub-populations}, (b) from that sub-population, uniformly select three \textit{individuals}, each holding a flock parameter set, (c) get fitness for each, either by running flock simulations (orange), or using the fitness cached from previous tournaments (green), (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g,h) that new individual replaces the worst of the three back in the population. Removing the worst individuals, rather than promoting the best, is a form of \textit{negative selection} which tends to preserve diversity in the population.}
     \label{fig:temp_evo_update}
 \end{figure*}
 
@@ -143,7 +148,8 @@ Since the 1980s, many simulation-based models of bird flocks have been proposed.
 and
 \citet{hoetzlein_flock2_2024}.
 
-``Tuning'' the many parameters of these flock models can be difficult, leading to research on better tools for this task. This paragraph lists previous works that are most similar to EvoFlock. An early, but not very successful, attempt at inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}. (GP is a variation of the \textit{genetic algorithm} (GA) \citep{holland_adaptation_1975}.) \citet{stonedahl_finding_2011} use a GA to search parameter spaces using an objective function running flock simulations based on NetLogo \citep{tisue_netlogo_2004}. Similarly, \citet{demsar_evolution_2017} attempted ``to evolve collective behavior from scratch.'' \citet{vasarhelyi_optimized_2018} used a GA to tune flocking models suitable for the flight dynamics of a swarm of real drones. \citet{stolfi_escorting_2025} use evolutionary optimization to design robotic swarms for ``escorting'' tasks.
+``Tuning'' the many parameters of these flock models can be difficult, leading to research on better tools for this task. This paragraph lists previous works that are most similar to EvoFlock. An early, but not very successful, attempt at inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}. (GP is a variation of the \textit{genetic algorithm} (GA) \citep{holland_adaptation_1975}. A modern survey of the larger field of \textit{evolutionary computation} can be found in
+\citet{de_jong_evolutionary_2016}.) \citet{stonedahl_finding_2011} use a GA to search parameter spaces using an objective function running flock simulations based on NetLogo \citep{tisue_netlogo_2004}. Similarly, \citet{demsar_evolution_2017} attempted ``to evolve collective behavior from scratch.'' \citet{vasarhelyi_optimized_2018} used a GA to tune flocking models suitable for the flight dynamics of a swarm of real drones. \citet{stolfi_escorting_2025} use evolutionary optimization to design robotic swarms for ``escorting'' tasks.
 
 Other than that handful of evolutionary-based solutions, most previous work on automatically tuning flock/multi-agent models has used \textit{reinforcement learning} (RL) \citep{sutton_reinforcement_1998} as the optimization technique. For example, see recent excellent work in \citet{cornelisse_building_2025} and \citet{cusumano-towner_robust_2025} on making high-quality \textit{driver agents} for a multi-agent traffic simulation. They use \textit{self-play} where agents learn (``bootstrap'') from interacting with each other. The technique described in this paper also has an aspect of self-play as flockmates learn to synchronize and cooperate with each other. A recently posted preprint uses reinforcement learning with an objective function \textit{very} similar to the one used here \citep{brambati_learning_2025}. 
 
@@ -155,7 +161,8 @@ EvoFlock was developed as part of a larger ongoing collaboration investigating n
 
 \begin{figure}[b!]
     \centering
-    \includegraphics[width=0.9\linewidth]{images/temp_system_blocks.png}
+    % \includegraphics[width=0.9\linewidth]{images/temp_system_blocks.png}
+    \includegraphics[width=0.9\linewidth]{images/system_blocks.pdf}
     \caption{Overall structure of the flock optimization presented here. A generic optimization base (green) operates on a user's flock inverse design problem (blue). The user's description includes a parameter set specification and an objective function, the latter containing a flock simulator and score keeping utilities.}
     \label{fig:system_blocks}
 \end{figure}
@@ -206,7 +213,8 @@ So, for example, the hypervolume goes up (or down) as any component goes up (or 
 
 \begin{figure}
     \centering
-    \includegraphics[width=\linewidth]{images/temp_fit_plot.png}
+    % \includegraphics[width=\linewidth]{images/temp_fit_plot.png}
+    \includegraphics[width=\linewidth]{images/fit_plot.pdf}
     \caption{Plot of scalarized fitness (and its component metrics) over 30,000 steps of evolutionary time. The black bold trace (ending at 0.83) is the cumulative best population fitness. The bold gray trace (bottommost) is population average fitness. The colored traces correspond to best and average values (saturated and pastel) for the three component fitness objectives: obstacle avoidance (red), separation (green), and speed (blue). Data from run 20250711a.}
     \label{fig:fit_plot}
 \end{figure}
@@ -227,18 +235,20 @@ The collection of all these make up the flock's \textit{parameter set} which is 
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\linewidth]{images/temp_sep_score.png}
+    % \includegraphics[width=0.9\linewidth]{images/temp_sep_score.png}
+    \includegraphics[width=0.9\linewidth]{images/sep_score.pdf}
     \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all \textit{boid-steps}. (That is, for 200 boids on 500 simulation steps, so 100,000 boid steps.)\\}
     \label{fig:SeparationScore}
 
     \centering
-    \includegraphics[width=0.9\linewidth]{images/temp_speed_score.png}
+    % \includegraphics[width=0.9\linewidth]{images/temp_speed_score.png}
+    \includegraphics[width=0.9\linewidth]{images/speed_score.pdf}
     \caption{Score for desired boid \textit{speed}, here $\sim$20 meters per second. This function is highest when speed is between 19 and 21 m/s and falls off to zero outside that range. The \textit{speed} score for an entire flock simulation is the average of this function over all boid-steps.\\}
     \label{fig:speed_score}
 
     \centering
-    \includegraphics[width=0.9\linewidth]{images/temp_avoidance_score.png}
-    \caption{Score for obstacle avoidance. It is the normalized number of collision-free boid-steps, raised to a high (500) power. This function is nearly zero until the number of collision-free steps is about 99\%.}
+    \includegraphics[width=0.9\linewidth]{images/avoidance_score.pdf}
+    \caption{Score for obstacle avoidance. It is the fraction of collision-free boid-steps (on [0, 1]) raised to a high power (500). This function is nearly zero until the number of collision-free steps is about 99\%.}
     \label{fig:avoid_score}
 
 \end{figure}
@@ -246,7 +256,8 @@ The collection of all these make up the flock's \textit{parameter set} which is 
 \begin{figure}[b]
 
     \centering
-    \includegraphics[width=0.9\linewidth]{images/temp_curve_score.png}
+    % \includegraphics[width=0.9\linewidth]{images/temp_curve_score.png}
+    \includegraphics[width=0.9\linewidth]{images/curve_score.pdf}
     \caption{Score for boosting boid path curvature by slightly penalizing especially low curvature. Measured as average over all boid-steps of flock run. Score ramps from 0.8 to 1.0 for curvature on [0, 0.1] then clips at 1 for higher curvature.}
     \label{fig:curve_score}
 \end{figure}
@@ -386,9 +397,16 @@ A note about GA population size versus the number of SSGA updates (see Figure \r
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% \begin{figure}
+%     \centering
+%     \includegraphics[width=0.9\linewidth]{images/temp_seed_variance.png}
+%     \caption{A histogram of final best fitness from 38 identical runs, varying only by random seeds}
+%     \label{fig:seed_variance_old}
+% \end{figure}
+
 \begin{figure}
     \centering
-    \includegraphics[width=0.9\linewidth]{images/temp_seed_variance.png}
+    \includegraphics[width=0.9\linewidth]{images/seed_variance.pdf}
     \caption{A histogram of final best fitness from 38 identical runs, varying only by random seeds}
     \label{fig:seed_variance}
 \end{figure}
@@ -419,6 +437,8 @@ EvoFlock finds good results using the genetic algorithm \citep{holland_adaptatio
 This work is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, and Jennifer Luo. I also want to thank my long time (30 year?) friend and ALife colleague, Inman Harvey, whose deep insights taught me much about evolutionary computation and scholarship. To Andy Kopra for discussions that led to the 1993 paper. Thanks to John Holland for genetic algorithms and to John Koza for introducing me to GP and GA. Thanks to my family for their loving support.
 % Wahrman(?)
 % flocking friends?
+
+\textbf{[[[Full Papers are 3 to 8 pages long (not including references or acknowledgments)]]]}
 
 \bibliographystyle{apalike}
 \bibliography{EvoFlock.bib}

@@ -1,5 +1,4 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 %
 % "EvoFlock: evolved inverse design of multi-agent motion"
 % draft paper for submission to ALIFE 2026 
@@ -120,7 +119,7 @@ A summary of (``hyper'')parameters for this framework is given in Table \ref{tab
     \centering
     % \includegraphics[width=0.7\textwidth]{images/temp_evo_update.png}
     \includegraphics[width=0.7\textwidth]{images/evo_update.pdf}
-    \caption{One update step of the (SSGA) evolutionary optimization process, using a 3-way tournament: (a) uniformly select one of the \textit{sub-populations}, (b) from that sub-population, uniformly select three \textit{individuals}, each holding a flock parameter set, (c) get fitness for each, either by running flock simulations (orange), or using the fitness cached from previous tournaments (green), (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g,h) that new individual replaces the worst of the three back in the population. Removing the worst individuals, rather than promoting the best, is a form of \textit{negative selection} which tends to preserve diversity in the population.}
+    \caption{One update step of the (SSGA) evolutionary optimization process, using a 3-way tournament: (a) uniformly select one of the \textit{sub-populations}, (b) from that sub-population, uniformly select three \textit{individuals}, each holding a flock parameter set, (c) get fitness for each, either by running flock simulations (orange), or using the fitness cached from previous tournaments (green), (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g,h) that new individual replaces the worst of the three back in the population. Removing the worst individuals, rather than promoting the best, is a form of \textit{negative selection} which tends to preserve diversity in the population. This 3-way tournament SSGA approach, and its hyperparameters, were used largely unchanged from previous projects.}
     \label{fig:temp_evo_update}
 \end{figure*}
 
@@ -148,7 +147,7 @@ Since the 1980s, many simulation-based models of bird flocks have been proposed.
 and
 \citet{hoetzlein_flock2_2024}.
 
-``Tuning'' the many parameters of these flock models can be difficult, leading to research on better tools for this task. This paragraph lists previous works that are most similar to EvoFlock. An early, but not very successful, attempt at inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}. (GP is a variation of the \textit{genetic algorithm} (GA) \citep{holland_adaptation_1975}. A modern survey of the larger field of \textit{evolutionary computation} can be found in
+``Tuning'' the many parameters of these flock models can be difficult, leading to research on better tools for this task. EvoFlock seeks to be a robust, gradient-free, evolutionary optimizer for parameter tuning for multi-agent motion models -- especially for large numbers of fast moving agents. An early, but not very successful, attempt at inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}. (GP is a variation of the \textit{genetic algorithm} (GA) \citep{holland_adaptation_1975}. A modern survey of the larger field of \textit{evolutionary computation} can be found in
 \citet{de_jong_evolutionary_2016}.) \citet{stonedahl_finding_2011} use a GA to search parameter spaces using an objective function running flock simulations based on NetLogo \citep{tisue_netlogo_2004}. Similarly, \citet{demsar_evolution_2017} attempted ``to evolve collective behavior from scratch.'' \citet{vasarhelyi_optimized_2018} used a GA to tune flocking models suitable for the flight dynamics of a swarm of real drones. \citet{stolfi_escorting_2025} use evolutionary optimization to design robotic swarms for ``escorting'' tasks.
 
 Other than that handful of evolutionary-based solutions, most previous work on automatically tuning flock/multi-agent models has used \textit{reinforcement learning} (RL) \citep{sutton_reinforcement_1998} as the optimization technique. For example, see recent excellent work in \citet{cornelisse_building_2025} and \citet{cusumano-towner_robust_2025} on making high-quality \textit{driver agents} for a multi-agent traffic simulation. They use \textit{self-play} where agents learn (``bootstrap'') from interacting with each other. The technique described in this paper also has an aspect of self-play as flockmates learn to synchronize and cooperate with each other. A recently posted preprint uses reinforcement learning with an objective function \textit{very} similar to the one used here \citep{brambati_learning_2025}. 
@@ -186,7 +185,10 @@ A GA is a population-based stochastic approach to optimization and discovery. Un
 
 The ``genome'' of a GA changes over time under the influence of the objective function. For example, a model parameter might be changed by \textit{mutation}: adding a small signed zero-centered random value, to change it a bit from its previous value. Perhaps more importantly, individuals are modified by \textit{crossover} where two \textit{parent} individuals are recombined to create a new \textit{offspring}. In a rough model of biological crossover involving parental DNA, two parental parameter sets are merged into one, by taking each parameter at random from one parent or the other (called \textit{uniform crossover}).
 
-Many variations on genetic algorithms have been developed over the years. Sometimes, the entire population of individuals is updated in parallel, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state genetic algorithms} (SSGA) updates individuals one at a time \citep{syswerda_study_1991}. If a generational GA is run for $G$ generations with a population of $P$ individuals, a corresponding SSGA would be run for $G{\times}P$ steps. A preexisting GA framework called \textit{LazyPredator} is used for this project. See Figure \ref{fig:temp_evo_update} for a diagram of the SSGA update cycle, and the ``tournament of three individuals'' based on \textit{negative selection} which promotes diversity in the population.
+Many variations on genetic algorithms have been developed over the years. Sometimes, the entire population of individuals is updated in parallel, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state genetic algorithms} (SSGA) updates individuals one at a time \citep{syswerda_study_1991}. If a generational GA is run for $G$ generations with a population of $P$ individuals, a corresponding SSGA would be run for $G{\times}P$ steps. A preexisting GA framework called \textit{
+%LazyPredator
+[[[redacted for double-blind review]]]
+} is used for this project. See Figure \ref{fig:temp_evo_update} for a diagram of the SSGA update cycle, and the ``tournament of three individuals'' based on \textit{negative selection} which promotes diversity in the population.
 
 
 \subsection{Objective Function}
@@ -427,6 +429,8 @@ All the examples in this work were based on tightly enclosed spaces cluttered wi
 
 Similarly, multi-agent models with non-uniform agents \citep{montanari_optimal_2025} and non-reciprocal behaviors \citep{choi_flocking_2025}, \citep{weis_generalized_2025} are promising future research topics.
 
+These evolutionary techniques may help tune parameters for modeling various types of \textit{stigmergic} behavior, as when social insects collaborate, via signals in the environment, to build communal structures: ant colonies, termite mounds, bee honeycomb \citep{camazine_self-organization_2003}.
+
 The formulation for speed score (Figure \ref{fig:speed_score}) and separation score (Figure \ref{fig:SeparationScore}) include ``ramps'' outside the target range. Are these necessary or even helpful? The robust sampling provided by 100,000 scores per run may tend to ``smooth out'' those scores without the extra complexity of choosing slopes for ramps.
 
 EvoFlock finds good results using the genetic algorithm \citep{holland_adaptation_1975}. It would be interesting to try a version using genetic programming \citep{koza_genetic_1992}. This would eliminate the need to start by hand coding a ``black-box flocking model'' and could instead evolve it from scratch.
@@ -434,22 +438,12 @@ EvoFlock finds good results using the genetic algorithm \citep{holland_adaptatio
 \section{Acknowledgements}
 \label{sec:ack}
 
-This work is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, and Jennifer Luo. I also want to thank my long time (30 year?) friend and ALife colleague, Inman Harvey, whose deep insights taught me much about evolutionary computation and scholarship. To Andy Kopra for discussions that led to the 1993 paper. Thanks to John Holland for genetic algorithms and to John Koza for introducing me to GP and GA. Thanks to my family for their loving support.
+This work is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, Jennifer Luo, and Ryan Zambrotta. Thanks to Ronin Barzel for reviewing an early draft of this paper. I also want to thank my long time (30 year?) friend and ALife colleague, Inman Harvey, whose deep insights taught me so much about evolutionary computation and scholarship. To Andy Kopra for discussions that led to the 1993 paper. Thanks to John Holland for genetic algorithms and to John Koza for introducing me to GP and GA. Finally to my family for their loving support.
 % Wahrman(?)
 % flocking friends?
-
-\textbf{[[[Full Papers are 3 to 8 pages long (not including references or acknowledgments)]]]}
+\textbf{[[[remember to remove Acknowledgements for review.]]] [[[Full Papers are 3 to 8 pages long (not including references or acknowledgments)]]]}
 
 \bibliographystyle{apalike}
 \bibliography{EvoFlock.bib}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Appendix / Supplemental Materials
-
-% \appendix
-% \onecolumn
-% \section{Appendix}
-% \label{sec:appendix}
 
 \end{document}

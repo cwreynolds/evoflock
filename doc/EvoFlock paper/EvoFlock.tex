@@ -52,11 +52,17 @@
 
 \begin{document}
 
-\title{{\tiny draft 3: \today}\\EvoFlock: evolved inverse design of multi-agent motion}
+% \title{{\tiny draft 3: \today}\\EvoFlock: evolved inverse design of multi-agent motion}
+
+\title{EvoFlock: evolved inverse design of multi-agent motion}
 
 \author{Craig Reynolds\authorcr
     unaffiliated researcher\authorcr 
     cwr@red3d.com}
+
+% \author{authors redacted\authorcr
+%     affiliations redacted\authorcr 
+%     email@redacted.com}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -82,7 +88,7 @@
     This paper describes an automatic method for \textit{adjusting} or \textit{tuning} models of multi-agent motion. Simulating the motion of bird flocks, human crowds, vehicle traffic, and other multi-agent systems is a widely used technique. These simulations model the behavior of a single group member (bird, human, or vehicle). The group behaviors (flock, crowd, traffic) \textit{emerge} from interactions between group members. These models typically have many numerical control parameters. Although each parameter may be intuitive in isolation, their interaction can be complex and nonlinear. It is challenging to determine which parameters to adjust for the desired change in group behavior. Changing one aspect of group behavior often causes other aspects to change, leading to a long frustrating process of incremental changes. In this work, the desired group behavior is measured with an objective(/fitness/loss) function and optimized with a genetic algorithm. The objective function used here rewards proper spacing with neighbors, flying near a desired speed, and avoiding obstacles. Interestingly, the vivid alignment seen in bird flocks appears to emerge from maintaining proper spacing between flockmates.
 \end{abstract}
 
-\noindent{\small\textbf{Keywords:} multi-agent, inverse design, optimization, evolutionary computation, genetic algorithm, boids, flocks, herds, schools, crowds, traffic}
+\noindent{\small\textbf{Keywords:} multi-agent, inverse design, optimization, multi-objective, evolutionary computation, genetic algorithm, boids, flocks, herds, schools, crowds, traffic}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -99,19 +105,21 @@
 \section{Introduction}
 \label{sec:intro}
 
-Simulation models of multi-agent motion are used in many fields. These include animation, games, biology, robotic swarms, urban planning, training autonomous vehicles, and other applications. Since the 1980s, several models of group motion have been developed, including \textit{boids} and others (see \nameref{sec:related}). These allow creating simulations of flocks and other group motions, which most observers will recognize as some form of flocking. This paper will refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic, drone swarms) can be similarly modeled.
+Simulation models of multi-agent motion are used in many fields including: animation, games, biology, robotic swarms, urban planning, training autonomous vehicles, and other applications. Since the 1980s, several models of group motion have been developed, including \textit{boids} and others (see \nameref{sec:related}). These allow creating simulations of flocks and other group motions, which most observers will recognize as some form of flocking. This paper will usually refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic, drone swarms) can be similarly modeled.
 
-This project addresses the issue of \textit{adjusting} or \textit{tuning} multi-agent motion models, toward a given behavioral goal. For example, modifying an existing model of bird flocks to instead portray fish schools. Or starting from a model of flocking crows and changing it to represent flocking sparrows. Similarly, starting from a generic abstract flock model and fitting it to field observations of a particular species of real birds in nature. Or to take a plausibly realistic model of a natural bird flock, and change it, say for storytelling purposes, to convey a flock of birds that are happy, or angry. 
+This project addresses the issue of \textit{adjusting} or \textit{tuning} multi-agent motion models, toward a given behavioral goal. For example, modifying an existing model of bird flocks to instead portray fish schools. Or starting from a model of flocking crows and changing it to flocking sparrows. Similarly, starting from a generic abstract flock model and fitting it to field observations of a particular species of real birds in nature. Or to take a plausibly realistic model of a natural bird flock, and change it, say for storytelling purposes, to convey a flock of birds that are happy, or angry. 
 
-A boids-like simulation model typically has a collection of numeric parameters (``knobs'') that control its action. \textit{EvoFlock} is a software framework that automatically finds a set of near-optimal parameters for a simulation-based multi-agent system. The flock model used for these experiments is a predefined hand-written ``black box'' model whose input is a \textit{parameter set} (consisting of 15 numbers, see Table \ref{table:flock-parameters}). The user provides a \textit{objective} (also known as \textit{fitness} or \textit{loss}) function. It takes a candidate parameter set, runs a simulation, and returns a \textit{score} reflecting how well the behavioral goals were met. The optimization process runs (for about two hours on a laptop) and produces a high quality parameter set, as measured by the objective function.
+A boids-like simulation model typically has a collection of numeric parameters (``knobs'') that control its action. \textit{EvoFlock} is a software framework that automatically finds a set of near-optimal parameters for a simulation-based multi-agent system. The flock model used for these experiments is a predefined hand-written ``black box'' model whose input is a \textit{parameter set} (consisting of 15 numbers, see Table \ref{table:flock-parameters}). The user provides a \textit{objective} (also known as \textit{fitness} or \textit{loss}) function. It takes a candidate parameter set, runs a simulation, and returns a \textit{score} reflecting how well the behavioral goals were met. The optimization process runs (for about two hours on a laptop) and produces a high quality parameter set, as measured by the user-supplied objective function.
 
-For a user of this optimization framework, it is convenient that the flock model is treated as a black box. Almost no restrictions are imposed on a preexisting model by the optimization framework. There are no restrictions on model design, source code availability, or the programming language used. (As could be an issue if optimization required language tools such as automatic differentiation \citep{baydin_automatic_2018}.)
+For a user of this optimization framework, it is convenient that the flock model is treated as a black box. Almost no restrictions are imposed on a preexisting model by the optimization framework. There are no restrictions on model design, source code availability, or the programming language used. (As is an issue if optimization uses language tools like automatic differentiation \citep{baydin_automatic_2018}.)
 
 In the past, flock models have been tuned manually, often a frustrating and time-consuming process. For a new model, adjusting parameters is required simply to create group motion that looks like plausible flocking. Any modification to a group motion model (e.g. birds{$\rightarrow$}fish) requires further adjustments to the parameters. Each such adjustment requires selecting which parameter(s) to change, whether it should increase or decrease, and by how much. Often more than one parameter needs to be changed. The main difficulty is that effects of control parameters may overlap and interact in non-linear ways. Changing one usually requires changing others to compensate. Often, the result is that many parameters need to be changed, leading to a long tedious series of changes and testing.
 
 This paper is about automating that adjustment process using metrics of flock quality and an optimization process. The metrics use multiple objectives. The nature of those objectives and how to add new ones will be described in sections \nameref{sec:FlockingObjective} and \nameref{sec:add_objective}. The optimization process used in these experiments is a genetic algorithm, described in section \nameref{subsec:Optimization_with_GA}.
 
-A summary of (``hyper'')parameters for this framework is given in Table \ref{table:HyperParameters}. See \href{https://anonymous.4open.science/r/evoflock-1F6F/}{anonymized c++ code} for this project. \href{https://drive.google.com/file/d/1ZbanvWVfapnH2TpTqamypWFoXuMeoY9b/view?usp=sharing}{Video 1} shows flock simulations based on this approach.
+% A summary of (``hyper'')parameters for this framework is given in Table \ref{table:HyperParameters}. See \href{https://anonymous.4open.science/r/evoflock-1F6F/}{anonymized c++ code} for this project. \href{https://drive.google.com/file/d/1ZbanvWVfapnH2TpTqamypWFoXuMeoY9b/view?usp=sharing}{Video 1} shows flock simulations based on this approach.
+
+A summary of (``hyper'')parameters for this framework is given in Table \ref{table:HyperParameters}. See the \href{https://github.com/cwreynolds/evoflock}{c++ code} for this project. \href{https://drive.google.com/file/d/1ZbanvWVfapnH2TpTqamypWFoXuMeoY9b/view?usp=sharing}{Video 1} shows flock simulations based on this approach.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -147,16 +155,23 @@ Since the 1980s, many simulation-based models of bird flocks have been proposed.
 and
 \citet{hoetzlein_flock2_2024}.
 
-``Tuning'' the many parameters of these flock models can be difficult, leading to research on better tools for that task. EvoFlock seeks to address this problem. It is a robust gradient-free evolutionary optimizer for parameter tuning to create, improve, or alter multi-agent motion models. It is well suited for large numbers of fast moving agents with potentially conflicting goals. It optimizes parameters toward multiple procedural objectives, allowing for complex inverse design tasks. 
+``Tuning'' the many parameters of these flock models can be difficult. EvoFlock seeks to address this problem. It is a robust gradient-free evolutionary optimizer for parameter tuning to create (or improve or re-target) multi-agent motion models. EvoFlock handles large numbers of fast moving agents with potentially conflicting goals. It optimizes parameters for multiple procedural objectives, allowing for complex inverse design tasks. 
 
-An early, but not very successful, attempt at evolutionary inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming} \citep{koza_genetic_1992}. (GP is a variation of the \textit{genetic algorithm} (GA) \citep{holland_adaptation_1975}. A modern survey of the larger field of \textit{evolutionary computation} can be found in
+An early, but not very successful, attempt at evolutionary inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming}. (GP  \citep{koza_genetic_1992} is a variation of the \textit{genetic algorithm} (GA) \citep{holland_adaptation_1975}. A modern survey of the larger field of \textit{evolutionary computation} can be found in
 \citet{de_jong_evolutionary_2016}.) \citet{stonedahl_finding_2011} use a GA to search parameter spaces using an objective function running flock simulations based on NetLogo \citep{tisue_netlogo_2004}. Similarly, \citet{demsar_evolution_2017} attempted ``to evolve collective behavior from scratch.'' \citet{vasarhelyi_optimized_2018} used a GA to tune flocking models suitable for the flight dynamics of a swarm of real drones. \citet{stolfi_escorting_2025} use evolutionary optimization to design robotic swarms for ``escorting'' tasks.
 
-Other than that handful of evolutionary-based solutions, most previous work on automatically tuning flock/multi-agent models has used \textit{reinforcement learning} (RL) \citep{sutton_reinforcement_1998} as the optimization technique. For example, see recent excellent work in \citet{cornelisse_building_2025} and \citet{cusumano-towner_robust_2025} on making high-quality \textit{driver agents} for a multi-agent traffic simulation. They use \textit{self-play} where agents learn (``bootstrap'') from interacting with each other. The technique described in this paper also has an aspect of self-play as flockmates learn to synchronize and cooperate with each other. A recently posted preprint uses reinforcement learning with an objective function \textit{very} similar to the one used here \citep{brambati_learning_2025}. 
+Other than that handful of evolutionary-based solutions, most previous work on automatically tuning flock/multi-agent models has used \textit{reinforcement learning} (RL) \citep{sutton_reinforcement_1998} as the optimization technique. For example, see recent excellent work in \citet{cornelisse_building_2025} and \citet{cusumano-towner_robust_2025} on making high-quality \textit{driver agents} for a multi-agent traffic simulation. They use \textit{self-play} where agents learn (``bootstrap'') from interacting with each other. EvoFlock also has an aspect of self-play as flockmates learn to synchronize and cooperate with each other. A recently posted preprint uses reinforcement learning with an objective function \textit{very} similar to the one used here \citep{brambati_learning_2025}.
+
+Close in spirit to EvoFlock is recent work on automatically tuning 2d herd models from overhead video \citealp{gong_herds_2025}. From drone video of (say) sheep flocks, the system provides a simulated dense flock that reacts to terrain models just like sheep would.
 
 Notable, if somewhat tangential: \citet{jaderberg_human-level_2019} uses a hybrid approach to learn human-level game-playing agents for multiplayer games. It uses population-based reinforcement learning, which combines aspects of RL, population-based GA, and the self-play mentioned above.
 
 EvoFlock was developed as part of a larger ongoing collaboration investigating new approaches to inverse design of multi-agent motion.
+
+\section{Description of the Technique}
+\label{sec:Description}
+
+This section discusses the various components of the optimization process for adjusting parameters of a flock, or other kinds of multi-agent motion models. See Figure \ref{fig:system_blocks} for a diagram.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -170,16 +185,10 @@ EvoFlock was developed as part of a larger ongoing collaboration investigating n
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-\section{Description of the Technique}
-\label{sec:Description}
-
-This section discusses the various components of the optimization process for adjusting parameters of a flock, or other kinds of multi-agent motion models. See Figure \ref{fig:system_blocks} for a diagram.
-
 \subsection{Optimization with Genetic Algorithms}
 \label{subsec:Optimization_with_GA}
 
-Optimization can be used to find a set of simulation parameters that best fit the behavioral goals, as given by an objective function. EvoFlock uses a \textit{genetic algorithm} (GA), a technique based loosely on concepts of biological evolution, as seen in the natural world. Genetic algorithms were first described by \citet{holland_adaptation_1975}. Evolution was first described by \citet{darwin_origin_1859}.
+Optimization can be used to find a set of simulation parameters that best fit the behavioral goals, as given by an objective function. EvoFlock uses a \textit{genetic algorithm} (GA), a technique based loosely on concepts of biological evolution, as seen in the natural world. Genetic algorithms were first described by \citet{holland_adaptation_1975}. Evolution was first described by \citet{darwin_origin_1859} and \citet{wallace_tendency_1858}.
 
 A genetic algorithm maintains a \textit{population} of candidate solutions. Usually, the population contains a fixed number (tens to thousands) of candidate solutions, often called \textit{individuals}. Typically, each individual is a fixed-sized vector of numeric parameter values. The population may be further divided into \textit{demes} or \textit{islands}, representing isolated breeding subpopulations. This is thought to promote diversity by pursuing different solutions in parallel. In an island model, there is usually some kind of \textit{migration} where individuals occasionally move from one island to another.
 
@@ -188,8 +197,8 @@ A GA is a population-based stochastic approach to optimization and discovery. Un
 The ``genome'' of a GA changes over time under the influence of the objective function. For example, a model parameter might be changed by \textit{mutation}: adding a small signed zero-centered random value, to change it a bit from its previous value. Perhaps more importantly, individuals are modified by \textit{crossover} where two \textit{parent} individuals are recombined to create a new \textit{offspring}. In a rough model of biological crossover involving parental DNA, two parental parameter sets are merged into one, by taking each parameter at random from one parent or the other (called \textit{uniform crossover}).
 
 Many variations on genetic algorithms have been developed over the years. Sometimes, the entire population of individuals is updated in parallel, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state genetic algorithms} (SSGA) updates individuals one at a time \citep{syswerda_study_1991}. If a generational GA is run for $G$ generations with a population of $P$ individuals, a corresponding SSGA would be run for $G{\times}P$ steps. A preexisting GA framework called \textit{
-%LazyPredator
-[[[redacted for double-blind review]]]
+LazyPredator
+% [[[redacted for double-blind review]]]
 } is used for this project. See Figure \ref{fig:temp_evo_update} for a diagram of the SSGA update cycle, and the ``tournament of three individuals'' based on \textit{negative selection} which promotes diversity in the population.
 
 
@@ -440,11 +449,10 @@ EvoFlock finds good results using the genetic algorithm \citep{holland_adaptatio
 \section{Acknowledgements}
 \label{sec:ack}
 
-% This work is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, Jennifer Luo, and Ryan Zambrotta. Thanks to Ronin Barzel for reviewing an early draft of this paper. I also want to thank my long time (30 year?) friend and ALife colleague, Inman Harvey, whose deep insights taught me so much about evolutionary computation and scholarship. To Andy Kopra for discussions that led to the 1993 paper. Thanks to John Holland for genetic algorithms and to John Koza for introducing me to GP and GA. Finally to my family for their loving support.
+This work is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, Jennifer Luo, and Ryan Zambrotta. Thanks to Ronin Barzel for reviewing an early draft of this paper. I also want to thank my long time (30 year?) friend and ALife colleague, Inman Harvey, whose deep insights taught me so much about evolutionary computation and scholarship. To Andy Kopra for discussions that led to the 1993 paper. Thanks to John Holland for genetic algorithms and to John Koza for introducing me to GP and GA. Finally to my family for their loving support.
 
-[[[...removed for double-blind review...]]]
-
-\textbf{[[[Full Papers are 3 to 8 pages long (not including references or acknowledgments)]]]}
+% [[[...removed for double-blind review...]]]
+% \textbf{[[[Full Papers are 3 to 8 pages long (not including references or acknowledgments)]]]}
 
 \bibliographystyle{apalike}
 \bibliography{EvoFlock.bib}

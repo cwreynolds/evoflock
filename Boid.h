@@ -824,6 +824,17 @@ public:
         auto sorted = [&](const Collision& a, const Collision& b)
                       { return a.time_to_collision < b.time_to_collision; };
         std::ranges::sort(predicted_obstacle_collisions_, sorted);
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260323 why passing through walls of BoxObstacle?
+        if (isSelected())
+        {
+            Collision c = predicted_obstacle_collisions_[0];
+            draw().addThickLineToAnimatedFrame(position(),
+                                               c.point_of_impact,
+                                               Color(1, 0.5, 0),
+                                               0.1);
+        }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }
 
     // get/set/inc api for this Boid's counter of collisions with obstacles.
@@ -843,6 +854,17 @@ public:
             Vec3 prev_position = getPreviousPosition();
             if (prev_position.is_none()) { prev_position = position(); }
             Vec3 ec = o->enforceConstraint(position(), prev_position);
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20260323 why passing through walls of BoxObstacle?
+            if (isSelected())
+            {
+                bool v = o->isAgentViolatingConstraint(position(), prev_position);
+                assert(not v);
+                std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+                debugPrint(v)
+                debugPrint(ec)
+            }
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             if (ec != position())
             {
                 // Count collision, set speed to zero, clear smoothing history.

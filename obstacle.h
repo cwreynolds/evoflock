@@ -547,16 +547,53 @@ public:
     BoxObstacle(const Vec3& center,
                 const Vec3& x_edge,
                 const Vec3& y_edge,
-//                const Vec3& z_edge)
                 const Vec3& z_edge,
                 ExcludeFrom ef)
       : Obstacle(),
-        xp(x_edge, center + (x_edge / 2)),
-        xm(x_edge, center - (x_edge / 2)),
-        yp(y_edge, center + (y_edge / 2)),
-        ym(y_edge, center - (y_edge / 2)),
-        zp(z_edge, center + (z_edge / 2)),
-        zm(z_edge, center - (z_edge / 2))
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260323 why passing through walls of BoxObstacle?
+
+//        xp(x_edge, center + (x_edge / 2)),
+//        xm(x_edge, center - (x_edge / 2)),
+//        yp(y_edge, center + (y_edge / 2)),
+//        ym(y_edge, center - (y_edge / 2)),
+//        zp(z_edge, center + (z_edge / 2)),
+//        zm(z_edge, center - (z_edge / 2))
+
+//        xp(-x_edge, center + (x_edge / 2)),
+//        xm( x_edge, center - (x_edge / 2)),
+//        yp(-y_edge, center + (y_edge / 2)),
+//        ym( y_edge, center - (y_edge / 2)),
+//        zp(-z_edge, center + (z_edge / 2)),
+//        zm( z_edge, center - (z_edge / 2))
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260326 quick and dirty aligned box container
+    
+//        xp( x_edge, center + (x_edge / 2)),
+//        xm(-x_edge, center - (x_edge / 2)),
+//        yp( y_edge, center + (y_edge / 2)),
+//        ym(-y_edge, center - (y_edge / 2)),
+//        zp( z_edge, center + (z_edge / 2)),
+//        zm(-z_edge, center - (z_edge / 2))
+
+//        xp( x_edge, center + (x_edge / 2), neither),
+//        xm(-x_edge, center - (x_edge / 2), neither),
+//        yp( y_edge, center + (y_edge / 2), neither),
+//        ym(-y_edge, center - (y_edge / 2), neither),
+//        zp( z_edge, center + (z_edge / 2), neither),
+//        zm(-z_edge, center - (z_edge / 2), neither)
+
+        xp(-x_edge, center + (x_edge / 2), neither),
+        xm( x_edge, center - (x_edge / 2), neither),
+        yp(-y_edge, center + (y_edge / 2), neither),
+        ym( y_edge, center - (y_edge / 2), neither),
+        zp(-z_edge, center + (z_edge / 2), neither),
+        zm( z_edge, center - (z_edge / 2), neither)
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     {
         // Require box not parallelepiped.
         assert(x_edge.normalize().is_perpendicular(y_edge.normalize()));
@@ -591,17 +628,31 @@ public:
         std::cout << "BoxObstacle constuctor" ;
         std::cout << "===========================================" << std::endl;
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+        
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260323 why passing through walls of BoxObstacle?
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260326 quick and dirty aligned box container
+        //               maybe bring this back when generalize past Q&D?
+
+//        for (auto p : planes_)
+//        {
+//            switch (ef)
+//            {
+//                case Obstacle::inside:  p->setExcludeFrom(outside); break;
+//                case Obstacle::outside: p->setExcludeFrom(inside);  break;
+//                default:                p->setExcludeFrom(neither); break;
+//            }
+//        }
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     }
     
-//    // Axis aligned version: center and size along global axes.
-//    BoxObstacle(const Vec3& center,
-//                double x_size,
-//                double y_size,
-//                double z_size)
-//      : BoxObstacle(center,
-//                    Vec3(1, 0, 0) * x_size,
-//                    Vec3(0, 1, 0) * y_size,
-//                    Vec3(0, 0, 1) * z_size) {}
 
     // Axis aligned version: center and size along global axes.
     BoxObstacle(const Vec3& center,
@@ -615,91 +666,22 @@ public:
                     Vec3(0, 0, 1) * z_size,
                     ef) {}
 
-    // Axis aligned version: center and size along global axes.
-    BoxObstacle(const Vec3& center,
-                double x_size,
-                double y_size,
-                double z_size)
-      : BoxObstacle(center,
-                    Vec3(1, 0, 0) * x_size,
-                    Vec3(0, 1, 0) * y_size,
-                    Vec3(0, 0, 1) * z_size,
-                    ExcludeFrom::inside) {}
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260326 quick and dirty aligned box container
+    //               maybe bring this back when generalize past Q&D?
 
-    
-//    // Structure for data about a ray intersection determination.
-//    class IntersectionData
-//    {
-//    public:
-//        Vec3 ray_intersection = Vec3::none();
-//        const PlaneObstacle* intersected_plane = nullptr;
-//    };
-//    
-//    // Utility to find nearest plane intersection.
-//    IntersectionData ri_util(const Vec3& origin,
-//                             const Vec3& tangent,
-//                             double body_radius) const
-//    {
-//        IntersectionData id;
-//        
-//        // Start with "unrolled" version
-//        Vec3 ri = Vec3::none();
-//        double nearest_distance = -1;
-//        auto test_one_plane = [&](const PlaneObstacle& po)
-//        {
-//            Vec3 pri = po.rayIntersection(origin, tangent, body_radius);
-//            if (not pri.is_none())
-//            {
-//                double pri_distance = (pri - origin).length();
-//                if (nearest_distance < pri_distance)
-//                {
-//                    nearest_distance = pri_distance;
-//                    ri = pri;
-//                    
-//                    id.intersected_plane = &po;
-//                }
-//            }
-//        };
-//        test_one_plane(xp);
-//        test_one_plane(xm);
-//        test_one_plane(yp);
-//        test_one_plane(ym);
-//        test_one_plane(zp);
-//        test_one_plane(zm);
-//        return id;
-//    }
-//
-//    
-//
-//    // Where a ray (Agent's path) will intersect the obstacle, or None.
-//    Vec3 rayIntersection(const Vec3& origin,
-//                         const Vec3& tangent,
-//                         double body_radius) const override
-//    {
-//        IntersectionData id = ri_util(origin, tangent, body_radius);
-//        return id.ray_intersection;
-//    }
-    
-        
-//    // Where a ray (Agent's path) will intersect the obstacle, or None.
-//    Vec3 rayIntersection(const Vec3& origin,
-//                         const Vec3& tangent,
-//                         double body_radius) const override
-//    {
-//        Vec3 nearest_ri;
-//        double nearest_distance = std::numeric_limits<double>::infinity();
-//        for (auto p : planes_)
-//        {
-//            Vec3 ri = p->rayIntersection(origin, tangent, body_radius);
-//            double dist = (ri - origin).length();
-//            if (nearest_distance > dist)
-//            {
-//                nearest_distance = dist;
-//                nearest_ri = ri;
-//            }
-//        }
-//        return nearest_ri;
-//    }
+//    // Axis aligned version: center and size along global axes.
+//    BoxObstacle(const Vec3& center,
+//                double x_size,
+//                double y_size,
+//                double z_size)
+//      : BoxObstacle(center,
+//                    Vec3(1, 0, 0) * x_size,
+//                    Vec3(0, 1, 0) * y_size,
+//                    Vec3(0, 0, 1) * z_size,
+//                    ExcludeFrom::inside) {}
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 rayIntersection(const Vec3& origin,
@@ -726,24 +708,62 @@ public:
 
 
 
+//    // Abstract normal for a given position. Points toward the +SDF side.
+//    Vec3 normal(const Vec3& poi) const override
+//    {
+//        Vec3 normal;
+//        double nearest_distance = std::numeric_limits<double>::infinity();
+//        for (auto p : planes_)
+//        {
+//            Vec3 np = p->nearest_point(poi);
+//            double dist = (np - poi).length();
+//            if (nearest_distance > dist)
+//            {
+//                nearest_distance = dist;
+//                normal = p->normal(poi);
+//            }
+//        }
+//        
+//        Draw::getInstance().addThickLineToAnimatedFrame(np,
+//                                                        np + normal * 10,
+//                                                        Color(0, 1, 0),
+//                                                        0.1);
+//        
+//        return normal;
+//    }
+  
     // Abstract normal for a given position. Points toward the +SDF side.
     Vec3 normal(const Vec3& poi) const override
     {
+        Vec3 np;
         Vec3 normal;
         double nearest_distance = std::numeric_limits<double>::infinity();
         for (auto p : planes_)
         {
-            Vec3 np = p->nearest_point(poi);
-            double dist = (np - poi).length();
+//            Vec3 np = p->nearest_point(poi);
+            Vec3 pnp = p->nearest_point(poi);
+            
+//            double dist = (np - poi).length();
+            double dist = (pnp - poi).length();
+
             if (nearest_distance > dist)
             {
                 nearest_distance = dist;
                 normal = p->normal(poi);
+
+                np = p->nearest_point(poi);
+
             }
         }
+        
+        Draw::getInstance().addThickLineToAnimatedFrame(np,
+                                                        np + normal * 10,
+                                                        Color(0, 1, 0),
+                                                        0.1);
+        
         return normal;
     }
-    
+
     // Point on surface of obstacle nearest the given query_point.
     Vec3 nearest_point(const Vec3& query_point) const override
     {
@@ -784,77 +804,16 @@ public:
         return nearest_fa;
 
     }
-    
-//    unimplemented normal()
-//    unimplemented nearest_point()
-//    unimplemented fly_away()
-
-    // should we have a virtual volume() function on Obstacle?
-
-    
-//        void addToScene() const override
-//        {
-//    //        auto mesh = Draw::constructSphereTriMesh(radius(),
-//    //                                                 center(),
-//            auto mesh = Draw::constructBoxTriMesh(x_edge_.length(),
-//                                                  y_edge_.length(),
-//                                                  z_edge_.length(),
-//                                                  center_,
-//                                                  getColor(),
-//                                                  true,
-//                                                  getExcludeFrom() == outside,
-//                                                  500);
-//            Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
-//            Draw::getInstance().addTriMeshToStaticScene(mesh);
-//        }
-
-//        void addToScene() const override
-//        {
-//            debugPrint(getExcludeFrom() == outside)
-//
-//            auto mesh = Draw::constructBoxTriMesh(x_edge_.length(),
-//                                                  y_edge_.length(),
-//                                                  z_edge_.length(),
-//                                                  center_,
-//                                                  getColor(),
-//                                                  true,
-//
-//    //                                              getExcludeFrom() == outside,
-//    //                                              true,
-//    //                                              getExcludeFrom() != outside,
-//                                                  getExcludeFrom() == outside,
-//
-//                                                  500);
-//            Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
-//            Draw::getInstance().addTriMeshToStaticScene(mesh);
-//
-//            // TODO DEBUG TEMP. Why so thick along cylinder axis? Why black?
-//            for (auto p : planes_)
-//            {
-//                p->addToScene();
-//            }
-//        }
 
     void addToScene() const override
     {
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-        // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
-        std::cout << "BoxObstacle::addToScene()" ;
-        std::cout << "===========================================" << std::endl;
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-
         auto mesh = Draw::constructBoxTriMesh(x_edge_.length(),
                                               y_edge_.length(),
                                               z_edge_.length(),
                                               center_,
                                               getColor(),
                                               true,
-                                              
-//                                              getExcludeFrom() == outside,
-//                                              true,
-//                                              getExcludeFrom() != outside,
                                               getExcludeFrom() == outside,
-
                                               500);
         Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
@@ -865,7 +824,6 @@ public:
             p->addToScene();
         }
     }
-
 
     std::string to_string() const override { return "BoxObstacle"; }
     
@@ -1059,15 +1017,14 @@ inline void Obstacle::unit_test()
         six_way_exclude_from(so_i, so_o, so_n);
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260307 wip add BoxObstacle
-    
-//    BoxObstacle bo(Vec3(2, 4, 6), 1, 2, 3);
-    
-    double s = 41;
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260326 quick and dirty aligned box container
+
+//    double s = 41;
 //    Obstacle* bo = new BoxObstacle bo(Vec3(), s * 2, s, s * 2);
-    BoxObstacle bo(Vec3(), s * 2, s, s * 2);
+//    BoxObstacle bo(Vec3(), s * 2, s, s * 2);
+    BoxObstacle bo(Vec3(), 80, 40, 80, outside);
 
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 }

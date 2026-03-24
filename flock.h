@@ -891,11 +891,7 @@ public:
             
             
             {
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-                // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
                 double s = 41;
-//                double s = 410;
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20260316 BoxObstacle ExcludeFrom

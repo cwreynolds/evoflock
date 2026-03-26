@@ -113,7 +113,7 @@ A boids-like simulation model typically has a collection of numeric parameters (
 
 For a user of this optimization framework, it is convenient that the flock model is treated as a black box. Almost no restrictions are imposed on a preexisting model by this optimization framework: not on model design, source code availability, or programming language. (As can be an issue if optimization uses gradient descent via automatic differentiation \citep{baydin_automatic_2018}.)
 
-In the past, flock models have been tuned manually, often a frustrating and time-consuming process. For a new model, adjusting parameters is required simply to create group motion that looks like plausible flocking. Any modification to a group motion model (e.g. birds{$\rightarrow$}fish) requires further adjustments to the parameters. Each such adjustment requires selecting which parameter(s) to change, whether it should increase or decrease, and by how much. Often more than one parameter needs to be changed. The main difficulty is that effects of control parameters may overlap and interact in non-linear ways. Changing one usually requires changing others to compensate. Often, the result is that many parameters need to be changed, leading to a long tedious series of changes and testing.
+In the past, flock models have been tuned manually, often a frustrating and time-consuming process. For a new model, adjusting parameters is required simply to create group motion that looks like plausible flocking. Any modification to a group motion model (e.g. birds{$\rightarrow$}fish) requires further adjustments to the parameters. Each such adjustment requires selecting which parameter(s) to change, and how much to increase or decrease them. The main difficulty is that effects of control parameters may overlap and interact in non-linear ways. Changing one usually requires changing others to compensate. Often, the result is that many parameters need to be changed, leading to a long tedious series of changes and testing.
 
 This paper is about automating that adjustment process using metrics of flock quality and an optimization process. The metrics use multiple objectives. The nature of those objectives and how to add new ones will be described in sections \nameref{sec:FlockingObjective} and \nameref{sec:add_objective}. The optimization process used in these experiments is a genetic algorithm, described in section \nameref{subsec:Optimization_with_GA}.
 
@@ -155,15 +155,14 @@ Since the 1980s, many simulation-based models of bird flocks have been proposed.
 and
 \citet{hoetzlein_flock2_2024}.
 
-``Tuning'' the many parameters of these flock models can be difficult. EvoFlock seeks to address this problem. It is a robust gradient-free evolutionary optimizer for parameter tuning to create (or improve or re-target) multi-agent motion models. EvoFlock handles large numbers of fast moving agents with potentially conflicting goals. It optimizes parameters for multiple procedural objectives, allowing for complex inverse design tasks. 
+``Tuning'' the many parameters of these flock models can be difficult. EvoFlock seeks to make it easier. It is a robust gradient-free evolutionary optimizer for parameter tuning to create (or improve or re-target) multi-agent motion models. EvoFlock handles large numbers of fast moving agents with potentially conflicting goals. It optimizes parameters for multiple procedural objectives, allowing for complex inverse design tasks. 
 
-An early, but not very successful, attempt at evolutionary inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming}. (GP  \citep{koza_genetic_1992} is a variation of the \textit{genetic algorithm} (GA) \citep{holland_adaptation_1975}. A modern survey of the larger field of \textit{evolutionary computation} can be found in
-\citet{de_jong_evolutionary_2016}.) \citet{stonedahl_finding_2011} use a GA to search parameter spaces using an objective function running flock simulations based on NetLogo \citep{tisue_netlogo_2004}. Similarly, \citet{demsar_evolution_2017} attempted ``to evolve collective behavior from scratch.'' \citet{vasarhelyi_optimized_2018} used a GA to tune flocking models suitable for the flight dynamics of a swarm of real drones. \citet{stolfi_escorting_2025} use evolutionary optimization to design robotic swarms for ``escorting'' tasks.
+An early, but not very successful, attempt at evolutionary inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming}. (GP  \citep{koza_genetic_1992} is a variation of the \textit{genetic algorithm} (GA) \citep{holland_adaptation_1975}.) \citet{stonedahl_finding_2011} use a GA to search parameter spaces using an objective function running flock simulations based on NetLogo \citep{tisue_netlogo_2004}. Similarly, \citet{demsar_evolution_2017} attempted ``to evolve collective behavior from scratch.'' \citet{vasarhelyi_optimized_2018} used a GA to tune flocking models suitable for the flight dynamics of a swarm of real drones. \citet{stolfi_escorting_2025} use evolutionary optimization to design robotic swarms for ``escorting'' tasks.
 
 Other than that handful of evolutionary-based solutions, most previous work on automatically tuning flock/multi-agent models has used \textit{reinforcement learning} (RL) \citep{sutton_reinforcement_1998} as the optimization technique. For example, see recent excellent work in \citet{cornelisse_building_2025} and \citet{cusumano-towner_robust_2025} on making high-quality \textit{driver agents} for a multi-agent traffic simulation. They use \textit{self-play} where agents learn (``bootstrap'') from interacting with each other. EvoFlock also has an aspect of self-play as flockmates learn to synchronize and cooperate with each other. A recently posted preprint uses reinforcement learning with an objective function \textit{very} similar to the one used here \citep{brambati_learning_2025}. See also research on drone-based communication networks
 \citet{sun_integrated_2025} attempting to maintain good spatial coverage while minimizing energy usage.
 
-Close in spirit to EvoFlock is recent work on automatically tuning 2d herd models from overhead video \citealp{gong_herds_2025}. From drone video of (say) sheep flocks, the system provides a simulated dense flock that reacts to terrain models just like sheep would.
+Close in spirit to EvoFlock is recent work on automatically tuning 2d herd models from overhead video \citep{gong_herds_2025}. From drone video of (say) sheep flocks, the system provides a dense simulated flock that reacts to simulated terrain quite like real sheep flocks would.
 
 Notable, if somewhat tangential: \citet{jaderberg_human-level_2019} uses a hybrid approach to learn human-level game-playing agents for multiplayer games. It uses population-based reinforcement learning, which combines aspects of RL, population-based GA, and the self-play mentioned above.
 
@@ -189,7 +188,8 @@ This section discusses the various components of the optimization process for ad
 \subsection{Optimization with Genetic Algorithms}
 \label{subsec:Optimization_with_GA}
 
-Optimization can be used to find a set of simulation parameters that best fit the behavioral goals, as given by an objective function. EvoFlock uses a \textit{genetic algorithm} (GA), a technique based loosely on concepts of biological evolution, as seen in the natural world. Genetic algorithms were first described by \citet{holland_adaptation_1975}. Evolution was first described by \citet{darwin_origin_1859} and \citet{wallace_tendency_1858}.
+Optimization can be used to find a set of simulation parameters that best fit the behavioral goals, as given by an objective function. EvoFlock uses a \textit{genetic algorithm} (GA), a technique based loosely on concepts of biological evolution, as seen in the natural world. Evolution was first described by \citet{darwin_origin_1859} and \citet{wallace_tendency_1858}. Genetic algorithms were first described by \citet{holland_adaptation_1975}. A modern survey of the larger field of \textit{evolutionary computation} can be found in
+\citet{de_jong_evolutionary_2016}.
 
 A genetic algorithm maintains a \textit{population} of candidate solutions. Usually, the population contains a fixed number (tens to thousands) of candidate solutions, often called \textit{individuals}. Typically, each individual is a fixed-sized vector of numeric parameter values. The population may be further divided into \textit{demes} or \textit{islands}, representing isolated breeding subpopulations. This is thought to promote diversity by pursuing different solutions in parallel. In an island model, there is usually some kind of \textit{migration} where individuals occasionally move from one island to another.
 
@@ -248,35 +248,28 @@ The collection of all these make up the flock's \textit{parameter set} which is 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{figure}
+% \begin{figure}[H]
+% \begin{figure}[]
+% \begin{figure}[b]
     \centering
-    % \includegraphics[width=0.9\linewidth]{images/temp_sep_score.png}
     \includegraphics[width=0.9\linewidth]{images/sep_score.pdf}
     \caption{Score for desired \textit{separation} distance to a boid's nearest neighbor. This function is highest when the centers of two boids are between 2 and 4 body diameters apart. The default boid body diameter is 1. The \textit{separation} score for an entire flock simulation is the average of this function, over all \textit{boid-steps}. (That is, for 200 boids on 500 simulation steps, so 100,000 boid steps.)\\}
     \label{fig:SeparationScore}
-
-    \centering
-    % \includegraphics[width=0.9\linewidth]{images/temp_speed_score.png}
-    \includegraphics[width=0.9\linewidth]{images/speed_score.pdf}
-    \caption{Score for desired boid \textit{speed}, here $\sim$20 meters per second. This function is highest when speed is between 19 and 21 m/s and falls off to zero outside that range. The \textit{speed} score for an entire flock simulation is the average of this function over all boid-steps.\\}
-    \label{fig:speed_score}
 
     \centering
     \includegraphics[width=0.9\linewidth]{images/avoidance_score.pdf}
     \caption{Score for obstacle avoidance. It is the fraction of collision-free boid-steps (on [0, 1]) raised to a high power (500). This function is nearly zero until the number of collision-free steps is about 99\%.}
     \label{fig:avoid_score}
 
-\end{figure}
-
-\begin{figure}[b]
-
     \centering
-    % \includegraphics[width=0.9\linewidth]{images/temp_curve_score.png}
-    \includegraphics[width=0.9\linewidth]{images/curve_score.pdf}
-    \caption{Score for boosting boid path curvature by slightly penalizing especially low curvature. Measured as average over all boid-steps of flock run. Score ramps from 0.8 to 1.0 for curvature on [0, 0.1] then clips at 1 for higher curvature.}
-    \label{fig:curve_score}
+    \includegraphics[width=0.9\linewidth]{images/speed_score.pdf}
+    \caption{Score for desired boid \textit{speed}, here $\sim$20 meters per second. This function is highest when speed is between 19 and 21 m/s and falls off to zero outside that range. The \textit{speed} score for an entire flock simulation is the average of this function over all boid-steps.\\}
+    \label{fig:speed_score}
+
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 \section{An objective function for flocking}
@@ -309,6 +302,19 @@ Originally (following early boid models \citep{reynolds_flocks_1987}) each boid'
 
 Flight speed \textit{can} be left to ``float'' during optimization. Unfortunately, there is an annoyingly large basin of attractions around not moving (speed=0). It seems likely that any given motion-based inverse design problem would imply a range of valid speeds. This suggests that the speed range should be given in the inverse design problem statement. For example, modeling vehicle traffic and pedestrian crowds would imply very different speed ranges. Figure \ref{fig:speed_score} shows a speed score function used in these experiments. It has a target range in the interval [19, 21] with a fixed support ramping down to zero outside that range.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}[b]
+% \begin{figure}
+
+    \centering
+    % \includegraphics[width=0.9\linewidth]{images/temp_curve_score.png}
+    \includegraphics[width=0.9\linewidth]{images/curve_score.pdf}
+    \caption{Score for boosting boid path curvature by slightly penalizing especially low curvature. Measured as average over all boid-steps of flock run. Score ramps from 0.8 to 1.0 for curvature on [0, 0.1] then clips at 1 for higher curvature.}
+    \label{fig:curve_score}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Adding an Objective}
 \label{sec:add_objective}

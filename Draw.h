@@ -1009,5 +1009,51 @@ public:
 
     //--------------------------------------------------------------------------
 
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+    // TODO 20260328 try fixing that "disappears when paused" annotation bug
+    
+    // TODO maybe this should be global rather than inside Boid?
+    class MiscAnnotation
+    {
+    public:
+        MiscAnnotation(Vec3 ep1, Vec3 ep2, Color color, double radius)
+          : ep1_(ep1), ep2_(ep2), color_(color), radius_(radius) {}
+        void addToAnimatedFrame()
+        {
+            auto& draw = Draw::getInstance();
+            draw.addThickLineToAnimatedFrame(ep1_, ep2_, color_, radius_);
+        }
+    private:
+        Vec3 ep1_;
+        Vec3 ep2_;
+        Color color_;
+        double radius_;
+    };
+    
+    std::vector<MiscAnnotation> misc_annotations_;
+    
+    void clearMiscAnnotation()
+    {
+        misc_annotations_.clear();
+    }
+    
+    void addMiscAnnotation(Vec3 ep1, Vec3 ep2, Color color, double radius)
+    {
+        misc_annotations_.push_back({ep1, ep2, color, radius});
+    }
+    
+    void addMiscAnnotation(Vec3 ep1, Vec3 ep2, Color color)
+    {
+        misc_annotations_.push_back({ep1, ep2, color, 0.02});
+    }
+    
+    void addMiscAnnotationsToAnimatedFrame()
+    {
+        for (auto ma : misc_annotations_) { ma.addToAnimatedFrame(); }
+    }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
 #endif  // USE_OPEN3D
 };

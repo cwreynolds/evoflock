@@ -193,6 +193,13 @@ public:
     {
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//            // TODO 20260328 try fixing that "disappears when paused" annotation bug
+//    //        clearMiscAnnotation();
+//            draw().clearMiscAnnotation();
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//
         Vec3 f = steerForSpeedControl()            * fp().weightForward();
         Vec3 s = steer_to_separate(neighbors)      * fp().weightSeparate();
         Vec3 a = steer_to_align(neighbors)         * fp().weightAlign();
@@ -712,7 +719,61 @@ public:
             Color c = util::interpolate(w, Color(0.5), Color(0.5, 0.9, 0.9));
             draw().addThickLineToAnimatedFrame(position(), poi, c, 0.01);
         }
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20260328 try fixing that "disappears when paused" annotation bug
+//        for (auto ma : misc_annotations_) { ma.addToAnimatedFrame(); }
+        draw().addMiscAnnotationsToAnimatedFrame();
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
     }
+    
+//    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//    // TODO 20260328 try fixing that "disappears when paused" annotation bug
+//    
+//    // TODO maybe this should be global rather than inside Boid?
+//    class MiscAnnotation
+//    {
+//    public:
+//        MiscAnnotation(Vec3 ep1, Vec3 ep2, Color color, double radius)
+//          : ep1_(ep1), ep2_(ep2), color_(color), radius_(radius) {}
+//        
+////        MiscAnnotation(Vec3 ep1, Vec3 ep2, Color color)
+////          : ep1_(ep1), ep2_(ep2_), color_(color), radius_(0.02)
+//        MiscAnnotation(Vec3 ep1, Vec3 ep2, Color color)
+//          : MiscAnnotation(ep1, ep2, color, 0.02) {}
+//
+//        void addToAnimatedFrame()
+//        {
+//            auto& draw = Draw::getInstance();
+//            draw.addThickLineToAnimatedFrame(ep1_, ep2_, color_, radius_);
+//        }
+//    private:
+//        Vec3 ep1_;
+//        Vec3 ep2_;
+//        Color color_;
+//        double radius_;
+//    };
+//    
+//    std::vector<MiscAnnotation> misc_annotations_;
+//    
+//    void clearMiscAnnotation()
+//    {
+//        misc_annotations_.clear();
+//    }
+//    
+//    void addMiscAnnotation(Vec3 ep1, Vec3 ep2, Color color, double radius)
+//    {
+//        misc_annotations_.push_back({ep1, ep2, color, radius});
+//    }
+//    
+//    void addMiscAnnotation(Vec3 ep1, Vec3 ep2, Color color)
+//    {
+//        misc_annotations_.push_back({ep1, ep2, color, 0.02});
+//    }
+//    
+//    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
     
 //    // Called from Flock to draw annotation for selected Boid and its neighbors.
 //    void drawAnnotationForBoidAndNeighbors()
@@ -756,9 +817,19 @@ public:
             for (Boid* b : cached_nearest_neighbors())
             {
                 Color c(xxx_temp_separation_score > 0.5 ? 1 : 0);
-                draw().addThickLineToAnimatedFrame(position(),
-                                                   b->position(),
-                                                   c, 0.01);
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20260328 try fixing that "disappears when paused" annotation bug
+                
+//                draw().addThickLineToAnimatedFrame(position(),
+//                                                   b->position(),
+//                                                   c, 0.01);
+
+//                addMiscAnnotation(position(), b->position(), c, 0.01);
+
+                draw().addMiscAnnotation(position(), b->position(), c, 0.01);
+
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
             }
         }
     }
@@ -829,10 +900,18 @@ public:
         if (isSelected())
         {
             Collision c = predicted_obstacle_collisions_[0];
-            draw().addThickLineToAnimatedFrame(position(),
-                                               c.point_of_impact,
-                                               Color(1, 0.5, 0),
-                                               0.1);
+//            draw().addThickLineToAnimatedFrame(position(),
+//                                               c.point_of_impact,
+//                                               Color(1, 0.5, 0),
+//                                               0.1);
+//            addMiscAnnotation(position(),
+//                              c.point_of_impact,
+//                              Color(1, 0.5, 0),
+//                              0.1);
+            draw().addMiscAnnotation(position(),
+                                     c.point_of_impact,
+                                     Color(1, 0.5, 0),
+                                     0.1);
         }
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }

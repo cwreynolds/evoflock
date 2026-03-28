@@ -94,7 +94,6 @@
 
 \begin{figure*}
     \centering
-    % \includegraphics[width=0.9\textwidth]{images/temp_MOF_HV.png}
     \includegraphics[width=0.9\textwidth]{images/MOF_HV.pdf}
     \caption{(A) Normalized multi-objective fitness space. For two objectives, a unit square. (B) The \textit{Pareto front} for two mutually conflicting objectives. (Like \textit{reliability} and \textit{affordability} in the hypothetical bridge design example.) The objectives can not all be fully satisfied at any point along the front. This is roughly the ``distance'' from (1, 1) to the red curve. (C) Two ``mostly compatible'' objectives, more typical of criteria for flock tuning. Here, the Pareto front passes near the global optimum. (D) Scalarization of a multiple-objective fitness value, using \textit{hypervolume}: the product of all objective scores. In this 2D example it is the blue rectangle's \textit{area}. Solving a multi-objective problem using scalarized fitness works best for problems of type (C).}
     \label{fig:MOF_HV}
@@ -107,13 +106,13 @@
 
 Simulation models of multi-agent motion are used in many fields including: animation, games, biology, robotic swarms, urban planning, training autonomous vehicles, and other applications. Since the 1980s, several models of group motion have been developed, including \textit{boids} and others (see \nameref{sec:related}). These allow creating simulations of flocks and other group motions, which most observers will recognize as some form of flocking. This paper will usually refer to bird flocks, with the assumption that other types of group motion (herds, schools, crowds, traffic, drone swarms) can be similarly modeled.
 
-This project addresses the issue of \textit{adjusting} or \textit{tuning} multi-agent motion models, toward a given behavioral goal. For example, modifying an existing model of bird flocks to instead portray fish schools. Or starting from a model of flocking crows and changing it to flocking sparrows. Similarly, starting from a generic abstract flock model and fitting it to field observations of a particular species of real birds in nature. Or to take a plausibly realistic model of a natural bird flock, and change it, say for storytelling purposes, to convey a flock of birds that are happy, or angry. 
+This project addresses the issue of \textit{adjusting} or \textit{tuning} multi-agent motion models toward a given behavioral goal. For example, modifying an existing model of bird flocks to instead portray fish schools. Or starting from a model of flocking crows and changing it to flocking sparrows. Similarly, starting from a generic abstract flock model and fitting it to field observations of a particular species of real birds in nature. Or to take a plausibly realistic model of a natural bird flock, and change it, say for storytelling purposes, to convey a flock of birds that are happy, or angry. 
 
 A boids-like simulation model typically has a collection of numeric parameters (``knobs'') that control its action. \textit{EvoFlock} is a software framework that automatically finds a set of near-optimal parameters for a simulation-based multi-agent system. The flock model used for these experiments is a predefined hand-written ``black box'' model whose input is a \textit{parameter set} (consisting of 15 numbers, see Table \ref{table:flock-parameters}). The user provides a \textit{objective} (also known as \textit{fitness} or \textit{loss}) function. It takes a candidate parameter set, runs a simulation, and returns a \textit{score} reflecting how well the behavioral goals were met. The optimization process runs (for about two hours on a laptop) and produces a high quality parameter set, as measured by the user-supplied objective function.
 
 For a user of this optimization framework, it is convenient that the flock model is treated as a black box. Almost no restrictions are imposed on a preexisting model by this optimization framework: not on model design, source code availability, or programming language. (As can be an issue if optimization uses gradient descent via automatic differentiation \citep{baydin_automatic_2018}.)
 
-In the past, flock models have been tuned manually, often a frustrating and time-consuming process. For a new model, adjusting parameters is required simply to create group motion that looks like plausible flocking. Any modification to a group motion model (e.g. birds{$\rightarrow$}fish) requires further adjustments to the parameters. Each such adjustment requires selecting which parameter(s) to change, and how much to increase or decrease them. The main difficulty is that effects of control parameters may overlap and interact in non-linear ways. Changing one usually requires changing others to compensate. Often, the result is that many parameters need to be changed, leading to a long tedious series of changes and testing.
+In the past, flock models have been tuned manually, often a frustrating and time-consuming process. For a new model, adjusting parameters is required simply to create group motion that looks like plausible flocking. Any modification to a group motion model (e.g. birds{$\rightarrow$}fish) requires further adjustments to the parameters. Each such adjustment requires selecting which parameter(s) to change and how much to increase or decrease them. The main difficulty is that effects of control parameters may overlap and interact in non-linear ways. Changing one usually requires changing others to compensate. Often, the result is that many parameters need to be changed, leading to a long tedious series of changes and tests.
 
 This paper is about automating that adjustment process using metrics of flock quality and an optimization process. The metrics use multiple objectives. The nature of those objectives and how to add new ones will be described in sections \nameref{sec:FlockingObjective} and \nameref{sec:add_objective}. The optimization process used in these experiments is a genetic algorithm, described in section \nameref{subsec:Optimization_with_GA}.
 
@@ -125,10 +124,9 @@ A summary of (``hyper'')parameters for this framework is given in Table \ref{tab
 
 \begin{figure*}
     \centering
-    % \includegraphics[width=0.7\textwidth]{images/temp_evo_update.png}
     \includegraphics[width=0.7\textwidth]{images/evo_update.pdf}
-    \caption{One update step of the (SSGA) evolutionary optimization process, using a 3-way tournament: (a) uniformly select one of the \textit{sub-populations}, (b) from that sub-population, uniformly select three \textit{individuals}, each holding a flock parameter set, (c) get fitness for each, either by running flock simulations (orange), or using the fitness cached from previous tournaments (green), (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g,h) that new individual replaces the worst of the three back in the population. Removing the worst individuals, rather than promoting the best, is a form of \textit{negative selection} which tends to preserve diversity in the population. This 3-way tournament SSGA approach, and its hyperparameters, were used largely unchanged from previous projects.}
-    \label{fig:temp_evo_update}
+    \caption{One update step of the (SSGA) evolutionary optimization process, using a 3-way tournament: (a) uniformly select one of the \textit{sub-populations}, (b) from that sub-population, uniformly select three \textit{individuals}, each holding a flock parameter set, (c) get fitness for each, either by running flock simulations (orange), or using the fitness cached from previous tournaments (green), (d) sort the three by fitness, (e) the worst (least fit) individual is deleted, (f) the best two individuals mate (\textit{crossover}) to create a new individual, (g,h) that new individual replaces the worst of the three back in the population. Removing the worst individuals, rather than promoting the best, is a form of \textit{negative selection} which tends to preserve diversity in the population.}
+    \label{fig:evo_update}
 \end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -155,11 +153,11 @@ Since the 1980s, many simulation-based models of bird flocks have been proposed.
 and
 \citet{hoetzlein_flock2_2024}.
 
-``Tuning'' the many parameters of these flock models can be difficult. EvoFlock seeks to make it easier. It is a robust gradient-free evolutionary optimizer for parameter tuning to create (or improve or re-target) multi-agent motion models. EvoFlock handles large numbers of fast moving agents with potentially conflicting goals. It optimizes parameters for multiple procedural objectives, allowing for complex inverse design tasks. 
+``Tuning'' the many parameters of these flock models can be difficult. EvoFlock seeks to help. It is a robust gradient-free evolutionary optimizer for parameter tuning to create (or improve or re-target) multi-agent motion models. EvoFlock handles large numbers of fast moving agents with potentially conflicting goals. It optimizes parameters to meet multiple procedural objectives, allowing for complex inverse design tasks. 
 
-An early, but not very successful, attempt at evolutionary inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming}. (GP  \citep{koza_genetic_1992} is a variation of the \textit{genetic algorithm} (GA) \citep{holland_adaptation_1975}.) \citet{stonedahl_finding_2011} use a GA to search parameter spaces using an objective function running flock simulations based on NetLogo \citep{tisue_netlogo_2004}. Similarly, \citet{demsar_evolution_2017} attempted ``to evolve collective behavior from scratch.'' \citet{vasarhelyi_optimized_2018} used a GA to tune flocking models suitable for the flight dynamics of a swarm of real drones. \citet{stolfi_escorting_2025} use evolutionary optimization to design robotic swarms for ``escorting'' tasks.
+An early, but not very successful, attempt at evolutionary inverse design for flock simulations \citep{reynolds_evolved_1993} used \textit{genetic programming}. (GP is a variation of the \textit{genetic algorithm} (GA).) \citet{stonedahl_finding_2011} use a GA to search parameter spaces using an objective function running flock simulations based on NetLogo \citep{tisue_netlogo_2004}. Similarly, \citet{demsar_evolution_2017} attempted ``to evolve collective behavior from scratch.'' \citet{vasarhelyi_optimized_2018} used a GA to tune flocking models suitable for the flight dynamics of a swarm of real drones. \citet{stolfi_escorting_2025} use evolutionary optimization to design robotic swarms for ``escorting'' tasks.
 
-Other than that handful of evolutionary-based solutions, most previous work on automatically tuning flock/multi-agent models has used \textit{reinforcement learning} (RL) \citep{sutton_reinforcement_1998} as the optimization technique. For example, see recent excellent work in \citet{cornelisse_building_2025} and \citet{cusumano-towner_robust_2025} on making high-quality \textit{driver agents} for a multi-agent traffic simulation. They use \textit{self-play} where agents learn (``bootstrap'') from interacting with each other. EvoFlock also has an aspect of self-play as flockmates learn to synchronize and cooperate with each other. A recently posted preprint uses reinforcement learning with an objective function \textit{very} similar to the one used here \citep{brambati_learning_2025}. See also research on drone-based communication networks
+Other than those evolutionary-based solutions, most previous work on automatic tuning of flock/multi-agent models has used \textit{reinforcement learning} (RL) \citep{sutton_reinforcement_1998} as the optimization technique. For example, see recent excellent work in \citet{cornelisse_building_2025} and \citet{cusumano-towner_robust_2025} on making high-quality \textit{driver agents} for a multi-agent traffic simulation. They use \textit{self-play} where agents learn (``bootstrap'') from interacting with each other. EvoFlock also has an aspect of self-play as flockmates learn to synchronize and cooperate with each other. A recently posted preprint uses reinforcement learning with an objective function \textit{very} similar to the one used here \citep{brambati_learning_2025}. See also research on drone-based communication networks
 \citet{sun_integrated_2025} attempting to maintain good spatial coverage while minimizing energy usage.
 
 Close in spirit to EvoFlock is recent work on automatically tuning 2d herd models from overhead video \citep{gong_herds_2025}. From drone video of (say) sheep flocks, the system provides a dense simulated flock that reacts to simulated terrain quite like real sheep flocks would.
@@ -177,7 +175,6 @@ This section discusses the various components of the optimization process for ad
 
 \begin{figure}[b!]
     \centering
-    % \includegraphics[width=0.9\linewidth]{images/temp_system_blocks.png}
     \includegraphics[width=0.9\linewidth]{images/system_blocks.pdf}
     \caption{Overall structure of the flock optimization presented here. A generic optimization base (green) operates on a user's flock inverse design problem (blue). The user's description includes a parameter set specification and an objective function, the latter containing a flock simulator and score keeping utilities.}
     \label{fig:system_blocks}
@@ -197,16 +194,14 @@ A GA is a population-based stochastic approach to optimization and discovery. Un
 
 The ``genome'' of a GA changes over time under the influence of the objective function. For example, a model parameter might be changed by \textit{mutation}: adding a small signed zero-centered random value, to change it a bit from its previous value. Perhaps more importantly, individuals are modified by \textit{crossover} where two \textit{parent} individuals are recombined to create a new \textit{offspring}. In a rough model of biological crossover involving parental DNA, two parental parameter sets are merged into one, by taking each parameter at random from one parent or the other (called \textit{uniform crossover}).
 
-Many variations on genetic algorithms have been developed over the years. Sometimes, the entire population of individuals is updated in parallel, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state genetic algorithms} (SSGA) updates individuals one at a time \citep{syswerda_study_1991}. If a generational GA is run for $G$ generations with a population of $P$ individuals, a corresponding SSGA would be run for $G{\times}P$ steps. A preexisting GA framework called \textit{
-LazyPredator
-% [[[redacted for double-blind review]]]
-} is used for this project. See Figure \ref{fig:temp_evo_update} for a diagram of the SSGA update cycle, and the ``tournament of three individuals'' based on \textit{negative selection} which promotes diversity in the population.
+Many variations on genetic algorithms have been developed over the years. Sometimes, the entire population of individuals is updated in parallel, as a \textit{generation}, and that process is repeated tens to hundreds of times. The approach used here, known as \textit{steady state genetic algorithms} (SSGA) updates individuals one at a time \citep{syswerda_study_1991}. If a generational GA is run for $G$ generations with a population of $P$ individuals, a corresponding SSGA runs for $G{\times}P$ steps. 
 
+A preexisting GA framework called \textit{LazyPredator} is used for this project. See Figure \ref{fig:evo_update} for a diagram of the SSGA update cycle, and the ``tournament of three individuals'' based on \textit{negative selection} which promotes diversity in the population. LazyPredator's default 3-way tournament SSGA approach, and its hyperparameters, were used largely unchanged from previous unrelated projects.
 
 \subsection{Objective Function}
 \label{subsec:ObjectiveFunction}
 
-EvoFlock is based on optimizing a set of parameters for a flock (multi-agent motion) model. Optimization procedures are guided by an \textit{objective function}. In many optimization problems, called multi-objective optimization, the overall objective is a combination of several, potentially contradictory goals. 
+EvoFlock is based on optimizing a set of parameters for a flock (multi-agent motion) model. Optimization procedures are guided by an \textit{objective function}. In many optimization problems, the overall objective is a combination of several potentially contradictory goals. This is called \textit{multi-objective optimization} \citep{deb_multi-objective_2001}. 
 
 To motivate this concept, consider building a bridge over a river. A key goal is that the bridge is reliable: that it will carry the required loads without collapsing. Another important goal is to minimize the cost of building the bridge. These criteria are directly opposed. A very strong bridge is reliable but costly. A very cheap bridge is unlikely to be reliable. This trade-off is often called \textit{Pareto optimality}. Tuples of such Pareto optimal values form the \textit{Pareto front}, see Figure \ref{fig:MOF_HV}(b).
 
@@ -216,7 +211,7 @@ Other types of multi-objective optimization have less contradictory goals. The m
 \subsection{Multi-Objective Optimization}
 \label{subsec:Multi-Objective}
 
-Genetic algorithms were originally used for problems with a single scalar fitness value. These have the advantage of having a \textit{total order}. However, like the bridge building example above, many problems inherently have \textit{multiple objectives} (see Figure \ref{fig:MOF_HV}(B)). The flock optimization problems addressed here seem to be in the ``mostly compatible'' type of multiple objective problems (see Figure \ref{fig:MOF_HV}(C)) so can be solved with \textit{scalarization}. A \textit{scalarizer} maps from multiple objective values to a single scaler value that somehow summarizes the multiple objective values.
+Genetic algorithms were first used for problems with a single scalar fitness value. These have the advantage of having a \textit{total order}. However, like the bridge building example above, many problems inherently have \textit{multiple objectives} (see Figure \ref{fig:MOF_HV}(B)). The flock optimization problems addressed here seem to be in the ``mostly compatible'' type of multiple objective problems (see Figure \ref{fig:MOF_HV}(C)) so can be solved with \textit{scalarization}. A \textit{scalarizer} maps from multiple objective values to a single scaler value that somehow summarizes the multiple objective values.
 
 A simple and commonly used scalarizer is called \textit{hypervolume}, which simply multiplies together the components of a multiple-objective value. The name hypervolume refers to a \textit{n}-dimensional box whose edges correspond to the components of a multiple objective value. Hypervolume has the property that its value changes in proportion to changes in each component.
 
@@ -227,11 +222,11 @@ So, for example, the hypervolume goes up (or down) as any component goes up (or 
 
 \begin{figure}
     \centering
-    % \includegraphics[width=\linewidth]{images/temp_fit_plot.png}
     \includegraphics[width=\linewidth]{images/fit_plot.pdf}
     \caption{Plot of scalarized fitness (and its component metrics) over 30,000 steps of evolutionary time. The black bold trace (ending at 0.83) is the cumulative best population fitness. The bold gray trace (bottommost) is population average fitness. The colored traces correspond to best and average values (saturated and pastel) for the three component fitness objectives: obstacle avoidance (red), separation (green), and speed (blue). Data from run 20250711a.}
     \label{fig:fit_plot}
 \end{figure}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Parameter set for a flocking model}
@@ -309,7 +304,6 @@ Flight speed \textit{can} be left to ``float'' during optimization. Unfortunatel
 % \begin{figure}
 
     \centering
-    % \includegraphics[width=0.9\linewidth]{images/temp_curve_score.png}
     \includegraphics[width=0.9\linewidth]{images/curve_score.pdf}
     \caption{Score for boosting boid path curvature by slightly penalizing especially low curvature. Measured as average over all boid-steps of flock run. Score ramps from 0.8 to 1.0 for curvature on [0, 0.1] then clips at 1 for higher curvature.}
     \label{fig:curve_score}
@@ -320,13 +314,13 @@ Flight speed \textit{can} be left to ``float'' during optimization. Unfortunatel
 \section{Adding an Objective}
 \label{sec:add_objective}
 
-EvoFlock aims to simplify modifying flock models. This section describes such a modification, adding a new fitness objective to the ``flocking with obstacles'' behavior described in the previous section (three objectives: separation in range, speed in range, and avoid obstacles). The flocking motion that results is competent and smooth. Let us assume for some user/application-specific reason, the quality of motion is judged to be ``too smooth.''
+EvoFlock aims to simplify both creating and modifying flock models. This section describes such a modification, adding a new fitness objective to the ``flocking with obstacles'' behavior described in the previous section (three objectives: separation in range, speed in range, and avoid obstacles). The flocking motion that results is competent and smooth. Let us assume for some user or application-specific reason, the quality of motion is judged to be ``too smooth.''
 
 This can be seen as a tendency of the previous three objectives to minimize the boid's \textit{path curvature}. Perhaps intentionally boosting the curvature would counteract that ``too smooth'' quality of motion? (For example, lending a more ``playful'' quality of motion?)
 
 The \code{Boid} class used by EvoFlock already provided an accessor for its instantaneous path curvature. A candidate ``flock curvature'' score could be simply averaging that over all boid-steps. A test run showed that the instantaneous curvature of a boid's path is approximately on [0, 2]. The average curvature over a run is on [0, 1] at the beginning, but about [0, 0.04] at the end. This supports the notion that basic flocking minimizes curvature.
 
-An objective metric for boosting curvature might map the average curvature of a run to a normalized fitness score. Prototyping this code change took about an hour of programmer effort, followed by a few two-hour optimization runs to find effective hyperparameters: a linear mapping (with clipping) from a curvature range of [0, 0.1] to a score range of [0.8, 1], see Figure \ref{fig:curve_score}. This is effectively a fitness penalty of 20\% for no path curvature, ramping up to no penalty for ``quite curvy.'' 
+An objective metric for boosting curvature might map the average curvature of a run to a normalized fitness score. Prototyping this code change took about an hour of programmer effort, followed by a few two-hour optimization runs to find effective hyperparameters: a linear mapping (with clipping) from a curvature range of [0, 0.1] to a score range of [0.8, 1], see Figure \ref{fig:curve_score}. This is effectively a fitness penalty of 20\% for zero path curvature, ramping up to no penalty for ``quite curvy.'' 
 
 A sample of the resulting flock motion can be seen in \href{https://drive.google.com/file/d/1HOeCqkmY__SiON4TCAQyPKa3CviIlPgM/view?usp=sharing}{Video 2}, a simulation with 1000 boids, using flock parameters evolved with this new curvature-boosting objective. (Compare with the non-curvature-boosting \href{https://drive.google.com/file/d/1ZbanvWVfapnH2TpTqamypWFoXuMeoY9b/view?usp=sharing}{Video 1} mentioned in the \nameref{sec:intro}.)
 
@@ -414,7 +408,7 @@ One advantage of using evolutionary optimization for this type of inverse design
 
 A surprising finding of this work is that the \textit{alignment} of birds in a flock seems to \textit{emerge} from maintaining proper spacing between flockmates. In retrospect this seems plausible: a group of fast moving animals, with a desire to remain close-but-not-too-close to each other, while dodging around obstacles, must travel on parallel curved paths. However, before these experiments, it was not clear whether an objective function specifically to require alignment would be needed.
 
-A note about GA population size versus the number of SSGA updates (see Figure \ref{fig:temp_evo_update}). Some experiments were made increasing the evolutionary population from 500 to 1000, while holding the total number of SSGA updates constant at 30,000. The hope was that more \textit{individuals} (more flock parameter sets) might allow a better solution to be found by using a wider coverage of the parameter space. The opposite seemed to be true. Larger populations led to worse results (often summarized as the best scalar fitness at end of run). In contrast, reducing the population from 500 to 300 produced somewhat better results, but 150 was worse. Finally, for a population size of 300, more steps seemed to help: running 30,000 updates produced fitness around 0.82, while running 60,000 updates produced fitness around 0.88. Apparently, having more updates per individual produces better results.
+A note about GA population size versus the number of SSGA updates (see Figure \ref{fig:evo_update}). Some experiments were made increasing the evolutionary population from 500 to 1000, while holding the total number of SSGA updates constant at 30,000. The hope was that more \textit{individuals} (more flock parameter sets) might allow a better solution to be found by using a wider coverage of the parameter space. The opposite seemed to be true. Larger populations led to worse results (often summarized as the best scalar fitness at end of run). In contrast, reducing the population from 500 to 300 produced somewhat better results, but 150 was worse. Finally, for a population size of 300, more steps seemed to help: running 30,000 updates produced fitness around 0.82, while running 60,000 updates produced fitness around 0.88. Apparently, having more updates per individual produces better results.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -432,14 +426,14 @@ A note about GA population size versus the number of SSGA updates (see Figure \r
 
 Because EvoFlock is a stochastic algorithm, the quality of the results varies from run to run. (For the three-objective version, typical end-of-run best fitness is around 0.83, but can be as low as 0.76. See Figure \ref{fig:seed_variance}.) This procedure is not deterministic, both because the random number generator is seeded from wall clock time for each run and because the objective function is multithreaded and so is inherently nondeterministic.
 
-The current objective function runs \textbf{four} flock simulations for each parameter set. These are run in parallel threads on separate CPU cores, so there is little time penalty. However, if not for this 4{$\times$} load, the cores would be free for other types of parallelism. The four simulations are an attempt to reduce fitness variance of the randomized simulations, to avoid ``lucky'' high scores. (Of the four fitness values, the \textit{lowest} (worst) is returned from the objective function as a conservative estimate.) Recent work \citep{antipov_evolutionary_2025} has shown that this extra computation may be misguided, and that the quality of results do not suffer from using noisy raw fitness values.
+The current objective function runs \textbf{four} flock simulations for each parameter set. These are run in parallel threads on separate CPU cores, so there is little time penalty. However, if not for this 4{$\times$} load, the cores would be free for other types of parallelism. The four simulations are an attempt to reduce fitness variance of the randomized simulations, to avoid ``lucky'' high scores. (Of the four fitness values, the \textit{lowest} (worst) is returned from the objective function as a conservative estimate.) Recent work \citep{antipov_evolutionary_2025} has shown that this extra computation may be misguided, and that the overall quality of results do not suffer from using noisy raw fitness values.
 
 \section{Future Work}
 \label{sec:future}
 
 The examples in this work were based on tightly enclosed spaces cluttered with obstacles, as in Figure \ref{fig:boid_flock}. These environments mean boids are always in ``emergency mode'' trying to avoid collisions with obstacles or with their flockmates. What happens when these constraints are relaxed? Other researchers have looked at ``open space flocking'' \citep{hoetzlein_flock2_2024} and \citep{brambati_learning_2025}. A parameter set found by EvoFlock, for crowded environments, has disappointing behavior when applied to open space. Small ``subflocks'' head off in different directions without further interaction. This is especially true for the 3 objective version (separation, speed, obstacle), and to a lesser extent, the 4 objective version (with curvature). Digging deeper into open space flocking, such as ``murmurations,'' seems a worthwhile direction for future work. A recent work-in-progress test for open space murmuration is in \href{https://drive.google.com/file/d/1TDA2PU7cYbU42iBIuXJ0x_W3TaR2s8t9/view?usp=sharing}{Video 3}.
 
-Similarly, multi-agent models with non-uniform agents \citep{montanari_optimal_2025} and non-reciprocal behaviors \citep{choi_flocking_2025}, \citep{weis_generalized_2025} are promising future research topics. Potential applications could include predator-prey models or automobile-bike-pedestrian\textbf{} models.
+Similarly, multi-agent models with non-uniform agents \citep{montanari_optimal_2025} and non-reciprocal behaviors \citep{choi_flocking_2025}, \citep{weis_generalized_2025} are promising future research topics. Potential applications could include predator-prey models or automobile-bike-pedestrian traffic models.
 
 These evolutionary techniques may help tune parameters for modeling various types of \textit{stigmergic} behavior, as when social insects collaborate, via signals in the environment, to build communal structures: ant colonies, termite mounds, bee honeycomb \citep{camazine_self-organization_2003}.
 

@@ -331,28 +331,8 @@ public:
         return mesh;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260310 wip draw box
-    
-    
-//    /// Factory function to create a box mesh (TriangleMeshFactory.cpp)
-//    /// The left bottom corner on the front will be placed at (0, 0, 0).
-//    /// \param width is x-directional length.
-//    /// \param height is y-directional length.
-//    /// \param depth is z-directional length.
-//    /// \param create_uv_map add default UV map to the shape.
-//    /// \param map_texture_to_each_face if true, maps the entire texture image
-//    /// to each face. If false, sets the default uv map to the mesh.
-//    static std::shared_ptr<TriangleMesh> CreateBox(
-//                                                   double width = 1.0,
-//                                                   double height = 1.0,
-//                                                   double depth = 1.0,
-//                                                   bool create_uv_map = false,
-//                                                   bool map_texture_to_each_face = false);
-
-    
-    // Make sphere: returns shared pointer to tri mesh with given parameters.
-//    static sp_tri_mesh_t constructSphereTriMesh(double radius,
+    // Make Box: returns shared pointer to tri mesh with given parameters. This
+    // version is axis aligned, need transformed version for general BoxObstacle.
     static sp_tri_mesh_t constructBoxTriMesh(double width,
                                              double height,
                                              double depth,
@@ -362,10 +342,7 @@ public:
                                              bool evert,
                                              int subdivision)
     {
-//        auto mesh = tri_mesh_t::CreateSphere(radius, subdivision);
         auto mesh = tri_mesh_t::CreateBox(width, height, depth);
-
-//        mesh->Translate(vec3ToEv3d(center));
         Vec3 offset(width / 2, height / 2, depth / 2);
         mesh->Translate(vec3ToEv3d(center - offset));
 
@@ -374,9 +351,6 @@ public:
         if (evert) { evertTriangleMesh(*mesh); }
         return mesh;
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     
     // Runtime switch to turn graphical display on and off.
     bool enable() const { return enable_ and not exitFromRun(); }
@@ -1009,11 +983,12 @@ public:
 
     //--------------------------------------------------------------------------
 
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-    // TODO 20260328 try fixing that "disappears when paused" annotation bug
-    
-    // TODO maybe this should be global rather than inside Boid?
+        
+    // API for drawing miscellaneous annotation lines in an animated frame.
+    //     Call addMiscAnnotation() from arbitrary user code.
+    //     Call clearMiscAnnotation() at beginning of frame.
+    //     Call addMiscAnnotationsToAnimatedFrame() at end.
+    //
     class MiscAnnotation
     {
     public:
@@ -1030,30 +1005,23 @@ public:
         Color color_;
         double radius_;
     };
-    
     std::vector<MiscAnnotation> misc_annotations_;
-    
     void clearMiscAnnotation()
     {
         misc_annotations_.clear();
     }
-    
     void addMiscAnnotation(Vec3 ep1, Vec3 ep2, Color color, double radius)
     {
         misc_annotations_.push_back({ep1, ep2, color, radius});
     }
-    
     void addMiscAnnotation(Vec3 ep1, Vec3 ep2, Color color)
     {
         misc_annotations_.push_back({ep1, ep2, color, 0.02});
     }
-    
     void addMiscAnnotationsToAnimatedFrame()
     {
         for (auto ma : misc_annotations_) { ma.addToAnimatedFrame(); }
     }
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
 #endif  // USE_OPEN3D
 };

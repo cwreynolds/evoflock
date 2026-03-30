@@ -193,13 +193,6 @@ public:
     {
         BoidPtrList neighbors = nearest_neighbors();
         flush_cache_of_predicted_obstacle_collisions();
-//
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-//            // TODO 20260328 try fixing that "disappears when paused" annotation bug
-//    //        clearMiscAnnotation();
-//            draw().clearMiscAnnotation();
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-//
         Vec3 f = steerForSpeedControl()            * fp().weightForward();
         Vec3 s = steer_to_separate(neighbors)      * fp().weightSeparate();
         Vec3 a = steer_to_align(neighbors)         * fp().weightAlign();
@@ -207,209 +200,6 @@ public:
         Vec3 ap = steer_for_predictive_avoidance() * fp().weightAvoidPredict();
         Vec3 as = fly_away_from_obstacles()        * fp().weightAvoidStatic();
         Vec3 combined_steering = smoothed_steering(f + s + a + c + ap + as);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260214 return_to_center VERY TEMPORARY IMPLEMENTATION !!!!
-        //               global flag for this?
-        //               do it only if there are no obstacles?
-        
-        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
-        // TODO 20260215 make radius smaller for viewing convenience
-        
-//    //        double outsideness = position().length() - fp().sphereRadius();
-//            double outsideness = position().length() - fp().sphereRadius() * 0.5;
-//            double weight = 1;
-//            Vec3 return_to_center = position().normalize() * (-outsideness * weight);
-//            combined_steering += return_to_center;
-      
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260216 add EF::no_obstacles_mode
-
-//            {
-//                double outsideness = position().length() - fp().sphereRadius() * 0.5;
-//                if (outsideness > 0)
-//                {
-//                    double weight = 1;
-//    //                double weight = 0.5;
-//                    Vec3 return_to_center = (position().normalize() *
-//                                             (-outsideness * weight));
-//                    combined_steering += return_to_center;
-//                }
-//            }
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260221 return_to_center only for boids pointing away
-        
-//            if (EF::no_obstacles_mode)
-//            {
-//    //            double outsideness = position().length() - fp().sphereRadius() * 0.5;
-//    //            double outsideness = position().length() - fp().sphereRadius() * 0.6;
-//    //            double outsideness = position().length() - fp().sphereRadius() * 0.4;
-//                double outsideness = position().length() - fp().sphereRadius() * 0.3;
-//                if (outsideness > 0)
-//                {
-//                    double weight = 1;
-//                    Vec3 return_to_center = (position().normalize() *
-//                                             (-outsideness * weight));
-//                    combined_steering += return_to_center;
-//                }
-//            }
-      
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260222 increase return_to_center outside distance
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260223 bring back cluster counting
-
-//            if (EF::no_obstacles_mode)
-//            {
-//                double dist = position().length();
-//    //            double outsideness = dist - fp().sphereRadius() * 0.3;
-//    //            double outsideness = dist - fp().sphereRadius() * 0.6;
-//    //            double outsideness = dist - fp().sphereRadius() * 0.5;
-//                double outsideness = dist - fp().sphereRadius() * 0.7;
-//                if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
-//                {
-//    //                double weight = 0.5;
-//    //                double weight = 0.65;
-//                    double weight = 0.75;
-//    //                Vec3 return_to_center = (position().normalize() *
-//    //                                         (-outsideness * weight));
-//                    Vec3 return_to_center = (-position().normalize() *
-//                                             (outsideness * weight));
-//                    combined_steering += return_to_center;
-//                }
-//            }
-
-//            if (EF::no_obstacles_mode)
-//            {
-//                double dist = position().length();
-//    //            double outsideness = dist - fp().sphereRadius() * 0.7;
-//                double outsideness = dist - fp().sphereRadius() * 0.5;
-//                if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
-//                {
-//    //                double weight = 0.75;
-//                    double weight = 1.0;
-//                    Vec3 return_to_center = (-position().normalize() *
-//                                             (outsideness * weight));
-//                    combined_steering += return_to_center;
-//                }
-//            }
-
-//            if (EF::no_obstacles_mode)
-//            {
-//                double dist = position().length();
-//    //            double outsideness = dist - fp().sphereRadius() * 0.7;
-//    //            double outsideness = dist - fp().sphereRadius() * 0.5;
-//                double outsideness = dist - fp().sphereRadius() * 0.7;
-//                if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
-//                {
-//    //                double weight = 0.75;
-//    //                double weight = 1.0;
-//                    double weight = 0.8;
-//                    Vec3 return_to_center = (-position().normalize() *
-//                                             (outsideness * weight));
-//                    combined_steering += return_to_center;
-//                }
-//            }
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260224 compress to smaller overall radius
-        
-//            if (EF::no_obstacles_mode)
-//            {
-//                double dist = position().length();
-//    //            double outsideness = dist - fp().sphereRadius() * 0.7;
-//                double outsideness = dist - fp().sphereRadius() * 0.6;
-//                if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
-//                {
-//    //                double weight = 0.8;
-//    //                double weight = 1.0;
-//    //                double weight = 1.5;
-//    //                double weight = 1.2;
-//                    double weight = 1.35;
-//                    Vec3 return_to_center = (-position().normalize() *
-//                                             (outsideness * weight));
-//                    combined_steering += return_to_center;
-//                }
-//            }
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260225 back off on return_to_center compression
-
-//            if (EF::no_obstacles_mode)
-//            {
-//                double dist = position().length();
-//    //            double outsideness = dist - fp().sphereRadius() * 0.6;
-//    //            double outsideness = dist - fp().sphereRadius() * 0.3;
-//                double outsideness = dist - fp().sphereRadius() * 0.2;
-//                if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
-//                {
-//    //                double weight = 1.35;
-//    //                double weight = 2;
-//                    double weight = 3;
-//                    Vec3 return_to_center = (-position().normalize() *
-//                                             (outsideness * weight));
-//                    combined_steering += return_to_center;
-//                }
-//            }
-      
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260227 switch from return_to_center to obstacle avoidance
-        
-//            if (EF::no_obstacles_mode)
-//            {
-//                double dist = position().length();
-//    //            double outsideness = dist - fp().sphereRadius() * 0.6;
-//    //            double outsideness = dist - fp().sphereRadius() * 0.3;
-//    //            double outsideness = dist - fp().sphereRadius() * 0.2;
-//    //            double outsideness = dist - fp().sphereRadius() * 0.3;
-//    //            double outsideness = dist - fp().sphereRadius() * 0.1;
-//                double outsideness = dist - fp().sphereRadius() * 0.25;
-//                if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
-//                {
-//    //                double weight = 1.35;
-//    //                double weight = 2;
-//    //                double weight = 3;
-//    //                double weight = 1.5;
-//    //                double weight = 2.5;
-//                    double weight = 3.5;
-//                    Vec3 return_to_center = (-position().normalize() *
-//                                             (outsideness * weight));
-//                    combined_steering += return_to_center;
-//                }
-//            }
-      
-//        if (EF::no_obstacles_mode)
-//        {
-//            double dist = position().length();
-//            double outsideness = dist - fp().sphereRadius() * 0.25;
-//            if ((outsideness > 0) and (Vec3::dot(position(), forward()) > 0))
-//            {
-//                double weight = 3.5;
-//                Vec3 return_to_center = (-position().normalize() *
-//                                         (outsideness * weight));
-//                combined_steering += return_to_center;
-//            }
-//        }
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
-        // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         saveAnnotation(s, a, c, ap, as, combined_steering);
         return combined_steering;
     }
@@ -719,95 +509,14 @@ public:
             Color c = util::interpolate(w, Color(0.5), Color(0.5, 0.9, 0.9));
             draw().addThickLineToAnimatedFrame(position(), poi, c, 0.01);
         }
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260328 try fixing that "disappears when paused" annotation bug
-//        for (auto ma : misc_annotations_) { ma.addToAnimatedFrame(); }
+
+        // Draw any "miscellaneous annotations" stored for this animated frame.
         draw().addMiscAnnotationsToAnimatedFrame();
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
     }
-    
-//    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-//    // TODO 20260328 try fixing that "disappears when paused" annotation bug
-//    
-//    // TODO maybe this should be global rather than inside Boid?
-//    class MiscAnnotation
-//    {
-//    public:
-//        MiscAnnotation(Vec3 ep1, Vec3 ep2, Color color, double radius)
-//          : ep1_(ep1), ep2_(ep2), color_(color), radius_(radius) {}
-//        
-////        MiscAnnotation(Vec3 ep1, Vec3 ep2, Color color)
-////          : ep1_(ep1), ep2_(ep2_), color_(color), radius_(0.02)
-//        MiscAnnotation(Vec3 ep1, Vec3 ep2, Color color)
-//          : MiscAnnotation(ep1, ep2, color, 0.02) {}
-//
-//        void addToAnimatedFrame()
-//        {
-//            auto& draw = Draw::getInstance();
-//            draw.addThickLineToAnimatedFrame(ep1_, ep2_, color_, radius_);
-//        }
-//    private:
-//        Vec3 ep1_;
-//        Vec3 ep2_;
-//        Color color_;
-//        double radius_;
-//    };
-//    
-//    std::vector<MiscAnnotation> misc_annotations_;
-//    
-//    void clearMiscAnnotation()
-//    {
-//        misc_annotations_.clear();
-//    }
-//    
-//    void addMiscAnnotation(Vec3 ep1, Vec3 ep2, Color color, double radius)
-//    {
-//        misc_annotations_.push_back({ep1, ep2, color, radius});
-//    }
-//    
-//    void addMiscAnnotation(Vec3 ep1, Vec3 ep2, Color color)
-//    {
-//        misc_annotations_.push_back({ep1, ep2, color, 0.02});
-//    }
-//    
-//    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
-    
-//    // Called from Flock to draw annotation for selected Boid and its neighbors.
-//    void drawAnnotationForBoidAndNeighbors()
-//    {
-//        drawAnnotation();
-//        for (Boid* b : cached_nearest_neighbors()) { b->drawAnnotation(); }
-//    }
-    
-//        // Called from Flock to draw annotation for selected Boid and its neighbors.
-//        void drawAnnotationForBoidAndNeighbors()
-//        {
-//            drawAnnotation();
-//            for (Boid* b : cached_nearest_neighbors())
-//            {
-//                Color c(angle_weight(b, 0));
-//                draw().addThickLineToAnimatedFrame(position(), b->position(), c, 0.01);
-//            }
-//        }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20251015 do not annotate neighbors in GP mode.
-    
-//    // Called from Flock to draw annotation for selected Boid and its neighbors.
-//    void drawAnnotationForBoidAndNeighbors()
-//    {
-//        drawAnnotation();
-//        for (Boid* b : cached_nearest_neighbors())
-//        {
-//            Color c(xxx_temp_separation_score > 0.5 ? 1 : 0);
-//            draw().addThickLineToAnimatedFrame(position(), b->position(), c, 0.01);
-//        }
-//    }
-    
-    
+
     // Called from Flock to draw annotation for selected Boid and its neighbors.
     void drawAnnotationForBoidAndNeighbors()
     {
@@ -817,19 +526,7 @@ public:
             for (Boid* b : cached_nearest_neighbors())
             {
                 Color c(xxx_temp_separation_score > 0.5 ? 1 : 0);
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-                // TODO 20260328 try fixing that "disappears when paused" annotation bug
-                
-//                draw().addThickLineToAnimatedFrame(position(),
-//                                                   b->position(),
-//                                                   c, 0.01);
-
-//                addMiscAnnotation(position(), b->position(), c, 0.01);
-
                 draw().addMiscAnnotation(position(), b->position(), c, 0.01);
-
-                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
             }
         }
     }
@@ -899,19 +596,8 @@ public:
         // TODO 20260323 why passing through walls of BoxObstacle?
         if (isSelected())
         {
-            Collision c = predicted_obstacle_collisions_[0];
-//            draw().addThickLineToAnimatedFrame(position(),
-//                                               c.point_of_impact,
-//                                               Color(1, 0.5, 0),
-//                                               0.1);
-//            addMiscAnnotation(position(),
-//                              c.point_of_impact,
-//                              Color(1, 0.5, 0),
-//                              0.1);
-            draw().addMiscAnnotation(position(),
-                                     c.point_of_impact,
-                                     Color(1, 0.5, 0),
-                                     0.1);
+            Vec3 poi = predicted_obstacle_collisions_[0].point_of_impact;
+            draw().addMiscAnnotation(position(), poi, Color::orange(), 0.1);
         }
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }

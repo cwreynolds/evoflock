@@ -668,6 +668,7 @@ public:
     static Color cyan()    { return {0, 1, 1};}
     static Color blue()    { return {0, 0, 1};}
     static Color magenta() { return {1, 0, 1};}
+    static Color orange()  { return {1, 0.5, 0};}
     static Color randomInRgbBox(Color a, Color b)
     { return EF::RS().randomPointInAxisAlignedBox(a, b); }
 };

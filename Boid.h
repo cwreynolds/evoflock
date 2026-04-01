@@ -510,8 +510,12 @@ public:
             draw().addThickLineToAnimatedFrame(position(), poi, c, 0.01);
         }
 
-        // Draw any "miscellaneous annotations" stored for this animated frame.
-        draw().addMiscAnnotationsToAnimatedFrame();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260331 move begin/end frame for MiscAnnotation to Draw
+
+//        // Draw any "miscellaneous annotations" stored for this animated frame.
+//        draw().addMiscAnnotationsToAnimatedFrame();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

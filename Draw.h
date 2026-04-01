@@ -129,24 +129,55 @@ public:
     // Called to end an animated scene.
     void endAnimatedScene() { if (enable()) { } }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260331 move begin/end frame for MiscAnnotation to Draw
+
+//    // Called to begin each animation frame.
+//    void beginOneAnimatedFrame()
+//    {
+//        poll_events_count_ = 0;
+//        if (enable() and not getWormMode()) { clearAnimatedGeometryFromScene(); }
+//    }
+
     // Called to begin each animation frame.
     void beginOneAnimatedFrame()
     {
         poll_events_count_ = 0;
-        if (enable() and not getWormMode()) { clearAnimatedGeometryFromScene(); }
+        if (enable() and not getWormMode())
+        {
+            clearAnimatedGeometryFromScene();
+//            clearMiscAnnotation();
+        }
     }
 
+//    // Called to end each animation frame.
+//    void endOneAnimatedFrame()
+//    {
+//        if (enable())
+//        {
+//            updateCamera();
+//            redrawScene();
+//            result_from_last_poll_events_call_ = pollEvents();
+//            if (poll_events_count_ > 1) { debugPrint(poll_events_count_); }
+//        }
+//    }
+    
     // Called to end each animation frame.
     void endOneAnimatedFrame()
     {
         if (enable())
         {
+            
+            addMiscAnnotationsToAnimatedFrame();
+            
             updateCamera();
             redrawScene();
             result_from_last_poll_events_call_ = pollEvents();
             if (poll_events_count_ > 1) { debugPrint(poll_events_count_); }
         }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Clear all animated geometry to begin building a new scene.
     void clearAnimatedGeometryFromScene()

@@ -129,16 +129,6 @@ public:
     // Called to end an animated scene.
     void endAnimatedScene() { if (enable()) { } }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260331 move begin/end frame for MiscAnnotation to Draw
-
-//    // Called to begin each animation frame.
-//    void beginOneAnimatedFrame()
-//    {
-//        poll_events_count_ = 0;
-//        if (enable() and not getWormMode()) { clearAnimatedGeometryFromScene(); }
-//    }
-
     // Called to begin each animation frame.
     void beginOneAnimatedFrame()
     {
@@ -146,38 +136,20 @@ public:
         if (enable() and not getWormMode())
         {
             clearAnimatedGeometryFromScene();
-//            clearMiscAnnotation();
         }
     }
-
-//    // Called to end each animation frame.
-//    void endOneAnimatedFrame()
-//    {
-//        if (enable())
-//        {
-//            updateCamera();
-//            redrawScene();
-//            result_from_last_poll_events_call_ = pollEvents();
-//            if (poll_events_count_ > 1) { debugPrint(poll_events_count_); }
-//        }
-//    }
     
     // Called to end each animation frame.
     void endOneAnimatedFrame()
     {
         if (enable())
         {
-            
-            addMiscAnnotationsToAnimatedFrame();
-            
             updateCamera();
             redrawScene();
             result_from_last_poll_events_call_ = pollEvents();
             if (poll_events_count_ > 1) { debugPrint(poll_events_count_); }
         }
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Clear all animated geometry to begin building a new scene.
     void clearAnimatedGeometryFromScene()
@@ -1025,11 +997,28 @@ public:
     public:
         MiscAnnotation(Vec3 ep1, Vec3 ep2, Color color, double radius)
           : ep1_(ep1), ep2_(ep2), color_(color), radius_(radius) {}
+        static void clear() { annotations().clear(); }
         void addToAnimatedFrame()
         {
-            auto& draw = Draw::getInstance();
-            draw.addThickLineToAnimatedFrame(ep1_, ep2_, color_, radius_);
+            dgi().addThickLineToAnimatedFrame(ep1_, ep2_, color_, radius_);
         }
+        static void addMiscAnnotationsToAnimatedFrame()
+        {
+            for (auto ma : annotations()) { ma.addToAnimatedFrame(); }
+        }
+        static void add(Vec3 ep1, Vec3 ep2, Color color, double radius)
+        {
+            annotations().push_back({ep1, ep2, color, radius});
+        }
+        static void add(Vec3 ep1, Vec3 ep2, Color color)
+        {
+            annotations().push_back({ep1, ep2, color, 0.02});
+        }
+        static std::vector<MiscAnnotation>& annotations()
+        {
+            return dgi().misc_annotations_;
+        }
+        static Draw& dgi() { return Draw::getInstance(); }
     private:
         Vec3 ep1_;
         Vec3 ep2_;
@@ -1037,22 +1026,6 @@ public:
         double radius_;
     };
     std::vector<MiscAnnotation> misc_annotations_;
-    void clearMiscAnnotation()
-    {
-        misc_annotations_.clear();
-    }
-    void addMiscAnnotation(Vec3 ep1, Vec3 ep2, Color color, double radius)
-    {
-        misc_annotations_.push_back({ep1, ep2, color, radius});
-    }
-    void addMiscAnnotation(Vec3 ep1, Vec3 ep2, Color color)
-    {
-        misc_annotations_.push_back({ep1, ep2, color, 0.02});
-    }
-    void addMiscAnnotationsToAnimatedFrame()
-    {
-        for (auto ma : misc_annotations_) { ma.addToAnimatedFrame(); }
-    }
 
 #endif  // USE_OPEN3D
 };

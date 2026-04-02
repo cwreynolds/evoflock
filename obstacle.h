@@ -756,24 +756,12 @@ public:
             }
         }
         
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         // TODO 20260328 try fixing that "disappears when paused" annotation bug
-        
-//        Draw::getInstance().addThickLineToAnimatedFrame(np,
-//                                                        np + normal * 10,
-//                                                        Color(0, 1, 0),
-//                                                        0.1);
+                
+        Draw::MiscAnnotation::add(np, np + normal * 10, Color::green());
 
-//        Draw::getInstance().addMiscAnnotation(np,
-//                                              np + normal * 10,
-//                                              Color(0, 1, 0),
-//                                              0.1);
-        
-        Draw::getInstance().addMiscAnnotation(np,
-                                              np + normal * 10,
-                                              Color::green());
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         return normal;
     }

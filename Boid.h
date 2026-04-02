@@ -509,13 +509,6 @@ public:
             Color c = util::interpolate(w, Color(0.5), Color(0.5, 0.9, 0.9));
             draw().addThickLineToAnimatedFrame(position(), poi, c, 0.01);
         }
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260331 move begin/end frame for MiscAnnotation to Draw
-
-//        // Draw any "miscellaneous annotations" stored for this animated frame.
-//        draw().addMiscAnnotationsToAnimatedFrame();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -530,7 +523,7 @@ public:
             for (Boid* b : cached_nearest_neighbors())
             {
                 Color c(xxx_temp_separation_score > 0.5 ? 1 : 0);
-                draw().addMiscAnnotation(position(), b->position(), c, 0.01);
+                Draw::MiscAnnotation::add(position(), b->position(), c, 0.01);
             }
         }
     }
@@ -596,14 +589,14 @@ public:
         auto sorted = [&](const Collision& a, const Collision& b)
                       { return a.time_to_collision < b.time_to_collision; };
         std::ranges::sort(predicted_obstacle_collisions_, sorted);
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
         // TODO 20260323 why passing through walls of BoxObstacle?
         if (isSelected())
         {
             Vec3 poi = predicted_obstacle_collisions_[0].point_of_impact;
-            draw().addMiscAnnotation(position(), poi, Color::orange(), 0.1);
+            Draw::MiscAnnotation::add(position(), poi, Color::orange(), 0.1);
         }
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     }
 
     // get/set/inc api for this Boid's counter of collisions with obstacles.

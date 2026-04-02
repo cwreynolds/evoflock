@@ -131,11 +131,10 @@ public:
             double fd = clock().frameDuration();
             double fdt = clock().frameDurationTarget();
             double step_duration = afap ? fd : fdt;
-
-            draw().beginOneAnimatedFrame();
             bool run_sim_this_frame = draw().runSimulationThisFrame();
             if (run_sim_this_frame)
             {
+                Draw::MiscAnnotation::clear();
                 // TODO 20250509 this used to be "step_duration" which caused
                 // the fly-slow-when-draw-is-turned-off bug. Have not tested
                 // but it seems "if (not fixed_time_step() and draw().enable())"
@@ -143,13 +142,12 @@ public:
                 // time matched the draw frame time.
                 fly_boids(fdt);
                 update_fps();
-
-//                debugPrint(selectedBoid()->speed());
-
             }
             // Draw all Boid bodies, whether sim was paused or not.
+            draw().beginOneAnimatedFrame();
             for_all_boids([&](Boid* b){ b->draw_body();});
             selectedBoid()->drawAnnotationForBoidAndNeighbors();
+            Draw::MiscAnnotation::addMiscAnnotationsToAnimatedFrame();
             draw().aimAgent() = *selectedBoid();
             draw().endOneAnimatedFrame();
             clock().sleepUntilEndOfFrame(afap ? 0 : step_duration);
@@ -333,13 +331,6 @@ public:
     // phase which actually moves the boids. Finally statistics are collected.
     void fly_boids(double time_step)
     {
-//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-//        // TODO 20260328 try fixing that "disappears when paused" annotation bug
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260331 move begin/end frame for MiscAnnotation to Draw
-        draw().clearMiscAnnotation();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();

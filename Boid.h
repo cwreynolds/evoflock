@@ -615,6 +615,11 @@ public:
     // from the obstacle surface.
     void enforceObstacleConstraint()
     {
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260403 more on EF::current_boid_is_selected for BoxObstacle
+        EF::current_boid_is_selected = isSelected();
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         for (auto& o : flock_obstacles())
         {
             Vec3 prev_position = getPreviousPosition();
@@ -631,8 +636,9 @@ public:
                 debugPrint(ec)
                 
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                // TODO 20260402 add EF::current_boid_is_selected for BoxObstacle debugging.
-                debugPrint(EF::current_boid_is_selected);
+                // TODO 20260403 more on EF::current_boid_is_selected for BoxObstacle
+                debugPrint(o->signed_distance(position()));
+                debugPrint(o->to_string());
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             }

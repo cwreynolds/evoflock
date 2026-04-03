@@ -758,8 +758,18 @@ public:
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         // TODO 20260328 try fixing that "disappears when paused" annotation bug
-                
-        Draw::MiscAnnotation::add(np, np + normal * 10, Color::green());
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260402 add EF::current_boid_is_selected for BoxObstacle debugging.
+        
+//        Draw::MiscAnnotation::add(np, np + normal * 10, Color::green());
+
+        if (EF::current_boid_is_selected)
+        {
+            Draw::MiscAnnotation::add(np, np + normal * 10, Color::green());
+        }
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

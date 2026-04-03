@@ -116,6 +116,11 @@ inline static int override_boids_per_flock = -1;
 inline static bool no_obstacles_mode = true;
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20260402 add EF::current_boid_is_selected for BoxObstacle debugging.
+inline static bool current_boid_is_selected = true;
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 // Simple replay previous results in visualizePreviouslyLoggedFlockParameters.
 //inline static bool visualize_previous_results_mode = false;
 inline static bool visualize_previous_results_mode = true;

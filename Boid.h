@@ -630,7 +630,10 @@ public:
             if (isSelected())
             {
                 bool v = o->isAgentViolatingConstraint(position(), prev_position);
-                assert(not v);
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                // TODO 20260404 why is BoxObstacle::signed_distance() always zero?
+                
+//                assert(not v);
                 std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
                 debugPrint(v)
                 debugPrint(ec)
@@ -638,9 +641,10 @@ public:
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                 // TODO 20260403 more on EF::current_boid_is_selected for BoxObstacle
                 debugPrint(o->signed_distance(position()));
-                debugPrint(o->to_string());
+//                debugPrint(o->to_string());
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             }
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             if (ec != position())

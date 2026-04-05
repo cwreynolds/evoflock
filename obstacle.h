@@ -79,12 +79,27 @@ public:
         return unimplemented("fly_away()", Vec3());
     }
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260404 why is BoxObstacle::signed_distance() always zero?
+
+//    // Signed distance function.
+//    // (From a query point to the nearest point on Obstacle's surface: negative
+//    // inside, positive outside, zero at surface. Very similar to nearest_point(),
+//    // maybe they can be combined?)
+//    virtual double signed_distance(const Vec3& query_point) const { return 0; }
+    
     // Signed distance function.
     // (From a query point to the nearest point on Obstacle's surface: negative
     // inside, positive outside, zero at surface. Very similar to nearest_point(),
     // maybe they can be combined?)
-    virtual double signed_distance(const Vec3& query_point) const { return 0; }
-    
+    // TODO 20260404 why does this not call unimplemented() like other virtuals?
+    virtual double signed_distance(const Vec3& query_point) const
+    {
+        return unimplemented("signed_distance()", 0);
+    }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     // Override this in derived to add tri-mesh model of Obstacle shape.
     virtual void addToScene() const {}
 
@@ -289,10 +304,42 @@ public:
         setColor({0.7, 0.7, 0.8});
     }
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260404 why is BoxObstacle::signed_distance() always zero?
+    //
+    // wait, what?! That first plane perp to +X axis faces to the right
+    // and is centered on the right. It should be one right, the left.
+    //
+    //    PlaneObstacle constructor normal_ = Vec3(1, 0, 0)
+    //    PlaneObstacle constructor center_ = Vec3(41, 0, 0)
+    //
+    //    PlaneObstacle constructor normal_ = Vec3(-1, -0, -0)
+    //    PlaneObstacle constructor center_ = Vec3(-41, 0, 0)
+    //
+    //    PlaneObstacle constructor normal_ = Vec3(0, 1, 0)
+    //    PlaneObstacle constructor center_ = Vec3(0, 20.5, 0)
+    //
+    //    PlaneObstacle constructor normal_ = Vec3(-0, -1, -0)
+    //    PlaneObstacle constructor center_ = Vec3(0, -20.5, 0)
+    //
+    //    PlaneObstacle constructor normal_ = Vec3(0, 0, 1)
+    //    PlaneObstacle constructor center_ = Vec3(0, 0, 41)
+    //
+    //    PlaneObstacle constructor normal_ = Vec3(-0, -0, -1)
+    //    PlaneObstacle constructor center_ = Vec3(0, 0, -41)
+
+
 //    PlaneObstacle(const Vec3& normal, const Vec3& center)
-//      : Obstacle(), normal_(normal), center_(center) {}
+//      : Obstacle(), normal_(normal.normalize()), center_(center) {}
     PlaneObstacle(const Vec3& normal, const Vec3& center)
-      : Obstacle(), normal_(normal.normalize()), center_(center) {}
+      : Obstacle(), normal_(normal.normalize()), center_(center)
+    {
+        std::cout << "PlaneObstacle constructor "; debugPrint(normal_);
+        std::cout << "PlaneObstacle constructor "; debugPrint(center_);
+        std::cout << std::endl;
+    }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     PlaneObstacle(const Vec3& normal, const Vec3& center, ExcludeFrom ef)
       : PlaneObstacle(normal.normalize(), center)
@@ -305,7 +352,6 @@ public:
                   const Vec3& center,
                   double visible_radius,
                   double visible_thickness)
-//      : PlaneObstacle(normal, center)
       : PlaneObstacle(normal.normalize(), center)
     {
         setColor({0.7, 0.7, 0.8});
@@ -584,12 +630,31 @@ public:
 //        zp( z_edge, center + (z_edge / 2), neither),
 //        zm(-z_edge, center - (z_edge / 2), neither)
 
-        xp(-x_edge, center + (x_edge / 2), neither),
-        xm( x_edge, center - (x_edge / 2), neither),
-        yp(-y_edge, center + (y_edge / 2), neither),
-        ym( y_edge, center - (y_edge / 2), neither),
-        zp(-z_edge, center + (z_edge / 2), neither),
-        zm( z_edge, center - (z_edge / 2), neither)
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260404 why is BoxObstacle::signed_distance() always zero?
+
+//        xp(-x_edge, center + (x_edge / 2), neither),
+//        xm( x_edge, center - (x_edge / 2), neither),
+//        yp(-y_edge, center + (y_edge / 2), neither),
+//        ym( y_edge, center - (y_edge / 2), neither),
+//        zp(-z_edge, center + (z_edge / 2), neither),
+//        zm( z_edge, center - (z_edge / 2), neither)
+
+//        xp( x_edge, center + (x_edge / 2), neither),
+//        xm(-x_edge, center - (x_edge / 2), neither),
+//        yp( y_edge, center + (y_edge / 2), neither),
+//        ym(-y_edge, center - (y_edge / 2), neither),
+//        zp( z_edge, center + (z_edge / 2), neither),
+//        zm(-z_edge, center - (z_edge / 2), neither)
+
+        xp( x_edge, center + (x_edge / 2), inside),
+        xm(-x_edge, center - (x_edge / 2), inside),
+        yp( y_edge, center + (y_edge / 2), inside),
+        ym(-y_edge, center - (y_edge / 2), inside),
+        zp( z_edge, center + (z_edge / 2), inside),
+        zm(-z_edge, center - (z_edge / 2), inside)
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
@@ -606,51 +671,27 @@ public:
         // Collection of pointers to planes for iterating over them.
         planes_ = {&xp, &xm, &yp, &ym, &zp, &zm};
         
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-        // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//        // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
+//
+//        double min_edge = std::min({x_edge.length(),
+//                                    y_edge.length(),
+//                                    z_edge.length()});
+//        for (auto p : planes_)
+//        {
+//            p->setVisibleRadius(min_edge / 2);
+//            p->setVisibleThickness(min_edge * 0.001);
+//
+//        }
+//        
+//        std::cout << "BoxObstacle constuctor" ;
+//        std::cout << "===========================================" << std::endl;
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
-//        double min_edge = std::min(x_edge.length(),
-//                                   std::min(y_edge.length(), z_edge.length()));
-        double min_edge = std::min({x_edge.length(),
-                                    y_edge.length(),
-                                    z_edge.length()});
-        for (auto p : planes_)
-        {
-            p->setVisibleRadius(min_edge / 2);
-            p->setVisibleThickness(min_edge * 0.001);
-
-        }
         // Base color.
         setColor({0.8, 0.7, 0.7});
         // Set ExcludeFrom in base class.
         setExcludeFrom(ef);
-        
-        std::cout << "BoxObstacle constuctor" ;
-        std::cout << "===========================================" << std::endl;
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-        
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260323 why passing through walls of BoxObstacle?
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260326 quick and dirty aligned box container
-        //               maybe bring this back when generalize past Q&D?
-
-//        for (auto p : planes_)
-//        {
-//            switch (ef)
-//            {
-//                case Obstacle::inside:  p->setExcludeFrom(outside); break;
-//                case Obstacle::outside: p->setExcludeFrom(inside);  break;
-//                default:                p->setExcludeFrom(neither); break;
-//            }
-//        }
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
     }
     
 
@@ -659,29 +700,12 @@ public:
                 double x_size,
                 double y_size,
                 double z_size,
-                ExcludeFrom ef)
+                ExcludeFrom ef) // TODO 20260404 any need for ctor without this?
       : BoxObstacle(center,
                     Vec3(1, 0, 0) * x_size,
                     Vec3(0, 1, 0) * y_size,
                     Vec3(0, 0, 1) * z_size,
                     ef) {}
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20260326 quick and dirty aligned box container
-    //               maybe bring this back when generalize past Q&D?
-
-//    // Axis aligned version: center and size along global axes.
-//    BoxObstacle(const Vec3& center,
-//                double x_size,
-//                double y_size,
-//                double z_size)
-//      : BoxObstacle(center,
-//                    Vec3(1, 0, 0) * x_size,
-//                    Vec3(0, 1, 0) * y_size,
-//                    Vec3(0, 0, 1) * z_size,
-//                    ExcludeFrom::inside) {}
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 rayIntersection(const Vec3& origin,
@@ -732,6 +756,30 @@ public:
 //        return normal;
 //    }
   
+//        // Abstract normal for a given position. Points toward the +SDF side.
+//        Vec3 normal(const Vec3& poi) const override
+//        {
+//            Vec3 np;
+//            Vec3 normal;
+//            double nearest_distance = std::numeric_limits<double>::infinity();
+//            for (auto p : planes_)
+//            {
+//    //            Vec3 np = p->nearest_point(poi);
+//                Vec3 pnp = p->nearest_point(poi);
+//
+//    //            double dist = (np - poi).length();
+//                double dist = (pnp - poi).length();
+//
+//                if (nearest_distance > dist)
+//                {
+//                    nearest_distance = dist;
+//                    normal = p->normal(poi);
+//
+//                    np = p->nearest_point(poi);
+//
+//                }
+//            }
+      
     // Abstract normal for a given position. Points toward the +SDF side.
     Vec3 normal(const Vec3& poi) const override
     {
@@ -740,22 +788,16 @@ public:
         double nearest_distance = std::numeric_limits<double>::infinity();
         for (auto p : planes_)
         {
-//            Vec3 np = p->nearest_point(poi);
             Vec3 pnp = p->nearest_point(poi);
-            
-//            double dist = (np - poi).length();
             double dist = (pnp - poi).length();
-
             if (nearest_distance > dist)
             {
                 nearest_distance = dist;
                 normal = p->normal(poi);
-
                 np = p->nearest_point(poi);
-
             }
         }
-        
+
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
         // TODO 20260328 try fixing that "disappears when paused" annotation bug
 
@@ -816,6 +858,55 @@ public:
         return nearest_fa;
 
     }
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260404 why is BoxObstacle::signed_distance() always zero?
+    //
+    // First draft, assumes "inside box" as used in murmuration tests.
+    
+    
+    // TODO TEMP here only for reference
+//    // Abstract normal for a given position. Points toward the +SDF side.
+//    Vec3 normal(const Vec3& poi) const override
+//    {
+//        Vec3 np;
+//        Vec3 normal;
+//        double nearest_distance = std::numeric_limits<double>::infinity();
+//        for (auto p : planes_)
+//        {
+//            Vec3 pnp = p->nearest_point(poi);
+//            double dist = (pnp - poi).length();
+//            if (nearest_distance > dist)
+//            {
+//                nearest_distance = dist;
+//                normal = p->normal(poi);
+//
+//                np = p->nearest_point(poi);
+//
+//            }
+//        }
+
+    
+    // Signed distance function. (From a query point to the nearest point on
+    // Obstacle's surface: negative inside, positive outside, zero at surface.)
+    double signed_distance(const Vec3& query_point) const override
+    {
+        PlaneObstacle* nearest_plane = nullptr;
+        double nearest_distance = std::numeric_limits<double>::infinity();
+        for (auto p : planes_)
+        {
+            Vec3 pnp = p->nearest_point(query_point);
+            double dist = (pnp - query_point).length();
+            if (nearest_distance > dist)
+            {
+                nearest_distance = dist;
+                nearest_plane = p;
+            }
+        }
+        assert(nearest_plane);
+        return nearest_plane->signed_distance(query_point);
+    }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     void addToScene() const override
     {
@@ -830,11 +921,11 @@ public:
         Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
         
-        // TODO DEBUG TEMP. Why so thick along cylinder axis? Why black?
-        for (auto p : planes_)
-        {
-            p->addToScene();
-        }
+//        // TODO DEBUG TEMP. Why so thick along cylinder axis? Why black?
+//        for (auto p : planes_)
+//        {
+//            p->addToScene();
+//        }
     }
 
     std::string to_string() const override { return "BoxObstacle"; }

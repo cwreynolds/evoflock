@@ -61,6 +61,17 @@ public:
         {
             sign = signum(signed_distance(prev_position));
         }
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260405 BoxObstacle normal() points in wrong direction, or does it?
+        
+//        if (EF::current_boid_is_selected)
+//        {
+//            Vec3 n = normal(now_position) * sign;
+//            Vec3 np = nearest_point(now_position);
+//            Draw::MiscAnnotation::add(np, np + n * 10, Color::green(), 0.1);
+//        }
+                
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         return normal(now_position) * sign;
     }
 
@@ -647,12 +658,32 @@ public:
 //        zp( z_edge, center + (z_edge / 2), neither),
 //        zm(-z_edge, center - (z_edge / 2), neither)
 
-        xp( x_edge, center + (x_edge / 2), inside),
-        xm(-x_edge, center - (x_edge / 2), inside),
-        yp( y_edge, center + (y_edge / 2), inside),
-        ym(-y_edge, center - (y_edge / 2), inside),
-        zp( z_edge, center + (z_edge / 2), inside),
-        zm(-z_edge, center - (z_edge / 2), inside)
+    
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260405 BoxObstacle normal() points in wrong direction, or does it?
+
+//        xp( x_edge, center + (x_edge / 2), inside),
+//        xm(-x_edge, center - (x_edge / 2), inside),
+//        yp( y_edge, center + (y_edge / 2), inside),
+//        ym(-y_edge, center - (y_edge / 2), inside),
+//        zp( z_edge, center + (z_edge / 2), inside),
+//        zm(-z_edge, center - (z_edge / 2), inside)
+
+//        xp(-x_edge, center + (x_edge / 2)),
+//        xm( x_edge, center - (x_edge / 2)),
+//        yp(-y_edge, center + (y_edge / 2)),
+//        ym( y_edge, center - (y_edge / 2)),
+//        zp(-z_edge, center + (z_edge / 2)),
+//        zm( z_edge, center - (z_edge / 2))
+
+        xp( x_edge, center + (x_edge / 2)),
+        xm(-x_edge, center - (x_edge / 2)),
+        yp( y_edge, center + (y_edge / 2)),
+        ym(-y_edge, center - (y_edge / 2)),
+        zp( z_edge, center + (z_edge / 2)),
+        zm(-z_edge, center - (z_edge / 2))
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -692,6 +723,10 @@ public:
         setColor({0.8, 0.7, 0.7});
         // Set ExcludeFrom in base class.
         setExcludeFrom(ef);
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260405 BoxObstacle normal() points in wrong direction
+        for (auto p : planes_) { p->setExcludeFrom(ef); }
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     }
     
 
@@ -798,22 +833,22 @@ public:
             }
         }
 
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20260328 try fixing that "disappears when paused" annotation bug
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260402 add EF::current_boid_is_selected for BoxObstacle debugging.
-        
-//        Draw::MiscAnnotation::add(np, np + normal * 10, Color::green());
-
-        if (EF::current_boid_is_selected)
-        {
-            Draw::MiscAnnotation::add(np, np + normal * 10, Color::green());
-        }
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            // TODO 20260328 try fixing that "disappears when paused" annotation bug
+//
+//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//            // TODO 20260402 add EF::current_boid_is_selected for BoxObstacle debugging.
+//
+//    //        Draw::MiscAnnotation::add(np, np + normal * 10, Color::green());
+//
+//            if (EF::current_boid_is_selected)
+//            {
+//                Draw::MiscAnnotation::add(np, np + normal * 10, Color::green());
+//            }
+//
+//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         return normal;
     }

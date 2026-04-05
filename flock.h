@@ -562,7 +562,7 @@ public:
     {
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20260311 work aroud curvature NaN
-        debugPrint(sum_curvature_)
+//        debugPrint(sum_curvature_)
         double temp_sc = std::isnan(sum_curvature_) ? 0 : sum_curvature_;
         
         double average_curvature = temp_sc / boidStepPerSim();
@@ -894,7 +894,15 @@ public:
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20260316 BoxObstacle ExcludeFrom
 //                Obstacle* bo = new BoxObstacle({}, s * 2, s, s * 2);
+                
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+                // TODO 20260405 BoxObstacle normal() points in wrong direction, or does it?
+
                 Obstacle* bo = new BoxObstacle({}, s * 2, s, s * 2, oside);
+//                Obstacle* bo = new BoxObstacle({}, s * 2, s, s * 2, iside);
+
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 obstacle_sets_.push_back(ObstacleSet("BoxObstacle", {bo}));
             }

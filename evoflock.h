@@ -121,9 +121,9 @@ inline static bool no_obstacles_mode = true;
 inline static bool current_boid_is_selected = true;
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-// Simple replay previous results in visualizePreviouslyLoggedFlockParameters.
-//inline static bool visualize_previous_results_mode = false;
-inline static bool visualize_previous_results_mode = true;
+// No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
+inline static bool visualize_previous_results_mode = false;
+//inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;

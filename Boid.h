@@ -625,28 +625,50 @@ public:
             Vec3 prev_position = getPreviousPosition();
             if (prev_position.is_none()) { prev_position = position(); }
             Vec3 ec = o->enforceConstraint(position(), prev_position);
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20260405 BoxObstacle normal() points in wrong direction, or does it?
+            
+            
+
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             // TODO 20260323 why passing through walls of BoxObstacle?
             if (isSelected())
             {
-                bool v = o->isAgentViolatingConstraint(position(), prev_position);
+                
+//                Vec3 n = o->normalTowardAllowedSide(position(), prev_position);
+//                Vec3 i = o->rayIntersection(position(), forward(), 1);
+//                Draw::MiscAnnotation(i, n, Color::green(), 0.1);
+
+                Vec3 normal = o->normalTowardAgent(position(), position());
+                Vec3 poi = o->rayIntersection(position(), forward(), 1);
+                Draw::MiscAnnotation(poi, normal, Color::green(), 0.1);
+
+                
+                
+//                bool v = o->isAgentViolatingConstraint(position(), prev_position);
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                 // TODO 20260404 why is BoxObstacle::signed_distance() always zero?
                 
 //                assert(not v);
-                std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-                debugPrint(v)
-                debugPrint(ec)
+//                std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+//                debugPrint(v)
+//                debugPrint(ec)
                 
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                 // TODO 20260403 more on EF::current_boid_is_selected for BoxObstacle
-                debugPrint(o->signed_distance(position()));
+//                debugPrint(o->signed_distance(position()));
 //                debugPrint(o->to_string());
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             }
+            
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+            
             if (ec != position())
             {
                 // Count collision, set speed to zero, clear smoothing history.

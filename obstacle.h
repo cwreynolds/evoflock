@@ -61,17 +61,6 @@ public:
         {
             sign = signum(signed_distance(prev_position));
         }
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260405 BoxObstacle normal() points in wrong direction, or does it?
-        
-//        if (EF::current_boid_is_selected)
-//        {
-//            Vec3 n = normal(now_position) * sign;
-//            Vec3 np = nearest_point(now_position);
-//            Draw::MiscAnnotation::add(np, np + n * 10, Color::green(), 0.1);
-//        }
-                
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         return normal(now_position) * sign;
     }
 
@@ -89,27 +78,15 @@ public:
     {
         return unimplemented("fly_away()", Vec3());
     }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260404 why is BoxObstacle::signed_distance() always zero?
-
-//    // Signed distance function.
-//    // (From a query point to the nearest point on Obstacle's surface: negative
-//    // inside, positive outside, zero at surface. Very similar to nearest_point(),
-//    // maybe they can be combined?)
-//    virtual double signed_distance(const Vec3& query_point) const { return 0; }
     
     // Signed distance function.
     // (From a query point to the nearest point on Obstacle's surface: negative
     // inside, positive outside, zero at surface. Very similar to nearest_point(),
     // maybe they can be combined?)
-    // TODO 20260404 why does this not call unimplemented() like other virtuals?
     virtual double signed_distance(const Vec3& query_point) const
     {
         return unimplemented("signed_distance()", 0);
     }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     // Override this in derived to add tri-mesh model of Obstacle shape.
     virtual void addToScene() const {}
@@ -315,33 +292,6 @@ public:
         setColor({0.7, 0.7, 0.8});
     }
 
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260404 why is BoxObstacle::signed_distance() always zero?
-    //
-    // wait, what?! That first plane perp to +X axis faces to the right
-    // and is centered on the right. It should be one right, the left.
-    //
-    //    PlaneObstacle constructor normal_ = Vec3(1, 0, 0)
-    //    PlaneObstacle constructor center_ = Vec3(41, 0, 0)
-    //
-    //    PlaneObstacle constructor normal_ = Vec3(-1, -0, -0)
-    //    PlaneObstacle constructor center_ = Vec3(-41, 0, 0)
-    //
-    //    PlaneObstacle constructor normal_ = Vec3(0, 1, 0)
-    //    PlaneObstacle constructor center_ = Vec3(0, 20.5, 0)
-    //
-    //    PlaneObstacle constructor normal_ = Vec3(-0, -1, -0)
-    //    PlaneObstacle constructor center_ = Vec3(0, -20.5, 0)
-    //
-    //    PlaneObstacle constructor normal_ = Vec3(0, 0, 1)
-    //    PlaneObstacle constructor center_ = Vec3(0, 0, 41)
-    //
-    //    PlaneObstacle constructor normal_ = Vec3(-0, -0, -1)
-    //    PlaneObstacle constructor center_ = Vec3(0, 0, -41)
-
-
-//    PlaneObstacle(const Vec3& normal, const Vec3& center)
-//      : Obstacle(), normal_(normal.normalize()), center_(center) {}
     PlaneObstacle(const Vec3& normal, const Vec3& center)
       : Obstacle(), normal_(normal.normalize()), center_(center)
     {
@@ -349,8 +299,6 @@ public:
         std::cout << "PlaneObstacle constructor "; debugPrint(center_);
         std::cout << std::endl;
     }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     PlaneObstacle(const Vec3& normal, const Vec3& center, ExcludeFrom ef)
       : PlaneObstacle(normal.normalize(), center)
@@ -589,14 +537,9 @@ private:
     double length_;
 };
 
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20260307 wip add BoxObstacle
-// TODO 20260308 wip on BoxObstacle::rayIntersection().
-// TODO 20260309 wip on BoxObstacle::rayIntersection().
-// TODO 20260310 ...
-// TODO 20260316 ...
-
+// WIP implementation. Only works correctly for ExcludeFrom:outside because
+// PlaneObstacles have infinite extent.
+//
 class BoxObstacle : public Obstacle
 {
 public:
@@ -607,89 +550,12 @@ public:
                 const Vec3& z_edge,
                 ExcludeFrom ef)
       : Obstacle(),
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260323 why passing through walls of BoxObstacle?
-
-//        xp(x_edge, center + (x_edge / 2)),
-//        xm(x_edge, center - (x_edge / 2)),
-//        yp(y_edge, center + (y_edge / 2)),
-//        ym(y_edge, center - (y_edge / 2)),
-//        zp(z_edge, center + (z_edge / 2)),
-//        zm(z_edge, center - (z_edge / 2))
-
-//        xp(-x_edge, center + (x_edge / 2)),
-//        xm( x_edge, center - (x_edge / 2)),
-//        yp(-y_edge, center + (y_edge / 2)),
-//        ym( y_edge, center - (y_edge / 2)),
-//        zp(-z_edge, center + (z_edge / 2)),
-//        zm( z_edge, center - (z_edge / 2))
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260326 quick and dirty aligned box container
-    
-//        xp( x_edge, center + (x_edge / 2)),
-//        xm(-x_edge, center - (x_edge / 2)),
-//        yp( y_edge, center + (y_edge / 2)),
-//        ym(-y_edge, center - (y_edge / 2)),
-//        zp( z_edge, center + (z_edge / 2)),
-//        zm(-z_edge, center - (z_edge / 2))
-
-//        xp( x_edge, center + (x_edge / 2), neither),
-//        xm(-x_edge, center - (x_edge / 2), neither),
-//        yp( y_edge, center + (y_edge / 2), neither),
-//        ym(-y_edge, center - (y_edge / 2), neither),
-//        zp( z_edge, center + (z_edge / 2), neither),
-//        zm(-z_edge, center - (z_edge / 2), neither)
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260404 why is BoxObstacle::signed_distance() always zero?
-
-//        xp(-x_edge, center + (x_edge / 2), neither),
-//        xm( x_edge, center - (x_edge / 2), neither),
-//        yp(-y_edge, center + (y_edge / 2), neither),
-//        ym( y_edge, center - (y_edge / 2), neither),
-//        zp(-z_edge, center + (z_edge / 2), neither),
-//        zm( z_edge, center - (z_edge / 2), neither)
-
-//        xp( x_edge, center + (x_edge / 2), neither),
-//        xm(-x_edge, center - (x_edge / 2), neither),
-//        yp( y_edge, center + (y_edge / 2), neither),
-//        ym(-y_edge, center - (y_edge / 2), neither),
-//        zp( z_edge, center + (z_edge / 2), neither),
-//        zm(-z_edge, center - (z_edge / 2), neither)
-
-    
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260405 BoxObstacle normal() points in wrong direction, or does it?
-
-//        xp( x_edge, center + (x_edge / 2), inside),
-//        xm(-x_edge, center - (x_edge / 2), inside),
-//        yp( y_edge, center + (y_edge / 2), inside),
-//        ym(-y_edge, center - (y_edge / 2), inside),
-//        zp( z_edge, center + (z_edge / 2), inside),
-//        zm(-z_edge, center - (z_edge / 2), inside)
-
-//        xp(-x_edge, center + (x_edge / 2)),
-//        xm( x_edge, center - (x_edge / 2)),
-//        yp(-y_edge, center + (y_edge / 2)),
-//        ym( y_edge, center - (y_edge / 2)),
-//        zp(-z_edge, center + (z_edge / 2)),
-//        zm( z_edge, center - (z_edge / 2))
-
         xp( x_edge, center + (x_edge / 2)),
         xm(-x_edge, center - (x_edge / 2)),
         yp( y_edge, center + (y_edge / 2)),
         ym(-y_edge, center - (y_edge / 2)),
         zp( z_edge, center + (z_edge / 2)),
         zm(-z_edge, center - (z_edge / 2))
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     {
         // Require box not parallelepiped.
         assert(x_edge.normalize().is_perpendicular(y_edge.normalize()));
@@ -701,34 +567,12 @@ public:
         z_edge_ = z_edge;
         // Collection of pointers to planes for iterating over them.
         planes_ = {&xp, &xm, &yp, &ym, &zp, &zm};
-        
-//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-//        // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
-//
-//        double min_edge = std::min({x_edge.length(),
-//                                    y_edge.length(),
-//                                    z_edge.length()});
-//        for (auto p : planes_)
-//        {
-//            p->setVisibleRadius(min_edge / 2);
-//            p->setVisibleThickness(min_edge * 0.001);
-//
-//        }
-//        
-//        std::cout << "BoxObstacle constuctor" ;
-//        std::cout << "===========================================" << std::endl;
-//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-
         // Base color.
         setColor({0.8, 0.7, 0.7});
-        // Set ExcludeFrom in base class.
+        // Set ExcludeFrom for box and for 6 planes.
         setExcludeFrom(ef);
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260405 BoxObstacle normal() points in wrong direction
         for (auto p : planes_) { p->setExcludeFrom(ef); }
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     }
-    
 
     // Axis aligned version: center and size along global axes.
     BoxObstacle(const Vec3& center,
@@ -765,56 +609,6 @@ public:
         return nearest_ri;
     }
 
-
-
-//    // Abstract normal for a given position. Points toward the +SDF side.
-//    Vec3 normal(const Vec3& poi) const override
-//    {
-//        Vec3 normal;
-//        double nearest_distance = std::numeric_limits<double>::infinity();
-//        for (auto p : planes_)
-//        {
-//            Vec3 np = p->nearest_point(poi);
-//            double dist = (np - poi).length();
-//            if (nearest_distance > dist)
-//            {
-//                nearest_distance = dist;
-//                normal = p->normal(poi);
-//            }
-//        }
-//        
-//        Draw::getInstance().addThickLineToAnimatedFrame(np,
-//                                                        np + normal * 10,
-//                                                        Color(0, 1, 0),
-//                                                        0.1);
-//        
-//        return normal;
-//    }
-  
-//        // Abstract normal for a given position. Points toward the +SDF side.
-//        Vec3 normal(const Vec3& poi) const override
-//        {
-//            Vec3 np;
-//            Vec3 normal;
-//            double nearest_distance = std::numeric_limits<double>::infinity();
-//            for (auto p : planes_)
-//            {
-//    //            Vec3 np = p->nearest_point(poi);
-//                Vec3 pnp = p->nearest_point(poi);
-//
-//    //            double dist = (np - poi).length();
-//                double dist = (pnp - poi).length();
-//
-//                if (nearest_distance > dist)
-//                {
-//                    nearest_distance = dist;
-//                    normal = p->normal(poi);
-//
-//                    np = p->nearest_point(poi);
-//
-//                }
-//            }
-      
     // Abstract normal for a given position. Points toward the +SDF side.
     Vec3 normal(const Vec3& poi) const override
     {
@@ -832,24 +626,6 @@ public:
                 np = p->nearest_point(poi);
             }
         }
-
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//            // TODO 20260328 try fixing that "disappears when paused" annotation bug
-//
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//            // TODO 20260402 add EF::current_boid_is_selected for BoxObstacle debugging.
-//
-//    //        Draw::MiscAnnotation::add(np, np + normal * 10, Color::green());
-//
-//            if (EF::current_boid_is_selected)
-//            {
-//                Draw::MiscAnnotation::add(np, np + normal * 10, Color::green());
-//            }
-//
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
         return normal;
     }
 
@@ -893,34 +669,7 @@ public:
         return nearest_fa;
 
     }
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260404 why is BoxObstacle::signed_distance() always zero?
-    //
-    // First draft, assumes "inside box" as used in murmuration tests.
-    
-    
-    // TODO TEMP here only for reference
-//    // Abstract normal for a given position. Points toward the +SDF side.
-//    Vec3 normal(const Vec3& poi) const override
-//    {
-//        Vec3 np;
-//        Vec3 normal;
-//        double nearest_distance = std::numeric_limits<double>::infinity();
-//        for (auto p : planes_)
-//        {
-//            Vec3 pnp = p->nearest_point(poi);
-//            double dist = (pnp - poi).length();
-//            if (nearest_distance > dist)
-//            {
-//                nearest_distance = dist;
-//                normal = p->normal(poi);
-//
-//                np = p->nearest_point(poi);
-//
-//            }
-//        }
 
-    
     // Signed distance function. (From a query point to the nearest point on
     // Obstacle's surface: negative inside, positive outside, zero at surface.)
     double signed_distance(const Vec3& query_point) const override
@@ -941,8 +690,6 @@ public:
         return nearest_plane->signed_distance(query_point);
     }
 
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
     void addToScene() const override
     {
         auto mesh = Draw::constructBoxTriMesh(x_edge_.length(),
@@ -955,12 +702,6 @@ public:
                                               500);
         Draw::brightnessSpecklePerVertex(0.95, 1.00, getColor(), mesh);
         Draw::getInstance().addTriMeshToStaticScene(mesh);
-        
-//        // TODO DEBUG TEMP. Why so thick along cylinder axis? Why black?
-//        for (auto p : planes_)
-//        {
-//            p->addToScene();
-//        }
     }
 
     std::string to_string() const override { return "BoxObstacle"; }
@@ -979,9 +720,6 @@ private:
     PlaneObstacle zm;
     std::vector<PlaneObstacle*> planes_;
 };
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
 // Class to contain statistics of a predicted collision with an Obstacle.
 class Collision
@@ -1155,14 +893,6 @@ inline void Obstacle::unit_test()
         six_way_exclude_from(so_i, so_o, so_n);
     }
 
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20260326 quick and dirty aligned box container
-
-//    double s = 41;
-//    Obstacle* bo = new BoxObstacle bo(Vec3(), s * 2, s, s * 2);
-//    BoxObstacle bo(Vec3(), s * 2, s, s * 2);
+    // Quick and dirty aligned box containment. Needs more test eventually.
     BoxObstacle bo(Vec3(), 80, 40, 80, outside);
-
-    
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 }

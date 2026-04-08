@@ -527,7 +527,11 @@ public:
             for (Boid* b : cached_nearest_neighbors())
             {
                 Color c(xxx_temp_separation_score > 0.5 ? 1 : 0);
-                Draw::MiscAnnotation::add(position(), b->position(), c, 0.01);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20260407 thinking about renaming
+//                Draw::MiscAnnotation::add(position(), b->position(), c, 0.01);
+                draw().addAnnotationLine(position(), b->position(), c, 0.01);
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
     }
@@ -598,7 +602,11 @@ public:
         if (isSelected())
         {
             Vec3 poi = predicted_obstacle_collisions_[0].point_of_impact;
-            Draw::MiscAnnotation::add(position(), poi, Color::orange(), 0.1);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260407 thinking about renaming
+//            Draw::MiscAnnotation::add(position(), poi, Color::orange(), 0.1);
+            draw().addAnnotationLine(position(), poi, Color::orange(), 0.1);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     }

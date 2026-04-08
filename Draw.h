@@ -986,7 +986,10 @@ public:
 
     //--------------------------------------------------------------------------
 
-        
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260407 thinking about renaming
+
     // API for drawing miscellaneous annotation lines in an animated frame.
     //     Call addMiscAnnotation() from arbitrary user code.
     //     Call clearMiscAnnotation() at beginning of frame.
@@ -997,35 +1000,64 @@ public:
     public:
         MiscAnnotation(Vec3 ep1, Vec3 ep2, Color color, double radius)
           : ep1_(ep1), ep2_(ep2), color_(color), radius_(radius) {}
-        static void clear() { annotations().clear(); }
-        void addToAnimatedFrame()
-        {
-            dgi().addThickLineToAnimatedFrame(ep1_, ep2_, color_, radius_);
-        }
-        static void addMiscAnnotationsToAnimatedFrame()
-        {
-            for (auto ma : annotations()) { ma.addToAnimatedFrame(); }
-        }
-        static void add(Vec3 ep1, Vec3 ep2, Color color, double radius)
-        {
-            annotations().push_back({ep1, ep2, color, radius});
-        }
-        static void add(Vec3 ep1, Vec3 ep2, Color color)
-        {
-            annotations().push_back({ep1, ep2, color, 0.02});
-        }
-        static std::vector<MiscAnnotation>& annotations()
-        {
-            return dgi().misc_annotations_;
-        }
-        static Draw& dgi() { return Draw::getInstance(); }
-    private:
+//        static void clear() { annotations().clear(); }
+//        void addToAnimatedFrame()
+//        {
+//            dgi().addThickLineToAnimatedFrame(ep1_, ep2_, color_, radius_);
+//        }
+//        static void addMiscAnnotationsToAnimatedFrame()
+//        {
+//            for (auto ma : annotations()) { ma.addToAnimatedFrame(); }
+//        }
+//        static void add(Vec3 ep1, Vec3 ep2, Color color, double radius)
+//        {
+//            annotations().push_back({ep1, ep2, color, radius});
+//        }
+//        static void add(Vec3 ep1, Vec3 ep2, Color color)
+//        {
+//            annotations().push_back({ep1, ep2, color, 0.02});
+//        }
+//        static std::vector<MiscAnnotation>& annotations()
+//        {
+//            return dgi().misc_annotations_;
+//        }
+//        static Draw& dgi() { return Draw::getInstance(); }
+//    private:
         Vec3 ep1_;
         Vec3 ep2_;
         Color color_;
         double radius_;
     };
     std::vector<MiscAnnotation> misc_annotations_;
+    
+    
+    void addAnnotationLine(Vec3 ep1, Vec3 ep2, Color color, double radius)
+    {
+        misc_annotations_.push_back({ep1, ep2, color, radius});
+    }
+    
+    void addAnnotationLine(Vec3 ep1, Vec3 ep2, Color color)
+    {
+        misc_annotations_.push_back({ep1, ep2, color, 0.02});
+    }
+    
+//    void addMiscAnnotationsToAnimatedFrame()
+    void addAnnotationsToAnimatedFrame()
+    {
+        for (auto a : misc_annotations_)
+        {
+            addThickLineToAnimatedFrame(a.ep1_, a.ep2_, a.color_, a.radius_);
+        }
+    }
+
+    void clearAnnotations()
+    {
+//        debugPrint(enable())
+        misc_annotations_.clear();
+    }
+
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #endif  // USE_OPEN3D
 };

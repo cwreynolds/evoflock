@@ -134,11 +134,7 @@ public:
             bool run_sim_this_frame = draw().runSimulationThisFrame();
             if (run_sim_this_frame)
             {
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20260407 thinking about renaming
-//                Draw::MiscAnnotation::clear();
                 draw().clearAnnotations();
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 // TODO 20250509 this used to be "step_duration" which caused
                 // the fly-slow-when-draw-is-turned-off bug. Have not tested
                 // but it seems "if (not fixed_time_step() and draw().enable())"
@@ -151,11 +147,7 @@ public:
             draw().beginOneAnimatedFrame();
             for_all_boids([&](Boid* b){ b->draw_body();});
             selectedBoid()->drawAnnotationForBoidAndNeighbors();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20260407 thinking about renaming
-//            Draw::MiscAnnotation::addMiscAnnotationsToAnimatedFrame();
             draw().addAnnotationsToAnimatedFrame();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             draw().aimAgent() = *selectedBoid();
             draw().endOneAnimatedFrame();
             clock().sleepUntilEndOfFrame(afap ? 0 : step_duration);

@@ -527,11 +527,7 @@ public:
             for (Boid* b : cached_nearest_neighbors())
             {
                 Color c(xxx_temp_separation_score > 0.5 ? 1 : 0);
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20260407 thinking about renaming
-//                Draw::MiscAnnotation::add(position(), b->position(), c, 0.01);
                 draw().addAnnotationLine(position(), b->position(), c, 0.01);
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
         }
     }
@@ -602,11 +598,7 @@ public:
         if (isSelected())
         {
             Vec3 poi = predicted_obstacle_collisions_[0].point_of_impact;
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20260407 thinking about renaming
-//            Draw::MiscAnnotation::add(position(), poi, Color::orange(), 0.1);
             draw().addAnnotationLine(position(), poi, Color::orange(), 0.1);
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     }
@@ -636,44 +628,13 @@ public:
             
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             // TODO 20260405 BoxObstacle normal() points in wrong direction, or does it?
-            
-            
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20260323 why passing through walls of BoxObstacle?
             if (isSelected())
             {
-                
-//                Vec3 n = o->normalTowardAllowedSide(position(), prev_position);
-//                Vec3 i = o->rayIntersection(position(), forward(), 1);
-//                Draw::MiscAnnotation(i, n, Color::green(), 0.1);
-
-                Vec3 normal = o->normalTowardAgent(position(), position());
-                Vec3 poi = o->rayIntersection(position(), forward(), 1);
-                Draw::MiscAnnotation(poi, normal, Color::green(), 0.1);
-
-                
-                
-//                bool v = o->isAgentViolatingConstraint(position(), prev_position);
-                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                // TODO 20260404 why is BoxObstacle::signed_distance() always zero?
-                
-//                assert(not v);
-//                std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
-//                debugPrint(v)
-//                debugPrint(ec)
-                
-                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                // TODO 20260403 more on EF::current_boid_is_selected for BoxObstacle
-//                debugPrint(o->signed_distance(position()));
-//                debugPrint(o->to_string());
-                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                auto first_collision = get_predicted_obstacle_collisions()[0];
+                Vec3 poi = first_collision.point_of_impact;
+                Vec3 norm = o->normalTowardAgent(poi, position()) * 3;
+                draw().addAnnotationLine(poi, poi + norm, Color::green(), 0.05);
             }
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
             

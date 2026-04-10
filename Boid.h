@@ -490,7 +490,7 @@ public:
                                              const Color& color)
         {
             Vec3 ep = position() + offset * scale;
-            draw().addThickLineToAnimatedFrame(position(), ep, color);
+            draw().addAnnotationLine(position(), ep, color);
         };
         relative_force_annotation(annote_separation_,    Color::red());
         relative_force_annotation(annote_alignment_,     Color::green());
@@ -504,14 +504,14 @@ public:
             Vec3 poi = annote_avoid_predict_poi_;
             double w = annote_avoid_predict_weight_;
             Color c = util::interpolate(w, Color(0.5), Color(0.9, 0.5, 0.9));
-            draw().addThickLineToAnimatedFrame(position(), poi, c, 0.01);
+            draw().addAnnotationLine(position(), poi, c, 0.01);
         }
         if (annote_avoid_static_weight_ > 0.1)
         {
             Vec3 poi = annote_avoid_static_poi_;
             double w = annote_avoid_static_weight_;
             Color c = util::interpolate(w, Color(0.5), Color(0.5, 0.9, 0.9));
-            draw().addThickLineToAnimatedFrame(position(), poi, c, 0.01);
+            draw().addAnnotationLine(position(), poi, c, 0.01);
         }
     }
 

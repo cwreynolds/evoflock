@@ -95,7 +95,6 @@ private:
                                             window_xy_position_ul.x(),
                                             window_xy_position_ul.y());
         // TODO does not work, see https://github.com/isl-org/Open3D/issues/6952
-        // (See also replacement/work-around: addThickLineToAnimatedFrame())
         visualizer().GetRenderOption().line_width_ = line_width;
         visualizer().GetRenderOption().point_size_ = point_size;
         // Callbacks for mouse gestures and single key commands.
@@ -229,19 +228,7 @@ public:
         }
 #endif  // USE_OPEN3D
     }
-        
-    // Adds an animated “thick line” (aka cylinder) to the current frame.
-    void addThickLineToAnimatedFrame(const Vec3& endpoint0,
-                                     const Vec3& endpoint1,
-                                     const Color& color,
-                                     double radius = 0.02)
-    {
-        if (enable() and enableAnnotation())
-        {
-            addCylinderToAnimatedFrame(endpoint0, endpoint1, color, radius);
-        }
-    }
-    
+
     // This is a "thick" version of addLineSegmentToAnimatedFrame().
     // (Converted from python code in Flock::Draw.py)
     void addCylinderToAnimatedFrame(const Vec3& endpoint0,
@@ -1007,13 +994,16 @@ public:
     }
     void addAnnotationLine(Vec3 ep1, Vec3 ep2, Color color)
     {
-        annotations_.push_back({ep1, ep2, color, 0.02});
+        addAnnotationLine(ep1, ep2, color, 0.02);
     }
     void addAnnotationsToAnimatedFrame()
     {
-        for (auto a : annotations_)
+        if (enable() and enableAnnotation())
         {
-            addThickLineToAnimatedFrame(a.ep1, a.ep2, a.color, a.radius);
+            for (auto a : annotations_)
+            {
+                addCylinderToAnimatedFrame(a.ep1, a.ep2, a.color, a.radius);
+            }
         }
     }
     void clearAnnotations()

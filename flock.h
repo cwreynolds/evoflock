@@ -218,10 +218,23 @@ public:
 
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         // TODO 20260222 increase return_to_center outside distance
-        if (EF::no_obstacles_mode)
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260410 merge add_curvature_objective / use_curvature_objective
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260410 rename EF::no_obstacles_mode to EF::murmuration_mode
+
+//        if (EF::no_obstacles_mode)
+        if (EF::murmuration_mode)
         {
             boid->setSpeed(EF::default_target_speed * rs.frandom2(0.9, 1.1));
         }
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     }
 
@@ -266,7 +279,11 @@ public:
         };
         
         // For DomeAndGround / NoObstacle / BoxObstacle
-        if (EF::no_obstacles_mode)
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260410 rename EF::no_obstacles_mode to EF::murmuration_mode
+//        if (EF::no_obstacles_mode)
+        if (EF::murmuration_mode)
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         {
             double radius = fp().sphereRadius() * 0.15;
             Vec3 center;
@@ -362,7 +379,13 @@ public:
         double average_speed = averageSpeedPerBoidStep();
         std::cout << std::format(", average speed = {:.3}", average_speed);
         std::cout << std::format(", speedScore() = {:.3}", speedScore());
-        if (EF::add_curvature_objective)
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260410 merge add_curvature_objective / use_curvature_objective
+
+//        if (EF::add_curvature_objective)
+        if (EF::use_curvature_objective)
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         {
             double ac = sum_curvature_ / boidStepPerSim();
             std::cout << std::format(", minc={:.3}", min_curvature_);
@@ -567,7 +590,15 @@ public:
         
         double average_curvature = temp_sc / boidStepPerSim();
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        double max_penalty = EF::no_obstacles_mode ? 0.1 : 0.2;
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260410 rename EF::no_obstacles_mode to EF::murmuration_mode
+
+//        double max_penalty = EF::no_obstacles_mode ? 0.1 : 0.2;
+        double max_penalty = EF::murmuration_mode ? 0.1 : 0.2;
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         return util::remap_interval_clip(average_curvature,
                                          0, 0.1,
                                          1 - max_penalty, 1);

@@ -59,8 +59,13 @@ inline static double roll_rate = 0.99;
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 // TODO 20260218 use curvature objective less strength
 
-//inline static bool add_curvature_objective = false;
-inline static bool add_curvature_objective = true;
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+// TODO 20260410 merge add_curvature_objective / use_curvature_objective
+
+//    //inline static bool add_curvature_objective = false;
+//    inline static bool add_curvature_objective = true;
+
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -112,8 +117,20 @@ inline static int override_boids_per_flock = -1;
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 // TODO 20260216 add EF::no_obstacles_mode
 // TODO 20260311 this should be renamed something like "murmuration_mode"
-//inline static bool no_obstacles_mode = false;
-inline static bool no_obstacles_mode = true;
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+// TODO 20260410 rename EF::no_obstacles_mode to EF::murmuration_mode
+
+// TODO 20260410 regression test, switch back to GA/not_murmuration mode
+
+//    inline static bool no_obstacles_mode = false;
+//    //inline static bool no_obstacles_mode = true;
+
+inline static bool murmuration_mode = false;
+//inline static bool murmuration_mode = true;
+
+//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -170,6 +187,35 @@ void runOneFlockEvolution()
     // EF::setUsingGP();
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20260410 regression test, switch back to GA/not_murmuration mode
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260410 rename EF::no_obstacles_mode to EF::murmuration_mode
+
+    if (murmuration_mode)
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    {
+        use_avoid_objective     = true;
+        use_separate_objective  = true;
+        use_speed_objective     = true;
+        use_curvature_objective = true;
+        use_alignment_objective = false;
+        use_cluster_objective   = true;
+    }
+    else
+    {
+        use_avoid_objective     = true;
+        use_separate_objective  = true;
+        use_speed_objective     = true;
+        use_curvature_objective = false;
+        use_alignment_objective = false;
+        use_cluster_objective   = false;
+    }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
     // Set likelihood of crossover versus hoist (on a randomly selected parent).
     LP::GpTree::likelihood_of_crossover_ = EF::usingGP() ? 0.9 : 1.0;

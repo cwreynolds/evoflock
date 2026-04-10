@@ -268,7 +268,15 @@ private:
     
 
 //    std::string use_obstacle_set = "SmallSpheresInBigSphere";
-    std::string use_obstacle_set = (EF::no_obstacles_mode ?
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260410 rename EF::no_obstacles_mode to EF::murmuration_mode
+
+//    std::string use_obstacle_set = (EF::no_obstacles_mode ?
+    std::string use_obstacle_set = (EF::murmuration_mode ?
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
                                     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                                     // TODO 20260226 DomeAndGround obstacle
 //                                    "NoObstacles" :

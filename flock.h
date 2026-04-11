@@ -215,27 +215,6 @@ public:
   
         // Init Boid speed to EF::default_target_speed.
         boid->setSpeed(EF::default_target_speed);
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260222 increase return_to_center outside distance
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260410 merge add_curvature_objective / use_curvature_objective
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260410 rename EF::no_obstacles_mode to EF::murmuration_mode
-
-//        if (EF::no_obstacles_mode)
-        if (EF::murmuration_mode)
-        {
-            boid->setSpeed(EF::default_target_speed * rs.frandom2(0.9, 1.1));
-        }
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     }
 
     // Random initial Boid "pose" (position and orientation). By default, they
@@ -279,11 +258,7 @@ public:
         };
         
         // For DomeAndGround / NoObstacle / BoxObstacle
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260410 rename EF::no_obstacles_mode to EF::murmuration_mode
-//        if (EF::no_obstacles_mode)
         if (EF::murmuration_mode)
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         {
             double radius = fp().sphereRadius() * 0.15;
             Vec3 center;
@@ -292,7 +267,7 @@ public:
             Vec3 boid_heading = rs.randomUnitVector();
             return LocalSpace::fromTo(boid_position, boid_heading);
         }
-        
+
         return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
     }
 
@@ -312,36 +287,6 @@ public:
         for_all_boids(ccs);
     }
 
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20260305 use new global flags to disable recording data for score
-    
-//        // Fly each boid in flock for one simulation step. Consists of two sequential
-//        // steps to avoid artifacts from order of boids. First a "sense/plan" phase
-//        // which computes the desired steering based on current state. Then an "act"
-//        // phase which actually moves the boids. Finally statistics are collected.
-//        void fly_boids(double time_step)
-//        {
-//            for_all_boids([&](Boid* b){ b->plan_next_steer();});
-//            for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
-//            enforceObsBoidConstraints();
-//            recordSeparationScorePerStep();
-//            recordSpeedScorePerStep();
-//            collectCurvatureStats();
-//
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//            // TODO 20251208 score for boid alignment.
-//            recordAlignmentScorePerStep();
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20260223 bring back cluster counting
-//
-//    //        debugPrint(count_clusters())
-//            recordClusterScorePerStep();
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        }
-
     // Fly each boid in flock for one simulation step. Consists of two sequential
     // steps to avoid artifacts from order of boids. First a "sense/plan" phase
     // which computes the desired steering based on current state. Then an "act"
@@ -358,9 +303,6 @@ public:
         if (EF::use_alignment_objective) { recordAlignmentScorePerStep();  }
         if (EF::use_cluster_objective  ) { recordClusterScorePerStep();    }
     }
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20251122 all ops return Vec3, Scalar values all constants
@@ -379,13 +321,7 @@ public:
         double average_speed = averageSpeedPerBoidStep();
         std::cout << std::format(", average speed = {:.3}", average_speed);
         std::cout << std::format(", speedScore() = {:.3}", speedScore());
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260410 merge add_curvature_objective / use_curvature_objective
-
-//        if (EF::add_curvature_objective)
         if (EF::use_curvature_objective)
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         {
             double ac = sum_curvature_ / boidStepPerSim();
             std::cout << std::format(", minc={:.3}", min_curvature_);
@@ -532,79 +468,16 @@ public:
     {
         return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260311 cleanup
 
-//        double curvatureScore() const
-//        {
-//            double average_curvature = sum_curvature_ / boidStepPerSim();
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20260214 tweak curvatureScore VERY TEMPORARY IMPLEMENTATION !!!!
-//            //               global flag for this?
-//
-//    //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
-//
-//            // 20260214_ga_no_obs_tweak_curvature
-//    //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
-//
-//            // 20260214_ga_no_obs_tweak_curvature_2
-//    //        return util::remap_interval_clip(average_curvature, 0, 0.05, 0.5, 1);
-//    //        return util::remap_interval_clip(average_curvature, 0, 0.2, 0.5, 1);
-//
-//            // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
-//            // TODO 20260215 back to previous curvature score
-//    //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.8, 1);
-//
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//            // TODO 20260218 use curvature objective less strength
-//
-//    //        return util::remap_interval_clip(average_curvature, 0, 0.1, 0.5, 1);
-//
-//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//            // TODO 20260301 temp disable curvatureScore() and clusterScore().
-//
-//    //        return 1;
-//
-//            double max_penalty = EF::no_obstacles_mode ? 0.1 : 0.2;
-//            return util::remap_interval_clip(average_curvature,
-//                                             0, 0.1,
-//                                             1 - max_penalty, 1);
-//
-//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//            // ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        }
-
+    // Compute average curvature per boid step, then remap for scoring.
     double curvatureScore() const
     {
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260311 work aroud curvature NaN
-//        debugPrint(sum_curvature_)
-        double temp_sc = std::isnan(sum_curvature_) ? 0 : sum_curvature_;
-        
-        double average_curvature = temp_sc / boidStepPerSim();
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260410 rename EF::no_obstacles_mode to EF::murmuration_mode
-
-//        double max_penalty = EF::no_obstacles_mode ? 0.1 : 0.2;
+        double average_curvature = sum_curvature_ / boidStepPerSim();
         double max_penalty = EF::murmuration_mode ? 0.1 : 0.2;
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
         return util::remap_interval_clip(average_curvature,
                                          0, 0.1,
                                          1 - max_penalty, 1);
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Accumulators for alignment score.
     // TODO Relocate in file?
@@ -633,10 +506,6 @@ public:
                 boidStepPerSim());
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260223 bring back cluster counting
-    
-    
     // Accumulators for cluster score.
     // TODO Relocate in file?
     double sum_of_cluster_counts_over_all_sim_steps_ = 0;
@@ -644,31 +513,18 @@ public:
     // Called once per simulation step.
     void recordClusterScorePerStep()
     {
-//        double max_cluster_count = 8;  // Perfect score for 8 or more clusters.
         double max_cluster_count = 6;  // Perfect score for 6 or more clusters.
         double cc = countClusters();
-//        double cc_score = std::pow(util::clip01(cc / max_cluster_count), 0.5);
         double cc_score = std::pow(util::clip01(cc / max_cluster_count), 0.3);
-
-//        debugPrint(cc);
-//        debugPrint(cc_score);
-
         sum_of_cluster_counts_over_all_sim_steps_ += cc_score;
     }
-    
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20260301 temp disable curvatureScore() and clusterScore().
     
     // Average alignment for each Boid with 7 neighbors on each simulation step.
     double clusterScore() const
     {
-//        return 1;
-
         return (sum_of_cluster_counts_over_all_sim_steps_ /
                 fp().maxSimulationSteps());
     }
-    
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     
     // Count the number of boid clusters using a version of DBSCAN algorithm.
     int countClusters() const
@@ -693,8 +549,6 @@ public:
         // Return number of clusters found.
         return dbscan.getClusterCount();
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Test all Boids against each Obstacle. Enforce constraint if necessary by
     // moving Boid to the not-ExcludedFrom side of Obstacle surface.
@@ -882,14 +736,8 @@ public:
                 obstacle_sets_.push_back(ObstacleSet("SmallSpheresInBigSphere",
                                                      obs));
             }
-            
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20260226 DomeAndGround obstacle
-
-            // TODO 20260228 testing murmuration in DomeAndGround
-            // TODO 20260301 temp disable curvatureScore()
-            // TODO 20260302 fix PlaneObstacle bug when not centered at origin
-            // TODO 20260305 double volume of DomeAndGround.
+                        
+            // Set n: DomeAndGround obstacle. Temp?
             {
                 // Dome has 30% the radius of BigSphere, then 8x volume
                 double r = sr * 0.3 * std::pow(8.0, 0.333);
@@ -897,12 +745,6 @@ public:
                 // note: for 40x, r = 51.2362, which is to say, same as default.
                 r = sr * 0.3 * std::pow(40, 0.333);
                 std::cout << "DomeAndGround radius = " << r << std::endl;
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                // TODO 20260307 VERY TEMP
-//                double DomeAndGround_volume = 4.0/3.0 * 3.14 * r * r * r / 2;
-//                debugPrint(DomeAndGround_volume);
-//                debugPrint(std::pow(DomeAndGround_volume, 0.333));
-//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 double thin = r * 0.001;
                 Vec3 up(0, 1, 0);
                 Vec3 lp_center = up * (r * -0.5);
@@ -912,44 +754,16 @@ public:
                 obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
                                                      {low_sphere, low_plane}));
             }
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20260309 wip add BoxObstacle
-            
-            
+            // Set n: single BoxObstacle containment.
             {
                 double s = 41;
-                
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-                // TODO 20260405 smaller BoxObstacle for 200 vs 1400 boids
-                
                 debugPrint(s);
                 s *= std::pow(200.0 / 1400.0, 1.0 / 3.0);
                 debugPrint(s);
-
-                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20260316 BoxObstacle ExcludeFrom
-//                Obstacle* bo = new BoxObstacle({}, s * 2, s, s * 2);
-                
-                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-                // TODO 20260405 BoxObstacle normal() points in wrong direction, or does it?
-
                 Obstacle* bo = new BoxObstacle({}, s * 2, s, s * 2, oside);
-//                Obstacle* bo = new BoxObstacle({}, s * 2, s, s * 2, iside);
-
-                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 obstacle_sets_.push_back(ObstacleSet("BoxObstacle", {bo}));
             }
-            
-            
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 
             // Set 6: no obstacles.
             obstacle_sets_.push_back(ObstacleSet("NoObstacles", {}));

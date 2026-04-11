@@ -281,9 +281,6 @@ private:
 class PlaneObstacle : public Obstacle
 {
 public:
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
-    
     PlaneObstacle()
       : Obstacle(),
         normal_(Vec3(0, 1, 0)),
@@ -317,8 +314,6 @@ public:
         visible_radius_ = visible_radius;
         visible_thickness_ = visible_thickness;
     }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // Where a ray (Agent's path) will intersect the obstacle, or None.
     Vec3 rayIntersection(const Vec3& origin,
@@ -383,14 +378,6 @@ public:
     
     void addToScene() const override
     {
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-        // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
-        std::cout << "PlaneObstacle::addToScene()" ;
-        std::cout << "===========================================" << std::endl;
-        debugPrint(visible_radius_)
-        debugPrint(visible_thickness_)
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-
         Vec3 ep_offset = normal_ * visible_thickness_;
         auto mesh = Draw::constructCylinderTriMesh(visible_radius_,
                                                    center_ + ep_offset,
@@ -405,11 +392,8 @@ public:
 
     std::string to_string() const override { return "PlaneObstacle"; }
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-    // TODO 20260316 why are PlaneObstacle wrong shape in BoxObstacle?
     void setVisibleRadius(double vr) { visible_radius_ = vr; }
     void setVisibleThickness(double vt) { visible_thickness_ = vt; }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
 private:
     Vec3 normal_;
@@ -537,7 +521,7 @@ private:
     double length_;
 };
 
-// WIP implementation. Only works correctly for ExcludeFrom:outside because
+// WIP implementation. Only works correctly for ExcludeFrom::outside because
 // PlaneObstacles have infinite extent.
 //
 class BoxObstacle : public Obstacle
@@ -572,6 +556,8 @@ public:
         // Set ExcludeFrom for box and for 6 planes.
         setExcludeFrom(ef);
         for (auto p : planes_) { p->setExcludeFrom(ef); }
+        // TODO 20260404 only works for ExcludeFrom:outside so exit early.
+        assert(ef != ExcludeFrom::inside);
     }
 
     // Axis aligned version: center and size along global axes.

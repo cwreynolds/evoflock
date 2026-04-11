@@ -155,15 +155,9 @@ public:
     // Determine and store desired steering for this simulation step
     void plan_next_steer()
     {
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260402 add EF::current_boid_is_selected for BoxObstacle debugging.
         EF::current_boid_is_selected = isSelected();
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         next_steer_ = steerToFlock();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251105 why did GP steering force get so small?
         sum_steer_mag_for_all_steps += next_steer_.length();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Apply the "steering force" -- previously computed in plan_next_steer()
@@ -593,14 +587,14 @@ public:
         auto sorted = [&](const Collision& a, const Collision& b)
                       { return a.time_to_collision < b.time_to_collision; };
         std::ranges::sort(predicted_obstacle_collisions_, sorted);
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
-        // TODO 20260323 why passing through walls of BoxObstacle?
-        if (isSelected())
-        {
-            Vec3 poi = predicted_obstacle_collisions_[0].point_of_impact;
-            draw().addAnnotationLine(position(), poi, Color::orange(), 0.1);
-        }
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+//        // TODO 20260323 why passing through walls of BoxObstacle?
+//        if (isSelected())
+//        {
+//            Vec3 poi = predicted_obstacle_collisions_[0].point_of_impact;
+//            draw().addAnnotationLine(position(), poi, Color::orange(), 0.1);
+//        }
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     }
 
     // get/set/inc api for this Boid's counter of collisions with obstacles.
@@ -615,11 +609,7 @@ public:
     // from the obstacle surface.
     void enforceObstacleConstraint()
     {
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260403 more on EF::current_boid_is_selected for BoxObstacle
         EF::current_boid_is_selected = isSelected();
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
         for (auto& o : flock_obstacles())
         {
             Vec3 prev_position = getPreviousPosition();
@@ -637,7 +627,6 @@ public:
             }
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
-            
             if (ec != position())
             {
                 // Count collision, set speed to zero, clear smoothing history.

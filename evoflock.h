@@ -42,101 +42,23 @@ inline static bool enable_multithreading = true;
 // Controls roll (rotation around forward axis) blend rate for Boid and Camera.
 inline static double roll_rate = 0.99;
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20260213 use EF::add_curvature_objective for no obstacles run
-
-// Global switch (temp?) enables 4th objective component for boosting curvature.
-//inline static bool add_curvature_objective = false;
-
-// ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
-// TODO 20260215 make radius smaller for viewing convenience
-
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20260216 add EF::no_obstacles_mode
-
-//inline static bool add_curvature_objective = true;
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20260218 use curvature objective less strength
-
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-// TODO 20260410 merge add_curvature_objective / use_curvature_objective
-
-//    //inline static bool add_curvature_objective = false;
-//    inline static bool add_curvature_objective = true;
-
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20260223 bring back cluster counting
-
-// TODO 20260223 this is obviously ad hoc, need to refactor the way
-//               objectives are added/removed from a given run.
-inline static bool add_curvature_AND_cluster_objectives = true;
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-// TODO 20260303 more wip with DomeAndGround, try alignmentScore()?
-//               refactor GP::mof_names() and GP::multiObjectiveFitnessOfFlock()
-
-//    inline static bool use_avoid_objective     = true;
-//    inline static bool use_separate_objective  = true;
-//    inline static bool use_speed_objective     = true;
-//    inline static bool use_curvature_objective = false;
-//    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//    // TODO 20260305 double volume of DomeAndGround.
-//    //inline static bool use_alignment_objective = true;
-//    inline static bool use_alignment_objective = false;
-//    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//    inline static bool use_cluster_objective   = false;
-
+// Select which objectives to enable.
 inline static bool use_avoid_objective     = true;
 inline static bool use_separate_objective  = true;
 inline static bool use_speed_objective     = true;
 inline static bool use_curvature_objective = true;
-inline static bool use_alignment_objective = false;
+inline static bool use_alignment_objective = true;
 inline static bool use_cluster_objective   = true;
-
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
 
 // experimental / temp?
 inline static int override_boids_per_flock = -1;
 
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// Special mode for simulating murmurations.
+//inline static bool murmuration_mode = false;
+inline static bool murmuration_mode = true;
 
-// ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20260216 add EF::no_obstacles_mode
-// TODO 20260311 this should be renamed something like "murmuration_mode"
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20260410 rename EF::no_obstacles_mode to EF::murmuration_mode
-
-// TODO 20260410 regression test, switch back to GA/not_murmuration mode
-
-//    inline static bool no_obstacles_mode = false;
-//    //inline static bool no_obstacles_mode = true;
-
-inline static bool murmuration_mode = false;
-//inline static bool murmuration_mode = true;
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-// TODO 20260402 add EF::current_boid_is_selected for BoxObstacle debugging.
+// Added for debugging BoxObstacle, maybe remove later?
 inline static bool current_boid_is_selected = true;
-//~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
 inline static bool visualize_previous_results_mode = false;
@@ -182,21 +104,12 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs, LP::Population* p)
 void runOneFlockEvolution()
 {
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     EF::setUsingGA();
     // EF::setUsingGP();
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20260410 regression test, switch back to GA/not_murmuration mode
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260410 rename EF::no_obstacles_mode to EF::murmuration_mode
-
+    // Select which objectives to enable, based on other mode flags.
     if (murmuration_mode)
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     {
         use_avoid_objective     = true;
         use_separate_objective  = true;
@@ -214,8 +127,6 @@ void runOneFlockEvolution()
         use_alignment_objective = false;
         use_cluster_objective   = false;
     }
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
 
     // Set likelihood of crossover versus hoist (on a randomly selected parent).
     LP::GpTree::likelihood_of_crossover_ = EF::usingGP() ? 0.9 : 1.0;
@@ -246,80 +157,15 @@ void runOneFlockEvolution()
     int max_evolution_steps = 30000;
 
     int ga_tree_size = 1 + FlockParameters::tunableParameterCount();
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20260117 very experimental, until right size OR "valid"
-
-//    int min_crossover_tree_size = EF::usingGP() ? 20 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
-
-    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
-    // TODO 20260122 start-end max tree size
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260124 change "style" retry loop to respect size constraints
-
-    // Oh, this is for crossover, which does not yet use FS::genericTreeMaker()
-//    double start_max_tree_size = 30;
-//    double end_max_tree_size = 60;
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20260124 trying to time travel back to 20260121?
-    
-//    double start_max_tree_size = 40;
-//    double end_max_tree_size = 80;
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260126 change start/end max tree size from 60/60 to 20/60
-
-//    double start_max_tree_size = 60;
-//    double end_max_tree_size = 60;
-
-//    // 20260126_gp_mts_60_60_to_20_60
-//    double start_max_tree_size = 20;
-//    double end_max_tree_size = 60;
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260127 fiddle with min/max tree size
-
-//    // 20260126_gp_mts_20_60_to_30_60
-//    double start_max_tree_size = 30;
-//    double end_max_tree_size = 60;
-  
-//    // 20260127_gp_mts_30_60_to_40_60
-//    double start_max_tree_size = 40;
-//    double end_max_tree_size = 60;
     
     // 20260205_gp_mts_40_60_to_60_60
     double start_max_tree_size = 60;
     double end_max_tree_size = 60;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260126 change start/end max tree size from 60/60 to 20/60
     
-//    int min_crossover_tree_size = EF::usingGP() ? 10 : 2;
-//    int max_crossover_tree_size = EF::usingGP() ? 60 : ga_tree_size;
-//    int max_initial_tree_size   = EF::usingGP() ? 60 : ga_tree_size;
-
     double smts = start_max_tree_size;
     int min_crossover_tree_size = EF::usingGP() ?   10 : 2;
     int max_crossover_tree_size = EF::usingGP() ? smts : ga_tree_size;
     int max_initial_tree_size   = EF::usingGP() ? smts : ga_tree_size;
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     debugPrint(min_crossover_tree_size);
     debugPrint(max_crossover_tree_size);
@@ -386,35 +232,18 @@ void runOneFlockEvolution()
         {
             // Exit if user interactively quits run.
             if (Draw::getInstance().exitFromRun()) { break; }
-            //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
-            // TODO 20260122 start-end max tree size
 
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20260127 fiddle with min/max tree size
-
+            // Ramp min/max tree size over duration of evo run.
             double fraction = float(i) / max_evolution_steps;
             double max_tree_size = util::interpolate(fraction,
                                                      float(start_max_tree_size),
                                                      float(end_max_tree_size));
-//            fs.setMaxTreeSize(max_tree_size);
-//            population->setMaxCrossoverTreeSize(max_tree_size);
             fs.setMaxTreeSize(std::round(max_tree_size));
             population->setMaxCrossoverTreeSize(std::round(max_tree_size));
-
             std::cout << "    ";  // "log_prefix"
             debugPrint(max_tree_size);
             std::cout << std::endl;
             
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20260212 log GpTree::likelihood_of_crossover_
-//            std::cout << "    ";  // "log_prefix"
-//            debugPrint(LP::GpTree::likelihood_of_crossover_);
-//            std::cout << std::endl;
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
             GP::save_fitness_time_series(*population);
             population->evolutionStep(GP::fitnessFunction, GP::scalarize_fitness);
             if ((population->getStepCount() % 100) == 0)
@@ -488,25 +317,9 @@ void visualizeBestIfRequested(LP::Population* population)
         
         bool previous_draw_enable_state = Draw::getInstance().enable();
         Draw::getInstance().setEnable(true);
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260216 add EF::no_obstacles_mode
         int previous_obpf = override_boids_per_flock;
-        
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260227 switch from return_to_center to obstacle avoidance
-//        override_boids_per_flock = 1200;
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
         GP::run_flock_simulation(individual, 1);
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260216 add EF::no_obstacles_mode
         override_boids_per_flock = previous_obpf;
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
         Draw::getInstance().setEnable(previous_draw_enable_state);
         enable_multithreading = previous_emt_state;
         draw.clearVisBestMode();
@@ -523,26 +336,8 @@ void visualizeBestIfRequested(LP::Population* population)
 // running the logged result.
 void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 {
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20260222 fix for EF::visualize_previous_results_mode
-    
-//    // For normal EF run: return without doing anything. Comment out this
-//    // return to instead post-visualize a logged result from a previous run.
-//    return;
-    
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260220 add EF::visualize_previous_results_mode
-    
-//    return;  // For normal EF run: return without doing anything. Comment this
-//             // out to post-visualize a logged result from a previous run.
-
     // Do nothing unless in visualize_previous_results_mode.
     if (not visualize_previous_results_mode) { return; }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
 
     if (EF::usingGA())
     {

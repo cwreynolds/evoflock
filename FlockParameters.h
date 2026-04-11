@@ -112,10 +112,6 @@ public:
     FlockParameters(const std::vector<double>& vector_of_parameters_)
     {
         assert(vector_of_parameters_.size() == tunableParameterCount());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20250908 assert FlockParameters only used in GA mode.
-//        assert(EF::usingGA());
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         tuning_parameters = vector_of_parameters_;
     }
 
@@ -198,8 +194,6 @@ public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // The count(/size) of ALL parameters in this class.
     static int parameterCount()
     {
@@ -251,56 +245,20 @@ private:
     double body_diameter_ = 1;
     double sphere_radius_ = 50;
     Vec3 sphere_center_;
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260220 add EF::visualize_previous_results_mode
-
-//    int max_simulation_steps_ = 500;    // ~17 seconds: for evolution run
-//    //int max_simulation_steps_ = 2000;   // ~66 seconds: for obs collision test
-//    //int max_simulation_steps_ = 9000;  // 5 minutes for demo mode
 
     int max_simulation_steps_ = (EF::visualize_previous_results_mode ?
                                  1000 :  // ~30 seconds viz prev results.
                                  500);   // ~17 seconds: for evolution run.
 
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    
-
-//    std::string use_obstacle_set = "SmallSpheresInBigSphere";
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260410 rename EF::no_obstacles_mode to EF::murmuration_mode
-
-//    std::string use_obstacle_set = (EF::no_obstacles_mode ?
     std::string use_obstacle_set = (EF::murmuration_mode ?
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-                                    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                                    // TODO 20260226 DomeAndGround obstacle
-//                                    "NoObstacles" :
-//                                    "DomeAndGround" :
-                                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                    // TODO 20260316 BoxObstacle ExcludeFrom
-//                                    "BoxObstacle" :
-//                                    "DomeAndGround" :
                                     "BoxObstacle" :
-                                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                                    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                                     "SmallSpheresInBigSphere");
 
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260311 remove conditionalization on "DomeAndGround"
-    
     int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
                             EF::override_boids_per_flock :
                             (EF::visualize_previous_results_mode ?
                              1400 :  // For viz prev results.
                              200));  // Normal, for evolution runs.
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     int fps_ = 30;
 };

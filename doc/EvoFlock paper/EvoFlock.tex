@@ -7,6 +7,7 @@
 %
 % May 29, 2025  Begin draft.
 % Mar  1, 2026  Begin draft 3 for submission.
+% Apr 12, 2026  Some last minute tweaks.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -88,7 +89,7 @@
     This paper describes an automatic method for \textit{adjusting} or \textit{tuning} models of multi-agent motion. Simulating the motion of bird flocks, human crowds, vehicle traffic, and other multi-agent systems is a widely used technique. These simulations model the behavior of a single group member (bird, human, or vehicle). The group behaviors (flock, crowd, traffic) \textit{emerge} from interactions between group members. These models typically have many numerical control parameters. Even if each parameter is intuitive in isolation, their interaction can be complex and nonlinear. It is challenging to determine which parameters to adjust for the desired change in group behavior. Changing one aspect of group behavior often causes other aspects to change, leading to a tedious process of incremental changes. In this work, the desired group behavior is measured with an objective(/fitness/loss) function and optimized with a genetic algorithm. The objective function used here for basic flocking rewards proper spacing with neighbors, flying near a desired speed, and avoiding obstacles. Interestingly, the vivid alignment seen in bird flocks appears to emerge from maintaining proper spacing between flockmates.
 \end{abstract}
 
-\noindent{\small\textbf{Keywords:} multi-agent, inverse design, optimization, multi-objective, evolutionary computation, genetic algorithm, boids, flocks, herds, schools, crowds, traffic}
+\noindent{\small\textbf{Keywords:} multi-agent, inverse design, optimization, evolutionary computation, genetic algorithm, multi-objective,  boids, flocks, herds, schools, crowds, traffic}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -162,9 +163,11 @@ Other than those evolutionary-based solutions, most previous work on automatic t
 
 Close in spirit to EvoFlock is recent work on automatically tuning 2d herd models from overhead video \citep{gong_herds_2025}. From drone video of (say) sheep flocks, the system provides a dense simulated flock that reacts to simulated terrain quite like real sheep flocks would.
 
+A recent example of controlling the dynamics of multi-agent motion using physically-based deep neural networks can be found in \citet{kim_commanding_2025}.
+
 Notable, if somewhat tangential: \citet{jaderberg_human-level_2019} uses a hybrid approach to learn human-level game-playing agents for multiplayer games. It uses population-based reinforcement learning, which combines aspects of RL, population-based GA, and the self-play mentioned above. Also a flock-like variant on particle swarm optimization: \citet{hereford_flockopt_2011}. Similar in theme to EvoFlock, but for non-flocking but still \textit{self-organizing particle systems}: \citet{parkar_evolving_2024}.
 
-EvoFlock was developed as part of a larger ongoing collaboration investigating new approaches to inverse design of multi-agent motion. Those related works are not yet published.
+EvoFlock was developed as part of a larger ongoing collaboration investigating new approaches to inverse design of multi-agent motion. This related work is not yet published.
 
 \section{Description of the Technique}
 \label{sec:Description}
@@ -236,10 +239,6 @@ The focus of EvoFlock is on \textit{inverse design}, the optimization of paramet
 
 Most flock models are written from the perspective of an individual boid (agent) at a single time step. The boid identifies its neighbors. (The model used in this work uses \textit{topological distance} to find the seven nearest neighbors \citep{cavagna_seventh_2008}.) The boid reacts to its neighbors by computing \textit{steering forces} related to their distance and angle. It may also need to steer to avoid obstacles. These component steering forces are combined (often by 3D vector addition) then applied to the boid's physics model (often a simple \textit{self-propelled particle} model).
 
-Each of these steering behaviors has parameters, such as weights, distances, and angles. (For example, the weight given to alignment behavior, or the minimum time before a predicted obstacle collision at which the boid should steer to avoid.) There are also parameters related to its physical model, such as the maximum force it can apply.
-
-The collection of all these make up the flock's \textit{parameter set} which is adjusted by optimization according the the objective function. See Table \ref{table:flock-parameters} for a list of the parameter set used in these experiments.
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -265,6 +264,10 @@ The collection of all these make up the flock's \textit{parameter set} which is 
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Each of these steering behaviors has parameters, such as weights, distances, and angles. (For example, the weight given to alignment behavior, or the minimum time before a predicted obstacle collision at which the boid should steer to avoid.) There are also parameters related to its physical model, such as the maximum force it can apply.
+
+The collection of all these make up the flock's \textit{parameter set} which is adjusted by optimization according the the objective function. See Table \ref{table:flock-parameters} for a list of the parameter set used in these experiments.
 
 
 
@@ -444,7 +447,7 @@ EvoFlock finds good results using the genetic algorithm \citep{holland_adaptatio
 \section{Acknowledgements}
 \label{sec:ack}
 
-This work is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, Jennifer Luo, and Ryan Zambrotta. Thanks to Ronin Barzel for a careful review of an early draft of this paper. I also want to thank my long time (30 year?) friend and ALife colleague, Inman Harvey, whose deep insights taught me so much about evolutionary computation and scholarship. To Andy Kopra for discussions that led to the 1993 paper. Thanks to John Holland for genetic algorithms and to John Koza for introducing me to GP and GA. Finally to my family for their loving support.
+This work is part of a larger project. Many thanks for conversations and camaraderie to my collaborators: Gilbert Bernstein, Matthew Shang, Jennifer Luo, Ryan Zambrotta, and Tzu-Mao Li. Thanks to Ronin Barzel for a careful review of an early draft of this paper. I also want to thank my long time (30 year?) friend and ALife colleague, Inman Harvey, whose deep insights taught me so much about evolutionary computation and scholarship. To Andy Kopra for discussions that led to my 1993 paper. Thanks to John Holland for genetic algorithms and to John Koza for introducing me to GP and GA. Finally to my family for their loving support.
 
 % [[[...removed for double-blind review...]]]
 % \textbf{[[[Full Papers are 3 to 8 pages long (not including references or acknowledgments)]]]}

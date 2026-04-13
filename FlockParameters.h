@@ -250,9 +250,13 @@ private:
                                  1000 :  // ~30 seconds viz prev results.
                                  500);   // ~17 seconds: for evolution run.
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260413 current flock centroid, and velocity
     std::string use_obstacle_set = (EF::murmuration_mode ?
-                                    "BoxObstacle" :
+//                                    "BoxObstacle" :
+                                    "NoObstacles" :
                                     "SmallSpheresInBigSphere");
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
                             EF::override_boids_per_flock :

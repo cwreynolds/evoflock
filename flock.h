@@ -302,6 +302,10 @@ public:
         if (EF::use_curvature_objective) { collectCurvatureStats();        }
         if (EF::use_alignment_objective) { recordAlignmentScorePerStep();  }
         if (EF::use_cluster_objective  ) { recordClusterScorePerStep();    }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260413 current flock centroid, and velocity
+        if (EF::use_centroid_objective)  { recordCentroid(time_step); }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
     }
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -452,6 +456,29 @@ public:
     {
         return double(clock().frameCounter()) / fp().maxSimulationSteps();
     }
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260413 current flock centroid, and velocity
+    
+    Vec3 centroid_;
+    Vec3 centroid_velocity_;
+
+    // Current average position of all boids in flock.
+    Vec3 centroid() const { return centroid_; }
+    
+    // Centroid's velocity based on difference since previous simulation step.
+    Vec3 centroidVelocity() const { return centroid_velocity_; }
+    
+    void recordCentroid(double time_step)
+    {
+        Vec3 sum_of_boid_positions;
+        for (auto b : boids()) { sum_of_boid_positions += b->position(); }
+        Vec3 average_position = sum_of_boid_positions / boids().size();
+        centroid_velocity_ = (average_position - centroid_) / time_step;
+        centroid_ = average_position;
+    }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250709 only called in printRunStats() replace with speedScore()?
@@ -656,7 +683,19 @@ public:
             if (name == os.at(i).name()) { index = i; }
         }
         bool obstacle_set_name_found = index >= 0;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260413 current flock centroid, and velocity
+        if (not obstacle_set_name_found)
+        {
+            std::cout << "Obstacle set name: " << name;
+            std::cout << " is not one of:" << std::endl;
+            for (int i = 0; i < os.size(); i++)
+            {
+                std::cout << os.at(i).name() << std::endl;
+            }
+        }
         assert(obstacle_set_name_found);
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         return index;
     }
 

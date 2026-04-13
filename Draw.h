@@ -101,6 +101,11 @@ private:
         setupGuiCallbacks();
         // Initialize camera parameters with default offset distance
         resetCameraView();
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260413 current flock centroid, and velocity
+        dummySceneForInitialization();
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 #endif  // USE_OPEN3D
     }
 
@@ -113,6 +118,20 @@ public:
         std::cout << triangle_count_ << "." << std::endl;
     }
 
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260413 current flock centroid, and velocity
+    void dummySceneForInitialization()
+    {
+        beginAnimatedScene();
+        beginOneAnimatedFrame();
+        auto mesh = constructSphereTriMesh(100, {}, {}, false, false, 10);
+        addTriMeshToStaticScene(mesh);
+        endOneAnimatedFrame();
+        endAnimatedScene();
+    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    
     // Called to begin an animated scene, typically composed of many frames.
     void beginAnimatedScene()
     {

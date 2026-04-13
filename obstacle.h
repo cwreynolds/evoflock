@@ -292,9 +292,9 @@ public:
     PlaneObstacle(const Vec3& normal, const Vec3& center)
       : Obstacle(), normal_(normal.normalize()), center_(center)
     {
-        std::cout << "PlaneObstacle constructor "; debugPrint(normal_);
-        std::cout << "PlaneObstacle constructor "; debugPrint(center_);
-        std::cout << std::endl;
+//        std::cout << "PlaneObstacle constructor "; debugPrint(normal_);
+//        std::cout << "PlaneObstacle constructor "; debugPrint(center_);
+//        std::cout << std::endl;
     }
 
     PlaneObstacle(const Vec3& normal, const Vec3& center, ExcludeFrom ef)

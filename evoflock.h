@@ -49,6 +49,10 @@ inline static bool use_speed_objective     = true;
 inline static bool use_curvature_objective = true;
 inline static bool use_alignment_objective = true;
 inline static bool use_cluster_objective   = true;
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20260413 current flock centroid, and velocity
+inline static bool use_centroid_objective  = true;
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
 
 // experimental / temp?
 inline static int override_boids_per_flock = -1;
@@ -117,6 +121,10 @@ void runOneFlockEvolution()
         use_curvature_objective = true;
         use_alignment_objective = false;
         use_cluster_objective   = true;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260413 current flock centroid, and velocity
+        use_centroid_objective  = true;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }
     else
     {
@@ -126,8 +134,24 @@ void runOneFlockEvolution()
         use_curvature_objective = false;
         use_alignment_objective = false;
         use_cluster_objective   = false;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260413 current flock centroid, and velocity
+        use_centroid_objective  = false;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260413 current flock centroid, and velocity
+    debugPrint(murmuration_mode);
+    debugPrint(use_avoid_objective);
+    debugPrint(use_separate_objective);
+    debugPrint(use_speed_objective);
+    debugPrint(use_curvature_objective);
+    debugPrint(use_alignment_objective);
+    debugPrint(use_cluster_objective);
+    debugPrint(use_centroid_objective);
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    
     // Set likelihood of crossover versus hoist (on a randomly selected parent).
     LP::GpTree::likelihood_of_crossover_ = EF::usingGP() ? 0.9 : 1.0;
     debugPrint(LP::GpTree::likelihood_of_crossover_);

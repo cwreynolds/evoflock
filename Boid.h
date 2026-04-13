@@ -618,7 +618,10 @@ public:
             
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             // TODO 20260405 BoxObstacle normal() points in wrong direction, or does it?
-            if (isSelected())
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20260413 current flock centroid, and velocity
+            if (isSelected() && (not flock_obstacles().empty()))
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             {
                 auto first_collision = get_predicted_obstacle_collisions()[0];
                 Vec3 poi = first_collision.point_of_impact;

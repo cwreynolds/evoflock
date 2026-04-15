@@ -149,6 +149,15 @@ public:
             selectedBoid()->drawAnnotationForBoidAndNeighbors();
             draw().addAnnotationsToAnimatedFrame();
             draw().aimAgent() = *selectedBoid();
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260414 wip on behavior for EF::use_centroid_objective
+
+            if (EF::use_centroid_objective)
+            {
+                debugPrint(draw().cameraLookAt());
+                draw().cameraLookAt() = centroid();
+            }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             draw().endOneAnimatedFrame();
             clock().sleepUntilEndOfFrame(afap ? 0 : step_duration);
             clock().measureFrameDuration(run_sim_this_frame);
@@ -293,6 +302,19 @@ public:
     // phase which actually moves the boids. Finally statistics are collected.
     void fly_boids(double time_step)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260414 wip on behavior for EF::use_centroid_objective
+        
+//        Vec3 centroid_;
+//        Vec3 centroid_velocity_;
+
+        for_all_boids([&](Boid* b){
+            b->centroid_ = centroid_;
+            b->centroid_velocity_ = centroid_velocity_;
+        });
+
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();

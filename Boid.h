@@ -183,6 +183,12 @@ public:
         }
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260414 wip on behavior for EF::use_centroid_objective
+    Vec3 centroid_;
+    Vec3 centroid_velocity_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Basic flocking behavior. Computes steering force for one simulation step
     // (an animation frame) for one boid in a flock. Uses a hand-written (black-
     // box) parametric flocking model. Modernized version of 1987 boids. Flock
@@ -198,6 +204,42 @@ public:
         Vec3 ap = steer_for_predictive_avoidance() * fp().weightAvoidPredict();
         Vec3 as = fly_away_from_obstacles()        * fp().weightAvoidStatic();
         Vec3 combined_steering = smoothed_steering(f + s + a + c + ap + as);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260414 wip on behavior for EF::use_centroid_objective
+
+        // very ad hoc prototype
+        if (EF::use_centroid_objective)
+        {
+            Vec3 c = centroid_;
+            
+//            double max_dist = 50;
+//            double min_centering_dist = max_dist * 0.8;
+//            double centering_strength = 1;
+//            double max_dist = 30;
+//            double min_centering_dist = max_dist * 0.5;
+//            double centering_strength = 2;
+//            double max_dist = 30;
+//            double min_centering_dist = max_dist * 0.5;
+//            double centering_strength = 4;
+//            double max_dist = 30;
+//            double min_centering_dist = max_dist * 0.5;
+//            double centering_strength = 4;
+            double max_dist = 30;
+            double min_centering_dist = max_dist * 0.4;
+            double centering_strength = 5;
+
+            Vec3 to_center = c - position();
+            double distance = to_center.length();
+            double too_far_dist = distance - min_centering_dist;
+            if (too_far_dist > 0)
+            {
+                Vec3 centroid_steer = ((to_center / distance) *
+                                       too_far_dist *
+                                       centering_strength);
+                combined_steering += centroid_steer;
+            }
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         saveAnnotation(s, a, c, ap, as, combined_steering);
         return combined_steering;
     }

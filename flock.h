@@ -147,6 +147,11 @@ public:
             draw().beginOneAnimatedFrame();
             for_all_boids([&](Boid* b){ b->draw_body();});
             selectedBoid()->drawAnnotationForBoidAndNeighbors();
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20260415 add temp axes for testing EF::use_centroid_objective
+            draw().addAnnotationAxes({});
+            draw().addAnnotationAxes(centroid(), 10);
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             draw().addAnnotationsToAnimatedFrame();
             draw().aimAgent() = *selectedBoid();
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -154,7 +159,7 @@ public:
 
             if (EF::use_centroid_objective)
             {
-                debugPrint(draw().cameraLookAt());
+//                debugPrint(draw().cameraLookAt());
                 draw().cameraLookAt() = centroid();
             }
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

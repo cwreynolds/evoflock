@@ -1015,6 +1015,33 @@ public:
     {
         addAnnotationLine(ep1, ep2, color, 0.02);
     }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260415 add temp axes for testing EF::use_centroid_objective
+    
+    // Draw 3 axes aligned with global space with the given
+    void addAnnotationAxes(Vec3 center,
+                           double length,
+                           double radius,
+                           const std::vector<Color>& colors)
+    {
+        assert(colors.size() == 3);
+        Vec3 x(length, 0, 0);
+        Vec3 y(0, length, 0);
+        Vec3 z(0, 0, length);
+        addAnnotationLine(center + x, center - x, colors.at(0), radius);
+        addAnnotationLine(center + y, center - y, colors.at(1), radius);
+        addAnnotationLine(center + z, center - z, colors.at(2), radius);
+    }
+    void addAnnotationAxes(Vec3 center, double length)
+    {
+        addAnnotationAxes(center, length, 0.05,
+                          {Color::red(), Color::green(), Color::blue()});
+    }
+    void addAnnotationAxes(Vec3 center)
+    {
+        addAnnotationAxes(center, 100);
+    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     void addAnnotationsToAnimatedFrame()
     {
         if (enable() and enableAnnotation())

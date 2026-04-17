@@ -313,12 +313,19 @@ public:
 //        Vec3 centroid_;
 //        Vec3 centroid_velocity_;
 
-        for_all_boids([&](Boid* b){
-            b->centroid_ = centroid_;
-            b->centroid_velocity_ = centroid_velocity_;
-        });
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+        // TODO 20260416 break off steerTowardCentroid()
 
-        
+//        for_all_boids([&](Boid* b){
+//            b->centroid_ = centroid_;
+//            b->centroid_velocity_ = centroid_velocity_;
+//        });
+
+        for_all_boids([&](Boid* b){b->setCentroid(centroid_);
+                                   b->setCentroidVelocity(centroid_velocity_);});
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});

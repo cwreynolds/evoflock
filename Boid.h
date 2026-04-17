@@ -183,12 +183,6 @@ public:
         }
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260414 wip on behavior for EF::use_centroid_objective
-    Vec3 centroid_;
-    Vec3 centroid_velocity_;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     // Basic flocking behavior. Computes steering force for one simulation step
     // (an animation frame) for one boid in a flock. Uses a hand-written (black-
     // box) parametric flocking model. Modernized version of 1987 boids. Flock
@@ -206,11 +200,14 @@ public:
         Vec3 combined_steering = smoothed_steering(f + s + a + c + ap + as);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260414 wip on behavior for EF::use_centroid_objective
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20260416 break off steerTowardCentroid()
 
         // very ad hoc prototype
         if (EF::use_centroid_objective)
         {
-            Vec3 c = centroid_;
+//            Vec3 c = centroid_;
             
 //            double max_dist = 50;
 //            double min_centering_dist = max_dist * 0.8;
@@ -224,21 +221,27 @@ public:
 //            double max_dist = 30;
 //            double min_centering_dist = max_dist * 0.5;
 //            double centering_strength = 4;
-            double max_dist = 30;
-            double min_centering_dist = max_dist * 0.4;
-            double centering_strength = 5;
 
-            Vec3 to_center = c - position();
-            double distance = to_center.length();
-            double too_far_dist = distance - min_centering_dist;
-            if (too_far_dist > 0)
-            {
-                Vec3 centroid_steer = ((to_center / distance) *
-                                       too_far_dist *
-                                       centering_strength);
-                combined_steering += centroid_steer;
-            }
+//            double max_dist = 30;
+//            double min_centering_dist = max_dist * 0.4;
+//            double centering_strength = 5;
+//
+//            Vec3 to_center = c - position();
+//            double distance = to_center.length();
+//            double too_far_dist = distance - min_centering_dist;
+//            if (too_far_dist > 0)
+//            {
+//                Vec3 centroid_steer = ((to_center / distance) *
+//                                       too_far_dist *
+//                                       centering_strength);
+//                combined_steering += centroid_steer;
+//            }
+            
+            combined_steering += steerTowardCentroid();
         }
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         saveAnnotation(s, a, c, ap, as, combined_steering);
         return combined_steering;
@@ -389,6 +392,116 @@ public:
         }
         return avoidance;
     }
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20260416 break off steerTowardCentroid()
+        
+    // Current average position of all boids in flock.
+    Vec3 centroid() const { return centroid_; }
+    void setCentroid(Vec3 c) { centroid_ = c; }
+
+    // Centroid's velocity based on difference since previous simulation step.
+    Vec3 centroidVelocity() const { return centroid_velocity_; }
+    void setCentroidVelocity(Vec3 cv) { centroid_velocity_ = cv; }
+
+//        // Steering force component for global cohesion, for EF::murmuration_mode.
+//        Vec3 steerTowardCentroid() const
+//        {
+//            Vec3 centroid_steer;
+//            // very ad hoc prototype
+//            if (EF::use_centroid_objective)
+//            {
+//    //            double max_dist = 30;
+//    //            double min_centering_dist = max_dist * 0.4;
+//    //            double centering_strength = 5;
+//
+//    //            double max_dist = 40;
+//    //            double min_centering_dist = max_dist * 0.4;
+//    //            double centering_strength = 10;
+//
+//    //            double max_dist = 60;
+//    //            double min_centering_dist = max_dist * 0.7;
+//    //            double centering_strength = 10;
+//
+//    //            double max_dist = 60;
+//    //            double min_centering_dist = max_dist * 0.7;
+//    //            double centering_strength = 20;
+//
+//    //            double max_dist = 50;
+//    //            double min_centering_dist = max_dist * 0.6;
+//    //            double centering_strength = 20;
+//
+//    //            double max_dist = 40;
+//    //            double min_centering_dist = max_dist * 0.5;
+//    //            double centering_strength = 30;
+//
+//    //            double max_dist = 30;
+//    //            double min_centering_dist = max_dist * 0.5;
+//    //            double centering_strength = 35;
+//
+//                double max_dist = 30;
+//                double min_centering_dist = max_dist * 0.5;
+//                double centering_strength = 40;
+//
+//                Vec3 to_center = centroid() - position();
+//                double distance = to_center.length();
+//    //            double too_far_dist = distance - min_centering_dist;
+//    //            if (too_far_dist > 0)
+//                if (distance > min_centering_dist)
+//                {
+//    //                Vec3 unit_center = to_center / distance;
+//    //                centroid_steer = unit_center * too_far_dist * centering_strength;
+//    //                Vec3 unit_steer = ;
+//
+//    //                centroid_steer = (to_center / distance *
+//    //                                  util::remap_interval_clip(distance,
+//    //                                                            min_centering_dist,
+//    //                                                            max_dist,
+//    //                                                            0,
+//    //                                                            centering_strength));
+//
+//
+//                    centroid_steer = to_center / distance;
+//                    centroid_steer *= util::remap_interval_clip(distance,
+//                                                                min_centering_dist,
+//                                                                max_dist,
+//                                                                0,
+//                                                                centering_strength);
+//                }
+//            }
+//            return centroid_steer;
+//        }
+    
+    // Steering force component for global cohesion, for EF::murmuration_mode.
+    Vec3 steerTowardCentroid() const
+    {
+        Vec3 centroid_steer;
+        // very ad hoc prototype
+        if (EF::use_centroid_objective)
+        {
+            double max_dist = 30;
+//            double min_centering_dist = max_dist * 0.5;
+            double min_centering_dist = max_dist * 0.4;
+//            double centering_strength = 40;
+            double centering_strength = 50;
+
+            Vec3 to_center = centroid() - position();
+            double distance = to_center.length();
+            if (distance > min_centering_dist)
+            {
+                centroid_steer = to_center / distance;
+                centroid_steer *= util::remap_interval_clip(distance,
+                                                            min_centering_dist,
+                                                            max_dist,
+                                                            0,
+                                                            centering_strength);
+            }
+        }
+        return centroid_steer;
+    }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
     // Compute a behavioral weight (on [0, 1]) for a neighbor of this Boid.
     // Shared by separate, align, and cohere steering behaviors
@@ -787,4 +900,10 @@ public:
 private:
     // Count of all obstacle collisions during the lifetime of this Boid.
     int obs_collision_count_ = 0;
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20260416 break off steerTowardCentroid()
+    Vec3 centroid_;
+    Vec3 centroid_velocity_;
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 };

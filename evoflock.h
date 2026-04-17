@@ -342,6 +342,11 @@ void visualizeBestIfRequested(LP::Population* population)
         bool previous_draw_enable_state = Draw::getInstance().enable();
         Draw::getInstance().setEnable(true);
         int previous_obpf = override_boids_per_flock;
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260417 combine computing centroid and setting it in all boids
+//        if (murmuration_mode) { override_boids_per_flock = 500; }
+        if (murmuration_mode) { override_boids_per_flock = 300; }
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         GP::run_flock_simulation(individual, 1);
         override_boids_per_flock = previous_obpf;
         Draw::getInstance().setEnable(previous_draw_enable_state);

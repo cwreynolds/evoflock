@@ -321,8 +321,13 @@ public:
 //            b->centroid_velocity_ = centroid_velocity_;
 //        });
 
-        for_all_boids([&](Boid* b){b->setCentroid(centroid_);
-                                   b->setCentroidVelocity(centroid_velocity_);});
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260417 combine computing centroid and setting it in all boids
+
+//        for_all_boids([&](Boid* b){b->setCentroid(centroid_);
+//                                   b->setCentroidVelocity(centroid_velocity_);});
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -510,6 +515,13 @@ public:
         Vec3 average_position = sum_of_boid_positions / boids().size();
         centroid_velocity_ = (average_position - centroid_) / time_step;
         centroid_ = average_position;
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260417 combine computing centroid and setting it in all boids
+                
+        for (auto b : boids()) {b->setCentroids(centroid_, centroid_velocity_);}
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~

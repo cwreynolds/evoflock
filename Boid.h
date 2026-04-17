@@ -395,14 +395,25 @@ public:
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20260416 break off steerTowardCentroid()
-        
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260417 combine computing centroid and setting it in all boids
+
     // Current average position of all boids in flock.
     Vec3 centroid() const { return centroid_; }
-    void setCentroid(Vec3 c) { centroid_ = c; }
+//    void setCentroid(Vec3 c) { centroid_ = c; }
 
     // Centroid's velocity based on difference since previous simulation step.
     Vec3 centroidVelocity() const { return centroid_velocity_; }
-    void setCentroidVelocity(Vec3 cv) { centroid_velocity_ = cv; }
+//    void setCentroidVelocity(Vec3 cv) { centroid_velocity_ = cv; }
+    
+    void setCentroids(Vec3 centroid, Vec3 centroid_velocity)
+    {
+        centroid_ = centroid;
+        centroid_velocity_ = centroid_velocity;
+    }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 //        // Steering force component for global cohesion, for EF::murmuration_mode.
 //        Vec3 steerTowardCentroid() const

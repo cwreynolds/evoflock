@@ -79,6 +79,12 @@ public:
         // Predict obstacle collisions only...
         // ...should this be renamed?
         1.4,   // min_time_to_collide
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260419 add tunable parameters for murmuration
+        
+        40,    // murm_max_distance
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     };
     
     // Accessors for tuning parameters:
@@ -105,6 +111,12 @@ public:
     // ignore obstacle until predicted impact is in less than this many seconds.
     const double& minTimeToCollide() const { return tuning_parameters.at(14); }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260419 add tunable parameters for murmuration
+
+    // Maximum distance from centroid for murmurations
+    const double& murmMaxDistance() const { return tuning_parameters.at(15); }
+
     // Default constructor
     FlockParameters() : FlockParameters(hand_tuned_parameters) {}
     
@@ -115,30 +127,29 @@ public:
         tuning_parameters = vector_of_parameters_;
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20250908 assert FlockParameters only used in GA mode.
-
-//    // Constructor for individual tunable parameters.
-//    FlockParameters(double max_force,
-//                    double weight_forward,
-//                    double weight_separate,
-//                    double weight_align,
-//                    double weight_cohere,
-//                    double weight_avoid_predict,
-//                    double weight_avoid_static,
-//                    double max_dist_separate,
-//                    double max_dist_align,
-//                    double max_dist_cohere,
-//                    double angle_separate,
-//                    double angle_align,
-//                    double angle_cohere,
-//                    double fly_away_max_dist,
-//                    double min_time_to_collide)
-//    {
+//        // Constructor for individual tunable parameters.
+//        FlockParameters(double max_force,
+//                        double weight_forward,
+//                        double weight_separate,
+//                        double weight_align,
+//                        double weight_cohere,
+//                        double weight_avoid_predict,
+//                        double weight_avoid_static,
+//                        double max_dist_separate,
+//                        double max_dist_align,
+//                        double max_dist_cohere,
+//                        double angle_separate,
+//                        double angle_align,
+//                        double angle_cohere,
+//                        double fly_away_max_dist,
+//                        
+//    //                    double min_time_to_collide)
+//                        double min_time_to_collide,
+//                        double murm_max_distance
+//                        )
 //
-//        // Set tuning parameter vector to given values.
-//        tuning_parameters =
-//        {
+//          : FlockParameters
+//        (std::vector<double>({
 //            max_force,
 //            weight_forward,
 //            weight_separate,
@@ -154,45 +165,9 @@ public:
 //            angle_cohere,
 //            fly_away_max_dist,
 //            min_time_to_collide
-//        };
-//    }
+//        })) {}
 
-    // Constructor for individual tunable parameters.
-    FlockParameters(double max_force,
-                    double weight_forward,
-                    double weight_separate,
-                    double weight_align,
-                    double weight_cohere,
-                    double weight_avoid_predict,
-                    double weight_avoid_static,
-                    double max_dist_separate,
-                    double max_dist_align,
-                    double max_dist_cohere,
-                    double angle_separate,
-                    double angle_align,
-                    double angle_cohere,
-                    double fly_away_max_dist,
-                    double min_time_to_collide)
-      : FlockParameters
-    (std::vector<double>({
-        max_force,
-        weight_forward,
-        weight_separate,
-        weight_align,
-        weight_cohere,
-        weight_avoid_predict,
-        weight_avoid_static,
-        max_dist_separate,
-        max_dist_align,
-        max_dist_cohere,
-        angle_separate,
-        angle_align,
-        angle_cohere,
-        fly_away_max_dist,
-        min_time_to_collide
-    })) {}
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // The count(/size) of ALL parameters in this class.
     static int parameterCount()

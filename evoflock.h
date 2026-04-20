@@ -437,11 +437,21 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                    91.0774, 96.0671, 2.73925, 4.86185, 20.5608,
         //                    -0.62327, 0.2073, 0.340471, 6.76677, 1.19798);
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260419 add tunable parameters for murmuration
+
+//        // Saved FP values from run 20260418_ga_murm_param_tweak
+//        FlockParameters fp(14.3525, 98.2618, 67.4173, 84.6732, 15.0438,
+//                           71.0199, 21.2444, 2.2782, 62.0336, 96.8648,
+//                           -0.905143, -0.906197, -0.318942, 67.6338, 1.27933);
+
         // Saved FP values from run 20260418_ga_murm_param_tweak
-        FlockParameters fp(14.3525, 98.2618, 67.4173, 84.6732, 15.0438,
-                           71.0199, 21.2444, 2.2782, 62.0336, 96.8648,
-                           -0.905143, -0.906197, -0.318942, 67.6338, 1.27933);
-        
+        FlockParameters fp({14.3525, 98.2618, 67.4173, 84.6732, 15.0438,
+                            71.0199, 21.2444, 2.2782, 62.0336, 96.8648,
+                            -0.905143, -0.906197, -0.318942, 67.6338, 1.27933});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);
         LP::Individual individual(GP::gaTreeFromFP(fp, fs), fs);

@@ -694,21 +694,189 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260422 trying to make an "H"/"help" key command
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260423 clean up setupGuiCallbacks()
+
+//        std::vector<std::pair<int, std::string>> key_commands_;
+//
+//        void printHelp()
+//        {
+//            std::cout << std::endl;
+//            std::cout << "EvoFlock: list of single key commands." << std::endl;
+//
+//            for (const auto& [key, doc] : key_commands_)
+//            {
+//                std::cout << "    " << char(key) << "  " << doc << std::endl;
+//            }
+//
+//
+//            std::cout << std::endl;
+//        }
+//
+//        // Called in constructor to set up the various key cmd and mouse callbacks.
+//        void setupGuiCallbacks()
+//        {
+//            // If "rv" is true, requests redraw after key command callback.
+//            bool rv = false;
+//            // Abbreviated name for unused Visualizer class.
+//            typedef base_vis_t vis;
+//            // Register a key command.
+//            auto rk = [&](int key,std::function<bool(vis *)> callback)
+//            {
+//                visualizer().RegisterKeyCallback(key, callback);
+//            };
+//
+//            // Register a key command, remembering it for the H/help command.
+//            auto qq = [&](int key,
+//                          std::string doc,
+//                          std::function<bool(vis *)> callback)
+//            {
+//                key_commands_.push_back({key, doc});
+//                rk(key, callback);
+//            };
+//
+//            // Add single key command callback to print help listing defined keys.
+//            qq('H', "print this list of single key commands.",
+//               [&](vis* v) { printHelp(); return rv; });
+//
+//
+//            // Add single key command callback to toggle "graphics mode"
+//    //        rk('G', [&](vis* v) { toggleEnable(); return rv; });
+//            qq('G', "toggle \"graphics mode\".",
+//               [&](vis* v) { toggleEnable(); return rv; });
+//
+//            // Add "C" command, to cycle through camera aiming modes.
+//    //        rk('C', [&](vis* v) { nextCameraMode(); return rv; });
+//            qq('C', "cycle through camera aiming modes.",
+//               [&](vis* v) { nextCameraMode(); return rv; });
+//
+//            // Add " " (space) command, toggles public pause simulation flag.
+//    //        rk(' ', [&](vis* v) { toggleSimPause(); return rv; });
+//            qq(' ', "(space) toggle simulation pause.",
+//               [&](vis* v) { toggleSimPause(); return rv; });
+//
+//            // Add "O" command, to increment obstacle set counter.
+//    //        rk('O', [&](vis* v) { nextObstacleSet(); return rv; });
+//            qq('O', "cycle through predefined obstacle sets.",
+//               [&](vis* v) { nextObstacleSet(); return rv; });
+//
+//            // Add "1" command, to set single step mode.
+//    //        rk('1', [&](vis* v) { setSingleStepMode(); return rv; });
+//            qq('1', "single step mode (advance one simulation step, then pause).",
+//               [&](vis* v) { setSingleStepMode(); return rv; });
+//
+//            // Add "S" command, to cycle selected boid through flock.
+//    //        rk('S', [&](vis* v) { selectNextBoid(); return rv; });
+//            qq('S', "cycle selected boid through flock.",
+//               [&](vis* v) { selectNextBoid(); return rv; });
+//
+//            // "A" command toggles drawing of annotation lines, etc.
+//    //        rk('A', [&](vis* v) { toggleAnnotation(); return rv; });
+//            qq('A', "toggle drawing of annotation lines, etc.",
+//               [&](vis* v) { toggleAnnotation(); return rv; });
+//
+//            // Add "R" command, reset camera to aligned view of whole scene.
+//    //        rk('R', [&](vis* v) { resetCameraView(100); return rv; });
+//            qq('R', "reset camera to aligned view of whole scene.",
+//               [&](vis* v) { resetCameraView(100); return rv; });
+//
+//            // Add "B" cmd runs a sim, with best individual & graphics, then reset.
+//    //        rk('B', [&](vis* v) { setVisBestMode(); return rv; });
+//            qq('B', "pause, run a sim with best individual & graphics, then proceed.",
+//               [&](vis* v) { setVisBestMode(); return rv; });
+//
+//            // Add "W" cmd to toggle "space-time worms".
+//    //        rk('W', [&](vis* v) { toggleWormMode(); return rv; });
+//            qq('W', "toggle \"space-time worms\".",
+//               [&](vis* v) { toggleWormMode(); return rv; });
+//
+//            // Set mouse move/scroll/button handlers.
+//            setMouseCallbacks();
+//        }
+    
+    // For printHelp(): pairs of single-key-command and doc string
     std::vector<std::pair<int, std::string>> key_commands_;
     
+    // Print to terminal a table of defined single-key-command and description.
     void printHelp()
     {
-        std::cout << std::endl;
+        std::cout << std::endl << std::endl;
         std::cout << "EvoFlock: list of single key commands." << std::endl;
-
         for (const auto& [key, doc] : key_commands_)
         {
             std::cout << "    " << char(key) << "  " << doc << std::endl;
         }
-
-        
-        std::cout << std::endl;
+        std::cout << std::endl << std::endl;
     }
+
+//        // Called in constructor to set up the various key cmd and mouse callbacks.
+//        void setupGuiCallbacks()
+//        {
+//            // If "rv" is true, requests redraw after key command callback.
+//            bool rv = false;
+//            // Abbreviated name for unused Visualizer class.
+//            typedef base_vis_t vis;
+//            // Register a key command.
+//    //        auto rk = [&](int key,std::function<bool(vis *)> callback)
+//    //        {
+//    //            visualizer().RegisterKeyCallback(key, callback);
+//    //        };
+//
+//            // Register a key command, remembering it for the H/help command.
+//            auto add_key = [&](int key,
+//                               std::string doc,
+//    //                           std::function<bool(vis *)> callback)
+//    //                           std::function<bool()> callback)
+//                               std::function<void()> callback)
+//            {
+//                key_commands_.push_back({key, doc});
+//    //            rk(key, callback);
+//
+//                auto wrap_cb = [&](vis *) { callback(); return rv; };
+//
+//                visualizer().RegisterKeyCallback(key, wrap_cb);
+//            };
+//
+//            add_key('H',
+//                    "print this list of single key commands.",
+//    //                [&](vis* v) { printHelp(); return rv; });
+//    //                [&](){ printHelp(); return rv; });
+//                    [&](){ printHelp(); });
+//            add_key('G',
+//    //                "toggle \"graphics mode\".",
+//                    R"(toggle "graphics mode".)",
+//                    [&](){ toggleEnable(); return rv; });
+//            add_key('C',
+//                    "cycle through camera aiming modes.",
+//                    [&](){ nextCameraMode(); return rv; });
+//            add_key(' ',
+//                    "[space] toggle simulation pause.",
+//                    [&](){ toggleSimPause(); return rv; });
+//            add_key('O',
+//                    "cycle through predefined obstacle sets.",
+//                    [&](){ nextObstacleSet(); return rv; });
+//            add_key('1',
+//                    "single step mode (advance one simulation step, then pause).",
+//                    [&](){ setSingleStepMode(); return rv; });
+//            add_key('S',
+//                    "cycle selected boid through flock.",
+//                    [&](){ selectNextBoid(); return rv; });
+//            add_key('A',
+//                    "toggle drawing of annotation lines, etc.",
+//                    [&](){ toggleAnnotation(); return rv; });
+//            add_key('R',
+//                    "reset camera to aligned view of whole scene.",
+//                    [&](){ resetCameraView(100); return rv; });
+//            add_key('B',
+//                    "pause, run sim with best individual & graphics, then proceed.",
+//                    [&](){ setVisBestMode(); return rv; });
+//            add_key('W',
+//                    "toggle \"space-time worms\".",
+//                    [&](){ toggleWormMode(); return rv; });
+//
+//            // Set mouse move/scroll/button handlers.
+//            setMouseCallbacks();
+//        }
 
     // Called in constructor to set up the various key cmd and mouse callbacks.
     void setupGuiCallbacks()
@@ -718,79 +886,83 @@ public:
         // Abbreviated name for unused Visualizer class.
         typedef base_vis_t vis;
         // Register a key command.
-        auto rk = [&](int key,std::function<bool(vis *)> callback)
+//        auto rk = [&](int key,std::function<bool(vis *)> callback)
+//        {
+//            visualizer().RegisterKeyCallback(key, callback);
+//        };
+        
+        // Register a key command, remembering it for the H/help command.
+        auto add_key = [&](int key,
+                           std::string doc,
+//                           std::function<bool(vis *)> callback)
+//                           std::function<bool()> callback)
+//                           std::function<void()> callback)
+//                           std::function<void(vis *)> callback)
+//                           std::function<bool(vis *)> callback)
+//                           std::function<void(vis *)> callback)
+                           std::function<bool(vis *)> callback)
         {
+//            debugPrint(char(key));
+//            debugPrint(doc);
+
+            
+            key_commands_.push_back({key, doc});
+            
+//    //            auto wrap_cb = [&](vis* v) { callback(v); return rv; };
+//    //            visualizer().RegisterKeyCallback(key, wrap_cb);
+//                visualizer().RegisterKeyCallback(key, callback);
+
+//            auto wrap_cb = [&](vis* v) { callback(v); return rv; };
+//            std::function<bool(vis *)>
+//            visualizer().RegisterKeyCallback(key, wrap_cb);
+
             visualizer().RegisterKeyCallback(key, callback);
         };
         
-        // Register a key command, remembering it for the H/help command.
-        auto qq = [&](int key,
-                      std::string doc,
-                      std::function<bool(vis *)> callback)
-        {
-            key_commands_.push_back({key, doc});
-            rk(key, callback);
-        };
-        
-        // Add single key command callback to print help listing defined keys.
-        qq('H', "print this list of single key commands.",
-           [&](vis* v) { printHelp(); return rv; });
-
-
-        // Add single key command callback to toggle "graphics mode"
-//        rk('G', [&](vis* v) { toggleEnable(); return rv; });
-        qq('G', "toggle \"graphics mode\".",
-           [&](vis* v) { toggleEnable(); return rv; });
-
-        // Add "C" command, to cycle through camera aiming modes.
-//        rk('C', [&](vis* v) { nextCameraMode(); return rv; });
-        qq('C', "cycle through camera aiming modes.",
-           [&](vis* v) { nextCameraMode(); return rv; });
-
-        // Add " " (space) command, toggles public pause simulation flag.
-//        rk(' ', [&](vis* v) { toggleSimPause(); return rv; });
-        qq(' ', "(space) toggle simulation pause.",
-           [&](vis* v) { toggleSimPause(); return rv; });
-
-        // Add "O" command, to increment obstacle set counter.
-//        rk('O', [&](vis* v) { nextObstacleSet(); return rv; });
-        qq('O', "cycle through predefined obstacle sets.",
-           [&](vis* v) { nextObstacleSet(); return rv; });
-
-        // Add "1" command, to set single step mode.
-//        rk('1', [&](vis* v) { setSingleStepMode(); return rv; });
-        qq('1', "single step mode (advance one simulation step, then pause).",
-           [&](vis* v) { setSingleStepMode(); return rv; });
-
-        // Add "S" command, to cycle selected boid through flock.
-//        rk('S', [&](vis* v) { selectNextBoid(); return rv; });
-        qq('S', "cycle selected boid through flock.",
-           [&](vis* v) { selectNextBoid(); return rv; });
-
-        // "A" command toggles drawing of annotation lines, etc.
-//        rk('A', [&](vis* v) { toggleAnnotation(); return rv; });
-        qq('A', "toggle drawing of annotation lines, etc.",
-           [&](vis* v) { toggleAnnotation(); return rv; });
-
-        // Add "R" command, reset camera to aligned view of whole scene.
-//        rk('R', [&](vis* v) { resetCameraView(100); return rv; });
-        qq('R', "reset camera to aligned view of whole scene.",
-           [&](vis* v) { resetCameraView(100); return rv; });
-
-        // Add "B" cmd runs a sim, with best individual & graphics, then reset.
-//        rk('B', [&](vis* v) { setVisBestMode(); return rv; });
-        qq('B', "pause, run a sim with best individual & graphics, then proceed.",
-           [&](vis* v) { setVisBestMode(); return rv; });
-
-        // Add "W" cmd to toggle "space-time worms".
-//        rk('W', [&](vis* v) { toggleWormMode(); return rv; });
-        qq('W', "toggle \"space-time worms\".",
-           [&](vis* v) { toggleWormMode(); return rv; });
+        add_key('H',
+                "print this list of single key commands.",
+//                [&](vis* v) { printHelp(); return rv; });
+//                [&](){ printHelp(); return rv; });
+//                [&](){ printHelp(); });
+                [&](vis*){ printHelp(); return rv; });
+        add_key('G',
+//                "toggle \"graphics mode\".",
+                R"(toggle "graphics mode".)",
+                [&](vis*){ toggleEnable(); return rv; });
+        add_key('C',
+                "cycle through camera aiming modes.",
+                [&](vis*){ nextCameraMode(); return rv; });
+        add_key(' ',
+                "[space] toggle simulation pause.",
+                [&](vis*){ toggleSimPause(); return rv; });
+        add_key('O',
+                "cycle through predefined obstacle sets.",
+                [&](vis*){ nextObstacleSet(); return rv; });
+        add_key('1',
+                "single step mode (advance one simulation step, then pause).",
+                [&](vis*){ setSingleStepMode(); return rv; });
+        add_key('S',
+                "cycle selected boid through flock.",
+                [&](vis*){ selectNextBoid(); return rv; });
+        add_key('A',
+                "toggle drawing of annotation lines, etc.",
+                [&](vis*){ toggleAnnotation(); return rv; });
+        add_key('R',
+                "reset camera to aligned view of whole scene.",
+                [&](vis*){ resetCameraView(100); return rv; });
+        add_key('B',
+                "pause, run sim with best individual & graphics, then proceed.",
+                [&](vis*){ setVisBestMode(); return rv; });
+        add_key('W',
+                "toggle \"space-time worms\".",
+                [&](vis*){ toggleWormMode(); return rv; });
 
         // Set mouse move/scroll/button handlers.
         setMouseCallbacks();
     }
-    
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Set a random per-vertex color brightness (grayscale) for given mesh.

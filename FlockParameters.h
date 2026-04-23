@@ -82,8 +82,9 @@ public:
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260419 add tunable parameters for murmuration
-        
-        40,    // murm_max_distance
+        // TODO 20260421 backing up to test README.md
+
+//        40,    // murm_max_distance
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     };
     

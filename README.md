@@ -16,11 +16,19 @@ So far, I have treated this code as a private branch: it is often broken, or mod
 
 **Just a few hints:**
 
+* Build **EvoFlock** using either:
+    * `CMake` on `CMakeLists.txt`
+    * `Xcode` on `evoflock.xcodeproj`
 * Dependencies (these should be formalized as `git` submodule dependancies):
     * **EvoFlock** uses an evolutionary computation engine, called **LazyPredator**, developed for an earlier project.
       * Its updated source code is in a subdirectory: `EvoFlock/LazyPredator/`.
       * _LazyPredator_ supports _genetic programming_ (GP). A _genetic algorithm_ (GA) can be considered a special case of GP.
     * The [Open3D](https://www.open3d.org/) library, a modern layer on top of OpenGL, is used for graphics. You will need to install this separately.
+* Run either from `Xcode` or with the `evoflock` executable from the command line.
+    * The normal action is to start optimization run, finding a solution for the given objective. For a GA run this will be a set of scalar values in a `ParameterSet` object, or in the experimental GP mode, the result will be “source code” in a domain specific language.
+    * Otherwise if `EF::visualize_previous_results_mode` is ~true` will run flock simulations based on results from a previous optimization run.
+    * Normally an `Open3D` window will open and logging will appear on the shell where `evoflock` was run.
+        * A simple user interface is avaialble in the `Open3D` window
 * _EvoFlock_ has several versions and modes of operation, all folded into a single code base using mode switches which are defined in `EvoFlock.h`. The progression over time was:
     * Use GA to find a `ParameterSet` for parametric flocking model according to three objectives: correct separation from nearest neighbor, obstacle avoidance, maintaining a target speed.
     * Add an objective to increase each boid's path curvature (`EF::use_curvature_objective`).

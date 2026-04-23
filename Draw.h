@@ -691,6 +691,25 @@ public:
     bool getWormMode() const { return enable_worm_mode_; }
     void toggleWormMode() { enable_worm_mode_ = not enable_worm_mode_; }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260422 trying to make an "H"/"help" key command
+    
+    std::vector<std::pair<int, std::string>> key_commands_;
+    
+    void printHelp()
+    {
+        std::cout << std::endl;
+        std::cout << "EvoFlock: list of single key commands." << std::endl;
+
+        for (const auto& [key, doc] : key_commands_)
+        {
+            std::cout << "    " << char(key) << "  " << doc << std::endl;
+        }
+
+        
+        std::cout << std::endl;
+    }
+
     // Called in constructor to set up the various key cmd and mouse callbacks.
     void setupGuiCallbacks()
     {
@@ -703,40 +722,76 @@ public:
         {
             visualizer().RegisterKeyCallback(key, callback);
         };
+        
+        // Register a key command, remembering it for the H/help command.
+        auto qq = [&](int key,
+                      std::string doc,
+                      std::function<bool(vis *)> callback)
+        {
+            key_commands_.push_back({key, doc});
+            rk(key, callback);
+        };
+        
+        // Add single key command callback to print help listing defined keys.
+        qq('H', "print this list of single key commands.",
+           [&](vis* v) { printHelp(); return rv; });
+
 
         // Add single key command callback to toggle "graphics mode"
-        rk('G', [&](vis* v) { toggleEnable(); return rv; });
-        
+//        rk('G', [&](vis* v) { toggleEnable(); return rv; });
+        qq('G', "toggle \"graphics mode\".",
+           [&](vis* v) { toggleEnable(); return rv; });
+
         // Add "C" command, to cycle through camera aiming modes.
-        rk('C', [&](vis* v) { nextCameraMode(); return rv; });
-        
+//        rk('C', [&](vis* v) { nextCameraMode(); return rv; });
+        qq('C', "cycle through camera aiming modes.",
+           [&](vis* v) { nextCameraMode(); return rv; });
+
         // Add " " (space) command, toggles public pause simulation flag.
-        rk(' ', [&](vis* v) { toggleSimPause(); return rv; });
-        
+//        rk(' ', [&](vis* v) { toggleSimPause(); return rv; });
+        qq(' ', "(space) toggle simulation pause.",
+           [&](vis* v) { toggleSimPause(); return rv; });
+
         // Add "O" command, to increment obstacle set counter.
-        rk('O', [&](vis* v) { nextObstacleSet(); return rv; });
-        
+//        rk('O', [&](vis* v) { nextObstacleSet(); return rv; });
+        qq('O', "cycle through predefined obstacle sets.",
+           [&](vis* v) { nextObstacleSet(); return rv; });
+
         // Add "1" command, to set single step mode.
-        rk('1', [&](vis* v) { setSingleStepMode(); return rv; });
-        
+//        rk('1', [&](vis* v) { setSingleStepMode(); return rv; });
+        qq('1', "single step mode (advance one simulation step, then pause).",
+           [&](vis* v) { setSingleStepMode(); return rv; });
+
         // Add "S" command, to cycle selected boid through flock.
-        rk('S', [&](vis* v) { selectNextBoid(); return rv; });
-        
+//        rk('S', [&](vis* v) { selectNextBoid(); return rv; });
+        qq('S', "cycle selected boid through flock.",
+           [&](vis* v) { selectNextBoid(); return rv; });
+
         // "A" command toggles drawing of annotation lines, etc.
-        rk('A', [&](vis* v) { toggleAnnotation(); return rv; });
+//        rk('A', [&](vis* v) { toggleAnnotation(); return rv; });
+        qq('A', "toggle drawing of annotation lines, etc.",
+           [&](vis* v) { toggleAnnotation(); return rv; });
 
         // Add "R" command, reset camera to aligned view of whole scene.
-        rk('R', [&](vis* v) { resetCameraView(100); return rv; });
+//        rk('R', [&](vis* v) { resetCameraView(100); return rv; });
+        qq('R', "reset camera to aligned view of whole scene.",
+           [&](vis* v) { resetCameraView(100); return rv; });
 
         // Add "B" cmd runs a sim, with best individual & graphics, then reset.
-        rk('B', [&](vis* v) { setVisBestMode(); return rv; });
-        
+//        rk('B', [&](vis* v) { setVisBestMode(); return rv; });
+        qq('B', "pause, run a sim with best individual & graphics, then proceed.",
+           [&](vis* v) { setVisBestMode(); return rv; });
+
         // Add "W" cmd to toggle "space-time worms".
-        rk('W', [&](vis* v) { toggleWormMode(); return rv; });
+//        rk('W', [&](vis* v) { toggleWormMode(); return rv; });
+        qq('W', "toggle \"space-time worms\".",
+           [&](vis* v) { toggleWormMode(); return rv; });
 
         // Set mouse move/scroll/button handlers.
         setMouseCallbacks();
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Set a random per-vertex color brightness (grayscale) for given mesh.
     static void brightnessSpecklePerVertex(double min_brightness,

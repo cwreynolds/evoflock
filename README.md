@@ -30,7 +30,21 @@ So far, I have treated this code as a private branch: it is often broken, or mod
     * Normally an `Open3D` window will open and logging will appear on the shell where `evoflock` was run.
         * A simple user interface is available in the `Open3D` window
         * The mouse can be used to adjust the “camera” (“point of view”).
-        * A few single characters commands exist. For example type an "H" to the `Open3D` window to print a list of currently defined command. See bottom of this page. The “B” key command can be used during an optimization run to check on its progress. The optimization is paused, a flock simulation is run with the _best_ solution found so far, then the optization resumes.
+        * A few single characters commands exist. For example type an "H" to the `Open3D` window to print a list of currently defined command. See below this paragraph. The “B” key command can be used during an optimization run to check on its progress. The optimization is paused, a flock simulation is run with the _best_ solution found so far, then the optimization resumes.
+        ```
+            EvoFlock: list of single key commands.
+            H  print this list of single key commands.
+            G  toggle "graphics mode".
+            C  cycle through camera aiming modes.
+               [space] toggle simulation pause.
+            O  cycle through predefined obstacle sets.
+            1  single step mode (advance one simulation step, then pause).
+            S  cycle selected boid through flock.
+            A  toggle drawing of annotation lines, etc.
+            R  reset camera to aligned view of whole scene.
+            B  pause, run sim with best individual & graphics, then proceed.
+            W  toggle "space-time worms".
+        ```
 * _EvoFlock_ has several versions and modes of operation, all folded into a single code base using mode switches which are defined in `EvoFlock.h`. The progression over time was:
     * Use GA to find a `ParameterSet` for parametric flocking model according to three objectives: correct separation from nearest neighbor, obstacle avoidance, maintaining a target speed.
     * Add an objective to increase each boid's path curvature (`EF::use_curvature_objective`).
@@ -44,18 +58,3 @@ So far, I have treated this code as a private branch: it is often broken, or mod
         * Boids per flock: 200
         * Steps per flock simulation: 500
 * I hope to soon convert this messy personal repository to be useful to others…
-
-```
-EvoFlock: list of single key commands.
-    H  print this list of single key commands.
-    G  toggle "graphics mode".
-    C  cycle through camera aiming modes.
-       [space] toggle simulation pause.
-    O  cycle through predefined obstacle sets.
-    1  single step mode (advance one simulation step, then pause).
-    S  cycle selected boid through flock.
-    A  toggle drawing of annotation lines, etc.
-    R  reset camera to aligned view of whole scene.
-    B  pause, run sim with best individual & graphics, then proceed.
-    W  toggle "space-time worms".
-```

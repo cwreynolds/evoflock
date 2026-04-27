@@ -118,7 +118,8 @@ public:
     {
         beginAnimatedScene();
         beginOneAnimatedFrame();
-        auto mesh = constructSphereTriMesh(100, {}, {}, false, false, 10);
+//        auto mesh = constructSphereTriMesh(100, {}, {}, false, false, 10);
+        auto mesh = constructSphereTriMesh(50, {}, {}, false, false, 10);
         addTriMeshToStaticScene(mesh);
         endOneAnimatedFrame();
         endAnimatedScene();

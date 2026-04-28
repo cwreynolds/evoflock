@@ -149,8 +149,11 @@ public:
             selectedBoid()->drawAnnotationForBoidAndNeighbors();
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             // TODO 20260415 add temp axes for testing EF::use_centroid_objective
-            draw().addAnnotationAxes({});
-            draw().addAnnotationAxes(centroid(), 10);
+            if (EF::use_centroid_objective)
+            {
+                draw().addAnnotationAxes({});
+                draw().addAnnotationAxes(centroid(), 10);
+            }
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             draw().addAnnotationsToAnimatedFrame();
             draw().aimAgent() = *selectedBoid();
@@ -508,6 +511,11 @@ public:
     // Centroid's velocity based on difference since previous simulation step.
     Vec3 centroidVelocity() const { return centroid_velocity_; }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260427 add centroidScore()
+    double count_boids_near_centroid_ = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     void recordCentroid(double time_step)
     {
         Vec3 sum_of_boid_positions;
@@ -522,7 +530,29 @@ public:
         for (auto b : boids()) {b->setCentroids(centroid_, centroid_velocity_);}
         
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260427 add centroidScore()
+
+        for (auto b : boids())
+        {
+            double murmuration_radius = 50;  // TODO FIX THIS RAW CONSTANT !!!!!
+            double distance = (b->position() - centroid()).length();
+            if (distance < murmuration_radius) { count_boids_near_centroid_++; }
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260427 add centroidScore()
+
+    // Average speed for each Boid on each simulation step.
+    double centroidScore() const
+    {
+        return count_boids_near_centroid_ / boidStepPerSim();
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

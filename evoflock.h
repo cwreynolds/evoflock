@@ -61,8 +61,8 @@ inline static int override_boids_per_flock = -1;
 // TODO 20260421 backing up to test README.md
 
 // Special mode for simulating murmurations.
-inline static bool murmuration_mode = false;
-//inline static bool murmuration_mode = true;
+//inline static bool murmuration_mode = false;
+inline static bool murmuration_mode = true;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

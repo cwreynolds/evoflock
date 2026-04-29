@@ -536,7 +536,11 @@ public:
 
         for (auto b : boids())
         {
-            double murmuration_radius = 50;  // TODO FIX THIS RAW CONSTANT !!!!!
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20260428 move temp murmuration parameters to EF
+//            double murmuration_radius = 50;  // TODO FIX THIS RAW CONSTANT !!!!!
+            double murmuration_radius = EF::center_max_dist;
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             double distance = (b->position() - centroid()).length();
             if (distance < murmuration_radius) { count_boids_near_centroid_++; }
         }

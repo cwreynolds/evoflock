@@ -586,6 +586,47 @@ public:
 //            return centroid_steer;
 //        }
 
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20260428 move temp murmuration parameters to EF
+    
+//        // Steering force component for global cohesion, for EF::murmuration_mode.
+//        Vec3 steerTowardCentroid() // const
+//        {
+//            Vec3 centroid_steer;
+//            // very ad hoc prototype
+//            if (EF::use_centroid_objective)
+//            {
+//    //            double max_dist = 30;
+//    //            double max_dist = 50;
+//                double max_dist = 40;
+//                double min_dist = max_dist * 0.4;
+//                double centering_strength = 90;
+//
+//                Vec3 to_center = centroid() - position();
+//                double distance = to_center.length();
+//                if (distance > min_dist)
+//                {
+//                    auto s = util::remap_interval_clip(distance,
+//                                                       min_dist, max_dist,
+//                                                       0, centering_strength);
+//                    centroid_steer = to_center / distance * s;
+//
+//                }
+//                if (distance > max_dist)
+//                {
+//    //                auto r = position() + to_center.normalize() * (distance - max_dist);
+//    //                draw().addAnnotationLine(position(), r, Color::white(), 0.05);
+//
+//                    // TODO temporary hack
+//                    if (forward().dot(position()) > 0)
+//                    {
+//                        centroid_steer -= velocity() * centering_strength * 0.5;
+//                    }
+//                }
+//            }
+//            return centroid_steer;
+//        }
+
     // Steering force component for global cohesion, for EF::murmuration_mode.
     Vec3 steerTowardCentroid() // const
     {
@@ -593,36 +634,34 @@ public:
         // very ad hoc prototype
         if (EF::use_centroid_objective)
         {
-//            double max_dist = 30;
-//            double max_dist = 50;
-            double max_dist = 40;
-            double min_dist = max_dist * 0.4;
-            double centering_strength = 90;
+//            double max_dist = 40;
+//            double min_dist = max_dist * 0.4;
+//            double centering_strength = 90;
 
             Vec3 to_center = centroid() - position();
             double distance = to_center.length();
-            if (distance > min_dist)
+            if (distance > EF::center_min_dist)
             {
                 auto s = util::remap_interval_clip(distance,
-                                                   min_dist, max_dist,
-                                                   0, centering_strength);
+                                                   EF::center_min_dist,
+                                                   EF::center_max_dist,
+                                                   0, EF::centering_strength);
                 centroid_steer = to_center / distance * s;
 
             }
-            if (distance > max_dist)
+            if (distance > EF::center_max_dist)
             {
-//                auto r = position() + to_center.normalize() * (distance - max_dist);
-//                draw().addAnnotationLine(position(), r, Color::white(), 0.05);
-                
                 // TODO temporary hack
                 if (forward().dot(position()) > 0)
                 {
-                    centroid_steer -= velocity() * centering_strength * 0.5;
+                    centroid_steer -= velocity() * EF::centering_strength * 0.5;
                 }
             }
         }
         return centroid_steer;
     }
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

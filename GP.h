@@ -62,6 +62,10 @@ inline std::vector<std::string> mof_names()
     if (EF::use_curvature_objective) { strings.push_back("curvature"); }
     if (EF::use_alignment_objective) { strings.push_back("alignment"); }
     if (EF::use_cluster_objective)   { strings.push_back("cluster"); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260429 MOF support for use_centroid_objective
+    if (EF::use_centroid_objective)  { strings.push_back("centroid"); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     return strings;
 }
 
@@ -78,6 +82,10 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
     if (EF::use_curvature_objective) { a(flock.curvatureScore()); }
     if (EF::use_alignment_objective) { a(flock.alignmentScore()); }
     if (EF::use_cluster_objective)   { a(flock.clusterScore()); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260429 MOF support for use_centroid_objective
+    if (EF::use_centroid_objective)  { a(flock.centroidScore()); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     return MOF(o, mof_names());
 }
 

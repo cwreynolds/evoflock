@@ -30,9 +30,15 @@ public:
     // remain fixed during evolution run. MUST update constParameterCount() when
     // const parameters are added or removed.
     static int constParameterCount() { return 7; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260430 add tunable parameters for murmuration
+
     // The count(/size) of tunable parameters in this class. For consistency
     // check, especially when changing the number of parameters.
-    static int tunableParameterCount() { return 15; }
+//    static int tunableParameterCount() { return 15; }
+    static int tunableParameterCount() { return 15 + 3; } // 3 for murmuration
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // "assume a spherical boid" unit diameter
     double bodyDiameter() const { return body_diameter_; }
     // Should this be called "world radius"?
@@ -83,8 +89,14 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260419 add tunable parameters for murmuration
         // TODO 20260421 backing up to test README.md
+        // TODO 20260430 add tunable parameters for murmuration
 
 //        40,    // murm_max_distance
+        
+        EF::center_max_dist,
+        EF::center_min_dist,
+        EF::centering_strength,
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     };
     

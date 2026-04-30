@@ -534,6 +534,13 @@ LazyPredator::FunctionSet static_ga_fs_ =
                 
                 "Real_0_100", // fly_away_max_dist
                 "Real_0_10",  // min_time_to_collide
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20260430 add tunable parameters for murmuration
+                "Real_0_100", // center_max_dist
+                "Real_0_100", // center_min_dist
+                "Real_0_100", // centering_strength
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             },
             
             // Evaluation function, which runs a flock simulation with the given

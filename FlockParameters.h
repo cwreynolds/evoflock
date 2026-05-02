@@ -124,6 +124,19 @@ public:
     // ignore obstacle until predicted impact is in less than this many seconds.
     const double& minTimeToCollide() const { return tuning_parameters.at(14); }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260501 add accessors for murmuration  parameters
+    //
+    // EF::center_max_dist,
+    // EF::center_min_dist,
+    // EF::centering_strength,
+  
+    // TODO names subject to change
+    const double& centerMaxDist()     const { return tuning_parameters.at(15); }
+    const double& centerMinDist()     const { return tuning_parameters.at(16); }
+    const double& centeringStrength() const { return tuning_parameters.at(17); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260419 add tunable parameters for murmuration
 

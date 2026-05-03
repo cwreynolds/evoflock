@@ -640,15 +640,20 @@ public:
 
             Vec3 to_center = centroid() - position();
             double distance = to_center.length();
-            if (distance > EF::center_min_dist)
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260502 replace EF::center_min_dist with FP call.
+//            if (distance > EF::center_min_dist)
+            if (distance > fp().centerMinDist())
             {
                 auto s = util::remap_interval_clip(distance,
-                                                   EF::center_min_dist,
+//                                                   EF::center_min_dist,
+                                                   fp().centerMinDist(),
                                                    EF::center_max_dist,
                                                    0, EF::centering_strength);
                 centroid_steer = to_center / distance * s;
 
             }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             if (distance > EF::center_max_dist)
             {
                 // TODO temporary hack

@@ -232,6 +232,12 @@ public:
         indent(); debugPrint(angleCohere());
         indent(); debugPrint(flyAwayMaxDist());
         indent(); debugPrint(minTimeToCollide());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260502 replace EF::center_min_dist with FP call.
+        indent(); debugPrint(centerMaxDist());
+        indent(); debugPrint(centerMinDist());
+        indent(); debugPrint(centeringStrength());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
     // Get i-th tuning parameter

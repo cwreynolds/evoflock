@@ -648,13 +648,14 @@ public:
                 auto s = util::remap_interval_clip(distance,
 //                                                   EF::center_min_dist,
                                                    fp().centerMinDist(),
-                                                   EF::center_max_dist,
+//                                                   EF::center_max_dist,
+                                                   fp().centerMaxDist(),
                                                    0, EF::centering_strength);
                 centroid_steer = to_center / distance * s;
 
             }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            if (distance > EF::center_max_dist)
+//            if (distance > EF::center_max_dist)
+            if (distance > fp().centerMaxDist())
             {
                 // TODO temporary hack
                 if (forward().dot(position()) > 0)
@@ -662,6 +663,7 @@ public:
                     centroid_steer -= velocity() * EF::centering_strength * 0.5;
                 }
             }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         return centroid_steer;
     }

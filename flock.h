@@ -539,7 +539,13 @@ public:
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             // TODO 20260428 move temp murmuration parameters to EF
 //            double murmuration_radius = 50;  // TODO FIX THIS RAW CONSTANT !!!!!
-            double murmuration_radius = EF::center_max_dist;
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260502 replace EF::center_min_dist with FP call.
+
+//            double murmuration_radius = EF::center_max_dist;
+            double murmuration_radius = fp().centerMaxDist();
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             double distance = (b->position() - centroid()).length();
             if (distance < murmuration_radius) { count_boids_near_centroid_++; }

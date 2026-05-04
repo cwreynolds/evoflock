@@ -650,7 +650,8 @@ public:
                                                    fp().centerMinDist(),
 //                                                   EF::center_max_dist,
                                                    fp().centerMaxDist(),
-                                                   0, EF::centering_strength);
+//                                                   0, EF::centering_strength);
+                                                   0, fp().centeringStrength());
                 centroid_steer = to_center / distance * s;
 
             }
@@ -660,7 +661,8 @@ public:
                 // TODO temporary hack
                 if (forward().dot(position()) > 0)
                 {
-                    centroid_steer -= velocity() * EF::centering_strength * 0.5;
+//                    centroid_steer -= velocity() * EF::centering_strength * 0.5;
+                    centroid_steer -= velocity() * fp().centeringStrength() * 0.5;
                 }
             }
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

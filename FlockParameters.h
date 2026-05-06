@@ -132,6 +132,8 @@ public:
     // EF::centering_strength,
   
     // TODO names subject to change
+    double& centerMaxDist()                 { return tuning_parameters.at(15); }
+    double& centerMinDist()                 { return tuning_parameters.at(16); }
     const double& centerMaxDist()     const { return tuning_parameters.at(15); }
     const double& centerMinDist()     const { return tuning_parameters.at(16); }
     const double& centeringStrength() const { return tuning_parameters.at(17); }
@@ -151,6 +153,11 @@ public:
     {
         assert(vector_of_parameters_.size() == tunableParameterCount());
         tuning_parameters = vector_of_parameters_;
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260505 FlockParameters::enforceConstraints()
+        enforceConstraints();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
 //        // Constructor for individual tunable parameters.
@@ -194,6 +201,21 @@ public:
 //        })) {}
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260505 FlockParameters::enforceConstraints()
+    
+    void enforceConstraints()
+    {
+        if (EF::murmuration_mode and (centerMinDist() > centerMaxDist()))
+        {
+            std::swap(centerMinDist(), centerMaxDist());
+            assert(centerMinDist() <= centerMaxDist());
+        }
+    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // The count(/size) of ALL parameters in this class.
     static int parameterCount()

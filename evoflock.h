@@ -77,8 +77,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -449,7 +449,7 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                    91.0774, 96.0671, 2.73925, 4.86185, 20.5608,
         //                    -0.62327, 0.2073, 0.340471, 6.76677, 1.19798);
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260419 add tunable parameters for murmuration
 
 //        // Saved FP values from run 20260418_ga_murm_param_tweak
@@ -457,12 +457,23 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 //                           71.0199, 21.2444, 2.2782, 62.0336, 96.8648,
 //                           -0.905143, -0.906197, -0.318942, 67.6338, 1.27933);
 
-        // Saved FP values from run 20260418_ga_murm_param_tweak
-        FlockParameters fp({14.3525, 98.2618, 67.4173, 84.6732, 15.0438,
-                            71.0199, 21.2444, 2.2782, 62.0336, 96.8648,
-                            -0.905143, -0.906197, -0.318942, 67.6338, 1.27933});
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260506 playback of yesterday's result
+        
+//        // Saved FP values from run 20260418_ga_murm_param_tweak
+//        FlockParameters fp({14.3525, 98.2618, 67.4173, 84.6732, 15.0438,
+//                            71.0199, 21.2444, 2.2782, 62.0336, 96.8648,
+//                            -0.905143, -0.906197, -0.318942, 67.6338, 1.27933});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Saved FP values from run 20260505_ga_murm_evo_param
+        FlockParameters fp({94.6537, 97.1757, 76.4246, 89.4007, 11.7499,
+                            6.80415, 92.7606, 2.43355, 14.4502, 5.96147,
+                            -0.424488, -0.125247, -0.886847, 69.5286,
+                            3.75423, 49.5624, 36.2599, 92.8005});
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         EF::enable_multithreading = false;
         Draw::getInstance().setEnable(true);

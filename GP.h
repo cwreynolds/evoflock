@@ -500,12 +500,21 @@ LazyPredator::FunctionSet static_ga_fs_ =
         { "Flock_Parameters" },
         { "Real_0_1",    0.0,   1.0, jiggle_scale },
         { "Real_0_10",   0.0,  10.0, jiggle_scale },
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260502 temp, for a murmuration radius 100 is too big
         
         { "Real_0_50",   0.0,  50.0, jiggle_scale },
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260507 fiddle with murmuration min/max distance
+        
+        
+        { "Real_0_30",   0.0,  30.0, jiggle_scale },
+        { "Real_0_20",   0.0,  20.0, jiggle_scale },
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         { "Real_0_100",  0.0, 100.0, jiggle_scale },
         { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
     },
@@ -546,9 +555,20 @@ LazyPredator::FunctionSet static_ga_fs_ =
 //                "Real_0_100", // center_max_dist
 //                "Real_0_100", // center_min_dist
 //                "Real_0_100", // centering_strength
-                "Real_0_50", // center_max_dist
-                "Real_0_50", // center_min_dist
+                
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+                // TODO 20260507 fiddle with murmuration min/max distance
+                
+//                "Real_0_50", // center_max_dist
+//                "Real_0_50", // center_min_dist
+//                "Real_0_100", // centering_strength
+
+                "Real_0_30", // center_max_dist
+                "Real_0_20", // center_min_dist
                 "Real_0_100", // centering_strength
+
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+                
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             },
             

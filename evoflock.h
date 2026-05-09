@@ -131,7 +131,11 @@ void runOneFlockEvolution()
         use_separate_objective  = true;
         use_speed_objective     = true;
         use_curvature_objective = true;
-        use_alignment_objective = false;
+        //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+        // TODO 20260508 try adding in alignment objective for murmuration_mode.
+//        use_alignment_objective = false;
+        use_alignment_objective = true;
+        //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
         use_cluster_objective   = true;
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20260413 current flock centroid, and velocity

@@ -134,7 +134,9 @@ void runOneFlockEvolution()
         //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
         // TODO 20260508 try adding in alignment objective for murmuration_mode.
 //        use_alignment_objective = false;
-        use_alignment_objective = true;
+//        use_alignment_objective = true;
+        // TODO 20260509 why did that get so slow? reverting to retest speed.
+        use_alignment_objective = false;
         //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
         use_cluster_objective   = true;
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~

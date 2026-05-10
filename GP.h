@@ -563,8 +563,12 @@ LazyPredator::FunctionSet static_ga_fs_ =
 //                "Real_0_50", // center_min_dist
 //                "Real_0_100", // centering_strength
 
-                "Real_0_30", // center_max_dist
-                "Real_0_20", // center_min_dist
+//                "Real_0_30", // center_max_dist
+//                "Real_0_20", // center_min_dist
+//                "Real_0_100", // centering_strength
+
+                "Real_0_50", // center_max_dist
+                "Real_0_50", // center_min_dist
                 "Real_0_100", // centering_strength
 
                 //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~

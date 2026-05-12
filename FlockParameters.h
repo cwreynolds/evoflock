@@ -126,17 +126,19 @@ public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260501 add accessors for murmuration  parameters
-    //
-    // EF::center_max_dist,
-    // EF::center_min_dist,
-    // EF::centering_strength,
   
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260511 replace FP::centerMinDist() with FP::centerMinFrac()
+
     // TODO names subject to change
     double& centerMaxDist()                 { return tuning_parameters.at(15); }
     double& centerMinDist()                 { return tuning_parameters.at(16); }
+    double& centerMinFrac()                 { return tuning_parameters.at(16); }
     const double& centerMaxDist()     const { return tuning_parameters.at(15); }
     const double& centerMinDist()     const { return tuning_parameters.at(16); }
+    const double& centerMinFrac()     const { return tuning_parameters.at(16); }
     const double& centeringStrength() const { return tuning_parameters.at(17); }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -206,14 +208,21 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260505 FlockParameters::enforceConstraints()
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260511 replace FP::centerMinDist() with FP::centerMinFrac()
+
+    
     void enforceConstraints()
     {
-        if (EF::murmuration_mode and (centerMinDist() > centerMaxDist()))
-        {
-            std::swap(centerMinDist(), centerMaxDist());
-            assert(centerMinDist() <= centerMaxDist());
-        }
+//        if (EF::murmuration_mode and (centerMinDist() > centerMaxDist()))
+//        {
+//            std::swap(centerMinDist(), centerMaxDist());
+//            assert(centerMinDist() <= centerMaxDist());
+//        }
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -257,7 +266,8 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260502 replace EF::center_min_dist with FP call.
         indent(); debugPrint(centerMaxDist());
-        indent(); debugPrint(centerMinDist());
+//        indent(); debugPrint(centerMinDist());
+        indent(); debugPrint(centerMinFrac());
         indent(); debugPrint(centeringStrength());
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }

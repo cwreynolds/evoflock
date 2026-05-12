@@ -393,201 +393,21 @@ public:
         return avoidance;
     }
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20260416 break off steerTowardCentroid()
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260417 combine computing centroid and setting it in all boids
 
     // Current average position of all boids in flock.
     Vec3 centroid() const { return centroid_; }
-//    void setCentroid(Vec3 c) { centroid_ = c; }
 
     // Centroid's velocity based on difference since previous simulation step.
     Vec3 centroidVelocity() const { return centroid_velocity_; }
-//    void setCentroidVelocity(Vec3 cv) { centroid_velocity_ = cv; }
     
     void setCentroids(Vec3 centroid, Vec3 centroid_velocity)
     {
         centroid_ = centroid;
         centroid_velocity_ = centroid_velocity;
     }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-//        // Steering force component for global cohesion, for EF::murmuration_mode.
-//        Vec3 steerTowardCentroid() const
-//        {
-//            Vec3 centroid_steer;
-//            // very ad hoc prototype
-//            if (EF::use_centroid_objective)
-//            {
-//    //            double max_dist = 30;
-//    //            double min_centering_dist = max_dist * 0.4;
-//    //            double centering_strength = 5;
-//
-//    //            double max_dist = 40;
-//    //            double min_centering_dist = max_dist * 0.4;
-//    //            double centering_strength = 10;
-//
-//    //            double max_dist = 60;
-//    //            double min_centering_dist = max_dist * 0.7;
-//    //            double centering_strength = 10;
-//
-//    //            double max_dist = 60;
-//    //            double min_centering_dist = max_dist * 0.7;
-//    //            double centering_strength = 20;
-//
-//    //            double max_dist = 50;
-//    //            double min_centering_dist = max_dist * 0.6;
-//    //            double centering_strength = 20;
-//
-//    //            double max_dist = 40;
-//    //            double min_centering_dist = max_dist * 0.5;
-//    //            double centering_strength = 30;
-//
-//    //            double max_dist = 30;
-//    //            double min_centering_dist = max_dist * 0.5;
-//    //            double centering_strength = 35;
-//
-//                double max_dist = 30;
-//                double min_centering_dist = max_dist * 0.5;
-//                double centering_strength = 40;
-//
-//                Vec3 to_center = centroid() - position();
-//                double distance = to_center.length();
-//    //            double too_far_dist = distance - min_centering_dist;
-//    //            if (too_far_dist > 0)
-//                if (distance > min_centering_dist)
-//                {
-//    //                Vec3 unit_center = to_center / distance;
-//    //                centroid_steer = unit_center * too_far_dist * centering_strength;
-//    //                Vec3 unit_steer = ;
-//
-//    //                centroid_steer = (to_center / distance *
-//    //                                  util::remap_interval_clip(distance,
-//    //                                                            min_centering_dist,
-//    //                                                            max_dist,
-//    //                                                            0,
-//    //                                                            centering_strength));
-//
-//
-//                    centroid_steer = to_center / distance;
-//                    centroid_steer *= util::remap_interval_clip(distance,
-//                                                                min_centering_dist,
-//                                                                max_dist,
-//                                                                0,
-//                                                                centering_strength);
-//                }
-//            }
-//            return centroid_steer;
-//        }
     
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260417 combine computing centroid and setting it in all boids
-
-//        // Steering force component for global cohesion, for EF::murmuration_mode.
-//        Vec3 steerTowardCentroid() const
-//        {
-//            Vec3 centroid_steer;
-//            // very ad hoc prototype
-//            if (EF::use_centroid_objective)
-//            {
-//                double max_dist = 30;
-//    //            double min_centering_dist = max_dist * 0.5;
-//                double min_centering_dist = max_dist * 0.4;
-//    //            double centering_strength = 40;
-//                double centering_strength = 50;
-//
-//                Vec3 to_center = centroid() - position();
-//                double distance = to_center.length();
-//                if (distance > min_centering_dist)
-//                {
-//                    centroid_steer = to_center / distance;
-//                    centroid_steer *= util::remap_interval_clip(distance,
-//                                                                min_centering_dist,
-//                                                                max_dist,
-//                                                                0,
-//                                                                centering_strength);
-//                }
-//            }
-//            return centroid_steer;
-//        }
-
-//        // Steering force component for global cohesion, for EF::murmuration_mode.
-//        Vec3 steerTowardCentroid() // const
-//        {
-//            Vec3 centroid_steer;
-//            // very ad hoc prototype
-//            if (EF::use_centroid_objective)
-//            {
-//                double max_dist = 30;
-//    //            double min_centering_dist = max_dist * 0.4;
-//                double min_centering_dist = max_dist * 0.4;
-//                double centering_strength = 50;
-//
-//                Vec3 to_center = centroid() - position();
-//                double distance = to_center.length();
-//                if (distance > min_centering_dist)
-//                {
-//                    centroid_steer = to_center / distance;
-//    //                centroid_steer *= util::remap_interval_clip(distance,
-//    //                                                            min_centering_dist,
-//    //                                                            max_dist,
-//    //                                                            0,
-//    //                                                            centering_strength);
-//                    auto s = util::remap_interval_clip(distance,
-//                                                       min_centering_dist, max_dist,
-//                                                       0, centering_strength);
-//                    centroid_steer *= s;
-//                }
-//                if (distance > max_dist)
-//                {
-//                    auto r = position() + to_center.normalize() * (distance - max_dist);
-//                    draw().addAnnotationLine(position(), r, Color::white(), 0.05);
-//                }
-//            }
-//            return centroid_steer;
-//        }
-
-//        // Steering force component for global cohesion, for EF::murmuration_mode.
-//        Vec3 steerTowardCentroid() // const
-//        {
-//            Vec3 centroid_steer;
-//            // very ad hoc prototype
-//            if (EF::use_centroid_objective)
-//            {
-//                double max_dist = 30;
-//    //            double min_centering_dist = max_dist * 0.4;
-//                double min_dist = max_dist * 0.4;
-//    //            double centering_strength = 50;
-//    //            double centering_strength = 70;
-//                double centering_strength = 90;
-//
-//                Vec3 to_center = centroid() - position();
-//                double distance = to_center.length();
-//                if (distance > min_dist)
-//                {
-//    //                centroid_steer = to_center / distance;
-//                    auto s = util::remap_interval_clip(distance,
-//                                                       min_dist, max_dist,
-//                                                       0, centering_strength);
-//                    centroid_steer = to_center / distance;
-//    //                centroid_steer *= s;
-//                    centroid_steer = to_center / distance * s;
-//
-//                }
-//                if (distance > max_dist)
-//                {
-//                    auto r = position() + to_center.normalize() * (distance - max_dist);
-//                    draw().addAnnotationLine(position(), r, Color::white(), 0.05);
-//                }
-//            }
-//            return centroid_steer;
-//        }
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20260428 move temp murmuration parameters to EF
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260511 replace FP::centerMinDist() with FP::centerMinFrac()
     
 //        // Steering force component for global cohesion, for EF::murmuration_mode.
 //        Vec3 steerTowardCentroid() // const
@@ -596,86 +416,77 @@ public:
 //            // very ad hoc prototype
 //            if (EF::use_centroid_objective)
 //            {
-//    //            double max_dist = 30;
-//    //            double max_dist = 50;
-//                double max_dist = 40;
-//                double min_dist = max_dist * 0.4;
-//                double centering_strength = 90;
+//    //            double max_dist = 40;
+//    //            double min_dist = max_dist * 0.4;
+//    //            double centering_strength = 90;
 //
 //                Vec3 to_center = centroid() - position();
 //                double distance = to_center.length();
-//                if (distance > min_dist)
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20260502 replace EF::center_min_dist with FP call.
+//    //            if (distance > EF::center_min_dist)
+//                if (distance > fp().centerMinDist())
 //                {
 //                    auto s = util::remap_interval_clip(distance,
-//                                                       min_dist, max_dist,
-//                                                       0, centering_strength);
+//    //                                                   EF::center_min_dist,
+//                                                       fp().centerMinDist(),
+//    //                                                   EF::center_max_dist,
+//                                                       fp().centerMaxDist(),
+//    //                                                   0, EF::centering_strength);
+//                                                       0, fp().centeringStrength());
 //                    centroid_steer = to_center / distance * s;
 //
 //                }
-//                if (distance > max_dist)
+//    //            if (distance > EF::center_max_dist)
+//                if (distance > fp().centerMaxDist())
 //                {
-//    //                auto r = position() + to_center.normalize() * (distance - max_dist);
-//    //                draw().addAnnotationLine(position(), r, Color::white(), 0.05);
-//
 //                    // TODO temporary hack
 //                    if (forward().dot(position()) > 0)
 //                    {
-//                        centroid_steer -= velocity() * centering_strength * 0.5;
+//    //                    centroid_steer -= velocity() * EF::centering_strength * 0.5;
+//                        centroid_steer -= velocity() * fp().centeringStrength() * 0.5;
 //                    }
 //                }
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //            }
 //            return centroid_steer;
 //        }
 
     // Steering force component for global cohesion, for EF::murmuration_mode.
-    Vec3 steerTowardCentroid() // const
+    // Still very experimental.
+    Vec3 steerTowardCentroid() const
     {
         Vec3 centroid_steer;
-        // very ad hoc prototype
         if (EF::use_centroid_objective)
         {
-//            double max_dist = 40;
-//            double min_dist = max_dist * 0.4;
-//            double centering_strength = 90;
-
             Vec3 to_center = centroid() - position();
             double distance = to_center.length();
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20260502 replace EF::center_min_dist with FP call.
-//            if (distance > EF::center_min_dist)
-            if (distance > fp().centerMinDist())
+            
+            double center_min_dist = fp().centerMinFrac() * fp().centerMaxDist();
+//            if (distance > fp().centerMinDist())
+            if (distance > center_min_dist)
+
             {
                 auto s = util::remap_interval_clip(distance,
-//                                                   EF::center_min_dist,
-                                                   fp().centerMinDist(),
-//                                                   EF::center_max_dist,
+//                                                   fp().centerMinDist(),
+                                                   center_min_dist,
                                                    fp().centerMaxDist(),
-//                                                   0, EF::centering_strength);
                                                    0, fp().centeringStrength());
                 centroid_steer = to_center / distance * s;
-
             }
-//            if (distance > EF::center_max_dist)
             if (distance > fp().centerMaxDist())
             {
                 // TODO temporary hack
                 if (forward().dot(position()) > 0)
                 {
-//                    centroid_steer -= velocity() * EF::centering_strength * 0.5;
                     centroid_steer -= velocity() * fp().centeringStrength() * 0.5;
                 }
             }
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         }
         return centroid_steer;
     }
 
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Compute a behavioral weight (on [0, 1]) for a neighbor of this Boid.
     // Shared by separate, align, and cohere steering behaviors

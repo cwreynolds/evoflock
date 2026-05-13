@@ -129,15 +129,22 @@ public:
   
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260511 replace FP::centerMinDist() with FP::centerMinFrac()
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260512 try exponent instead of minFrac
 
     // TODO names subject to change
     double& centerMaxDist()                 { return tuning_parameters.at(15); }
-    double& centerMinDist()                 { return tuning_parameters.at(16); }
-    double& centerMinFrac()                 { return tuning_parameters.at(16); }
+//    double& centerMinDist()                 { return tuning_parameters.at(16); }
+//    double& centerMinFrac()                 { return tuning_parameters.at(16); }
+    double& centerExponent()                { return tuning_parameters.at(16); }
     const double& centerMaxDist()     const { return tuning_parameters.at(15); }
-    const double& centerMinDist()     const { return tuning_parameters.at(16); }
-    const double& centerMinFrac()     const { return tuning_parameters.at(16); }
+//    const double& centerMinDist()     const { return tuning_parameters.at(16); }
+//    const double& centerMinFrac()     const { return tuning_parameters.at(16); }
+    const double& centerExponent()    const { return tuning_parameters.at(16); }
     const double& centeringStrength() const { return tuning_parameters.at(17); }
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -267,7 +274,11 @@ public:
         // TODO 20260502 replace EF::center_min_dist with FP call.
         indent(); debugPrint(centerMaxDist());
 //        indent(); debugPrint(centerMinDist());
-        indent(); debugPrint(centerMinFrac());
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260512 try exponent instead of minFrac
+//        indent(); debugPrint(centerMinFrac());
+        indent(); debugPrint(centerExponent());
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         indent(); debugPrint(centeringStrength());
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }

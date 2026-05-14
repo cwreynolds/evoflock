@@ -77,8 +77,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -454,16 +454,11 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         // FlockParameters fp(70.4853, 91.1533, 60.5059, 45.6154, 34.6533,
         //                    91.0774, 96.0671, 2.73925, 4.86185, 20.5608,
         //                    -0.62327, 0.2073, 0.340471, 6.76677, 1.19798);
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260512 after replace FP::centerMinDist() with FP::centerMinFrac()
 
         // Saved FP values from run 20260418_ga_murm_param_tweak
         // FlockParameters fp(14.3525, 98.2618, 67.4173, 84.6732, 15.0438,
         //                    71.0199, 21.2444, 2.2782, 62.0336, 96.8648,
         //                    -0.905143, -0.906197, -0.318942, 67.6338, 1.27933);
-
-        
 
         // Saved FP values from run 20260505_ga_murm_evo_param
         // FlockParameters fp({94.6537, 97.1757, 76.4246, 89.4007, 11.7499,
@@ -472,10 +467,16 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     3.75423, 49.5624, 36.2599, 92.8005});
         
         // Saved best FP values from run 20260511_ga_murm_min_frac
-        FlockParameters fp({80.6664, 84.5755, 80.7222, 68.0803, 26.7053,
-                            36.1821, 9.62825, 2.05975, 89.7731, 90.1345,
-                            -0.965851, 0.356241, -0.184357, 91.0539,
-                            9.86365, 46.5262, 0.700153, 85.2107});
+        // FlockParameters fp({80.6664, 84.5755, 80.7222, 68.0803, 26.7053,
+        //                     36.1821, 9.62825, 2.05975, 89.7731, 90.1345,
+        //                     -0.965851, 0.356241, -0.184357, 91.0539,
+        //                     9.86365, 46.5262, 0.700153, 85.2107});
+        
+        // Saved best FP values from run 20260512_ga_murm_use_expt
+        FlockParameters fp({94.7641, 91.9363, 63.7496, 98.1078, 9.6187,
+                            77.7354, 96.0103, 2.1662, 89.3659, 12.7148,
+                            -0.883542, 0.0379527, -0.68233, 89.7384,
+                            4.59969, 48.6678, 4.91045, 69.8889});
         
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

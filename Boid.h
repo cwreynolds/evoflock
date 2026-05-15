@@ -406,6 +406,22 @@ public:
         centroid_velocity_ = centroid_velocity;
     }
     
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260514 try dynamic centroid
+
+//    centroidRandomSample()
+    
+    // very ad hoc !!!!!!!!!!!!!!!!!!!!!!
+    Vec3 random_centroid_;
+    void setRandomCentroid(Vec3 centroid) { random_centroid_ = centroid; }
+    Vec3 getRandomCentroid() const { return random_centroid_; }
+
+    
+
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260511 replace FP::centerMinDist() with FP::centerMinFrac()
     
@@ -528,6 +544,26 @@ public:
 //            return centroid_steer;
 //        }
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260514 try dynamic centroid
+
+//    // Steering force component for global cohesion, for EF::murmuration_mode.
+//    // Still very experimental.
+//    Vec3 steerTowardCentroid() const
+//    {
+//        Vec3 centroid_steer;
+//        if (EF::use_centroid_objective)
+//        {
+//            Vec3 to_center = centroid() - position();
+//            double distance = to_center.length();
+//            double rel_dist = distance / fp().centerMaxDist();
+//            double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
+//            double strength = rel_dist_expt * fp().centeringStrength();
+//            centroid_steer = to_center / distance * strength;
+//        }
+//        return centroid_steer;
+//    }
+
     // Steering force component for global cohesion, for EF::murmuration_mode.
     // Still very experimental.
     Vec3 steerTowardCentroid() const
@@ -535,7 +571,12 @@ public:
         Vec3 centroid_steer;
         if (EF::use_centroid_objective)
         {
-            Vec3 to_center = centroid() - position();
+//            Vec3 to_center = centroid() - position();
+//            Vec3 to_center = getFlock().centroidRandomSample() - position();
+            Vec3 to_center = getRandomCentroid() - position();
+
+            
+            
             double distance = to_center.length();
             double rel_dist = distance / fp().centerMaxDist();
             double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
@@ -544,6 +585,8 @@ public:
         }
         return centroid_steer;
     }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

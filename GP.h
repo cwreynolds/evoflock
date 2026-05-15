@@ -520,8 +520,10 @@ LazyPredator::FunctionSet static_ga_fs_ =
         
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20260512 try exponent instead of minFrac
+        // TODO 20260514 try dynamic centroid
         
-        { "Real_1_5",    1.0,   5.0, jiggle_scale },
+//        { "Real_1_5",    1.0,   5.0, jiggle_scale },
+        { "Real_1_3",    1.0,   5.0, jiggle_scale },
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     },
@@ -589,8 +591,14 @@ LazyPredator::FunctionSet static_ga_fs_ =
 //                "Real_0_1",   // FP::centerMinFrac()
 //                "Real_0_100", // FP::centeringStrength()
 
+                // TODO 20260514 try dynamic centroid
+
+//                "Real_0_50",  // FP::centerMaxDist()
+//                "Real_1_5",   // FP::centerExponent()
+//                "Real_0_100", // FP::centeringStrength()
+
                 "Real_0_50",  // FP::centerMaxDist()
-                "Real_1_5",   // FP::centerExponent()
+                "Real_1_3",   // FP::centerExponent()
                 "Real_0_100", // FP::centeringStrength()
 
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~

@@ -523,7 +523,7 @@ LazyPredator::FunctionSet static_ga_fs_ =
         // TODO 20260514 try dynamic centroid
         
 //        { "Real_1_5",    1.0,   5.0, jiggle_scale },
-        { "Real_1_3",    1.0,   5.0, jiggle_scale },
+        { "Real_1_3",    1.0,   3.0, jiggle_scale },
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     },

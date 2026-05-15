@@ -130,7 +130,15 @@ void runOneFlockEvolution()
         use_avoid_objective     = true;
         use_separate_objective  = true;
         use_speed_objective     = true;
-        use_curvature_objective = true;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260515 try turning off curvature_objective
+        //               (was seeing too much tornado)
+        
+//        use_curvature_objective = true;
+        use_curvature_objective = false;
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
         // TODO 20260508 try adding in alignment objective for murmuration_mode.
 //        use_alignment_objective = false;
@@ -472,12 +480,20 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     -0.965851, 0.356241, -0.184357, 91.0539,
         //                     9.86365, 46.5262, 0.700153, 85.2107});
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260515 test 20260514_ga_murm_dyna_center with bigger flock
+
         // Saved best FP values from run 20260512_ga_murm_use_expt
-        FlockParameters fp({94.7641, 91.9363, 63.7496, 98.1078, 9.6187,
-                            77.7354, 96.0103, 2.1662, 89.3659, 12.7148,
-                            -0.883542, 0.0379527, -0.68233, 89.7384,
-                            4.59969, 48.6678, 4.91045, 69.8889});
-        
+        // FlockParameters fp({94.7641, 91.9363, 63.7496, 98.1078, 9.6187,
+        //                     77.7354, 96.0103, 2.1662, 89.3659, 12.7148,
+        //                     -0.883542, 0.0379527, -0.68233, 89.7384,
+        //                     4.59969, 48.6678, 4.91045, 69.8889});
+
+        // Saved best FP values from run 20260514_ga_murm_dyna_center
+        FlockParameters fp({72.5795, 92.6647, 74.488, 92.9831, 21.9784,
+                            18.5211, 1.67698, 2.73893, 74.3763, 13.6239,
+                            -0.507361, 0.116378, -0.796355, 23.0692,
+                            2.25646, 49.6829, 2.40116, 41.5759});
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

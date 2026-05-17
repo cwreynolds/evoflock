@@ -509,6 +509,7 @@ LazyPredator::FunctionSet static_ga_fs_ =
         // TODO 20260507 fiddle with murmuration min/max distance
         
         
+        { "Real_0_40",   0.0,  40.0, jiggle_scale },
         { "Real_0_30",   0.0,  30.0, jiggle_scale },
         { "Real_0_20",   0.0,  20.0, jiggle_scale },
 
@@ -523,7 +524,14 @@ LazyPredator::FunctionSet static_ga_fs_ =
         // TODO 20260514 try dynamic centroid
         
 //        { "Real_1_5",    1.0,   5.0, jiggle_scale },
-        { "Real_1_3",    1.0,   3.0, jiggle_scale },
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260516 more fiddling with murmuration parameters
+
+//        { "Real_1_3",    1.0,   3.0, jiggle_scale },
+        { "Real_0.5_2.0",    0.5,   2.0, jiggle_scale },
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     },
@@ -597,9 +605,23 @@ LazyPredator::FunctionSet static_ga_fs_ =
 //                "Real_1_5",   // FP::centerExponent()
 //                "Real_0_100", // FP::centeringStrength()
 
-                "Real_0_50",  // FP::centerMaxDist()
-                "Real_1_3",   // FP::centerExponent()
-                "Real_0_100", // FP::centeringStrength()
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20260516 more fiddling with murmuration parameters
+                
+//                //        { "Real_1_3",    1.0,   3.0, jiggle_scale },
+//                { "Real_0.5_2.0",    0.5,   2.0, jiggle_scale },
+                
+//                "Real_0_50",  // FP::centerMaxDist()
+//                "Real_1_3",   // FP::centerExponent()
+//                "Real_0_100", // FP::centeringStrength()
+
+                "Real_0_40",     // FP::centerMaxDist()
+                "Real_0.5_2.0",  // FP::centerExponent()
+                "Real_0_100",    // FP::centeringStrength()
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

@@ -531,6 +531,11 @@ LazyPredator::FunctionSet static_ga_fs_ =
 //        { "Real_1_3",    1.0,   3.0, jiggle_scale },
         { "Real_0.5_2.0",    0.5,   2.0, jiggle_scale },
 
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260517 semi-revert exponent?
+        { "Real_1_2",    1.0,   2.0, jiggle_scale },
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -616,9 +621,22 @@ LazyPredator::FunctionSet static_ga_fs_ =
 //                "Real_1_3",   // FP::centerExponent()
 //                "Real_0_100", // FP::centeringStrength()
 
-                "Real_0_40",     // FP::centerMaxDist()
-                "Real_0.5_2.0",  // FP::centerExponent()
-                "Real_0_100",    // FP::centeringStrength()
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                // TODO 20260517 got only boids on sphere surface, revert max?
+                // TODO 20260517 semi-revert exponent?
+                
+
+//    //                "Real_0_40",     // FP::centerMaxDist()
+//                    "Real_0_50",     // FP::centerMaxDist()
+//    //                "Real_0.5_2.0",  // FP::centerExponent()
+//                    "Real_1_2",      // FP::centerExponent()
+//                    "Real_0_100",    // FP::centeringStrength()
+
+                "Real_0_50",   // FP::centerMaxDist()
+                "Real_1_2",    // FP::centerExponent()
+                "Real_0_100",  // FP::centeringStrength()
+
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -311,7 +311,20 @@ private:
     int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
                             EF::override_boids_per_flock :
                             (EF::visualize_previous_results_mode ?
-                             1400 :  // For viz prev results.
+                             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                             // TODO 20260518 can this be bigger?
+//                             1400 :  // For viz prev results.
+//                             1600 :  // For viz prev results.
+//                             1800 :  // For viz prev results.
+//                             2000 :  // For viz prev results.
+                             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                             // TODO 20260518 bigger flock for murmuration viz.
+                             
+                             // For visualizing previous results.
+                             (EF::murmuration_mode ? 2000 : 1400) :
+                             
+                             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                              200));  // Normal, for evolution runs.
 
     int fps_ = 30;

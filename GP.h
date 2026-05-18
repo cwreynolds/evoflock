@@ -632,9 +632,18 @@ LazyPredator::FunctionSet static_ga_fs_ =
 //                    "Real_1_2",      // FP::centerExponent()
 //                    "Real_0_100",    // FP::centeringStrength()
 
-                "Real_0_50",   // FP::centerMaxDist()
-                "Real_1_2",    // FP::centerExponent()
-                "Real_0_100",  // FP::centeringStrength()
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20260518 bigger flock for murmuration viz.
+
+//                "Real_0_50",   // FP::centerMaxDist()
+//                "Real_1_2",    // FP::centerExponent()
+//                "Real_0_100",  // FP::centeringStrength()
+
+                "Real_0_50",    // FP::centerMaxDist()
+                "Real_0.5_2.0", // FP::centerExponent()
+                "Real_0_100",   // FP::centeringStrength()
+
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

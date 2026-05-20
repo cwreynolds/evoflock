@@ -528,7 +528,7 @@ LazyPredator::FunctionSet static_ga_fs_ =
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260516 more fiddling with murmuration parameters
 
-//        { "Real_1_3",    1.0,   3.0, jiggle_scale },
+        { "Real_1_3",    1.0,   3.0, jiggle_scale },
         { "Real_0.5_2.0",    0.5,   2.0, jiggle_scale },
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -639,9 +639,18 @@ LazyPredator::FunctionSet static_ga_fs_ =
 //                "Real_1_2",    // FP::centerExponent()
 //                "Real_0_100",  // FP::centeringStrength()
 
-                "Real_0_50",    // FP::centerMaxDist()
-                "Real_0.5_2.0", // FP::centerExponent()
-                "Real_0_100",   // FP::centeringStrength()
+//                "Real_0_50",    // FP::centerMaxDist()
+//                "Real_0.5_2.0", // FP::centerExponent()
+//                "Real_0_100",   // FP::centeringStrength()
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20260519 this exponent stuff makes no sense to me
+
+                "Real_0_50",   // FP::centerMaxDist()
+                "Real_1_2",    // FP::centerExponent()
+                "Real_0_100",  // FP::centeringStrength()
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

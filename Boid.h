@@ -574,8 +574,16 @@ public:
 //            Vec3 to_center = centroid() - position();
 //            Vec3 to_center = getFlock().centroidRandomSample() - position();
 //            Vec3 to_center = getRandomCentroid() - position();
-            Vec3 blend_center = (centroid() + getRandomCentroid()) / 2;
-            Vec3 to_center = blend_center - position();
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260520 turn off getRandomCentroid() experiment.
+            
+//            Vec3 blend_center = (centroid() + getRandomCentroid()) / 2;
+//            Vec3 to_center = blend_center - position();
+            
+            Vec3 to_center = centroid() - position();
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             
             

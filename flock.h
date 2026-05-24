@@ -549,19 +549,38 @@ public:
 
         for (auto b : boids())
         {
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20260428 move temp murmuration parameters to EF
-//            double murmuration_radius = 50;  // TODO FIX THIS RAW CONSTANT !!!!!
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20260502 replace EF::center_min_dist with FP call.
+            
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20260522 refactor centroid score: ramp not threshold
 
-//            double murmuration_radius = EF::center_max_dist;
-            double murmuration_radius = fp().centerMaxDist();
+            //~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+            // TODO 20260523 change ramp parameters
 
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//            double distance = (b->position() - centroid()).length();
+////            if (distance < murmuration_radius) { count_boids_near_centroid_++; }
+//            
+//            double bs_score = util::remap_interval_clip(distance,
+//                                                        0, murmuration_radius,
+//                                                        1, 0);
+//            count_boids_near_centroid_ += bs_score;
+
+//            double max_dist = fp().centerMaxDist();
+            double r = fp().centerMaxDist();
+
             double distance = (b->position() - centroid()).length();
-            if (distance < murmuration_radius) { count_boids_near_centroid_++; }
+            double bs_score = util::remap_interval_clip(distance,
+//                                                        0, murmuration_radius,
+//                                                        0, max_dist,
+//                                                        max_dist*0.6, max_dist,
+//                                                        max_dist*0.8, max_dist*1.2,
+//                                                        r * 0.8, r * 1.2,
+                                                        r * 0.8, r,
+                                                        1, 0);
+            count_boids_near_centroid_ += bs_score;
+
+            //~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }

@@ -618,8 +618,13 @@ public:
         if (EF::use_centroid_objective)
         {
 //            Vec3 to_center = centroid() - position();
-            Vec3 to_center = futureCentroid() - position();
             
+            //~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+            // TODO 20260523 turn off futureCentroid() experiment
+//            Vec3 to_center = futureCentroid() - position();
+            Vec3 to_center = centroid() - position();
+            //~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+
 
 //            double distance = to_center.length();
             

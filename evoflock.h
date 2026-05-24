@@ -77,8 +77,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-//inline static bool visualize_previous_results_mode = false;
-inline static bool visualize_previous_results_mode = true;
+inline static bool visualize_previous_results_mode = false;
+//inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -516,9 +516,6 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     -0.769009, 0.898582, -0.136664, 90.4239,
         //                     3.38967, 47.2217, 2.83461, 56.3936});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260519 test 20260521_ga_murm_centroid_velocity with bigger flock
-        
         // Saved best FP values from run 20260520_ga_murm_no_random_centroid
         // FlockParameters fp({76.6822, 95.7527, 50.3573, 75.9461, 10.9027,
         //                     23.1812, 13.6745, 2.36192, 6.5394, 85.6075,
@@ -526,11 +523,26 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     1.3531, 48.2294, 1.90271, 30.9173});
 
         // Saved best FP values from run 20260521_ga_murm_centroid_velocity
-        FlockParameters fp({81.8399, 93.0806, 36.0119, 43.931, 15.0976,
-                            24.1014, 17.2065, 2.48293, 5.442, 84.9158,
-                            -0.876558, -0.988123, 0.204049, 75.3648,
-                            6.07002, 48.2284, 1.52215, 20.0814});
+        // FlockParameters fp({81.8399, 93.0806, 36.0119, 43.931, 15.0976,
+        //                     24.1014, 17.2065, 2.48293, 5.442, 84.9158,
+        //                     -0.876558, -0.988123, 0.204049, 75.3648,
+        //                     6.07002, 48.2284, 1.52215, 20.0814});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260523 test 20260522_ga_murm_new_score with bigger flock
         
+        // Saved best FP values from run 20260522_ga_murm_new_score
+        // FlockParameters fp({80.5681, 93.185, 51.197, 64.3521, 10.1647,
+        //                     30.1383, 37.6609, 2.21258, 35.4355, 72.4732,
+        //                     -0.997584, -0.786088, 0.979533, 61.0075,
+        //                     4.65929, 47.2678, 1.43407, 62.5916});
+
+        // Saved best FP values from run 20260523_ga_murm_no_velocity
+        FlockParameters fp({86.9914, 98.9878, 45.7494, 66.1938, 7.91513,
+                            69.1745, 8.13903, 2.16534, 73.3584, 94.5009,
+                            -0.908106, -0.939498, 0.934986, 57.5063,
+                            9.40786, 47.935, 1.40237, 91.5868});
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         EF::enable_multithreading = false;

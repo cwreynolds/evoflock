@@ -134,8 +134,14 @@ void runOneFlockEvolution()
         // TODO 20260515 try turning off curvature_objective
         //               (was seeing too much tornado)
         
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260524 bring back curvature
+
 //        use_curvature_objective = true;
-        use_curvature_objective = false;
+//        use_curvature_objective = false;
+        use_curvature_objective = true;
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -146,7 +152,15 @@ void runOneFlockEvolution()
         // TODO 20260509 why did that get so slow? reverting to retest speed.
         use_alignment_objective = false;
         //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260524 maybe use_cluster_objective is more of a distraction?
+//        use_cluster_objective   = true;
+//        use_cluster_objective   = false;
+        // or not...
         use_cluster_objective   = true;
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20260413 current flock centroid, and velocity
         use_centroid_objective  = true;
@@ -528,20 +542,26 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     -0.876558, -0.988123, 0.204049, 75.3648,
         //                     6.07002, 48.2284, 1.52215, 20.0814});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260523 test 20260522_ga_murm_new_score with bigger flock
-        
         // Saved best FP values from run 20260522_ga_murm_new_score
         // FlockParameters fp({80.5681, 93.185, 51.197, 64.3521, 10.1647,
         //                     30.1383, 37.6609, 2.21258, 35.4355, 72.4732,
         //                     -0.997584, -0.786088, 0.979533, 61.0075,
         //                     4.65929, 47.2678, 1.43407, 62.5916});
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260524 test  with bigger flock
+        
+        // Saved best FP values from run 20260523_ga_murm_refactored
+        // FlockParameters fp({86.9914, 98.9878, 45.7494, 66.1938, 7.91513,
+        //                     69.1745, 8.13903, 2.16534, 73.3584, 94.5009,
+        //                     -0.908106, -0.939498, 0.934986, 57.5063,
+        //                     9.40786, 47.935, 1.40237, 91.5868});
+
         // Saved best FP values from run 20260523_ga_murm_no_velocity
-        FlockParameters fp({86.9914, 98.9878, 45.7494, 66.1938, 7.91513,
-                            69.1745, 8.13903, 2.16534, 73.3584, 94.5009,
-                            -0.908106, -0.939498, 0.934986, 57.5063,
-                            9.40786, 47.935, 1.40237, 91.5868});
+        FlockParameters fp({67.6349, 97.0842, 51.0182, 59.9569, 5.80385,
+                            5.10904, 21.0246, 2.01136, 5.57006, 51.3922,
+                            -0.931831, -0.916835, 0.269348, 74.2693,
+                            7.19527, 48.1632, 1.9225, 69.3859});
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

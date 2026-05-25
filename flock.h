@@ -461,6 +461,24 @@ public:
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260524 fiddling with murmuration centroid score
+
+//    // Called each simulation step, records stats for the separation score.
+//    void recordSeparationScorePerStep()
+//    {
+//        // Piecewise linear function of distance to score
+//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
+//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
+//        for (auto b : boids())
+//        {
+//            double distance = b->distanceToNearestNeighbor();
+//            double score = parameterToWeightWithRamps(distance, d, s);
+//            b->xxx_temp_separation_score = score;  // temp for annotation
+//            separation_score_sum_ += score;
+//        }
+//    }
+  
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
@@ -472,9 +490,28 @@ public:
             double distance = b->distanceToNearestNeighbor();
             double score = parameterToWeightWithRamps(distance, d, s);
             b->xxx_temp_separation_score = score;  // temp for annotation
-            separation_score_sum_ += score;
+            
+            // EXPERIMENT only count if generally parallel
+            
+//            separation_score_sum_ += score;
+            
+//            if (EF::murmuration_mode and
+//                (b->forward().dot(b->nearestNeighbor().forward()) > 0.707))
+//            {
+//                separation_score_sum_ += score;
+//            }
+
+            if ((not EF::murmuration_mode) or
+                (b->forward().dot(b->nearestNeighbor().forward()) > 0.707))
+            {
+                separation_score_sum_ += score;
+            }
+
+
         }
     }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
@@ -568,15 +605,25 @@ public:
             double r = fp().centerMaxDist();
 
             double distance = (b->position() - centroid()).length();
-            double bs_score = util::remap_interval_clip(distance,
-//                                                        0, murmuration_radius,
-//                                                        0, max_dist,
-//                                                        max_dist*0.6, max_dist,
-//                                                        max_dist*0.8, max_dist*1.2,
-//                                                        r * 0.8, r * 1.2,
-                                                        r * 0.8, r,
-                                                        1, 0);
-            count_boids_near_centroid_ += bs_score;
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20260524 fiddling with murmuration centroid score
+            
+//                double bs_score = util::remap_interval_clip(distance,
+//    //                                                        0, murmuration_radius,
+//    //                                                        0, max_dist,
+//    //                                                        max_dist*0.6, max_dist,
+//    //                                                        max_dist*0.8, max_dist*1.2,
+//    //                                                        r * 0.8, r * 1.2,
+//    //                                                        r * 0.8, r,
+//                                                            r * 0.7, r,
+//                                                            1, 0);
+//
+//                count_boids_near_centroid_ += bs_score;
+
+            if (distance < r) { count_boids_near_centroid_++; }
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             //~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
 
@@ -591,7 +638,16 @@ public:
     // Average speed for each Boid on each simulation step.
     double centroidScore() const
     {
-        return count_boids_near_centroid_ / boidStepPerSim();
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260524 fiddling with murmuration centroid score
+        
+//        return count_boids_near_centroid_ / boidStepPerSim();
+
+        // TODO experiment deemphasize low values:
+        double exponent = 5;
+        return std::pow(count_boids_near_centroid_ / boidStepPerSim(), exponent);
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

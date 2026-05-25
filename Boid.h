@@ -964,13 +964,32 @@ public:
         setSpeed(0);
     }
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260524 fiddling with murmuration centroid score
+    
+    // Return const reference to nearest neighbor
+    const Boid& nearestNeighbor() const
+    {
+        return *(cached_nearest_neighbors().at(0));
+    }
+
+
+//    // Returns distance from this Boid to its nearest neighbor, center to center.
+//    double distanceToNearestNeighbor() const
+//    {
+//        Boid* nearest_neighbor = cached_nearest_neighbors().at(0);
+//        return (position() - nearest_neighbor->position()).length();
+//    }
+    
     // Returns distance from this Boid to its nearest neighbor, center to center.
     double distanceToNearestNeighbor() const
     {
-        Boid* nearest_neighbor = cached_nearest_neighbors().at(0);
-        return (position() - nearest_neighbor->position()).length();
+//        Boid* nearest_neighbor = cached_nearest_neighbors().at(0);
+        return (position() - nearestNeighbor().position()).length();
     }
-    
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     // For debugging: does this boid instance appear to be valid?
     // TODO 20230204 if needed again, should check other invariants.
     bool is_valid() const

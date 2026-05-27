@@ -77,8 +77,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -554,21 +554,36 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     -0.908106, -0.939498, 0.934986, 57.5063,
         //                     9.40786, 47.935, 1.40237, 91.5868});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260524 test 20260523_ga_murm_curvature_on with bigger flock
-        
         // Saved best FP values from run 20260523_ga_murm_no_velocity
         // FlockParameters fp({67.6349, 97.0842, 51.0182, 59.9569, 5.80385,
         //                     5.10904, 21.0246, 2.01136, 5.57006, 51.3922,
         //                     -0.931831, -0.916835, 0.269348, 74.2693,
         //                     7.19527, 48.1632, 1.9225, 69.3859});
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260526 test 20260526_ga_murm_adj_escape_heading with bigger flock
         
         // Saved best FP values from run 20260523_ga_murm_curvature_on
-        FlockParameters fp({64.8864, 94.1601, 43.1356, 42.3645, 8.80777,
-                            49.7421, 14.0622, 2.25498, 6.28338, 66.4416,
-                            -0.863101, -0.67368, 0.275353, 88.4203,
-                            5.66381, 49.9535, 1.93114, 69.1544});
+        // FlockParameters fp({64.8864, 94.1601, 43.1356, 42.3645, 8.80777,
+        //                     49.7421, 14.0622, 2.25498, 6.28338, 66.4416,
+        //                     -0.863101, -0.67368, 0.275353, 88.4203,
+        //                     5.66381, 49.9535, 1.93114, 69.1544});
+
+        // Saved best FP values from run 20260525_ga_murm_no_escape_vel
+        // FlockParameters fp({61.3092, 88.0454, 32.771, 25.5647, 18.3933,
+        //                     55.9217, 84.2697, 2.6064, 81.129, 22.2795,
+        //                     -0.973852, -0.711805, 0.175394, 75.6662,
+        //                     5.98547, 49.7585, 1.97701, 8.46627});
+        
+        // Saved best FP values from run 20260526_ga_murm_adj_escape_heading
+        FlockParameters fp({61.3092, 88.0454, 32.771, 25.5647, 18.3933,
+                            55.9217, 84.2697, 2.6064, 81.129, 22.2795,
+                            -0.973852, -0.711805, 0.175394, 75.6662,
+//                            5.98547, 49.7585, 1.97701, 8.46627});
+//                            5.98547, 60.0, 1.97701, 8.46627});
+//                            5.98547, 80.0, 1.97701, 8.46627});
+//                              5.98547, 30.0, 1.97701, 8.46627});
+                            5.98547, 100.0, 1.97701, 8.46627});
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

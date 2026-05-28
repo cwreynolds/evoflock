@@ -734,6 +734,48 @@ public:
 //            return centroid_steer;
 //        }
     
+    //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
+    // TODO 20260527 are we pushing toward center hard enough?
+
+    
+//        // Steering force component for global cohesion, for EF::murmuration_mode.
+//        // Still very experimental.
+//        // TODO 20260525 try focusing on decreasing velocity heading out of sphere.
+//        Vec3 steerTowardCentroid() const
+//        {
+//            Vec3 centroid_steer;
+//            if (EF::use_centroid_objective)
+//            {
+//                Vec3 to_center = centroid() - position();
+//                auto [unit_to_center, distance] = to_center.normalize_and_length();
+//    //            double rel_dist = distance / fp().centerMaxDist();
+//    //            double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
+//
+//    //            if (velocity().dot(unit_to_center) < 0)  // are we heading out?
+//
+//    //            double in_ness_threshold = 0;  // are we heading out?
+//                double in_ness_threshold = 0.707; // are we heading sufficiently in?
+//                if (velocity().dot(unit_to_center) < in_ness_threshold)
+//
+//                {
+//                    Vec3 out_vel = velocity().parallel_component(-unit_to_center);
+//
+//    //                Vec3 slowing = velocity() * -0.1;
+//    //                Vec3 centering = unit_to_center * (speed() * 0.3);
+//                    Vec3 slowing = velocity() * -0.4;
+//                    Vec3 centering = unit_to_center * (speed() * 0.5);
+//
+//                    double rel_dist = distance / fp().centerMaxDist();
+//                    double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
+//
+//                    double strength = rel_dist_expt * fp().centeringStrength();
+//                    centroid_steer = (centering + slowing - out_vel) * strength;
+//                }
+//            }
+//            return centroid_steer;
+//        }
+    
+    
     // Steering force component for global cohesion, for EF::murmuration_mode.
     // Still very experimental.
     // TODO 20260525 try focusing on decreasing velocity heading out of sphere.
@@ -744,22 +786,14 @@ public:
         {
             Vec3 to_center = centroid() - position();
             auto [unit_to_center, distance] = to_center.normalize_and_length();
-//            double rel_dist = distance / fp().centerMaxDist();
-//            double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
-            
-//            if (velocity().dot(unit_to_center) < 0)  // are we heading out?
-            
-//            double in_ness_threshold = 0;  // are we heading out?
             double in_ness_threshold = 0.707; // are we heading sufficiently in?
             if (velocity().dot(unit_to_center) < in_ness_threshold)
 
             {
                 Vec3 out_vel = velocity().parallel_component(-unit_to_center);
-
-//                Vec3 slowing = velocity() * -0.1;
-//                Vec3 centering = unit_to_center * (speed() * 0.3);
                 Vec3 slowing = velocity() * -0.4;
-                Vec3 centering = unit_to_center * (speed() * 0.5);
+//                Vec3 centering = unit_to_center * (speed() * 0.5);
+                Vec3 centering = unit_to_center * (speed() * 2);
 
                 double rel_dist = distance / fp().centerMaxDist();
                 double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
@@ -771,6 +805,8 @@ public:
         return centroid_steer;
     }
 
+    //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
+    
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~

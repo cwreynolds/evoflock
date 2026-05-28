@@ -152,7 +152,11 @@ public:
             if (EF::use_centroid_objective)
             {
                 draw().addAnnotationAxes({});
-                draw().addAnnotationAxes(centroid(), 10);
+                //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
+                // TODO 20260527 are we pushing toward center hard enough?
+//                draw().addAnnotationAxes(centroid(), 10);
+                draw().addAnnotationAxes(centroid(), fp().centerMaxDist());
+                //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
             }
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             draw().addAnnotationsToAnimatedFrame();

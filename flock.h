@@ -314,31 +314,11 @@ public:
     // phase which actually moves the boids. Finally statistics are collected.
     void fly_boids(double time_step)
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260414 wip on behavior for EF::use_centroid_objective
-        
-//        Vec3 centroid_;
-//        Vec3 centroid_velocity_;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260528 add some annotation for Boid::steerTowardCentroid()
+        Boid::temp_flock_index = 0;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-        // TODO 20260416 break off steerTowardCentroid()
-
-//        for_all_boids([&](Boid* b){
-//            b->centroid_ = centroid_;
-//            b->centroid_velocity_ = centroid_velocity_;
-//        });
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260417 combine computing centroid and setting it in all boids
-
-//        for_all_boids([&](Boid* b){b->setCentroid(centroid_);
-//                                   b->setCentroidVelocity(centroid_velocity_);});
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();

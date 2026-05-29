@@ -775,17 +775,34 @@ public:
 //            return centroid_steer;
 //        }
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260528 add some annotation for Boid::steerTowardCentroid()
     
+    static inline int temp_flock_index = 0;
+
     // Steering force component for global cohesion, for EF::murmuration_mode.
     // Still very experimental.
     // TODO 20260525 try focusing on decreasing velocity heading out of sphere.
-    Vec3 steerTowardCentroid() const
+    Vec3 steerTowardCentroid() // const
     {
         Vec3 centroid_steer;
         if (EF::use_centroid_objective)
         {
             Vec3 to_center = centroid() - position();
             auto [unit_to_center, distance] = to_center.normalize_and_length();
+            
+            bool annotate = (temp_flock_index++ % 20) == 0;
+            if (annotate)
+            {
+                draw().addAnnotationLine(centroid(),
+                                         (centroid() +
+                                          (unit_to_center *
+                                           -fp().centerMaxDist())),
+                                         Color::red());
+            }
+            
+
+            
             double in_ness_threshold = 0.707; // are we heading sufficiently in?
             if (velocity().dot(unit_to_center) < in_ness_threshold)
 
@@ -804,6 +821,8 @@ public:
         }
         return centroid_steer;
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
     

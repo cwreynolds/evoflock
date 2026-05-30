@@ -817,6 +817,17 @@ public:
 
                 double strength = rel_dist_expt * fp().centeringStrength();
                 centroid_steer = (centering + slowing - out_vel) * strength;
+                
+                //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~
+                // TODO 20260529 add annotation for centroid_steer
+                if (annotate)
+                {
+                    draw().addAnnotationLine(position(),
+                                             position() + centroid_steer,
+                                             Color::green(),
+                                             0.02 * 2);
+                }
+                //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~
             }
         }
         return centroid_steer;

@@ -15,6 +15,23 @@ int main(int argc, const char * argv[])
 {
     EF::unit_test();
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260530 what is average radius of uniformly distributed
+    //               points in a unit radius sphere? Answer: 0.75
+    
+//    int samples = 100000000;
+//    double sum_of_radii = 0;
+//    for (int i = 0; i < samples; i++)
+//    {
+//        Vec3 random_point = EF::RS().randomPointInUnitRadiusSphere();
+//        sum_of_radii += random_point.length();
+//    }
+//    double average_radius = sum_of_radii / samples;
+//    debugPrint(average_radius)
+//    return EXIT_SUCCESS;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     // TODO 20260116 what distribution of tree sizes for give max size?
     

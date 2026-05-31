@@ -545,10 +545,18 @@ public:
     // Centroid's velocity based on difference since previous simulation step.
     Vec3 centroidVelocity() const { return centroid_velocity_; }
     
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20260530 make centroidScore() reward uniform distribution
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260427 add centroidScore()
-    double count_boids_near_centroid_ = 0;
+    
+//    double count_boids_near_centroid_ = 0;
+    double total_boids_to_centroid_distance_ = 0;
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     void recordCentroid(double time_step)
     {
@@ -604,9 +612,17 @@ public:
 //                                                            1, 0);
 //
 //                count_boids_near_centroid_ += bs_score;
-
-            if (distance < r) { count_boids_near_centroid_++; }
             
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20260530 make centroidScore() reward uniform distribution
+
+//            if (distance < r) { count_boids_near_centroid_++; }
+
+            total_boids_to_centroid_distance_ += distance;
+            
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             //~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
@@ -627,9 +643,22 @@ public:
         
 //        return count_boids_near_centroid_ / boidStepPerSim();
 
-        // TODO experiment deemphasize low values:
-        double exponent = 5;
-        return std::pow(count_boids_near_centroid_ / boidStepPerSim(), exponent);
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260530 make centroidScore() reward uniform distribution
+
+//        // TODO experiment deemphasize low values:
+//        double exponent = 5;
+//        return std::pow(count_boids_near_centroid_ / boidStepPerSim(), exponent);
+
+        double max_dist = fp().centerMaxDist();
+        double peak = 0.75 * max_dist;
+        // Piecewise linear function of distance to score
+        std::vector<double> d = {0.0, peak, max_dist};
+        std::vector<double> s = {0.0, 1.0,  0.0};
+        double distance = total_boids_to_centroid_distance_ / boidStepPerSim();
+        return parameterToWeightWithRamps(distance, d, s);
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }

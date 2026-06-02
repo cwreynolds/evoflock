@@ -778,6 +778,64 @@ public:
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20260528 add some annotation for Boid::steerTowardCentroid()
     
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+    // TODO 20260601 refactor after new Flock::centroidScore() -- "0.75" version
+    
+//        static inline int temp_flock_index = 0;
+//
+//        // Steering force component for global cohesion, for EF::murmuration_mode.
+//        // Still very experimental.
+//        // TODO 20260525 try focusing on decreasing velocity heading out of sphere.
+//        Vec3 steerTowardCentroid() // const
+//        {
+//            Vec3 centroid_steer;
+//            if (EF::use_centroid_objective)
+//            {
+//                Vec3 to_center = centroid() - position();
+//                auto [unit_to_center, distance] = to_center.normalize_and_length();
+//
+//                bool annotate = (temp_flock_index++ % 20) == 0;
+//                if (annotate)
+//                {
+//                    draw().addAnnotationLine(centroid(),
+//                                             (centroid() +
+//                                              (unit_to_center *
+//                                               -fp().centerMaxDist())),
+//                                             Color::red());
+//                }
+//
+//
+//
+//                double in_ness_threshold = 0.707; // are we heading sufficiently in?
+//                if (velocity().dot(unit_to_center) < in_ness_threshold)
+//
+//                {
+//                    Vec3 out_vel = velocity().parallel_component(-unit_to_center);
+//                    Vec3 slowing = velocity() * -0.4;
+//    //                Vec3 centering = unit_to_center * (speed() * 0.5);
+//                    Vec3 centering = unit_to_center * (speed() * 2);
+//
+//                    double rel_dist = distance / fp().centerMaxDist();
+//                    double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
+//
+//                    double strength = rel_dist_expt * fp().centeringStrength();
+//                    centroid_steer = (centering + slowing - out_vel) * strength;
+//
+//                    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~
+//                    // TODO 20260529 add annotation for centroid_steer
+//                    if (annotate)
+//                    {
+//                        draw().addAnnotationLine(position(),
+//                                                 position() + centroid_steer,
+//                                                 Color::green(),
+//                                                 0.02 * 2);
+//                    }
+//                    //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~
+//                }
+//            }
+//            return centroid_steer;
+//        }
+
     static inline int temp_flock_index = 0;
 
     // Steering force component for global cohesion, for EF::murmuration_mode.
@@ -794,32 +852,35 @@ public:
             bool annotate = (temp_flock_index++ % 20) == 0;
             if (annotate)
             {
-                draw().addAnnotationLine(centroid(),
-                                         (centroid() +
-                                          (unit_to_center *
-                                           -fp().centerMaxDist())),
-                                         Color::red());
+                auto v = centroid() + (unit_to_center * -fp().centerMaxDist());
+                draw().addAnnotationLine(centroid(), v, Color::red());
             }
-            
 
-            
+            // XXX should in_ness_threshold be an evolved parameter?
             double in_ness_threshold = 0.707; // are we heading sufficiently in?
+            
             if (velocity().dot(unit_to_center) < in_ness_threshold)
-
             {
-                Vec3 out_vel = velocity().parallel_component(-unit_to_center);
+                //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~
+                // TODO 20260601 do we need to add in "out_vel"?
+                
+//                Vec3 out_vel = velocity().parallel_component(-unit_to_center);
+                
+                //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~
                 Vec3 slowing = velocity() * -0.4;
-//                Vec3 centering = unit_to_center * (speed() * 0.5);
                 Vec3 centering = unit_to_center * (speed() * 2);
 
                 double rel_dist = distance / fp().centerMaxDist();
                 double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
 
                 double strength = rel_dist_expt * fp().centeringStrength();
-                centroid_steer = (centering + slowing - out_vel) * strength;
-                
-                //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~
-                // TODO 20260529 add annotation for centroid_steer
+                //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~
+                // TODO 20260601 do we need to add in "out_vel"?
+
+//                centroid_steer = (centering + slowing - out_vel) * strength;
+                centroid_steer = (centering + slowing) * strength;
+
+                //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~
                 if (annotate)
                 {
                     draw().addAnnotationLine(position(),
@@ -827,11 +888,12 @@ public:
                                              Color::green(),
                                              0.02 * 2);
                 }
-                //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~
             }
         }
         return centroid_steer;
     }
+
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

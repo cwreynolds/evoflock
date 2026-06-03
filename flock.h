@@ -594,7 +594,7 @@ public:
 //            count_boids_near_centroid_ += bs_score;
 
 //            double max_dist = fp().centerMaxDist();
-            double r = fp().centerMaxDist();
+//            double r = fp().centerMaxDist();
 
             double distance = (b->position() - centroid()).length();
             

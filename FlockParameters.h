@@ -36,7 +36,14 @@ public:
     // The count(/size) of tunable parameters in this class. For consistency
     // check, especially when changing the number of parameters.
 //    static int tunableParameterCount() { return 15; }
-    static int tunableParameterCount() { return 15 + 3; } // 3 for murmuration
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260602 add more inline parameters to FB for GA optimization
+
+//    static int tunableParameterCount() { return 15 + 3; } // 3 for murmuration
+    static int tunableParameterCount() { return 15 + 6; } // 3 for murmuration
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // "assume a spherical boid" unit diameter
@@ -86,18 +93,19 @@ public:
         // ...should this be renamed?
         1.4,   // min_time_to_collide
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260419 add tunable parameters for murmuration
-        // TODO 20260421 backing up to test README.md
-        // TODO 20260430 add tunable parameters for murmuration
-
-//        40,    // murm_max_distance
-        
+        // Parameters for murmuration behaviors.
         EF::center_max_dist,
         EF::center_min_dist,
         EF::centering_strength,
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260602 add more inline parameters to FB for GA optimization
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        0.707,  // in_ness_threshold: are we heading sufficiently in?
+        0.5,    // centerSlowing() fraction of maxForce if heading out
+        0.5,    // centerCentering() fraction of maxForce if heading out
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     };
     
     // Accessors for tuning parameters:
@@ -144,6 +152,17 @@ public:
     const double& centerExponent()    const { return tuning_parameters.at(16); }
     const double& centeringStrength() const { return tuning_parameters.at(17); }
     
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260602 add more inline parameters to FB for GA optimization
+    
+    const double& centerInNess() const { return tuning_parameters.at(18); }
+    const double& centerSlowing() const { return tuning_parameters.at(19); }
+    const double& centerCentering() const { return tuning_parameters.at(20); }
+
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -281,6 +300,14 @@ public:
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         indent(); debugPrint(centeringStrength());
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260602 add more inline parameters to FB for GA optimization
+
+        indent(); debugPrint(centerInNess());
+        indent(); debugPrint(centerSlowing());
+        indent(); debugPrint(centerCentering());
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
     
     // Get i-th tuning parameter

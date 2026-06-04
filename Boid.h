@@ -914,8 +914,8 @@ public:
             bool annotate = (temp_flock_index++ % 20) == 0;
             if (annotate)
             {
-                auto v = centroid() + (unit_to_center * -fp().centerMaxDist());
-                draw().addAnnotationLine(centroid(), v, Color::red());
+//                auto v = centroid() + (unit_to_center * -fp().centerMaxDist());
+//                draw().addAnnotationLine(centroid(), v, Color::red());
             }
 
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -931,7 +931,13 @@ public:
 //                Vec3 slowing = velocity() * -0.4;
 //                Vec3 centering = unit_to_center * (speed() * 2);
                 double mf = fp().maxForce();
-                Vec3 slowing = forward() * (mf * fp().centerSlowing());
+                
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                // TODO 20260603 oops using forward instead of backward
+//                Vec3 slowing = forward() * (mf * fp().centerSlowing());
+                Vec3 slowing = forward() * (-1 * mf * fp().centerSlowing());
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
                 Vec3 centering = unit_to_center * (mf * fp().centerCentering());
 
                 double rel_dist = distance / fp().centerMaxDist();
@@ -942,10 +948,10 @@ public:
 
                 if (annotate)
                 {
-                    draw().addAnnotationLine(position(),
-                                             position() + centroid_steer,
-                                             Color::green(),
-                                             0.02 * 2);
+//                    draw().addAnnotationLine(position(),
+//                                             position() + centroid_steer,
+//                                             Color::green(),
+//                                             0.02 * 2);
                 }
             }
             

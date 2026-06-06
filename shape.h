@@ -24,6 +24,22 @@ public:
     Sphere(Vec3 center_, double radius_) : center(center_), radius(radius_){}
     Vec3 center;
     double radius = 1;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260605 radius from sphere volume -- very WIP
+    
+    // Get radius from a sphere's volume. (Used for murmuration density.)
+    // r = cube root of (3/4 • v/π)
+    static double radiusFromVolume(double volume)
+    {
+        return std::pow((3.0 * volume) / (4.0 * util::pi), 1.0 / 3.0);
+    }
+
+    static double volumeFromRadius(double radius)
+    {
+//        return (4.0 / 3.0) * util::pi * std::pow(radius, 3)
+        return std::pow(radius, 3) * util::pi * 4.0 / 3.0;
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 // Returns the point of intersection of a ray (half-line) and sphere. Used
@@ -486,6 +502,17 @@ void unit_test()
             }
         }
     }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260605 radius from sphere volume -- very WIP
+
+    double r = 0.62035049089940008659738168717012740671634674072265625;
+    assert(r == Sphere::radiusFromVolume(1));
+    assert(1 == Sphere::radiusFromVolume(Sphere::volumeFromRadius(1)));
+    assert(5 == Sphere::radiusFromVolume(Sphere::volumeFromRadius(5)));
+    double v = Sphere::volumeFromRadius(Sphere::radiusFromVolume(8));
+    assert(util::within_epsilon(v, 8, 0.0000000000001));
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 }
 
 }  // end of namespace shape

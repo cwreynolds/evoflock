@@ -16,6 +16,42 @@ int main(int argc, const char * argv[])
     EF::unit_test();
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260606 test calculations for adjusting murmuration sphere radius
+    //               to maintain boid density.
+    
+    FlockParameters fp;
+    std::cout << std::endl;
+    debugPrint(fp.sphereRadius())
+    debugPrint(fp.boidsPerFlock())
+    debugPrint(shape::Sphere::volumeFromRadius(fp.sphereRadius()));
+    debugPrint(fp.boidsPerFlock() /
+               shape::Sphere::volumeFromRadius(fp.sphereRadius()));
+    std::cout << std::endl;
+    double r = fp.sphereRadius();
+    double v = shape::Sphere::volumeFromRadius(r);
+    double bpf = fp.boidsPerFlock();
+    double bpm3 = bpf / v;
+    debugPrint(r);
+    debugPrint(v);
+    debugPrint(bpf);
+    debugPrint(bpm3);
+    std::cout << std::endl;
+    
+    // Now say instead of 2000 boids in flock we only have 300
+    double bpf_ratio = 300.0 / 2000.0;
+    double v2 = v * bpf_ratio;
+    double r2 = shape::Sphere::radiusFromVolume(v2);
+    debugPrint(bpf_ratio);
+    debugPrint(v2);
+    debugPrint(r2);
+
+    std::cout << std::endl;
+
+//    return EXIT_SUCCESS;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260530 what is average radius of uniformly distributed
     //               points in a unit radius sphere? Answer: 0.75
     

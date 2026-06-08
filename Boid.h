@@ -404,6 +404,28 @@ public:
         centroid_ = centroid;
         centroid_velocity_ = centroid_velocity;
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260607 adjust centerMaxDist() to maintain constant boid density
+    
+    
+    double centroid_max_distance_ = -1;
+    
+    double centroidMaxDistance()
+    {
+        if (centroid_max_distance_ < 0)
+        {
+            double r = fp().sphereRadius();
+            double v = shape::Sphere::volumeFromRadius(r);
+//            double bpf_ratio = fp().boidsPerFlock() / 2000.0;
+            double bpf_big = 2000;
+            double bpf_ratio = fp().boidsPerFlock() / bpf_big;
+            double v2 = v * bpf_ratio;
+            double r2 = shape::Sphere::radiusFromVolume(v2);
+            centroid_max_distance_ = r2;
+        }
+        return centroid_max_distance_;
+    }
 
     // TODO 20250604 calling this “version 1.0” a probably-not-nonsense version
     //               of Boid::steerTowardCentroid(). Remove LOT of tentative WIP
@@ -421,10 +443,17 @@ public:
             if (velocity().dot(unit_to_center) < fp().centerInNess())
             {
                 double mf = fp().maxForce();
+                
 //                Vec3 slowing = forward() * (-1 * mf * fp().centerSlowing());
-                Vec3 slowing = forward() * (mf * -fp().centerSlowing());
+//                Vec3 slowing = forward() * (mf * -fp().centerSlowing());
+                Vec3 backward = -forward();
+                Vec3 slowing = backward * (mf * fp().centerSlowing());
+
                 Vec3 centering = unit_to_center * (mf * fp().centerCentering());
-                double rel_dist = distance / fp().centerMaxDist();
+                
+//                double rel_dist = distance / fp().centerMaxDist();
+                double rel_dist = distance / centroidMaxDistance();
+
                 double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
                 double strength = rel_dist_expt * fp().centeringStrength();
                 centroid_steer = (centering + slowing) * strength;
@@ -432,7 +461,9 @@ public:
         }
         return centroid_steer;
     }
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Compute a behavioral weight (on [0, 1]) for a neighbor of this Boid.
     // Shared by separate, align, and cohere steering behaviors
     double neighborWeight(Boid* neighbor,

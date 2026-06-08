@@ -305,7 +305,15 @@ void runOneFlockEvolution()
             fs.setMaxTreeSize(std::round(max_tree_size));
             population->setMaxCrossoverTreeSize(std::round(max_tree_size));
             std::cout << "    ";  // "log_prefix"
-            debugPrint(max_tree_size);
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260608 adjust centerMaxDist() to maintain constant boid density
+//            debugPrint(max_tree_size);
+//            if (start_max_tree_size != end_max_tree_size)
+//            {
+//                debugPrint(max_tree_size);
+//            }
+            if (EF::usingGP()) { debugPrint(max_tree_size); }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             std::cout << std::endl;
             
             GP::save_fitness_time_series(*population);
@@ -619,16 +627,23 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     1.00104, 44.7399, 1.92882, 6.27248, 0.311584,
         //                     0.0351969, 0.157518});
 
+        // Saved best FP values from run 20260607_ga_murm_adjust_density
+        // FlockParameters fp({29.1696, 74.6058, 32.9445, 40.1742, 5.07739,
+        //                     45.4729, 21.9687, 2.5749, 14.2125, 66.3719,
+        //                     -0.797268, -0.777954, 0.504381, 88.6072,
+        //                     6.565, 39.9455, 1.50628, 2.74551, -0.557402,
+        //                     0.0494514, 0.364301});
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260601 test 20260607_ga_murm_adjust_density with bigger flock
+        // TODO 20260601 test 20260608_ga_murm_wip_density with bigger flock
         
         // Saved best FP values from run 20260607_ga_murm_adjust_density
-        FlockParameters fp({29.1696, 74.6058, 32.9445, 40.1742, 5.07739,
-                            45.4729, 21.9687, 2.5749, 14.2125, 66.3719,
-                            -0.797268, -0.777954, 0.504381, 88.6072,
-                            6.565, 39.9455, 1.50628, 2.74551, -0.557402,
-                            0.0494514, 0.364301});
-
+        FlockParameters fp({41.3796, 92.344, 42.9878, 54.2326, 17.2815,
+                            81.733, 96.2759, 2.2627, 97.0137, 62.6568,
+                            -0.965195, -0.873262, 0.331639, 7.36768,
+                            4.63413, 14.4471, 1.84435, 7.26177, -0.924752,
+                            0.0165574, 0.329412});
+        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         EF::enable_multithreading = false;

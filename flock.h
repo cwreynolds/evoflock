@@ -109,6 +109,10 @@ public:
         set_fixed_fps(30);
         clock().setFPS(fixed_fps());
         initializeStaticScene();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260608 adjust centerMaxDist() to maintain constant boid density
+        initCentroidMaxDistance();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Run boids simulation.
@@ -147,18 +151,15 @@ public:
             draw().beginOneAnimatedFrame();
             for_all_boids([&](Boid* b){ b->draw_body();});
             selectedBoid()->drawAnnotationForBoidAndNeighbors();
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20260415 add temp axes for testing EF::use_centroid_objective
             if (EF::use_centroid_objective)
             {
                 draw().addAnnotationAxes({});
-                //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
-                // TODO 20260527 are we pushing toward center hard enough?
-//                draw().addAnnotationAxes(centroid(), 10);
-                draw().addAnnotationAxes(centroid(), fp().centerMaxDist());
-                //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20260608 adjust centerMaxDist() to maintain constant boid density
+//                draw().addAnnotationAxes(centroid(), fp().centerMaxDist());
+                draw().addAnnotationAxes(centroid(), centroidMaxDistance());
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             draw().addAnnotationsToAnimatedFrame();
             draw().aimAgent() = *selectedBoid();
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -236,6 +237,11 @@ public:
   
         // Init Boid speed to EF::default_target_speed.
         boid->setSpeed(EF::default_target_speed);
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260607 adjust centerMaxDist() to maintain constant boid density
+        boid->setCentroidMaxDistance(centroidMaxDistance());
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Random initial Boid "pose" (position and orientation). By default, they
@@ -291,6 +297,51 @@ public:
 
         return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
     }
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260608 adjust centerMaxDist() to maintain constant boid density
+    
+    
+//    double centroid_max_distance_ = -1;
+//    
+//    double centroidMaxDistance()
+//    {
+//        if (centroid_max_distance_ < 0)
+//        {
+//            FlockParameters fp;
+//            double r = fp.sphereRadius();
+//            double v = shape::Sphere::volumeFromRadius(r);
+//            double bpf_big = 2000;
+//            double bpf_ratio = fp.boidsPerFlock() / bpf_big;
+//            double v2 = v * bpf_ratio;
+//            double r2 = shape::Sphere::radiusFromVolume(v2);
+//            centroid_max_distance_ = r2;
+//        }
+//        return centroid_max_distance_;
+//    }
+
+
+    // For murmuration, adjust centroid max distance to maintain constant boid
+    // density in "sphere".
+    double centroid_max_distance_ = FlockParameters().boidsPerFlock();
+    double centroidMaxDistance() const { return centroid_max_distance_; }
+    void initCentroidMaxDistance()
+    {
+        if (EF::murmuration_mode)
+        {
+            FlockParameters fp;
+            double r = fp.sphereRadius();
+            double v = shape::Sphere::volumeFromRadius(r);
+            double bpf_big = 2000;
+            double bpf_ratio = fp.boidsPerFlock() / bpf_big;
+            double v2 = v * bpf_ratio;
+            double r2 = shape::Sphere::radiusFromVolume(v2);
+            centroid_max_distance_ = r2;
+        }
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Collect flock curvature stats
     double min_curvature_ = +std::numeric_limits<double>::infinity();
@@ -614,38 +665,25 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260427 add centroidScore()
 
     // Average speed for each Boid on each simulation step.
     double centroidScore() const
     {
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260524 fiddling with murmuration centroid score
-        
-//        return count_boids_near_centroid_ / boidStepPerSim();
+        // TODO 20260607 adjust centerMaxDist() to maintain constant boid density
 
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260530 make centroidScore() reward uniform distribution
+//        double max_dist = fp().centerMaxDist();
+        double max_dist = centroidMaxDistance();
 
-//        // TODO experiment deemphasize low values:
-//        double exponent = 5;
-//        return std::pow(count_boids_near_centroid_ / boidStepPerSim(), exponent);
-
-        double max_dist = fp().centerMaxDist();
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         double peak = 0.75 * max_dist;
         // Piecewise linear function of distance to score
         std::vector<double> d = {0.0, peak, max_dist};
         std::vector<double> s = {0.0, 1.0,  0.0};
         double distance = total_boids_to_centroid_distance_ / boidStepPerSim();
         return parameterToWeightWithRamps(distance, d, s);
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

@@ -409,23 +409,27 @@ public:
     // TODO 20260607 adjust centerMaxDist() to maintain constant boid density
     
     
-    double centroid_max_distance_ = -1;
+    double centroid_max_distance_ = 0;
     
-    double centroidMaxDistance()
-    {
-        if (centroid_max_distance_ < 0)
-        {
-            double r = fp().sphereRadius();
-            double v = shape::Sphere::volumeFromRadius(r);
-//            double bpf_ratio = fp().boidsPerFlock() / 2000.0;
-            double bpf_big = 2000;
-            double bpf_ratio = fp().boidsPerFlock() / bpf_big;
-            double v2 = v * bpf_ratio;
-            double r2 = shape::Sphere::radiusFromVolume(v2);
-            centroid_max_distance_ = r2;
-        }
-        return centroid_max_distance_;
-    }
+    void setCentroidMaxDistance(double md) { centroid_max_distance_ = md; }
+    
+//        double centroidMaxDistance()
+//        {
+//            if (centroid_max_distance_ < 0)
+//            {
+//                double r = fp().sphereRadius();
+//                double v = shape::Sphere::volumeFromRadius(r);
+//    //            double bpf_ratio = fp().boidsPerFlock() / 2000.0;
+//                double bpf_big = 2000;
+//                double bpf_ratio = fp().boidsPerFlock() / bpf_big;
+//                double v2 = v * bpf_ratio;
+//                double r2 = shape::Sphere::radiusFromVolume(v2);
+//                centroid_max_distance_ = r2;
+//            }
+//            return centroid_max_distance_;
+//        }
+
+    double centroidMaxDistance() { return centroid_max_distance_; }
 
     // TODO 20250604 calling this “version 1.0” a probably-not-nonsense version
     //               of Boid::steerTowardCentroid(). Remove LOT of tentative WIP

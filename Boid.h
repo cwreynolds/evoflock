@@ -315,6 +315,17 @@ public:
             double weight = neighborWeight(neighbor,
                                            fp().maxDistAlign(),
                                            fp().angleAlign());
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20260609 Don't cohere with poorly aligned neighbors.
+            //               Should this be inside neighborWeight?
+            
+            if (EF::murmuration_mode)
+            {
+                double alignment = forward().dot(neighbor->forward());
+                //                if (alignment > 0.707) { weight = 0; }
+                if (alignment > 0.85) { weight = 0; }
+            }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             direction += heading_offset.normalize_or_0() * weight;
         }
         return direction.normalize_or_0();
@@ -330,6 +341,17 @@ public:
             double weight = neighborWeight(neighbor,
                                            fp().maxDistCohere(),
                                            fp().angleCohere());
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20260609 Don't cohere with poorly aligned neighbors.
+            //               Should this be inside neighborWeight?
+            
+            if (EF::murmuration_mode)
+            {
+                double alignment = forward().dot(neighbor->forward());
+//                if (alignment > 0.707) { weight = 0; }
+                if (alignment > 0.85) { weight = 0; }
+            }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             neighbor_center += neighbor->position() * weight;
             total_weight += weight;
         }

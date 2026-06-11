@@ -300,6 +300,18 @@ public:
             double weight = neighborWeight(neighbor,
                                            fp().maxDistSeparate(),
                                            fp().angleSeparate());
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20260609 Don't cohere with poorly aligned neighbors.
+            //               Should this be inside neighborWeight?
+            
+            if (EF::murmuration_mode)
+            {
+                double alignment = forward().dot(neighbor->forward());
+//                if (alignment > 0.707) { weight *= -1; }
+                if (alignment > 0.85) { weight *= -1; }
+                if (alignment < 0.85) { weight *= 2; }
+            }
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             direction += offset * weight;
         }
         return direction.normalize_or_0();
@@ -322,8 +334,9 @@ public:
             if (EF::murmuration_mode)
             {
                 double alignment = forward().dot(neighbor->forward());
-                //                if (alignment > 0.707) { weight = 0; }
-                if (alignment > 0.85) { weight = 0; }
+//                if (alignment > 0.707) { weight = 0; }
+//                if (alignment > 0.85) { weight = 0; }
+                if (alignment < 0.85) { weight = 0; }
             }
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             direction += heading_offset.normalize_or_0() * weight;
@@ -349,7 +362,8 @@ public:
             {
                 double alignment = forward().dot(neighbor->forward());
 //                if (alignment > 0.707) { weight = 0; }
-                if (alignment > 0.85) { weight = 0; }
+//                if (alignment > 0.85) { weight = 0; }
+                if (alignment < 0.85) { weight = 0; }
             }
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
             neighbor_center += neighbor->position() * weight;

@@ -77,8 +77,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -641,15 +641,30 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     4.63413, 14.4471, 1.84435, 7.26177, -0.924752,
         //                     0.0165574, 0.329412});
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260601 test 20260609_ga_murm_ignore_unaligned with bigger flock
-        
         // Saved best FP values from run 20260609_ga_murm_ignore_unaligned
-        FlockParameters fp({37.8103, 92.9423, 50.351, 71.7843, 5.39694,
-                            38.5116, 92.7048, 2.08736, 25.3785, 52.5458,
-                            -0.506184, -0.854214, 0.869957, 69.5605, 6.83093,
-                            23.9512, 1.89026, 9.93311, -0.734261, 0.0753744,
-                            0.178261});
+        // FlockParameters fp({37.8103, 92.9423, 50.351, 71.7843, 5.39694,
+        //                     38.5116, 92.7048, 2.08736, 25.3785, 52.5458,
+        //                     -0.506184, -0.854214, 0.869957, 69.5605, 6.83093,
+        //                     23.9512, 1.89026, 9.93311, -0.734261, 0.0753744,
+        //                     0.178261});
+
+        // Saved best FP values from run 20260611_ga_murm_fix_for_sep
+        // FlockParameters fp({33.1629, 99.6163, 0.0665019, 34.3899, 55.5842,
+        //                     1.6567, 14.6102, 68.4548, 40.9983, 1.48856,
+        //                     0.30279, -0.0640597, -0.0371724, 11.8859,
+        //                     1.78334, 9.46372, 1.11051, 5.63369, -0.270475,
+        //                     0.0150335, 0.0135678});
+
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260601 test 20260611_ga_murm_no_sac_fix with bigger flock
+        
+        // Saved best FP values from run 20260611_ga_murm_no_sac_fix
+        FlockParameters fp({43.9872, 86.9619, 67.0914, 71.2227, 17.2915,
+                            81.0617, 73.2342, 2.02347, 33.498, 59.5138,
+                            -0.996257, -0.578367, 0.254471, 86.6538,
+                            9.3115, 26.8014, 1.63077, 5.62702, -0.931885,
+                            0.0811591, 0.247335});
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

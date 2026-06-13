@@ -151,15 +151,15 @@ public:
             draw().beginOneAnimatedFrame();
             for_all_boids([&](Boid* b){ b->draw_body();});
             selectedBoid()->drawAnnotationForBoidAndNeighbors();
-            if (EF::use_centroid_objective)
-            {
-                draw().addAnnotationAxes({});
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20260608 adjust centerMaxDist() to maintain constant boid density
-//                draw().addAnnotationAxes(centroid(), fp().centerMaxDist());
-                draw().addAnnotationAxes(centroid(), centroidMaxDistance());
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            }
+//                if (EF::use_centroid_objective)
+//                {
+//                    draw().addAnnotationAxes({});
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // TODO 20260608 adjust centerMaxDist() to maintain constant boid density
+//    //                draw().addAnnotationAxes(centroid(), fp().centerMaxDist());
+//                    draw().addAnnotationAxes(centroid(), centroidMaxDistance());
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                }
             draw().addAnnotationsToAnimatedFrame();
             draw().aimAgent() = *selectedBoid();
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -388,15 +388,46 @@ public:
                 auto nn = b->nearestNeighbor();
                 Vec3 cross_neighbor = Vec3::cross(b->forward(), nn.forward());
                 
-                bool aligned = 0 >Vec3::dot(sum_of_cross_prods, cross_neighbor);
-                sum_of_cross_prods += aligned ? cross_neighbor : -cross_neighbor;
+                
+//                    cross_neighbor = cross_neighbor.normalize();
+//
+//    //                bool aligned = 0 > Vec3::dot(sum_of_cross_prods, cross_neighbor);
+//    //                sum_of_cross_prods += aligned ? cross_neighbor : -cross_neighbor;
+//
+//                    bool aligned = 0 > Vec3::dot(sum_of_cross_prods, cross_neighbor);
+//                    Vec3 cross_neighbor_align = cross_neighbor * (aligned ? 1 : -1);
+//                    sum_of_cross_prods += cross_neighbor_align;
+                
+                // TODO 20260613 AHA! the fix is to just sum the crossproducts
+                //               I was being too clever by half!
+                sum_of_cross_prods += cross_neighbor;
+
+                
+//                    if (b->isSelected())
+//                    {
+//                        draw().addAnnotationLine(b->position(),
+//                                                 b->position() + cross_neighbor * 5,
+//                                                 Color::orange(),
+//                                                 0.05);
+//
+//    //                    draw().addAnnotationLine(b->position(),
+//    //                                             b->position() + cross_neighbor_align * 5,
+//    //                                             Color::magenta(),
+//    //                                             0.05);
+//                    }
             };
             for_all_boids(per_boid_donut_axis);
             Vec3 ep = sum_of_cross_prods.normalize() * 50;
-            draw().addAnnotationLine(centroid() + ep,
-                                     centroid() - ep,
-                                     Color::orange(),
-                                     0.1);
+//                draw().addAnnotationLine(centroid() + ep,
+//                                         centroid() - ep,
+//                                         Color::orange(),
+//    //                                     0.1);
+//                                         0.2);
+
+            Color c1 = Color::orange();
+            Color c2 = Color::white() - Color::orange();
+            draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
+            draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
         }
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }

@@ -377,8 +377,49 @@ public:
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20260413 current flock centroid, and velocity
         if (EF::use_centroid_objective)  { recordCentroid(time_step); }
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260612 WIP test: find donut axis?
+        {
+            Vec3 sum_of_cross_prods;
+            auto per_boid_donut_axis = [&](Boid* b)
+            {
+                auto nn = b->nearestNeighbor();
+                Vec3 cross_neighbor = Vec3::cross(b->forward(), nn.forward());
+                
+                bool aligned = 0 >Vec3::dot(sum_of_cross_prods, cross_neighbor);
+                sum_of_cross_prods += aligned ? cross_neighbor : -cross_neighbor;
+            };
+            for_all_boids(per_boid_donut_axis);
+            Vec3 ep = sum_of_cross_prods.normalize() * 50;
+            draw().addAnnotationLine(centroid() + ep,
+                                     centroid() - ep,
+                                     Color::orange(),
+                                     0.1);
+        }
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
+    
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260612 WIP test: find donut axis?
+    
+//    // Accumulators for cluster score.
+//    // TODO Relocate in file?
+//    double sum_of_cluster_counts_over_all_sim_steps_ = 0;
+//    
+//    // Called once per simulation step.
+//    void recordClusterScorePerStep()
+//    {
+//        double max_cluster_count = 6;  // Perfect score for 6 or more clusters.
+//        double cc = countClusters();
+//        double cc_score = std::pow(util::clip01(cc / max_cluster_count), 0.3);
+//        sum_of_cluster_counts_over_all_sim_steps_ += cc_score;
+//    }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20251122 all ops return Vec3, Scalar values all constants

@@ -77,8 +77,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-//inline static bool visualize_previous_results_mode = false;
-inline static bool visualize_previous_results_mode = true;
+inline static bool visualize_previous_results_mode = false;
+//inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -666,6 +666,7 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
                             9.3115, 26.8014, 1.63077, 5.62702, -0.931885,
                             0.0811591, 0.247335});
 
+        // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         EF::enable_multithreading = false;

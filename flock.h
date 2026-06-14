@@ -381,75 +381,96 @@ public:
         
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         // TODO 20260612 WIP test: find donut axis?
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260614 track delta angle between per-step donut-hole axis
+        
+//            {
+//                Vec3 sum_of_cross_prods;
+//                auto per_boid_donut_axis = [&](Boid* b)
+//                {
+//                    auto nn = b->nearestNeighbor();
+//                    Vec3 cross_neighbor = Vec3::cross(b->forward(), nn.forward());
+//
+//
+//    //                    cross_neighbor = cross_neighbor.normalize();
+//    //
+//    //    //                bool aligned = 0 > Vec3::dot(sum_of_cross_prods, cross_neighbor);
+//    //    //                sum_of_cross_prods += aligned ? cross_neighbor : -cross_neighbor;
+//    //
+//    //                    bool aligned = 0 > Vec3::dot(sum_of_cross_prods, cross_neighbor);
+//    //                    Vec3 cross_neighbor_align = cross_neighbor * (aligned ? 1 : -1);
+//    //                    sum_of_cross_prods += cross_neighbor_align;
+//
+//                    // TODO 20260613 AHA! the fix is to just sum the crossproducts
+//                    //               I was being too clever by half!
+//                    sum_of_cross_prods += cross_neighbor;
+//
+//
+//    //                    if (b->isSelected())
+//    //                    {
+//    //                        draw().addAnnotationLine(b->position(),
+//    //                                                 b->position() + cross_neighbor * 5,
+//    //                                                 Color::orange(),
+//    //                                                 0.05);
+//    //
+//    //    //                    draw().addAnnotationLine(b->position(),
+//    //    //                                             b->position() + cross_neighbor_align * 5,
+//    //    //                                             Color::magenta(),
+//    //    //                                             0.05);
+//    //                    }
+//                };
+//                for_all_boids(per_boid_donut_axis);
+//                Vec3 ep = sum_of_cross_prods.normalize() * 50;
+//    //                draw().addAnnotationLine(centroid() + ep,
+//    //                                         centroid() - ep,
+//    //                                         Color::orange(),
+//    //    //                                     0.1);
+//    //                                         0.2);
+//
+//                Color c1 = Color::orange();
+//                Color c2 = Color::white() - Color::orange();
+//                draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
+//                draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
+//            }
+      
         {
             Vec3 sum_of_cross_prods;
             auto per_boid_donut_axis = [&](Boid* b)
             {
                 auto nn = b->nearestNeighbor();
                 Vec3 cross_neighbor = Vec3::cross(b->forward(), nn.forward());
-                
-                
-//                    cross_neighbor = cross_neighbor.normalize();
-//
-//    //                bool aligned = 0 > Vec3::dot(sum_of_cross_prods, cross_neighbor);
-//    //                sum_of_cross_prods += aligned ? cross_neighbor : -cross_neighbor;
-//
-//                    bool aligned = 0 > Vec3::dot(sum_of_cross_prods, cross_neighbor);
-//                    Vec3 cross_neighbor_align = cross_neighbor * (aligned ? 1 : -1);
-//                    sum_of_cross_prods += cross_neighbor_align;
-                
-                // TODO 20260613 AHA! the fix is to just sum the crossproducts
-                //               I was being too clever by half!
                 sum_of_cross_prods += cross_neighbor;
-
-                
-//                    if (b->isSelected())
-//                    {
-//                        draw().addAnnotationLine(b->position(),
-//                                                 b->position() + cross_neighbor * 5,
-//                                                 Color::orange(),
-//                                                 0.05);
-//
-//    //                    draw().addAnnotationLine(b->position(),
-//    //                                             b->position() + cross_neighbor_align * 5,
-//    //                                             Color::magenta(),
-//    //                                             0.05);
-//                    }
             };
             for_all_boids(per_boid_donut_axis);
-            Vec3 ep = sum_of_cross_prods.normalize() * 50;
-//                draw().addAnnotationLine(centroid() + ep,
-//                                         centroid() - ep,
-//                                         Color::orange(),
-//    //                                     0.1);
-//                                         0.2);
+            
+//            Vec3 ep = sum_of_cross_prods.normalize() * 50;
+            Vec3 donut_hole_axis = sum_of_cross_prods.normalize();
+            Vec3 ep = donut_hole_axis * 50;
+            
+            double delta_axis_angle = Vec3::angle_between(donut_hole_axis,
+                                                          previous_donut_hole_axis_);
+            std::cout << delta_axis_angle << std::endl;
+            previous_donut_hole_axis_ = donut_hole_axis;
 
             Color c1 = Color::orange();
             Color c2 = Color::white() - Color::orange();
             draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
             draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
         }
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
     
     
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260612 WIP test: find donut axis?
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260614 track delta angle between per-step donut-hole axis
     
-//    // Accumulators for cluster score.
-//    // TODO Relocate in file?
-//    double sum_of_cluster_counts_over_all_sim_steps_ = 0;
-//    
-//    // Called once per simulation step.
-//    void recordClusterScorePerStep()
-//    {
-//        double max_cluster_count = 6;  // Perfect score for 6 or more clusters.
-//        double cc = countClusters();
-//        double cc_score = std::pow(util::clip01(cc / max_cluster_count), 0.3);
-//        sum_of_cluster_counts_over_all_sim_steps_ += cc_score;
-//    }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // Normalized tangent to donut hole axis from previous simulation step.
+    Vec3 previous_donut_hole_axis_;
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~

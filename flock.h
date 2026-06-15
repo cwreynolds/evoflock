@@ -167,7 +167,6 @@ public:
 
             if (EF::use_centroid_objective)
             {
-//                debugPrint(draw().cameraLookAt());
                 draw().cameraLookAt() = centroid();
             }
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -299,29 +298,6 @@ public:
     }
     
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260608 adjust centerMaxDist() to maintain constant boid density
-    
-    
-//    double centroid_max_distance_ = -1;
-//    
-//    double centroidMaxDistance()
-//    {
-//        if (centroid_max_distance_ < 0)
-//        {
-//            FlockParameters fp;
-//            double r = fp.sphereRadius();
-//            double v = shape::Sphere::volumeFromRadius(r);
-//            double bpf_big = 2000;
-//            double bpf_ratio = fp.boidsPerFlock() / bpf_big;
-//            double v2 = v * bpf_ratio;
-//            double r2 = shape::Sphere::radiusFromVolume(v2);
-//            centroid_max_distance_ = r2;
-//        }
-//        return centroid_max_distance_;
-//    }
-
-
     // For murmuration, adjust centroid max distance to maintain constant boid
     // density in "sphere".
     double centroid_max_distance_ = FlockParameters().boidsPerFlock();
@@ -340,8 +316,6 @@ public:
             centroid_max_distance_ = r2;
         }
     }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Collect flock curvature stats
     double min_curvature_ = +std::numeric_limits<double>::infinity();
@@ -378,93 +352,38 @@ public:
         // TODO 20260413 current flock centroid, and velocity
         if (EF::use_centroid_objective)  { recordCentroid(time_step); }
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260612 WIP test: find donut axis?
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260614 track delta angle between per-step donut-hole axis
-        
-//            {
-//                Vec3 sum_of_cross_prods;
-//                auto per_boid_donut_axis = [&](Boid* b)
-//                {
-//                    auto nn = b->nearestNeighbor();
-//                    Vec3 cross_neighbor = Vec3::cross(b->forward(), nn.forward());
-//
-//
-//    //                    cross_neighbor = cross_neighbor.normalize();
-//    //
-//    //    //                bool aligned = 0 > Vec3::dot(sum_of_cross_prods, cross_neighbor);
-//    //    //                sum_of_cross_prods += aligned ? cross_neighbor : -cross_neighbor;
-//    //
-//    //                    bool aligned = 0 > Vec3::dot(sum_of_cross_prods, cross_neighbor);
-//    //                    Vec3 cross_neighbor_align = cross_neighbor * (aligned ? 1 : -1);
-//    //                    sum_of_cross_prods += cross_neighbor_align;
-//
-//                    // TODO 20260613 AHA! the fix is to just sum the crossproducts
-//                    //               I was being too clever by half!
-//                    sum_of_cross_prods += cross_neighbor;
-//
-//
-//    //                    if (b->isSelected())
-//    //                    {
-//    //                        draw().addAnnotationLine(b->position(),
-//    //                                                 b->position() + cross_neighbor * 5,
-//    //                                                 Color::orange(),
-//    //                                                 0.05);
-//    //
-//    //    //                    draw().addAnnotationLine(b->position(),
-//    //    //                                             b->position() + cross_neighbor_align * 5,
-//    //    //                                             Color::magenta(),
-//    //    //                                             0.05);
-//    //                    }
-//                };
-//                for_all_boids(per_boid_donut_axis);
-//                Vec3 ep = sum_of_cross_prods.normalize() * 50;
-//    //                draw().addAnnotationLine(centroid() + ep,
-//    //                                         centroid() - ep,
-//    //                                         Color::orange(),
-//    //    //                                     0.1);
-//    //                                         0.2);
-//
-//                Color c1 = Color::orange();
-//                Color c2 = Color::white() - Color::orange();
-//                draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
-//                draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
-//            }
-      
-        {
-            Vec3 sum_of_cross_prods;
-            auto per_boid_donut_axis = [&](Boid* b)
-            {
-                auto nn = b->nearestNeighbor();
-                Vec3 cross_neighbor = Vec3::cross(b->forward(), nn.forward());
-                sum_of_cross_prods += cross_neighbor;
-            };
-            for_all_boids(per_boid_donut_axis);
-            
-//            Vec3 ep = sum_of_cross_prods.normalize() * 50;
-            Vec3 donut_hole_axis = sum_of_cross_prods.normalize();
-            Vec3 ep = donut_hole_axis * 50;
-            
-            double delta_axis_angle = Vec3::angle_between(donut_hole_axis,
-                                                          previous_donut_hole_axis_);
-            std::cout << delta_axis_angle << std::endl;
-            previous_donut_hole_axis_ = donut_hole_axis;
-
-            Color c1 = Color::orange();
-            Color c2 = Color::white() - Color::orange();
-            draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
-            draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
-        }
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
-    
-    
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260615 move inline test code to xxxTrackDonutHoleAxisChanges()
+
+    void xxxTrackDonutHoleAxisChanges()
+    {
+        Vec3 sum_of_cross_prods;
+        auto per_boid_donut_axis = [&](Boid* b)
+        {
+            auto nn = b->nearestNeighbor();
+            Vec3 cross_neighbor = Vec3::cross(b->forward(), nn.forward());
+            sum_of_cross_prods += cross_neighbor;
+        };
+        for_all_boids(per_boid_donut_axis);
+        
+        Vec3 donut_hole_axis = sum_of_cross_prods.normalize();
+        Vec3 ep = donut_hole_axis * 50;
+        
+        double delta_axis_angle = Vec3::angle_between(donut_hole_axis,
+                                                      previous_donut_hole_axis_);
+        // std::cout << delta_axis_angle << std::endl;
+        previous_donut_hole_axis_ = donut_hole_axis;
+        
+        Color c1 = Color::orange();
+        Color c2 = Color::white() - Color::orange();
+        draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
+        draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     // TODO 20260614 track delta angle between per-step donut-hole axis
     
@@ -589,37 +508,37 @@ public:
 //        }
 //    }
   
-    // Called each simulation step, records stats for the separation score.
-    void recordSeparationScorePerStep()
-    {
-        // Piecewise linear function of distance to score
-        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
-        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
-        for (auto b : boids())
+        // Called each simulation step, records stats for the separation score.
+        void recordSeparationScorePerStep()
         {
-            double distance = b->distanceToNearestNeighbor();
-            double score = parameterToWeightWithRamps(distance, d, s);
-            b->xxx_temp_separation_score = score;  // temp for annotation
-            
-            // EXPERIMENT only count if generally parallel
-            
-//            separation_score_sum_ += score;
-            
-//            if (EF::murmuration_mode and
-//                (b->forward().dot(b->nearestNeighbor().forward()) > 0.707))
-//            {
-//                separation_score_sum_ += score;
-//            }
-
-            if ((not EF::murmuration_mode) or
-                (b->forward().dot(b->nearestNeighbor().forward()) > 0.707))
+            // Piecewise linear function of distance to score
+            std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
+            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
+            for (auto b : boids())
             {
-                separation_score_sum_ += score;
+                double distance = b->distanceToNearestNeighbor();
+                double score = parameterToWeightWithRamps(distance, d, s);
+                b->xxx_temp_separation_score = score;  // temp for annotation
+                
+                // EXPERIMENT only count if generally parallel
+                
+    //            separation_score_sum_ += score;
+                
+    //            if (EF::murmuration_mode and
+    //                (b->forward().dot(b->nearestNeighbor().forward()) > 0.707))
+    //            {
+    //                separation_score_sum_ += score;
+    //            }
+
+                if ((not EF::murmuration_mode) or
+                    (b->forward().dot(b->nearestNeighbor().forward()) > 0.707))
+                {
+                    separation_score_sum_ += score;
+                }
+
+
             }
-
-
         }
-    }
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -659,30 +578,19 @@ public:
         return double(clock().frameCounter()) / fp().maxSimulationSteps();
     }
     
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260413 current flock centroid, and velocity
-    
     Vec3 centroid_;
     Vec3 centroid_velocity_;
-
     // Current average position of all boids in flock.
     Vec3 centroid() const { return centroid_; }
-    
     // Centroid's velocity based on difference since previous simulation step.
     Vec3 centroidVelocity() const { return centroid_velocity_; }
     
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     // TODO 20260530 make centroidScore() reward uniform distribution
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260427 add centroidScore()
     
-//    double count_boids_near_centroid_ = 0;
+    // make centroidScore() reward uniform distribution
     double total_boids_to_centroid_distance_ = 0;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     void recordCentroid(double time_step)
     {
@@ -691,84 +599,27 @@ public:
         Vec3 average_position = sum_of_boid_positions / boids().size();
         centroid_velocity_ = (average_position - centroid_) / time_step;
         centroid_ = average_position;
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260417 combine computing centroid and setting it in all boids
-                
+
+        // Set centroid values in each boid.
         for (auto b : boids()) {b->setCentroids(centroid_, centroid_velocity_);}
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260427 add centroidScore()
 
         for (auto b : boids())
         {
-            
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-            // TODO 20260522 refactor centroid score: ramp not threshold
-
-            //~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
-            // TODO 20260523 change ramp parameters
-
-//            double distance = (b->position() - centroid()).length();
-////            if (distance < murmuration_radius) { count_boids_near_centroid_++; }
-//            
-//            double bs_score = util::remap_interval_clip(distance,
-//                                                        0, murmuration_radius,
-//                                                        1, 0);
-//            count_boids_near_centroid_ += bs_score;
-
-//            double max_dist = fp().centerMaxDist();
-//            double r = fp().centerMaxDist();
-
             double distance = (b->position() - centroid()).length();
-            
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20260524 fiddling with murmuration centroid score
-            
-//                double bs_score = util::remap_interval_clip(distance,
-//    //                                                        0, murmuration_radius,
-//    //                                                        0, max_dist,
-//    //                                                        max_dist*0.6, max_dist,
-//    //                                                        max_dist*0.8, max_dist*1.2,
-//    //                                                        r * 0.8, r * 1.2,
-//    //                                                        r * 0.8, r,
-//                                                            r * 0.7, r,
-//                                                            1, 0);
-//
-//                count_boids_near_centroid_ += bs_score;
-            
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20260530 make centroidScore() reward uniform distribution
-
-//            if (distance < r) { count_boids_near_centroid_++; }
-
             total_boids_to_centroid_distance_ += distance;
-            
-            
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-            //~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
-
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260615 move inline test code to xxxTrackDonutHoleAxisChanges()
+        //               call that from recordCentroid()
+        xxxTrackDonutHoleAxisChanges();
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
-    
 
     // Average speed for each Boid on each simulation step.
     double centroidScore() const
     {
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260607 adjust centerMaxDist() to maintain constant boid density
-
-//        double max_dist = fp().centerMaxDist();
         double max_dist = centroidMaxDistance();
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         double peak = 0.75 * max_dist;
         // Piecewise linear function of distance to score
         std::vector<double> d = {0.0, peak, max_dist};
@@ -776,28 +627,6 @@ public:
         double distance = total_boids_to_centroid_distance_ / boidStepPerSim();
         return parameterToWeightWithRamps(distance, d, s);
     }
-
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260514 try dynamic centroid
-    
-    Vec3 centroidRandomSample() const
-    {
-        int sample_count = 10;
-        Vec3 sum_of_boid_positions;
-        for (int i = 0; i < sample_count; i++)
-        {
-            int random_boid_index = EF::RS().randomN(boids().size());
-            sum_of_boid_positions += boids().at(random_boid_index)->position();
-        }
-        return sum_of_boid_positions / boids().size();
-    }
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
     
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

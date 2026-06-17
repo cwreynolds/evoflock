@@ -376,12 +376,28 @@ public:
         // std::cout << delta_axis_angle << std::endl;
         previous_donut_hole_axis_ = donut_hole_axis;
         
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260616 centroidScore() combines "inside sphere" and "anti-donut"
+        
+//        double enough_jiggle = 0.05;
+        double enough_jiggle = 0.20;
+        if (delta_axis_angle > enough_jiggle) { total_anti_donut_good_steps_++; }
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        
         Color c1 = Color::orange();
         Color c2 = Color::white() - Color::orange();
         draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
         draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260616 centroidScore() combines "inside sphere" and "anti-donut"
+    
+    double total_anti_donut_good_steps_ = 0;
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
@@ -616,8 +632,36 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260616 centroidScore() combines "inside sphere" and "anti-donut"
+    
+//    // Average speed for each Boid on each simulation step.
+//    double centroidScore() const
+//    {
+//        double max_dist = centroidMaxDistance();
+//        double peak = 0.75 * max_dist;
+//        // Piecewise linear function of distance to score
+//        std::vector<double> d = {0.0, peak, max_dist};
+//        std::vector<double> s = {0.0, 1.0,  0.0};
+//        double distance = total_boids_to_centroid_distance_ / boidStepPerSim();
+//        return parameterToWeightWithRamps(distance, d, s);
+//    }
+    
     // Average speed for each Boid on each simulation step.
     double centroidScore() const
+    {
+        // TODO XXX very temp
+        double d = centroidDistanceScore();
+        double a = centroidAntiDonutScore();
+        std::cout << "        " << a * d;
+        std::cout << " (centroidDistanceScore()=" << d;
+        std::cout << "  centroidAntiDonutScore()=" << a << ")" << std::endl;
+
+        return centroidDistanceScore() * centroidAntiDonutScore();
+    }
+
+    // Average speed for each Boid on each simulation step.
+    double centroidDistanceScore() const
     {
         double max_dist = centroidMaxDistance();
         double peak = 0.75 * max_dist;
@@ -627,7 +671,13 @@ public:
         double distance = total_boids_to_centroid_distance_ / boidStepPerSim();
         return parameterToWeightWithRamps(distance, d, s);
     }
-    
+
+    double centroidAntiDonutScore() const
+    {
+        return total_anti_donut_good_steps_ / fp().maxSimulationSteps();
+    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20250709 only called in printRunStats() replace with speedScore()?

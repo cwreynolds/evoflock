@@ -653,9 +653,18 @@ LazyPredator::FunctionSet static_ga_fs_ =
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                 // TODO 20260602 add more inline parameters to FB for GA optimization
                 
-                "Real_m1_p1",  // FP::centerInNess()
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+                // TODO 20260617 fiddle with centerInNess() range.
+                
+//                "Real_m1_p1",  // FP::centerInNess()
+//                "Real_0_1",    // FP::centerSlowing()
+//                "Real_0_1",    // FP::centerCentering()
+
+                "Real_0_1",    // FP::centerInNess()
                 "Real_0_1",    // FP::centerSlowing()
                 "Real_0_1",    // FP::centerCentering()
+
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

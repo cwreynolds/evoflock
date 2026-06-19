@@ -151,15 +151,16 @@ public:
             draw().beginOneAnimatedFrame();
             for_all_boids([&](Boid* b){ b->draw_body();});
             selectedBoid()->drawAnnotationForBoidAndNeighbors();
-//                if (EF::use_centroid_objective)
-//                {
-//                    draw().addAnnotationAxes({});
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                    // TODO 20260608 adjust centerMaxDist() to maintain constant boid density
-//    //                draw().addAnnotationAxes(centroid(), fp().centerMaxDist());
-//                    draw().addAnnotationAxes(centroid(), centroidMaxDistance());
-//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//                }
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260618 change initial position to be throughout centroid
+
+            if (EF::use_centroid_objective)
+            {
+                draw().addAnnotationAxes({});
+                draw().addAnnotationAxes(centroid(), centroidMaxDistance());
+            }
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             draw().addAnnotationsToAnimatedFrame();
             draw().aimAgent() = *selectedBoid();
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -237,6 +238,15 @@ public:
         // Init Boid speed to EF::default_target_speed.
         boid->setSpeed(EF::default_target_speed);
         
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//        // TODO 20260618 change initial position to be throughout centroid
+//        if (EF::murmuration_mode)
+//        {
+//            boid->setSpeed(EF::default_target_speed * 2);
+//        }
+//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260607 adjust centerMaxDist() to maintain constant boid density
         boid->setCentroidMaxDistance(centroidMaxDistance());
@@ -283,16 +293,30 @@ public:
             return point;
         };
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260618 change initial position to be throughout centroid
+        
         // For DomeAndGround / NoObstacle / BoxObstacle
         if (EF::murmuration_mode)
         {
-            double radius = fp().sphereRadius() * 0.15;
+//            double radius = fp().sphereRadius() * 0.15;
+//            double radius = centroidMaxDistance() * 0.9;
+//            double radius = centroidMaxDistance() * 0.75;
+//            double radius = centroidMaxDistance() * 0.75;
+            double radius = centroidMaxDistance() * 0.5;
+//            debugPrint(radius);
+            
             Vec3 center;
             Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
             Vec3 boid_position = center + (rand_in_unit_sphere * radius);
-            Vec3 boid_heading = rs.randomUnitVector();
+            
+//            Vec3 boid_heading = rs.randomUnitVector();
+            Vec3 boid_heading = rand_in_unit_sphere.normalize().find_perpendicular();
+
             return LocalSpace::fromTo(boid_position, boid_heading);
         }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
     }
@@ -300,7 +324,11 @@ public:
     
     // For murmuration, adjust centroid max distance to maintain constant boid
     // density in "sphere".
-    double centroid_max_distance_ = FlockParameters().boidsPerFlock();
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260618 change initial position to be throughout centroid
+//    double centroid_max_distance_ = FlockParameters().boidsPerFlock();
+    double centroid_max_distance_ = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double centroidMaxDistance() const { return centroid_max_distance_; }
     void initCentroidMaxDistance()
     {
@@ -339,6 +367,15 @@ public:
     // phase which actually moves the boids. Finally statistics are collected.
     void fly_boids(double time_step)
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260618 change initial position to be throughout centroid
+//        if (EF::murmuration_mode and
+//            (clock().frameCounter() % 50) == 0)
+//        {
+//            debugPrint(selectedBoid()->speed());
+//        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         for_all_boids([&](Boid* b){ b->plan_next_steer();});
         for_all_boids([&](Boid* b){ b->apply_next_steer(time_step);});
         enforceObsBoidConstraints();

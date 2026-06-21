@@ -325,7 +325,8 @@ public:
         if (EF::murmuration_mode)
         {
 //            double radius = centroidMaxDistance() * 0.8;
-            double radius = centroidMaxDistance() * 0.3;
+//            double radius = centroidMaxDistance() * 0.3;
+            double radius = centroidMaxDistance() * 0.8;
 
             Vec3 center;
 //            Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
@@ -333,8 +334,9 @@ public:
             
             Vec3 boid_position = center + (rand_in_unit_sphere * radius);
             
-            Vec3 boid_heading = rand_in_unit_sphere.normalize().find_perpendicular();
-
+//            Vec3 boid_heading = rand_in_unit_sphere.normalize().find_perpendicular();
+            Vec3 boid_heading = rs.randomUnitVector();
+            
             // Early return for murmuration_mode
             return LocalSpace::fromTo(boid_position, boid_heading);
         }

@@ -296,26 +296,51 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260618 change initial position to be throughout centroid
         
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260619 more tweak init position distribution
+
+        
+//            // For DomeAndGround / NoObstacle / BoxObstacle
+//            if (EF::murmuration_mode)
+//            {
+//    //            double radius = fp().sphereRadius() * 0.15;
+//    //            double radius = centroidMaxDistance() * 0.9;
+//    //            double radius = centroidMaxDistance() * 0.75;
+//    //            double radius = centroidMaxDistance() * 0.75;
+//    //            double radius = centroidMaxDistance() * 0.5;
+//                double radius = centroidMaxDistance() * 0.8;
+//    //            debugPrint(radius);
+//
+//                Vec3 center;
+//                Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
+//                Vec3 boid_position = center + (rand_in_unit_sphere * radius);
+//
+//    //            Vec3 boid_heading = rs.randomUnitVector();
+//                Vec3 boid_heading = rand_in_unit_sphere.normalize().find_perpendicular();
+//
+//                return LocalSpace::fromTo(boid_position, boid_heading);
+//            }
+      
         // For DomeAndGround / NoObstacle / BoxObstacle
         if (EF::murmuration_mode)
         {
-//            double radius = fp().sphereRadius() * 0.15;
-//            double radius = centroidMaxDistance() * 0.9;
-//            double radius = centroidMaxDistance() * 0.75;
-//            double radius = centroidMaxDistance() * 0.75;
-            double radius = centroidMaxDistance() * 0.5;
-//            debugPrint(radius);
-            
+//            double radius = centroidMaxDistance() * 0.8;
+            double radius = centroidMaxDistance() * 0.3;
+
             Vec3 center;
-            Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
+//            Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
+            Vec3 rand_in_unit_sphere = rs.randomUnitVector();
+            
             Vec3 boid_position = center + (rand_in_unit_sphere * radius);
             
-//            Vec3 boid_heading = rs.randomUnitVector();
             Vec3 boid_heading = rand_in_unit_sphere.normalize().find_perpendicular();
 
+            // Early return for murmuration_mode
             return LocalSpace::fromTo(boid_position, boid_heading);
         }
-        
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
@@ -334,14 +359,22 @@ public:
     {
         if (EF::murmuration_mode)
         {
-            FlockParameters fp;
-            double r = fp.sphereRadius();
-            double v = shape::Sphere::volumeFromRadius(r);
-            double bpf_big = 2000;
-            double bpf_ratio = fp.boidsPerFlock() / bpf_big;
-            double v2 = v * bpf_ratio;
-            double r2 = shape::Sphere::radiusFromVolume(v2);
-            centroid_max_distance_ = r2;
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20260619 revert density maintenance, just use original radius
+            
+//            FlockParameters fp;
+//            double r = fp.sphereRadius();
+//            double v = shape::Sphere::volumeFromRadius(r);
+//            double bpf_big = 2000;
+//            double bpf_ratio = fp.boidsPerFlock() / bpf_big;
+//            double v2 = v * bpf_ratio;
+//            double r2 = shape::Sphere::radiusFromVolume(v2);
+//            centroid_max_distance_ = r2;
+            
+
+            centroid_max_distance_ = fp().sphereRadius();
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         }
     }
 

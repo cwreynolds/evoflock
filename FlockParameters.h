@@ -347,8 +347,20 @@ private:
                              //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                              // TODO 20260518 bigger flock for murmuration viz.
                              
+                             //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+                             // TODO 20260622 What does 2x dense look like?
+                             
+//                             // For visualizing previous results.
+//                             (EF::murmuration_mode ? 2000 : 1400) :
+                             
+//                             // For visualizing previous results.
+//                             (EF::murmuration_mode ? 4000 : 1400) :
+
                              // For visualizing previous results.
                              (EF::murmuration_mode ? 2000 : 1400) :
+
+                             //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+
                              
                              //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
                              //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

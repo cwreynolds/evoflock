@@ -329,9 +329,17 @@ public:
             double radius = centroidMaxDistance() * 0.8;
 
             Vec3 center;
-//            Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
-            Vec3 rand_in_unit_sphere = rs.randomUnitVector();
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20260624 is this little change really what made it get worse?
+            //
+            // TODO 20260624 next experiment: 
+            // maybe start them near center and pointed **away** from the center?
             
+//            Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
+//            Vec3 rand_in_unit_sphere = rs.randomUnitVector();
+            Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
             Vec3 boid_position = center + (rand_in_unit_sphere * radius);
             
 //            Vec3 boid_heading = rand_in_unit_sphere.normalize().find_perpendicular();

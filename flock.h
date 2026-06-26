@@ -326,14 +326,19 @@ public:
         {
 //            double radius = centroidMaxDistance() * 0.8;
 //            double radius = centroidMaxDistance() * 0.3;
-            double radius = centroidMaxDistance() * 0.8;
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20260624 init near center and pointed AWAY from the center
+
+//            double radius = centroidMaxDistance() * 0.8;
+            double radius = centroidMaxDistance() * 0.3;
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
             Vec3 center;
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // TODO 20260624 is this little change really what made it get worse?
             //
-            // TODO 20260624 next experiment: 
-            // maybe start them near center and pointed **away** from the center?
             
 //            Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
 //            Vec3 rand_in_unit_sphere = rs.randomUnitVector();
@@ -343,8 +348,15 @@ public:
             Vec3 boid_position = center + (rand_in_unit_sphere * radius);
             
 //            Vec3 boid_heading = rand_in_unit_sphere.normalize().find_perpendicular();
-            Vec3 boid_heading = rs.randomUnitVector();
             
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20260624 init near center and pointed AWAY from the center
+            
+//            Vec3 boid_heading = rs.randomUnitVector();
+            Vec3 boid_heading = rand_in_unit_sphere.normalize();
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
             // Early return for murmuration_mode
             return LocalSpace::fromTo(boid_position, boid_heading);
         }

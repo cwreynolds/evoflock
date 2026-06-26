@@ -498,9 +498,37 @@ public:
                 double strength = rel_dist_expt * fp().centeringStrength();
                 centroid_steer = (centering + slowing) * strength;
             }
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20260625 annotation selected boid's steerTowardCentroid()
+            
+            if (isSelected())
+            {
+//                draw().addAnnotationLine(position(),
+//                                         position() + centroid_steer,
+//                                         Color::black(),
+//                                         0.05);
+
+                annotationLineOffset(centroid_steer, Color::black(), 0.05);
+            }
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         }
         return centroid_steer;
     }
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20260625 annotation selected boid's steerTowardCentroid()
+    
+    void annotationLineOffset(Vec3 offset, Color color, double radius)
+    {
+        annotationLineToPoint(offset + position(), color, radius);
+    }
+    
+    void annotationLineToPoint(Vec3 point, Color color, double radius)
+    {
+        draw().addAnnotationLine(position(), point, color, radius);
+    }
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

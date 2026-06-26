@@ -77,8 +77,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -410,6 +410,11 @@ void visualizeBestIfRequested(LP::Population* population)
     }
 }
 
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+// TODO 20260625 annotation selected boid's steerTowardCentroid()
+//bool pauseBeforeVisualizePreviousFS = false;
+bool pauseBeforeVisualizePreviousFS = true;
+//~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
 // Tool to (optionally) visualize a previous logged result. For example, after
 // an overnight evolution has completed, a result can be copied and pasted from
@@ -422,6 +427,11 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 {
     // Do nothing unless in visualize_previous_results_mode.
     if (not visualize_previous_results_mode) { return; }
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20260625 annotation selected boid's steerTowardCentroid()
+    Draw& draw = Draw::getInstance();
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260601 test 20260601_ga_murm_no_out_vel with bigger flock
@@ -712,21 +722,29 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     48.2666, 1.89866, 14.9117, 0.811644, 0.0764724,
         //                     0.195077});
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260601 test 20260621_ga_murm_fix_initPose with bigger flock
-
         // Saved best FP values from run 20260621_ga_murm_fix_initPose
-        FlockParameters fp({25.8798, 91.128, 66.7921, 73.1955, 19.0353,
-                            5.58319, 26.3711, 2.58225, 33.3171, 51.912,
-                            -0.777807, -0.921582, -0.840182, 29.7588,
-                            8.6607, 37.3203, 1.95872, 12.5221, 0.297009,
-                            0.142382, 0.206578});
+        // FlockParameters fp({25.8798, 91.128, 66.7921, 73.1955, 19.0353,
+        //                     5.58319, 26.3711, 2.58225, 33.3171, 51.912,
+        //                     -0.777807, -0.921582, -0.840182, 29.7588,
+        //                     8.6607, 37.3203, 1.95872, 12.5221, 0.297009,
+        //                     0.142382, 0.206578});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260601 test 20260624_ga_murm_face_outward with bigger flock
+        
+        // Saved best FP values from run 20260624_ga_murm_face_outward
+        FlockParameters fp({38.2494, 96.4766, 32.6476, 40.5122, 12.836,
+                            59.8341, 27.8042, 2.10652, 76.5876, 66.4315,
+                            -0.90675, 0.285309, -0.0509794, 75.4455,
+                            1.03952, 16.0169, 1.82491, 6.10348, 0.517219,
+                            0.172052, 0.155188});
 
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         EF::enable_multithreading = false;
-        Draw::getInstance().setEnable(true);
+//        Draw::getInstance().setEnable(true);
+        draw.setEnable(true);
         LP::Individual individual(GP::gaTreeFromFP(fp, fs), fs);
         while (true) { GP::run_flock_simulation(&individual, 1); }
     }
@@ -917,8 +935,31 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         LP::GpTree tree = fs.compile(gp_source);
         LP::Individual individual(tree, fs);
         EF::enable_multithreading = false;
-        Draw::getInstance().setEnable(true);
-        while (true) { GP::run_flock_simulation(&individual, 1); }
+//        Draw::getInstance().setEnable(true);
+        draw.setEnable(true);
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260625 annotation selected boid's steerTowardCentroid()
+        
+//        while (true) { GP::run_flock_simulation(&individual, 1); }
+//            while (true)
+//            {
+//    //            Draw::getInstance().simPause() = true;
+//    //            if (pauseBeforeVisualizePreviousFS)
+//    //            {
+//    //                Draw::getInstance().simPause() = true;
+//    //            }
+//                if (pauseBeforeVisualizePreviousFS) { draw.simPause() = true; }
+//                GP::run_flock_simulation(&individual, 1);
+//            }
+
+        while (true)
+        {
+            if (pauseBeforeVisualizePreviousFS) { draw.simPause() = true; }
+            GP::run_flock_simulation(&individual, 1);
+        }
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     }
 }
 

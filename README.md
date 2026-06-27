@@ -2,17 +2,18 @@
 
 ## Evolution Flocking
 
-April 20, 2026<br>
 Craig Reynolds<br>
 cwr@red3d.com
 
-This is experimental code, described in a draft paper **EvoFlock: evolved inverse design of multi-agent motion**, currently under review.
+![Fig 1 from paper: visualization of flock simulation step.](https://github.com/cwreynolds/evoflock/blob/main/doc/EvoFlock%20paper/images/temp_fig_1.jpeg?raw=true "Fig 1 from paper: visualization of flock simulation step.")
+
+This is experimental code, described in the paper [EvoFlock: evolved inverse design of multi-agent motion](https://arxiv.org/pdf/2606.25280), to be presented at the [The 2026 Artificial Life Conference](https://2026.alife.org/). (See also the video supplements to that paper: [vanilla flocking with obstacles](https://www.youtube.com/watch?v=XkwJXPJwxIc), [same with boosted path curvature](https://www.youtube.com/watch?v=p8RE0ApsPuw), and [WIP murmuration test](https://www.youtube.com/watch?v=n-IKdgAOzSA).)
 
 The abstract of the abstract is that _multi-agent motion models_ (such as _boids_) can be hard to adjust. They have many (~15) parameters which interact in nonlinear ways.
 
 This work takes an _inverse design_ approach using optimization (via a genetic algorithm) according to an objective function (written by the user).
 
-So far, I have treated this code as a private branch: it is often broken, or modified for debugging. If you are interested in building/using it, (a) thanks for your interest!, and (b) please send me email so I can help you get a clean version. If you do try, please let me know how you fare so I can make this code easier to use. For example, I think it has only been run on macOS.
+So far, I have treated this code as a private branch: it is often broken, or modified for debugging. If you are interested in building/using it, (a) thanks for your interest!, and (b) please send me email so I can help you get a clean version. If you do try, please let me know how you fare so I can make this code easier to use. For example, I think it has only been run on macOS. (**Note**: As of June 18, 2026, a helpful user (who I will name once they let me know it is OK) was able to build and run `EvoFlock` on `Arch Linux` with `Open3D 0.19.0`.)
 
 **Just a few hints:**
 
@@ -20,13 +21,13 @@ So far, I have treated this code as a private branch: it is often broken, or mod
     * `CMake` on `CMakeLists.txt`
     * `Xcode` on `evoflock.xcodeproj`
 * Dependencies (these should be formalized as `git` submodule dependancies):
+    * The [Open3D](https://www.open3d.org/) library, a modern layer on top of OpenGL, is used for graphics. You will need to install this separately.
     * **EvoFlock** uses an evolutionary computation engine, called **LazyPredator**, developed for an earlier project.
       * Its updated source code is in a subdirectory: `EvoFlock/LazyPredator/`.
       * _LazyPredator_ supports _genetic programming_ (GP). A _genetic algorithm_ (GA) can be considered a special case of GP.
-    * The [Open3D](https://www.open3d.org/) library, a modern layer on top of OpenGL, is used for graphics. You will need to install this separately.
 * Run either from `Xcode` or with the `evoflock` executable from the command line.
     * The normal action is to start optimization run, finding a solution for the given objective. For a GA run this will be a set of scalar values in a `ParameterSet` object, or in the experimental GP mode, the result will be “source code” in a domain specific language.
-    * Otherwise if `EF::visualize_previous_results_mode` is `true` will run flock simulations based on results from a previous optimization run.
+    * Otherwise if `EF::visualize_previous_results_mode` is `true` will run flock simulations based on results from a previous optimization run which has previously been manually copied into the souce code. (See `EF::visualizePreviouslyLoggedFlockParameters()`)
     * Normally an `Open3D` window will open and logging will appear on the shell where `evoflock` was run.
         * A simple user interface is available in the `Open3D` window
         * The mouse can be used to adjust the “camera” (“point of view”).
@@ -58,3 +59,4 @@ So far, I have treated this code as a private branch: it is often broken, or mod
         * Boids per flock: 200
         * Steps per flock simulation: 500
 * I hope to soon convert this messy personal repository to be useful to others…
+  * Especially I should separate a “release” version from my messy WIP experiments.

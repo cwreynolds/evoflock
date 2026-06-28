@@ -121,6 +121,9 @@ public:
     Vec3 getPreviousPosition() const { return previous_position_; }
     void setPreviousPosition(Vec3 prev_pos) { previous_position_ = prev_pos; }
     
+    // Simple prediction of this Boid's position on the next simulation step.
+    Vec3 predictNextPosition() const {return position()*2 - previous_position_;}
+
     // Experimental, possibly ill-considered, read-only accessor, for debugging.
     Vec3 nextSteer() const { return next_steer_; }
     
@@ -441,30 +444,10 @@ public:
         centroid_velocity_ = centroid_velocity;
     }
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260607 adjust centerMaxDist() to maintain constant boid density
-    
-    
     double centroid_max_distance_ = 0;
     
     void setCentroidMaxDistance(double md) { centroid_max_distance_ = md; }
     
-//        double centroidMaxDistance()
-//        {
-//            if (centroid_max_distance_ < 0)
-//            {
-//                double r = fp().sphereRadius();
-//                double v = shape::Sphere::volumeFromRadius(r);
-//    //            double bpf_ratio = fp().boidsPerFlock() / 2000.0;
-//                double bpf_big = 2000;
-//                double bpf_ratio = fp().boidsPerFlock() / bpf_big;
-//                double v2 = v * bpf_ratio;
-//                double r2 = shape::Sphere::radiusFromVolume(v2);
-//                centroid_max_distance_ = r2;
-//            }
-//            return centroid_max_distance_;
-//        }
-
     double centroidMaxDistance() { return centroid_max_distance_; }
 
     // TODO 20250604 calling this “version 1.0” a probably-not-nonsense version
@@ -483,31 +466,18 @@ public:
             if (velocity().dot(unit_to_center) < fp().centerInNess())
             {
                 double mf = fp().maxForce();
-                
-//                Vec3 slowing = forward() * (-1 * mf * fp().centerSlowing());
-//                Vec3 slowing = forward() * (mf * -fp().centerSlowing());
                 Vec3 backward = -forward();
                 Vec3 slowing = backward * (mf * fp().centerSlowing());
-
                 Vec3 centering = unit_to_center * (mf * fp().centerCentering());
-                
-//                double rel_dist = distance / fp().centerMaxDist();
                 double rel_dist = distance / centroidMaxDistance();
-
                 double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
                 double strength = rel_dist_expt * fp().centeringStrength();
                 centroid_steer = (centering + slowing) * strength;
             }
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             // TODO 20260625 annotation selected boid's steerTowardCentroid()
-            
             if (isSelected())
             {
-//                draw().addAnnotationLine(position(),
-//                                         position() + centroid_steer,
-//                                         Color::black(),
-//                                         0.05);
-
                 annotationLineOffset(centroid_steer, Color::black(), 0.05);
             }
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
@@ -515,22 +485,17 @@ public:
         return centroid_steer;
     }
 
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20260625 annotation selected boid's steerTowardCentroid()
-    
+    // Draw annotation from this Boid along a given offset vector.
     void annotationLineOffset(Vec3 offset, Color color, double radius)
     {
-        annotationLineToPoint(offset + position(), color, radius);
+        annotationLineToPoint(offset + predictNextPosition(), color, radius);
     }
-    
+
+    // Draw annotation from this Boid to a given global position.
     void annotationLineToPoint(Vec3 point, Color color, double radius)
     {
-        draw().addAnnotationLine(position(), point, color, radius);
+        draw().addAnnotationLine(predictNextPosition(), point, color, radius);
     }
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Compute a behavioral weight (on [0, 1]) for a neighbor of this Boid.
     // Shared by separate, align, and cohere steering behaviors

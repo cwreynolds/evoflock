@@ -428,17 +428,11 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
     // Do nothing unless in visualize_previous_results_mode.
     if (not visualize_previous_results_mode) { return; }
     
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20260625 annotation selected boid's steerTowardCentroid()
     Draw& draw = Draw::getInstance();
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260601 test 20260601_ga_murm_no_out_vel with bigger flock
     std::cout<<"In EF::visualizePreviouslyLoggedFlockParameters()"<<std::endl;
-    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     if (EF::usingGA())
     {
         // To visualize FlockParameters from a previous GA run
@@ -743,7 +737,6 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         EF::enable_multithreading = false;
-//        Draw::getInstance().setEnable(true);
         draw.setEnable(true);
         LP::Individual individual(GP::gaTreeFromFP(fp, fs), fs);
         while (true) { GP::run_flock_simulation(&individual, 1); }
@@ -935,30 +928,15 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         LP::GpTree tree = fs.compile(gp_source);
         LP::Individual individual(tree, fs);
         EF::enable_multithreading = false;
-//        Draw::getInstance().setEnable(true);
         draw.setEnable(true);
 
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         // TODO 20260625 annotation selected boid's steerTowardCentroid()
-        
-//        while (true) { GP::run_flock_simulation(&individual, 1); }
-//            while (true)
-//            {
-//    //            Draw::getInstance().simPause() = true;
-//    //            if (pauseBeforeVisualizePreviousFS)
-//    //            {
-//    //                Draw::getInstance().simPause() = true;
-//    //            }
-//                if (pauseBeforeVisualizePreviousFS) { draw.simPause() = true; }
-//                GP::run_flock_simulation(&individual, 1);
-//            }
-
         while (true)
         {
             if (pauseBeforeVisualizePreviousFS) { draw.simPause() = true; }
             GP::run_flock_simulation(&individual, 1);
         }
-
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     }
 }

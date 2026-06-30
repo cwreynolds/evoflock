@@ -1020,10 +1020,24 @@ public:
         Color color;
         double radius;
     };
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20260630 maybe fix intermittent fail here when not drawing?
+    
+//    void addAnnotationLine(Vec3 ep1, Vec3 ep2, Color color, double radius)
+//    {
+//        annotations_.push_back({ep1, ep2, color, radius});
+//    }
+
     void addAnnotationLine(Vec3 ep1, Vec3 ep2, Color color, double radius)
     {
-        annotations_.push_back({ep1, ep2, color, radius});
+        if (enable() and enableAnnotation())
+        {
+            annotations_.push_back({ep1, ep2, color, radius});
+        }
     }
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
     void addAnnotationLine(Vec3 ep1, Vec3 ep2, Color color)
     {
         addAnnotationLine(ep1, ep2, color, 0.02);

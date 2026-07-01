@@ -342,6 +342,17 @@ public:
 //                    if (alignment < 0.85) { weight = 0; }
 //                }
 //                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260701 retry "Don't cohere with poorly aligned neighbors."
+            
+            if (EF::murmuration_mode)
+            {
+                double alignment = forward().dot(neighbor->forward());
+                if (alignment < 0) { weight = 0; }
+            }
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             direction += heading_offset.normalize_or_0() * weight;
         }
         return direction.normalize_or_0();

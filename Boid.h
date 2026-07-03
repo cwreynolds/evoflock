@@ -349,7 +349,11 @@ public:
             if (EF::murmuration_mode)
             {
                 double alignment = forward().dot(neighbor->forward());
-                if (alignment < 0) { weight = 0; }
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                // TODO 20260702 try intermediate value -- maybe evolve it?
+//                if (alignment < 0) { weight = 0; }
+                if (alignment < -0.7) { weight = 0; }
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             }
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

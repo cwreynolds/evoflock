@@ -761,7 +761,16 @@ public:
         std::vector<double> d = {0.0, peak, max_dist};
         std::vector<double> s = {0.0, 1.0,  0.0};
         double distance = total_boids_to_centroid_distance_ / boidStepPerSim();
-        return parameterToWeightWithRamps(distance, d, s);
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260704 try deemphasize low scores
+        
+//        return parameterToWeightWithRamps(distance, d, s);
+
+        double weight = parameterToWeightWithRamps(distance, d, s);
+        return std::pow(weight, 3);
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
 
     double centroidAntiDonutScore() const

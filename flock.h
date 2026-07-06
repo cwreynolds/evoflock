@@ -758,8 +758,21 @@ public:
         double max_dist = centroidMaxDistance();
         double peak = 0.75 * max_dist;
         // Piecewise linear function of distance to score
-        std::vector<double> d = {0.0, peak, max_dist};
-        std::vector<double> s = {0.0, 1.0,  0.0};
+        
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260705 deemphasize low scores, change exponent from 3 to 10.
+
+//        std::vector<double> d = {0.0, peak, max_dist};
+//        std::vector<double> s = {0.0, 1.0,  0.0};
+
+        // TODO 20260705 wider range for max centroidDistanceScore().
+
+        double m = 0.15 * max_dist;
+        std::vector<double> d = {0.0, peak - m, peak + m, max_dist};
+        std::vector<double> s = {0.0,      1.0,      1.0,      0.0};
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
         double distance = total_boids_to_centroid_distance_ / boidStepPerSim();
         
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -772,7 +785,8 @@ public:
         
         double weight = parameterToWeightWithRamps(distance, d, s);
 //        return std::pow(weight, 3);
-        return std::pow(weight, 10);
+//        return std::pow(weight, 10);
+        return std::pow(weight, 2);
 
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 

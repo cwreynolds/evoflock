@@ -77,8 +77,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -400,7 +400,15 @@ void visualizeBestIfRequested(LP::Population* population)
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         // TODO 20260417 combine computing centroid and setting it in all boids
 //        if (murmuration_mode) { override_boids_per_flock = 500; }
-        if (murmuration_mode) { override_boids_per_flock = 300; }
+        
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260705 use big population for mermuration mode.
+
+//        if (murmuration_mode) { override_boids_per_flock = 300; }
+        if (murmuration_mode) { override_boids_per_flock = 2000; }
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         GP::run_flock_simulation(individual, 1);
         override_boids_per_flock = previous_obpf;
@@ -737,15 +745,29 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     7.44694, 17.3619, 1.99738, 8.7232, 0.403676,
         //                     0.225352, 0.311683});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260601 test 20260702_gp_murm_aligned_thresh with bigger flock
-
         // Saved best FP values from run 20260702_gp_murm_aligned_thresh
-        FlockParameters fp({33.3162, 93.2145, 39.7751, 26.4942, 17.0202,
-                            45.3041, 17.0165, 2.04144, 69.2959, 30.7305,
-                            -0.879553, -0.87552, -0.543477, 68.9127,
-                            0.883016, 36.198, 1.96473, 8.39168, 0.767759,
-                            0.163439, 0.202948});
+        // FlockParameters fp({33.3162, 93.2145, 39.7751, 26.4942, 17.0202,
+        //                     45.3041, 17.0165, 2.04144, 69.2959, 30.7305,
+        //                     -0.879553, -0.87552, -0.543477, 68.9127,
+        //                     0.883016, 36.198, 1.96473, 8.39168, 0.767759,
+        //                     0.163439, 0.202948});
+
+        // Saved best FP values from run 20260704_gp_murm_deemph_score
+        // FlockParameters fp({16.4136, 84.8683, 48.0453, 33.7709, 28.0435,
+        //                     7.78292, 25.0073, 2.38106, 84.8157, 91.9128,
+        //                     -0.840901, 0.609479, 0.0750392, 59.1723,
+        //                     3.98219, 21.1622, 1.84967, 24.8849, 0.42066,
+        //                     0.000683475, 0.12666});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260601 test 20260705_gp_murm_deemph_3_to_10 with bigger flock
+        
+        // Saved best FP values from run 20260705_gp_murm_deemph_3_to_10
+        FlockParameters fp({13.8166, 99.7467, 48.6482, 45.6296, 28.3388,
+                            75.9962, 31.8302, 3.55908, 43.0806, 54.3273,
+                            0.671708, 0.76904, -0.83723, 37.0715,
+                            0.352327, 26.2512, 1.88037, 13.5667, 0.968767,
+                            0.0823908, 0.479566});
         
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -767,8 +767,14 @@ public:
         
 //        return parameterToWeightWithRamps(distance, d, s);
 
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260705 deemphasize low scores, change exponent from 3 to 10.
+        
         double weight = parameterToWeightWithRamps(distance, d, s);
-        return std::pow(weight, 3);
+//        return std::pow(weight, 3);
+        return std::pow(weight, 10);
+
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }

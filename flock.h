@@ -696,9 +696,16 @@ public:
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     // TODO 20260530 make centroidScore() reward uniform distribution
 
-    
-    // make centroidScore() reward uniform distribution
-    double total_boids_to_centroid_distance_ = 0;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260706 switch to sum of per boid-step centroid distance score.
+
+//    // make centroidScore() reward uniform distribution
+//    double total_boids_to_centroid_distance_ = 0;
+
+    // Sum up weighted scores for every boid-step.
+    double sum_of_centroid_distance_score_ = 0;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void recordCentroid(double time_step)
     {
@@ -711,12 +718,22 @@ public:
         // Set centroid values in each boid.
         for (auto b : boids()) {b->setCentroids(centroid_, centroid_velocity_);}
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260706 switch to sum of per boid-step centroid distance score.
+
+//        for (auto b : boids())
+//        {
+//            double distance = (b->position() - centroid()).length();
+//            total_boids_to_centroid_distance_ += distance;
+//        }
+
         for (auto b : boids())
         {
-            double distance = (b->position() - centroid()).length();
-            total_boids_to_centroid_distance_ += distance;
+            sum_of_centroid_distance_score_ += perBoidCentroidDistanceScore(b);
         }
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260615 move inline test code to xxxTrackDonutHoleAxisChanges()
         //               call that from recordCentroid()
@@ -751,47 +768,115 @@ public:
 
         return centroidDistanceScore() * centroidAntiDonutScore();
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260706 switch to sum of per boid-step centroid distance score.
+
+//        // Average speed for each Boid on each simulation step.
+//        double centroidDistanceScore() const
+//        {
+//            double max_dist = centroidMaxDistance();
+//            double peak = 0.75 * max_dist;
+//            // Piecewise linear function of distance to score
+//
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//            // TODO 20260705 deemphasize low scores, change exponent from 3 to 10.
+//
+//    //        std::vector<double> d = {0.0, peak, max_dist};
+//    //        std::vector<double> s = {0.0, 1.0,  0.0};
+//
+//            // TODO 20260705 wider range for max centroidDistanceScore().
+//
+//            double m = 0.15 * max_dist;
+//            std::vector<double> d = {0.0, peak - m, peak + m, max_dist};
+//            std::vector<double> s = {0.0,      1.0,      1.0,      0.0};
+//
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//            double distance = total_boids_to_centroid_distance_ / boidStepPerSim();
+//
+//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//            // TODO 20260704 try deemphasize low scores
+//
+//    //        return parameterToWeightWithRamps(distance, d, s);
+//
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//            // TODO 20260705 deemphasize low scores, change exponent from 3 to 10.
+//
+//            double weight = parameterToWeightWithRamps(distance, d, s);
+//    //        return std::pow(weight, 3);
+//    //        return std::pow(weight, 10);
+//            return std::pow(weight, 2);
+//
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//        }
 
     // Average speed for each Boid on each simulation step.
     double centroidDistanceScore() const
     {
-        double max_dist = centroidMaxDistance();
-        double peak = 0.75 * max_dist;
-        // Piecewise linear function of distance to score
+        double average_score = sum_of_centroid_distance_score_ / boidStepPerSim();
+//        return std::pow(average_score, 2);
         
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260705 deemphasize low scores, change exponent from 3 to 10.
-
-//        std::vector<double> d = {0.0, peak, max_dist};
-//        std::vector<double> s = {0.0, 1.0,  0.0};
-
-        // TODO 20260705 wider range for max centroidDistanceScore().
-
-        double m = 0.15 * max_dist;
-        std::vector<double> d = {0.0, peak - m, peak + m, max_dist};
-        std::vector<double> s = {0.0,      1.0,      1.0,      0.0};
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-        double distance = total_boids_to_centroid_distance_ / boidStepPerSim();
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260707 try flipped exp for score, average over boid_steps
         
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260704 try deemphasize low scores
+//        return std::pow(average_score, 3);
+        return average_score;
         
-//        return parameterToWeightWithRamps(distance, d, s);
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260705 deemphasize low scores, change exponent from 3 to 10.
-        
-        double weight = parameterToWeightWithRamps(distance, d, s);
-//        return std::pow(weight, 3);
-//        return std::pow(weight, 10);
-        return std::pow(weight, 2);
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
+
+//        double perBoidCentroidDistanceScore(Boid* boid) const
+//        {
+//            // Piecewise linear function of distance to score
+//            double distance = (boid->position() - centroid()).length();
+//    //        double max_dist = centroidMaxDistance();
+//            double max = centroidMaxDistance();
+//    //        double peak = 0.75 * max_dist;
+//    //        std::vector<double> d = {0.0, peak, max_dist};
+//    //        double knee = 0.75 * max_dist;
+//    //        std::vector<double> d = {0.0, knee, max_dist};
+//    //        std::vector<double> s = {1.0,  1.0,      0.0};
+//            double knee = 0.75 * max;
+//            std::vector<double> d = {0.0, knee, max};
+//            std::vector<double> s = {1.0,  1.0, 0.0};
+//            // Get score for given boid's distance from murmuration centroid.
+//    //        double distance = (boid->position() - centroid()).length();
+//            return parameterToWeightWithRamps(distance, d, s);
+//        }
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260707 try flipped exp for score, average over boid_steps
+    
+//    double perBoidCentroidDistanceScore(Boid* boid) const
+//    {
+//        // Piecewise linear function of distance to score
+//        double distance = (boid->position() - centroid()).length();
+//        double max = centroidMaxDistance();
+//        double knee = 0.75 * max;
+//        // Get score for given boid's distance from murmuration centroid.
+//        return parameterToWeightWithRamps(distance,
+//                                          {0.0, knee, max},
+//                                          {1.0,  1.0, 0.0});
+//    }
+
+    double perBoidCentroidDistanceScore(Boid* boid) const
+    {
+        // Flipped exponential over normalized distance
+        // (See plot of this function via Wolfram|Alpha: http://bit.ly/44d0OIv)
+        double distance = (boid->position() - centroid()).length();
+        double max = centroidMaxDistance();
+        double clipped_normalized_distance = util::clip01(distance / max);
+        return 1 - std::pow(clipped_normalized_distance, 3);
+    }
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     double centroidAntiDonutScore() const
     {

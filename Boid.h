@@ -148,6 +148,11 @@ public:
     {
         color_ = Color::randomInRgbBox(Color(0.5), Color(0.8));
         name_ = "boid_" + std::to_string(name_counter_++);
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260708 wip skip think
+        skip_think_counter_ = EF::RS().randomN(1000);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,13 +160,34 @@ public:
     double sum_steer_mag_for_all_steps = 0;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260708 wip skip think -- OK only when skip_think_ == 0
+    
+    int skip_think_ = 0;
+//    int skip_think_ = 5;
+    int skip_think_counter_ = 0;
+
+//    // Determine and store desired steering for this simulation step
+//    void plan_next_steer()
+//    {
+//        EF::current_boid_is_selected = isSelected();
+//        next_steer_ = steerToFlock();
+//        sum_steer_mag_for_all_steps += next_steer_.length();
+//    }
+
     // Determine and store desired steering for this simulation step
     void plan_next_steer()
     {
-        EF::current_boid_is_selected = isSelected();
-        next_steer_ = steerToFlock();
-        sum_steer_mag_for_all_steps += next_steer_.length();
+        skip_think_counter_++;
+        if ((skip_think_ == 0) or ((skip_think_counter_ % skip_think_) > 0))
+        {
+            EF::current_boid_is_selected = isSelected();
+            next_steer_ = steerToFlock();
+            sum_steer_mag_for_all_steps += next_steer_.length();
+        }
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Apply the "steering force" -- previously computed in plan_next_steer()
     // during a separate pass -- to this Boid's geometric state.

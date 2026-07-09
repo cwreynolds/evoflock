@@ -77,8 +77,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -766,16 +766,23 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     0.352327, 26.2512, 1.88037, 13.5667, 0.968767,
         //                     0.0823908, 0.479566});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260601 test 20260705_gp_murm_wider_dist_range with bigger flock
-        
         // Saved best FP values from run 20260705_gp_murm_wider_dist_range
         // Note: I want to tag this as "pretty good" but not great.
-        FlockParameters fp({28.737, 93.3437, 79.4043, 33.7731, 30.5318,
-                            28.6686, 32.567, 2.01342, 6.65827, 68.3297,
-                            -0.986453, -0.982711, -0.0373494, 54.4517,
-                            6.72244, 7.21255, 1.67303, 3.24235, 0.813466,
-                            0.0937856, 0.508831});
+        // FlockParameters fp({28.737, 93.3437, 79.4043, 33.7731, 30.5318,
+        //                     28.6686, 32.567, 2.01342, 6.65827, 68.3297,
+        //                     -0.986453, -0.982711, -0.0373494, 54.4517,
+        //                     6.72244, 7.21255, 1.67303, 3.24235, 0.813466,
+        //                     0.0937856, 0.508831});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260601 test 20260707_gp_murm_inverted_exponential with bigger flock
+        
+        // Saved best FP values from run 20260707_gp_murm_inverted_exponential
+        FlockParameters fp({45.8709, 92.201, 43.9575, 89.562, 19.5672,
+                            34.2522, 92.2603, 2.18338, 66.3786, 35.2458,
+                            -0.751519, -0.96067, -0.821331, 3.50968,
+                            5.17391, 5.59268, 1.9179, 6.37049, 0.68777,
+                            0.0628003, 0.348716});
 
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

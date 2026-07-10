@@ -166,6 +166,19 @@ public:
     int skip_think_ = 0;
 //    int skip_think_ = 5;
     int skip_think_counter_ = 0;
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260709 new skipThink api.
+    
+    // TODO maybe skip_think_counter_ should be a
+    //      (random) offset added to step counter.
+    
+    bool skipThinkOnThisStep() const
+    {
+        return ((skip_think_ > 0) and ((skip_think_counter_ % skip_think_) > 0));
+    }
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 //    // Determine and store desired steering for this simulation step
 //    void plan_next_steer()
@@ -175,17 +188,34 @@ public:
 //        sum_steer_mag_for_all_steps += next_steer_.length();
 //    }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260709 new skipThink api.
+
+//    // Determine and store desired steering for this simulation step
+//    void plan_next_steer()
+//    {
+//        skip_think_counter_++;
+//        if ((skip_think_ == 0) or ((skip_think_counter_ % skip_think_) > 0))
+//        {
+//            EF::current_boid_is_selected = isSelected();
+//            next_steer_ = steerToFlock();
+//            sum_steer_mag_for_all_steps += next_steer_.length();
+//        }
+//    }
+
     // Determine and store desired steering for this simulation step
     void plan_next_steer()
     {
         skip_think_counter_++;
-        if ((skip_think_ == 0) or ((skip_think_counter_ % skip_think_) > 0))
+        if (not skipThinkOnThisStep())
         {
             EF::current_boid_is_selected = isSelected();
             next_steer_ = steerToFlock();
             sum_steer_mag_for_all_steps += next_steer_.length();
         }
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

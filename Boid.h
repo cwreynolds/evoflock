@@ -836,19 +836,23 @@ public:
             if (prev_position.is_none()) { prev_position = position(); }
             Vec3 ec = o->enforceConstraint(position(), prev_position);
             
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20260405 BoxObstacle normal() points in wrong direction, or does it?
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20260413 current flock centroid, and velocity
-            if (isSelected() && (not flock_obstacles().empty()))
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            {
-                auto first_collision = get_predicted_obstacle_collisions()[0];
-                Vec3 poi = first_collision.point_of_impact;
-                Vec3 norm = o->normalTowardAgent(poi, position()) * 3;
-                draw().addAnnotationLine(poi, poi + norm, Color::green(), 0.05);
-            }
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20260710 turn this off, done debugging BoxObstacle for now.
+
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//            // TODO 20260405 BoxObstacle normal() points in wrong direction, or does it?
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            // TODO 20260413 current flock centroid, and velocity
+//            if (isSelected() && (not flock_obstacles().empty()))
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            {
+//                auto first_collision = get_predicted_obstacle_collisions()[0];
+//                Vec3 poi = first_collision.point_of_impact;
+//                Vec3 norm = o->normalTowardAgent(poi, position()) * 3;
+//                draw().addAnnotationLine(poi, poi + norm, Color::green(), 0.05);
+//            }
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             if (ec != position())
             {

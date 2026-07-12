@@ -915,22 +915,43 @@ public:
     // TODO Relocate in file?
     double sum_of_alignment_scores_over_all_boid_steps_ = 0;
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260712 refactor nearest neighbors cache
+
+//    // Called each simulation step, record alignment score. Sums pos dot product.
+//    void recordAlignmentScorePerStep()
+//    {
+//        for (auto b : boids())
+//        {
+//            double sum_pos_aligns = 0;
+//            for (Boid* n : b->nearest_neighbors())
+//            {
+//                double d = Vec3::dot(b->forward(), n->forward());
+//                if (d > 0) { sum_pos_aligns += d; }
+//            }
+//            sum_pos_aligns /= b->nearest_neighbors().size();  // ave pos align
+//            sum_of_alignment_scores_over_all_boid_steps_ += sum_pos_aligns;
+//        }
+//    }
+
     // Called each simulation step, record alignment score. Sums pos dot product.
     void recordAlignmentScorePerStep()
     {
         for (auto b : boids())
         {
             double sum_pos_aligns = 0;
-            for (Boid* n : b->nearest_neighbors())
+            for (Boid* n : b->nearestNeighbors())
             {
                 double d = Vec3::dot(b->forward(), n->forward());
                 if (d > 0) { sum_pos_aligns += d; }
             }
-            sum_pos_aligns /= b->nearest_neighbors().size();  // ave pos align
+            sum_pos_aligns /= b->nearestNeighbors().size();  // ave pos align
             sum_of_alignment_scores_over_all_boid_steps_ += sum_pos_aligns;
         }
     }
-    
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+\
     // Average alignment for each Boid with 7 neighbors on each simulation step.
     double alignmentScore() const
     {

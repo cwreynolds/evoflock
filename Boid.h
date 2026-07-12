@@ -34,11 +34,7 @@ private:  // move to bottom of class later
     Draw* draw_ = nullptr;
     FlockParameters* fp_ = nullptr;
     ObstaclePtrList* flock_obstacles_;  // Flock's current list of obstacles.
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20240617 revisit incremental_sort()
-//    BoidPtrList* flock_boids_;  // List of boids in flock.
     BoidPtrList flock_boids_;  // List of boids in flock.
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Set during sense/plan phase, saved for steer phase.
     Vec3 next_steer_;
@@ -51,16 +47,28 @@ private:  // move to bottom of class later
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260711 refactor nearest neighbors cache
 
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260712 refactor nearest neighbors cache
+
     // OLD:
     
-    // Cache of nearest neighbors.
-    BoidPtrList cached_nearest_neighbors_;
-    int neighbors_count_ = 7;
+    //    // Cache of nearest neighbors.
+    //    BoidPtrList cached_nearest_neighbors_;
+    //    int neighbors_count_ = 7;
+
+    // OLD API to replace:
     
+    // cached_nearest_neighbors()
+    // recompute_nearest_neighbors()
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
     // NEW:
     
     BoidPtrList nearest_neighbors_cache_;
     bool nearest_neighbors_cache_valid_ = false;
+    int neighbors_count_default_ = 7;
 
     void clearNearestNeighborsCache()
     {
@@ -70,8 +78,89 @@ private:  // move to bottom of class later
     
     void fillNearestNeighborsCache()
     {
-        // something like the old recompute_nearest_neighbors(int n)
+        fillNearestNeighborsCache(neighbors_count_default_);
     }
+
+    void fillNearestNeighborsCache(int n)
+    {
+
+//        // TODO TEMP trying to verify this code is still thread-safe.
+//        assert(xxx_temp_rnn_count == 0);
+//        xxx_temp_rnn_count++;
+        
+        // Metric for "neighbor distance": distance squared between "me"
+        // (this boid) and the given neighbor, times a factor of "penalty"
+        // if the neighbor is behind me. Infinite if neighbor is me.
+        auto neighbor_distance = [&](const Boid* neighbor)
+        {
+            Vec3 offset_to_other = neighbor->position() - position();
+            double distance_squared = offset_to_other.length_squared();
+            double forwardness = forward().dot(offset_to_other);
+            double penalty = 2;
+            return (distance_squared > 0 ?
+                    distance_squared * (forwardness > 0 ? 1 : penalty) :
+                    std::numeric_limits<double>::infinity());
+        };
+        // Are boids a and b sorted by least distance from me?
+        auto sorted = [&](const Boid* a, const Boid* b)
+        {
+            return neighbor_distance(a) < neighbor_distance(b);
+        };
+        // Short name for this boid's list of pointers all boids in flock.
+        BoidPtrList& fb = flock_boids();
+        // Maybe neighbor list size should be min(n,flock.size())? But for now:
+        assert((fb.size() > n) && "neighborhood > flock size");
+        // Sort all boids in flock by nearest distance (squared) from me.
+        std::partial_sort(fb.begin(), fb.begin() + n, fb.end(), sorted);
+        
+        
+        // NEW state names
+        //        BoidPtrList nearest_neighbors_cache_;
+        //        bool nearest_neighbors_cache_valid_ = false;
+        //        int neighbors_count_default_ = 7;
+
+        
+//        // Set "cached_nearest_neighbors_" to nearest "n" of flock's boids.
+//        cached_nearest_neighbors_.resize(n);
+//        std::copy(fb.begin(), fb.begin() + n, cached_nearest_neighbors_.begin());
+//        // Verify nearest neighbor is not coincident with this boid.
+//        assert(neighbor_distance(cached_nearest_neighbors_[0]) > 0);
+  
+        // Set "nearest_neighbors_cache_" to nearest "n" of flock's boids.
+        nearest_neighbors_cache_.resize(n);
+        std::copy(fb.begin(), fb.begin() + n, nearest_neighbors_cache_.begin());
+        // Verify nearest neighbor is not coincident with this boid.
+        assert(neighbor_distance(nearest_neighbors_cache_[0]) > 0);
+
+//        // TODO TEMP trying to verify this code is still thread-safe.
+//        xxx_temp_rnn_count--;
+//        assert(xxx_temp_rnn_count == 0);
+//        
+//        return cached_nearest_neighbors_;
+
+        nearest_neighbors_cache_valid_ = true;
+
+    }
+
+    
+//    // Returns a collection of pointers to the "n" Boids nearest this one.
+//    // Computes and caches the collection if needed.
+//    BoidPtrList nearestNeighbors()
+//    {
+//        if (not nearest_neighbors_cache_valid_) { fillNearestNeighborsCache(); }
+//        return nearest_neighbors_cache_;
+//    }
+
+//    // Returns a (pre-cached) collection of pointers to the "n" Boids
+//    // nearest this one. Computes and caches the collection if needed.
+//    BoidPtrList nearestNeighbors() const
+//    {
+//        assert(nearest_neighbors_cache_valid_);
+//        return nearest_neighbors_cache_;
+//    }
+
+    
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Used to detect agent crossing Obstacle surface.
@@ -129,11 +218,24 @@ public:
     const Draw& draw() const { return *draw_; }
     void set_draw(Draw* draw) { draw_ = draw; }
 
-    // Cache of nearest neighbors, updating "occasionally".
-    const BoidPtrList& cached_nearest_neighbors() const
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260712 refactor nearest neighbors cache
+
+//    // Cache of nearest neighbors, updating "occasionally".
+//    const BoidPtrList& cached_nearest_neighbors() const
+//    {
+//        return cached_nearest_neighbors_;
+//    }
+
+    // Returns a (pre-cached) collection of pointers to the "n" Boids
+    // nearest this one. Computes and caches the collection if needed.
+    BoidPtrList nearestNeighbors() const
     {
-        return cached_nearest_neighbors_;
+        assert(nearest_neighbors_cache_valid_);
+        return nearest_neighbors_cache_;
     }
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     const Color& color() const { return color_; }
     void setColor(Color c) { color_ = c; }
@@ -231,6 +333,12 @@ public:
         skip_think_counter_++;
         if (not skipThinkOnThisStep())
         {
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20260712 refactor nearest neighbors cache
+            fillNearestNeighborsCache();
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+            
             EF::current_boid_is_selected = isSelected();
             next_steer_ = steerToFlock();
             sum_steer_mag_for_all_steps += next_steer_.length();
@@ -270,7 +378,11 @@ public:
     // parameters for this boid are accessed through fp() function.
     Vec3 steerToFlockForGA()
     {
-        BoidPtrList neighbors = nearest_neighbors();
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260712 refactor nearest neighbors cache
+//        BoidPtrList neighbors = nearest_neighbors();
+        BoidPtrList neighbors = nearestNeighbors();
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         flush_cache_of_predicted_obstacle_collisions();
         Vec3 f = steerForSpeedControl()            * fp().weightForward();
         Vec3 s = steer_to_separate(neighbors)      * fp().weightSeparate();
@@ -333,11 +445,12 @@ public:
     // flocking model, supplied as a lambda called override_steer_function_
     Vec3 steerToFlockForGP()
     {
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20251104 remind me, is frame count mismatch only in multithreading?
-        BoidPtrList neighbors = nearest_neighbors();
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260712 refactor nearest neighbors cache
+//        BoidPtrList neighbors = nearest_neighbors();
+        BoidPtrList neighbors = nearestNeighbors();
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         flush_cache_of_predicted_obstacle_collisions();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         assert(override_steer_function_);
         setGpPerThread(this);
@@ -617,61 +730,66 @@ public:
         return util::remap_interval_clip(projection, cos_angle_threshold, 1, 0, 1);
     }
 
-    // Returns a list of the "neighbors_count" Boids nearest this one.
-    BoidPtrList nearest_neighbors() {return nearest_neighbors(neighbors_count_);}
-    BoidPtrList nearest_neighbors(int n){return recompute_nearest_neighbors(n);}
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260712 refactor nearest neighbors cache
 
-    // Recomputes a cached list of the "neighbors_count" Boids nearest this one.
-    BoidPtrList recompute_nearest_neighbors()
-    {
-        return recompute_nearest_neighbors(neighbors_count_);
-    }
-
-    // TODO TEMP trying to verify this code is still thread-safe. Remove later.
-    int xxx_temp_rnn_count = 0;
+//    // Returns a list of the "neighbors_count" Boids nearest this one.
+//    BoidPtrList nearest_neighbors() {return nearest_neighbors(neighbors_count_);}
+//    BoidPtrList nearest_neighbors(int n){return recompute_nearest_neighbors(n);}
+//
+//    // Recomputes a cached list of the "neighbors_count" Boids nearest this one.
+//    BoidPtrList recompute_nearest_neighbors()
+//    {
+//        return recompute_nearest_neighbors(neighbors_count_);
+//    }
+//
+//    // TODO TEMP trying to verify this code is still thread-safe. Remove later.
+//    int xxx_temp_rnn_count = 0;
     
-    BoidPtrList recompute_nearest_neighbors(int n)
-    {
-        // TODO TEMP trying to verify this code is still thread-safe.
-        assert(xxx_temp_rnn_count == 0);
-        xxx_temp_rnn_count++;
+//    BoidPtrList recompute_nearest_neighbors(int n)
+//    {
+//        // TODO TEMP trying to verify this code is still thread-safe.
+//        assert(xxx_temp_rnn_count == 0);
+//        xxx_temp_rnn_count++;
+//
+//        // Metric for "neighbor distance": distance squared between "me"
+//        // (this boid) and the given neighbor, times a factor of "penalty"
+//        // if the neighbor is behind me. Infinite if neighbor is me.
+//        auto neighbor_distance = [&](const Boid* neighbor)
+//        {
+//            Vec3 offset_to_other = neighbor->position() - position();
+//            double distance_squared = offset_to_other.length_squared();
+//            double forwardness = forward().dot(offset_to_other);
+//            double penalty = 2;
+//            return (distance_squared > 0 ?
+//                    distance_squared * (forwardness > 0 ? 1 : penalty) :
+//                    std::numeric_limits<double>::infinity());
+//        };
+//        // Are boids a and b sorted by least distance from me?
+//        auto sorted = [&](const Boid* a, const Boid* b)
+//        {
+//            return neighbor_distance(a) < neighbor_distance(b);
+//        };
+//        // Short name for this boid's list of pointers all boids in flock.
+//        BoidPtrList& fb = flock_boids();
+//        // Maybe neighbor list size should be min(n,flock.size())? But for now:
+//        assert((fb.size() > n) && "neighborhood > flock size");
+//        // Sort all boids in flock by nearest distance (squared) from me.
+//        std::partial_sort(fb.begin(), fb.begin() + n, fb.end(), sorted);
+//        // Set "cached_nearest_neighbors_" to nearest "n" of flock's boids.
+//        cached_nearest_neighbors_.resize(n);
+//        std::copy(fb.begin(), fb.begin() + n, cached_nearest_neighbors_.begin());
+//        // Verify nearest neighbor is not coincident with this boid.
+//        assert(neighbor_distance(cached_nearest_neighbors_[0]) > 0);
+//
+//        // TODO TEMP trying to verify this code is still thread-safe.
+//        xxx_temp_rnn_count--;
+//        assert(xxx_temp_rnn_count == 0);
+//
+//        return cached_nearest_neighbors_;
+//    }
 
-        // Metric for "neighbor distance": distance squared between "me"
-        // (this boid) and the given neighbor, times a factor of "penalty"
-        // if the neighbor is behind me. Infinite if neighbor is me.
-        auto neighbor_distance = [&](const Boid* neighbor)
-        {
-            Vec3 offset_to_other = neighbor->position() - position();
-            double distance_squared = offset_to_other.length_squared();
-            double forwardness = forward().dot(offset_to_other);
-            double penalty = 2;
-            return (distance_squared > 0 ?
-                    distance_squared * (forwardness > 0 ? 1 : penalty) :
-                    std::numeric_limits<double>::infinity());
-        };
-        // Are boids a and b sorted by least distance from me?
-        auto sorted = [&](const Boid* a, const Boid* b)
-        {
-            return neighbor_distance(a) < neighbor_distance(b);
-        };
-        // Short name for this boid's list of pointers all boids in flock.
-        BoidPtrList& fb = flock_boids();
-        // Maybe neighbor list size should be min(n,flock.size())? But for now:
-        assert((fb.size() > n) && "neighborhood > flock size");
-        // Sort all boids in flock by nearest distance (squared) from me.
-        std::partial_sort(fb.begin(), fb.begin() + n, fb.end(), sorted);
-        // Set "cached_nearest_neighbors_" to nearest "n" of flock's boids.
-        cached_nearest_neighbors_.resize(n);
-        std::copy(fb.begin(), fb.begin() + n, cached_nearest_neighbors_.begin());
-        // Verify nearest neighbor is not coincident with this boid.
-        assert(neighbor_distance(cached_nearest_neighbors_[0]) > 0);
-
-        // TODO TEMP trying to verify this code is still thread-safe.
-        xxx_temp_rnn_count--;
-        assert(xxx_temp_rnn_count == 0);
-
-        return cached_nearest_neighbors_;
-    }
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     // Ad hoc low-pass filtering of steering force. Blends this step's newly
     // determined "raw" steering into a per-boid accumulator, then returns that
@@ -760,7 +878,11 @@ public:
         drawAnnotation();
         if (EF::usingGA())
         {
-            for (Boid* b : cached_nearest_neighbors())
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20260712 refactor nearest neighbors cache
+//            for (Boid* b : cached_nearest_neighbors())
+            for (Boid* b : nearestNeighbors())
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
             {
                 Color c(xxx_temp_separation_score > 0.5 ? 1 : 0);
                 draw().addAnnotationLine(position(), b->position(), c, 0.01);
@@ -913,11 +1035,22 @@ public:
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20260524 fiddling with murmuration centroid score
     
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260712 refactor nearest neighbors cache
+    
+//    // Return const reference to nearest neighbor
+//    const Boid& nearestNeighbor() const
+//    {
+//        return *(cached_nearest_neighbors().at(0));
+//    }
+  
     // Return const reference to nearest neighbor
     const Boid& nearestNeighbor() const
     {
-        return *(cached_nearest_neighbors().at(0));
+        return *(nearestNeighbors().at(0));
     }
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 
 //    // Returns distance from this Boid to its nearest neighbor, center to center.

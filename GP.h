@@ -793,15 +793,28 @@ void save_fitness_time_series(LP::Population& population)
     }
 }
 
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+// TODO 20260712 refactor nearest neighbors cache
+
+//Boid* getGpBoidNeighbor(int n)
+//{
+//    assert(Boid::getGpPerThread());
+//    assert(Boid::getGpPerThread()->cached_nearest_neighbors().size() == 7);
+//    BoidPtrList neighbors = Boid::getGpPerThread()->cached_nearest_neighbors();
+//    assert(neighbors.size() >= n);
+//    return neighbors.at(n - 1);
+//}
+
 Boid* getGpBoidNeighbor(int n)
 {
     assert(Boid::getGpPerThread());
-    assert(Boid::getGpPerThread()->cached_nearest_neighbors().size() == 7);
-    BoidPtrList neighbors = Boid::getGpPerThread()->cached_nearest_neighbors();
+    assert(Boid::getGpPerThread()->nearestNeighbors().size() == 7);
+    BoidPtrList neighbors = Boid::getGpPerThread()->nearestNeighbors();
     assert(neighbors.size() >= n);
     return neighbors.at(n - 1);
 }
 
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 Vec3 ensure_unit_length(Vec3 v)
 {

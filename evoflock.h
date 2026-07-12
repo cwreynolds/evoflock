@@ -738,35 +738,35 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     1.03952, 16.0169, 1.82491, 6.10348, 0.517219,
         //                     0.172052, 0.155188});
 
-        // Saved best FP values from run 20260701_gp_murm_retry_poorly_aligned
+        // Saved best FP values from run 20260701_ga_murm_retry_poorly_aligned
         // FlockParameters fp({24.3345, 89.6558, 55.3344, 88.8797, 18.2282,
         //                     23.52, 7.32941, 1.94558, 9.37577, 54.5579,
         //                     -0.677538, -0.92024, -0.641881, 48.4769,
         //                     7.44694, 17.3619, 1.99738, 8.7232, 0.403676,
         //                     0.225352, 0.311683});
 
-        // Saved best FP values from run 20260702_gp_murm_aligned_thresh
+        // Saved best FP values from run 20260702_ga_murm_aligned_thresh
         // FlockParameters fp({33.3162, 93.2145, 39.7751, 26.4942, 17.0202,
         //                     45.3041, 17.0165, 2.04144, 69.2959, 30.7305,
         //                     -0.879553, -0.87552, -0.543477, 68.9127,
         //                     0.883016, 36.198, 1.96473, 8.39168, 0.767759,
         //                     0.163439, 0.202948});
 
-        // Saved best FP values from run 20260704_gp_murm_deemph_score
+        // Saved best FP values from run 20260704_ga_murm_deemph_score
         // FlockParameters fp({16.4136, 84.8683, 48.0453, 33.7709, 28.0435,
         //                     7.78292, 25.0073, 2.38106, 84.8157, 91.9128,
         //                     -0.840901, 0.609479, 0.0750392, 59.1723,
         //                     3.98219, 21.1622, 1.84967, 24.8849, 0.42066,
         //                     0.000683475, 0.12666});
 
-        // Saved best FP values from run 20260705_gp_murm_deemph_3_to_10
+        // Saved best FP values from run 20260705_ga_murm_deemph_3_to_10
         // FlockParameters fp({13.8166, 99.7467, 48.6482, 45.6296, 28.3388,
         //                     75.9962, 31.8302, 3.55908, 43.0806, 54.3273,
         //                     0.671708, 0.76904, -0.83723, 37.0715,
         //                     0.352327, 26.2512, 1.88037, 13.5667, 0.968767,
         //                     0.0823908, 0.479566});
 
-        // Saved best FP values from run 20260705_gp_murm_wider_dist_range
+        // Saved best FP values from run 20260705_ga_murm_wider_dist_range
         // Note: I want to tag this as "pretty good" but not great.
         // FlockParameters fp({28.737, 93.3437, 79.4043, 33.7731, 30.5318,
         //                     28.6686, 32.567, 2.01342, 6.65827, 68.3297,
@@ -775,9 +775,9 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     0.0937856, 0.508831});
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260601 test 20260707_gp_murm_inverted_exponential with bigger flock
+        // TODO 20260601 test 20260707_ga_murm_inverted_exponential with bigger flock
         
-        // Saved best FP values from run 20260707_gp_murm_inverted_exponential
+        // Saved best FP values from run 20260707_ga_murm_inverted_exponential
         FlockParameters fp({45.8709, 92.201, 43.9575, 89.562, 19.5672,
                             34.2522, 92.2603, 2.18338, 66.3786, 35.2458,
                             -0.751519, -0.96067, -0.821331, 3.50968,

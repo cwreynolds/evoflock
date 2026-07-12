@@ -47,10 +47,32 @@ private:  // move to bottom of class later
     util::Blender<Vec3> steer_memory_;
     // Low pass filter for roll control ("up" target).
     util::Blender<Vec3> up_memory_;
-        
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260711 refactor nearest neighbors cache
+
+    // OLD:
+    
     // Cache of nearest neighbors.
     BoidPtrList cached_nearest_neighbors_;
     int neighbors_count_ = 7;
+    
+    // NEW:
+    
+    BoidPtrList nearest_neighbors_cache_;
+    bool nearest_neighbors_cache_valid_ = false;
+
+    void clearNearestNeighborsCache()
+    {
+        nearest_neighbors_cache_.clear();
+        nearest_neighbors_cache_valid_ = false;
+    }
+    
+    void fillNearestNeighborsCache()
+    {
+        // something like the old recompute_nearest_neighbors(int n)
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Used to detect agent crossing Obstacle surface.
     Vec3 previous_position_ = Vec3::none();

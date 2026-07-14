@@ -67,27 +67,83 @@ private:  // move to bottom of class later
     // NEW:
     
     BoidPtrList nearest_neighbors_cache_;
-    bool nearest_neighbors_cache_valid_ = false;
+//    bool nearest_neighbors_cache_valid_ = false;
     int neighbors_count_default_ = 7;
 
-    void clearNearestNeighborsCache()
-    {
-        nearest_neighbors_cache_.clear();
-        nearest_neighbors_cache_valid_ = false;
-    }
+//    void clearNearestNeighborsCache()
+//    {
+//        nearest_neighbors_cache_.clear();
+//        nearest_neighbors_cache_valid_ = false;
+//    }
     
-    void fillNearestNeighborsCache()
-    {
-        fillNearestNeighborsCache(neighbors_count_default_);
-    }
+//    void fillNearestNeighborsCache()
+//    {
+//        fillNearestNeighborsCache(neighbors_count_default_);
+//    }
+
+//        void fillNearestNeighborsCache(int n)
+//        {
+//
+//    //        // TODO TEMP trying to verify this code is still thread-safe.
+//    //        assert(xxx_temp_rnn_count == 0);
+//    //        xxx_temp_rnn_count++;
+//
+//            // Metric for "neighbor distance": distance squared between "me"
+//            // (this boid) and the given neighbor, times a factor of "penalty"
+//            // if the neighbor is behind me. Infinite if neighbor is me.
+//            auto neighbor_distance = [&](const Boid* neighbor)
+//            {
+//                Vec3 offset_to_other = neighbor->position() - position();
+//                double distance_squared = offset_to_other.length_squared();
+//                double forwardness = forward().dot(offset_to_other);
+//                double penalty = 2;
+//                return (distance_squared > 0 ?
+//                        distance_squared * (forwardness > 0 ? 1 : penalty) :
+//                        std::numeric_limits<double>::infinity());
+//            };
+//            // Are boids a and b sorted by least distance from me?
+//            auto sorted = [&](const Boid* a, const Boid* b)
+//            {
+//                return neighbor_distance(a) < neighbor_distance(b);
+//            };
+//            // Short name for this boid's list of pointers all boids in flock.
+//            BoidPtrList& fb = flock_boids();
+//            // Maybe neighbor list size should be min(n,flock.size())? But for now:
+//            assert((fb.size() > n) && "neighborhood > flock size");
+//            // Sort all boids in flock by nearest distance (squared) from me.
+//            std::partial_sort(fb.begin(), fb.begin() + n, fb.end(), sorted);
+//
+//
+//            // NEW state names
+//            //        BoidPtrList nearest_neighbors_cache_;
+//            //        bool nearest_neighbors_cache_valid_ = false;
+//            //        int neighbors_count_default_ = 7;
+//
+//
+//    //        // Set "cached_nearest_neighbors_" to nearest "n" of flock's boids.
+//    //        cached_nearest_neighbors_.resize(n);
+//    //        std::copy(fb.begin(), fb.begin() + n, cached_nearest_neighbors_.begin());
+//    //        // Verify nearest neighbor is not coincident with this boid.
+//    //        assert(neighbor_distance(cached_nearest_neighbors_[0]) > 0);
+//
+//            // Set "nearest_neighbors_cache_" to nearest "n" of flock's boids.
+//            nearest_neighbors_cache_.resize(n);
+//            std::copy(fb.begin(), fb.begin() + n, nearest_neighbors_cache_.begin());
+//            // Verify nearest neighbor is not coincident with this boid.
+//            assert(neighbor_distance(nearest_neighbors_cache_[0]) > 0);
+//
+//    //        // TODO TEMP trying to verify this code is still thread-safe.
+//    //        xxx_temp_rnn_count--;
+//    //        assert(xxx_temp_rnn_count == 0);
+//    //
+//    //        return cached_nearest_neighbors_;
+//
+//    //        nearest_neighbors_cache_valid_ = true;
+//
+//        }
 
     void fillNearestNeighborsCache(int n)
     {
-
-//        // TODO TEMP trying to verify this code is still thread-safe.
-//        assert(xxx_temp_rnn_count == 0);
-//        xxx_temp_rnn_count++;
-        
         // Metric for "neighbor distance": distance squared between "me"
         // (this boid) and the given neighbor, times a factor of "penalty"
         // if the neighbor is behind me. Infinite if neighbor is me.
@@ -113,33 +169,11 @@ private:  // move to bottom of class later
         // Sort all boids in flock by nearest distance (squared) from me.
         std::partial_sort(fb.begin(), fb.begin() + n, fb.end(), sorted);
         
-        
-        // NEW state names
-        //        BoidPtrList nearest_neighbors_cache_;
-        //        bool nearest_neighbors_cache_valid_ = false;
-        //        int neighbors_count_default_ = 7;
-
-        
-//        // Set "cached_nearest_neighbors_" to nearest "n" of flock's boids.
-//        cached_nearest_neighbors_.resize(n);
-//        std::copy(fb.begin(), fb.begin() + n, cached_nearest_neighbors_.begin());
-//        // Verify nearest neighbor is not coincident with this boid.
-//        assert(neighbor_distance(cached_nearest_neighbors_[0]) > 0);
-  
         // Set "nearest_neighbors_cache_" to nearest "n" of flock's boids.
         nearest_neighbors_cache_.resize(n);
         std::copy(fb.begin(), fb.begin() + n, nearest_neighbors_cache_.begin());
         // Verify nearest neighbor is not coincident with this boid.
         assert(neighbor_distance(nearest_neighbors_cache_[0]) > 0);
-
-//        // TODO TEMP trying to verify this code is still thread-safe.
-//        xxx_temp_rnn_count--;
-//        assert(xxx_temp_rnn_count == 0);
-//        
-//        return cached_nearest_neighbors_;
-
-        nearest_neighbors_cache_valid_ = true;
-
     }
 
     
@@ -231,8 +265,13 @@ public:
     // nearest this one. Computes and caches the collection if needed.
     BoidPtrList nearestNeighbors() const
     {
-        assert(nearest_neighbors_cache_valid_);
+//        assert(nearest_neighbors_cache_valid_);
         return nearest_neighbors_cache_;
+    }
+
+    void fillNearestNeighborsCache()
+    {
+        fillNearestNeighborsCache(neighbors_count_default_);
     }
 
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
@@ -287,9 +326,22 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260708 wip skip think -- OK only when skip_think_ == 0
     
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260712 try test with skip_think_ = 5
+
+//        int skip_think_ = 0;
+//    //    int skip_think_ = 5;
+//        int skip_think_counter_ = 0;
+    
+//    //    int skip_think_ = 0;
+//        int skip_think_ = 5;
+//        int skip_think_counter_ = 0;
+
     int skip_think_ = 0;
-//    int skip_think_ = 5;
     int skip_think_counter_ = 0;
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20260709 new skipThink api.

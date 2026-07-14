@@ -251,6 +251,12 @@ public:
         // TODO 20260607 adjust centerMaxDist() to maintain constant boid density
         boid->setCentroidMaxDistance(centroidMaxDistance());
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260712 refactor nearest neighbors cache
+        boid->fillNearestNeighborsCache();
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
     }
 
     // Random initial Boid "pose" (position and orientation). By default, they

@@ -64,12 +64,27 @@ double centering_strength = 90;
 // experimental / temp?
 inline static int override_boids_per_flock = -1;
 
+//~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+// TODO 20260713 skipThink only for visualization
+
+//    // experimental / temp?
+//    //inline static int override_skip_think = -1;
+//    //inline static int override_skip_think = 3;
+//    //inline static int override_skip_think = 6;
+//    inline static int override_skip_think = 10;
+
+// experimental / temp?
+inline static int override_skip_think = -1;
+
+//~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20260421 backing up to test README.md
 
 // Special mode for simulating murmurations.
-inline static bool murmuration_mode = false;
-//inline static bool murmuration_mode = true;
+//inline static bool murmuration_mode = false;
+inline static bool murmuration_mode = true;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -394,9 +409,20 @@ void visualizeBestIfRequested(LP::Population* population)
         }
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20260713 skipThink only for visualization
+        
+        
+//        // experimental / temp?
+//        inline static int override_skip_think = -1;
+        
+
         bool previous_draw_enable_state = Draw::getInstance().enable();
         Draw::getInstance().setEnable(true);
         int previous_obpf = override_boids_per_flock;
+        
+        int previous_ost = override_skip_think;
+
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         // TODO 20260417 combine computing centroid and setting it in all boids
 //        if (murmuration_mode) { override_boids_per_flock = 500; }
@@ -405,16 +431,34 @@ void visualizeBestIfRequested(LP::Population* population)
         // TODO 20260705 use big population for mermuration mode.
 
 //        if (murmuration_mode) { override_boids_per_flock = 300; }
-        if (murmuration_mode) { override_boids_per_flock = 2000; }
+        
+        //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+        // TODO 20260713 skipThink only for visualization
+
+//        if (murmuration_mode) { override_boids_per_flock = 2000; }
+        if (murmuration_mode) { override_boids_per_flock = 4000; }
+        
+        
+        if (murmuration_mode) { override_skip_think = 10; }
+
+
+        //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
 
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         GP::run_flock_simulation(individual, 1);
         override_boids_per_flock = previous_obpf;
+        
+        override_skip_think = previous_ost;
+        
         Draw::getInstance().setEnable(previous_draw_enable_state);
         enable_multithreading = previous_emt_state;
         draw.clearVisBestMode();
+        
+        
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
 }
 

@@ -337,8 +337,16 @@ public:
 //        int skip_think_ = 5;
 //        int skip_think_counter_ = 0;
 
-    int skip_think_ = 0;
+    //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+    // TODO 20260713 skipThink only for visualization
+
+//    int skip_think_ = 0;
+//    int skip_think_counter_ = 0;
+    
+    int skip_think_ = EF::override_skip_think > 0 ? EF::override_skip_think : 0;
     int skip_think_counter_ = 0;
+
+    //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

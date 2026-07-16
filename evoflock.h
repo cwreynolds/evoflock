@@ -411,17 +411,15 @@ void visualizeBestIfRequested(LP::Population* population)
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20260713 skipThink only for visualization
-        
-        
-//        // experimental / temp?
-//        inline static int override_skip_think = -1;
-        
 
         bool previous_draw_enable_state = Draw::getInstance().enable();
         Draw::getInstance().setEnable(true);
         int previous_obpf = override_boids_per_flock;
         
         int previous_ost = override_skip_think;
+        
+        debugPrint(override_skip_think);
+        debugPrint(previous_ost);
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
         // TODO 20260417 combine computing centroid and setting it in all boids
@@ -436,10 +434,13 @@ void visualizeBestIfRequested(LP::Population* population)
         // TODO 20260713 skipThink only for visualization
 
 //        if (murmuration_mode) { override_boids_per_flock = 2000; }
-        if (murmuration_mode) { override_boids_per_flock = 4000; }
+//        if (murmuration_mode) { override_boids_per_flock = 4000; }
+        if (murmuration_mode) { override_boids_per_flock = 2000; }
+
         
-        
-        if (murmuration_mode) { override_skip_think = 10; }
+//        if (murmuration_mode) { override_skip_think = 10; }
+        if (murmuration_mode) { override_skip_think = 1; }
+        debugPrint(override_skip_think);
 
 
         //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
@@ -451,7 +452,8 @@ void visualizeBestIfRequested(LP::Population* population)
         override_boids_per_flock = previous_obpf;
         
         override_skip_think = previous_ost;
-        
+        debugPrint(override_skip_think);
+
         Draw::getInstance().setEnable(previous_draw_enable_state);
         enable_multithreading = previous_emt_state;
         draw.clearVisBestMode();

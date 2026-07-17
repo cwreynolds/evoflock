@@ -92,8 +92,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -820,19 +820,58 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     6.72244, 7.21255, 1.67303, 3.24235, 0.813466,
         //                     0.0937856, 0.508831});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260601 test 20260707_ga_murm_inverted_exponential with bigger flock
-        
         // Saved best FP values from run 20260707_ga_murm_inverted_exponential
-        FlockParameters fp({45.8709, 92.201, 43.9575, 89.562, 19.5672,
-                            34.2522, 92.2603, 2.18338, 66.3786, 35.2458,
-                            -0.751519, -0.96067, -0.821331, 3.50968,
-                            5.17391, 5.59268, 1.9179, 6.37049, 0.68777,
-                            0.0628003, 0.348716});
-
+        // FlockParameters fp({45.8709, 92.201, 43.9575, 89.562, 19.5672,
+        //                     34.2522, 92.2603, 2.18338, 66.3786, 35.2458,
+        //                     -0.751519, -0.96067, -0.821331, 3.50968,
+        //                     5.17391, 5.59268, 1.9179, 6.37049, 0.68777,
+        //                     0.0628003, 0.348716});
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260601 test 20260715_ga_murm_no_skipthink with bigger flock
+        
+        // Saved best FP values from run 20260715_ga_murm_no_skipthink
+        FlockParameters fp({49.8458, 84.6639, 42.5257, 94.405, 24.6471,
+                            52.3631, 64.6379, 2.27721, 5.06495, 75.1935,
+                            -0.851845, -0.902276, 0.00360828, 28.1461,
+                            6.88166, 2.14837, 1.77579, 5.20369, 0.796599,
+                            0.165038, 0.344694});
+        
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+        
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260716 VERY TEMP FOR QUICK TEST Use big flock and skipThink
+        //               for EF::visualizePreviouslyLoggedFlockParameters()
+        //               NEED TO SAVE AND RESTORE THESE GLOBAL PARAMETERS.
+
+//    //        if (murmuration_mode) { override_boids_per_flock = 2000; }
+//            if (murmuration_mode) { override_boids_per_flock = 4000; }
+//
+//            if (murmuration_mode) { override_skip_think = 10; }
+//
+//
+//    //        if (murmuration_mode) { fp.centerMaxDist() = 200; }
+//    //        if (murmuration_mode) { fp.centerMaxDist() = 300; }
+//    //        if (murmuration_mode) { fp.centerMaxDist() = 400; }
+//            if (murmuration_mode) { fp.centerMaxDist() = 600; }
+
+//        if (murmuration_mode) { override_boids_per_flock = 4000; }
+//        if (murmuration_mode) { override_skip_think = 10; }
+//        if (murmuration_mode) { fp.centerMaxDist() = 600; }
+
+        if (murmuration_mode) { override_boids_per_flock = 2000; }
+        if (murmuration_mode) { override_skip_think = 0; }
+//        if (murmuration_mode) { fp.centerMaxDist() = 80; }
+        if (murmuration_mode) { fp.centerMaxDist() = 60; }
+
+        debugPrint(fp.centerMaxDist());
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        
         EF::enable_multithreading = false;
         draw.setEnable(true);
         LP::Individual individual(GP::gaTreeFromFP(fp, fs), fs);

@@ -862,11 +862,26 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 //        if (murmuration_mode) { override_skip_think = 10; }
 //        if (murmuration_mode) { fp.centerMaxDist() = 600; }
 
-        if (murmuration_mode) { override_boids_per_flock = 2000; }
-        if (murmuration_mode) { override_skip_think = 0; }
-//        if (murmuration_mode) { fp.centerMaxDist() = 80; }
-        if (murmuration_mode) { fp.centerMaxDist() = 60; }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260717 try centerMaxDist() SMALLER than default (50)
+        
+//            if (murmuration_mode) { override_boids_per_flock = 2000; }
+//            if (murmuration_mode) { override_skip_think = 0; }
+//    //        if (murmuration_mode) { fp.centerMaxDist() = 80; }
+//            if (murmuration_mode) { fp.centerMaxDist() = 60; }
 
+        if (murmuration_mode)
+        {
+            override_boids_per_flock = 2000;
+            override_skip_think = 0;
+//            fp.centerMaxDist() = 60;
+//            fp.centerMaxDist() = fp.sphereRadius(); // aka 50
+            fp.centerMaxDist() = fp.sphereRadius() * 0.8; // aka 40
+        }
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+        
         debugPrint(fp.centerMaxDist());
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

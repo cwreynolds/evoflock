@@ -15,6 +15,65 @@ int main(int argc, const char * argv[])
 {
     EF::unit_test();
     
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20260726 WIP on plane-fitting for neighbors in murmurations
+    
+    {
+        Draw& draw = Draw::getInstance(true);
+
+        auto disk = [&](Vec3 normal, Vec3 center,
+                        double diameter, double thickness,
+                        int count)
+        {
+            std::vector<Vec3> points;
+            double hd = diameter / 2;
+            double ht = thickness / 2;
+            Vec3 bc(hd, hd, ht);
+            Vec3 draw_point;
+            LocalSpace ls = LocalSpace::fromTo(center, center + normal);
+            for (int i = 0; i < count; i++)
+            {
+                Vec3 box_point = EF::RS().randomPointInAxisAlignedBox(bc, -bc);
+                Vec3 global_point = ls.globalizePosition(box_point);
+                points.push_back(global_point);
+                debugPrint(global_point)
+                draw.addAnnotationAxes(Vec3(), 5);
+                draw.addAnnotationLine(global_point, draw_point,
+                                       Color::cyan(), 0.5);
+            }
+            return points;
+        };
+        
+//        disk(Vec3(1, 0, 0), Vec3(), 10, 1, 7);
+//        disk(Vec3(1, 0, 0), Vec3(), 10, 1, 100);
+        disk(Vec3(1,1,1).normalize(), Vec3(), 10, 1, 7);
+        
+        draw.beginAnimatedScene();
+
+        for (int i = 0; i < 100; i++)
+        {
+            
+            draw.beginOneAnimatedFrame();
+            
+//            disk(Vec3(1, 0, 0), Vec3(), 10, 1, 7);
+//            disk(Vec3(1, 0, 0), Vec3(), 10, 1, 100);
+            disk(Vec3(1,1,1).normalize(), Vec3(), 10, 1, 7);
+            
+            util::thread_sleep_in_seconds(0.01);
+
+
+            draw.endOneAnimatedFrame();
+        }
+        draw.endAnimatedScene();
+
+    }
+    
+    return EXIT_SUCCESS;
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260606 test calculations for adjusting murmuration sphere radius
     //               to maintain boid density.

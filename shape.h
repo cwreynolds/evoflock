@@ -246,6 +246,22 @@ std::vector<Vec3> arrangeNonOverlappingSpheres(std::vector<double> radii,
     return centers;
 }
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20260727 WIP on plane-fitting for neighbors in murmurations
+//
+
+// Simple class to represent an abstract geometrical sphere.
+class Plane
+{
+public:
+    Plane() : normal({0, 1, 0}) {}
+    Plane(Vec3 normal_, Vec3 center_) : normal(normal_), center(center_) {}
+    Vec3 normal;
+    Vec3 center;
+};
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 // Defines a 3d (axis aligned) voxel map of given voxel count, overall box_size,
 // and center. Calling add() with a given location (say a boid center) marks
 // that voxel as occupied. In the context of EvoFlock that means "occupied by at

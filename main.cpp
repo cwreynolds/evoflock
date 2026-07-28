@@ -17,10 +17,14 @@ int main(int argc, const char * argv[])
     
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20260726 WIP on plane-fitting for neighbors in murmurations
+    // TODO 20260727 WIP on plane-fitting for neighbors in murmurations
+    //
+    // References:
+    // https://www.tangramvision.com/blog/a-different-way-to-think-about-plane-fitting
     
     {
-        Draw& draw = Draw::getInstance(true);
+        Draw& draw = Draw::getInstance();
+        draw.setEnable(true);
 
         auto disk = [&](Vec3 normal, Vec3 center,
                         double diameter, double thickness,
@@ -39,34 +43,48 @@ int main(int argc, const char * argv[])
                 points.push_back(global_point);
                 debugPrint(global_point)
                 draw.addAnnotationAxes(Vec3(), 5);
-                draw.addAnnotationLine(global_point, draw_point,
-                                       Color::cyan(), 0.5);
+                draw.addAnnotationLine(global_point, draw_point, Color::cyan(), 0.1);
+                draw_point = global_point;
             }
             return points;
         };
         
-//        disk(Vec3(1, 0, 0), Vec3(), 10, 1, 7);
-//        disk(Vec3(1, 0, 0), Vec3(), 10, 1, 100);
-        disk(Vec3(1,1,1).normalize(), Vec3(), 10, 1, 7);
         
-        draw.beginAnimatedScene();
-
-        for (int i = 0; i < 100; i++)
+      
+        
+        auto fitPlaneToPoints = [](const std::vector<Vec3>& points)
         {
+            // TEMP should not duplicate this in case ever used on big dataset.
+            std::vector<Vec3> p = points;
             
+            Vec3 sum = std::reduce(p.begin(), p.end(), Vec3(), std::plus());
+            Vec3 center = sum / p.size();
+            
+            // TEMP should not duplicate this in case ever used on big dataset.
+            for (int i = 0; i < p.size(); i++) { p[i] -= center; }
+            
+            
+            Vec3 normal(0, 1, 0);  // XXXXXXXXXXXXXXXXXXXXXXXXX
+            return shape::Plane(normal, center);
+        };
+
+
+        draw.beginAnimatedScene();
+        for (int i = 0; i < 1000; i++)
+        {
             draw.beginOneAnimatedFrame();
-            
-//            disk(Vec3(1, 0, 0), Vec3(), 10, 1, 7);
-//            disk(Vec3(1, 0, 0), Vec3(), 10, 1, 100);
-            disk(Vec3(1,1,1).normalize(), Vec3(), 10, 1, 7);
-            
+            draw.clearAnnotations();
+
+//            disk(Vec3(1, 0, 0),           Vec3(), 10, 1, 100);
+            disk(Vec3(1,1,1).normalize(), Vec3(), 10, 1, 100);
+
             util::thread_sleep_in_seconds(0.01);
-
-
+            draw.addAnnotationsToAnimatedFrame();
+            debugPrint(draw.enable());
+//            debugPrint(draw.annotations_.size());
             draw.endOneAnimatedFrame();
         }
         draw.endAnimatedScene();
-
     }
     
     return EXIT_SUCCESS;

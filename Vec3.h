@@ -648,6 +648,43 @@ Vec3 RandomSequence::randomUnitVector()
     return RandomSequence::random_unit_vector();
 }
 
+//~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+// TODO 20260728 add RandomSequence::randomPointInCylinder
+
+// Generate a random point inside a unit radius xy circle centered on origin.
+inline Vec3 RandomSequence::randomPointInUnitRadiusXYcircle()
+{
+    Vec3 v;
+    do
+    {
+        v = random_point_in_axis_aligned_box(Vec3(-1, -1, 0), Vec3(1, 1, 0));
+        
+        debugPrint(v);
+    }
+    while (v.length() > 1);
+    return v;
+}
+
+
+Vec3 RandomSequence::randomPointInCylinder(double radius, double height,
+                                                 Vec3 axis, Vec3 center)
+{
+    Vec3 point_xy_circle = randomPointInUnitRadiusXYcircle();
+    double fraction_of_axis = random2(0.0, height);
+    
+    Vec3 rpiunxyc = (center +
+                     (point_xy_circle * radius) +
+                     (axis * util::interpolate(fraction_of_axis,
+                                               height / -2, height / 2)));
+    debugPrint(rpiunxyc);
+    
+    return (center +
+            (point_xy_circle * radius) +
+            (axis * util::interpolate(fraction_of_axis, height/-2, height/2)));
+}
+
+//~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+
 
 // Just a thin layer on top of Vec3 to more conveniently represent color values.
 class Color : public Vec3

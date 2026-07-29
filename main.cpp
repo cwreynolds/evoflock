@@ -31,15 +31,26 @@ int main(int argc, const char * argv[])
                         int count)
         {
             std::vector<Vec3> points;
-            double hd = diameter / 2;
-            double ht = thickness / 2;
-            Vec3 bc(hd, hd, ht);
+            
+            //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
+            // TODO 20260728 add RandomSequence::randomPointInCylinder
+
+//            double hd = diameter / 2;
+//            double ht = thickness / 2;
+//            Vec3 bc(hd, hd, ht);
             Vec3 draw_point;
-            LocalSpace ls = LocalSpace::fromTo(center, center + normal);
+//            LocalSpace ls = LocalSpace::fromTo(center, center + normal);
             for (int i = 0; i < count; i++)
             {
-                Vec3 box_point = EF::RS().randomPointInAxisAlignedBox(bc, -bc);
-                Vec3 global_point = ls.globalizePosition(box_point);
+//                Vec3 box_point = EF::RS().randomPointInAxisAlignedBox(bc, -bc);
+//                Vec3 global_point = ls.globalizePosition(box_point);
+
+                Vec3 global_point = EF::RS().randomPointInCylinder(diameter/2,
+                                                                   thickness,
+                                                                   normal,
+                                                                   center);
+                //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~
+
                 points.push_back(global_point);
                 debugPrint(global_point)
                 draw.addAnnotationAxes(Vec3(), 5);

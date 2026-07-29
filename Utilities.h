@@ -709,6 +709,11 @@ public:
     Vec3 randomUnitVector();
     Vec3 randomPointInUnitRadiusSphere();
     Vec3 randomPointInAxisAlignedBox(Vec3 a, Vec3 b);
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+    // TODO 20260728
+    Vec3 randomPointInCylinder(double radius, double height, Vec3 axis, Vec3 center);
+    Vec3 randomPointInUnitRadiusXYcircle();
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
     // Names to match Python code.
     Vec3 random_unit_vector();
     Vec3 random_point_in_unit_radius_sphere();

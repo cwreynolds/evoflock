@@ -32,6 +32,30 @@ public:
     double& x() { return x_; }
     double& y() { return y_; }
     double& z() { return z_; }
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+//    // Returns LS as 16 scalars for a 4x4 transformation matrix.
+//    // Currently unused, candidate for deletion.
+//    std::vector<double> asArray() const
+//    {
+//        std::vector<double> array;
+//        auto a = [&](double s){ array.push_back(s); };
+//        a(i().x()); a(i().y()); a(i().z()); a(p().x());
+//        a(j().x()); a(j().y()); a(j().z()); a(p().y());
+//        a(k().x()); a(k().y()); a(k().z()); a(p().z());
+//        a(0);       a(0);       a(0);       a(1);
+//        return array;
+//    }
+  
+//    double* asArray() const
+//    {
+//        double array[3] = {x(), y(), z()};
+//        return array;
+//    }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 
     // Basic operators.
     bool operator==(const Vec3 v) const
@@ -666,22 +690,40 @@ inline Vec3 RandomSequence::randomPointInUnitRadiusXYcircle()
 }
 
 
-Vec3 RandomSequence::randomPointInCylinder(double radius, double height,
-                                                 Vec3 axis, Vec3 center)
-{
-    Vec3 point_xy_circle = randomPointInUnitRadiusXYcircle();
-    double fraction_of_axis = random2(0.0, height);
-    
-    Vec3 rpiunxyc = (center +
-                     (point_xy_circle * radius) +
-                     (axis * util::interpolate(fraction_of_axis,
-                                               height / -2, height / 2)));
-    debugPrint(rpiunxyc);
-    
-    return (center +
-            (point_xy_circle * radius) +
-            (axis * util::interpolate(fraction_of_axis, height/-2, height/2)));
-}
+//Vec3 RandomSequence::randomPointInCylinder(double radius, double height,
+//                                                 Vec3 axis, Vec3 center)
+//{
+//    Vec3 point_xy_circle = randomPointInUnitRadiusXYcircle();
+//    double fraction_of_axis = random2(0.0, height);
+//    
+//    Vec3 rpiunxyc = (center +
+//                     (point_xy_circle * radius) +
+//                     (axis * util::interpolate(fraction_of_axis,
+//                                               height / -2, height / 2)));
+//    debugPrint(rpiunxyc);
+//    
+//    return (center +
+//            (point_xy_circle * radius) +
+//            (axis * util::interpolate(fraction_of_axis, height/-2, height/2)));
+//}
+
+//Vec3 RandomSequence::randomPointInCylinder(double radius, double height,
+//                                           Vec3 axis, Vec3 center)
+//{
+//    Vec3 point_xy_circle = randomPointInUnitRadiusXYcircle();
+//    double fraction_of_axis = frandom01();
+//
+//    Vec3 rpiunxyc = (center +
+//                     (point_xy_circle * radius) +
+//                     (axis * util::interpolate(fraction_of_axis,
+//                                               height / -2, height / 2)));
+//    debugPrint(rpiunxyc);
+//
+//    return (center +
+//            (point_xy_circle * radius) +
+//            (axis * util::interpolate(fraction_of_axis, height/-2, height/2)));
+//}
+
 
 //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
 

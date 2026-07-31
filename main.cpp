@@ -67,37 +67,98 @@
 
 //    #include <Eigen/Dense>
 //    #include <vector>
+//
+//    struct Point3D { double x, y, z; };
+//
+//    bool fitPlane(const std::vector<Point3D>& pts, Eigen::Vector3d& normal, Eigen::Vector3d& centroid) {
+//        if (pts.size() < 3) return false;
+//
+//        // 1. Compute centroid
+//        centroid.setZero();
+//        for (const auto& p : pts) {
+//            centroid(0) += p.x;
+//            centroid(1) += p.y;
+//            centroid(2) += p.z;
+//        }
+//        centroid /= static_cast<double>(pts.size());
+//
+//        // 2. Build centered 3 x N matrix
+//        Eigen::MatrixXd centered(3, pts.size());
+//        for (size_t i = 0; i < pts.size(); ++i) {
+//            centered(0, i) = pts[i].x - centroid(0);
+//            centered(1, i) = pts[i].y - centroid(1);
+//            centered(2, i) = pts[i].z - centroid(2);
+//        }
+//
+//        // 3. Apply SVD
+//        Eigen::BDCSVD<Eigen::MatrixXd> svd(centered, Eigen::ComputeThinU | Eigen::ComputeThinV);
+//
+//        // 4. Normal is the last column of U (smallest singular value)
+//        normal = svd.matrixU().col(2);
+//        normal.normalize();
+//
+//        return true;
+//    }
 
-struct Point3D { double x, y, z; };
 
-bool fitPlane(const std::vector<Point3D>& pts, Eigen::Vector3d& normal, Eigen::Vector3d& centroid) {
-    if (pts.size() < 3) return false;
+
+//bool fitPlane(const std::vector<Point3D>& pts, Eigen::Vector3d& normal, Eigen::Vector3d& centroid)
+shape::Plane fitPlaneToPoints(const std::vector<Vec3>& points)
+{
+    //    if (pts.size() < 3) return false;
+    if (points.size() < 3) { return shape::Plane(Vec3::none(), Vec3::none()); }
+    
+    //    // 1. Compute centroid
+    //    centroid.setZero();
+    //    for (const auto& p : pts) {
+    //        centroid(0) += p.x;
+    //        centroid(1) += p.y;
+    //        centroid(2) += p.z;
+    //    }
+    //    centroid /= static_cast<double>(pts.size());
+    
+    //    // 1. Compute centroid
+    //    Vec3 centroid;
+    //    for (const auto& p : points) { centroid += p; }
+    //    centroid /= points.size();
     
     // 1. Compute centroid
-    centroid.setZero();
-    for (const auto& p : pts) {
-        centroid(0) += p.x;
-        centroid(1) += p.y;
-        centroid(2) += p.z;
-    }
-    centroid /= static_cast<double>(pts.size());
+    Vec3 centroid;
+    for (const auto& p : points) { centroid += (p / points.size()); }
+    
+    //    // 2. Build centered 3 x N matrix
+    //    Eigen::MatrixXd centered(3, pts.size());
+    //    for (size_t i = 0; i < pts.size(); ++i) {
+    //        centered(0, i) = pts[i].x - centroid(0);
+    //        centered(1, i) = pts[i].y - centroid(1);
+    //        centered(2, i) = pts[i].z - centroid(2);
+    //    }
     
     // 2. Build centered 3 x N matrix
-    Eigen::MatrixXd centered(3, pts.size());
-    for (size_t i = 0; i < pts.size(); ++i) {
-        centered(0, i) = pts[i].x - centroid(0);
-        centered(1, i) = pts[i].y - centroid(1);
-        centered(2, i) = pts[i].z - centroid(2);
+    Eigen::MatrixXd centered(3, points.size());
+    for (size_t i = 0; i < points.size(); ++i)
+    {
+        Vec3 c = points[i] - centroid;
+        centered(0, i) = c.x();  // maybe I should use an "as_array" method?
+        centered(1, i) = c.y();
+        centered(2, i) = c.z();
     }
     
     // 3. Apply SVD
     Eigen::BDCSVD<Eigen::MatrixXd> svd(centered, Eigen::ComputeThinU | Eigen::ComputeThinV);
     
-    // 4. Normal is the last column of U (smallest singular value)
-    normal = svd.matrixU().col(2);
-    normal.normalize();
+    //    // 4. Normal is the last column of U (smallest singular value)
+    //    normal = svd.matrixU().col(2);
+    //    normal.normalize();
     
-    return true;
+    // 4. Normal is the last column of U (smallest singular value)
+    Vec3 normal(svd.matrixU().col(2)[0],
+                svd.matrixU().col(2)[1],
+                svd.matrixU().col(2)[2]);
+    
+    //    return true;
+    
+    return shape::Plane(normal.normalize(), centroid);
 }
 
 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -110,9 +171,45 @@ int main(int argc, const char * argv[])
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20260727 WIP on plane-fitting for neighbors in murmurations
     //
-    // References:
-    // https://www.tangramvision.com/blog/a-different-way-to-think-about-plane-fitting
     
+//        {
+//            Draw& draw = Draw::getInstance();
+//            draw.setEnable(true);
+//
+//            auto disk = [&](Vec3 normal, Vec3 center,
+//                            double diameter, double thickness,
+//                            int count)
+//            {
+//                std::vector<Vec3> points;
+//
+//                //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
+//                // TODO 20260728 add RandomSequence::randomPointInCylinder
+//
+//    //            double hd = diameter / 2;
+//    //            double ht = thickness / 2;
+//    //            Vec3 bc(hd, hd, ht);
+//                Vec3 draw_point;
+//    //            LocalSpace ls = LocalSpace::fromTo(center, center + normal);
+//                for (int i = 0; i < count; i++)
+//                {
+//    //                Vec3 box_point = EF::RS().randomPointInAxisAlignedBox(bc, -bc);
+//    //                Vec3 global_point = ls.globalizePosition(box_point);
+//
+//                    Vec3 global_point = EF::RS().randomPointInCylinder(diameter/2,
+//                                                                       thickness,
+//                                                                       normal,
+//                                                                       center);
+//                    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~
+//
+//                    points.push_back(global_point);
+//                    debugPrint(global_point)
+//                    draw.addAnnotationAxes(Vec3(), 5);
+//                    draw.addAnnotationLine(global_point, draw_point, Color::cyan(), 0.1);
+//                    draw_point = global_point;
+//                }
+//                return points;
+//            };
+        
     {
         Draw& draw = Draw::getInstance();
         draw.setEnable(true);
@@ -122,26 +219,13 @@ int main(int argc, const char * argv[])
                         int count)
         {
             std::vector<Vec3> points;
-            
-            //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
-            // TODO 20260728 add RandomSequence::randomPointInCylinder
-
-//            double hd = diameter / 2;
-//            double ht = thickness / 2;
-//            Vec3 bc(hd, hd, ht);
             Vec3 draw_point;
-//            LocalSpace ls = LocalSpace::fromTo(center, center + normal);
             for (int i = 0; i < count; i++)
             {
-//                Vec3 box_point = EF::RS().randomPointInAxisAlignedBox(bc, -bc);
-//                Vec3 global_point = ls.globalizePosition(box_point);
-
                 Vec3 global_point = EF::RS().randomPointInCylinder(diameter/2,
                                                                    thickness,
                                                                    normal,
                                                                    center);
-                //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~
-
                 points.push_back(global_point);
                 debugPrint(global_point)
                 draw.addAnnotationAxes(Vec3(), 5);
@@ -150,25 +234,24 @@ int main(int argc, const char * argv[])
             }
             return points;
         };
-        
-        
+
       
         
-        auto fitPlaneToPoints = [](const std::vector<Vec3>& points)
-        {
-            // TEMP should not duplicate this in case ever used on big dataset.
-            std::vector<Vec3> p = points;
-            
-            Vec3 sum = std::reduce(p.begin(), p.end(), Vec3(), std::plus());
-            Vec3 center = sum / p.size();
-            
-            // TEMP should not duplicate this in case ever used on big dataset.
-            for (int i = 0; i < p.size(); i++) { p[i] -= center; }
-            
-            
-            Vec3 normal(0, 1, 0);  // XXXXXXXXXXXXXXXXXXXXXXXXX
-            return shape::Plane(normal, center);
-        };
+//        auto fitPlaneToPoints = [](const std::vector<Vec3>& points)
+//        {
+//            // TEMP should not duplicate this in case ever used on big dataset.
+//            std::vector<Vec3> p = points;
+//            
+//            Vec3 sum = std::reduce(p.begin(), p.end(), Vec3(), std::plus());
+//            Vec3 center = sum / p.size();
+//            
+//            // TEMP should not duplicate this in case ever used on big dataset.
+//            for (int i = 0; i < p.size(); i++) { p[i] -= center; }
+//            
+//            
+//            Vec3 normal(0, 1, 0);  // XXXXXXXXXXXXXXXXXXXXXXXXX
+//            return shape::Plane(normal, center);
+//        };
 
 
         draw.beginAnimatedScene();
@@ -178,9 +261,21 @@ int main(int argc, const char * argv[])
             draw.clearAnnotations();
 
 //            disk(Vec3(1, 0, 0),           Vec3(), 10, 1, 100);
-            disk(Vec3(1,1,1).normalize(), Vec3(), 10, 1, 100);
+//            disk(Vec3(1,1,1).normalize(), Vec3(), 10, 1, 100);
+            
+            std::vector<Vec3> points =
+//            disk(Vec3(1, 0, 0), Vec3(1, 1, 1), 5, 1, 7);
+            disk(Vec3(1, 1, 1).normalize(), Vec3(1, 1, 1), 5, 1, 7);
 
-            util::thread_sleep_in_seconds(0.01);
+            
+            shape::Plane plane = fitPlaneToPoints(points);
+            draw.addAnnotationLine(plane.center,
+                                   plane.center + plane.normal * 10,
+                                   Color::magenta(), 0.2);
+
+            
+
+            util::thread_sleep_in_seconds(0.05);
             draw.addAnnotationsToAnimatedFrame();
             debugPrint(draw.enable());
 //            debugPrint(draw.annotations_.size());

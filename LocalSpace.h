@@ -333,3 +333,55 @@ inline std::ostream& operator<<(std::ostream& os, const LocalSpace& ls)
     os << "]";
     return os;
 }
+
+//~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+// TODO 20260730 add RandomSequence::randomPointInCylinder
+
+//    Vec3 RandomSequence::randomPointInCylinder(double radius, double height,
+//                                               Vec3 axis, Vec3 center)
+//    {
+//        LocalSpace ls = LocalSpace::fromTo(center, center + axis);
+//    //    Vec3 point_xy_circle = randomPointInUnitRadiusXYcircle();
+//        Vec3 point_xy_circle = randomPointInUnitRadiusXYcircle() * radius;
+//        double fraction_of_axis = frandom01();
+//
+//    //    Vec3 rpiunxyc = (center +
+//    //                     (point_xy_circle * radius) +
+//    //                     (axis * util::interpolate(fraction_of_axis,
+//    //                                               height / -2, height / 2)));
+//
+//    //    Vec3 rpic = ls.globalizePosition((point_xy_circle * radius) +
+//    //                                     (axis * util::interpolate(fraction_of_axis,
+//    //                                                               height / -2,
+//    //                                                               height / 2)));
+//
+//        double axis_scale = util::interpolate(fraction_of_axis, height/-2, height/2);
+//        Vec3 along_axis = axis * axis_scale;
+//
+//
+//        Vec3 rpic = ls.globalizePosition(point_xy_circle + along_axis);
+//
+//
+//        debugPrint(rpic);
+//
+//        return rpic;
+//    }
+
+Vec3 RandomSequence::randomPointInCylinder(double radius, double height,
+                                           Vec3 axis, Vec3 center)
+{
+    LocalSpace ls = LocalSpace::fromTo(center, center + axis);
+    Vec3 point_xy_circle = randomPointInUnitRadiusXYcircle() * radius;
+    double fraction_of_axis = frandom01();
+    double axis_scale = util::interpolate(fraction_of_axis, height/-2, height/2);
+//    Vec3 along_axis = axis * axis_scale;
+    Vec3 along_axis = Vec3(0, 0, axis_scale);
+
+    Vec3 rpic = ls.globalizePosition(point_xy_circle + along_axis);
+    debugPrint(rpic);
+    return rpic;
+}
+
+
+
+//~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~

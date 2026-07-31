@@ -258,6 +258,25 @@ public:
     Plane(Vec3 normal_, Vec3 center_) : normal(normal_), center(center_) {}
     Vec3 normal;
     Vec3 center;
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260731 add shape::Plane::mapPointToSurface()
+    
+    // Project any point to the plane.
+    // (Copied from PlaneObstacle::nearest_point() which this should replace.)
+    Vec3 mapPointToSurface(const Vec3& point) const
+    {
+        // Offset from center point (origin) of plane.
+        Vec3 offset = point - center;
+        // Signed distance from plane.
+        double distance =  offset.dot(normal);
+        // Translate offset point onto plane (in plane's local space).
+        Vec3 on_plane = offset - (normal * distance);
+        // Translate back to global space.
+        return on_plane + center;
+    }
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 };
 
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~

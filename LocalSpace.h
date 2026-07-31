@@ -27,7 +27,11 @@ public:
     // Constructors
     LocalSpace() {}
     LocalSpace(Vec3 i, Vec3 j, Vec3 k, Vec3 p) : i_(i), j_(j), k_(k), p_(p) {}
-    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260731 add from-to constructor to LocalSpace
+    LocalSpace(Vec3 from, Vec3 to) { *this = fromTo(from, to); }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     // Accessors
     Vec3 i() const { return i_; }
     Vec3 j() const { return j_; }
@@ -367,20 +371,23 @@ inline std::ostream& operator<<(std::ostream& os, const LocalSpace& ls)
 //        return rpic;
 //    }
 
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20260731 add from-to constructor to LocalSpace
+
+
+// Generate a random point inside an arbitrary cylinder with given radius,
+// height, axis, and center. The axis is expressed as a unit tangent vector
+// but its length is irrelevant.
 Vec3 RandomSequence::randomPointInCylinder(double radius, double height,
                                            Vec3 axis, Vec3 center)
 {
-    LocalSpace ls = LocalSpace::fromTo(center, center + axis);
-    Vec3 point_xy_circle = randomPointInUnitRadiusXYcircle() * radius;
-    double fraction_of_axis = frandom01();
-    double axis_scale = util::interpolate(fraction_of_axis, height/-2, height/2);
-//    Vec3 along_axis = axis * axis_scale;
-    Vec3 along_axis = Vec3(0, 0, axis_scale);
-
-    Vec3 rpic = ls.globalizePosition(point_xy_circle + along_axis);
-    debugPrint(rpic);
-    return rpic;
+    LocalSpace ls(center, center + axis);  // Local space by from-to along axis.
+    Vec3 point_in_xy_circle = randomPointInUnitRadiusXYcircle() * radius;
+    double axis_scale = util::interpolate(frandom01(), height/-2, height/2);
+    return ls.globalizePosition(point_in_xy_circle + Vec3(0, 0, axis_scale));
 }
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
 

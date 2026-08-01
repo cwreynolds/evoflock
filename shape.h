@@ -12,6 +12,7 @@
 
 #pragma once
 #include "Vec3.h"
+#include <Eigen/Dense>  // For fitting plane to points. REALLY slows compilation!
 
 namespace shape
 {
@@ -24,8 +25,6 @@ public:
     Sphere(Vec3 center_, double radius_) : center(center_), radius(radius_){}
     Vec3 center;
     double radius = 1;
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260605 radius from sphere volume -- very WIP
     
     // Get radius from a sphere's volume. (Used for murmuration density.)
     // r = cube root of (3/4 • v/π)
@@ -36,10 +35,8 @@ public:
 
     static double volumeFromRadius(double radius)
     {
-//        return (4.0 / 3.0) * util::pi * std::pow(radius, 3)
         return std::pow(radius, 3) * util::pi * 4.0 / 3.0;
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 // Returns the point of intersection of a ray (half-line) and sphere. Used
@@ -93,8 +90,6 @@ Vec3 ray_sphere_intersection(const Vec3& ray_origin,
     Sphere s(sphere_center, sphere_radius);
     return ray_sphere_intersection(ray_origin, ray_tangent, s);
 }
-
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 
 // Returns the point of intersection of a ray (half-line) and a plane. Or it
@@ -246,22 +241,17 @@ std::vector<Vec3> arrangeNonOverlappingSpheres(std::vector<double> radii,
     return centers;
 }
 
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-// TODO 20260727 WIP on plane-fitting for neighbors in murmurations
-//
-
-// Simple class to represent an abstract geometrical sphere.
+// Class to represent an abstract geometrical plane.
 class Plane
 {
 public:
-    Plane() : normal({0, 1, 0}) {}
-    Plane(Vec3 normal_, Vec3 center_) : normal(normal_), center(center_) {}
     Vec3 normal;
     Vec3 center;
     
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260731 add shape::Plane::mapPointToSurface()
-    
+    Plane() : normal({0, 1, 0}) {}
+    Plane(Vec3 normal_, Vec3 center_) : normal(normal_), center(center_) {}
+    Plane(const std::vector<Vec3>& points) { *this = fitPlaneToPoints(points); }
+
     // Project any point to the plane.
     // (Copied from PlaneObstacle::nearest_point() which this should replace.)
     Vec3 mapPointToSurface(const Vec3& point) const
@@ -275,11 +265,34 @@ public:
         // Translate back to global space.
         return on_plane + center;
     }
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        
+    // Fit a plane to 3 or more points.
+    static Plane fitPlaneToPoints(const std::vector<Vec3>& points)
+    {
+        assert(points.size() >= 3);
+        // Get centroid of points
+        const auto& p = points;
+        Vec3 centroid = (std::reduce(p.begin(), p.end(), Vec3(), std::plus()) /
+                         points.size());
+        // Build centered 3xN matrix in Eigen format.
+        Eigen::MatrixXd centered(3, points.size());
+        for (size_t i = 0; i < points.size(); ++i)
+        {
+            Vec3 c = points[i] - centroid;
+            centered(0, i) = c.x();  // maybe I should use an "as_array" method?
+            centered(1, i) = c.y();
+            centered(2, i) = c.z();
+        }
+        // Apply SVD to points.
+        auto flags = Eigen::ComputeThinU | Eigen::ComputeThinV;
+        Eigen::BDCSVD<Eigen::MatrixXd> svd(centered, flags);
+        // Plane's normal is the last column of U (smallest singular value)
+        const auto& n = svd.matrixU().col(2);
+        Vec3 normal = Vec3(n[0], n[1], n[2]).normalize();
+        return Plane(normal, centroid);
+    }
 };
 
-//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 // Defines a 3d (axis aligned) voxel map of given voxel count, overall box_size,
 // and center. Calling add() with a given location (say a boid center) marks

@@ -19,63 +19,65 @@ int main(int argc, const char * argv[])
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20260727 WIP on plane-fitting for neighbors in murmurations
 
-    {
-        Draw& draw = Draw::getInstance();
-        draw.setEnable(true);
-
-        auto disk = [&](Vec3 normal, Vec3 center,
-                        double diameter, double thickness,
-                        int count)
-        {
-            std::vector<Vec3> points;
-            Vec3 draw_point;
-            for (int i = 0; i < count; i++)
-            {
-                Vec3 global_point = EF::RS().randomPointInCylinder(diameter/2,
-                                                                   thickness,
-                                                                   normal,
-                                                                   center);
-                points.push_back(global_point);
-                // debugPrint(global_point)
-                draw.addAnnotationAxes(Vec3(), 5);
-                draw.addAnnotationLine(global_point, draw_point, Color::cyan(), 0.1);
-                draw_point = global_point;
-            }
-            return points;
-        };
-
-        draw.beginAnimatedScene();
-        for (int i = 0; i < 1000; i++)
-        {
-            draw.beginOneAnimatedFrame();
-            draw.clearAnnotations();
-
-            
-            std::vector<Vec3> points =
-                disk(Vec3(1, 0, 0), Vec3(1, 1, 1), 5, 1, 7);
-//                disk(Vec3(1, 1, 1).normalize(), Vec3(1, 1, 1), 5, 1, 7);
-
-            shape::Plane plane(points);
-
-            Vec3 n = plane.normal;
-            draw.addAnnotationLine(plane.center, plane.center + n * 10,
-                                   Color::magenta(), 0.2);
-            
-            for (const auto& p : points)
-            {
-                draw.addAnnotationLine(p, p + n * 5, Color::white(), 0.05);
-                Vec3 q = plane.mapPointToSurface(p);
-                draw.addAnnotationLine(q, q + n * 5, Color::black(), 0.05);
-            }
-
-            util::thread_sleep_in_seconds(0.01);
-            draw.addAnnotationsToAnimatedFrame();
-            draw.endOneAnimatedFrame();
-        }
-        draw.endAnimatedScene();
-    }
+//    {
+//        Draw& draw = Draw::getInstance();
+//        draw.setEnable(true);
+//
+//        auto disk = [&](Vec3 normal, Vec3 center,
+//                        double diameter, double thickness,
+//                        int count)
+//        {
+//            std::vector<Vec3> points;
+//            Vec3 draw_point;
+//            for (int i = 0; i < count; i++)
+//            {
+//                Vec3 global_point = EF::RS().randomPointInCylinder(diameter/2,
+//                                                                   thickness,
+//                                                                   normal,
+//                                                                   center);
+//                points.push_back(global_point);
+//                // debugPrint(global_point)
+//                draw.addAnnotationAxes(Vec3(), 5);
+//                draw.addAnnotationLine(global_point, draw_point, Color::cyan(), 0.1);
+//                draw_point = global_point;
+//            }
+//            return points;
+//        };
+//
+//        draw.beginAnimatedScene();
+//        for (int i = 0; i < 1000; i++)
+//        {
+//            draw.beginOneAnimatedFrame();
+//            draw.clearAnnotations();
+//
+//            
+//            std::vector<Vec3> points =
+//                disk(Vec3(1, 0, 0), Vec3(1, 1, 1), 5, 1, 7);
+//                // disk(Vec3(1, 1, 1).normalize(), Vec3(1, 1, 1), 5, 1, 7);
+//
+//            shape::Plane plane(points);
+//
+//            Vec3 n = plane.normal;
+//            draw.addAnnotationLine(plane.center, plane.center + n * 10,
+//                                   Color::magenta(), 0.2);
+//            
+//            for (const auto& p : points)
+//            {
+//                draw.addAnnotationLine(p, p + n * 5, Color::white(), 0.05);
+//                Vec3 q = plane.mapPointToSurface(p);
+//                draw.addAnnotationLine(q, q + n * 5, Color::black(), 0.05);
+//            }
+//
+//            util::thread_sleep_in_seconds(0.01);
+//            draw.addAnnotationsToAnimatedFrame();
+//            draw.endOneAnimatedFrame();
+//        }
+//        draw.endAnimatedScene();
+//        
+//        return EXIT_SUCCESS;
+//
+//    }
     
-    return EXIT_SUCCESS;
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     

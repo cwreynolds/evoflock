@@ -457,42 +457,22 @@ public:
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20260416 break off steerTowardCentroid()
 
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260802 try steerTowardManifold() vs steerTowardCentroid().
+        
         // very ad hoc prototype
         if (EF::use_centroid_objective)
         {
-//            Vec3 c = centroid_;
-            
-//            double max_dist = 50;
-//            double min_centering_dist = max_dist * 0.8;
-//            double centering_strength = 1;
-//            double max_dist = 30;
-//            double min_centering_dist = max_dist * 0.5;
-//            double centering_strength = 2;
-//            double max_dist = 30;
-//            double min_centering_dist = max_dist * 0.5;
-//            double centering_strength = 4;
-//            double max_dist = 30;
-//            double min_centering_dist = max_dist * 0.5;
-//            double centering_strength = 4;
+//            combined_steering += steerTowardCentroid();
 
-//            double max_dist = 30;
-//            double min_centering_dist = max_dist * 0.4;
-//            double centering_strength = 5;
-//
-//            Vec3 to_center = c - position();
-//            double distance = to_center.length();
-//            double too_far_dist = distance - min_centering_dist;
-//            if (too_far_dist > 0)
-//            {
-//                Vec3 centroid_steer = ((to_center / distance) *
-//                                       too_far_dist *
-//                                       centering_strength);
-//                combined_steering += centroid_steer;
-//            }
-            
+//            combined_steering += steerTowardManifold();
+
             combined_steering += steerTowardCentroid();
+            combined_steering += steerTowardManifold();
         }
         
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -751,6 +731,31 @@ public:
         return centroid_steer;
     }
 
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260802 try steerTowardManifold() vs steerTowardCentroid().
+    
+    // very ad hoc prototype
+    Vec3 steerTowardManifold()
+    {
+//        double wip_weight = 10;
+        double wip_weight = 50;
+        // Collect nearest neighbor positions.
+        std::vector<Vec3> nnp;
+        for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
+        // Find plane approximating local flock manifold.
+        shape::Plane neighbor_plane(nnp);
+        
+        // Project this boid's position onto that plane.
+        Vec3 on_plane = neighbor_plane.mapPointToSurface(position());
+        // Weighted steering toward
+        Vec3 toward_plane = (on_plane - position()).normalize() * wip_weight;
+        return toward_plane;
+    }
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    
     // Draw annotation from this Boid along a given offset vector.
     void annotationLineOffset(Vec3 offset, Color color, double radius)
     {

@@ -467,8 +467,19 @@ public:
 
 //            combined_steering += steerTowardManifold();
 
-            combined_steering += steerTowardCentroid();
-            combined_steering += steerTowardManifold();
+//            combined_steering += steerTowardCentroid();
+//            combined_steering += steerTowardManifold();
+
+            
+//    //            double wip_weight = 10;
+//    //            double wip_weight = 50;
+//                double wip_weight = 100;
+//                combined_steering += steerTowardManifold() * wip_weight;
+      
+            combined_steering += steerTowardCentroid() * 0.5;
+            combined_steering += steerTowardManifold() * 100;
+
+
         }
         
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -738,8 +749,8 @@ public:
     // very ad hoc prototype
     Vec3 steerTowardManifold()
     {
-//        double wip_weight = 10;
-        double wip_weight = 50;
+//    //        double wip_weight = 10;
+//            double wip_weight = 50;
         // Collect nearest neighbor positions.
         std::vector<Vec3> nnp;
         for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
@@ -748,8 +759,12 @@ public:
         
         // Project this boid's position onto that plane.
         Vec3 on_plane = neighbor_plane.mapPointToSurface(position());
-        // Weighted steering toward
-        Vec3 toward_plane = (on_plane - position()).normalize() * wip_weight;
+//        // Weighted steering toward
+//        Vec3 toward_plane = (on_plane - position()).normalize() * wip_weight;
+//        return toward_plane;
+
+        // Steering toward plane
+        Vec3 toward_plane = (on_plane - position()).normalize();
         return toward_plane;
     }
     

@@ -329,10 +329,22 @@ private:
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20260413 current flock centroid, and velocity
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20260805 revisit DomeAndGround obstacle set for murmuration
+
+//        std::string use_obstacle_set = (EF::murmuration_mode ?
+//    //                                    "BoxObstacle" :
+//                                        "NoObstacles" :
+//                                        "SmallSpheresInBigSphere");
+
     std::string use_obstacle_set = (EF::murmuration_mode ?
-//                                    "BoxObstacle" :
-                                    "NoObstacles" :
+//                                    "NoObstacles" :
+                                    "DomeAndGround" :
                                     "SmallSpheresInBigSphere");
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?

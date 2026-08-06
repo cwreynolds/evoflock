@@ -1210,11 +1210,22 @@ public:
                         
             // Set n: DomeAndGround obstacle. Temp?
             {
-                // Dome has 30% the radius of BigSphere, then 8x volume
-                double r = sr * 0.3 * std::pow(8.0, 0.333);
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20260805 revisit DomeAndGround obstacle set for murmuration
+
+//                // Dome has 30% the radius of BigSphere, then 8x volume
+//                double r = sr * 0.3 * std::pow(8.0, 0.333);
+//                
+//                // note: for 40x, r = 51.2362, which is to say, same as default.
+//                r = sr * 0.3 * std::pow(40, 0.333);
                 
-                // note: for 40x, r = 51.2362, which is to say, same as default.
-                r = sr * 0.3 * std::pow(40, 0.333);
+                
+//                double r = 70;
+//                double r = 100;
+                double r = 120;
+
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                 std::cout << "DomeAndGround radius = " << r << std::endl;
                 double thin = r * 0.001;
                 Vec3 up(0, 1, 0);
@@ -1222,6 +1233,18 @@ public:
                 Vec3 ls_center = up * (r * -0.5);
                 Obstacle* low_sphere = new SphereObstacle(r, ls_center, oside);
                 Obstacle* low_plane = new PlaneObstacle(up, lp_center, r, thin);
+                
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+                // TODO 20260805 revisit DomeAndGround obstacle set for murmuration
+
+                // Gray values noise just below white.
+                Color g1(0.90);
+                Color g2(0.90);
+                low_sphere->setColor(Color::randomInRgbBox(g1, g2));
+                low_sphere->setColor(Color::randomInRgbBox(g1, g2));
+
+                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
                 obstacle_sets_.push_back(ObstacleSet("DomeAndGround",
                                                      {low_sphere, low_plane}));
             }

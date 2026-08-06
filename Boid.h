@@ -476,9 +476,15 @@ public:
 //                double wip_weight = 100;
 //                combined_steering += steerTowardManifold() * wip_weight;
       
-            combined_steering += steerTowardCentroid() * 0.5;
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20260805 revisit DomeAndGround obstacle set for murmuration
+
+//            combined_steering += steerTowardCentroid() * 0.5;
+//            combined_steering += steerTowardManifold() * 100;
+
             combined_steering += steerTowardManifold() * 100;
 
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
         }
         

@@ -482,7 +482,18 @@ public:
 //            combined_steering += steerTowardCentroid() * 0.5;
 //            combined_steering += steerTowardManifold() * 100;
 
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20260806 ok, try putting back centroid objective & behavior
+
+//            combined_steering += steerTowardCentroid() * 0.5;
+//            combined_steering += steerTowardCentroid() * 0.2;
+//            combined_steering += steerTowardCentroid() * 0.05;
+//            combined_steering += steerTowardManifold() * 100;
+
+            combined_steering += steerTowardCentroid_v2();
             combined_steering += steerTowardManifold() * 100;
+            
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -747,6 +758,38 @@ public:
         }
         return centroid_steer;
     }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20260806 ok, try putting back centroid objective & behavior
+    
+    // New, more simple version. Trying after steerTowardManifold()
+    
+    
+    // Steering force for global cohesion to centroid, for EF::murmuration_mode.
+    Vec3 steerTowardCentroid_v2() // const
+    {
+        Vec3 centroid_steer;
+        if (EF::use_centroid_objective)
+        {
+            Vec3 to_center = centroid() - position();
+            auto [unit_to_center, distance] = to_center.normalize_and_length();
+            centroid_steer = unit_to_center * fp().centeringStrength();
+
+
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20260625 annotation selected boid's steerTowardCentroid()
+            if (isSelected())
+            {
+                annotationLineOffset(centroid_steer, Color::red(), 0.05);
+            }
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+        }
+        return centroid_steer;
+    }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
     
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~

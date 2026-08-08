@@ -722,8 +722,15 @@ public:
     
     void setCentroidMaxDistance(double md) { centroid_max_distance_ = md; }
     
-    double centroidMaxDistance() { return centroid_max_distance_; }
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20260806 ok, try putting back centroid objective & behavior
 
+//    double centroidMaxDistance() { return centroid_max_distance_; }
+    double centroidMaxDistance() const { return centroid_max_distance_; }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+    
     // TODO 20250604 calling this “version 1.0” a probably-not-nonsense version
     //               of Boid::steerTowardCentroid(). Remove LOT of tentative WIP
     //               code that had been commented out above.
@@ -765,25 +772,83 @@ public:
     // New, more simple version. Trying after steerTowardManifold()
     
     
+//        // Steering force for global cohesion to centroid, for EF::murmuration_mode.
+//        Vec3 steerTowardCentroid_v2() // const
+//        {
+//            Vec3 centroid_steer;
+//            if (EF::use_centroid_objective)
+//            {
+//                Vec3 to_center = centroid() - position();
+//                auto [unit_to_center, distance] = to_center.normalize_and_length();
+//
+//
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//                // TODO 20260625 oops
+//
+//    //            centroid_steer = unit_to_center * fp().centeringStrength();
+//
+//                double weight = fp().centeringStrength() * distance;
+//                centroid_steer = unit_to_center * weight;
+//
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//                // TODO 20260625 annotation selected boid's steerTowardCentroid()
+//                if (isSelected())
+//                {
+//                    annotationLineOffset(centroid_steer, Color::red(), 0.05);
+//                }
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//            }
+//            return centroid_steer;
+//        }
+
+//        // Steering force for global cohesion to centroid, for EF::murmuration_mode.
+//        Vec3 steerTowardCentroid_v2() const
+//        {
+//            Vec3 centroid_steer;
+//            if (EF::use_centroid_objective)
+//            {
+//                Vec3 to_center = centroid() - position();
+//                auto [unit_to_center, distance] = to_center.normalize_and_length();
+//
+//                double excess_distance = distance - centroidMaxDistance();
+//
+//                if (excess_distance > 0)
+//                {
+//                    double weight = fp().centeringStrength() * excess_distance;
+//                    centroid_steer = unit_to_center * weight;
+//
+//                }
+//
+//    //            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//    //            // TODO 20260625 annotation selected boid's steerTowardCentroid()
+//    //            if (isSelected())
+//    //            {
+//    //                annotationLineOffset(centroid_steer, Color::red(), 0.05);
+//    //            }
+//    //            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//            }
+//            return centroid_steer;
+//        }
+
     // Steering force for global cohesion to centroid, for EF::murmuration_mode.
-    Vec3 steerTowardCentroid_v2() // const
+    Vec3 steerTowardCentroid_v2() const
     {
         Vec3 centroid_steer;
         if (EF::use_centroid_objective)
         {
             Vec3 to_center = centroid() - position();
             auto [unit_to_center, distance] = to_center.normalize_and_length();
-            centroid_steer = unit_to_center * fp().centeringStrength();
-
-
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20260625 annotation selected boid's steerTowardCentroid()
-            if (isSelected())
+            double excess_distance = distance - centroidMaxDistance();
+            if (excess_distance > 0)
             {
-                annotationLineOffset(centroid_steer, Color::red(), 0.05);
+                double weight = fp().centeringStrength() * excess_distance;
+                centroid_steer = unit_to_center * weight;
             }
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
         }
         return centroid_steer;
     }

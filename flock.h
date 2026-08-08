@@ -327,45 +327,63 @@ public:
 //                return LocalSpace::fromTo(boid_position, boid_heading);
 //            }
       
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20260807 ok, try putting back centroid objective & behavior
+
+//            // For DomeAndGround / NoObstacle / BoxObstacle
+//            if (EF::murmuration_mode)
+//            {
+//    //            double radius = centroidMaxDistance() * 0.8;
+//    //            double radius = centroidMaxDistance() * 0.3;
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                // TODO 20260624 init near center and pointed AWAY from the center
+//
+//    //            double radius = centroidMaxDistance() * 0.8;
+//                double radius = centroidMaxDistance() * 0.3;
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                Vec3 center;
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                // TODO 20260624 is this little change really what made it get worse?
+//                //
+//
+//    //            Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
+//    //            Vec3 rand_in_unit_sphere = rs.randomUnitVector();
+//                Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
+//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//                Vec3 boid_position = center + (rand_in_unit_sphere * radius);
+//
+//    //            Vec3 boid_heading = rand_in_unit_sphere.normalize().find_perpendicular();
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//                // TODO 20260624 init near center and pointed AWAY from the center
+//
+//    //            Vec3 boid_heading = rs.randomUnitVector();
+//                Vec3 boid_heading = rand_in_unit_sphere.normalize();
+//
+//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//
+//                // Early return for murmuration_mode
+//                return LocalSpace::fromTo(boid_position, boid_heading);
+//            }
+
         // For DomeAndGround / NoObstacle / BoxObstacle
         if (EF::murmuration_mode)
         {
-//            double radius = centroidMaxDistance() * 0.8;
-//            double radius = centroidMaxDistance() * 0.3;
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20260624 init near center and pointed AWAY from the center
-
-//            double radius = centroidMaxDistance() * 0.8;
-            double radius = centroidMaxDistance() * 0.3;
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-            Vec3 center;
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20260624 is this little change really what made it get worse?
-            //
-            
-//            Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
-//            Vec3 rand_in_unit_sphere = rs.randomUnitVector();
             Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-            Vec3 boid_position = center + (rand_in_unit_sphere * radius);
+            Vec3 boid_position = rand_in_unit_sphere * centroidMaxDistance();
             
-//            Vec3 boid_heading = rand_in_unit_sphere.normalize().find_perpendicular();
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20260624 init near center and pointed AWAY from the center
-            
-//            Vec3 boid_heading = rs.randomUnitVector();
-            Vec3 boid_heading = rand_in_unit_sphere.normalize();
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+//            Vec3 boid_heading = rand_in_unit_sphere.normalize();
+            Vec3 boid_heading = boid_position.normalize();
 
             // Early return for murmuration_mode
             return LocalSpace::fromTo(boid_position, boid_heading);
         }
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

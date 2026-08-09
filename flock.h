@@ -887,15 +887,28 @@ public:
 //                                          {1.0,  1.0, 0.0});
 //    }
 
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20260808 simplify this in the "manifold era" to just be in or out.
+    
+//    double perBoidCentroidDistanceScore(Boid* boid) const
+//    {
+//        // Flipped exponential over normalized distance
+//        // (See plot of this function via Wolfram|Alpha: http://bit.ly/44d0OIv)
+//        double distance = (boid->position() - centroid()).length();
+//        double max = centroidMaxDistance();
+//        double clipped_normalized_distance = util::clip01(distance / max);
+//        return 1 - std::pow(clipped_normalized_distance, 3);
+//    }
+
     double perBoidCentroidDistanceScore(Boid* boid) const
     {
-        // Flipped exponential over normalized distance
-        // (See plot of this function via Wolfram|Alpha: http://bit.ly/44d0OIv)
         double distance = (boid->position() - centroid()).length();
         double max = centroidMaxDistance();
-        double clipped_normalized_distance = util::clip01(distance / max);
-        return 1 - std::pow(clipped_normalized_distance, 3);
+        return (distance < max) ? 1 : 0;
     }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
@@ -1257,9 +1270,9 @@ public:
 
                 // Gray values noise just below white.
                 Color g1(0.90);
-                Color g2(0.90);
+                Color g2(0.95);
                 low_sphere->setColor(Color::randomInRgbBox(g1, g2));
-                low_sphere->setColor(Color::randomInRgbBox(g1, g2));
+                low_plane->setColor(Color::randomInRgbBox(g1, g2));
 
                 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -1272,11 +1285,32 @@ public:
                 double s = 41;
                 debugPrint(s);
                 s *= std::pow(200.0 / 1400.0, 1.0 / 3.0);
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20260808 random test
+                s = 60;
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 debugPrint(s);
                 Obstacle* bo = new BoxObstacle({}, s * 2, s, s * 2, oside);
                 obstacle_sets_.push_back(ObstacleSet("BoxObstacle", {bo}));
             }
 
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20260808 random test
+
+            // Set n: a bigger sphere.
+            Obstacle* bigger_sphere = new SphereObstacle(sr * 1.5, sc, oside);
+            
+            // Gray values noise just below white.
+            Color g1(0.90);
+            Color g2(0.95);
+            bigger_sphere->setColor(Color::randomInRgbBox(g1, g2));
+
+            obstacle_sets_.push_back(ObstacleSet("BiggerSphere",
+                                                 {bigger_sphere}));
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+            
             // Set 6: no obstacles.
             obstacle_sets_.push_back(ObstacleSet("NoObstacles", {}));
             

@@ -338,10 +338,19 @@ private:
 //                                        "NoObstacles" :
 //                                        "SmallSpheresInBigSphere");
 
-    std::string use_obstacle_set = (EF::murmuration_mode ?
-//                                    "NoObstacles" :
-                                    "DomeAndGround" :
-                                    "SmallSpheresInBigSphere");
+//        std::string use_obstacle_set = (EF::murmuration_mode ?
+//    //                                    "NoObstacles" :
+//                                        "DomeAndGround" :
+//                                        "SmallSpheresInBigSphere");
+
+        std::string use_obstacle_set = (EF::murmuration_mode ?
+//                                        "BoxObstacle" :
+//                                        "NoObstacles" :
+//                                        "BigSphere" :
+//                                        "BiggerSphere" :
+//                                        "DomeAndGround" :
+                                        "NoObstacles" :
+                                        "SmallSpheresInBigSphere");
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

@@ -490,8 +490,16 @@ public:
 //            combined_steering += steerTowardCentroid() * 0.05;
 //            combined_steering += steerTowardManifold() * 100;
 
+            
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20260809 ramp down perBoidCentroidDistanceScore toward outside
+            
             combined_steering += steerTowardCentroid_v2();
-            combined_steering += steerTowardManifold() * 100;
+//            combined_steering += steerTowardManifold() * 100;
+            combined_steering += steerTowardManifold() * 50;
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
             
             //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
@@ -856,33 +864,30 @@ public:
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20260802 try steerTowardManifold() vs steerTowardCentroid().
     
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260809 ramp down perBoidCentroidDistanceScore toward outside
+
     // very ad hoc prototype
     Vec3 steerTowardManifold()
     {
-//    //        double wip_weight = 10;
-//            double wip_weight = 50;
         // Collect nearest neighbor positions.
         std::vector<Vec3> nnp;
         for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
         // Find plane approximating local flock manifold.
         shape::Plane neighbor_plane(nnp);
-        
         // Project this boid's position onto that plane.
         Vec3 on_plane = neighbor_plane.mapPointToSurface(position());
-//        // Weighted steering toward
-//        Vec3 toward_plane = (on_plane - position()).normalize() * wip_weight;
-//        return toward_plane;
-
         // Steering toward plane
         Vec3 toward_plane = (on_plane - position()).normalize();
         return toward_plane;
     }
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
     
     // Draw annotation from this Boid along a given offset vector.

@@ -900,12 +900,27 @@ public:
 //        return 1 - std::pow(clipped_normalized_distance, 3);
 //    }
 
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260809 ramp down perBoidCentroidDistanceScore toward outside
+    
+//    double perBoidCentroidDistanceScore(Boid* boid) const
+//    {
+//        double distance = (boid->position() - centroid()).length();
+//        double max = centroidMaxDistance();
+//        return (distance < max) ? 1 : 0;
+//    }
+
     double perBoidCentroidDistanceScore(Boid* boid) const
     {
         double distance = (boid->position() - centroid()).length();
         double max = centroidMaxDistance();
-        return (distance < max) ? 1 : 0;
+//        return (distance < max) ? 1 : 0;
+//        return util::remap_interval_clip(distance, 0, max, 1, 0.5);
+        return util::remap_interval_clip(distance, 0, max, 1, 0.3);
     }
+    
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 

@@ -910,15 +910,34 @@ public:
 //        return (distance < max) ? 1 : 0;
 //    }
 
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20260809 flat until max*0.6 then ramp down to 0.3
+    
+//        double perBoidCentroidDistanceScore(Boid* boid) const
+//        {
+//            double distance = (boid->position() - centroid()).length();
+//            double max = centroidMaxDistance();
+//    //        return (distance < max) ? 1 : 0;
+//    //        return util::remap_interval_clip(distance, 0, max, 1, 0.5);
+//            return util::remap_interval_clip(distance, 0, max, 1, 0.3);
+//        }
+    
+//        double perBoidCentroidDistanceScore(Boid* boid) const
+//        {
+//            double distance = (boid->position() - centroid()).length();
+//            double max = centroidMaxDistance();
+//    //        return util::remap_interval_clip(distance, 0, max, 1, 0.3);
+//            return util::remap_interval_clip(distance, max * 0.6, max, 1, 0.3);
+//        }
+
     double perBoidCentroidDistanceScore(Boid* boid) const
     {
         double distance = (boid->position() - centroid()).length();
         double max = centroidMaxDistance();
-//        return (distance < max) ? 1 : 0;
-//        return util::remap_interval_clip(distance, 0, max, 1, 0.5);
-        return util::remap_interval_clip(distance, 0, max, 1, 0.3);
+        return util::remap_interval_clip(distance, max * 0.3, max, 1, 0.3);
     }
-    
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

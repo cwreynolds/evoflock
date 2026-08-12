@@ -157,7 +157,10 @@ public:
             if (EF::use_centroid_objective)
             {
                 draw().addAnnotationAxes({});
-                draw().addAnnotationAxes(centroid(), centroidMaxDistance());
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20260811 remove debugging annotation to record for ALIFE slides
+//                draw().addAnnotationAxes(centroid(), centroidMaxDistance());
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -485,7 +488,6 @@ public:
         for_all_boids(per_boid_donut_axis);
         
         Vec3 donut_hole_axis = sum_of_cross_prods.normalize();
-        Vec3 ep = donut_hole_axis * 50;
         
         double delta_axis_angle = Vec3::angle_between(donut_hole_axis,
                                                       previous_donut_hole_axis_);
@@ -501,10 +503,14 @@ public:
         
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         
-        Color c1 = Color::orange();
-        Color c2 = Color::white() - Color::orange();
-        draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
-        draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260811 remove debugging annotation to record for ALIFE slides
+//        Vec3 ep = donut_hole_axis * 50;
+//        Color c1 = Color::orange();
+//        Color c2 = Color::white() - Color::orange();
+//        draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
+//        draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

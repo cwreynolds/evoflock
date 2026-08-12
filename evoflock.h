@@ -92,8 +92,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -867,15 +867,23 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     4.54067, 15.2742, 1.90937, 73.0926, 0.771522,
         //                     0.0147633, 0.582662});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260601 test 20260807_ga_murm_new_centroid_behavior with bigger flock
-        
         // Saved best FP values from run 20260807_ga_murm_new_centroid_behavior
-        FlockParameters fp({21.1744, 99.1969, 84.5473, 72.5734, 31.8913,
-                            14.7115, 74.2143, 2.54586, 4.5935, 8.61831,
-                            -0.907183, -0.425851, 0.969641, 87.4402,
-                            6.6779, 46.6654, 1.9284, 84.5593, 0.304477,
-                            0.437125, 0.148308});
+        // FlockParameters fp({21.1744, 99.1969, 84.5473, 72.5734, 31.8913,
+        //                     14.7115, 74.2143, 2.54586, 4.5935, 8.61831,
+        //                     -0.907183, -0.425851, 0.969641, 87.4402,
+        //                     6.6779, 46.6654, 1.9284, 84.5593, 0.304477,
+        //                     0.437125, 0.148308});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260601 test 20260810_ga_murm_centroid_score_03 with bigger flock
+        
+        // Saved best FP values from run 20260810_ga_murm_centroid_score_03
+        // This version recorded for ALIFE slides.
+        FlockParameters fp({80.6216, 98.9733, 68.7651, 98.2395, 8.5418,
+                            61.4942, 61.0828, 2.28219, 36.7693, 30.7322,
+                            -0.952589, -0.873591, 0.805319, 50.6854,
+                            7.63409, 42.9963, 1.75816, 39.9723, 0.270314,
+                            0.250123, 0.932436});
 
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

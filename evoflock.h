@@ -92,8 +92,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -873,9 +873,6 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     -0.907183, -0.425851, 0.969641, 87.4402,
         //                     6.6779, 46.6654, 1.9284, 84.5593, 0.304477,
         //                     0.437125, 0.148308});
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260601 test 20260810_ga_murm_centroid_score_03 with bigger flock
         
         // Saved best FP values from run 20260810_ga_murm_centroid_score_03
         // This version recorded for ALIFE slides.
@@ -884,6 +881,16 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
                             -0.952589, -0.873591, 0.805319, 50.6854,
                             7.63409, 42.9963, 1.75816, 39.9723, 0.270314,
                             0.250123, 0.932436});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260601 test 20260813_ga_murm_smooth_plane_07 with bigger flock
+        
+        // Saved best FP values from run 20260813_ga_murm_smooth_plane_07
+        // FlockParameters fp({55.4661, 99.6427, 80.7136, 89.6579, 19.0617,
+        //                     8.83765, 11.7418, 3.26475, 89.1056, 65.5162,
+        //                     -0.617491, -0.231962, 0.695704, 63.5697,
+        //                     6.65252, 32.2689, 1.57743, 82.0562, 0.54128,
+        //                     0.0935764, 0.952435});
 
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

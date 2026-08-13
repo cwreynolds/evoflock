@@ -887,10 +887,14 @@ public:
 //        return toward_plane;
 //    }
 
-    
-    util::Blender<shape::Plane> smoothed_neighbor_plane_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260813 why is plane blending broken?
 
-    
+//    util::Blender<shape::Plane> smoothed_neighbor_plane_;
+    shape::Plane smoothed_neighbor_plane_;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     Vec3 steerTowardManifold()
     {
         // Collect nearest neighbor positions.
@@ -899,11 +903,33 @@ public:
         // Find plane approximating local flock manifold.
         shape::Plane neighbor_plane(nnp);
         
-        // Blend that plane into smoothed memory plane.
-//        double smoothness = 0.8;
-        double smoothness = 0.5;
-        neighbor_plane = smoothed_neighbor_plane_.blend(neighbor_plane, smoothness);
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260813 why is plane blending broken?
+
+//            // Blend that plane into smoothed memory plane.
+//    //        double smoothness = 0.8;
+//            double smoothness = 0.5;
+//            neighbor_plane = smoothed_neighbor_plane_.blend(neighbor_plane, smoothness);
+      
         
+//            // Blend that plane into smoothed memory plane.
+//    //        double smoothness = 0.8;
+//    //        double smoothness = 0.5;
+//            double smoothness = 0.7;
+//
+//            Vec3 n = util::interpolate(smoothness,
+//                                       neighbor_plane.normal,
+//                                       smoothed_neighbor_plane_.normal).normalize();
+//            Vec3 c = util::interpolate(smoothness,
+//                                       neighbor_plane.center,
+//                                       smoothed_neighbor_plane_.center);
+//
+//            smoothed_neighbor_plane_ = shape::Plane(n, c);
+//
+//            neighbor_plane = smoothed_neighbor_plane_;
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
         // Project this boid's position onto that plane.
         Vec3 on_plane = neighbor_plane.mapPointToSurface(position());
 

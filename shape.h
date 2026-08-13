@@ -249,7 +249,19 @@ public:
     Vec3 center;
     
     Plane() : normal({0, 1, 0}) {}
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260813 why is plane blending broken?
+
     Plane(Vec3 normal_, Vec3 center_) : normal(normal_), center(center_) {}
+
+//    Plane(Vec3 normal_, Vec3 center_) : normal(normal_), center(center_)
+//    {
+//        grabPrintLock_evoflock();
+//        debugPrint(normal.length());
+//        assert(normal.is_unit_length());
+//    }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Plane(const std::vector<Vec3>& points) { *this = fitPlaneToPoints(points); }
 
     // Project any point to the plane.

@@ -870,7 +870,27 @@ public:
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20260809 ramp down perBoidCentroidDistanceScore toward outside
 
-    // very ad hoc prototype
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260812 try remembering a smoothing version of neighbor plane.
+    
+//    Vec3 steerTowardManifold()
+//    {
+//        // Collect nearest neighbor positions.
+//        std::vector<Vec3> nnp;
+//        for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
+//        // Find plane approximating local flock manifold.
+//        shape::Plane neighbor_plane(nnp);
+//        // Project this boid's position onto that plane.
+//        Vec3 on_plane = neighbor_plane.mapPointToSurface(position());
+//        // Steering toward plane
+//        Vec3 toward_plane = (on_plane - position()).normalize();
+//        return toward_plane;
+//    }
+
+    
+    util::Blender<shape::Plane> smoothed_neighbor_plane_;
+
+    
     Vec3 steerTowardManifold()
     {
         // Collect nearest neighbor positions.
@@ -878,12 +898,21 @@ public:
         for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
         // Find plane approximating local flock manifold.
         shape::Plane neighbor_plane(nnp);
+        
+        // Blend that plane into smoothed memory plane.
+//        double smoothness = 0.8;
+        double smoothness = 0.5;
+        neighbor_plane = smoothed_neighbor_plane_.blend(neighbor_plane, smoothness);
+        
         // Project this boid's position onto that plane.
         Vec3 on_plane = neighbor_plane.mapPointToSurface(position());
+
         // Steering toward plane
         Vec3 toward_plane = (on_plane - position()).normalize();
         return toward_plane;
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

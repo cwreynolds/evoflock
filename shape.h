@@ -291,6 +291,25 @@ public:
         Vec3 normal = Vec3(n[0], n[1], n[2]).normalize();
         return Plane(normal, centroid);
     }
+ 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260812 try remembering a smoothing version of neighbor plane.
+    //               These were added solely to use with Blender, still needed?
+
+//    Plane(Vec3 normal_, Vec3 center_) : normal(normal_), center(center_) {}
+
+    Plane operator+(Plane p) const
+    {
+//        return { x() + v.x(), y() + v.y(), z() + v.z() };
+        return { (normal + p.normal).normalize(), center + p.center };
+    }
+    
+//        Vec3 operator*(double s) const { return { x() * s, y() * s, z() * s}; }
+    Plane operator*(double s) const
+    {
+        return { normal * s, center * s };
+    }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 };
 
 

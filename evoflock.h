@@ -875,15 +875,12 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     0.437125, 0.148308});
         
         // Saved best FP values from run 20260810_ga_murm_centroid_score_03
-        // This version recorded for ALIFE slides.
-        FlockParameters fp({80.6216, 98.9733, 68.7651, 98.2395, 8.5418,
-                            61.4942, 61.0828, 2.28219, 36.7693, 30.7322,
-                            -0.952589, -0.873591, 0.805319, 50.6854,
-                            7.63409, 42.9963, 1.75816, 39.9723, 0.270314,
-                            0.250123, 0.932436});
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260601 test 20260813_ga_murm_smooth_plane_07 with bigger flock
+        // This version recorded for ALIFE 2026 presentation slides.
+        // FlockParameters fp({80.6216, 98.9733, 68.7651, 98.2395, 8.5418,
+        //                     61.4942, 61.0828, 2.28219, 36.7693, 30.7322,
+        //                     -0.952589, -0.873591, 0.805319, 50.6854,
+        //                     7.63409, 42.9963, 1.75816, 39.9723, 0.270314,
+        //                     0.250123, 0.932436});
         
         // Saved best FP values from run 20260813_ga_murm_smooth_plane_07
         // FlockParameters fp({55.4661, 99.6427, 80.7136, 89.6579, 19.0617,
@@ -892,6 +889,16 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     6.65252, 32.2689, 1.57743, 82.0562, 0.54128,
         //                     0.0935764, 0.952435});
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260814_ga_murm_evo_manifold_param with bigger flock
+
+        // Saved best FP values from run 20260814_ga_murm_evo_manifold_param
+        FlockParameters fp({64.1342, 91.6654, 73.0865, 90.7622, 9.60565,
+                            49.6563, 5.23743, 2.7647, 19.7544, 67.9891,
+                            -0.744581, -0.955327, 0.0820796, 8.4517,
+                            2.21422, 30.3302, 1.78119, 20.6654, 0.123763,
+                            0.407652, 0.466743});
+        
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

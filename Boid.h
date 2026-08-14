@@ -494,9 +494,22 @@ public:
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
             // TODO 20260809 ramp down perBoidCentroidDistanceScore toward outside
             
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20260814 hack upon hack: TEMPORARILY repurposing this
+            //               currently unused FP to be a (relative) weight on
+            //               steerTowardManifold()
+
+//                combined_steering += steerTowardCentroid_v2();
+//    //            combined_steering += steerTowardManifold() * 100;
+//                combined_steering += steerTowardManifold() * 50;
+
             combined_steering += steerTowardCentroid_v2();
-//            combined_steering += steerTowardManifold() * 100;
-            combined_steering += steerTowardManifold() * 50;
+            combined_steering += (steerTowardManifold() *
+                                  (100 * fp().weightRelManifold()));
+
+            
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -736,113 +749,45 @@ public:
 //    double centroidMaxDistance() { return centroid_max_distance_; }
     double centroidMaxDistance() const { return centroid_max_distance_; }
 
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
     
-    // TODO 20250604 calling this “version 1.0” a probably-not-nonsense version
-    //               of Boid::steerTowardCentroid(). Remove LOT of tentative WIP
-    //               code that had been commented out above.
-    //
-    // Steering force component for global cohesion, for EF::murmuration_mode.
-    Vec3 steerTowardCentroid() // const
-    {
-        Vec3 centroid_steer;
-        if (EF::use_centroid_objective)
-        {
-            Vec3 to_center = centroid() - position();
-            auto [unit_to_center, distance] = to_center.normalize_and_length();
-            // Are we heading sufficiently in toward center?
-            if (velocity().dot(unit_to_center) < fp().centerInNess())
-            {
-                double mf = fp().maxForce();
-                Vec3 backward = -forward();
-                Vec3 slowing = backward * (mf * fp().centerSlowing());
-                Vec3 centering = unit_to_center * (mf * fp().centerCentering());
-                double rel_dist = distance / centroidMaxDistance();
-                double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
-                double strength = rel_dist_expt * fp().centeringStrength();
-                centroid_steer = (centering + slowing) * strength;
-            }
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20260625 annotation selected boid's steerTowardCentroid()
-            if (isSelected())
-            {
-                annotationLineOffset(centroid_steer, Color::black(), 0.05);
-            }
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        }
-        return centroid_steer;
-    }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20260806 ok, try putting back centroid objective & behavior
-    
-    // New, more simple version. Trying after steerTowardManifold()
-    
-    
-//        // Steering force for global cohesion to centroid, for EF::murmuration_mode.
-//        Vec3 steerTowardCentroid_v2() // const
+//    // TODO 20250604 calling this “version 1.0” a probably-not-nonsense version
+//    //               of Boid::steerTowardCentroid(). Remove LOT of tentative WIP
+//    //               code that had been commented out above.
+//    //
+//    // Steering force component for global cohesion, for EF::murmuration_mode.
+//    Vec3 steerTowardCentroid() // const
+//    {
+//        Vec3 centroid_steer;
+//        if (EF::use_centroid_objective)
 //        {
-//            Vec3 centroid_steer;
-//            if (EF::use_centroid_objective)
+//            Vec3 to_center = centroid() - position();
+//            auto [unit_to_center, distance] = to_center.normalize_and_length();
+//            // Are we heading sufficiently in toward center?
+//            if (velocity().dot(unit_to_center) < fp().centerInNess())
 //            {
-//                Vec3 to_center = centroid() - position();
-//                auto [unit_to_center, distance] = to_center.normalize_and_length();
-//
-//
-//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//                // TODO 20260625 oops
-//
-//    //            centroid_steer = unit_to_center * fp().centeringStrength();
-//
-//                double weight = fp().centeringStrength() * distance;
-//                centroid_steer = unit_to_center * weight;
-//
-//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//
-//
-//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//                // TODO 20260625 annotation selected boid's steerTowardCentroid()
-//                if (isSelected())
-//                {
-//                    annotationLineOffset(centroid_steer, Color::red(), 0.05);
-//                }
-//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//
+//                double mf = fp().maxForce();
+//                Vec3 backward = -forward();
+//                Vec3 slowing = backward * (mf * fp().centerSlowing());
+//                Vec3 centering = unit_to_center * (mf * fp().centerCentering());
+//                double rel_dist = distance / centroidMaxDistance();
+//                double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
+//                double strength = rel_dist_expt * fp().centeringStrength();
+//                centroid_steer = (centering + slowing) * strength;
 //            }
-//            return centroid_steer;
-//        }
-
-//        // Steering force for global cohesion to centroid, for EF::murmuration_mode.
-//        Vec3 steerTowardCentroid_v2() const
-//        {
-//            Vec3 centroid_steer;
-//            if (EF::use_centroid_objective)
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//            // TODO 20260625 annotation selected boid's steerTowardCentroid()
+//            if (isSelected())
 //            {
-//                Vec3 to_center = centroid() - position();
-//                auto [unit_to_center, distance] = to_center.normalize_and_length();
-//
-//                double excess_distance = distance - centroidMaxDistance();
-//
-//                if (excess_distance > 0)
-//                {
-//                    double weight = fp().centeringStrength() * excess_distance;
-//                    centroid_steer = unit_to_center * weight;
-//
-//                }
-//
-//    //            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//    //            // TODO 20260625 annotation selected boid's steerTowardCentroid()
-//    //            if (isSelected())
-//    //            {
-//    //                annotationLineOffset(centroid_steer, Color::red(), 0.05);
-//    //            }
-//    //            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//
+//                annotationLineOffset(centroid_steer, Color::black(), 0.05);
 //            }
-//            return centroid_steer;
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 //        }
+//        return centroid_steer;
+//    }
 
+    
+    // New, more simple version. Trying after adding steerTowardManifold()
+    
     // Steering force for global cohesion to centroid, for EF::murmuration_mode.
     Vec3 steerTowardCentroid_v2() const
     {

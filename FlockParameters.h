@@ -156,7 +156,14 @@ public:
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20260602 add more inline parameters to FB for GA optimization
     
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20260814 hack upon hack: TEMPORARILY repurposing this currently
+    //               unused FP to be a (relative) weight on steerTowardManifold()
+    
     const double& centerInNess() const { return tuning_parameters.at(18); }
+    const double& weightRelManifold() const { return tuning_parameters.at(18); }
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     const double& centerSlowing() const { return tuning_parameters.at(19); }
     const double& centerCentering() const { return tuning_parameters.at(20); }
 

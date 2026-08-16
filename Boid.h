@@ -840,13 +840,33 @@ public:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20260815 get/set for plane approximating local neighbor manifold.
+    //               Perhaps to be used for a "manifold objective"
+    
+    shape::Plane neighbor_plane_;
+    shape::Plane getNeighborPlane() const { return neighbor_plane_; }
+    void setNeighborPlane(shape::Plane p)  { neighbor_plane_ = p; }
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
     Vec3 steerTowardManifold()
     {
         // Collect nearest neighbor positions.
         std::vector<Vec3> nnp;
         for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
+        
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260815 get/set for plane approximating local neighbor manifold.
+        
+//        // Find plane approximating local flock manifold.
+//        shape::Plane neighbor_plane(nnp);
+
         // Find plane approximating local flock manifold.
-        shape::Plane neighbor_plane(nnp);
+        setNeighborPlane(shape::Plane(nnp));
+        
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260813 why is plane blending broken?
@@ -875,13 +895,21 @@ public:
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20260815 get/set for plane approximating local neighbor manifold.
+
         // Project this boid's position onto that plane.
-        Vec3 on_plane = neighbor_plane.mapPointToSurface(position());
+//        Vec3 on_plane = neighbor_plane.mapPointToSurface(position());
+        Vec3 on_plane = getNeighborPlane().mapPointToSurface(position());
+        
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
         // Steering toward plane
         Vec3 toward_plane = (on_plane - position()).normalize();
         return toward_plane;
     }
+    
+    
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

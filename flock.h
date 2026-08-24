@@ -786,18 +786,49 @@ public:
 //        return parameterToWeightWithRamps(distance, d, s);
 //    }
     
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260823 WIP on centroidManifoldScore()
+    
+//    // Average speed for each Boid on each simulation step.
+//    double centroidScore() const
+//    {
+//        // TODO XXX very temp
+//        double d = centroidDistanceScore();
+//        double a = centroidAntiDonutScore();
+//        std::cout << "        " << a * d;
+//        std::cout << " (centroidDistanceScore()=" << d;
+//        std::cout << "  centroidAntiDonutScore()=" << a << ")" << std::endl;
+//
+//        return centroidDistanceScore() * centroidAntiDonutScore();
+//    }
+  
     // Average speed for each Boid on each simulation step.
     double centroidScore() const
     {
         // TODO XXX very temp
         double d = centroidDistanceScore();
         double a = centroidAntiDonutScore();
-        std::cout << "        " << a * d;
+        double m = centroidManifoldScore();
+        double hypervolume = d * a * m;
+//        std::cout << "        " << a * d;
+        std::cout << "        " << hypervolume;
         std::cout << " (centroidDistanceScore()=" << d;
-        std::cout << "  centroidAntiDonutScore()=" << a << ")" << std::endl;
+        std::cout << "  centroidAntiDonutScore()=" << a;
+        std::cout << "  centroidManifoldScore()=" << m << ")" << std::endl;
 
-        return centroidDistanceScore() * centroidAntiDonutScore();
+        return hypervolume;
     }
+
+    // XXX Super temp stand-in
+    double centroidManifoldScore() const
+    {
+        // XXX Super temp stand-in
+        return 1;
+    }
+
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260706 switch to sum of per boid-step centroid distance score.

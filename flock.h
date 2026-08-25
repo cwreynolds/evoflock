@@ -735,6 +735,13 @@ public:
     // Sum up weighted scores for every boid-step.
     double sum_of_centroid_distance_score_ = 0;
 
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260824 maintain per-boid-step distance-from-boid-to-manifold
+    double sum_of_boid_manifold_score_ = 0;
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     void recordCentroid(double time_step)
@@ -769,6 +776,20 @@ public:
         //               call that from recordCentroid()
         xxxTrackDonutHoleAxisChanges();
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        
+        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20260824 maintain per-boid-step distance-from-boid-to-manifold
+        
+        for (auto b : boids())
+        {
+            shape::Plane plane = b->getNeighborPlane();
+            double distance = plane.pointToSurfaceDistance(b->position());
+            double threshold = 1.5; // TODO inline constant, in diameters
+            if (distance < threshold) { sum_of_boid_manifold_score_ += 1; }
+        }
+
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -819,12 +840,22 @@ public:
         return hypervolume;
     }
 
-    // XXX Super temp stand-in
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260824 maintain per-boid-step distance-from-boid-to-manifold
+
+//    // XXX Super temp stand-in
+//    double centroidManifoldScore() const
+//    {
+//        // XXX Super temp stand-in
+//        return 1;
+//    }
+  
     double centroidManifoldScore() const
     {
-        // XXX Super temp stand-in
-        return 1;
+        return sum_of_boid_manifold_score_ / boidStepPerSim();
     }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~

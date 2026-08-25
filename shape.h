@@ -277,6 +277,17 @@ public:
         // Translate back to global space.
         return on_plane + center;
     }
+    
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    // TODO 20260824 maintain per-boid-step distance-from-boid-to-manifold
+
+    double pointToSurfaceDistance(const Vec3& point) const
+    {
+        return (point - mapPointToSurface(point)).length();
+    }
+
+    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         
     // Fit a plane to 3 or more points.
     static Plane fitPlaneToPoints(const std::vector<Vec3>& points)

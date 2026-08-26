@@ -785,7 +785,11 @@ public:
         {
             shape::Plane plane = b->getNeighborPlane();
             double distance = plane.pointToSurfaceDistance(b->position());
-            double threshold = 1.5; // TODO inline constant, in diameters
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20260825 2x the manifold score threshold (make less strict)
+//            double threshold = 1.5; // TODO inline constant, in diameters
+            double threshold = 3; // TODO inline constant, in diameters
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             if (distance < threshold) { sum_of_boid_manifold_score_ += 1; }
         }
 

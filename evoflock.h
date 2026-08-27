@@ -80,11 +80,11 @@ inline static int override_skip_think = -1;
 
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20260421 backing up to test README.md
+// TODO 20260827 revert back to "basic flocking" for regression testing
 
 // Special mode for simulating murmurations.
-//inline static bool murmuration_mode = false;
-inline static bool murmuration_mode = true;
+inline static bool murmuration_mode = false;
+//inline static bool murmuration_mode = true;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -92,8 +92,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-//inline static bool visualize_previous_results_mode = false;
-inline static bool visualize_previous_results_mode = true;
+inline static bool visualize_previous_results_mode = false;
+//inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;

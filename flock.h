@@ -503,14 +503,6 @@ public:
         
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260811 remove debugging annotation to record for ALIFE slides
-//        Vec3 ep = donut_hole_axis * 50;
-//        Color c1 = Color::orange();
-//        Color c2 = Color::white() - Color::orange();
-//        draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
-//        draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -726,24 +718,13 @@ public:
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     // TODO 20260530 make centroidScore() reward uniform distribution
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260706 switch to sum of per boid-step centroid distance score.
-
-//    // make centroidScore() reward uniform distribution
-//    double total_boids_to_centroid_distance_ = 0;
 
     // Sum up weighted scores for every boid-step.
     double sum_of_centroid_distance_score_ = 0;
 
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260824 maintain per-boid-step distance-from-boid-to-manifold
+    // For murmuration, sum over all boid-steps, of the manifold distance score.
     double sum_of_boid_manifold_score_ = 0;
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     void recordCentroid(double time_step)
     {
         Vec3 sum_of_boid_positions;
@@ -777,23 +758,13 @@ public:
         xxxTrackDonutHoleAxisChanges();
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260824 maintain per-boid-step distance-from-boid-to-manifold
-        
         for (auto b : boids())
         {
             shape::Plane plane = b->getNeighborPlane();
             double distance = plane.pointToSurfaceDistance(b->position());
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20260825 2x the manifold score threshold (make less strict)
-//            double threshold = 1.5; // TODO inline constant, in diameters
             double threshold = 3; // TODO inline constant, in diameters
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
             if (distance < threshold) { sum_of_boid_manifold_score_ += 1; }
         }
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -810,24 +781,8 @@ public:
 //        double distance = total_boids_to_centroid_distance_ / boidStepPerSim();
 //        return parameterToWeightWithRamps(distance, d, s);
 //    }
-    
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20260823 WIP on centroidManifoldScore()
-    
-//    // Average speed for each Boid on each simulation step.
-//    double centroidScore() const
-//    {
-//        // TODO XXX very temp
-//        double d = centroidDistanceScore();
-//        double a = centroidAntiDonutScore();
-//        std::cout << "        " << a * d;
-//        std::cout << " (centroidDistanceScore()=" << d;
-//        std::cout << "  centroidAntiDonutScore()=" << a << ")" << std::endl;
-//
-//        return centroidDistanceScore() * centroidAntiDonutScore();
-//    }
-  
-    // Average speed for each Boid on each simulation step.
+
+    // Needs refactoring, combines the (now) three objectives for murmuration.
     double centroidScore() const
     {
         // TODO XXX very temp
@@ -835,172 +790,32 @@ public:
         double a = centroidAntiDonutScore();
         double m = centroidManifoldScore();
         double hypervolume = d * a * m;
-//        std::cout << "        " << a * d;
-        std::cout << "        " << hypervolume;
-        std::cout << " (centroidDistanceScore()=" << d;
-        std::cout << "  centroidAntiDonutScore()=" << a;
-        std::cout << "  centroidManifoldScore()=" << m << ")" << std::endl;
-
+        {
+            std::cout << "        " << hypervolume;
+            std::cout << " (centroidDistanceScore()=" << d;
+            std::cout << "  centroidAntiDonutScore()=" << a;
+            std::cout << "  centroidManifoldScore()=" << m << ")" << std::endl;
+        }
         return hypervolume;
     }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260824 maintain per-boid-step distance-from-boid-to-manifold
-
-//    // XXX Super temp stand-in
-//    double centroidManifoldScore() const
-//    {
-//        // XXX Super temp stand-in
-//        return 1;
-//    }
   
+    // Returns "murmurations manifold score" after run completes.
     double centroidManifoldScore() const
     {
         return sum_of_boid_manifold_score_ / boidStepPerSim();
     }
 
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260706 switch to sum of per boid-step centroid distance score.
 
-//        // Average speed for each Boid on each simulation step.
-//        double centroidDistanceScore() const
-//        {
-//            double max_dist = centroidMaxDistance();
-//            double peak = 0.75 * max_dist;
-//            // Piecewise linear function of distance to score
-//
-//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//            // TODO 20260705 deemphasize low scores, change exponent from 3 to 10.
-//
-//    //        std::vector<double> d = {0.0, peak, max_dist};
-//    //        std::vector<double> s = {0.0, 1.0,  0.0};
-//
-//            // TODO 20260705 wider range for max centroidDistanceScore().
-//
-//            double m = 0.15 * max_dist;
-//            std::vector<double> d = {0.0, peak - m, peak + m, max_dist};
-//            std::vector<double> s = {0.0,      1.0,      1.0,      0.0};
-//
-//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//
-//            double distance = total_boids_to_centroid_distance_ / boidStepPerSim();
-//
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//            // TODO 20260704 try deemphasize low scores
-//
-//    //        return parameterToWeightWithRamps(distance, d, s);
-//
-//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//            // TODO 20260705 deemphasize low scores, change exponent from 3 to 10.
-//
-//            double weight = parameterToWeightWithRamps(distance, d, s);
-//    //        return std::pow(weight, 3);
-//    //        return std::pow(weight, 10);
-//            return std::pow(weight, 2);
-//
-//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//
-//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//        }
-
     // Average speed for each Boid on each simulation step.
     double centroidDistanceScore() const
     {
-        double average_score = sum_of_centroid_distance_score_ / boidStepPerSim();
-//        return std::pow(average_score, 2);
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260707 try flipped exp for score, average over boid_steps
-        
-//        return std::pow(average_score, 3);
-        return average_score;
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
+//        double average_score = sum_of_centroid_distance_score_ / boidStepPerSim();
+//        return average_score;
+        return sum_of_centroid_distance_score_ / boidStepPerSim();
     }
-
-//        double perBoidCentroidDistanceScore(Boid* boid) const
-//        {
-//            // Piecewise linear function of distance to score
-//            double distance = (boid->position() - centroid()).length();
-//    //        double max_dist = centroidMaxDistance();
-//            double max = centroidMaxDistance();
-//    //        double peak = 0.75 * max_dist;
-//    //        std::vector<double> d = {0.0, peak, max_dist};
-//    //        double knee = 0.75 * max_dist;
-//    //        std::vector<double> d = {0.0, knee, max_dist};
-//    //        std::vector<double> s = {1.0,  1.0,      0.0};
-//            double knee = 0.75 * max;
-//            std::vector<double> d = {0.0, knee, max};
-//            std::vector<double> s = {1.0,  1.0, 0.0};
-//            // Get score for given boid's distance from murmuration centroid.
-//    //        double distance = (boid->position() - centroid()).length();
-//            return parameterToWeightWithRamps(distance, d, s);
-//        }
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260707 try flipped exp for score, average over boid_steps
-    
-//    double perBoidCentroidDistanceScore(Boid* boid) const
-//    {
-//        // Piecewise linear function of distance to score
-//        double distance = (boid->position() - centroid()).length();
-//        double max = centroidMaxDistance();
-//        double knee = 0.75 * max;
-//        // Get score for given boid's distance from murmuration centroid.
-//        return parameterToWeightWithRamps(distance,
-//                                          {0.0, knee, max},
-//                                          {1.0,  1.0, 0.0});
-//    }
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20260808 simplify this in the "manifold era" to just be in or out.
-    
-//    double perBoidCentroidDistanceScore(Boid* boid) const
-//    {
-//        // Flipped exponential over normalized distance
-//        // (See plot of this function via Wolfram|Alpha: http://bit.ly/44d0OIv)
-//        double distance = (boid->position() - centroid()).length();
-//        double max = centroidMaxDistance();
-//        double clipped_normalized_distance = util::clip01(distance / max);
-//        return 1 - std::pow(clipped_normalized_distance, 3);
-//    }
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260809 ramp down perBoidCentroidDistanceScore toward outside
-    
-//    double perBoidCentroidDistanceScore(Boid* boid) const
-//    {
-//        double distance = (boid->position() - centroid()).length();
-//        double max = centroidMaxDistance();
-//        return (distance < max) ? 1 : 0;
-//    }
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20260809 flat until max*0.6 then ramp down to 0.3
-    
-//        double perBoidCentroidDistanceScore(Boid* boid) const
-//        {
-//            double distance = (boid->position() - centroid()).length();
-//            double max = centroidMaxDistance();
-//    //        return (distance < max) ? 1 : 0;
-//    //        return util::remap_interval_clip(distance, 0, max, 1, 0.5);
-//            return util::remap_interval_clip(distance, 0, max, 1, 0.3);
-//        }
-    
-//        double perBoidCentroidDistanceScore(Boid* boid) const
-//        {
-//            double distance = (boid->position() - centroid()).length();
-//            double max = centroidMaxDistance();
-//    //        return util::remap_interval_clip(distance, 0, max, 1, 0.3);
-//            return util::remap_interval_clip(distance, max * 0.6, max, 1, 0.3);
-//        }
 
     double perBoidCentroidDistanceScore(Boid* boid) const
     {
@@ -1008,16 +823,6 @@ public:
         double max = centroidMaxDistance();
         return util::remap_interval_clip(distance, max * 0.3, max, 1, 0.3);
     }
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

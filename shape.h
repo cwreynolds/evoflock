@@ -249,19 +249,7 @@ public:
     Vec3 center;
     
     Plane() : normal({0, 1, 0}) {}
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260813 why is plane blending broken?
-
     Plane(Vec3 normal_, Vec3 center_) : normal(normal_), center(center_) {}
-
-//    Plane(Vec3 normal_, Vec3 center_) : normal(normal_), center(center_)
-//    {
-//        grabPrintLock_evoflock();
-//        debugPrint(normal.length());
-//        assert(normal.is_unit_length());
-//    }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Plane(const std::vector<Vec3>& points) { *this = fitPlaneToPoints(points); }
 
     // Project any point to the plane.
@@ -278,17 +266,11 @@ public:
         return on_plane + center;
     }
     
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260824 maintain per-boid-step distance-from-boid-to-manifold
-
     double pointToSurfaceDistance(const Vec3& point) const
     {
         return (point - mapPointToSurface(point)).length();
     }
 
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        
     // Fit a plane to 3 or more points.
     static Plane fitPlaneToPoints(const std::vector<Vec3>& points)
     {
@@ -315,24 +297,24 @@ public:
         return Plane(normal, centroid);
     }
  
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260812 try remembering a smoothing version of neighbor plane.
-    //               These were added solely to use with Blender, still needed?
-
-//    Plane(Vec3 normal_, Vec3 center_) : normal(normal_), center(center_) {}
-
-    Plane operator+(Plane p) const
-    {
-//        return { x() + v.x(), y() + v.y(), z() + v.z() };
-        return { (normal + p.normal).normalize(), center + p.center };
-    }
-    
-//        Vec3 operator*(double s) const { return { x() * s, y() * s, z() * s}; }
-    Plane operator*(double s) const
-    {
-        return { normal * s, center * s };
-    }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        // TODO 20260812 try remembering a smoothing version of neighbor plane.
+//        //               These were added solely to use with Blender, still needed?
+//
+//    //    Plane(Vec3 normal_, Vec3 center_) : normal(normal_), center(center_) {}
+//
+//        Plane operator+(Plane p) const
+//        {
+//    //        return { x() + v.x(), y() + v.y(), z() + v.z() };
+//            return { (normal + p.normal).normalize(), center + p.center };
+//        }
+//        
+//    //        Vec3 operator*(double s) const { return { x() * s, y() * s, z() * s}; }
+//        Plane operator*(double s) const
+//        {
+//            return { normal * s, center * s };
+//        }
+//        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 };
 
 

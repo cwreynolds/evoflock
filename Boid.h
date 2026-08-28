@@ -453,77 +453,13 @@ public:
         Vec3 combined_steering = smoothed_steering(f + s + a + c + ap + as);
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260414 wip on behavior for EF::use_centroid_objective
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260416 break off steerTowardCentroid()
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260802 try steerTowardManifold() vs steerTowardCentroid().
-        
         // very ad hoc prototype
         if (EF::use_centroid_objective)
         {
-//            combined_steering += steerTowardCentroid();
-
-//            combined_steering += steerTowardManifold();
-
-//            combined_steering += steerTowardCentroid();
-//            combined_steering += steerTowardManifold();
-
-            
-//    //            double wip_weight = 10;
-//    //            double wip_weight = 50;
-//                double wip_weight = 100;
-//                combined_steering += steerTowardManifold() * wip_weight;
-      
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20260805 revisit DomeAndGround obstacle set for murmuration
-
-//            combined_steering += steerTowardCentroid() * 0.5;
-//            combined_steering += steerTowardManifold() * 100;
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20260806 ok, try putting back centroid objective & behavior
-
-//            combined_steering += steerTowardCentroid() * 0.5;
-//            combined_steering += steerTowardCentroid() * 0.2;
-//            combined_steering += steerTowardCentroid() * 0.05;
-//            combined_steering += steerTowardManifold() * 100;
-
-            
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20260809 ramp down perBoidCentroidDistanceScore toward outside
-            
-            
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20260814 hack upon hack: TEMPORARILY repurposing this
-            //               currently unused FP to be a (relative) weight on
-            //               steerTowardManifold()
-
-//                combined_steering += steerTowardCentroid_v2();
-//    //            combined_steering += steerTowardManifold() * 100;
-//                combined_steering += steerTowardManifold() * 50;
-
             combined_steering += steerTowardCentroid_v2();
             combined_steering += (steerTowardManifold() *
                                   (100 * fp().weightRelManifold()));
-
-            
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-            
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
         }
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         saveAnnotation(s, a, c, ap, as, combined_steering);
         return combined_steering;
@@ -743,50 +679,7 @@ public:
     
     void setCentroidMaxDistance(double md) { centroid_max_distance_ = md; }
     
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20260806 ok, try putting back centroid objective & behavior
-
-//    double centroidMaxDistance() { return centroid_max_distance_; }
     double centroidMaxDistance() const { return centroid_max_distance_; }
-
-    
-//    // TODO 20250604 calling this “version 1.0” a probably-not-nonsense version
-//    //               of Boid::steerTowardCentroid(). Remove LOT of tentative WIP
-//    //               code that had been commented out above.
-//    //
-//    // Steering force component for global cohesion, for EF::murmuration_mode.
-//    Vec3 steerTowardCentroid() // const
-//    {
-//        Vec3 centroid_steer;
-//        if (EF::use_centroid_objective)
-//        {
-//            Vec3 to_center = centroid() - position();
-//            auto [unit_to_center, distance] = to_center.normalize_and_length();
-//            // Are we heading sufficiently in toward center?
-//            if (velocity().dot(unit_to_center) < fp().centerInNess())
-//            {
-//                double mf = fp().maxForce();
-//                Vec3 backward = -forward();
-//                Vec3 slowing = backward * (mf * fp().centerSlowing());
-//                Vec3 centering = unit_to_center * (mf * fp().centerCentering());
-//                double rel_dist = distance / centroidMaxDistance();
-//                double rel_dist_expt = std::pow(rel_dist, fp().centerExponent());
-//                double strength = rel_dist_expt * fp().centeringStrength();
-//                centroid_steer = (centering + slowing) * strength;
-//            }
-//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//            // TODO 20260625 annotation selected boid's steerTowardCentroid()
-//            if (isSelected())
-//            {
-//                annotationLineOffset(centroid_steer, Color::black(), 0.05);
-//            }
-//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-//        }
-//        return centroid_steer;
-//    }
-
-    
-    // New, more simple version. Trying after adding steerTowardManifold()
     
     // Steering force for global cohesion to centroid, for EF::murmuration_mode.
     Vec3 steerTowardCentroid_v2() const
@@ -806,118 +699,30 @@ public:
         return centroid_steer;
     }
 
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20260802 try steerTowardManifold() vs steerTowardCentroid().
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260809 ramp down perBoidCentroidDistanceScore toward outside
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260812 try remembering a smoothing version of neighbor plane.
-    
-//    Vec3 steerTowardManifold()
-//    {
-//        // Collect nearest neighbor positions.
-//        std::vector<Vec3> nnp;
-//        for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
-//        // Find plane approximating local flock manifold.
-//        shape::Plane neighbor_plane(nnp);
-//        // Project this boid's position onto that plane.
-//        Vec3 on_plane = neighbor_plane.mapPointToSurface(position());
-//        // Steering toward plane
-//        Vec3 toward_plane = (on_plane - position()).normalize();
-//        return toward_plane;
-//    }
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260813 why is plane blending broken?
-
-//    util::Blender<shape::Plane> smoothed_neighbor_plane_;
-    shape::Plane smoothed_neighbor_plane_;
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-    // TODO 20260815 get/set for plane approximating local neighbor manifold.
-    //               Perhaps to be used for a "manifold objective"
-    
+    // get/set for plane approximating local neighbor manifold.
+    // Perhaps to be used for a "manifold objective"
     shape::Plane neighbor_plane_;
     shape::Plane getNeighborPlane() const { return neighbor_plane_; }
     void setNeighborPlane(shape::Plane p)  { neighbor_plane_ = p; }
-
-    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     Vec3 steerTowardManifold()
     {
         // Collect nearest neighbor positions.
         std::vector<Vec3> nnp;
         for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
-        
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260815 get/set for plane approximating local neighbor manifold.
-        
-//        // Find plane approximating local flock manifold.
-//        shape::Plane neighbor_plane(nnp);
 
         // Find plane approximating local flock manifold.
         setNeighborPlane(shape::Plane(nnp));
-        
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260813 why is plane blending broken?
-
-//            // Blend that plane into smoothed memory plane.
-//    //        double smoothness = 0.8;
-//            double smoothness = 0.5;
-//            neighbor_plane = smoothed_neighbor_plane_.blend(neighbor_plane, smoothness);
-      
-        
-//            // Blend that plane into smoothed memory plane.
-//    //        double smoothness = 0.8;
-//    //        double smoothness = 0.5;
-//            double smoothness = 0.7;
-//
-//            Vec3 n = util::interpolate(smoothness,
-//                                       neighbor_plane.normal,
-//                                       smoothed_neighbor_plane_.normal).normalize();
-//            Vec3 c = util::interpolate(smoothness,
-//                                       neighbor_plane.center,
-//                                       smoothed_neighbor_plane_.center);
-//
-//            smoothed_neighbor_plane_ = shape::Plane(n, c);
-//
-//            neighbor_plane = smoothed_neighbor_plane_;
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-        // TODO 20260815 get/set for plane approximating local neighbor manifold.
 
         // Project this boid's position onto that plane.
-//        Vec3 on_plane = neighbor_plane.mapPointToSurface(position());
         Vec3 on_plane = getNeighborPlane().mapPointToSurface(position());
         
-        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
         // Steering toward plane
         Vec3 toward_plane = (on_plane - position()).normalize();
         return toward_plane;
     }
-    
-    
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    
     // Draw annotation from this Boid along a given offset vector.
     void annotationLineOffset(Vec3 offset, Color color, double radius)
     {

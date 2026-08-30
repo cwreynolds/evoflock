@@ -319,7 +319,11 @@ inline Vec3 sanitizeEvolvedSteeringForce(Vec3 v)
 // Run flock simulation(s) described by the given evolutionary LP::Individual.
 // Makes "runs" simulations, in parallel if EF::enable_multithreading is set to
 // true. Returns the MOF with the LEAST scalar fitness score.
-inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
+//~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~
+// TODO 20260829 just turn off "least fitness of 4 runs" -- "ignore noise" idea
+//inline MOF run_flock_simulation(LP::Individual* individual, int runs = 4)
+inline MOF run_flock_simulation(LP::Individual* individual, int runs = 1)
+//~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~
 {
     MOF least_mof;
     double least_scalar_fitness = std::numeric_limits<double>::infinity();

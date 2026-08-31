@@ -302,77 +302,6 @@ public:
             return point;
         };
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260618 change initial position to be throughout centroid
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260619 more tweak init position distribution
-
-        
-//            // For DomeAndGround / NoObstacle / BoxObstacle
-//            if (EF::murmuration_mode)
-//            {
-//    //            double radius = fp().sphereRadius() * 0.15;
-//    //            double radius = centroidMaxDistance() * 0.9;
-//    //            double radius = centroidMaxDistance() * 0.75;
-//    //            double radius = centroidMaxDistance() * 0.75;
-//    //            double radius = centroidMaxDistance() * 0.5;
-//                double radius = centroidMaxDistance() * 0.8;
-//    //            debugPrint(radius);
-//
-//                Vec3 center;
-//                Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
-//                Vec3 boid_position = center + (rand_in_unit_sphere * radius);
-//
-//    //            Vec3 boid_heading = rs.randomUnitVector();
-//                Vec3 boid_heading = rand_in_unit_sphere.normalize().find_perpendicular();
-//
-//                return LocalSpace::fromTo(boid_position, boid_heading);
-//            }
-      
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260807 ok, try putting back centroid objective & behavior
-
-//            // For DomeAndGround / NoObstacle / BoxObstacle
-//            if (EF::murmuration_mode)
-//            {
-//    //            double radius = centroidMaxDistance() * 0.8;
-//    //            double radius = centroidMaxDistance() * 0.3;
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                // TODO 20260624 init near center and pointed AWAY from the center
-//
-//    //            double radius = centroidMaxDistance() * 0.8;
-//                double radius = centroidMaxDistance() * 0.3;
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//
-//                Vec3 center;
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                // TODO 20260624 is this little change really what made it get worse?
-//                //
-//
-//    //            Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
-//    //            Vec3 rand_in_unit_sphere = rs.randomUnitVector();
-//                Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
-//                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//                Vec3 boid_position = center + (rand_in_unit_sphere * radius);
-//
-//    //            Vec3 boid_heading = rand_in_unit_sphere.normalize().find_perpendicular();
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//                // TODO 20260624 init near center and pointed AWAY from the center
-//
-//    //            Vec3 boid_heading = rs.randomUnitVector();
-//                Vec3 boid_heading = rand_in_unit_sphere.normalize();
-//
-//                //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-//
-//                // Early return for murmuration_mode
-//                return LocalSpace::fromTo(boid_position, boid_heading);
-//            }
-
         // For DomeAndGround / NoObstacle / BoxObstacle
         if (EF::murmuration_mode)
         {
@@ -385,12 +314,6 @@ public:
             // Early return for murmuration_mode
             return LocalSpace::fromTo(boid_position, boid_heading);
         }
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
     }

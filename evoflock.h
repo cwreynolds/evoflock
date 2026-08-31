@@ -131,6 +131,28 @@ void visualizeBestIfRequested(LP::Population* population);
 void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs);
 void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs, LP::Population* p);
 
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20260831 temp code to record data in SimsPerFit1vs4.csv
+
+// This had been in EvoFlock.h, was called in at the end of the block beginning
+// “util::Timer t("Run evolution.");” inside EF::runOneFlockEvolution()
+
+void recordDataForSimsPerFit1vs4(LP::Population* population, double time_in_sec)
+{
+    std::string pathname = "/Users/cwr/Desktop/SimsPerFit1vs4.csv";
+    if (not fs::exists(pathname))
+    {
+        std::ofstream stream(pathname);
+        stream << "date and time,best fit,runtime hours" << std::endl;
+        stream.close();
+    }
+    std::ofstream stream(pathname, std::ios_base::app);
+    stream << util::date_hours_minutes() << ",";
+    stream << population->bestFitness()->getFitness() << ",";
+    stream << time_in_sec / (60 * 60) << std::endl;  // convert seconds to hours
+}
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
 void runOneFlockEvolution()
 {
@@ -366,6 +388,10 @@ void runOneFlockEvolution()
             std::cout << std::endl;
             visualizeBestIfRequested(population);
         }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260831 temp code to record data in SimsPerFit1vs4.csv
+        recordDataForSimsPerFit1vs4(population, t.elapsedSeconds());
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }
     
     // Save end of run data.

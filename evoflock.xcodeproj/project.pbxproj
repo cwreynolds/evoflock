@@ -143,6 +143,7 @@
 		848101FB2C77B53E00433168 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
 		848244A02F79E0E700BEBCAB /* EvoFlock_paper_v3.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = EvoFlock_paper_v3.pdf; sourceTree = "<group>"; };
 		848BC33C2B69856700509CE5 /* flock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = flock.h; sourceTree = "<group>"; };
+		8492BB0F3048D08F00101405 /* 20260820_ALIFE_EvoFlock.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = 20260820_ALIFE_EvoFlock.pdf; sourceTree = "<group>"; };
 		849817952E077C11002B4548 /* fitness_plot_template.numbers */ = {isa = PBXFileReference; lastKnownFileType = file; path = fitness_plot_template.numbers; sourceTree = "<group>"; };
 		849817962E1368DC002B4548 /* EvoFlock_Figures.pages */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvoFlock_Figures.pages; sourceTree = "<group>"; };
 		8498179E2E1ACC39002B4548 /* alifeconf.sty */ = {isa = PBXFileReference; lastKnownFileType = text; path = alifeconf.sty; sourceTree = "<group>"; };
@@ -298,6 +299,7 @@
 			isa = PBXGroup;
 			children = (
 				849817A12E1ACC39002B4548 /* EvoFlock paper */,
+				8492BB103048D08F00101405 /* EvoFlock presentations */,
 				849817962E1368DC002B4548 /* EvoFlock_Figures.pages */,
 				849817952E077C11002B4548 /* fitness_plot_template.numbers */,
 				847ED7422E554320005909CD /* seed_induced_variation.numbers */,
@@ -443,6 +445,14 @@
 				848101F62C7666CA00433168 /* libOpen3D.0.18.0.dylib */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		8492BB103048D08F00101405 /* EvoFlock presentations */ = {
+			isa = PBXGroup;
+			children = (
+				8492BB0F3048D08F00101405 /* 20260820_ALIFE_EvoFlock.pdf */,
+			);
+			path = "EvoFlock presentations";
 			sourceTree = "<group>";
 		};
 		8498179D2E1ACC39002B4548 /* images */ = {

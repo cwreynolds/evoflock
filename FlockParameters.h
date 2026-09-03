@@ -352,9 +352,7 @@ private:
 
         std::string use_obstacle_set = (EF::murmuration_mode ?
 //                                        "BoxObstacle" :
-//                                        "NoObstacles" :
 //                                        "BigSphere" :
-//                                        "BiggerSphere" :
 //                                        "DomeAndGround" :
                                         "NoObstacles" :
                                         "SmallSpheresInBigSphere");

@@ -390,7 +390,7 @@ void runOneFlockEvolution()
         }
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20260831 temp code to record data in SimsPerFit1vs4.csv
-        recordDataForSimsPerFit1vs4(population, t.elapsedSeconds());
+//        recordDataForSimsPerFit1vs4(population, t.elapsedSeconds());
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }
     

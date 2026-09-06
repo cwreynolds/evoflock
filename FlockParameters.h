@@ -361,6 +361,21 @@ private:
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260904 try using 10x (2000 v 200) for murm fitness tests
+    
+//    int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
+//                            EF::override_boids_per_flock :
+//                            (EF::visualize_previous_results_mode ?
+//                             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                             // TODO 20260518 bigger flock for murmuration viz.
+//                             
+//                             // For visualizing previous results.
+//                             (EF::murmuration_mode ? 2000 : 1400) :
+//                             
+//                             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//                             200));  // Normal, for evolution runs.
+
     int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
                             EF::override_boids_per_flock :
                             (EF::visualize_previous_results_mode ?
@@ -371,7 +386,11 @@ private:
                              (EF::murmuration_mode ? 2000 : 1400) :
                              
                              //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                             200));  // Normal, for evolution runs.
+//                             200));  // Normal, for evolution runs.
+
+                             (EF::murmuration_mode ? 2000 : 200)));  // Normal, for evolution runs.
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     int fps_ = 30;
 };

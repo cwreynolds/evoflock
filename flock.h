@@ -648,6 +648,56 @@ public:
     // For murmuration, sum over all boid-steps, of the manifold distance score.
     double sum_of_boid_manifold_score_ = 0;
     
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260905 refactor Flock::recordCentroid() to use for_all_boids().
+    //               On second thought, a lot of this is just adding up a stat
+    //               over all boids which is not thread-safe (due to overwrite)
+    //               and making it thread safe will probably use up the
+    //               advantage of parallel threads.
+    
+//        void recordCentroid(double time_step)
+//        {
+//            Vec3 sum_of_boid_positions;
+//            for (auto b : boids()) { sum_of_boid_positions += b->position(); }
+//            Vec3 average_position = sum_of_boid_positions / boids().size();
+//            centroid_velocity_ = (average_position - centroid_) / time_step;
+//            centroid_ = average_position;
+//
+//            // Set centroid values in each boid.
+//            for (auto b : boids()) {b->setCentroids(centroid_, centroid_velocity_);}
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20260706 switch to sum of per boid-step centroid distance score.
+//
+//    //        for (auto b : boids())
+//    //        {
+//    //            double distance = (b->position() - centroid()).length();
+//    //            total_boids_to_centroid_distance_ += distance;
+//    //        }
+//
+//            for (auto b : boids())
+//            {
+//                sum_of_centroid_distance_score_ += perBoidCentroidDistanceScore(b);
+//            }
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20260615 move inline test code to xxxTrackDonutHoleAxisChanges()
+//            //               call that from recordCentroid()
+//            xxxTrackDonutHoleAxisChanges();
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            for (auto b : boids())
+//            {
+//                shape::Plane plane = b->getNeighborPlane();
+//                double distance = plane.pointToSurfaceDistance(b->position());
+//                double threshold = 3; // TODO inline constant, in diameters
+//                if (distance < threshold) { sum_of_boid_manifold_score_ += 1; }
+//            }
+//        }
+    
     void recordCentroid(double time_step)
     {
         Vec3 sum_of_boid_positions;
@@ -659,27 +709,10 @@ public:
         // Set centroid values in each boid.
         for (auto b : boids()) {b->setCentroids(centroid_, centroid_velocity_);}
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260706 switch to sum of per boid-step centroid distance score.
-
-//        for (auto b : boids())
-//        {
-//            double distance = (b->position() - centroid()).length();
-//            total_boids_to_centroid_distance_ += distance;
-//        }
-
         for (auto b : boids())
         {
             sum_of_centroid_distance_score_ += perBoidCentroidDistanceScore(b);
         }
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260615 move inline test code to xxxTrackDonutHoleAxisChanges()
-        //               call that from recordCentroid()
-        xxxTrackDonutHoleAxisChanges();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
         for (auto b : boids())
         {
@@ -688,7 +721,16 @@ public:
             double threshold = 3; // TODO inline constant, in diameters
             if (distance < threshold) { sum_of_boid_manifold_score_ += 1; }
         }
+        
+        
+        xxxTrackDonutHoleAxisChanges();
+
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+    
+    
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20260616 centroidScore() combines "inside sphere" and "anti-donut"
@@ -895,6 +937,43 @@ public:
         };
         for_all_boids(enforce_one_boid_do_not_count);
     }
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260905 try using more threads when using 10x pop for murmuration
+
+//    // Apply the given function to all Boids using two parallel threads.
+//    //
+//    // (At first this spun up N(=3) new threads to run in parallel. But that
+//    //  provided almost no benefit. Probably the savings being canceled out by
+//    //  thread launching overhead. Now creates ONE thread and splits the load
+//    //  between it and this main thread. On 20240527 I tried adjusting the load
+//    //  ratio between the threads. (Used util::Timer and averaged over all calls
+//    //  in an evolution run.) I got maybe 1-2% improvement but didn't think it
+//    //  was worth the extra code complexity. Verified that two threads are
+//    //  better than one.)
+//    //
+//    void for_all_boids(std::function<void(Boid* b)> boid_func)
+//    {
+//        // Apply "boid_func" to boids between indices "first" and "last"
+//        auto chunk_func = [&](int first, int last)
+//        {
+//            int end = std::min(last, int(boids().size()));
+//            for (int i = first; i < end; i++) { boid_func(boids().at(i)); }
+//        };
+//        int boid_count = int(boids().size());
+//        int boids_per_thread = 1 + (boid_count * 0.5);
+//        if (EF::enable_multithreading)
+//        {
+//            std::thread helper(chunk_func, 0, boids_per_thread);
+//            chunk_func(boids_per_thread, boid_count);
+//            helper.join();
+//        }
+//        else
+//        {
+//            chunk_func(0, boid_count);
+//        }
+//    };
+
 
     // Apply the given function to all Boids using two parallel threads.
     //
@@ -915,19 +994,56 @@ public:
             int end = std::min(last, int(boids().size()));
             for (int i = first; i < end; i++) { boid_func(boids().at(i)); }
         };
-        int boid_count = int(boids().size());
-        int boids_per_thread = 1 + (boid_count * 0.5);
+        
+//        int boid_count = int(boids().size());
+//        int boids_per_thread = 1 + (boid_count * 0.5);
+
+        double target_boids_per_thread = 100;
+        double boid_count = boids().size();
+        int thread_count = boid_count / target_boids_per_thread;
+        
+//        debugPrint(target_boids_per_thread);
+//        debugPrint(boid_count);
+//        debugPrint(thread_count);
+//        assert(thread_count > 0);
+        
+        int boids_per_thread = 1 + (boid_count / thread_count);
+        
         if (EF::enable_multithreading)
+//        {
+//            std::thread helper(chunk_func, 0, boids_per_thread);
+//            chunk_func(boids_per_thread, boid_count);
+//            helper.join();
+//        }
+        
         {
-            std::thread helper(chunk_func, 0, boids_per_thread);
-            chunk_func(boids_per_thread, boid_count);
-            helper.join();
+            int chunk_start_index = 0;
+            int chunk_end_index = boids_per_thread;
+
+            // Do each chunk in a parallel thread.
+            std::vector<std::thread> threads;
+            for (int r = 0; r < thread_count; r++)
+            {
+                threads.push_back(std::thread(chunk_func,
+                                              chunk_start_index,
+                                              chunk_end_index));
+                
+                chunk_start_index = chunk_end_index;
+                chunk_end_index += boids_per_thread;
+
+            }
+            // Wait for helper threads to finish, join them with this thread.
+            for (auto& t : threads) { t.join(); }
         }
+
+        
         else
         {
             chunk_func(0, boid_count);
         }
     };
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     std::string log_prefix;
 

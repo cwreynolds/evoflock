@@ -83,8 +83,8 @@ inline static int override_skip_think = -1;
 // TODO 20260827 revert back to "basic flocking" for regression testing
 
 // Special mode for simulating murmurations.
-inline static bool murmuration_mode = false;
-//inline static bool murmuration_mode = true;
+//inline static bool murmuration_mode = false;
+inline static bool murmuration_mode = true;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -708,12 +708,22 @@ public:
 
     Vec3 steerTowardManifold()
     {
-        // Collect nearest neighbor positions.
-        std::vector<Vec3> nnp;
-        for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260906 try using rough approximation to SVD neighbor-plane-fit.
+        
 
+//        // Collect nearest neighbor positions.
+//        std::vector<Vec3> nnp;
+//        for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
+//
+//        // Find plane approximating local flock manifold.
+//        setNeighborPlane(shape::Plane(nnp));
+        
         // Find plane approximating local flock manifold.
-        setNeighborPlane(shape::Plane(nnp));
+        setNeighborPlane(approximateNeighborPlane());
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
         // Project this boid's position onto that plane.
         Vec3 on_plane = getNeighborPlane().mapPointToSurface(position());
@@ -722,7 +732,29 @@ public:
         Vec3 toward_plane = (on_plane - position()).normalize();
         return toward_plane;
     }
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260906 try using rough approximation to SVD neighbor-plane-fit.
 
+    // approximate neighborhood plane based on 2 nearest neighbors (triangle).
+    shape::Plane approximateNeighborPlane() const
+    {
+        // Positions of 2 nearest neighbors.
+        Vec3 pos_neighbor_0 = nearestNeighbors()[0]->position();
+        Vec3 pos_neighbor_1 = nearestNeighbors()[0]->position();
+        // Vectors from us to the 2 nearest neighbors.
+        Vec3 to_neighbor_0 = position() - pos_neighbor_0;
+        Vec3 to_neighbor_1 = position() - pos_neighbor_1;
+        // Normal to the triangle formed by us and 2 nearest neighbors.
+        Vec3 normal = (to_neighbor_0.cross(to_neighbor_1)).normalize();
+        // Centroid of triangle.
+        Vec3 centroid = (position() + pos_neighbor_0 + pos_neighbor_1) / 3;
+        return shape::Plane(normal, centroid);
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
     // Draw annotation from this Boid along a given offset vector.
     void annotationLineOffset(Vec3 offset, Color color, double radius)
     {

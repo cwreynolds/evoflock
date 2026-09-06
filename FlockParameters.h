@@ -388,7 +388,15 @@ private:
                              //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 //                             200));  // Normal, for evolution runs.
 
-                             (EF::murmuration_mode ? 2000 : 200)));  // Normal, for evolution runs.
+                             //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+                             // TODO 20260906 2000 boids is too painful try 1000
+                             
+                             // Normal, for evolution runs.
+//                             (EF::murmuration_mode ? 2000 : 200)
+                             (EF::murmuration_mode ? 1000 : 200)
+                             
+                             //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+                             ));
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

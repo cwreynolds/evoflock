@@ -108,11 +108,8 @@ int main(int argc, const char * argv[])
     
     EF::unit_test();
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260831 temp code to record data in SimsPerFit1vs4.csv
-    // EF::runOneFlockEvolution();
-    EF::runFlockEvolutionLoop();
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    EF::runOneFlockEvolution();
+    // EF::runFlockEvolutionLoop();
 
     Draw::deleteInstance();
     return EXIT_SUCCESS;

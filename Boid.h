@@ -706,55 +706,84 @@ public:
     shape::Plane getNeighborPlane() const { return neighbor_plane_; }
     void setNeighborPlane(shape::Plane p)  { neighbor_plane_ = p; }
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20260908 oh! it has to be 3 neighbors, NOT including "this"
+
+//        Vec3 steerTowardManifold()
+//        {
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            // TODO 20260906 try using rough approximation to SVD neighbor-plane-fit.
+//
+//
+//    //        // Collect nearest neighbor positions.
+//    //        std::vector<Vec3> nnp;
+//    //        for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
+//    //
+//    //        // Find plane approximating local flock manifold.
+//    //        setNeighborPlane(shape::Plane(nnp));
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20260907 debugging approximateNeighborPlane()
+//
+//    //        // Find plane approximating local flock manifold.
+//    //        setNeighborPlane(approximateNeighborPlane());
+//
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            // TODO 20260908 oh! it has to be 3 neighbors, NOT including "this"
+//
+//    //        // Collect nearest neighbor positions.
+//    //        std::vector<Vec3> nnp;
+//    //        for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
+//    //
+//    //        // Find plane approximating local flock manifold.
+//    //        setNeighborPlane(shape::Plane(nnp));
+//
+//            // Find plane approximating local flock manifold.
+//            setNeighborPlane(approximateNeighborPlane());
+//
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//
+//            // Project this boid's position onto that plane.
+//            Vec3 on_plane = getNeighborPlane().mapPointToSurface(position());
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20260907 debugging approximateNeighborPlane()
+//
+//    //        draw().addAnnotationLine(position(), on_plane, Color::black());
+//            if (isSelected()) { annotationLineToPoint(on_plane, Color::black(), 0.1); }
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//
+//            // Steering toward plane
+//            Vec3 toward_plane = (on_plane - position()).normalize();
+//            return toward_plane;
+//        }
+    
     Vec3 steerTowardManifold()
     {
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260906 try using rough approximation to SVD neighbor-plane-fit.
-        
-
-//        // Collect nearest neighbor positions.
-//        std::vector<Vec3> nnp;
-//        for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
-//
-//        // Find plane approximating local flock manifold.
-//        setNeighborPlane(shape::Plane(nnp));
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260907 debugging approximateNeighborPlane()
-
-//        // Find plane approximating local flock manifold.
-//        setNeighborPlane(approximateNeighborPlane());
-
-        // Collect nearest neighbor positions.
-        std::vector<Vec3> nnp;
-        for (Boid* b : nearestNeighbors()) { nnp.push_back(b->position()); }
-
         // Find plane approximating local flock manifold.
-        setNeighborPlane(shape::Plane(nnp));
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-
+        setNeighborPlane(approximateNeighborPlane());
         // Project this boid's position onto that plane.
         Vec3 on_plane = getNeighborPlane().mapPointToSurface(position());
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260907 debugging approximateNeighborPlane()
-        
-//        draw().addAnnotationLine(position(), on_plane, Color::black());
         if (isSelected()) { annotationLineToPoint(on_plane, Color::black(), 0.1); }
-        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        
         // Steering toward plane
         Vec3 toward_plane = (on_plane - position()).normalize();
         return toward_plane;
     }
-    
-    
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260906 try using rough approximation to SVD neighbor-plane-fit.
     // TODO 20260907 switch to use new "three points" constructor for Plane.
@@ -775,22 +804,60 @@ public:
 //        return shape::Plane(normal, centroid);
 //    }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260908 oh! it has to be 3 neighbors, NOT including "this"
+    
+//        // approximate neighborhood plane based on 2 nearest neighbors (triangle).
+//        shape::Plane approximateNeighborPlane() const
+//        {
+//            // Construct Plane from three positions: ours and 2 nearest neighbors.
+//
+//    //        return shape::Plane(position(),
+//    //                            nearestNeighbors()[0]->position(),
+//    //                            nearestNeighbors()[1]->position());
+//
+//    //        return shape::Plane();
+//
+//
+//            return shape::Plane(position(),
+//                                nearestNeighbors()[0]->position(),
+//                                nearestNeighbors()[0]->position());
+//        }
+    
+//        // approximate neighborhood plane based on 2 nearest neighbors (triangle).
+//        shape::Plane approximateNeighborPlane() const
+//        {
+//            // Construct Plane from three positions: ours and 2 nearest neighbors.
+//
+//    //        return shape::Plane(position(),
+//    //                            nearestNeighbors()[0]->position(),
+//    //                            nearestNeighbors()[1]->position());
+//
+//    //        return shape::Plane();
+//
+//
+//    //        return shape::Plane(position(),
+//    //                            nearestNeighbors()[0]->position(),
+//    //                            nearestNeighbors()[0]->position());
+//
+//            return shape::Plane(nearestNeighbors().at(0)->position(),
+//                                nearestNeighbors().at(1)->position(),
+//                                nearestNeighbors().at(2)->position());
+//
+//        }
+    
+    
     // approximate neighborhood plane based on 2 nearest neighbors (triangle).
     shape::Plane approximateNeighborPlane() const
     {
-        // Construct Plane from three positions: ours and 2 nearest neighbors.
-
-//        return shape::Plane(position(),
-//                            nearestNeighbors()[0]->position(),
-//                            nearestNeighbors()[1]->position());
-
-//        return shape::Plane();
-
-
-        return shape::Plane(position(),
-                            nearestNeighbors()[0]->position(),
-                            nearestNeighbors()[0]->position());
+        // Construct Plane from positions of three nearest neighbors.
+        return shape::Plane(nearestNeighbors().at(0)->position(),
+                            nearestNeighbors().at(1)->position(),
+                            nearestNeighbors().at(2)->position());
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     

@@ -1009,7 +1009,11 @@ public:
 //        int boid_count = int(boids().size());
 //        int boids_per_thread = 1 + (boid_count * 0.5);
 
-        double target_boids_per_thread = 100;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20260910 try changing target_boids_per_thread from 100 to 200
+//        double target_boids_per_thread = 100;
+        double target_boids_per_thread = 200;
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         double boid_count = boids().size();
         int thread_count = boid_count / target_boids_per_thread;
         
@@ -1033,16 +1037,34 @@ public:
 
             // Do each chunk in a parallel thread.
             std::vector<std::thread> threads;
-            for (int r = 0; r < thread_count; r++)
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20260910 try changing target_boids_per_thread from 100 to 200
+
+//            for (int r = 0; r < thread_count; r++)
+//            {
+//                threads.push_back(std::thread(chunk_func,
+//                                              chunk_start_index,
+//                                              chunk_end_index));
+//                chunk_start_index = chunk_end_index;
+//                chunk_end_index += boids_per_thread;
+//            }
+
+            // Start thread_count-1 helper threads
+            for (int r = 0; r < (thread_count - 1); r++)
             {
                 threads.push_back(std::thread(chunk_func,
                                               chunk_start_index,
                                               chunk_end_index));
-                
                 chunk_start_index = chunk_end_index;
                 chunk_end_index += boids_per_thread;
-
             }
+            
+            // Compute the final chunk "here" in the original thread
+            chunk_func(chunk_start_index, chunk_end_index);
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
             // Wait for helper threads to finish, join them with this thread.
             for (auto& t : threads) { t.join(); }
         }

@@ -718,8 +718,19 @@ public:
         {
             shape::Plane plane = b->getNeighborPlane();
             double distance = plane.pointToSurfaceDistance(b->position());
-            double threshold = 3; // TODO inline constant, in diameters
-            if (distance < threshold) { sum_of_boid_manifold_score_ += 1; }
+            
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20260909 fiddle with sum_of_boid_manifold_score_
+
+//            double threshold = 3; // TODO inline constant, in diameters
+//            if (distance < threshold) { sum_of_boid_manifold_score_ += 1; }
+
+            double threshold = 5; // TODO inline constant, in diameters
+            sum_of_boid_manifold_score_ += util::remap_interval_clip(distance,
+                                                                     0, threshold,
+                                                                     1, 0);
+
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
         
         

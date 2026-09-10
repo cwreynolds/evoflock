@@ -12,7 +12,7 @@
 
 #pragma once
 #include "Vec3.h"
-#include <Eigen/Dense>  // For fitting plane to points. REALLY slows compilation!
+//#include <Eigen/Dense>  // For fitting plane to points. REALLY slows compilation!
 
 namespace shape
 {

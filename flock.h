@@ -725,10 +725,19 @@ public:
 //            double threshold = 3; // TODO inline constant, in diameters
 //            if (distance < threshold) { sum_of_boid_manifold_score_ += 1; }
 
-            double threshold = 5; // TODO inline constant, in diameters
-            sum_of_boid_manifold_score_ += util::remap_interval_clip(distance,
-                                                                     0, threshold,
-                                                                     1, 0);
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+            // TODO 20260911 try new manifold_score falloff.
+            
+//            double threshold = 5; // TODO inline constant, in diameters
+//            sum_of_boid_manifold_score_ += util::remap_interval_clip(distance,
+//                                                                     0, threshold,
+//                                                                     1, 0);
+  
+            double max = 10; // TODO inline constant, in diameters
+            double nearness = util::remap_interval_clip(distance, 0, max, 1, 0);
+            sum_of_boid_manifold_score_ += std::pow(nearness, 2);
+
+            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
@@ -793,12 +802,25 @@ public:
         return sum_of_centroid_distance_score_ / boidStepPerSim();
     }
 
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+    // TODO 20260911 yet another version of steerTowardCentroid() -- v3.
+
+//    double perBoidCentroidDistanceScore(Boid* boid) const
+//    {
+//        double distance = (boid->position() - centroid()).length();
+//        double max = centroidMaxDistance();
+//        return util::remap_interval_clip(distance, max * 0.3, max, 1, 0.3);
+//    }
+
     double perBoidCentroidDistanceScore(Boid* boid) const
     {
         double distance = (boid->position() - centroid()).length();
         double max = centroidMaxDistance();
-        return util::remap_interval_clip(distance, max * 0.3, max, 1, 0.3);
+//        return util::remap_interval_clip(distance, max * 0.3, max, 1, 0.3);
+        return (distance < max) ? 1 : 0;
     }
+
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

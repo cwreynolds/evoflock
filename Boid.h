@@ -456,7 +456,13 @@ public:
         // very ad hoc prototype
         if (EF::use_centroid_objective)
         {
-            combined_steering += steerTowardCentroid_v2();
+            //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
+            // TODO 20260911 yet another version of steerTowardCentroid() -- v3.
+            
+//            combined_steering += steerTowardCentroid_v2();
+            combined_steering += steerTowardCentroid_v3();
+            
+            //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
             combined_steering += (steerTowardManifold() *
                                   (100 * fp().weightRelManifold()));
         }
@@ -699,6 +705,66 @@ public:
         return centroid_steer;
     }
 
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
+    // TODO 20260911 yet another version of steerTowardCentroid() -- v3.
+    //               Exponential increase STARTING at 0 distance from centroid
+    
+    
+//        // Steering force for global cohesion to centroid, for EF::murmuration_mode.
+//        Vec3 steerTowardCentroid_v3() const
+//        {
+//            Vec3 centroid_steer;
+//            if (EF::use_centroid_objective)
+//            {
+//                Vec3 to_center = centroid() - position();
+//                auto [unit_to_center, distance] = to_center.normalize_and_length();
+//    //            double excess_distance = distance - centroidMaxDistance();
+//    //            if (excess_distance > 0)
+//    //            {
+//    //                double weight = fp().centeringStrength() * excess_distance;
+//    //                centroid_steer = unit_to_center * weight;
+//    //            }
+//
+//                // Abstract normalized measure of how far from murmuration centroid.
+//                double farness = util::remap_interval_clip(distance,
+//                                                           0, centroidMaxDistance(),
+//                                                           0, 1);
+//
+//                double weight = std::pow(farness, 2) * fp().centeringStrength();
+//
+//                centroid_steer = unit_to_center * weight;
+//            }
+//            return centroid_steer;
+//        }
+
+    // Steering force for global cohesion to centroid, for EF::murmuration_mode.
+    Vec3 steerTowardCentroid_v3() const
+    {
+        Vec3 centroid_steer;
+        if (EF::use_centroid_objective)
+        {
+            Vec3 to_center = centroid() - position();
+            auto [unit_to_center, distance] = to_center.normalize_and_length();
+            
+            // Abstract normalized measure of how far from murmuration centroid.
+//            double farness = util::remap_interval_clip(distance,
+//                                                       0, centroidMaxDistance(),
+//                                                       0, 1);
+
+            double max = centroidMaxDistance();
+            double farness = util::remap_interval_clip(distance,
+                                                       max / 2, max,
+                                                       0, 1);
+
+            // Square farness and scale it by evolved strength parameter.
+            double weight = std::pow(farness, 2) * fp().centeringStrength();
+            centroid_steer = unit_to_center * weight;
+        }
+        return centroid_steer;
+    }
+
+    
+    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
 
     // get/set for plane approximating local neighbor manifold.
     // Perhaps to be used for a "manifold objective"

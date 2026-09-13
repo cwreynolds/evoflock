@@ -737,6 +737,69 @@ public:
 //            return centroid_steer;
 //        }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260913 make conditional on heading AWAY from centroid, or too far.
+
+//        // Steering force for global cohesion to centroid, for EF::murmuration_mode.
+//        Vec3 steerTowardCentroid_v3() const
+//        {
+//            Vec3 centroid_steer;
+//            if (EF::use_centroid_objective)
+//            {
+//                Vec3 to_center = centroid() - position();
+//                auto [unit_to_center, distance] = to_center.normalize_and_length();
+//
+//                // Abstract normalized measure of how far from murmuration centroid.
+//    //            double farness = util::remap_interval_clip(distance,
+//    //                                                       0, centroidMaxDistance(),
+//    //                                                       0, 1);
+//
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//                // TODO 20260912 try pushing this "correction zone" closer to max.
+//
+//    //            double max = centroidMaxDistance();
+//    //            double farness = util::remap_interval_clip(distance,
+//    //                                                       max / 2, max,
+//    //                                                       0, 1);
+//
+//                double max = centroidMaxDistance();
+//                double farness = util::remap_interval_clip(distance,
+//                                                           max * 0.66, max,
+//                                                           0, 1);
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // QQQ should this all be conditional on heading AWAY from centroid?
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//                // Square farness and scale it by evolved strength parameter.
+//                double weight = std::pow(farness, 2) * fp().centeringStrength();
+//                centroid_steer = unit_to_center * weight;
+//            }
+//            return centroid_steer;
+//        }
+
+//    // Steering force for global cohesion to centroid, for EF::murmuration_mode.
+//    Vec3 steerTowardCentroid_v3() const
+//    {
+//        Vec3 centroid_steer;
+//        if (EF::use_centroid_objective)
+//        {
+//            Vec3 to_center = centroid() - position();
+//            auto [unit_to_center, distance] = to_center.normalize_and_length();
+//            // Abstract normalized measure of how far from murmuration centroid.
+//            double max = centroidMaxDistance();
+//            double farness = util::remap_interval_clip(distance,
+//                                                       max * 0.66, max,
+//                                                       0, 1);
+//            // Square farness and scale it by evolved strength parameter.
+//            double weight = std::pow(farness, 2) * fp().centeringStrength();
+//            centroid_steer = unit_to_center * weight;
+//        }
+//        return centroid_steer;
+//    }
+
     // Steering force for global cohesion to centroid, for EF::murmuration_mode.
     Vec3 steerTowardCentroid_v3() const
     {
@@ -745,39 +808,30 @@ public:
         {
             Vec3 to_center = centroid() - position();
             auto [unit_to_center, distance] = to_center.normalize_and_length();
-            
-            // Abstract normalized measure of how far from murmuration centroid.
-//            double farness = util::remap_interval_clip(distance,
-//                                                       0, centroidMaxDistance(),
-//                                                       0, 1);
-
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20260912 try pushing this "correction zone" closer to max.
-            
-//            double max = centroidMaxDistance();
-//            double farness = util::remap_interval_clip(distance,
-//                                                       max / 2, max,
-//                                                       0, 1);
-
             double max = centroidMaxDistance();
-            double farness = util::remap_interval_clip(distance,
-                                                       max * 0.66, max,
-                                                       0, 1);
 
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // QQQ should this all be conditional on heading AWAY from centroid?
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // When heading AWAY from centroid, or too far away.
 
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-            // Square farness and scale it by evolved strength parameter.
-            double weight = std::pow(farness, 2) * fp().centeringStrength();
-            centroid_steer = unit_to_center * weight;
+//            if ((unit_to_center.dot(forward()) < 0) or (distance > max))
+//            if ((unit_to_center.dot(forward()) < 0.707) or (distance > max))
+            bool heading_away = unit_to_center.dot(forward()) < 0.707;
+            if (heading_away or (distance > max))
+            {
+                // Abstract normalized measure of how far from centroid.
+                double farness = util::remap_interval_clip(distance,
+//                                                           max * 0.66, max,
+                                                           max * 0.4, max,
+                                                           0, 1);
+                // Square farness and scale it by evolved strength parameter.
+                double weight = std::pow(farness, 2) * fp().centeringStrength();
+                centroid_steer = unit_to_center * weight;
+            }
         }
         return centroid_steer;
     }
 
-    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
 
     // get/set for plane approximating local neighbor manifold.

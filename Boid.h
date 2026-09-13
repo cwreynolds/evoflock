@@ -751,10 +751,24 @@ public:
 //                                                       0, centroidMaxDistance(),
 //                                                       0, 1);
 
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+            // TODO 20260912 try pushing this "correction zone" closer to max.
+            
+//            double max = centroidMaxDistance();
+//            double farness = util::remap_interval_clip(distance,
+//                                                       max / 2, max,
+//                                                       0, 1);
+
             double max = centroidMaxDistance();
             double farness = util::remap_interval_clip(distance,
-                                                       max / 2, max,
+                                                       max * 0.66, max,
                                                        0, 1);
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // QQQ should this all be conditional on heading AWAY from centroid?
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
             // Square farness and scale it by evolved strength parameter.
             double weight = std::pow(farness, 2) * fp().centeringStrength();

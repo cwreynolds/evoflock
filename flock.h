@@ -752,8 +752,12 @@ public:
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260915 try disabling "donut hole" objective.
         
-        xxxTrackDonutHoleAxisChanges();
+//        xxxTrackDonutHoleAxisChanges();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     }
 
@@ -782,7 +786,11 @@ public:
     {
         // TODO XXX very temp
         double d = centroidDistanceScore();
-        double a = centroidAntiDonutScore();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260915 try disabling "donut hole" objective.
+//        double a = centroidAntiDonutScore();
+        double a = 1;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         double m = centroidManifoldScore();
         double hypervolume = d * a * m;
         {

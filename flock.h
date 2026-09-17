@@ -421,7 +421,15 @@ public:
         // TODO 20260616 centroidScore() combines "inside sphere" and "anti-donut"
         
 //        double enough_jiggle = 0.05;
-        double enough_jiggle = 0.20;
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20260916 increase threshold for anti_donut_good_step
+        
+//        double enough_jiggle = 0.20;
+        double enough_jiggle = 0.30;
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         if (delta_axis_angle > enough_jiggle) { total_anti_donut_good_steps_++; }
         
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -751,14 +759,7 @@ public:
 
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260915 try disabling "donut hole" objective.
-        
-//        xxxTrackDonutHoleAxisChanges();
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+        xxxTrackDonutHoleAxisChanges();
     }
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -786,11 +787,7 @@ public:
     {
         // TODO XXX very temp
         double d = centroidDistanceScore();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260915 try disabling "donut hole" objective.
-//        double a = centroidAntiDonutScore();
-        double a = 1;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        double a = centroidAntiDonutScore();
         double m = centroidManifoldScore();
         double hypervolume = d * a * m;
         {

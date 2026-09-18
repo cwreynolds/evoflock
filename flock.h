@@ -426,8 +426,10 @@ public:
         // TODO 20260916 increase threshold for anti_donut_good_step
         
 //        double enough_jiggle = 0.20;
-        double enough_jiggle = 0.30;
+//        double enough_jiggle = 0.30;
 
+        double enough_jiggle = 0.20;
+        
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
         if (delta_axis_angle > enough_jiggle) { total_anti_donut_good_steps_++; }

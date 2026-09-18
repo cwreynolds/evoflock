@@ -92,8 +92,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -992,16 +992,23 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     2.30834, 21.0137, 1.42478, 79.5345, 0.0294618,
         //                     0.22269, 0.329968});
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260917_ga_murm_tune_anti_donut_hole with bigger flock
-        
         // Saved best FP values from run 20260917_ga_murm_tune_anti_donut_hole
-        FlockParameters fp({96.7795, 94.6618, 81.6187, 65.9294, 0.162333,
-                            38.2249, 21.4856, 1.93228, 29.1105, 67.9278,
-                            -0.799061, -0.816402, -0.93844, 43.1481,
-                            5.97883, 3.77211, 1.66532, 46.2998, 0.156128,
-                            0.518358, 0.601389});
+        // FlockParameters fp({96.7795, 94.6618, 81.6187, 65.9294, 0.162333,
+        //                     38.2249, 21.4856, 1.93228, 29.1105, 67.9278,
+        //                     -0.799061, -0.816402, -0.93844, 43.1481,
+        //                     5.97883, 3.77211, 1.66532, 46.2998, 0.156128,
+        //                     0.518358, 0.601389});
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260917_ga_murm_enough_jiggle_03_to_02 with bigger flock
+        
+        // Saved best FP values from run 20260917_ga_murm_enough_jiggle_03_to_02
+        FlockParameters fp({64.8474, 92.3363, 44.437, 76.7676, 0.337323,
+                            10.549, 60.9972, 2.26667, 48.0627, 27.7182,
+                            -0.918118, -0.918184, -0.261904, 6.00552,
+                            2.16409, 15.7198, 1.87228, 58.0778, 0.05792,
+                            0.985117, 0.560822});
+
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

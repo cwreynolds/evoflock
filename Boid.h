@@ -834,6 +834,36 @@ public:
 //            return centroid_steer;
 //        }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    
+//        // Steering force for global cohesion to centroid, for EF::murmuration_mode.
+//        Vec3 steerTowardCentroid_v3() const
+//        {
+//            Vec3 centroid_steer;
+//            if (EF::use_centroid_objective)
+//            {
+//                Vec3 to_center = centroid() - position();
+//                auto [unit_to_center, distance] = to_center.normalize_and_length();
+//                double max = centroidMaxDistance();
+//
+//                // When heading AWAY from centroid, or too far away.
+//    //            bool heading_away = unit_to_center.dot(forward()) < 0.707;
+//                bool heading_away = unit_to_center.dot(forward()) < 0.92; //cos(22°)
+//                if (heading_away or (distance > max))
+//                {
+//                    // Abstract normalized measure of how far from centroid.
+//                    double farness = util::remap_interval_clip(distance,
+//    //                                                           max * 0.4, max,
+//                                                               max * 0.5, max,
+//                                                               0, 1);
+//                    // Square farness and scale it by evolved strength parameter.
+//                    double weight = std::pow(farness, 2) * fp().centeringStrength();
+//                    centroid_steer = unit_to_center * weight;
+//                }
+//            }
+//            return centroid_steer;
+//        }
+
     // Steering force for global cohesion to centroid, for EF::murmuration_mode.
     Vec3 steerTowardCentroid_v3() const
     {
@@ -845,14 +875,14 @@ public:
             double max = centroidMaxDistance();
 
             // When heading AWAY from centroid, or too far away.
-//            bool heading_away = unit_to_center.dot(forward()) < 0.707;
             bool heading_away = unit_to_center.dot(forward()) < 0.92; //cos(22°)
             if (heading_away or (distance > max))
             {
                 // Abstract normalized measure of how far from centroid.
                 double farness = util::remap_interval_clip(distance,
 //                                                           max * 0.4, max,
-                                                           max * 0.5, max,
+//                                                           max * 0.5, max,
+                                                           max * 0.3, max,
                                                            0, 1);
                 // Square farness and scale it by evolved strength parameter.
                 double weight = std::pow(farness, 2) * fp().centeringStrength();
@@ -861,6 +891,8 @@ public:
         }
         return centroid_steer;
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 

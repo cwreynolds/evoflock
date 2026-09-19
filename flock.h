@@ -750,10 +750,16 @@ public:
 //            double nearness = util::remap_interval_clip(distance, 0, max, 1, 0);
 //            sum_of_boid_manifold_score_ += std::pow(nearness, 2);
 
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+            // TODO 20260919 narrow the acceptable distance to manifold.
             
-            double max = 5; // TODO inline constant, in diameters
+//            double max = 5; // TODO inline constant, in diameters
+            double max = 2; // TODO inline constant, in diameters
+
             double score = util::remap_interval_clip(distance, 0, max, 1, 0);
             sum_of_boid_manifold_score_ += score;
+
+            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
             //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 

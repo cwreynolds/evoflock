@@ -1531,6 +1531,31 @@ public:
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20260923 does given Boid have a roughly parallel heading
+    
+    // Is given Boid heading in roughly the same direction as me?
+    bool roughlyParallelHeading(const Boid& other)
+    {
+        return roughlyParallelHeading(other, 0.707);
+    }
+    
+    // Is given Boid heading in roughly the same direction as me?
+    // (cos_angle_threshold is threshold for dot prod of the two forward() vecs)
+    bool roughlyParallelHeading(const Boid& other, double cos_angle_threshold)
+    {
+        return forward().dot(other.forward()) > cos_angle_threshold;
+    }
+    
+    // Is nearest neighbor heading in roughly the same direction as me?
+    bool roughlyParallelNearestNeighbor()
+    {
+        return roughlyParallelHeading(nearestNeighbor());
+    }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    
     static void unit_test()
     {
         Boid b;

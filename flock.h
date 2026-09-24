@@ -606,6 +606,23 @@ public:
 //            }
 //        }
 
+    // Try without "EXPERIMENT only count if generally parallel"
+    
+//    // Called each simulation step, records stats for the separation score.
+//    void recordSeparationScorePerStep()
+//    {
+//        // Piecewise linear function of distance to score
+//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
+//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
+//        for (auto b : boids())
+//        {
+//            double distance = b->distanceToNearestNeighbor();
+//            double score = parameterToWeightWithRamps(distance, d, s);
+//            b->xxx_temp_separation_score = score;  // temp for annotation
+//            separation_score_sum_ += score;
+//        }
+//    }
+  
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
@@ -617,10 +634,13 @@ public:
             double distance = b->distanceToNearestNeighbor();
             double score = parameterToWeightWithRamps(distance, d, s);
             b->xxx_temp_separation_score = score;  // temp for annotation
-            separation_score_sum_ += score;
+            if ((!EF::murmuration_mode) or b->roughlyParallelNearestNeighbor())
+            {
+                separation_score_sum_ += score;
+            }
         }
     }
-
+    
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~

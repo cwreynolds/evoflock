@@ -623,24 +623,58 @@ public:
 //        }
 //    }
   
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20260924 allow more separation for murmuation
+    
+//    // Called each simulation step, records stats for the separation score.
+//    void recordSeparationScorePerStep()
+//    {
+//        // Piecewise linear function of distance to score
+//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
+//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
+//        for (auto b : boids())
+//        {
+//            double distance = b->distanceToNearestNeighbor();
+//            double score = parameterToWeightWithRamps(distance, d, s);
+//            b->xxx_temp_separation_score = score;  // temp for annotation
+//            if ((!EF::murmuration_mode) or b->roughlyParallelNearestNeighbor())
+//            {
+//                separation_score_sum_ += score;
+//            }
+//        }
+//    }
+  
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
+        bool mm = EF::murmuration_mode;
         // Piecewise linear function of distance to score
         std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
         std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
+        
+        if (mm)
+        {
+//            d = {0.0, 1.5, 2.0, 4.0, 6.0};
+            d = {0.0, 1.5, 2.0, 8.0, 10.0};
+        }
+        
+        
         for (auto b : boids())
         {
             double distance = b->distanceToNearestNeighbor();
             double score = parameterToWeightWithRamps(distance, d, s);
             b->xxx_temp_separation_score = score;  // temp for annotation
-            if ((!EF::murmuration_mode) or b->roughlyParallelNearestNeighbor())
+//            if ((!EF::murmuration_mode) or b->roughlyParallelNearestNeighbor())
+            if ((not mm) or b->roughlyParallelNearestNeighbor())
             {
                 separation_score_sum_ += score;
             }
         }
     }
-    
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~

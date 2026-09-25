@@ -92,8 +92,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -1033,16 +1033,23 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     -0.863084, -0.792452, -0.320875, 70.6433,
         //                     7.10675, 16.189, 1.83229, 62.7817, 0.121626,
         //                     0.857078, 0.879035});
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260923_ga_murm_restore_sep_score with bigger flock
         
         // Saved best FP values from run 20260923_ga_murm_restore_sep_score
-        FlockParameters fp({93.558, 95.2189, 57.0349, 58.7954, 0.0777719,
-                            96.0724, 41.0339, 1.9746, 67.3857, 71.7696,
-                            -0.778077, -0.993364, -0.654883, 53.7109,
-                            1.6927, 45.9539, 1.16906, 54.0816, 0.126804,
-                            0.278191, 0.924969});
+        // FlockParameters fp({93.558, 95.2189, 57.0349, 58.7954, 0.0777719,
+        //                     96.0724, 41.0339, 1.9746, 67.3857, 71.7696,
+        //                     -0.778077, -0.993364, -0.654883, 53.7109,
+        //                     1.6927, 45.9539, 1.16906, 54.0816, 0.126804,
+        //                     0.278191, 0.924969});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260924_ga_murm_allow_more_sep_2_6 with bigger flock
+        
+        // Saved best FP values from run 20260924_ga_murm_allow_more_sep_2_6
+        FlockParameters fp({81.8129, 95.1294, 49.07, 41.8677, 1.33824,
+                            11.4361, 86.5407, 1.97817, 49.3125, 62.6628,
+                            -0.968906, 0.161025, 0.167527, 15.6733, 5.83678,
+                            47.0431, 1.27839, 52.6233, 0.142122, 0.815513,
+                            0.583558});
 
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

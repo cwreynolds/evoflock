@@ -834,9 +834,16 @@ public:
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             // TODO 20260926 change max (allowable dist from manifold) from 2→1
             
-//    //            double max = 5; // TODO inline constant, in diameters
-//                double max = 2; // TODO inline constant, in diameters
-            double max = 1; // TODO inline constant, in diameters
+            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+            // TODO 20260927 change max (allowable dist from manifold) from 1→3
+
+//    //    //            double max = 5; // TODO inline constant, in diameters
+//    //                double max = 2; // TODO inline constant, in diameters
+//                double max = 1; // TODO inline constant, in diameters
+
+            double max = 3; // TODO inline constant, in diameters
+
+            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
 
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

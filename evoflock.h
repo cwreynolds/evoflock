@@ -92,8 +92,8 @@ inline static bool murmuration_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -1048,16 +1048,24 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     47.0431, 1.27839, 52.6233, 0.142122, 0.815513,
         //                     0.583558});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260926_ga_murm_max_near_2_to_1 with bigger flock
-        
         // Saved best FP values from run 20260926_ga_murm_max_near_2_to_1
         // (This was pretty good, diffuse flock, with long transient "folds")
-        FlockParameters fp({91.1059, 97.9004, 89.3908, 66.9782, 67.2186,
-                            28.7607, 48.3499, 35.8539, 24.8191, 43.6992,
-                            -0.791802, -0.560356, -0.0767214, 52.3738,
-                            9.18808, 47.5319, 1.6614, 81.3793, 0.0983593,
-                            0.404118, 0.129849});
+        // FlockParameters fp({91.1059, 97.9004, 89.3908, 66.9782, 67.2186,
+        //                     28.7607, 48.3499, 35.8539, 24.8191, 43.6992,
+        //                     -0.791802, -0.560356, -0.0767214, 52.3738,
+        //                     9.18808, 47.5319, 1.6614, 81.3793, 0.0983593,
+        //                     0.404118, 0.129849});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20260927_ga_murm_max_near_1_to_3 with bigger flock
+        
+        // Saved best FP values from run 20260927_ga_murm_max_near_1_to_3
+        // (Generally good. multiple blobs that merge and split. long transients)
+        FlockParameters fp({95.7677, 82.1399, 63.6482, 65.7031, 0.684546,
+                            0.909002, 35.6237, 1.98405, 44.9446, 18.7284,
+                            -0.81988, -0.852757, -0.173611, 90.6706,
+                            4.74543, 38.9639, 1.18292, 81.4037, 0.130969,
+                            0.839481, 0.786213});
 
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

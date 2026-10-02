@@ -553,98 +553,6 @@ public:
     
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260524 fiddling with murmuration centroid score
-
-//    // Called each simulation step, records stats for the separation score.
-//    void recordSeparationScorePerStep()
-//    {
-//        // Piecewise linear function of distance to score
-//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
-//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
-//        for (auto b : boids())
-//        {
-//            double distance = b->distanceToNearestNeighbor();
-//            double score = parameterToWeightWithRamps(distance, d, s);
-//            b->xxx_temp_separation_score = score;  // temp for annotation
-//            separation_score_sum_ += score;
-//        }
-//    }
-  
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260923 oops, 20260524 SeparationScore experiment probably obsolete
-    
-//        // Called each simulation step, records stats for the separation score.
-//        void recordSeparationScorePerStep()
-//        {
-//            // Piecewise linear function of distance to score
-//            std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
-//            std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
-//            for (auto b : boids())
-//            {
-//                double distance = b->distanceToNearestNeighbor();
-//                double score = parameterToWeightWithRamps(distance, d, s);
-//                b->xxx_temp_separation_score = score;  // temp for annotation
-//                
-//                // EXPERIMENT only count if generally parallel
-//                
-//    //            separation_score_sum_ += score;
-//                
-//    //            if (EF::murmuration_mode and
-//    //                (b->forward().dot(b->nearestNeighbor().forward()) > 0.707))
-//    //            {
-//    //                separation_score_sum_ += score;
-//    //            }
-//
-//                if ((not EF::murmuration_mode) or
-//                    (b->forward().dot(b->nearestNeighbor().forward()) > 0.707))
-//                {
-//                    separation_score_sum_ += score;
-//                }
-//
-//
-//            }
-//        }
-
-    // Try without "EXPERIMENT only count if generally parallel"
-    
-//    // Called each simulation step, records stats for the separation score.
-//    void recordSeparationScorePerStep()
-//    {
-//        // Piecewise linear function of distance to score
-//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
-//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
-//        for (auto b : boids())
-//        {
-//            double distance = b->distanceToNearestNeighbor();
-//            double score = parameterToWeightWithRamps(distance, d, s);
-//            b->xxx_temp_separation_score = score;  // temp for annotation
-//            separation_score_sum_ += score;
-//        }
-//    }
-  
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260924 allow more separation for murmuation
-    
-//    // Called each simulation step, records stats for the separation score.
-//    void recordSeparationScorePerStep()
-//    {
-//        // Piecewise linear function of distance to score
-//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
-//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
-//        for (auto b : boids())
-//        {
-//            double distance = b->distanceToNearestNeighbor();
-//            double score = parameterToWeightWithRamps(distance, d, s);
-//            b->xxx_temp_separation_score = score;  // temp for annotation
-//            if ((!EF::murmuration_mode) or b->roughlyParallelNearestNeighbor())
-//            {
-//                separation_score_sum_ += score;
-//            }
-//        }
-//    }
-  
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
@@ -652,50 +560,8 @@ public:
         // Piecewise linear function of distance to score
         std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
         std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260930 cleaning up
-
-//            if (mm)
-//            {
-//    //            d = {0.0, 1.5, 2.0, 4.0, 6.0};
-//                //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
-//                // TODO 20260924 one more tweak
-//    //            d = {0.0, 1.5, 2.0, 8.0, 10.0};
-//
-//                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//                // TODO 20260929 increase target sep, slide entire range out by 1.
-//
-//    //            d = {0.0, 1.5, 2.0, 6.0, 8.0};
-//    //            d = {0.0, 3.5, 4.0, 8.0, 10.0};
-//
-//                // TODO increase the min allowable spacing, keeping max the same.
-//
-//    //          d = {0.0, 2.5, 3.0, 7.0, 9.0};
-//
-//                // TODO now reduce the max by 1
-//
-//    //          d = {0.0, 3.5, 4.0, 7.0, 9.0};
-//    //            d = {0.0, 3.5, 4.0, 6.0, 8.0};
-//
-//                // TODO 20260930 slide entire range in (down) by 1
-//
-//    //          d = {0.0, 3.5, 4.0, 6.0, 8.0};
-//    //          d = {0.0, 2.5, 3.0, 5.0, 7.0};
-//
-//                // TODO 20260930 none of these have been obviously better (one more)
-//    //          d = {0.0, 2.5, 3.0, 5.0, 7.0};
-//                d = {0.0, 1.5, 2.0, 5.0, 6.0};
-//
-//                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//
-//                //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
-//            }
-
-        // Tiny tweak for murmuration mode. Test if this can be used always.
-        if (mm) { d = {0.0, 1.5, 2.0, 5.0, 6.0}; }
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Tiny tweak for murmuration mode. Test if this can always be used.
+        if (mm) {           d = {0.0, 1.5, 2.0, 5.0, 6.0}; }
 
         
         for (auto b : boids())
@@ -703,19 +569,12 @@ public:
             double distance = b->distanceToNearestNeighbor();
             double score = parameterToWeightWithRamps(distance, d, s);
             b->xxx_temp_separation_score = score;  // temp for annotation
-//            if ((!EF::murmuration_mode) or b->roughlyParallelNearestNeighbor())
             if ((not mm) or b->roughlyParallelNearestNeighbor())
             {
                 separation_score_sum_ += score;
             }
         }
     }
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
     // Return a unit fitness component: maintaining proper separation distance.
     double separationScore() const
@@ -777,49 +636,7 @@ public:
     //               over all boids which is not thread-safe (due to overwrite)
     //               and making it thread safe will probably use up the
     //               advantage of parallel threads.
-    
-//        void recordCentroid(double time_step)
-//        {
-//            Vec3 sum_of_boid_positions;
-//            for (auto b : boids()) { sum_of_boid_positions += b->position(); }
-//            Vec3 average_position = sum_of_boid_positions / boids().size();
-//            centroid_velocity_ = (average_position - centroid_) / time_step;
-//            centroid_ = average_position;
-//
-//            // Set centroid values in each boid.
-//            for (auto b : boids()) {b->setCentroids(centroid_, centroid_velocity_);}
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20260706 switch to sum of per boid-step centroid distance score.
-//
-//    //        for (auto b : boids())
-//    //        {
-//    //            double distance = (b->position() - centroid()).length();
-//    //            total_boids_to_centroid_distance_ += distance;
-//    //        }
-//
-//            for (auto b : boids())
-//            {
-//                sum_of_centroid_distance_score_ += perBoidCentroidDistanceScore(b);
-//            }
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//            // TODO 20260615 move inline test code to xxxTrackDonutHoleAxisChanges()
-//            //               call that from recordCentroid()
-//            xxxTrackDonutHoleAxisChanges();
-//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//            for (auto b : boids())
-//            {
-//                shape::Plane plane = b->getNeighborPlane();
-//                double distance = plane.pointToSurfaceDistance(b->position());
-//                double threshold = 3; // TODO inline constant, in diameters
-//                if (distance < threshold) { sum_of_boid_manifold_score_ += 1; }
-//            }
-//        }
-    
+
     void recordCentroid(double time_step)
     {
         Vec3 sum_of_boid_positions;
@@ -840,57 +657,9 @@ public:
         {
             shape::Plane plane = b->getNeighborPlane();
             double distance = plane.pointToSurfaceDistance(b->position());
-            
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-            // TODO 20260909 fiddle with sum_of_boid_manifold_score_
-
-//            double threshold = 3; // TODO inline constant, in diameters
-//            if (distance < threshold) { sum_of_boid_manifold_score_ += 1; }
-
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-            // TODO 20260911 try new manifold_score falloff.
-            
-//            double threshold = 5; // TODO inline constant, in diameters
-//            sum_of_boid_manifold_score_ += util::remap_interval_clip(distance,
-//                                                                     0, threshold,
-//                                                                     1, 0);
-  
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-            // TODO 20260912 revert back after centroid distance changes
-            
-//            double max = 10; // TODO inline constant, in diameters
-//            double nearness = util::remap_interval_clip(distance, 0, max, 1, 0);
-//            sum_of_boid_manifold_score_ += std::pow(nearness, 2);
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-            // TODO 20260919 narrow the acceptable distance to manifold.
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20260926 change max (allowable dist from manifold) from 2→1
-            
-            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
-            // TODO 20260927 change max (allowable dist from manifold) from 1→3
-
-//    //    //            double max = 5; // TODO inline constant, in diameters
-//    //                double max = 2; // TODO inline constant, in diameters
-//                double max = 1; // TODO inline constant, in diameters
-
             double max = 3; // TODO inline constant, in diameters
-
-            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
             double score = util::remap_interval_clip(distance, 0, max, 1, 0);
             sum_of_boid_manifold_score_ += score;
-
-            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
-            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
         xxxTrackDonutHoleAxisChanges();
     }

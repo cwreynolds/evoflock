@@ -251,8 +251,7 @@ public:
     Plane() : normal({0, 1, 0}) {}
     Plane(Vec3 normal_, Vec3 center_) : normal(normal_), center(center_) {}
     Plane(const std::vector<Vec3>& points) { *this = fitPlaneToPoints(points); }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260906 add constructor for Plane from three vertices of a triangle
+    // Constructor based on cross product of a triangle's three vertices.
     Plane(Vec3 tri_vertex_0, Vec3 tri_vertex_1, Vec3 tri_vertex_2)
     {
         // Vectors from v0 to v1 and v2.
@@ -262,7 +261,6 @@ public:
         normal = (to_v1.cross(to_v2)).normalize();
         center = (tri_vertex_0 + tri_vertex_1 + tri_vertex_2) / 3;
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Project any point to the plane.
     // (Copied from PlaneObstacle::nearest_point() which this should replace.)

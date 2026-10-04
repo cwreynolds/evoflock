@@ -396,9 +396,6 @@ public:
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260615 move inline test code to xxxTrackDonutHoleAxisChanges()
-
     void xxxTrackDonutHoleAxisChanges()
     {
         Vec3 sum_of_cross_prods;
@@ -417,44 +414,15 @@ public:
         // std::cout << delta_axis_angle << std::endl;
         previous_donut_hole_axis_ = donut_hole_axis;
         
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260616 centroidScore() combines "inside sphere" and "anti-donut"
-        
-//        double enough_jiggle = 0.05;
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260916 increase threshold for anti_donut_good_step
-        
-//        double enough_jiggle = 0.20;
-//        double enough_jiggle = 0.30;
-
         double enough_jiggle = 0.20;
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
         if (delta_axis_angle > enough_jiggle) { total_anti_donut_good_steps_++; }
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        
     }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260616 centroidScore() combines "inside sphere" and "anti-donut"
-    
     double total_anti_donut_good_steps_ = 0;
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20260614 track delta angle between per-step donut-hole axis
-    
     // Normalized tangent to donut hole axis from previous simulation step.
     Vec3 previous_donut_hole_axis_;
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
-    
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20251122 all ops return Vec3, Scalar values all constants
     static inline double max_steer_mag = 0;
@@ -666,24 +634,6 @@ public:
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
-    
-    
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260616 centroidScore() combines "inside sphere" and "anti-donut"
-    
-//    // Average speed for each Boid on each simulation step.
-//    double centroidScore() const
-//    {
-//        double max_dist = centroidMaxDistance();
-//        double peak = 0.75 * max_dist;
-//        // Piecewise linear function of distance to score
-//        std::vector<double> d = {0.0, peak, max_dist};
-//        std::vector<double> s = {0.0, 1.0,  0.0};
-//        double distance = total_boids_to_centroid_distance_ / boidStepPerSim();
-//        return parameterToWeightWithRamps(distance, d, s);
-//    }
-
     // Needs refactoring, combines the (now) three objectives for murmuration.
     double centroidScore() const
     {
@@ -707,27 +657,11 @@ public:
         return sum_of_boid_manifold_score_ / boidStepPerSim();
     }
 
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260706 switch to sum of per boid-step centroid distance score.
-
     // Average speed for each Boid on each simulation step.
     double centroidDistanceScore() const
     {
-//        double average_score = sum_of_centroid_distance_score_ / boidStepPerSim();
-//        return average_score;
         return sum_of_centroid_distance_score_ / boidStepPerSim();
     }
-
-    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
-    // TODO 20260911 yet another version of steerTowardCentroid() -- v3.
-
-//    double perBoidCentroidDistanceScore(Boid* boid) const
-//    {
-//        double distance = (boid->position() - centroid()).length();
-//        double max = centroidMaxDistance();
-//        return util::remap_interval_clip(distance, max * 0.3, max, 1, 0.3);
-//    }
 
     double perBoidCentroidDistanceScore(Boid* boid) const
     {
@@ -737,15 +671,10 @@ public:
         return (distance < max) ? 1 : 0;
     }
 
-    //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     double centroidAntiDonutScore() const
     {
         return total_anti_donut_good_steps_ / fp().maxSimulationSteps();
     }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

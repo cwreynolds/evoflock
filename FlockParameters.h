@@ -334,22 +334,6 @@ private:
                                  1000 :  // ~30 seconds viz prev results.
                                  500);   // ~17 seconds: for evolution run.
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260413 current flock centroid, and velocity
-    
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-    // TODO 20260805 revisit DomeAndGround obstacle set for murmuration
-
-//        std::string use_obstacle_set = (EF::murmuration_mode ?
-//    //                                    "BoxObstacle" :
-//                                        "NoObstacles" :
-//                                        "SmallSpheresInBigSphere");
-
-//        std::string use_obstacle_set = (EF::murmuration_mode ?
-//    //                                    "NoObstacles" :
-//                                        "DomeAndGround" :
-//                                        "SmallSpheresInBigSphere");
-
         std::string use_obstacle_set = (EF::murmuration_mode ?
 //                                        "BoxObstacle" :
 //                                        "BigSphere" :
@@ -357,46 +341,17 @@ private:
                                         "NoObstacles" :
                                         "SmallSpheresInBigSphere");
 
-    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260904 try using 10x (2000 v 200) for murm fitness tests
-    
-//    int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
-//                            EF::override_boids_per_flock :
-//                            (EF::visualize_previous_results_mode ?
-//                             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                             // TODO 20260518 bigger flock for murmuration viz.
-//                             
-//                             // For visualizing previous results.
-//                             (EF::murmuration_mode ? 2000 : 1400) :
-//                             
-//                             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                             200));  // Normal, for evolution runs.
-
     int boids_per_flock_ = (EF::override_boids_per_flock > 0 ?
                             EF::override_boids_per_flock :
                             (EF::visualize_previous_results_mode ?
-                             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-                             // TODO 20260518 bigger flock for murmuration viz.
                              
                              // For visualizing previous results.
+                             // (Bigger for murmurations.)
                              (EF::murmuration_mode ? 2000 : 1400) :
-                             
-                             //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//                             200));  // Normal, for evolution runs.
 
-                             //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
-                             // TODO 20260906 2000 boids is too painful try 1000
-                             
                              // Normal, for evolution runs.
-//                             (EF::murmuration_mode ? 2000 : 200)
-                             (EF::murmuration_mode ? 1000 : 200)
-                             
-                             //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~
-                             ));
+                             // (Bigger for murmurations.)
+                             (EF::murmuration_mode ? 1000 : 200)));
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

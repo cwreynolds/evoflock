@@ -662,15 +662,52 @@ public:
     // Current average position of all boids in flock.
     Vec3 centroid() const { return centroid_; }
 
-    // Centroid's velocity based on difference since previous simulation step.
-    Vec3 centroidVelocity() const { return centroid_velocity_; }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20261005 remove unused Boid::centroidVelocity()
     
-    void setCentroids(Vec3 centroid, Vec3 centroid_velocity)
+//    // Centroid's velocity based on difference since previous simulation step.
+//    Vec3 centroidVelocity() const { return centroid_velocity_; }
+    
+//    void setCentroids(Vec3 centroid, Vec3 centroid_velocity)
+//    {
+//        centroid_ = centroid;
+//        centroid_velocity_ = centroid_velocity;
+//    }
+
+    void setCentroid(Vec3 centroid) { centroid_ = centroid; }
+
+    
+    
+    // Low pass filter for this boid's centroid for murmurations.
+    util::Blender<Vec3> centroid_memory_;
+    
+
+    void updateEstimatedCentroid()
     {
-        centroid_ = centroid;
-        centroid_velocity_ = centroid_velocity;
+        Vec3 nearest;
+        double nearest_distance = std::numeric_limits<double>::infinity();
+        size_t samples = 3;
+//        std::vector<size_t> excludes;
+        for (size_t i = 0; i < samples; i++)
+        {
+            int sample_index = EF::RS().randomN(flock_boids().size());
+            Boid& sample_boid = *(flock_boids().at(sample_index));
+            double distance = (position() - sample_boid.position()).length();
+            if (nearest_distance > distance) { nearest_distance = distance; }
+        }
+        
+        double smoothness = 0.8;
+        setCentroid(centroid_memory_.blend(nearest, smoothness));
     }
-    
+
+//    blend
+//    return steer_memory_.blend(steer, smoothness);
+
+//    // Low pass filter for steering vector.
+//    util::Blender<Vec3> steer_memory_;
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     double centroid_max_distance_ = 0;
     
     void setCentroidMaxDistance(double md) { centroid_max_distance_ = md; }
@@ -1225,6 +1262,9 @@ private:
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20260416 break off steerTowardCentroid()
     Vec3 centroid_;
-    Vec3 centroid_velocity_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20261005 remove unused Boid::centroidVelocity()
+//    Vec3 centroid_velocity_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 };

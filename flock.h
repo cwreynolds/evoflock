@@ -580,12 +580,29 @@ public:
         return double(clock().frameCounter()) / fp().maxSimulationSteps();
     }
     
-    Vec3 centroid_;
-    Vec3 centroid_velocity_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20261005 remove unused Boid::centroidVelocity()
+
+//    Vec3 centroid_;
+//    Vec3 centroid_velocity_;
+//    // Current average position of all boids in flock.
+//    Vec3 centroid() const { return centroid_; }
+//    // Centroid's velocity based on difference since previous simulation step.
+//    Vec3 centroidVelocity() const { return centroid_velocity_; }
+    
+//        Vec3 centroid_;
+//    //    Vec3 centroid_velocity_;
+//        // Current average position of all boids in flock.
+//        Vec3 centroid() const { return centroid_; }
+//    //    // Centroid's velocity based on difference since previous simulation step.
+//    //    Vec3 centroidVelocity() const { return centroid_velocity_; }
+
     // Current average position of all boids in flock.
+    Vec3 centroid_;
     Vec3 centroid() const { return centroid_; }
-    // Centroid's velocity based on difference since previous simulation step.
-    Vec3 centroidVelocity() const { return centroid_velocity_; }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     // TODO 20260530 make centroidScore() reward uniform distribution
@@ -607,14 +624,55 @@ public:
 
     void recordCentroid(double time_step)
     {
-        Vec3 sum_of_boid_positions;
-        for (auto b : boids()) { sum_of_boid_positions += b->position(); }
-        Vec3 average_position = sum_of_boid_positions / boids().size();
-        centroid_velocity_ = (average_position - centroid_) / time_step;
-        centroid_ = average_position;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261005 remove unused Boid::centroidVelocity()
 
-        // Set centroid values in each boid.
-        for (auto b : boids()) {b->setCentroids(centroid_, centroid_velocity_);}
+//        Vec3 sum_of_boid_positions;
+//        for (auto b : boids()) { sum_of_boid_positions += b->position(); }
+//        Vec3 average_position = sum_of_boid_positions / boids().size();
+//        centroid_velocity_ = (average_position - centroid_) / time_step;
+//        centroid_ = average_position;
+//
+//        // Set centroid values in each boid.
+//        for (auto b : boids()) {b->setCentroids(centroid_, centroid_velocity_);}
+
+        
+//            Vec3 sum_of_boid_positions;
+//            for (auto b : boids()) { sum_of_boid_positions += b->position(); }
+//            Vec3 average_position = sum_of_boid_positions / boids().size();
+//    //        centroid_velocity_ = (average_position - centroid_) / time_step;
+//            centroid_ = average_position;
+//
+//            // Set centroid values in each boid.
+//    //        for (auto b : boids()) {b->setCentroids(centroid_, centroid_velocity_);}
+//
+//            for (auto b : boids()) {b->setCentroid(centroid_);}
+
+        
+        if (EF::per_boid_centroid_mode)
+        {
+            // Update the per-boid estimated centroid.
+            for (auto b : boids()) {b->updateEstimatedCentroid();}
+            
+            
+            // TODO QQQ very temp experiment
+            // set flock's centroid to average of boid centroids
+            Vec3 sum_of_boid_centroids;
+            for (auto b : boids()) { sum_of_boid_centroids += b->centroid(); }
+            centroid_ = sum_of_boid_centroids / boids().size();
+        }
+        else
+        {
+            Vec3 sum_of_boid_positions;
+            for (auto b : boids()) { sum_of_boid_positions += b->position(); }
+            Vec3 average_position = sum_of_boid_positions / boids().size();
+            centroid_ = average_position;
+            
+            // Set centroid values in each boid.
+            for (auto b : boids()) {b->setCentroid(centroid_);}
+        }
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         for (auto b : boids())
         {

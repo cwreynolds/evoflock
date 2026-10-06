@@ -88,6 +88,14 @@ inline static bool murmuration_mode = true;
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20261005 experimenting with per-boid-centroid
+
+inline static bool per_boid_centroid_mode = true;
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 // Added for debugging BoxObstacle, maybe remove later?
 inline static bool current_boid_is_selected = true;
 

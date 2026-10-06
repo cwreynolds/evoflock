@@ -100,8 +100,8 @@ inline static bool per_boid_centroid_mode = true;
 inline static bool current_boid_is_selected = true;
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global default target speed. Move to const section of FlockParameters?
 inline static double default_target_speed = 20;
@@ -1063,17 +1063,25 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     -0.791802, -0.560356, -0.0767214, 52.3738,
         //                     9.18808, 47.5319, 1.6614, 81.3793, 0.0983593,
         //                     0.404118, 0.129849});
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260927_ga_murm_max_near_1_to_3 with bigger flock
         
         // Saved best FP values from run 20260927_ga_murm_max_near_1_to_3
         // (Generally good. multiple blobs that merge and split. long transients)
-        FlockParameters fp({95.7677, 82.1399, 63.6482, 65.7031, 0.684546,
-                            0.909002, 35.6237, 1.98405, 44.9446, 18.7284,
-                            -0.81988, -0.852757, -0.173611, 90.6706,
-                            4.74543, 38.9639, 1.18292, 81.4037, 0.130969,
-                            0.839481, 0.786213});
+        // FlockParameters fp({95.7677, 82.1399, 63.6482, 65.7031, 0.684546,
+        //                     0.909002, 35.6237, 1.98405, 44.9446, 18.7284,
+        //                     -0.81988, -0.852757, -0.173611, 90.6706,
+        //                     4.74543, 38.9639, 1.18292, 81.4037, 0.130969,
+        //                     0.839481, 0.786213});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261005_ga_murm_per_boid_centroid with bigger flock
+        
+        // Saved best FP values from run 20261005_ga_murm_per_boid_centroid
+        // ()
+        FlockParameters fp({83.9665, 90.3734, 50.4425, 42.1214, 2.80843,
+                            62.8313, 62.323, 2.34177, 45.8501, 19.1711,
+                            -0.948253, 0.00743547, -0.356282, 63.7951,
+                            1.75133, 42.8185, 1.66463, 83.8254, 0.139405,
+                            0.576368, 0.682982});
 
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

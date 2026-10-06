@@ -422,6 +422,20 @@ public:
     // GA/GP versions, respectively for parameter evolution and model evolution.
     Vec3 steerToFlock()
     {
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261006 temp annotation for per_boid_centroid_mode.
+        
+        debugPrint(centroid())
+        debugPrint(isSelected())
+        debugPrint(EF::murmuration_mode)
+        debugPrint(EF::per_boid_centroid_mode)
+
+        if (isSelected() and EF::murmuration_mode and EF::per_boid_centroid_mode)
+        {
+//            debugPrint(centroid())
+            annotationLineToPoint(centroid(), Color::black(), 0.05);
+        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if (EF::usingGA())
         {
             return steerToFlockForGA();

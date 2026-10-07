@@ -425,10 +425,10 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20261006 temp annotation for per_boid_centroid_mode.
         
-        debugPrint(centroid())
-        debugPrint(isSelected())
-        debugPrint(EF::murmuration_mode)
-        debugPrint(EF::per_boid_centroid_mode)
+//        debugPrint(centroid())
+//        debugPrint(isSelected())
+//        debugPrint(EF::murmuration_mode)
+//        debugPrint(EF::per_boid_centroid_mode)
 
         if (isSelected() and EF::murmuration_mode and EF::per_boid_centroid_mode)
         {
@@ -688,9 +688,23 @@ public:
 //        centroid_velocity_ = centroid_velocity;
 //    }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261007 temp debugging for per_boid_centroid_mode.
+
     void setCentroid(Vec3 centroid) { centroid_ = centroid; }
 
-    
+//    void setCentroid(Vec3 centroid)
+//    {
+//        centroid_ = centroid;
+//        
+//        if (isSelected())
+//        {
+//            std::cout << "setCentroid(" << centroid_ << ")" << std::endl;
+//        }
+//    }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     
     // Low pass filter for this boid's centroid for murmurations.
     util::Blender<Vec3> centroid_memory_;
@@ -706,19 +720,32 @@ public:
         {
             int sample_index = EF::RS().randomN(flock_boids().size());
             Boid& sample_boid = *(flock_boids().at(sample_index));
-            double distance = (position() - sample_boid.position()).length();
-            if (nearest_distance > distance) { nearest_distance = distance; }
+            Vec3 sb_pos = sample_boid.position();
+            double distance = (position() - sb_pos).length();
+//            if (nearest_distance > distance) { nearest_distance = distance; }
+            if (nearest_distance > distance)
+            {
+                nearest_distance = distance;
+                nearest = sb_pos;
+            }
         }
         
-        double smoothness = 0.8;
+//        double smoothness = 0.8;
+//        double smoothness = 0.9;
+        double smoothness = 0.95;
         setCentroid(centroid_memory_.blend(nearest, smoothness));
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20261007 temp debugging for per_boid_centroid_mode.
+        
+//        if (isSelected())
+//        {
+//            std::cout << "updateEstimatedCentroid ";
+//            debugPrint(nearest);
+//        }
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }
-
-//    blend
-//    return steer_memory_.blend(steer, smoothness);
-
-//    // Low pass filter for steering vector.
-//    util::Blender<Vec3> steer_memory_;
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

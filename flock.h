@@ -698,7 +698,11 @@ public:
         // TODO XXX very temp
         double d = centroidDistanceScore();
         double a = centroidAntiDonutScore();
-        double m = centroidManifoldScore();
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20261008 try turning off manifold for per_boid_centroid_mode
+//        double m = centroidManifoldScore();
+        double m = EF::per_boid_centroid_mode ? 1 : centroidManifoldScore();
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         double hypervolume = d * a * m;
         {
             std::cout << "        " << hypervolume;

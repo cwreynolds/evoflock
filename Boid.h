@@ -467,8 +467,20 @@ public:
         if (EF::use_centroid_objective)
         {
             combined_steering += steerTowardCentroid_v3();
-            combined_steering += (steerTowardManifold() *
-                                  (100 * fp().weightRelManifold()));
+            
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20261008 try turning off manifold for per_boid_centroid_mode
+            
+//            combined_steering += (steerTowardManifold() *
+//                                  (100 * fp().weightRelManifold()));
+
+            if (not EF::per_boid_centroid_mode)
+            {
+                combined_steering += (steerTowardManifold() *
+                                      (100 * fp().weightRelManifold()));
+
+            }
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         saveAnnotation(s, a, c, ap, as, combined_steering);

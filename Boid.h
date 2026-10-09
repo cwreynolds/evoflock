@@ -721,43 +721,69 @@ public:
     // Low pass filter for this boid's centroid for murmurations.
     util::Blender<Vec3> centroid_memory_;
     
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20261009 experimental adjustment for per_boid_centroid_mode
+    
+//        void updateEstimatedCentroid()
+//        {
+//            Vec3 nearest;
+//            double nearest_distance = std::numeric_limits<double>::infinity();
+//            size_t samples = 3;
+//    //        std::vector<size_t> excludes;
+//            for (size_t i = 0; i < samples; i++)
+//            {
+//                int sample_index = EF::RS().randomN(flock_boids().size());
+//                Boid& sample_boid = *(flock_boids().at(sample_index));
+//                Vec3 sb_pos = sample_boid.position();
+//                double distance = (position() - sb_pos).length();
+//    //            if (nearest_distance > distance) { nearest_distance = distance; }
+//                if (nearest_distance > distance)
+//                {
+//                    nearest_distance = distance;
+//                    nearest = sb_pos;
+//                }
+//            }
+//
+//    //        double smoothness = 0.8;
+//    //        double smoothness = 0.9;
+//            double smoothness = 0.95;
+//            setCentroid(centroid_memory_.blend(nearest, smoothness));
+//
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            // TODO 20261007 temp debugging for per_boid_centroid_mode.
+//
+//    //        if (isSelected())
+//    //        {
+//    //            std::cout << "updateEstimatedCentroid ";
+//    //            debugPrint(nearest);
+//    //        }
+//
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        }
 
     void updateEstimatedCentroid()
     {
         Vec3 nearest;
         double nearest_distance = std::numeric_limits<double>::infinity();
-        size_t samples = 3;
-//        std::vector<size_t> excludes;
+//        size_t samples = 3;
+        size_t samples = 5;
         for (size_t i = 0; i < samples; i++)
         {
             int sample_index = EF::RS().randomN(flock_boids().size());
             Boid& sample_boid = *(flock_boids().at(sample_index));
             Vec3 sb_pos = sample_boid.position();
             double distance = (position() - sb_pos).length();
-//            if (nearest_distance > distance) { nearest_distance = distance; }
             if (nearest_distance > distance)
             {
                 nearest_distance = distance;
                 nearest = sb_pos;
             }
         }
-        
-//        double smoothness = 0.8;
-//        double smoothness = 0.9;
         double smoothness = 0.95;
         setCentroid(centroid_memory_.blend(nearest, smoothness));
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20261007 temp debugging for per_boid_centroid_mode.
-        
-//        if (isSelected())
-//        {
-//            std::cout << "updateEstimatedCentroid ";
-//            debugPrint(nearest);
-//        }
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

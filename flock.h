@@ -343,8 +343,15 @@ public:
 //            double r2 = shape::Sphere::radiusFromVolume(v2);
 //            centroid_max_distance_ = r2;
             
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20261009 experimental adjustment for per_boid_centroid_mode
 
-            centroid_max_distance_ = fp().sphereRadius();
+//            centroid_max_distance_ = fp().sphereRadius();
+            // TODO QQQ looking for more "clumpier" structure.
+//            centroid_max_distance_ = fp().sphereRadius() / 3;
+            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         }
@@ -679,13 +686,25 @@ public:
             sum_of_centroid_distance_score_ += perBoidCentroidDistanceScore(b);
         }
         
-        for (auto b : boids())
+//        for (auto b : boids())
+//        {
+//            shape::Plane plane = b->getNeighborPlane();
+//            double distance = plane.pointToSurfaceDistance(b->position());
+//            double max = 3; // TODO inline constant, in diameters
+//            double score = util::remap_interval_clip(distance, 0, max, 1, 0);
+//            sum_of_boid_manifold_score_ += score;
+//        }
+
+        if (not EF::per_boid_centroid_mode)
         {
-            shape::Plane plane = b->getNeighborPlane();
-            double distance = plane.pointToSurfaceDistance(b->position());
-            double max = 3; // TODO inline constant, in diameters
-            double score = util::remap_interval_clip(distance, 0, max, 1, 0);
-            sum_of_boid_manifold_score_ += score;
+            for (auto b : boids())
+            {
+                shape::Plane plane = b->getNeighborPlane();
+                double distance = plane.pointToSurfaceDistance(b->position());
+                double max = 3; // TODO inline constant, in diameters
+                double score = util::remap_interval_clip(distance, 0, max, 1, 0);
+                sum_of_boid_manifold_score_ += score;
+            }
         }
         xxxTrackDonutHoleAxisChanges();
     }

@@ -766,7 +766,8 @@ public:
         Vec3 nearest;
         double nearest_distance = std::numeric_limits<double>::infinity();
 //        size_t samples = 3;
-        size_t samples = 5;
+//        size_t samples = 5;
+        size_t samples = 4;
         for (size_t i = 0; i < samples; i++)
         {
             int sample_index = EF::RS().randomN(flock_boids().size());

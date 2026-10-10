@@ -37,8 +37,8 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global switch to enable/disable multithreading.
 inline static bool enable_multithreading = true;
@@ -1088,16 +1088,24 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     6.3607, 31.0104, 1.89217, 98.5089, 0.0977344,
         //                     0.608581, 0.147269});
 
+        // Saved best FP values from run 20261007_ga_murm_pbc_fix
+        // (too compact)
+        // FlockParameters fp({57.7021, 91.0198, 79.1562, 54.2571, 28.6636,
+        //                     38.6893, 66.457, 2.23716, 82.7597, 98.3973,
+        //                     -0.610903, 0.299638, 0.554365, 56.7624,
+        //                     1.1212, 2.67482, 1.34719, 89.5803, 0.646036,
+        //                     0.87076, 0.110068});
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20261007_ga_murm_pbc_fix with bigger flock
         
         // Saved best FP values from run 20261007_ga_murm_pbc_fix
-        // (Great long term transients. Too much empty space. Worm-like groups.)
-        FlockParameters fp({57.7021, 91.0198, 79.1562, 54.2571, 28.6636,
-                            38.6893, 66.457, 2.23716, 82.7597, 98.3973,
-                            -0.610903, 0.299638, 0.554365, 56.7624,
-                            1.1212, 2.67482, 1.34719, 89.5803, 0.646036,
-                            0.87076, 0.110068});
+        // (Hmm seems nice. Long transients, merges and diverges.)
+        FlockParameters fp({95.9833, 89.1522, 76.6335, 47.4269, 18.2749,
+                            8.1471, 36.0006, 2.85774, 17.2384, 2.50537,
+                            -0.775018, -0.703174, 0.929372, 81.4308,
+                            4.96927, 33.5301, 1.42094, 83.5019, 0.0520144,
+                            0.151142, 0.706112});
 
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

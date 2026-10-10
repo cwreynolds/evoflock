@@ -349,7 +349,8 @@ public:
 //            centroid_max_distance_ = fp().sphereRadius();
             // TODO QQQ looking for more "clumpier" structure.
 //            centroid_max_distance_ = fp().sphereRadius() / 3;
-            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+//            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+            centroid_max_distance_ = fp().sphereRadius() * 0.8;
 
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 

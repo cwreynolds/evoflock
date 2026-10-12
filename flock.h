@@ -171,7 +171,13 @@ public:
 
             if (EF::use_centroid_objective)
             {
-                draw().cameraLookAt() = centroid();
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20261011 replace Flock::centroid() with Flock::centroidOfCentroids()
+                
+//                draw().cameraLookAt() = centroid();
+                draw().cameraLookAt() = centroidOfCentroids();
+
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             }
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             draw().endOneAnimatedFrame();
@@ -350,7 +356,17 @@ public:
             // TODO QQQ looking for more "clumpier" structure.
 //            centroid_max_distance_ = fp().sphereRadius() / 3;
 //            centroid_max_distance_ = fp().sphereRadius() * 0.6;
-            centroid_max_distance_ = fp().sphereRadius() * 0.8;
+//            centroid_max_distance_ = fp().sphereRadius() * 0.8;
+            
+            
+            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+            // TODO 20261011 replace Flock::centroid() with Flock::centroidOfCentroids()
+
+//            centroid_max_distance_ = fp().sphereRadius() * 0.8;
+//            centroid_max_distance_ = fp().sphereRadius() * 0.4;
+            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+
+            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
 
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
@@ -605,9 +621,18 @@ public:
 //    //    // Centroid's velocity based on difference since previous simulation step.
 //    //    Vec3 centroidVelocity() const { return centroid_velocity_; }
 
-    // Current average position of all boids in flock.
-    Vec3 centroid_;
-    Vec3 centroid() const { return centroid_; }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261011 replace Flock::centroid() with Flock::centroidOfCentroids()
+    
+//    // Current average position of all boids in flock.
+//    Vec3 centroid_;
+//    Vec3 centroid() const { return centroid_; }
+
+    // Current average of all per-boid's centroids
+    Vec3 centroid_of_centroids_;
+    Vec3 centroidOfCentroids() const { return centroid_of_centroids_; }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -657,6 +682,9 @@ public:
 //            for (auto b : boids()) {b->setCentroid(centroid_);}
 
         
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20261011 replace Flock::centroid() with Flock::centroidOfCentroids()
+
         if (EF::per_boid_centroid_mode)
         {
             // Update the per-boid estimated centroid.
@@ -666,20 +694,26 @@ public:
             // TODO QQQ very temp experiment
             // set flock's centroid to average of boid centroids
             Vec3 sum_of_boid_centroids;
+//            for (auto b : boids()) { sum_of_boid_centroids += b->centroid(); }
             for (auto b : boids()) { sum_of_boid_centroids += b->centroid(); }
-            centroid_ = sum_of_boid_centroids / boids().size();
+//            centroid_ = sum_of_boid_centroids / boids().size();
+            centroid_of_centroids_ = sum_of_boid_centroids / boids().size();
         }
         else
         {
             Vec3 sum_of_boid_positions;
             for (auto b : boids()) { sum_of_boid_positions += b->position(); }
             Vec3 average_position = sum_of_boid_positions / boids().size();
-            centroid_ = average_position;
-            
+//            centroid_ = average_position;
+            centroid_of_centroids_ = average_position;
+
             // Set centroid values in each boid.
-            for (auto b : boids()) {b->setCentroid(centroid_);}
+//            for (auto b : boids()) {b->setCentroid(centroid_);}
+            for (auto b : boids()) {b->setCentroid(centroid_of_centroids_);}
         }
-        
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         for (auto b : boids())
@@ -745,13 +779,26 @@ public:
         return sum_of_centroid_distance_score_ / boidStepPerSim();
     }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261011 replace Flock::centroid() with Flock::centroidOfCentroids()
+
+//        double perBoidCentroidDistanceScore(Boid* boid) const
+//        {
+//            double distance = (boid->position() - centroid()).length();
+//            double max = centroidMaxDistance();
+//    //        return util::remap_interval_clip(distance, max * 0.3, max, 1, 0.3);
+//            return (distance < max) ? 1 : 0;
+//        }
+
     double perBoidCentroidDistanceScore(Boid* boid) const
     {
-        double distance = (boid->position() - centroid()).length();
+//        double distance = (boid->position() - centroid()).length();
+        double distance = (boid->position() - boid->centroid()).length();
         double max = centroidMaxDistance();
-//        return util::remap_interval_clip(distance, max * 0.3, max, 1, 0.3);
         return (distance < max) ? 1 : 0;
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     double centroidAntiDonutScore() const
     {

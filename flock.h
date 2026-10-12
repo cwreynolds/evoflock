@@ -364,7 +364,14 @@ public:
 
 //            centroid_max_distance_ = fp().sphereRadius() * 0.8;
 //            centroid_max_distance_ = fp().sphereRadius() * 0.4;
-            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+            
+            // 20261011_ga_murm_pbc_for_cent_dist_score_b
+//            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+//            centroid_max_distance_ = fp().sphereRadius() * 0.4;
+            
+            // 20261012_ga_murm_pbc_for_cent_dist_score
+//            centroid_max_distance_ = fp().sphereRadius() * 0.4;
+            centroid_max_distance_ = fp().sphereRadius() * 0.5;
 
             //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
 

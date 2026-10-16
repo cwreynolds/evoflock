@@ -388,9 +388,16 @@ public:
             // see https://www.youtube.com/watch?v=EhBIGjCVx7E
             
 //            centroid_max_distance_ = fp().sphereRadius() * 0.6;
-            centroid_max_distance_ = fp().sphereRadius() * 0.8;
+//            centroid_max_distance_ = fp().sphereRadius() * 0.8;
 
-            
+            //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~
+            // TODO 20261015 blend per_boid_centroid with centroidOfCentroids()
+
+//            centroid_max_distance_ = fp().sphereRadius() * 0.8;
+            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+
+            //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~
+
             //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~
 
             //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
@@ -819,13 +826,30 @@ public:
 //            return (distance < max) ? 1 : 0;
 //        }
 
+    //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
+    // TODO 20261015 blend per_boid_centroid with centroidOfCentroids()
+
+//        double perBoidCentroidDistanceScore(Boid* boid) const
+//        {
+//    //        double distance = (boid->position() - centroid()).length();
+//            double distance = (boid->position() - boid->centroid()).length();
+//            double max = centroidMaxDistance();
+//            return (distance < max) ? 1 : 0;
+//        }
+
     double perBoidCentroidDistanceScore(Boid* boid) const
     {
-//        double distance = (boid->position() - centroid()).length();
-        double distance = (boid->position() - boid->centroid()).length();
-        double max = centroidMaxDistance();
-        return (distance < max) ? 1 : 0;
+//        double distance = (boid->position() - boid->centroid()).length();
+        Vec3 center = util::interpolate(0.3,
+                                        boid->centroid(),
+                                        centroidOfCentroids());
+        double distance = (boid->position() - center).length();
+//        double max = centroidMaxDistance();
+//        return (distance < max) ? 1 : 0;
+        return (distance < centroidMaxDistance()) ? 1 : 0;
     }
+
+    //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

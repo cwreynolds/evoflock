@@ -378,7 +378,7 @@ public:
             
             // 20261012_ga_murm_pbc_for_cent_dist_score
 //            centroid_max_distance_ = fp().sphereRadius() * 0.4;
-            centroid_max_distance_ = fp().sphereRadius() * 0.5;
+//            centroid_max_distance_ = fp().sphereRadius() * 0.5;
             
             //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
             // 20261013_ga_murm_pbc_for_cent_dist_score
@@ -401,7 +401,19 @@ public:
             // TODO 20261015 blend per_boid_centroid with centroidOfCentroids()
 
 //            centroid_max_distance_ = fp().sphereRadius() * 0.8;
-            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+//            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20261017 tweaks to centroid_blend and max_dist scale.
+
+//            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+            
+            // TODO 20261017 should be subject evolutionary optimization.
+//            double cent_max_dist_scale = 0.6;
+            double cent_max_dist_scale = 0.8;
+            centroid_max_distance_ = fp().sphereRadius() * cent_max_dist_scale;
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~
 
@@ -860,18 +872,53 @@ public:
 //            return (distance < centroidMaxDistance()) ? 1 : 0;
 //        }
 
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20261017 tweaks to centroid_blend and max_dist scale.
+
+//        double perBoidCentroidDistanceScore(Boid* boid) const
+//        {
+//
+//
+//
+//
+//
+//    //        Vec3 center = util::interpolate(0.3,
+//            Vec3 center = util::interpolate(0.7,
+//                                            boid->centroid(),
+//                                            centroidOfCentroids());
+//
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//            // TODO 20261016 change centroid weighting from 0.3 to 0.7
+//
+//            if (boid == selectedBoid())
+//            {
+//                Vec3 bp = boid->position();
+//                draw().addAnnotationLine(bp, center, Color::cyan(), 0.05);
+//                draw().addAnnotationLine(bp, centroidOfCentroids(), Color::blue(), 0.05);
+//            }
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//
+//            double distance = (boid->position() - center).length();
+//            return (distance < centroidMaxDistance()) ? 1 : 0;
+//        }
+
     double perBoidCentroidDistanceScore(Boid* boid) const
     {
-        
-        
-
-        
-        
-//        Vec3 center = util::interpolate(0.3,
-        Vec3 center = util::interpolate(0.7,
+//    //        Vec3 center = util::interpolate(0.3,
+//            Vec3 center = util::interpolate(0.7,
+//                                            boid->centroid(),
+//                                            centroidOfCentroids());
+      
+        // TODO 20261017 should be subject evolutionary optimization.
+//        double centroid_blend = 0.3;
+//        double centroid_blend = 0.7;
+        double centroid_blend = 0.6;
+        Vec3 center = util::interpolate(centroid_blend,
                                         boid->centroid(),
                                         centroidOfCentroids());
-        
+
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         // TODO 20261016 change centroid weighting from 0.3 to 0.7
         
@@ -887,6 +934,8 @@ public:
         double distance = (boid->position() - center).length();
         return (distance < centroidMaxDistance()) ? 1 : 0;
     }
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 

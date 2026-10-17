@@ -177,6 +177,13 @@ public:
 //                draw().cameraLookAt() = centroid();
                 draw().cameraLookAt() = centroidOfCentroids();
 
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+                // TODO 20261016 change centroid weighting from 0.3 to 0.7
+
+                draw().cameraLookFrom() = {60, 60, 60};
+                
+                //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
             }
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -837,17 +844,51 @@ public:
 //            return (distance < max) ? 1 : 0;
 //        }
 
+    
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20261016 change centroid weighting from 0.3 to 0.7
+    
+//        double perBoidCentroidDistanceScore(Boid* boid) const
+//        {
+//    //        double distance = (boid->position() - boid->centroid()).length();
+//            Vec3 center = util::interpolate(0.3,
+//                                            boid->centroid(),
+//                                            centroidOfCentroids());
+//            double distance = (boid->position() - center).length();
+//    //        double max = centroidMaxDistance();
+//    //        return (distance < max) ? 1 : 0;
+//            return (distance < centroidMaxDistance()) ? 1 : 0;
+//        }
+
     double perBoidCentroidDistanceScore(Boid* boid) const
     {
-//        double distance = (boid->position() - boid->centroid()).length();
-        Vec3 center = util::interpolate(0.3,
+        
+        
+
+        
+        
+//        Vec3 center = util::interpolate(0.3,
+        Vec3 center = util::interpolate(0.7,
                                         boid->centroid(),
                                         centroidOfCentroids());
+        
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20261016 change centroid weighting from 0.3 to 0.7
+        
+        if (boid == selectedBoid())
+        {
+            Vec3 bp = boid->position();
+            draw().addAnnotationLine(bp, center, Color::cyan(), 0.05);
+            draw().addAnnotationLine(bp, centroidOfCentroids(), Color::blue(), 0.05);
+        }
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+
+        
         double distance = (boid->position() - center).length();
-//        double max = centroidMaxDistance();
-//        return (distance < max) ? 1 : 0;
         return (distance < centroidMaxDistance()) ? 1 : 0;
     }
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
 

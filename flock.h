@@ -410,7 +410,14 @@ public:
             
             // TODO 20261017 should be subject evolutionary optimization.
 //            double cent_max_dist_scale = 0.6;
-            double cent_max_dist_scale = 0.8;
+//            double cent_max_dist_scale = 0.8;
+            
+            // TODO 20261017 cent_max_dist_scale from 0.8 to 0.6
+//            double cent_max_dist_scale = 0.6;
+            
+            // TODO 20261018 cent_max_dist_scale from 0.6 to 0.7
+            double cent_max_dist_scale = 0.7;
+            
             centroid_max_distance_ = fp().sphereRadius() * cent_max_dist_scale;
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -37,8 +37,8 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global switch to enable/disable multithreading.
 inline static bool enable_multithreading = true;
@@ -1144,16 +1144,24 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     6.3026, 49.2777, 1.45151, 93.1993, 0.191601,
         //                     0.872844, 0.920237});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20261017_ga_murm_cent_blend_06_dist_scale_06 with bigger flock
-        
         // Saved best FP values from run 20261017_ga_murm_cent_blend_06_dist_scale_06
         // ()
-        FlockParameters fp({57.9525, 86.6185, 71.1318, 42.4027, 12.4634,
-                            42.6137, 75.4824, 2.45901, 84.6595, 2.93688,
-                            -0.96075, 0.153568, 0.55676, 4.16788,
-                            2.99865, 13.3744, 1.06284, 96.9604, 0.809296,
-                            0.801659, 0.841637});
+        // FlockParameters fp({57.9525, 86.6185, 71.1318, 42.4027, 12.4634,
+        //                     42.6137, 75.4824, 2.45901, 84.6595, 2.93688,
+        //                     -0.96075, 0.153568, 0.55676, 4.16788,
+        //                     2.99865, 13.3744, 1.06284, 96.9604, 0.809296,
+        //                     0.801659, 0.841637});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261018_ga_murm_cent_blend_06_dist_scale_07 with bigger flock
+        
+        // Saved best FP values from run 20261018_ga_murm_cent_blend_06_dist_scale_07
+        // ()
+        FlockParameters fp({56.6898, 95.4059, 61.776, 53.4552, 14.9512,
+                            31.824, 32.7552, 3.01195, 51.3896, 2.43534,
+                            -0.92373, 0.0663624, 0.761259, 39.606,
+                            3.02882, 38.5175, 1.79029, 76.2449, 0.354588,
+                            0.202012, 0.461432});
 
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1208,7 +1216,24 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         EF::enable_multithreading = false;
         draw.setEnable(true);
         LP::Individual individual(GP::gaTreeFromFP(fp, fs), fs);
-        while (true) { GP::run_flock_simulation(&individual, 1); }
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+        // TODO 20261019 go into simPause before each GA playback
+        // TODO 20261019 debug murmurations "init toward origin"
+//        while (true) { GP::run_flock_simulation(&individual, 1); }
+        while (true)
+        {
+            if (pauseBeforeVisualizePreviousFS) { draw.simPause() = true; }
+            
+            
+            //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+            // TODO 20261019 debug murmurations "init toward origin"
+            draw.cameraMode() = 0;
+            //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+
+            
+            GP::run_flock_simulation(&individual, 1);
+        }
+        //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
     }
     else
     {

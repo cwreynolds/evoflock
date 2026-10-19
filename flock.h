@@ -182,6 +182,14 @@ public:
 
                 draw().cameraLookFrom() = {60, 60, 60};
                 
+                //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+                // TODO 20261019 debug murmurations "init toward origin"
+                Vec3 heading = selectedBoid()->forward() * 20;
+                selectedBoid()->annotationLineOffset(heading, Color::red(), 0.1);
+                debugPrint(selectedBoid()->speed());
+                //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+
+                
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -262,6 +270,13 @@ public:
 //        }
 //        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+        //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+        // TODO 20261019 debug murmurations "init toward origin"
+        
+        debugPrint(boid->speed())
+        
+        //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+
         
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260607 adjust centerMaxDist() to maintain constant boid density
@@ -315,6 +330,9 @@ public:
             return point;
         };
         
+        //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
+        // TODO 20261019 debug murmurations "init toward origin"
+
         // For DomeAndGround / NoObstacle / BoxObstacle
         if (EF::murmuration_mode)
         {
@@ -322,11 +340,16 @@ public:
             Vec3 boid_position = rand_in_unit_sphere * centroidMaxDistance();
             
 //            Vec3 boid_heading = rand_in_unit_sphere.normalize();
-            Vec3 boid_heading = boid_position.normalize();
-
+//            Vec3 boid_heading = boid_position.normalize();
+            Vec3 boid_heading = rand_in_unit_sphere.normalize();
+            
+//            std::cout << "About to take Early return for murmuration_mode" << std::endl;
+            
             // Early return for murmuration_mode
             return LocalSpace::fromTo(boid_position, boid_heading);
         }
+        
+        //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
 
         return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
     }

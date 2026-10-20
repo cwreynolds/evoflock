@@ -519,8 +519,8 @@ void visualizeBestIfRequested(LP::Population* population)
 
 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 // TODO 20260625 annotation selected boid's steerTowardCentroid()
-//bool pauseBeforeVisualizePreviousFS = false;
-bool pauseBeforeVisualizePreviousFS = true;
+bool pauseBeforeVisualizePreviousFS = false;
+//bool pauseBeforeVisualizePreviousFS = true;
 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
 // Tool to (optionally) visualize a previous logged result. For example, after
@@ -1152,16 +1152,25 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     2.99865, 13.3744, 1.06284, 96.9604, 0.809296,
         //                     0.801659, 0.841637});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20261018_ga_murm_cent_blend_06_dist_scale_07 with bigger flock
-        
         // Saved best FP values from run 20261018_ga_murm_cent_blend_06_dist_scale_07
         // ()
-        FlockParameters fp({56.6898, 95.4059, 61.776, 53.4552, 14.9512,
-                            31.824, 32.7552, 3.01195, 51.3896, 2.43534,
-                            -0.92373, 0.0663624, 0.761259, 39.606,
-                            3.02882, 38.5175, 1.79029, 76.2449, 0.354588,
-                            0.202012, 0.461432});
+        // FlockParameters fp({56.6898, 95.4059, 61.776, 53.4552, 14.9512,
+        //                     31.824, 32.7552, 3.01195, 51.3896, 2.43534,
+        //                     -0.92373, 0.0663624, 0.761259, 39.606,
+        //                     3.02882, 38.5175, 1.79029, 76.2449, 0.354588,
+        //                     0.202012, 0.461432});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261019_ga_murm_init_toward_origin_bug with bigger flock
+        
+        // Saved best FP values from run 20261019_ga_murm_init_toward_origin_bug
+        // (AHA! direction vs position in from-to)
+        // (But still getting bad centroidAntiDonutScore, try tweaking that?)
+        FlockParameters fp({99.4626, 91.9569, 40.5606, 98.8312, 7.03269,
+                            4.75024, 31.8399, 3.16874, 47.3947, 25.4626,
+                            -0.821323, -0.844557, 0.366421, 20.9816,
+                            8.35263, 26.2545, 1.097, 90.2277, 0.651235,
+                            0.289539, 0.622153});
 
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1227,7 +1236,7 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
             
             //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
             // TODO 20261019 debug murmurations "init toward origin"
-            draw.cameraMode() = 0;
+//            draw.cameraMode() = 0;
             //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
 
             

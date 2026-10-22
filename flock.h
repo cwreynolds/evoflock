@@ -887,14 +887,25 @@ public:
                 if (max_flock_radius < bcd) { max_flock_radius = bcd; }
             }
             
-//            shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
-            double flock_volume = shape::Sphere::volumeFromRadius(max_flock_radius);
-//            double flock_density = flock_volume / boids().size();
-            double flock_density = boids().size() / flock_volume;
-//            debugPrint(max_flock_radius);
-//            debugPrint(flock_volume);
-            std::cout << "boids per m³ = ";
-            debugPrint(flock_density);
+            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+            // TODO 20261022 experiment with metric for (inverse?) flock density
+            
+
+//    //            shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
+//                double flock_volume = shape::Sphere::volumeFromRadius(max_flock_radius);
+//    //            double flock_density = flock_volume / boids().size();
+//                double flock_density = boids().size() / flock_volume;
+//    //            debugPrint(max_flock_radius);
+//    //            debugPrint(flock_volume);
+
+            shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
+            double flock_volume = flock_sphere.volume();
+            double flock_density = boids().size() / flock_volume; //boids per m³
+            
+            std::cout << clock().frameCounter();
+            std::cout << ": m³ per boid = " << 1 / flock_density << std::endl;
+
+            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
 
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }

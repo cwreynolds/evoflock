@@ -26,6 +26,13 @@ public:
     Vec3 center;
     double radius = 1;
     
+    //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+    // TODO 20261022 experiment with metric for (inverse?) flock density
+
+    double volume() const { return volumeFromRadius(radius); }
+    
+    //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+
     // Get radius from a sphere's volume. (Used for murmuration density.)
     // r = cube root of (3/4 • v/π)
     static double radiusFromVolume(double volume)

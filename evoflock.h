@@ -1160,18 +1160,27 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     3.02882, 38.5175, 1.79029, 76.2449, 0.354588,
         //                     0.202012, 0.461432});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20261019_ga_murm_init_toward_origin_bug with bigger flock
-        
         // Saved best FP values from run 20261019_ga_murm_init_toward_origin_bug
         // (AHA! direction vs position in from-to)
         // (But still getting bad centroidAntiDonutScore, try tweaking that?)
-        FlockParameters fp({99.4626, 91.9569, 40.5606, 98.8312, 7.03269,
-                            4.75024, 31.8399, 3.16874, 47.3947, 25.4626,
-                            -0.821323, -0.844557, 0.366421, 20.9816,
-                            8.35263, 26.2545, 1.097, 90.2277, 0.651235,
-                            0.289539, 0.622153});
+        // FlockParameters fp({99.4626, 91.9569, 40.5606, 98.8312, 7.03269,
+        //                     4.75024, 31.8399, 3.16874, 47.3947, 25.4626,
+        //                     -0.821323, -0.844557, 0.366421, 20.9816,
+        //                     8.35263, 26.2545, 1.097, 90.2277, 0.651235,
+        //                     0.289539, 0.622153});
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261020_ga_murm_donut_02_to_03 with bigger flock
+        
+        // Saved best FP values from run 20261020_ga_murm_donut_02_to_03
+        // (AHA! direction vs position in from-to)
+        // (But still getting bad centroidAntiDonutScore, try tweaking that?)
+        FlockParameters fp({92.1122, 94.5379, 68.959, 87.964, 24.2417,
+                            35.919, 32.9889, 2.21386, 16.4516, 10.4711,
+                            -0.526217, 0.490771, 0.229172, 54.3628,
+                            8.07099, 28.5652, 1.01695, 86.7331, 0.718106,
+                            0.208374, 0.790204});
+        
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

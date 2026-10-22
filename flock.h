@@ -363,7 +363,17 @@ public:
         {
             Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
             Vec3 position = rand_in_unit_sphere * centroidMaxDistance();
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20261020 experiment with "orbital" initial murm pose.
+            //               seemed to make the tornado mode even worse
+            
+//            Vec3 heading = rs.randomUnitVector();
+//            Vec3 heading = position.normalize().find_perpendicular();
             Vec3 heading = rs.randomUnitVector();
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
             // Early return for murmuration_mode
             return LocalSpace::fromTo(position, position + heading);
         }
@@ -524,6 +534,32 @@ public:
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }
 
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20261020 bring back DonutHoleAxisChange annotation
+    
+//    void xxxTrackDonutHoleAxisChanges()
+//    {
+//        Vec3 sum_of_cross_prods;
+//        auto per_boid_donut_axis = [&](Boid* b)
+//        {
+//            auto nn = b->nearestNeighbor();
+//            Vec3 cross_neighbor = Vec3::cross(b->forward(), nn.forward());
+//            sum_of_cross_prods += cross_neighbor;
+//        };
+//        for_all_boids(per_boid_donut_axis);
+//        
+//        Vec3 donut_hole_axis = sum_of_cross_prods.normalize();
+//        
+//        double delta_axis_angle = Vec3::angle_between(donut_hole_axis,
+//                                                      previous_donut_hole_axis_);
+//        // std::cout << delta_axis_angle << std::endl;
+//        previous_donut_hole_axis_ = donut_hole_axis;
+//        
+//        double enough_jiggle = 0.20;
+//        if (delta_axis_angle > enough_jiggle) { total_anti_donut_good_steps_++; }
+//    }
+
+    
     void xxxTrackDonutHoleAxisChanges()
     {
         Vec3 sum_of_cross_prods;
@@ -533,7 +569,11 @@ public:
             Vec3 cross_neighbor = Vec3::cross(b->forward(), nn.forward());
             sum_of_cross_prods += cross_neighbor;
         };
-        for_all_boids(per_boid_donut_axis);
+        
+        // TODO 20261020 do a simple loop to avoid multi-threaded count issues?
+        //        for_all_boids(per_boid_donut_axis);
+        for (Boid* b : boids()) { per_boid_donut_axis(b); }
+        
         
         Vec3 donut_hole_axis = sum_of_cross_prods.normalize();
         
@@ -542,9 +582,41 @@ public:
         // std::cout << delta_axis_angle << std::endl;
         previous_donut_hole_axis_ = donut_hole_axis;
         
-        double enough_jiggle = 0.20;
-        if (delta_axis_angle > enough_jiggle) { total_anti_donut_good_steps_++; }
+//            double enough_jiggle = 0.20;
+//    //        double enough_jiggle = 0.50;
+//    //        double enough_jiggle = 0.30;
+//            if (delta_axis_angle > enough_jiggle) { total_anti_donut_good_steps_++; }
+      
+//        double jiggle_threshold = 0.20;  // in radians
+        double jiggle_threshold = 0.30;  // in radians
+        bool enough_jiggle = delta_axis_angle > jiggle_threshold;
+        if (enough_jiggle) { total_anti_donut_good_steps_++; }
+
+        
+        // TODO 20261020  bring back annotation
+        if (show_annotation_for_anti_donut_hole_)
+        {
+            Vec3 ep = sum_of_cross_prods.normalize() * 50;
+//            Color c1 = Color::orange();
+//            Color c2 = Color::white() - Color::orange();
+            Color color = enough_jiggle ? Color::green() : Color::red();
+            
+//            if (delta_axis_angle < enough_jiggle) { c1 = Color::black(); c2 = c1; }
+
+            
+            Vec3 coc = centroidOfCentroids();
+//            draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
+//            draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
+//            draw().addAnnotationLine(coc, coc + ep, c1, 0.2);
+//            draw().addAnnotationLine(coc, coc - ep, c2, 0.2);
+            draw().addAnnotationLine(coc, coc + ep, color, 0.2);
+            draw().addAnnotationLine(coc, coc - ep, color, 0.2);
+        }
     }
+
+    bool show_annotation_for_anti_donut_hole_ = true;
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     double total_anti_donut_good_steps_ = 0;
 
@@ -802,6 +874,29 @@ public:
             for (auto b : boids()) { sum_of_boid_centroids += b->centroid(); }
 //            centroid_ = sum_of_boid_centroids / boids().size();
             centroid_of_centroids_ = sum_of_boid_centroids / boids().size();
+            
+            
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20261021 prototype flock density determination
+            
+            double max_flock_radius = 0;
+            for (auto b : boids())
+            {
+                // distance from boid to flock's centroidOfCentroids().
+                double bcd = (b->position() - centroidOfCentroids()).length();
+                if (max_flock_radius < bcd) { max_flock_radius = bcd; }
+            }
+            
+//            shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
+            double flock_volume = shape::Sphere::volumeFromRadius(max_flock_radius);
+//            double flock_density = flock_volume / boids().size();
+            double flock_density = boids().size() / flock_volume;
+//            debugPrint(max_flock_radius);
+//            debugPrint(flock_volume);
+            std::cout << "boids per m³ = ";
+            debugPrint(flock_density);
+
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
         else
         {

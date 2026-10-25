@@ -54,6 +54,26 @@ public:
         parameter_type_names_(parameter_type_names),
         eval_(eval),
         selection_weight_(selection_weight) {}
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20261024 mocking up a GpFunction with NAMES for parameters.
+    //               Adding (currently unused) constructor with param NAMES.
+
+    GpFunction(const std::string& name,
+               const std::string& return_type_name,
+               const std::vector<std::string>& parameter_type_names,
+               const std::vector<std::string>& parameter_names,
+               std::function<std::any(GpTree& t)> eval,
+               float selection_weight)
+      : name_(name),
+        return_type_name_(return_type_name),
+        parameter_type_names_(parameter_type_names),
+        parameter_names_(parameter_names),
+        eval_(eval),
+        selection_weight_(selection_weight) {}
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    
     // String name of this GpFunction.
     const std::string& name() const { return name_; }
     // String name of this GpFunction's return type.
@@ -120,6 +140,10 @@ private:
     std::string return_type_name_;
     GpType* return_type_ = nullptr;
     std::vector<std::string> parameter_type_names_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20261024 mocking up a GpFunction with NAMES for parameters.
+    std::vector<std::string> parameter_names_;
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     std::vector<GpType*> parameter_types_;
     int min_size_to_terminate_ = std::numeric_limits<int>::max();
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -133,6 +157,16 @@ private:
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     float selection_weight_ = 1;
+    
+    
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20261024 mocking up a GpFunction with NAMES for parameters.
+    static const std::string int2let(int n)
+    {
+        assert(n >= 1 && n <= 26);  // TODO 20261024 time-bomb waiting to fail.
+        return std::string("abcdefghijklmnopqrstuvwxyz").substr(n-1, 1);
+    }
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 };
 
 }  // end of namespace LazyPredator

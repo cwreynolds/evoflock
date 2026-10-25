@@ -164,6 +164,23 @@ void recordDataForSimsPerFit1vs4(LP::Population* population, double time_in_sec)
 
 void runOneFlockEvolution()
 {
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20261024 mocking up a GpFunction with NAMES for parameters.
+    
+    std::cout << std::endl;
+    std::vector<std::string> aaa = {"a", "a", "a"};
+    std::vector<std::string> abc = {"a", "b", "c"};
+    std::vector<std::string> abc2 = {"a", "b", "c"};
+    debugPrint(aaa == aaa)
+    debugPrint(aaa == abc);
+    debugPrint(abc == abc2);
+    
+    // "GpFunction: Run_Flock, return_type: Flock_Parameters, 0 parameters: ()."
+    GP::mock_up.print();
+    
+    exit(EXIT_SUCCESS);
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
     EF::setUsingGA();
     // EF::setUsingGP();

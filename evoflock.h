@@ -37,8 +37,8 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-//inline static bool visualize_previous_results_mode = false;
-inline static bool visualize_previous_results_mode = true;
+inline static bool visualize_previous_results_mode = false;
+//inline static bool visualize_previous_results_mode = true;
 
 // Global switch to enable/disable multithreading.
 inline static bool enable_multithreading = true;
@@ -166,7 +166,9 @@ void runOneFlockEvolution()
 {
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20261024 mocking up a GpFunction with NAMES for parameters.
-    
+
+//    for (int i=0;i<1000;i++){std::cout<<LP::GpFunction::intToStr(i)<<std::endl;}
+
     std::cout << std::endl;
     std::vector<std::string> aaa = {"a", "a", "a"};
     std::vector<std::string> abc = {"a", "b", "c"};

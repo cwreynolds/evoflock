@@ -169,18 +169,22 @@ void runOneFlockEvolution()
 
 //    for (int i=0;i<1000;i++){std::cout<<LP::GpFunction::intToStr(i)<<std::endl;}
 
-    std::cout << std::endl;
-    std::vector<std::string> aaa = {"a", "a", "a"};
-    std::vector<std::string> abc = {"a", "b", "c"};
-    std::vector<std::string> abc2 = {"a", "b", "c"};
-    debugPrint(aaa == aaa)
-    debugPrint(aaa == abc);
-    debugPrint(abc == abc2);
+//    std::cout << std::endl;
+//    std::vector<std::string> aaa = {"a", "a", "a"};
+//    std::vector<std::string> abc = {"a", "b", "c"};
+//    std::vector<std::string> abc2 = {"a", "b", "c"};
+//    debugPrint(aaa == aaa)
+//    debugPrint(aaa == abc);
+//    debugPrint(abc == abc2);
+//    
+//    // "GpFunction: Run_Flock, return_type: Flock_Parameters, 0 parameters: ()."
+//    GP::mock_up.print();
+//    
+//    std::cout << std::endl;
+//    GP::evoflockGpFunctionSet().print();
+//    
+//    exit(EXIT_SUCCESS);
     
-    // "GpFunction: Run_Flock, return_type: Flock_Parameters, 0 parameters: ()."
-    GP::mock_up.print();
-    
-    exit(EXIT_SUCCESS);
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?

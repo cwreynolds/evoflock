@@ -221,8 +221,8 @@ typedef std::vector<std::vector<std::string>> vecOfVecOfStrings;
 //                           const vecOfVecOfStrings& names,
 //                           const LP::FunctionSet& fs)
 bool areFuncsInTree(const LP::GpTree& tree,
-                           const vecOfVecOfStrings& names,
-                           const LP::FunctionSet& fs)
+                    const vecOfVecOfStrings& names,
+                    const LP::FunctionSet& fs)
 {
     bool ok = true;
     for (auto& alternatives : names)
@@ -1097,42 +1097,145 @@ LazyPredator::FunctionSet static_ga_fs_ =
 //
 //    }};
 
-LP::GpFuncParamList mock_upgpfpl
-({
-    "Real_0_100",  "max_force",
-    
-    "Real_0_100",  "weight_forward",
-    "Real_0_100",  "weight_separate",
-    "Real_0_100",  "weight_align",
-    "Real_0_100",  "weight_cohere",
-    
-    "Real_0_100",  "weightAvoidPredict",
-    "Real_0_100",  "weightAvoidStatic",
-    
-    "Real_0_100",  "max_dist_separate",
-    "Real_0_100",  "max_dist_align",
-    "Real_0_100",  "max_dist_cohere",
-    
-    // Cosine of threshold angle (max angle from forward to be seen)
-    
-    "Real_m1_p1",  "angle_separate",
-    "Real_m1_p1",  "angle_align",
-    "Real_m1_p1",  "angle_cohere",
-    
-    "Real_0_100",  "fly_away_max_dist",
-    "Real_0_10",   "min_time_to_collide",
-    
-    "Real_0_50",   "FP::centerMaxDist()",
-    "Real_1_2",    "FP::centerExponent()",
-    "Real_0_100",  "FP::centeringStrength()",
-    
-    "Real_0_1",    "FP::centerInNess()",
-    "Real_0_1",    "FP::centerSlowing()",
-    "Real_0_1",    "FP::centerCentering()",
-    
-    "XXX QQQ",     "TODO"
-});
+//    LP::GpFuncParamList mock_upgpfpl
+//     ({
+//         "Real_0_100",  "max_force",
+//
+//         "Real_0_100",  "weight_forward",
+//         "Real_0_100",  "weight_separate",
+//         "Real_0_100",  "weight_align",
+//         "Real_0_100",  "weight_cohere",
+//
+//         "Real_0_100",  "weightAvoidPredict",
+//         "Real_0_100",  "weightAvoidStatic",
+//
+//         "Real_0_100",  "max_dist_separate",
+//         "Real_0_100",  "max_dist_align",
+//         "Real_0_100",  "max_dist_cohere",
+//
+//         // Cosine of threshold angle (max angle from forward to be seen)
+//
+//         "Real_m1_p1",  "angle_separate",
+//         "Real_m1_p1",  "angle_align",
+//         "Real_m1_p1",  "angle_cohere",
+//
+//         "Real_0_100",  "fly_away_max_dist",
+//         "Real_0_10",   "min_time_to_collide",
+//
+//         "Real_0_50",   "FP::centerMaxDist()",
+//         "Real_1_2",    "FP::centerExponent()",
+//         "Real_0_100",  "FP::centeringStrength()",
+//
+//         "Real_0_1",    "FP::centerInNess()",
+//         "Real_0_1",    "FP::centerSlowing()",
+//         "Real_0_1",    "FP::centerCentering()",
+//
+//         //    "XXX QQQ",     "TODO"
+//     });
 
+
+
+//    LP::GpFunction mock_up =
+//    {
+//        // GP function name:
+//        "mock_Run_Flock",
+//
+//        // Return type: a FlockParameters object.
+//        "Flock_Parameters",
+//
+//
+//    //    mock_upgpfpl,
+//
+//        LP::GpFuncParamList({
+//            "Real_0_100",  "max_force",
+//
+//            "Real_0_100",  "weight_forward",
+//            "Real_0_100",  "weight_separate",
+//            "Real_0_100",  "weight_align",
+//            "Real_0_100",  "weight_cohere",
+//
+//            "Real_0_100",  "weightAvoidPredict",
+//            "Real_0_100",  "weightAvoidStatic",
+//
+//            "Real_0_100",  "max_dist_separate",
+//            "Real_0_100",  "max_dist_align",
+//            "Real_0_100",  "max_dist_cohere",
+//
+//            // Cosine of threshold angle (max angle from forward to be seen)
+//
+//            "Real_m1_p1",  "angle_separate",
+//            "Real_m1_p1",  "angle_align",
+//            "Real_m1_p1",  "angle_cohere",
+//
+//            "Real_0_100",  "fly_away_max_dist",
+//            "Real_0_10",   "min_time_to_collide",
+//
+//            "Real_0_50",   "FP::centerMaxDist()",
+//            "Real_1_2",    "FP::centerExponent()",
+//            "Real_0_100",  "FP::centeringStrength()",
+//
+//            "Real_0_1",    "FP::centerInNess()",
+//            "Real_0_1",    "FP::centerSlowing()",
+//            "Real_0_1",    "FP::centerCentering()",
+//
+//    //        "XXX QQQ",     "TODO"
+//        }),
+
+//    LP::GpFunction mock_up =
+//    {
+//        // GP function name:
+//        "mock_Run_Flock",
+//
+//        // Return type: a FlockParameters object.
+//        "Flock_Parameters",
+//
+//        LP::GpFuncParamList({
+//            {"Real_0_100",  "max_force"},
+//
+//            {"Real_0_100",  "weight_forward"},
+//            {"Real_0_100",  "weight_separate"},
+//            {"Real_0_100",  "weight_align"},
+//            {"Real_0_100",  "weight_cohere"},
+//
+//            {"Real_0_100",  "weightAvoidPredict"},
+//            {"Real_0_100",  "weightAvoidStatic"},
+//
+//            {"Real_0_100",  "max_dist_separate"},
+//            {"Real_0_100",  "max_dist_align"},
+//            {"Real_0_100",  "max_dist_cohere"},
+//
+//            // Cosine of threshold angle (max angle from forward to be seen)
+//
+//            {"Real_m1_p1",  "angle_separate"},
+//            {"Real_m1_p1",  "angle_align"},
+//            {"Real_m1_p1",  "angle_cohere"},
+//
+//            {"Real_0_100",  "fly_away_max_dist"},
+//            {"Real_0_10",   "min_time_to_collide"},
+//
+//            {"Real_0_50",   "FP::centerMaxDist()"},
+//            {"Real_1_2",    "FP::centerExponent()"},
+//            {"Real_0_100",  "FP::centeringStrength()"},
+//
+//            {"Real_0_1",    "FP::centerInNess()"},
+//            {"Real_0_1",    "FP::centerSlowing()"},
+//            {"Real_0_1",    "FP::centerCentering()"},
+//
+//    //        "XXX QQQ",     "TODO"
+//        }),
+//
+//
+//        // Evaluation function, which runs a flock simulation with the given
+//        // parameters and returns the fitness.
+//        [](LazyPredator::GpTree& t)
+//        {
+//            // TODO should the body of fp_from_ga_tree() be written
+//            // inline here? or is it used elsewhere?
+//            return std::any(fp_from_ga_tree(t));
+//        }
+//
+//        , 1
+//    };
 
 
 LP::GpFunction mock_up =
@@ -1143,10 +1246,39 @@ LP::GpFunction mock_up =
     // Return type: a FlockParameters object.
     "Flock_Parameters",
     
+    LP::GpFuncParamList({
+        {"Real_0_100",  "max_force"},
+        
+        {"Real_0_100",  "weight_forward"},
+        {"Real_0_100",  "weight_separate"},
+        {"Real_0_100",  "weight_align"},
+        {"Real_0_100",  "weight_cohere"},
+        
+        {"Real_0_100",  "weightAvoidPredict"},
+        {"Real_0_100",  "weightAvoidStatic"},
+        
+        {"Real_0_100",  "max_dist_separate"},
+        {"Real_0_100",  "max_dist_align"},
+        {"Real_0_100",  "max_dist_cohere"},
+        
+        // Cosine of threshold angle (max angle from forward to be seen)
+        
+        {"Real_m1_p1",  "angle_separate"},
+        {"Real_m1_p1",  "angle_align"},
+        {"Real_m1_p1",  "angle_cohere"},
+        
+        {"Real_0_100",  "fly_away_max_dist"},
+        {"Real_0_10",   "min_time_to_collide"},
+        
+        {"Real_0_50",   "FP::centerMaxDist()"},
+        {"Real_1_2",    "FP::centerExponent()"},
+        {"Real_0_100",  "FP::centeringStrength()"},
+        
+        {"Real_0_1",    "FP::centerInNess()"},
+        {"Real_0_1",    "FP::centerSlowing()"},
+        {"Real_0_1",    "FP::centerCentering()"},
+    }),
 
-    mock_upgpfpl,
-    
-    
     // Evaluation function, which runs a flock simulation with the given
     // parameters and returns the fitness.
     [](LazyPredator::GpTree& t)
@@ -1156,8 +1288,11 @@ LP::GpFunction mock_up =
         return std::any(fp_from_ga_tree(t));
     }
     
-    , 1
+//    , 1
 };
+
+
+
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

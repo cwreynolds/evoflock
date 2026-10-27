@@ -902,8 +902,8 @@ public:
             double flock_volume = flock_sphere.volume();
             double flock_density = boids().size() / flock_volume; //boids per m³
             
-            std::cout << clock().frameCounter();
-            std::cout << ": m³ per boid = " << 1 / flock_density << std::endl;
+//            std::cout << clock().frameCounter();
+//            std::cout << ": m³ per boid = " << 1 / flock_density << std::endl;
 
             //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
 

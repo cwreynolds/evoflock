@@ -29,14 +29,14 @@
 namespace fs = std::filesystem;
 class Vec3;
 
-namespace Utilities 
+// Vectors of name strings, and vectors of those.
+typedef std::vector<std::string> VecOfStrings;
+typedef std::vector<VecOfStrings> VecOfVecOfStrings;
+
+namespace Utilities
 {
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// TODO 20241221 square panels on cylinders
 
 double pi = std::acos(-1);
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 // Generic interpolation
 template<typename F,typename T>
@@ -155,7 +155,7 @@ template <typename T> std::string vec_to_string(const std::vector<T>& vector)
 std::string ordinal_word(int n)
 {
     // The OCD in me wants a version for all non-negative numbers, but for now:
-    std::vector<std::string> ordinals = {"zeroth", "first", "second", "third",
+    VecOfStrings ordinals = {"zeroth", "first", "second", "third",
         "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth",
         "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth",
         "sixteenth", "seventeenth", "eighteenth", "nineteenth", "twentieth"};

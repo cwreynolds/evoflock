@@ -170,9 +170,9 @@ void runOneFlockEvolution()
 //    for (int i=0;i<1000;i++){std::cout<<LP::GpFunction::intToStr(i)<<std::endl;}
 
 //    std::cout << std::endl;
-//    std::vector<std::string> aaa = {"a", "a", "a"};
-//    std::vector<std::string> abc = {"a", "b", "c"};
-//    std::vector<std::string> abc2 = {"a", "b", "c"};
+//    VecOfStrings aaa = {"a", "a", "a"};
+//    VecOfStrings abc = {"a", "b", "c"};
+//    VecOfStrings abc2 = {"a", "b", "c"};
 //    debugPrint(aaa == aaa)
 //    debugPrint(aaa == abc);
 //    debugPrint(abc == abc2);
@@ -186,6 +186,59 @@ void runOneFlockEvolution()
 //    exit(EXIT_SUCCESS);
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261028 make FlockParameters expose a VecOfStrings of param names.
+
+    FlockParameters().print();
+
+    // Before any changes:
+    //
+    //    FlockParameters object containing these values:
+    //    7 constant parameters:
+    //    bodyDiameter() = 1
+    //    sphereRadius() = 50
+    //    sphereCenter() = Vec3(0, 0, 0)
+    //    maxSimulationSteps() = 500
+    //    boidsPerFlock() = 1000
+    //    useObstacleSet() = NoObstacles
+    //    getFPS() = 30
+    //    21 parameters to be optimized:
+    //    maxForce() = 100
+    //    weightForward() = 4
+    //    weightSeparate() = 40
+    //    weightAlign() = 45
+    //    weightCohere() = 35
+    //    weightAvoidPredict() = 85
+    //    weightAvoidStatic() = 55
+    //    maxDistSeparate() = 15
+    //    maxDistAlign() = 40
+    //    maxDistCohere() = 40
+    //    angleSeparate() = -1
+    //    angleAlign() = 0.6
+    //    angleCohere() = -0.4
+    //    flyAwayMaxDist() = 10
+    //    minTimeToCollide() = 1.4
+    //    centerMaxDist() = 40
+    //    centerExponent() = 0
+    //    centeringStrength() = 90
+    //    centerInNess() = 0.707
+    //    centerSlowing() = 0.5
+    //    centerCentering() = 0.5
+
+    {
+        FlockParameters fp;
+        
+        const LP::FunctionSet& fs = GP::evoflockGaFunctionSet();
+        const LP::GpFunction* gp_func = fs.lookupGpFunctionByName("Run_Flock");
+
+        fp.assertEqualTwoVecOfStrings(fp.allParameterNames(),
+                                      gp_func->parameterNames());
+    }
+    
+    exit(EXIT_SUCCESS);
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
     EF::setUsingGA();

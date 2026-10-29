@@ -23,7 +23,7 @@ public:
     MultiObjectiveFitness(const std::vector<double>& multi_objective_fitness)
       : MultiObjectiveFitness(multi_objective_fitness, {}) {}
     MultiObjectiveFitness(const std::vector<double>& multi_objective_fitness,
-                          const std::vector<std::string>& names)
+                          const VecOfStrings& names)
     {
         mof_ = multi_objective_fitness;
         names_ = names;
@@ -151,7 +151,7 @@ private:
     
     // TODO maybe instead of this in each instance, maybe just provide a
     // utility function which takes this as an argument?
-    std::vector<std::string> names_;
+    VecOfStrings names_;
 };
 
 }  // end of namespace LazyPredator

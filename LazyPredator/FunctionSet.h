@@ -821,7 +821,7 @@ public:
     GpTree compile(const std::string& source_code) const
     {
         GpTree tree;
-        std::vector<std::string> tokens = tokenizeTreeSource(source_code);
+        VecOfStrings tokens = tokenizeTreeSource(source_code);
         int token_index = 0;
         compileTreeNode(tree, getRootType(), token_index, tokens);
         // debugPrint(token_index);
@@ -833,7 +833,7 @@ public:
     GpTree compileTreeNode(GpTree& tree,
                            const GpType* type,
                            int& token_index,
-                           const std::vector<std::string>& tokens) const
+                           const VecOfStrings& tokens) const
     {
         assert (type);
         std::string first_token = tokens.at(token_index);
@@ -881,7 +881,7 @@ public:
         return n;
     };
 
-    static std::vector<std::string> tokenizeTreeSource(const std::string& source)
+    static VecOfStrings tokenizeTreeSource(const std::string& source)
     {
         
         // Preprocess source code to be uniformly delimited by single blanks.
@@ -895,7 +895,7 @@ public:
         s = findAndReplaceAllOccurrences("\\n", " ", s);
         s = removeDuplicateWhitespace(s);
 
-        std::vector<std::string> tokens;
+        VecOfStrings tokens;
         size_t start = 0;
         size_t delim = 0;
         while (start < s.size())

@@ -890,18 +890,10 @@ public:
             //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
             // TODO 20261022 experiment with metric for (inverse?) flock density
             
-
-//    //            shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
-//                double flock_volume = shape::Sphere::volumeFromRadius(max_flock_radius);
-//    //            double flock_density = flock_volume / boids().size();
-//                double flock_density = boids().size() / flock_volume;
-//    //            debugPrint(max_flock_radius);
-//    //            debugPrint(flock_volume);
-
-            shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
-            double flock_volume = flock_sphere.volume();
-            double flock_density = boids().size() / flock_volume; //boids per m³
-            
+//            shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
+//            double flock_volume = flock_sphere.volume();
+//            double flock_density = boids().size() / flock_volume; //boids per m³
+//            
 //            std::cout << clock().frameCounter();
 //            std::cout << ": m³ per boid = " << 1 / flock_density << std::endl;
 
@@ -914,11 +906,9 @@ public:
             Vec3 sum_of_boid_positions;
             for (auto b : boids()) { sum_of_boid_positions += b->position(); }
             Vec3 average_position = sum_of_boid_positions / boids().size();
-//            centroid_ = average_position;
             centroid_of_centroids_ = average_position;
 
             // Set centroid values in each boid.
-//            for (auto b : boids()) {b->setCentroid(centroid_);}
             for (auto b : boids()) {b->setCentroid(centroid_of_centroids_);}
         }
 

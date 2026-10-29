@@ -195,45 +195,6 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
-//        // Constructor for individual tunable parameters.
-//        FlockParameters(double max_force,
-//                        double weight_forward,
-//                        double weight_separate,
-//                        double weight_align,
-//                        double weight_cohere,
-//                        double weight_avoid_predict,
-//                        double weight_avoid_static,
-//                        double max_dist_separate,
-//                        double max_dist_align,
-//                        double max_dist_cohere,
-//                        double angle_separate,
-//                        double angle_align,
-//                        double angle_cohere,
-//                        double fly_away_max_dist,
-//                        
-//    //                    double min_time_to_collide)
-//                        double min_time_to_collide,
-//                        double murm_max_distance
-//                        )
-//
-//          : FlockParameters
-//        (std::vector<double>({
-//            max_force,
-//            weight_forward,
-//            weight_separate,
-//            weight_align,
-//            weight_cohere,
-//            weight_avoid_predict,
-//            weight_avoid_static,
-//            max_dist_separate,
-//            max_dist_align,
-//            max_dist_cohere,
-//            angle_separate,
-//            angle_align,
-//            angle_cohere,
-//            fly_away_max_dist,
-//            min_time_to_collide
-//        })) {}
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -317,6 +278,57 @@ public:
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261028 make FlockParameters expose a VecOfStrings of param names.
+    // TODO 20261028 mock-up of parameter name access
+    
+    VecOfStrings allParameterNames() const
+    {
+        return
+        {
+            "maxForce",
+            "weightForward",
+            "weightSeparate",
+            "weightAlign",
+            "weightCohere",
+            "weightAvoidPredict",
+            "weightAvoidStatic",
+            "maxDistSeparate",
+            "maxDistAlign",
+            "maxDistCohere",
+            "angleSeparate",
+            "angleAlign",
+            "angleCohere",
+            "flyAwayMaxDist",
+            "minTimeToCollide",
+            "centerMaxDist",
+            "centerExponent",
+            "centeringStrength",
+            "centerInNess",
+            "centerSlowing",
+            "centerCentering",
+        };
+    }
+    
+    static void assertEqualTwoVecOfStrings(const VecOfStrings& a,
+                                           const VecOfStrings& b)
+    {
+        size_t as = a.size();
+        size_t bs = b.size();
+        std::string mismatch_msg = "Size mismatch between name sets.";
+        if (as != bs) { std::cout << mismatch_msg << std::endl; }
+        
+        for (int i = 0; i < std::max(as, bs); i++)
+        {
+            std::cout << (i < as ? a.at(i) : "          ");
+            std::cout << " ";
+            std::cout << (i < bs ? b.at(i) : "          ");
+            std::cout << std::endl;
+        }
+    }
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     // Get i-th tuning parameter
     // TODO experimental reconsider design.
     double getTuningParameter(int i) const { return tuning_parameters.at(i); }

@@ -149,7 +149,7 @@ private:
     std::function<std::any(std::any)> jiggle_ = nullptr;
     // Pointers to (and names of) GpFunctions which return this type.
     std::vector<GpFunction*> functions_returning_this_type_;
-    std::vector<std::string> names_of_functions_returning_this_type_;
+    VecOfStrings names_of_functions_returning_this_type_;
     // Minimum "size" of tree returning this type from root;
     int min_size_to_terminate_ = std::numeric_limits<int>::max();
     // Optional function to delete a heap-allocated value of this GpType, e.g.

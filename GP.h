@@ -53,9 +53,9 @@ inline std::function<double(MOF)> scalarize_fitness = scalarize_fitness_hyperVol
 
 
 // Component names for MOF (multi-objective fitness) values (by mode settings).
-inline std::vector<std::string> mof_names()
+inline VecOfStrings mof_names()
 {
-    std::vector<std::string> strings;
+    VecOfStrings strings;
     if (EF::use_avoid_objective)     { strings.push_back("avoid"); }
     if (EF::use_separate_objective)  { strings.push_back("separate"); }
     if (EF::use_speed_objective)     { strings.push_back("speed"); }
@@ -109,7 +109,7 @@ inline void fitness_logger(const MOF& mof)
     // Format labels.
     std::string sc = "scalar composite";
     size_t cw = sc.size();  // Column width.
-    std::vector<std::string> labels;
+    VecOfStrings labels;
     for (auto& s : mof_names()) { labels.push_back(s + " fitness"); }
     for (auto& s : labels){ size_t ss = s.size(); if (cw < ss) { cw = ss; } }
     // Print one row of a table with a named mof fitness.
@@ -209,8 +209,6 @@ void doOneRunDebugLogging(Boid& boid,
 }
 
 
-typedef std::vector<std::vector<std::string>> vecOfVecOfStrings;
-
 // Check if a given collection of GpFunction names are contained in the given
 // GpTree. The collection is an "and of or", a vector of vectors of strings:
 // std::vector<std::vector<std::string>>. The tree must contain one function
@@ -218,10 +216,10 @@ typedef std::vector<std::vector<std::string>> vecOfVecOfStrings;
 // example: {{"a", "aa", "aaa"}, {"b", "bb", "bbb"}, {"c", "cc", "ccc"}} would
 // match a tree containing functions: aa, b, and ccc.
 //inline bool areFuncsInTree(const LP::GpTree& tree,
-//                           const vecOfVecOfStrings& names,
+//                           const VecOfVecOfStrings& names,
 //                           const LP::FunctionSet& fs)
 bool areFuncsInTree(const LP::GpTree& tree,
-                    const vecOfVecOfStrings& names,
+                    const VecOfVecOfStrings& names,
                     const LP::FunctionSet& fs)
 {
     bool ok = true;
@@ -244,7 +242,7 @@ bool areFuncsInTree(const LP::GpTree& tree,
 bool evoflockGpValidateTree(const LP::GpTree& tree,
                             const LP::FunctionSet& fs)
 {
-    vecOfVecOfStrings required_gp_funcs =
+    VecOfVecOfStrings required_gp_funcs =
     {
         { "Velocity" },
         { "NeighborhoodVelocityDiff", "NearestNeighborVelocityDiff" },
@@ -549,6 +547,15 @@ LazyPredator::FunctionSet static_ga_fs_ =
                 {"Real_0_1",    "FP::centerInNess()"},
                 {"Real_0_1",    "FP::centerSlowing()"},
                 {"Real_0_1",    "FP::centerCentering()"},
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20261027 test mismatch between GpFunc and FlockParameters
+                
+                {"Real_0_1",    "quux"}, // add one so count is wrong
+                
+                // also make it notice wrong parameter name (the quux part).
+
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }),
             
             // Evaluation function, which runs a flock simulation with the given

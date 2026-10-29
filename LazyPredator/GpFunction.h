@@ -35,11 +35,6 @@ class GpTree;      // Forward reference to class defined later.
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-// Utilities, defined at global scope, probably be moved to another file.
-typedef std::vector<std::string> VecOfStrings;
-typedef std::vector<VecOfStrings> VecOfVecOfStrings;
-
-
 // Used as third arg of a GpFunc constructor to pair parameter types and names.
 class GpFuncParamList
 {
@@ -95,8 +90,8 @@ public:
     // Version for explicit parameter_type_names and parameter_names.
     GpFunction(const std::string& name,
                const std::string& return_type_name,
-               const std::vector<std::string>& parameter_type_names,
-               const std::vector<std::string>& parameter_names,
+               const VecOfStrings& parameter_type_names,
+               const VecOfStrings& parameter_names,
                std::function<std::any(GpTree& t)> eval,
                float selection_weight)
       : name_(name),
@@ -115,12 +110,12 @@ public:
     const std::vector<GpType*>& parameterTypes() const
     { return parameter_types_; }
     // String names for GpTypes of all parameters of this GpFunction.
-    const std::vector<std::string>& parameterTypeNames() const
+    const VecOfStrings& parameterTypeNames() const
     { return parameter_type_names_; }
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20261025 insert default parameter names when none specified.
     // String names for all parameters of this GpFunction.
-    const std::vector<std::string>& parameterNames() const
+    const VecOfStrings& parameterNames() const
     { return parameter_names_; }
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // Set GpTypes for return type and all parameter types of this GpFunction.
@@ -208,8 +203,8 @@ private:
     std::string name_;
     std::string return_type_name_;
     GpType* return_type_ = nullptr;
-    std::vector<std::string> parameter_type_names_;
-    std::vector<std::string> parameter_names_;
+    VecOfStrings parameter_type_names_;
+    VecOfStrings parameter_names_;
     std::vector<GpType*> parameter_types_;
     int min_size_to_terminate_ = std::numeric_limits<int>::max();
     std::function<std::any(GpTree& t)> eval_ = nullptr;

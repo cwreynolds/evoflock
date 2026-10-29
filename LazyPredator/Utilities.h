@@ -57,6 +57,10 @@ public:
     }
 };
 
+// Vectors of name strings, and vectors of those.
+typedef std::vector<std::string> VecOfStrings;
+typedef std::vector<VecOfStrings> VecOfVecOfStrings;
+
 // Just for convenience in hand-written prototypes and tests:
 const float pi = M_PI;
 
@@ -427,9 +431,9 @@ inline std::string date_hours_minutes()
 }
 
 // Returns collection of the names of all files in the given directory pathname.
-inline std::vector<std::string> directory_filenames(std::string directory_path)
+inline VecOfStrings directory_filenames(std::string directory_path)
 {
-    std::vector<std::string> directory_contents;
+    VecOfStrings directory_contents;
     fs::path directory(directory_path);
     assert(fs::is_directory(directory));
     for (const auto& entry : fs::directory_iterator(directory))
@@ -451,7 +455,7 @@ public:
     CommandLine(){}
     CommandLine(int argc, const char* argv[]):cmd_line_(toStrings(argc, argv)){}
     // Constructor to allow injecting "unix style" command line for unit test.
-    CommandLine(std::vector<std::string> cmd_line) : cmd_line_(cmd_line) {}
+    CommandLine(VecOfStrings cmd_line) : cmd_line_(cmd_line) {}
     // For positional, non-optional, string arguments.
     // TODO provide int and float versions?
     std::string positionalArgument(int index) const
@@ -498,14 +502,14 @@ public:
         return whole_command;
     }
     // Return copy(?) of parsed cmd line as vector of strings.
-    std::vector<std::string> parsedTokens() const { return cmd_line_; }
+    VecOfStrings parsedTokens() const { return cmd_line_; }
 private:
     // Given traditional main() parameters argc/argv, return BY VALUE an
     // std::vector of std::strings representing the tokens of a unix-style
     // command line.
-    std::vector<std::string> toStrings(int argc, const char* argv[])
+    VecOfStrings toStrings(int argc, const char* argv[])
     {
-        std::vector<std::string> cmd_line;
+        VecOfStrings cmd_line;
         for (int i = 0; i < argc; i++)
         {
             cmd_line.push_back(std::string(argv[i]));
@@ -520,7 +524,7 @@ private:
                 f(cmd_line_.at(index)));
     }
     // Parsed version of the ("unix") command line that invoked this run.
-    const std::vector<std::string> cmd_line_;
+    const VecOfStrings cmd_line_;
 };
 
 // This thread allows others to run. Prevents lockup during long computations.

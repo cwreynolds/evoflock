@@ -228,12 +228,13 @@ void runOneFlockEvolution()
 
     {
         FlockParameters fp;
-        
         const LP::FunctionSet& fs = GP::evoflockGaFunctionSet();
         const LP::GpFunction* gp_func = fs.lookupGpFunctionByName("Run_Flock");
-
+        std::cout << std::endl;
         fp.assertEqualTwoVecOfStrings(fp.allParameterNames(),
-                                      gp_func->parameterNames());
+                                      gp_func->parameterNames(),
+                                      "GpFunc Run_Flock:",
+                                      "FlockParameters:");
     }
     
     exit(EXIT_SUCCESS);

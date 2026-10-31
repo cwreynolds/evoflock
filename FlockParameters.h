@@ -309,54 +309,6 @@ public:
             "centerCentering",
         };
     }
-
-    // TODO perhaps move this to Utilities.h?
-    // Assert equality of two VecOfStrings, with optional logging of mismatch.
-    static void assertEqualTwoVecOfStrings(const VecOfStrings& a,
-                                           const VecOfStrings& b,
-                                           const std::string& a_label = "",
-                                           const std::string& b_label = "",
-                                           bool verbose = true)
-    {
-        bool match = (a == b);
-        if (verbose and not match)
-        {
-            std::string mismatch_msg = "Name sets do not match.";
-            if (not match){std::cout << mismatch_msg << std::endl << std::endl;}
-            size_t as = a.size();
-            size_t bs = b.size();
-            size_t amax = std::max(findMaxStringSize(a), a_label.size());
-            size_t bmax = std::max(findMaxStringSize(b), b_label.size());
-            auto pad2n = [](std::string s, size_t n) {
-                while (s.size() < n) { s += " "; } return s; };
-            if (not (a_label.empty() and b_label.empty()))
-            {
-                std::cout << pad2n(a_label, amax) << " ";
-                std::cout << pad2n(b_label, bmax) << " Match?" << std::endl;
-            }
-            for (int i = 0; i < std::max(as, bs); i++)
-            {
-                bool a_ok = i < as;
-                bool b_ok = i < bs;
-                std::cout << pad2n((a_ok ? a.at(i) : ""), amax);
-                std::cout << " ";
-                std::cout << pad2n((b_ok ? b.at(i) : ""), bmax);
-                bool i_match = a_ok and b_ok and (a.at(i) == b.at(i));
-                std::cout << (i_match ? " yes" : " no") << std::endl;
-            }
-            std::cout << std::endl;
-        }
-        assert(match);
-    }
-
-    // TODO perhaps move this to Utilities.h?
-    // Find the longest string in a VecOfStrings.
-    static size_t findMaxStringSize(const VecOfStrings& vos)
-    {
-        size_t max = 0;
-        for (auto& str : vos) { if (max < str.size()) { max = str.size(); } }
-        return max;
-    }
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

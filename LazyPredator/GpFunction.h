@@ -171,32 +171,21 @@ public:
     {
         bool comma = false;
         size_t parameter_count = parameterTypeNames().size();
-        bool one_liner = parameter_count < 5;
-        size_t col_width = 0;
-        for (int i = 0; i < parameter_count; i ++)
-        {
-            col_width = std::max(col_width, parameterTypeNames().at(i).size()+3);
-        }
+        bool one_line = parameter_count < 5;
+        size_t col_width = findMaxStringSize(parameterTypeNames()) + 2;
         std::cout << "GpFunction: " << name() << ", return_type: ";
         std::cout << returnTypeName() << ", ";
         std::cout << parameterTypeNames().size() << " parameters:";
-        std::cout << (one_liner ? " (" : "\n");
+        std::cout << (one_line ? " (" : "\n");
         for (int i = 0; i < parameter_count; i ++)
         {
-            if (comma) {std::cout<<(one_liner?", ":"\n");} else {comma = true;}
-            std::string pad_tn = parameterTypeNames().at(i);
-            if (one_liner)
-            {
-                pad_tn += " ";
-            }
-            else
-            {
-                while (pad_tn.size() < col_width - 1) { pad_tn += " "; }
-            }
-            std::cout << "(" << pad_tn;
+            if (comma) {std::cout<<(one_line?", ":"\n");} else { comma = true; }
+            std::string tn = parameterTypeNames().at(i);
+            if (one_line) { tn += " "; } else { tn = padToSize(tn, col_width); }
+            std::cout << "(" << tn;
             std::cout << parameterNames().at(i) << ")";
         }
-        if (one_liner) { std::cout << ")."; }
+        if (one_line) { std::cout << ")."; }
         std::cout << std::endl;
     }
 private:

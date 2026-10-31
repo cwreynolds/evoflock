@@ -366,6 +366,63 @@ inline std::string float_to_percent_fractional_digits(float value, int digits)
     return ss.str();
 }
 
+// Find the longest string in a VecOfStrings.
+size_t findMaxStringSize(const VecOfStrings& vos)
+{
+    size_t max = 0;
+    for (auto& str : vos) { if (max < str.size()) { max = str.size(); } }
+    return max;
+}
+
+// Pad a given "string" on the right to a given total "size" (width) with copies
+// of a string which defaults to " ". Clips result to ensure given "size" even
+// if original string was too big, or pad is longer than one character.
+std::string padToSize(std::string string, size_t size, const std::string& pad)
+{
+    while (string.size() < size) { string += pad; }
+    return string.substr(0, size);
+}
+std::string padToSize(const std::string& string, size_t size)
+{
+    return padToSize(string, size, " ");
+}
+
+// Assert equality of two VecOfStrings, with optional logging of mismatch.
+void assertEqualTwoVecOfStrings(const VecOfStrings& a,
+                                const VecOfStrings& b,
+                                const std::string& a_label = "",
+                                const std::string& b_label = "",
+                                bool verbose = true)
+{
+    bool match = (a == b);
+    if (verbose and not match)
+    {
+        std::string mismatch_msg = "Name sets do not match.";
+        if (not match){std::cout << mismatch_msg << std::endl << std::endl;}
+        size_t as = a.size();
+        size_t bs = b.size();
+        size_t amax = std::max(findMaxStringSize(a), a_label.size());
+        size_t bmax = std::max(findMaxStringSize(b), b_label.size());
+        if (not (a_label.empty() and b_label.empty()))
+        {
+            std::cout << padToSize(a_label, amax) << " ";
+            std::cout << padToSize(b_label, bmax) << " Match?" << std::endl;
+        }
+        for (int i = 0; i < std::max(as, bs); i++)
+        {
+            bool a_ok = i < as;
+            bool b_ok = i < bs;
+            std::cout << padToSize((a_ok ? a.at(i) : ""), amax);
+            std::cout << " ";
+            std::cout << padToSize((b_ok ? b.at(i) : ""), bmax);
+            bool i_match = a_ok and b_ok and (a.at(i) == b.at(i));
+            std::cout << (i_match ? " yes" : " no") << std::endl;
+        }
+        std::cout << std::endl;
+    }
+    assert(match);
+}
+
 // Utilities to count and report, but otherwise tolerate, "abnormal" floats.
 #define paper_over_abnormal_values(e) paper_over_abnormal_values_helper((e), #e)
 inline int abnormal_value_counter = 0;

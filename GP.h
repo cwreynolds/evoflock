@@ -515,49 +515,86 @@ LazyPredator::FunctionSet static_ga_fs_ =
             // Return type: a FlockParameters object.
             "Flock_Parameters",
             
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+//                LP::GpFuncParamList
+//                ({
+//                    {"Real_0_100",  "max_force"},
+//
+//                    {"Real_0_100",  "weight_forward"},
+//                    {"Real_0_100",  "weight_separate"},
+//                    {"Real_0_100",  "weight_align"},
+//                    {"Real_0_100",  "weight_cohere"},
+//
+//                    {"Real_0_100",  "weightAvoidPredict"},
+//                    {"Real_0_100",  "weightAvoidStatic"},
+//
+//                    {"Real_0_100",  "max_dist_separate"},
+//                    {"Real_0_100",  "max_dist_align"},
+//                    {"Real_0_100",  "max_dist_cohere"},
+//
+//                    // Cosine of threshold angle (max angle from forward to be seen)
+//
+//                    {"Real_m1_p1",  "angle_separate"},
+//                    {"Real_m1_p1",  "angle_align"},
+//                    {"Real_m1_p1",  "angle_cohere"},
+//
+//                    {"Real_0_100",  "fly_away_max_dist"},
+//                    {"Real_0_10",   "min_time_to_collide"},
+//
+//                    {"Real_0_50",   "FP::centerMaxDist()"},
+//                    {"Real_1_2",    "FP::centerExponent()"},
+//                    {"Real_0_100",  "FP::centeringStrength()"},
+//
+//                    {"Real_0_1",    "FP::centerInNess()"},
+//                    {"Real_0_1",    "FP::centerSlowing()"},
+//                    {"Real_0_1",    "FP::centerCentering()"},
+//
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                    // TODO 20261027 test mismatch between GpFunc and FlockParameters
+//
+//    //                {"Real_0_1",    "quux"}, // add one so count is wrong
+//
+//                    // also make it notice wrong parameter name (the quux part).
+//
+//                    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                }),
+            
             LP::GpFuncParamList
             ({
-                {"Real_0_100",  "max_force"},
+                {"Real_0_100",  "maxForce"},
                 
-                {"Real_0_100",  "weight_forward"},
-                {"Real_0_100",  "weight_separate"},
-                {"Real_0_100",  "weight_align"},
-                {"Real_0_100",  "weight_cohere"},
+                {"Real_0_100",  "weightForward"},
+                {"Real_0_100",  "weightSeparate"},
+                {"Real_0_100",  "weightAlign"},
+                {"Real_0_100",  "weightCohere"},
                 
                 {"Real_0_100",  "weightAvoidPredict"},
                 {"Real_0_100",  "weightAvoidStatic"},
                 
-                {"Real_0_100",  "max_dist_separate"},
-                {"Real_0_100",  "max_dist_align"},
-                {"Real_0_100",  "max_dist_cohere"},
+                {"Real_0_100",  "maxDistSeparate"},
+                {"Real_0_100",  "maxDistAlign"},
+                {"Real_0_100",  "maxDistCohere"},
                 
                 // Cosine of threshold angle (max angle from forward to be seen)
+                {"Real_m1_p1",  "angleSeparate"},
+                {"Real_m1_p1",  "angleAlign"},
+                {"Real_m1_p1",  "angleCohere"},
                 
-                {"Real_m1_p1",  "angle_separate"},
-                {"Real_m1_p1",  "angle_align"},
-                {"Real_m1_p1",  "angle_cohere"},
+                {"Real_0_100",  "flyAwayMaxDist"},
+                {"Real_0_10",   "minTimeToCollide"},
                 
-                {"Real_0_100",  "fly_away_max_dist"},
-                {"Real_0_10",   "min_time_to_collide"},
+                {"Real_0_50",   "centerMaxDist"},
+                {"Real_1_2",    "centerExponent"},
+                {"Real_0_100",  "centeringStrength"},
                 
-                {"Real_0_50",   "FP::centerMaxDist()"},
-                {"Real_1_2",    "FP::centerExponent()"},
-                {"Real_0_100",  "FP::centeringStrength()"},
-                
-                {"Real_0_1",    "FP::centerInNess()"},
-                {"Real_0_1",    "FP::centerSlowing()"},
-                {"Real_0_1",    "FP::centerCentering()"},
-                
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20261027 test mismatch between GpFunc and FlockParameters
-                
-                {"Real_0_1",    "quux"}, // add one so count is wrong
-                
-                // also make it notice wrong parameter name (the quux part).
-
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                {"Real_0_1",    "centerInNess"},
+                {"Real_0_1",    "centerSlowing"},
+                {"Real_0_1",    "centerCentering"},
             }),
-            
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
             // Evaluation function, which runs a flock simulation with the given
             // parameters and returns the fitness.
             [](LazyPredator::GpTree& t)

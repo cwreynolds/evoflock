@@ -311,6 +311,35 @@ public:
     }
     
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    
+    
+    //~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~
+    // TODO 20261031 WIP: new unified mechanism to define evolvable parameters.
+    
+    static inline int evolvable_parameter_count_ = 0;
+    
+    // XXX Oh, maybe this should be (or be used from?) an old style macro?
+    //     Then we could use tricks like in debugPrint() to get matching strings
+    //     and c++ symbols
+    void addEvolvableParameter(const std::string& name)
+    {
+        // save an index into tuning_parameters (via evolvable_parameter_count_)
+        // save string for allParameterNames()
+        // define an accessor like maxForce()
+    }
+
+    void initialize()
+    {
+        if (evolvable_parameter_count_ == 0)
+        {
+            addEvolvableParameter("MaxForce");
+            
+            evolvable_parameter_count_++;
+        }
+    }
+    
+    //~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~
+
 
     // Get i-th tuning parameter
     // TODO experimental reconsider design.

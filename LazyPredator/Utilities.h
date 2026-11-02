@@ -366,6 +366,22 @@ inline std::string float_to_percent_fractional_digits(float value, int digits)
     return ss.str();
 }
 
+// Return a unique string for any non-negative int (from optional alphabet).
+// (Should this be moved from this class header file to a utility library?)
+const std::string intToString(int n, const std::string& alphabet)
+{
+    std::string result;
+    assert(n >= 0);
+    int dup = n / alphabet.size();
+    std::string letter = alphabet.substr(n % alphabet.size(), 1);
+    for (int i = 0; i < dup + 1; i++) { result += letter; }
+    return result;
+}
+const std::string intToString(int n)
+{
+    return intToString(n, "abcdefghijklmnopqrstuvwxyz");
+}
+
 // Find the longest string in a VecOfStrings.
 size_t findMaxStringSize(const VecOfStrings& vos)
 {

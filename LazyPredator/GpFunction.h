@@ -147,25 +147,10 @@ public:
     static VecOfStrings default_param_names(const VecOfStrings& types)
     {
         VecOfStrings vos;
-        for (int i = 0; i < types.size(); i++) { vos.push_back(intToStr(i)); }
+        for (int i = 0; i < types.size(); i++) { vos.push_back(intToString(i)); }
         return vos;
     }
 
-    // Return a unique string for any non-negative int (from optional alphabet).
-    // (Should this be moved from this class header file to a utility library?)
-    static const std::string intToStr(int n)
-    {
-        return intToStr(n, "abcdefghijklmnopqrstuvwxyz");
-    }
-    static const std::string intToStr(int n, const std::string& alphabet)
-    {
-        std::string result;
-        assert(n >= 0);
-        int dup = n / alphabet.size();
-        std::string letter = alphabet.substr(n % alphabet.size(), 1);
-        for (int i = 0; i < dup + 1; i++) { result += letter; }
-        return result;
-    }
     // Print description of this GpFunction to std::cout.
     void print() const
     {

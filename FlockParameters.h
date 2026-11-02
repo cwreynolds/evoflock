@@ -278,39 +278,39 @@ public:
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
     
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20261028 make FlockParameters expose a VecOfStrings of param names.
-    // TODO 20261028 mock-up of parameter name access
-    
-    VecOfStrings allParameterNames() const
-    {
-        return
-        {
-            "maxForce",
-            "weightForward",
-            "weightSeparate",
-            "weightAlign",
-            "weightCohere",
-            "weightAvoidPredict",
-            "weightAvoidStatic",
-            "maxDistSeparate",
-            "maxDistAlign",
-            "maxDistCohere",
-            "angleSeparate",
-            "angleAlign",
-            "angleCohere",
-            "flyAwayMaxDist",
-            "minTimeToCollide",
-            "centerMaxDist",
-            "centerExponent",
-            "centeringStrength",
-            "centerInNess",
-            "centerSlowing",
-            "centerCentering",
-        };
-    }
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//    // TODO 20261028 make FlockParameters expose a VecOfStrings of param names.
+//    // TODO 20261028 mock-up of parameter name access
+//    
+//    VecOfStrings allParameterNames() const
+//    {
+//        return
+//        {
+//            "maxForce",
+//            "weightForward",
+//            "weightSeparate",
+//            "weightAlign",
+//            "weightCohere",
+//            "weightAvoidPredict",
+//            "weightAvoidStatic",
+//            "maxDistSeparate",
+//            "maxDistAlign",
+//            "maxDistCohere",
+//            "angleSeparate",
+//            "angleAlign",
+//            "angleCohere",
+//            "flyAwayMaxDist",
+//            "minTimeToCollide",
+//            "centerMaxDist",
+//            "centerExponent",
+//            "centeringStrength",
+//            "centerInNess",
+//            "centerSlowing",
+//            "centerCentering",
+//        };
+//    }
+//    
+//    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     
     
     //~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~
@@ -344,6 +344,95 @@ public:
     // Get i-th tuning parameter
     // TODO experimental reconsider design.
     double getTuningParameter(int i) const { return tuning_parameters.at(i); }
+
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20261101 new FlockParameters::unit_test()
+    
+    
+    // Types for pairing evolvable parameter names and their accessors.
+    typedef std::function<double()> FpAccessor;
+    typedef std::pair<std::string, FpAccessor> FpNameAccessorPair;
+    
+    // Return names of all evolvable parameters.
+    VecOfStrings allParameterNames() const
+    {
+        VecOfStrings names;
+        auto all_naa = allParameterNamesAndAccessors();
+        for (auto& [name, accessor] : all_naa) { names.push_back(name); }
+        return names;
+    }
+
+    // Return [name.acessor] pairs for all evolvable parameters.
+    std::vector<FpNameAccessorPair> allParameterNamesAndAccessors() const
+    {
+        return
+        {
+            {"maxForce",           [&](){ return maxForce(); }},
+            {"weightForward",      [&](){ return weightForward(); }},
+            {"weightSeparate",     [&](){ return weightSeparate(); }},
+            {"weightAlign",        [&](){ return weightAlign(); }},
+            {"weightCohere",       [&](){ return weightCohere(); }},
+            {"weightAvoidPredict", [&](){ return weightAvoidPredict(); }},
+            {"weightAvoidStatic",  [&](){ return weightAvoidStatic(); }},
+            {"maxDistSeparate",    [&](){ return maxDistSeparate(); }},
+            {"maxDistAlign",       [&](){ return maxDistAlign(); }},
+            {"maxDistCohere",      [&](){ return maxDistCohere(); }},
+            {"angleSeparate",      [&](){ return angleSeparate(); }},
+            {"angleAlign",         [&](){ return angleAlign(); }},
+            {"angleCohere",        [&](){ return angleCohere(); }},
+            {"flyAwayMaxDist",     [&](){ return flyAwayMaxDist(); }},
+            {"minTimeToCollide",   [&](){ return minTimeToCollide(); }},
+            {"centerMaxDist",      [&](){ return centerMaxDist(); }},
+            {"centerExponent",     [&](){ return centerExponent(); }},
+            {"centeringStrength",  [&](){ return centeringStrength(); }},
+            {"centerInNess",       [&](){ return centerInNess(); }},
+            {"centerSlowing",      [&](){ return centerSlowing(); }},
+            {"centerCentering",    [&](){ return centerCentering(); }},
+//            {"centerCentering",    [&](){ return centerSlowing(); }}, // intentionally wrong!!!
+        };
+    }
+
+    static void unit_test()
+    {
+//        {
+//            FlockParameters fp;
+//            const LP::FunctionSet& fs = GP::evoflockGaFunctionSet();
+//            const LP::GpFunction* gp_func = fs.lookupGpFunctionByName("Run_Flock");
+//            
+//            std::cout << std::endl;
+//            gp_func->print();
+//            
+//            std::cout << std::endl;
+//            GP::evoflockGpFunctionSet().print();
+//            
+//            std::cout << std::endl;
+//            util::assertEqualTwoVecOfStrings(fp.allParameterNames(),
+//                                             gp_func->parameterNames(),
+//                                             "GpFunc Run_Flock:",
+//                                             "FlockParameters:");
+//        }
+
+        {
+            std::vector<double> indices;
+            for (int i=0; i<tunableParameterCount(); i++){indices.push_back(i);}
+            FlockParameters fp(indices);
+            int count = 0;
+            for (auto& [name, accessor] : fp.allParameterNamesAndAccessors())
+            {
+                bool match = (count == accessor());
+                if (not match)
+                {
+                    std::cout << "Error for accessor FlockParameters::";
+                    std::cout << name << "()" << std::endl;
+                }
+                assert(match);
+                count++;
+            }
+        }
+    }
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 private:
     // Parameters for tuning:

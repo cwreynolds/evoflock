@@ -122,10 +122,7 @@ namespace EF = EvoFlock;
 #include "dbscan.h"
 #include "Draw.h"
 #include "flock.h"
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-// TODO 20261101 new FlockParameters::unit_test()
 #include "FlockParameters.h"
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 #include "GP.h"
 #include "LazyPredator/LazyPredator.h"  // version 2.0 currently in subdirectory
 #include "LocalSpace.h"
@@ -165,15 +162,13 @@ void recordDataForSimsPerFit1vs4(LP::Population* population, double time_in_sec)
 
 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
-
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-// TODO 20261101 new FlockParameters::unit_test()
-
-void testFpVsGpFuncCompatibility()
+// Check compatibility of evolvable parameter set, between FlockParameters, and
+// the parameter set formed on the GP side in GpFunc "RunFlock".
+void checkCompatibilityFpVsGpFunc()
 {
     FlockParameters fp;
     const LP::FunctionSet& fs = GP::evoflockGaFunctionSet();
-    const LP::GpFunction* gp_func = fs.lookupGpFunctionByName("Run_Flock");
+    const LP::GpFunction* gp_func = fs.lookupGpFunctionByName("RunFlock");
     
     std::cout << std::endl;
     gp_func->print();
@@ -184,35 +179,12 @@ void testFpVsGpFuncCompatibility()
     std::cout << std::endl;
     util::assertEqualTwoVecOfStrings(fp.allParameterNames(),
                                      gp_func->parameterNames(),
-                                     "GpFunc Run_Flock:",
+                                     "GpFunc RunFlock:",
                                      "FlockParameters:");
 }
-//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
 
 void runOneFlockEvolution()
 {
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20261024 mocking up a GpFunction with NAMES for parameters.
-
-//    std::cout << std::endl;
-//    VecOfStrings aaa = {"a", "a", "a"};
-//    VecOfStrings abc = {"a", "b", "c"};
-//    VecOfStrings abc2 = {"a", "b", "c"};
-//    debugPrint(aaa == aaa)
-//    debugPrint(aaa == abc);
-//    debugPrint(abc == abc2);
-//    
-//    // "GpFunction: Run_Flock, return_type: Flock_Parameters, 0 parameters: ()."
-//    GP::mock_up.print();
-//    
-//    std::cout << std::endl;
-//    GP::evoflockGpFunctionSet().print();
-//    
-//    exit(EXIT_SUCCESS);
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20261028 make FlockParameters expose a VecOfStrings of param names.
 
@@ -251,33 +223,6 @@ void runOneFlockEvolution()
     //    centerInNess() = 0.707
     //    centerSlowing() = 0.5
     //    centerCentering() = 0.5
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20261101 new FlockParameters::unit_test()
-
-//    {
-//        FlockParameters fp;
-//        const LP::FunctionSet& fs = GP::evoflockGaFunctionSet();
-//        const LP::GpFunction* gp_func = fs.lookupGpFunctionByName("Run_Flock");
-//        
-//        std::cout << std::endl;
-//        gp_func->print();
-//        
-//        std::cout << std::endl;
-//        GP::evoflockGpFunctionSet().print();
-//
-//        std::cout << std::endl;
-//        util::assertEqualTwoVecOfStrings(fp.allParameterNames(),
-//                                         gp_func->parameterNames(),
-//                                         "GpFunc Run_Flock:",
-//                                         "FlockParameters:");
-//    }
-    
-//    exit(EXIT_SUCCESS);
-    
-//    testFpVsGpFuncCompatibility();
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
@@ -377,6 +322,8 @@ void runOneFlockEvolution()
     debugPrint(use_centroid_objective);
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     
+    checkCompatibilityFpVsGpFunc();  // Second call if unit tests not run.
+
     // Set likelihood of crossover versus hoist (on a randomly selected parent).
     LP::GpTree::likelihood_of_crossover_ = EF::usingGP() ? 0.9 : 1.0;
     debugPrint(LP::GpTree::likelihood_of_crossover_);
@@ -1606,11 +1553,7 @@ void injectHandWrittenCodeIntoPopulation(LP::FunctionSet& fs,
 // Run unit tests in all modules
 void unit_test()
 {
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20261101 new FlockParameters::unit_test()
-    testFpVsGpFuncCompatibility();
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
+    checkCompatibilityFpVsGpFunc();  // First call for ordering error messages.
     util::unit_test();
     Vec3::unit_test();
     LocalSpace::unit_test();
@@ -1621,10 +1564,7 @@ void unit_test()
     Flock::unit_test();
     LazyPredator::unit_test();
     Draw::unit_test();
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20261101 new FlockParameters::unit_test()
     FlockParameters::unit_test();
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
     std::cout << "All unit tests OK." << std::endl;
 }
 

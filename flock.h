@@ -261,23 +261,7 @@ public:
   
         // Init Boid speed to EF::default_target_speed.
         boid->setSpeed(EF::default_target_speed);
-        
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//        // TODO 20260618 change initial position to be throughout centroid
-//        if (EF::murmuration_mode)
-//        {
-//            boid->setSpeed(EF::default_target_speed * 2);
-//        }
-//        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
-        // TODO 20261019 debug murmurations "init toward origin"
-        
-//        debugPrint(boid->speed())
-        
-        //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
-
-        
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20260607 adjust centerMaxDist() to maintain constant boid density
         boid->setCentroidMaxDistance(centroidMaxDistance());
@@ -329,56 +313,16 @@ public:
             }
             return point;
         };
-        
-        //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
-        // TODO 20261019 debug murmurations "init toward origin"
-
-//            // For DomeAndGround / NoObstacle / BoxObstacle
-//            if (EF::murmuration_mode)
-//            {
-//                Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
-//                Vec3 boid_position = rand_in_unit_sphere * centroidMaxDistance();
-//
-//    //            Vec3 boid_heading = rand_in_unit_sphere.normalize();
-//    //            Vec3 boid_heading = boid_position.normalize();
-//                Vec3 boid_heading = rand_in_unit_sphere.normalize();
-//
-//    //            std::cout << "About to take Early return for murmuration_mode" << std::endl;
-//
-//                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//                // TODO 20261019 debug murmurations "init toward origin"
-//                //               d'oh, is THIS the problem? (Direction vs position?)
-//
-//    //            // Early return for murmuration_mode
-//    //            return LocalSpace::fromTo(boid_position, boid_heading);
-//
-//                // Early return for murmuration_mode
-//                return LocalSpace::fromTo(boid_position, boid_position + boid_heading);
-//
-//                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-//            }
-      
+              
         // For DomeAndGround / NoObstacle / BoxObstacle
         if (EF::murmuration_mode)
         {
             Vec3 rand_in_unit_sphere = rs.random_point_in_unit_radius_sphere();
             Vec3 position = rand_in_unit_sphere * centroidMaxDistance();
-            
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20261020 experiment with "orbital" initial murm pose.
-            //               seemed to make the tornado mode even worse
-            
-//            Vec3 heading = rs.randomUnitVector();
-//            Vec3 heading = position.normalize().find_perpendicular();
             Vec3 heading = rs.randomUnitVector();
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
             // Early return for murmuration_mode
             return LocalSpace::fromTo(position, position + heading);
         }
-
-        //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
 
         return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
     }

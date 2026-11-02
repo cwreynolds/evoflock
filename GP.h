@@ -510,8 +510,9 @@ LazyPredator::FunctionSet static_ga_fs_ =
     {
         {
             // GP function name:
-            "Run_Flock",
-            
+//            "Run_Flock",
+            "RunFlock",
+
             // Return type: a FlockParameters object.
             "Flock_Parameters",
             

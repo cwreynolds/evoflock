@@ -110,14 +110,9 @@ public:
     const std::vector<GpType*>& parameterTypes() const
     { return parameter_types_; }
     // String names for GpTypes of all parameters of this GpFunction.
-    const VecOfStrings& parameterTypeNames() const
-    { return parameter_type_names_; }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20261025 insert default parameter names when none specified.
+    const VecOfStrings& parameterTypeNames() const {return parameter_type_names_;}
     // String names for all parameters of this GpFunction.
-    const VecOfStrings& parameterNames() const
-    { return parameter_names_; }
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    const VecOfStrings& parameterNames() const { return parameter_names_; }
     // Set GpTypes for return type and all parameter types of this GpFunction.
     void setReturnTypePointer(GpType* rtp) { return_type_ = rtp; }
     void setParameterTypePointers(const std::vector<GpType*>& vec_ptype_ptrs)

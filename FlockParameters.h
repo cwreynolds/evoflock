@@ -277,79 +277,11 @@ public:
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     }
-    
-//    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//    // TODO 20261028 make FlockParameters expose a VecOfStrings of param names.
-//    // TODO 20261028 mock-up of parameter name access
-//    
-//    VecOfStrings allParameterNames() const
-//    {
-//        return
-//        {
-//            "maxForce",
-//            "weightForward",
-//            "weightSeparate",
-//            "weightAlign",
-//            "weightCohere",
-//            "weightAvoidPredict",
-//            "weightAvoidStatic",
-//            "maxDistSeparate",
-//            "maxDistAlign",
-//            "maxDistCohere",
-//            "angleSeparate",
-//            "angleAlign",
-//            "angleCohere",
-//            "flyAwayMaxDist",
-//            "minTimeToCollide",
-//            "centerMaxDist",
-//            "centerExponent",
-//            "centeringStrength",
-//            "centerInNess",
-//            "centerSlowing",
-//            "centerCentering",
-//        };
-//    }
-//    
-//    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    
-    
-    //~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~
-    // TODO 20261031 WIP: new unified mechanism to define evolvable parameters.
-    
-    static inline int evolvable_parameter_count_ = 0;
-    
-    // XXX Oh, maybe this should be (or be used from?) an old style macro?
-    //     Then we could use tricks like in debugPrint() to get matching strings
-    //     and c++ symbols
-    void addEvolvableParameter(const std::string& name)
-    {
-        // save an index into tuning_parameters (via evolvable_parameter_count_)
-        // save string for allParameterNames()
-        // define an accessor like maxForce()
-    }
-
-    void initialize()
-    {
-        if (evolvable_parameter_count_ == 0)
-        {
-            addEvolvableParameter("MaxForce");
-            
-            evolvable_parameter_count_++;
-        }
-    }
-    
-    //~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~~~ ~~~~
-
 
     // Get i-th tuning parameter
     // TODO experimental reconsider design.
     double getTuningParameter(int i) const { return tuning_parameters.at(i); }
 
-    
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-    // TODO 20261101 new FlockParameters::unit_test()
-    
-    
     // Types for pairing evolvable parameter names and their accessors.
     typedef std::function<double()> FpAccessor;
     typedef std::pair<std::string, FpAccessor> FpNameAccessorPair;
@@ -389,50 +321,30 @@ public:
             {"centerInNess",       [&](){ return centerInNess(); }},
             {"centerSlowing",      [&](){ return centerSlowing(); }},
             {"centerCentering",    [&](){ return centerCentering(); }},
-//            {"centerCentering",    [&](){ return centerSlowing(); }}, // intentionally wrong!!!
         };
     }
 
     static void unit_test()
     {
-//        {
-//            FlockParameters fp;
-//            const LP::FunctionSet& fs = GP::evoflockGaFunctionSet();
-//            const LP::GpFunction* gp_func = fs.lookupGpFunctionByName("Run_Flock");
-//            
-//            std::cout << std::endl;
-//            gp_func->print();
-//            
-//            std::cout << std::endl;
-//            GP::evoflockGpFunctionSet().print();
-//            
-//            std::cout << std::endl;
-//            util::assertEqualTwoVecOfStrings(fp.allParameterNames(),
-//                                             gp_func->parameterNames(),
-//                                             "GpFunc Run_Flock:",
-//                                             "FlockParameters:");
-//        }
-
+        std::vector<double> indices;
+        for (int i=0; i<tunableParameterCount(); i++){indices.push_back(i);}
+        FlockParameters fp(indices);
+        int count = 0;
+        for (auto& [name, accessor] : fp.allParameterNamesAndAccessors())
         {
-            std::vector<double> indices;
-            for (int i=0; i<tunableParameterCount(); i++){indices.push_back(i);}
-            FlockParameters fp(indices);
-            int count = 0;
-            for (auto& [name, accessor] : fp.allParameterNamesAndAccessors())
+            bool match = (count == accessor());
+            if (not match)
             {
-                bool match = (count == accessor());
-                if (not match)
-                {
-                    std::cout << "Error for accessor FlockParameters::";
-                    std::cout << name << "()" << std::endl;
-                }
-                assert(match);
-                count++;
+                std::cout << std::endl;
+                std::cout << "Error for accessor FlockParameters::";
+                std::cout << name << "()" << std::endl;
+                std::cout << "Check layout of accessors in parameter vector.";
+                std::cout << std::endl;
             }
+            assert(match);
+            count++;
         }
     }
-
-    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 private:
     // Parameters for tuning:

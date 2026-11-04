@@ -823,23 +823,34 @@ public:
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
             // TODO 20261021 prototype flock density determination
             
-            double max_flock_radius = 0;
-            for (auto b : boids())
-            {
-                // distance from boid to flock's centroidOfCentroids().
-                double bcd = (b->position() - centroidOfCentroids()).length();
-                if (max_flock_radius < bcd) { max_flock_radius = bcd; }
-            }
+//            double max_flock_radius = 0;
+//            for (auto b : boids())
+//            {
+//                // distance from boid to flock's centroidOfCentroids().
+//                double bcd = (b->position() - centroidOfCentroids()).length();
+//                if (max_flock_radius < bcd) { max_flock_radius = bcd; }
+//            }
             
             //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
             // TODO 20261022 experiment with metric for (inverse?) flock density
+            
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20261102 wip flock density score.
             
 //            shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
 //            double flock_volume = flock_sphere.volume();
 //            double flock_density = boids().size() / flock_volume; //boids per m³
 //            
-//            std::cout << clock().frameCounter();
-//            std::cout << ": m³ per boid = " << 1 / flock_density << std::endl;
+//            if ((clock().frameCounter() % 100) == 99)
+//            {
+//                std::cout << clock().frameCounter();
+//                std::cout << ": m³ per boid = " << 1 / flock_density << std::endl;
+//            }
+            
+//            total_density_score_ += perStepDensityScore();
+            recordPerStepDensityScore();
+
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
             //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
 
@@ -890,23 +901,84 @@ public:
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20261102 wip flock density score.
+    
+    double total_density_score_ = 0;
+    
+    void recordPerStepDensityScore()
+    {
+        double max_flock_radius = 0;
+        for (auto b : boids())
+        {
+            // distance from boid to flock's centroidOfCentroids().
+            double bcd = (b->position() - centroidOfCentroids()).length();
+            if (max_flock_radius < bcd) { max_flock_radius = bcd; }
+        }
+
+        
+        
+        shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
+        double flock_volume = flock_sphere.volume();
+        double flock_density = boids().size() / flock_volume; //boids per m³
+        double cubic_meter_per_boid = 1 / flock_density;
+        
+        if ((clock().frameCounter() % 100) == 99)
+        {
+            std::cout << clock().frameCounter();
+//            std::cout << ": m³ per boid = " << 1 / flock_density << std::endl;
+            std::cout << ": m³ per boid = " << cubic_meter_per_boid << std::endl;
+        }
+        
+        double score = parameterToWeightWithRamps(cubic_meter_per_boid,
+                                                  {0, 500, 1500, 2000},
+                                                  {0,   1,    1,    0});
+        total_density_score_ += score;
+    }
+    
+    double densityScore() const
+    {
+        return total_density_score_ / max_simulation_steps();
+    }
+
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
     // Needs refactoring, combines the (now) three objectives for murmuration.
     double centroidScore() const
     {
         // TODO XXX very temp
         double d = centroidDistanceScore();
         double a = centroidAntiDonutScore();
+        
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         // TODO 20261008 try turning off manifold for per_boid_centroid_mode
 //        double m = centroidManifoldScore();
         double m = EF::per_boid_centroid_mode ? 1 : centroidManifoldScore();
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        double hypervolume = d * a * m;
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20261102 wip flock density score.
+
+        double n = densityScore();
+
+//        double hypervolume = d * a * m;
+        double hypervolume = d * a * m * n;
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         {
             std::cout << "        " << hypervolume;
             std::cout << " (centroidDistanceScore()=" << d;
             std::cout << "  centroidAntiDonutScore()=" << a;
-            std::cout << "  centroidManifoldScore()=" << m << ")" << std::endl;
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20261102 wip flock density score.
+
+//            std::cout << "  centroidManifoldScore()=" << m << ")" << std::endl;
+            std::cout << "  centroidManifoldScore()=" << m;
+            std::cout << "  densityScore=" << n << ")" << std::endl;
+
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
         return hypervolume;
     }

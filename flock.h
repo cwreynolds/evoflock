@@ -154,14 +154,7 @@ public:
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             // TODO 20260618 change initial position to be throughout centroid
 
-            if (EF::use_centroid_objective)
-            {
-                draw().addAnnotationAxes({});
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                // TODO 20260811 remove debugging annotation to record for ALIFE slides
-//                draw().addAnnotationAxes(centroid(), centroidMaxDistance());
-                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            }
+            if (EF::use_centroid_objective) { draw().addAnnotationAxes({}); }
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             draw().addAnnotationsToAnimatedFrame();
@@ -171,6 +164,19 @@ public:
 
             if (EF::use_centroid_objective)
             {
+                
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20261104 can't mouse-drag camera
+                
+//                draw().cameraLookFrom() = {60, 60, 60};
+                
+                if (clock().frameCounter() == 0)
+                {
+                    draw().cameraLookFrom() = {60, 60, 60};
+                }
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                
+
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 // TODO 20261011 replace Flock::centroid() with Flock::centroidOfCentroids()
                 
@@ -179,9 +185,12 @@ public:
 
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
                 // TODO 20261016 change centroid weighting from 0.3 to 0.7
-
-                draw().cameraLookFrom() = {60, 60, 60};
                 
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                // TODO 20261104 can't mouse-drag camera
+//                draw().cameraLookFrom() = {60, 60, 60};
+                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
                 //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
                 // TODO 20261019 debug murmurations "init toward origin"
                 Vec3 heading = selectedBoid()->forward() * 20;
@@ -915,24 +924,28 @@ public:
             double bcd = (b->position() - centroidOfCentroids()).length();
             if (max_flock_radius < bcd) { max_flock_radius = bcd; }
         }
-
-        
         
         shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
         double flock_volume = flock_sphere.volume();
         double flock_density = boids().size() / flock_volume; //boids per m³
         double cubic_meter_per_boid = 1 / flock_density;
         
+//        double score = parameterToWeightWithRamps(cubic_meter_per_boid,
+//                                                  {0, 500, 1500, 2000},
+//                                                  {0,   1,    1,    0});
+        double score = parameterToWeightWithRamps(cubic_meter_per_boid,
+                                                  {0, 300, 500, 1000, 1200},
+                                                  {0,   0,   1,    1,    0});
+
         if ((clock().frameCounter() % 100) == 99)
         {
             std::cout << clock().frameCounter();
-//            std::cout << ": m³ per boid = " << 1 / flock_density << std::endl;
-            std::cout << ": m³ per boid = " << cubic_meter_per_boid << std::endl;
+            std::cout << ": flock density = " << flock_density;
+            std::cout << "  m³ per boid = " << cubic_meter_per_boid;
+            std::cout << "  score = " << score;
+            std::cout << std::endl;
         }
-        
-        double score = parameterToWeightWithRamps(cubic_meter_per_boid,
-                                                  {0, 500, 1500, 2000},
-                                                  {0,   1,    1,    0});
+
         total_density_score_ += score;
     }
     

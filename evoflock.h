@@ -37,8 +37,8 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global switch to enable/disable multithreading.
 inline static bool enable_multithreading = true;
@@ -1233,17 +1233,33 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     8.35263, 26.2545, 1.097, 90.2277, 0.651235,
         //                     0.289539, 0.622153});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20261020_ga_murm_donut_02_to_03 with bigger flock
-        
         // Saved best FP values from run 20261020_ga_murm_donut_02_to_03
         // (AHA! direction vs position in from-to)
         // (But still getting bad centroidAntiDonutScore, try tweaking that?)
-        FlockParameters fp({92.1122, 94.5379, 68.959, 87.964, 24.2417,
-                            35.919, 32.9889, 2.21386, 16.4516, 10.4711,
-                            -0.526217, 0.490771, 0.229172, 54.3628,
-                            8.07099, 28.5652, 1.01695, 86.7331, 0.718106,
-                            0.208374, 0.790204});
+        // FlockParameters fp({92.1122, 94.5379, 68.959, 87.964, 24.2417,
+        //                     35.919, 32.9889, 2.21386, 16.4516, 10.4711,
+        //                     -0.526217, 0.490771, 0.229172, 54.3628,
+        //                     8.07099, 28.5652, 1.01695, 86.7331, 0.718106,
+        //                     0.208374, 0.790204});
+        
+        // Saved best FP values from run 20261103_ga_murm_use_density_score
+        // (Too dense using target score 500-1500)
+        // FlockParameters fp({88.0197, 92.1784, 47.4502, 98.6506, 15.7526,
+        //                     29.4356, 56.7093, 2.41112, 8.42375, 66.1467,
+        //                     -0.690546, 0.468936, 0.817885, 99.5807,
+        //                     8.8505, 27.8506, 1.45538, 98.716, 0.676253,
+        //                     0.507441, 0.253903});
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261103_ga_murm_density_500_to_1000 with bigger flock
+        
+        // Saved best FP values from run 20261103_ga_murm_density_500_to_1000
+        // ()
+        FlockParameters fp({64.9401, 92.1808, 61.6423, 34.8766, 39.9109,
+                            62.9179, 96.9704, 2.42329, 7.4851, 11.5878,
+                            -0.229319, 0.472085, 0.459535, 34.1031,
+                            1.78935, 22.9006, 1.50408, 93.6232, 0.658155,
+                            0.54178, 0.120565});
         
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

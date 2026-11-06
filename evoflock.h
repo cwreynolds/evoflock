@@ -188,7 +188,7 @@ void runOneFlockEvolution()
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     // TODO 20261028 make FlockParameters expose a VecOfStrings of param names.
 
-    FlockParameters().print();
+//    FlockParameters().print();
 
     // Before any changes:
     //

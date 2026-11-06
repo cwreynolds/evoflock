@@ -22,37 +22,29 @@
 #pragma once
 #include "Vec3.h"
 
-//  A container for all boid flocking parameters relevant to optimization.
+// A container for all boid flocking parameters for simulation and optimization.
 class FlockParameters
 {
 public:
+    // Default constructor
+    FlockParameters() : FlockParameters(hand_tuned_parameters) {}
+    
+    // Constructor based on a vector of numeric parameters.
+    FlockParameters(const std::vector<double>& vector_of_parameters_)
+    {
+        assert(vector_of_parameters_.size() == tunableParameterCount());
+        initParameterNamesAndAccessors();
+        tuning_parameters = vector_of_parameters_;
+        enforceConstraints();
+    }
+
     // Shared const/input parameters. These are not subject to optimization and
     // remain fixed during evolution run. MUST update constParameterCount() when
     // const parameters are added or removed.
     static int constParameterCount() { return 7; }
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260430 add tunable parameters for murmuration
-
     // The count(/size) of tunable parameters in this class. For consistency
     // check, especially when changing the number of parameters.
-//    static int tunableParameterCount() { return 15; }
-    
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    // TODO 20260602 add more inline parameters to FB for GA optimization
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20261105 make centroid_max_distance_ an evolvable param
-
-//    static int tunableParameterCount() { return 15 + 3; } // 3 for murmuration
-//    static int tunableParameterCount() { return 15 + 6; } // 6 for murmuration
-
     static int tunableParameterCount(){return int(hand_tuned_parameters.size());}
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // "assume a spherical boid" unit diameter
     double bodyDiameter() const { return body_diameter_; }
     // Should this be called "world radius"?
@@ -188,76 +180,28 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260419 add tunable parameters for murmuration
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20261105 make centroid_max_distance_ an evolvable param
-
-    // Maximum distance from centroid for murmurations
-
-    //    const double& murmMaxDistance() const { return tuning_parameters.at(15); }
+    // TODO 20261106 murmurations -- modern evolvable parameters
+        
+    // Maximum distance from (per boid) centroid for murmurations.
     const double& murmMaxDistance() const { return tuning_parameters.at(21); }
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-    // Default constructor
-    FlockParameters() : FlockParameters(hand_tuned_parameters) {}
     
-    // Constructor based on a vector of numeric parameters.
-    FlockParameters(const std::vector<double>& vector_of_parameters_)
-    {
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20261105 make centroid_max_distance_ an evolvable param
-        initParameterNamesAndAccessors();
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
-        assert(vector_of_parameters_.size() == tunableParameterCount());
-        tuning_parameters = vector_of_parameters_;
-        enforceConstraints();
-    }
-
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260505 FlockParameters::enforceConstraints()
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // TODO 20260511 replace FP::centerMinDist() with FP::centerMinFrac()
-
-    
+    // Enforce constraints in constructor. Currently unused. Should be virtual.
     void enforceConstraints()
     {
-//        if (EF::murmuration_mode and (centerMinDist() > centerMaxDist()))
-//        {
-//            std::swap(centerMinDist(), centerMaxDist());
-//            assert(centerMinDist() <= centerMaxDist());
-//        }
     }
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20261105 make centroid_max_distance_ an evolvable param
-
-//    // The count(/size) of ALL parameters in this class.
-//    static int parameterCount()
-//    {
-//        return constParameterCount() + tunableParameterCount();
-//    }
-  
     // The count(/size) of ALL parameters in this class.
     static size_t parameterCount()
     {
         return constParameterCount() + tunableParameterCount();
     }
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     void print() const
     {
@@ -326,65 +270,16 @@ public:
     typedef std::function<double()> FpAccessor;
     typedef std::pair<std::string, FpAccessor> FpNameAccessorPair;
     
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20261105 make centroid_max_distance_ an evolvable param
-
-//    // Return names of all evolvable parameters.
-//    VecOfStrings allParameterNames() const
-//    {
-//        VecOfStrings names;
-//        auto all_naa = allParameterNamesAndAccessors();
-//        for (auto& [name, accessor] : all_naa) { names.push_back(name); }
-//        return names;
-//    }
-
-    // Return names of all evolvable parameters.
-    VecOfStrings allParameterNames() const
-    {
-        VecOfStrings names;
-        const auto& all_naa = allParameterNamesAndAccessors();
-        for (auto& [name, accessor] : all_naa) { names.push_back(name); }
-        return names;
-    }
-
-//    // Return [name.accessor] pairs for all evolvable parameters.
-//    // TODO should be changed to build the structure only once
-//    std::vector<FpNameAccessorPair> allParameterNamesAndAccessors() const
-//    {
-//        std::vector<FpNameAccessorPair> apnaa =
-//        {
-//            {"maxForce",           [&](){ return maxForce(); }},
-//            {"weightForward",      [&](){ return weightForward(); }},
-//            {"weightSeparate",     [&](){ return weightSeparate(); }},
-//            {"weightAlign",        [&](){ return weightAlign(); }},
-//            {"weightCohere",       [&](){ return weightCohere(); }},
-//            {"weightAvoidPredict", [&](){ return weightAvoidPredict(); }},
-//            {"weightAvoidStatic",  [&](){ return weightAvoidStatic(); }},
-//            {"maxDistSeparate",    [&](){ return maxDistSeparate(); }},
-//            {"maxDistAlign",       [&](){ return maxDistAlign(); }},
-//            {"maxDistCohere",      [&](){ return maxDistCohere(); }},
-//            {"angleSeparate",      [&](){ return angleSeparate(); }},
-//            {"angleAlign",         [&](){ return angleAlign(); }},
-//            {"angleCohere",        [&](){ return angleCohere(); }},
-//            {"flyAwayMaxDist",     [&](){ return flyAwayMaxDist(); }},
-//            {"minTimeToCollide",   [&](){ return minTimeToCollide(); }},
-//            {"centerMaxDist",      [&](){ return centerMaxDist(); }},
-//            {"centerExponent",     [&](){ return centerExponent(); }},
-//            {"centeringStrength",  [&](){ return centeringStrength(); }},
-//            {"centerInNess",       [&](){ return centerInNess(); }},
-//            {"centerSlowing",      [&](){ return centerSlowing(); }},
-//            {"centerCentering",    [&](){ return centerCentering(); }},
-//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//            // TODO 20261105 make centroid_max_distance_ an evolvable param
-//            {"murmMaxDistance",    [&](){ return murmMaxDistance(); }},
-//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//        };
-//        assert(apnaa.size() == tuning_parameters.size()); // legacy check
-//        return apnaa;
-//    }
-
+    // Make and cache the collection of parameters and accessors per instance.
+    // TODO 20261106 since FP are constructed only 3 (why 3?) times per sim,
+    //               each of which take 0.25 to 0.75 secconds, is it worth
+    //               caching? Maybe just build each time it is needed.
+    //
+    //               I would like to merge FP::tuning_parameters in here, but
+    //               that wants to be static and this wants to be per-instance
+    //
     std::vector<FpNameAccessorPair> all_params_names_accessors_;
-    
+    //
     void initParameterNamesAndAccessors()
     {
         all_params_names_accessors_ =
@@ -419,50 +314,20 @@ public:
         assert(all_params_names_accessors_.size() == tuning_parameters.size());
     }
 
-//    // Return [name.accessor] pairs for all evolvable parameters.
-//    const std::vector<FpNameAccessorPair>& allParameterNamesAndAccessors() const
-//    {
-//        std::vector<FpNameAccessorPair> apnaa =
-//        {
-//            {"maxForce",           [&](){ return maxForce(); }},
-//            {"weightForward",      [&](){ return weightForward(); }},
-//            {"weightSeparate",     [&](){ return weightSeparate(); }},
-//            {"weightAlign",        [&](){ return weightAlign(); }},
-//            {"weightCohere",       [&](){ return weightCohere(); }},
-//            {"weightAvoidPredict", [&](){ return weightAvoidPredict(); }},
-//            {"weightAvoidStatic",  [&](){ return weightAvoidStatic(); }},
-//            {"maxDistSeparate",    [&](){ return maxDistSeparate(); }},
-//            {"maxDistAlign",       [&](){ return maxDistAlign(); }},
-//            {"maxDistCohere",      [&](){ return maxDistCohere(); }},
-//            {"angleSeparate",      [&](){ return angleSeparate(); }},
-//            {"angleAlign",         [&](){ return angleAlign(); }},
-//            {"angleCohere",        [&](){ return angleCohere(); }},
-//            {"flyAwayMaxDist",     [&](){ return flyAwayMaxDist(); }},
-//            {"minTimeToCollide",   [&](){ return minTimeToCollide(); }},
-//            {"centerMaxDist",      [&](){ return centerMaxDist(); }},
-//            {"centerExponent",     [&](){ return centerExponent(); }},
-//            {"centeringStrength",  [&](){ return centeringStrength(); }},
-//            {"centerInNess",       [&](){ return centerInNess(); }},
-//            {"centerSlowing",      [&](){ return centerSlowing(); }},
-//            {"centerCentering",    [&](){ return centerCentering(); }},
-//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//            // TODO 20261105 make centroid_max_distance_ an evolvable param
-//            {"murmMaxDistance",    [&](){ return murmMaxDistance(); }},
-//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-//        };
-//        assert(apnaa.size() == tuning_parameters.size()); // legacy check
-//        return apnaa;
-//    }
-
     // Return [name.accessor] pairs for all evolvable parameters.
     const std::vector<FpNameAccessorPair>& allParameterNamesAndAccessors() const
     {
         return all_params_names_accessors_;
     }
 
-    
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
+    // Return names of all evolvable parameters.
+    VecOfStrings allParameterNames() const
+    {
+        VecOfStrings names;
+        const auto& all_naa = allParameterNamesAndAccessors();
+        for (auto& [name, accessor] : all_naa) { names.push_back(name); }
+        return names;
+    }
 
     static void unit_test()
     {
@@ -517,8 +382,5 @@ private:
                              // Normal, for evolution runs.
                              // (Bigger for murmurations.)
                              (EF::murmuration_mode ? 1000 : 200)));
-
-    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
     int fps_ = 30;
 };

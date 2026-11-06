@@ -547,6 +547,15 @@ LazyPredator::FunctionSet static_ga_fs_ =
                 {"Real_0_1",    "centerInNess"},
                 {"Real_0_1",    "centerSlowing"},
                 {"Real_0_1",    "centerCentering"},
+                
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+                // TODO 20261105 make centroid_max_distance_ an evolvable param
+                
+//                40,    // murmMaxDistance()
+                
+                {"Real_0_50",   "murmMaxDistance"},
+                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
             }),
 
             // Evaluation function, which runs a flock simulation with the given

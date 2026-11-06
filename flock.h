@@ -345,101 +345,122 @@ public:
     double centroid_max_distance_ = 0;
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     double centroidMaxDistance() const { return centroid_max_distance_; }
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261105 make centroid_max_distance_ an evolvable param
+
+//        void initCentroidMaxDistance()
+//        {
+//            if (EF::murmuration_mode)
+//            {
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                // TODO 20260619 revert density maintenance, just use original radius
+//
+//    //            FlockParameters fp;
+//    //            double r = fp.sphereRadius();
+//    //            double v = shape::Sphere::volumeFromRadius(r);
+//    //            double bpf_big = 2000;
+//    //            double bpf_ratio = fp.boidsPerFlock() / bpf_big;
+//    //            double v2 = v * bpf_ratio;
+//    //            double r2 = shape::Sphere::radiusFromVolume(v2);
+//    //            centroid_max_distance_ = r2;
+//
+//                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//                // TODO 20261009 experimental adjustment for per_boid_centroid_mode
+//
+//    //            centroid_max_distance_ = fp().sphereRadius();
+//                // TODO QQQ looking for more "clumpier" structure.
+//    //            centroid_max_distance_ = fp().sphereRadius() / 3;
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.8;
+//
+//
+//                //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+//                // TODO 20261011 replace Flock::centroid() with Flock::centroidOfCentroids()
+//
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.8;
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.4;
+//
+//                // 20261011_ga_murm_pbc_for_cent_dist_score_b
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.4;
+//
+//                // 20261012_ga_murm_pbc_for_cent_dist_score
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.4;
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.5;
+//
+//                //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
+//                // 20261013_ga_murm_pbc_for_cent_dist_score
+//
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.5;
+//    //            centroid_max_distance_ = fp().sphereRadius() * 1.0;
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+//
+//
+//                //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~
+//                // 20261014_ga_murm_pbc_for_cent_dist_score_08
+//
+//                // why can't I get back to 20261009 ga murm pbc x2
+//                // see https://www.youtube.com/watch?v=EhBIGjCVx7E
+//
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.8;
+//
+//                //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~
+//                // TODO 20261015 blend per_boid_centroid with centroidOfCentroids()
+//
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.8;
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//                // TODO 20261017 tweaks to centroid_blend and max_dist scale.
+//
+//    //            centroid_max_distance_ = fp().sphereRadius() * 0.6;
+//
+//                // TODO 20261017 should be subject evolutionary optimization.
+//    //            double cent_max_dist_scale = 0.6;
+//    //            double cent_max_dist_scale = 0.8;
+//
+//                // TODO 20261017 cent_max_dist_scale from 0.8 to 0.6
+//    //            double cent_max_dist_scale = 0.6;
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//                // TODO 20261105 make centroid_max_distance_ an evolvable param
+//
+//    //            // TODO 20261018 cent_max_dist_scale from 0.6 to 0.7
+//    //            double cent_max_dist_scale = 0.7;
+//    //            centroid_max_distance_ = fp().sphereRadius() * cent_max_dist_scale;
+//
+//                centroid_max_distance_ = fp().murmMaxDistance();
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//                //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//                //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~
+//
+//                //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~
+//
+//                //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
+//
+//                //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+//
+//                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//
+//                //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            }
+//        }
+
+    
     void initCentroidMaxDistance()
     {
         if (EF::murmuration_mode)
         {
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-            // TODO 20260619 revert density maintenance, just use original radius
-            
-//            FlockParameters fp;
-//            double r = fp.sphereRadius();
-//            double v = shape::Sphere::volumeFromRadius(r);
-//            double bpf_big = 2000;
-//            double bpf_ratio = fp.boidsPerFlock() / bpf_big;
-//            double v2 = v * bpf_ratio;
-//            double r2 = shape::Sphere::radiusFromVolume(v2);
-//            centroid_max_distance_ = r2;
-            
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-            // TODO 20261009 experimental adjustment for per_boid_centroid_mode
-
-//            centroid_max_distance_ = fp().sphereRadius();
-            // TODO QQQ looking for more "clumpier" structure.
-//            centroid_max_distance_ = fp().sphereRadius() / 3;
-//            centroid_max_distance_ = fp().sphereRadius() * 0.6;
-//            centroid_max_distance_ = fp().sphereRadius() * 0.8;
-            
-            
-            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
-            // TODO 20261011 replace Flock::centroid() with Flock::centroidOfCentroids()
-
-//            centroid_max_distance_ = fp().sphereRadius() * 0.8;
-//            centroid_max_distance_ = fp().sphereRadius() * 0.4;
-            
-            // 20261011_ga_murm_pbc_for_cent_dist_score_b
-//            centroid_max_distance_ = fp().sphereRadius() * 0.6;
-//            centroid_max_distance_ = fp().sphereRadius() * 0.4;
-            
-            // 20261012_ga_murm_pbc_for_cent_dist_score
-//            centroid_max_distance_ = fp().sphereRadius() * 0.4;
-//            centroid_max_distance_ = fp().sphereRadius() * 0.5;
-            
-            //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
-            // 20261013_ga_murm_pbc_for_cent_dist_score
-            
-//            centroid_max_distance_ = fp().sphereRadius() * 0.5;
-//            centroid_max_distance_ = fp().sphereRadius() * 1.0;
-//            centroid_max_distance_ = fp().sphereRadius() * 0.6;
-
-            
-            //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~
-            // 20261014_ga_murm_pbc_for_cent_dist_score_08
-
-            // why can't I get back to 20261009 ga murm pbc x2
-            // see https://www.youtube.com/watch?v=EhBIGjCVx7E
-            
-//            centroid_max_distance_ = fp().sphereRadius() * 0.6;
-//            centroid_max_distance_ = fp().sphereRadius() * 0.8;
-
-            //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~
-            // TODO 20261015 blend per_boid_centroid with centroidOfCentroids()
-
-//            centroid_max_distance_ = fp().sphereRadius() * 0.8;
-//            centroid_max_distance_ = fp().sphereRadius() * 0.6;
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            // TODO 20261017 tweaks to centroid_blend and max_dist scale.
-
-//            centroid_max_distance_ = fp().sphereRadius() * 0.6;
-            
-            // TODO 20261017 should be subject evolutionary optimization.
-//            double cent_max_dist_scale = 0.6;
-//            double cent_max_dist_scale = 0.8;
-            
-            // TODO 20261017 cent_max_dist_scale from 0.8 to 0.6
-//            double cent_max_dist_scale = 0.6;
-            
-            // TODO 20261018 cent_max_dist_scale from 0.6 to 0.7
-            double cent_max_dist_scale = 0.7;
-            
-            centroid_max_distance_ = fp().sphereRadius() * cent_max_dist_scale;
-
-            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-            //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~
-
-            //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~
-
-            //~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~~ ~ ~
-
-            //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
-
-            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            centroid_max_distance_ = fp().murmMaxDistance();
         }
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // Collect flock curvature stats
     double min_curvature_ = +std::numeric_limits<double>::infinity();

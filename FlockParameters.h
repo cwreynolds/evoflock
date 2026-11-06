@@ -40,8 +40,15 @@ public:
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     // TODO 20260602 add more inline parameters to FB for GA optimization
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261105 make centroid_max_distance_ an evolvable param
+
 //    static int tunableParameterCount() { return 15 + 3; } // 3 for murmuration
-    static int tunableParameterCount() { return 15 + 6; } // 3 for murmuration
+//    static int tunableParameterCount() { return 15 + 6; } // 6 for murmuration
+
+    static int tunableParameterCount(){return int(hand_tuned_parameters.size());}
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -106,6 +113,13 @@ public:
         0.5,    // centerCentering() fraction of maxForce if heading out
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20261105 make centroid_max_distance_ an evolvable param
+        
+        40,    // murmMaxDistance()
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     };
     
     // Accessors for tuning parameters:
@@ -177,8 +191,15 @@ public:
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260419 add tunable parameters for murmuration
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261105 make centroid_max_distance_ an evolvable param
+
     // Maximum distance from centroid for murmurations
-    const double& murmMaxDistance() const { return tuning_parameters.at(15); }
+
+    //    const double& murmMaxDistance() const { return tuning_parameters.at(15); }
+    const double& murmMaxDistance() const { return tuning_parameters.at(21); }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     // Default constructor
     FlockParameters() : FlockParameters(hand_tuned_parameters) {}
@@ -186,13 +207,14 @@ public:
     // Constructor based on a vector of numeric parameters.
     FlockParameters(const std::vector<double>& vector_of_parameters_)
     {
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20261105 make centroid_max_distance_ an evolvable param
+        initParameterNamesAndAccessors();
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
         assert(vector_of_parameters_.size() == tunableParameterCount());
         tuning_parameters = vector_of_parameters_;
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260505 FlockParameters::enforceConstraints()
         enforceConstraints();
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
 
@@ -220,11 +242,22 @@ public:
     
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261105 make centroid_max_distance_ an evolvable param
+
+//    // The count(/size) of ALL parameters in this class.
+//    static int parameterCount()
+//    {
+//        return constParameterCount() + tunableParameterCount();
+//    }
+  
     // The count(/size) of ALL parameters in this class.
-    static int parameterCount()
+    static size_t parameterCount()
     {
         return constParameterCount() + tunableParameterCount();
     }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     void print() const
     {
@@ -276,6 +309,13 @@ public:
         indent(); debugPrint(centerCentering());
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20261105 make centroid_max_distance_ an evolvable param
+        
+        indent(); debugPrint(murmMaxDistance());
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
     }
 
     // Get i-th tuning parameter
@@ -286,19 +326,68 @@ public:
     typedef std::function<double()> FpAccessor;
     typedef std::pair<std::string, FpAccessor> FpNameAccessorPair;
     
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261105 make centroid_max_distance_ an evolvable param
+
+//    // Return names of all evolvable parameters.
+//    VecOfStrings allParameterNames() const
+//    {
+//        VecOfStrings names;
+//        auto all_naa = allParameterNamesAndAccessors();
+//        for (auto& [name, accessor] : all_naa) { names.push_back(name); }
+//        return names;
+//    }
+
     // Return names of all evolvable parameters.
     VecOfStrings allParameterNames() const
     {
         VecOfStrings names;
-        auto all_naa = allParameterNamesAndAccessors();
+        const auto& all_naa = allParameterNamesAndAccessors();
         for (auto& [name, accessor] : all_naa) { names.push_back(name); }
         return names;
     }
 
-    // Return [name.acessor] pairs for all evolvable parameters.
-    std::vector<FpNameAccessorPair> allParameterNamesAndAccessors() const
+//    // Return [name.accessor] pairs for all evolvable parameters.
+//    // TODO should be changed to build the structure only once
+//    std::vector<FpNameAccessorPair> allParameterNamesAndAccessors() const
+//    {
+//        std::vector<FpNameAccessorPair> apnaa =
+//        {
+//            {"maxForce",           [&](){ return maxForce(); }},
+//            {"weightForward",      [&](){ return weightForward(); }},
+//            {"weightSeparate",     [&](){ return weightSeparate(); }},
+//            {"weightAlign",        [&](){ return weightAlign(); }},
+//            {"weightCohere",       [&](){ return weightCohere(); }},
+//            {"weightAvoidPredict", [&](){ return weightAvoidPredict(); }},
+//            {"weightAvoidStatic",  [&](){ return weightAvoidStatic(); }},
+//            {"maxDistSeparate",    [&](){ return maxDistSeparate(); }},
+//            {"maxDistAlign",       [&](){ return maxDistAlign(); }},
+//            {"maxDistCohere",      [&](){ return maxDistCohere(); }},
+//            {"angleSeparate",      [&](){ return angleSeparate(); }},
+//            {"angleAlign",         [&](){ return angleAlign(); }},
+//            {"angleCohere",        [&](){ return angleCohere(); }},
+//            {"flyAwayMaxDist",     [&](){ return flyAwayMaxDist(); }},
+//            {"minTimeToCollide",   [&](){ return minTimeToCollide(); }},
+//            {"centerMaxDist",      [&](){ return centerMaxDist(); }},
+//            {"centerExponent",     [&](){ return centerExponent(); }},
+//            {"centeringStrength",  [&](){ return centeringStrength(); }},
+//            {"centerInNess",       [&](){ return centerInNess(); }},
+//            {"centerSlowing",      [&](){ return centerSlowing(); }},
+//            {"centerCentering",    [&](){ return centerCentering(); }},
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            // TODO 20261105 make centroid_max_distance_ an evolvable param
+//            {"murmMaxDistance",    [&](){ return murmMaxDistance(); }},
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        };
+//        assert(apnaa.size() == tuning_parameters.size()); // legacy check
+//        return apnaa;
+//    }
+
+    std::vector<FpNameAccessorPair> all_params_names_accessors_;
+    
+    void initParameterNamesAndAccessors()
     {
-        return
+        all_params_names_accessors_ =
         {
             {"maxForce",           [&](){ return maxForce(); }},
             {"weightForward",      [&](){ return weightForward(); }},
@@ -321,8 +410,59 @@ public:
             {"centerInNess",       [&](){ return centerInNess(); }},
             {"centerSlowing",      [&](){ return centerSlowing(); }},
             {"centerCentering",    [&](){ return centerCentering(); }},
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20261105 make centroid_max_distance_ an evolvable param
+            {"murmMaxDistance",    [&](){ return murmMaxDistance(); }},
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         };
+        // Double check for legacy standard.
+        assert(all_params_names_accessors_.size() == tuning_parameters.size());
     }
+
+//    // Return [name.accessor] pairs for all evolvable parameters.
+//    const std::vector<FpNameAccessorPair>& allParameterNamesAndAccessors() const
+//    {
+//        std::vector<FpNameAccessorPair> apnaa =
+//        {
+//            {"maxForce",           [&](){ return maxForce(); }},
+//            {"weightForward",      [&](){ return weightForward(); }},
+//            {"weightSeparate",     [&](){ return weightSeparate(); }},
+//            {"weightAlign",        [&](){ return weightAlign(); }},
+//            {"weightCohere",       [&](){ return weightCohere(); }},
+//            {"weightAvoidPredict", [&](){ return weightAvoidPredict(); }},
+//            {"weightAvoidStatic",  [&](){ return weightAvoidStatic(); }},
+//            {"maxDistSeparate",    [&](){ return maxDistSeparate(); }},
+//            {"maxDistAlign",       [&](){ return maxDistAlign(); }},
+//            {"maxDistCohere",      [&](){ return maxDistCohere(); }},
+//            {"angleSeparate",      [&](){ return angleSeparate(); }},
+//            {"angleAlign",         [&](){ return angleAlign(); }},
+//            {"angleCohere",        [&](){ return angleCohere(); }},
+//            {"flyAwayMaxDist",     [&](){ return flyAwayMaxDist(); }},
+//            {"minTimeToCollide",   [&](){ return minTimeToCollide(); }},
+//            {"centerMaxDist",      [&](){ return centerMaxDist(); }},
+//            {"centerExponent",     [&](){ return centerExponent(); }},
+//            {"centeringStrength",  [&](){ return centeringStrength(); }},
+//            {"centerInNess",       [&](){ return centerInNess(); }},
+//            {"centerSlowing",      [&](){ return centerSlowing(); }},
+//            {"centerCentering",    [&](){ return centerCentering(); }},
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            // TODO 20261105 make centroid_max_distance_ an evolvable param
+//            {"murmMaxDistance",    [&](){ return murmMaxDistance(); }},
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//        };
+//        assert(apnaa.size() == tuning_parameters.size()); // legacy check
+//        return apnaa;
+//    }
+
+    // Return [name.accessor] pairs for all evolvable parameters.
+    const std::vector<FpNameAccessorPair>& allParameterNamesAndAccessors() const
+    {
+        return all_params_names_accessors_;
+    }
+
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 
     static void unit_test()
     {

@@ -767,7 +767,17 @@ public:
         double nearest_distance = std::numeric_limits<double>::infinity();
 //        size_t samples = 3;
 //        size_t samples = 5;
-        size_t samples = 4;
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20261107 updateEstimatedCentroid() less focus on nearby neighbors
+
+//        size_t samples = 4;
+//        size_t samples = 2;
+//        size_t samples = 3;
+        size_t samples = 2;
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+
         for (size_t i = 0; i < samples; i++)
         {
             int sample_index = EF::RS().randomN(flock_boids().size());
@@ -812,6 +822,9 @@ public:
         return centroid_steer;
     }
 
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~  ~~
+    // TODO 20261106 make const params in steerTowardCentroid_v3 evolvable.
+
     // Steering force for global cohesion to centroid, for EF::murmuration_mode.
     Vec3 steerTowardCentroid_v3() const
     {
@@ -820,23 +833,41 @@ public:
         {
             Vec3 to_center = centroid() - position();
             auto [unit_to_center, distance] = to_center.normalize_and_length();
+
             // Abstract normalized measure of how far from murmuration centroid.
-            double max = centroidMaxDistance();
+//            double max = centroidMaxDistance();
+            double max = fp().murmMaxDistance();
+            
+            double min = max * fp().murmMinDistFrac();
+            
             // When heading AWAY from centroid, or too far away.
-            bool heading_away = unit_to_center.dot(forward()) < 0.92; //cos(22°)
+//            bool heading_away = unit_to_center.dot(forward()) < 0.92; //cos(22°)
+            bool heading_away = (unit_to_center.dot(forward()) <
+                                 fp().murmHeadingAway());
+
+            
             if (heading_away or (distance > max))
             {
                 // 0 from centroid to 66% of max, then ramping up to 100% at max.
-                double farness = util::remap_interval_clip(distance,
-                                                           max * 0.66, max,
-                                                           0,          1);
+//                double farness = util::remap_interval_clip(distance,
+//                                                           max * 0.66, max,
+//                                                           0,          1);
+//                double farness = util::remap_interval_clip(distance,
+//                                                           min, max,
+//                                                           0,   1);
+                double farness = util::remap_interval_clip(distance,min,max,0,1);
+
                 // Square farness and scale it by evolved strength parameter.
-                double weight = std::pow(farness, 2) * fp().centeringStrength();
+//                double weight = std::pow(farness, 2) * fp().centeringStrength();
+                double weight = std::pow(farness, 2) * fp().murmCenterStrength();
                 centroid_steer = unit_to_center * weight;
             }
         }
         return centroid_steer;
     }
+
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~  ~~
 
     // get/set for plane approximating local neighbor manifold.
     // Perhaps to be used for a "manifold objective"

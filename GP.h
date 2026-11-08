@@ -540,21 +540,32 @@ LazyPredator::FunctionSet static_ga_fs_ =
                 {"Real_0_100",  "flyAwayMaxDist"},
                 {"Real_0_10",   "minTimeToCollide"},
                 
-                {"Real_0_50",   "centerMaxDist"},
-                {"Real_1_2",    "centerExponent"},
-                {"Real_0_100",  "centeringStrength"},
-                
-                {"Real_0_1",    "centerInNess"},
-                {"Real_0_1",    "centerSlowing"},
-                {"Real_0_1",    "centerCentering"},
+                {"Real_0_50",   "centerMaxDist"},      // (old style murm)
+                {"Real_1_2",    "centerExponent"},     // (old style murm)
+                {"Real_0_100",  "centeringStrength"},  // (old style murm)
+                {"Real_0_1",    "centerInNess"},       // (old style murm)
+                {"Real_0_1",    "centerSlowing"},      // (old style murm)
+                {"Real_0_1",    "centerCentering"},    // (old style murm)
                 
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
                 // TODO 20261105 make centroid_max_distance_ an evolvable param
-                
-//                40,    // murmMaxDistance()
-                
                 {"Real_0_50",   "murmMaxDistance"},
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+                // TODO 20261106 make murmHeadingAway an evolvable param
+                {"Real_m1_p1", "murmHeadingAway"},
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+                //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+                // TODO 20261106 make murmMinDistFrac an evolvable param
+                {"Real_0_1", "murmMinDistFrac"},
+                //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+                // TODO 20261107 make murmCenterStrength an evolvable param
+                {"Real_0_100", "murmCenterStrength"},
+                //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
             }),
 

@@ -549,7 +549,15 @@ void visualizeBestIfRequested(LP::Population* population)
 
 //        if (murmuration_mode) { override_boids_per_flock = 2000; }
 //        if (murmuration_mode) { override_boids_per_flock = 4000; }
-        if (murmuration_mode) { override_boids_per_flock = 2000; }
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20261107 I think I having a hard time adjusting hyperparameters
+        //               because the "B" (show sim with best FP) sims are much
+        //               too large, which throws off density score.
+        
+//        if (murmuration_mode) { override_boids_per_flock = 2000; }
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         
 //        if (murmuration_mode) { override_skip_think = 10; }

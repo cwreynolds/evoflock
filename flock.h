@@ -926,7 +926,13 @@ public:
                 sum_of_boid_manifold_score_ += score;
             }
         }
-        xxxTrackDonutHoleAxisChanges();
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20261107 try without "anti donut hole" score;
+
+//        xxxTrackDonutHoleAxisChanges();
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -954,13 +960,20 @@ public:
 //        double score = parameterToWeightWithRamps(cubic_meter_per_boid,
 //                                                  {0, 500, 1500, 2000},
 //                                                  {0,   1,    1,    0});
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20261107 I think I having a hard time adjusting hyperparameters
+
         double score = parameterToWeightWithRamps(cubic_meter_per_boid,
-                                                  {0, 300, 500, 1000, 1200},
+//                                                {0, 300, 500, 1000, 1200},
+                                                  {0, 300, 500,  700,  900},
                                                   {0,   0,   1,    1,    0});
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         if ((clock().frameCounter() % 100) == 99)
         {
-            std::cout << clock().frameCounter();
+            std::cout << "    " << clock().frameCounter();
             std::cout << ": flock density = " << flock_density;
             std::cout << "  m³ per boid = " << cubic_meter_per_boid;
             std::cout << "  score = " << score;
@@ -983,7 +996,12 @@ public:
     {
         // TODO XXX very temp
         double d = centroidDistanceScore();
-        double a = centroidAntiDonutScore();
+        
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20261107 try without "anti donut hole" score;
+//        double a = centroidAntiDonutScore();
+        double a = 1;
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         // TODO 20261008 try turning off manifold for per_boid_centroid_mode

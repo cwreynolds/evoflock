@@ -533,6 +533,63 @@ public:
 //        if (delta_axis_angle > enough_jiggle) { total_anti_donut_good_steps_++; }
 //    }
 
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+    // TODO 20261107 restore "anti donut hole" score, but less strict
+
+//        void xxxTrackDonutHoleAxisChanges()
+//        {
+//            Vec3 sum_of_cross_prods;
+//            auto per_boid_donut_axis = [&](Boid* b)
+//            {
+//                auto nn = b->nearestNeighbor();
+//                Vec3 cross_neighbor = Vec3::cross(b->forward(), nn.forward());
+//                sum_of_cross_prods += cross_neighbor;
+//            };
+//
+//            // TODO 20261020 do a simple loop to avoid multi-threaded count issues?
+//            //        for_all_boids(per_boid_donut_axis);
+//            for (Boid* b : boids()) { per_boid_donut_axis(b); }
+//
+//
+//            Vec3 donut_hole_axis = sum_of_cross_prods.normalize();
+//
+//            double delta_axis_angle = Vec3::angle_between(donut_hole_axis,
+//                                                          previous_donut_hole_axis_);
+//            // std::cout << delta_axis_angle << std::endl;
+//            previous_donut_hole_axis_ = donut_hole_axis;
+//
+//    //            double enough_jiggle = 0.20;
+//    //    //        double enough_jiggle = 0.50;
+//    //    //        double enough_jiggle = 0.30;
+//    //            if (delta_axis_angle > enough_jiggle) { total_anti_donut_good_steps_++; }
+//
+//    //        double jiggle_threshold = 0.20;  // in radians
+//            double jiggle_threshold = 0.30;  // in radians
+//            bool enough_jiggle = delta_axis_angle > jiggle_threshold;
+//            if (enough_jiggle) { total_anti_donut_good_steps_++; }
+//
+//
+//            // TODO 20261020  bring back annotation
+//            if (show_annotation_for_anti_donut_hole_)
+//            {
+//                Vec3 ep = sum_of_cross_prods.normalize() * 50;
+//    //            Color c1 = Color::orange();
+//    //            Color c2 = Color::white() - Color::orange();
+//                Color color = enough_jiggle ? Color::green() : Color::red();
+//
+//    //            if (delta_axis_angle < enough_jiggle) { c1 = Color::black(); c2 = c1; }
+//
+//
+//                Vec3 coc = centroidOfCentroids();
+//    //            draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
+//    //            draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
+//    //            draw().addAnnotationLine(coc, coc + ep, c1, 0.2);
+//    //            draw().addAnnotationLine(coc, coc - ep, c2, 0.2);
+//                draw().addAnnotationLine(coc, coc + ep, color, 0.2);
+//                draw().addAnnotationLine(coc, coc - ep, color, 0.2);
+//            }
+//        }
     
     void xxxTrackDonutHoleAxisChanges()
     {
@@ -555,14 +612,11 @@ public:
                                                       previous_donut_hole_axis_);
         // std::cout << delta_axis_angle << std::endl;
         previous_donut_hole_axis_ = donut_hole_axis;
-        
-//            double enough_jiggle = 0.20;
-//    //        double enough_jiggle = 0.50;
-//    //        double enough_jiggle = 0.30;
-//            if (delta_axis_angle > enough_jiggle) { total_anti_donut_good_steps_++; }
-      
+              
 //        double jiggle_threshold = 0.20;  // in radians
-        double jiggle_threshold = 0.30;  // in radians
+//        double jiggle_threshold = 0.30;  // in radians
+//        double jiggle_threshold = 0.20;  // in radians
+        double jiggle_threshold = 0.10;  // in radians
         bool enough_jiggle = delta_axis_angle > jiggle_threshold;
         if (enough_jiggle) { total_anti_donut_good_steps_++; }
 
@@ -571,22 +625,15 @@ public:
         if (show_annotation_for_anti_donut_hole_)
         {
             Vec3 ep = sum_of_cross_prods.normalize() * 50;
-//            Color c1 = Color::orange();
-//            Color c2 = Color::white() - Color::orange();
             Color color = enough_jiggle ? Color::green() : Color::red();
-            
-//            if (delta_axis_angle < enough_jiggle) { c1 = Color::black(); c2 = c1; }
-
-            
             Vec3 coc = centroidOfCentroids();
-//            draw().addAnnotationLine(centroid(), centroid() + ep, c1, 0.2);
-//            draw().addAnnotationLine(centroid(), centroid() - ep, c2, 0.2);
-//            draw().addAnnotationLine(coc, coc + ep, c1, 0.2);
-//            draw().addAnnotationLine(coc, coc - ep, c2, 0.2);
             draw().addAnnotationLine(coc, coc + ep, color, 0.2);
             draw().addAnnotationLine(coc, coc - ep, color, 0.2);
         }
     }
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 
     bool show_annotation_for_anti_donut_hole_ = true;
     
@@ -931,6 +978,7 @@ public:
         // TODO 20261107 try without "anti donut hole" score;
 
 //        xxxTrackDonutHoleAxisChanges();
+        xxxTrackDonutHoleAxisChanges();
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
@@ -999,8 +1047,10 @@ public:
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20261107 try without "anti donut hole" score;
+        // TODO 20261107 restore "anti donut hole" score, but less strict
 //        double a = centroidAntiDonutScore();
-        double a = 1;
+//        double a = 1;
+        double a = centroidAntiDonutScore();
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~

@@ -474,12 +474,21 @@ public:
 //            combined_steering += (steerTowardManifold() *
 //                                  (100 * fp().weightRelManifold()));
 
-            if (not EF::per_boid_centroid_mode)
-            {
-                combined_steering += (steerTowardManifold() *
-                                      (100 * fp().weightRelManifold()));
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20261109 try bringing back manifold
 
-            }
+//            if (not EF::per_boid_centroid_mode)
+//            {
+//                combined_steering += (steerTowardManifold() *
+//                                      (100 * fp().weightRelManifold()));
+//
+//            }
+
+            combined_steering += (steerTowardManifold() *
+                                  (100 * fp().weightRelManifold()));
+
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

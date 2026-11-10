@@ -616,10 +616,13 @@ public:
 //        double jiggle_threshold = 0.20;  // in radians
 //        double jiggle_threshold = 0.30;  // in radians
 //        double jiggle_threshold = 0.20;  // in radians
-        double jiggle_threshold = 0.10;  // in radians
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261108 jiggle_threshold from 0.10 to 0.05
+//        double jiggle_threshold = 0.10;  // in radians
+        double jiggle_threshold = 0.05;  // in radians
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         bool enough_jiggle = delta_axis_angle > jiggle_threshold;
         if (enough_jiggle) { total_anti_donut_good_steps_++; }
-
         
         // TODO 20261020  bring back annotation
         if (show_annotation_for_anti_donut_hole_)
@@ -962,17 +965,31 @@ public:
 //            sum_of_boid_manifold_score_ += score;
 //        }
 
-        if (not EF::per_boid_centroid_mode)
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20261109 try bringing back manifold
+
+//        if (not EF::per_boid_centroid_mode)
+//        {
+//            for (auto b : boids())
+//            {
+//                shape::Plane plane = b->getNeighborPlane();
+//                double distance = plane.pointToSurfaceDistance(b->position());
+//                double max = 3; // TODO inline constant, in diameters
+//                double score = util::remap_interval_clip(distance, 0, max, 1, 0);
+//                sum_of_boid_manifold_score_ += score;
+//            }
+//        }
+  
+        for (auto b : boids())
         {
-            for (auto b : boids())
-            {
-                shape::Plane plane = b->getNeighborPlane();
-                double distance = plane.pointToSurfaceDistance(b->position());
-                double max = 3; // TODO inline constant, in diameters
-                double score = util::remap_interval_clip(distance, 0, max, 1, 0);
-                sum_of_boid_manifold_score_ += score;
-            }
+            shape::Plane plane = b->getNeighborPlane();
+            double distance = plane.pointToSurfaceDistance(b->position());
+            double max = 3; // TODO inline constant, in diameters
+            double score = util::remap_interval_clip(distance, 0, max, 1, 0);
+            sum_of_boid_manifold_score_ += score;
         }
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20261107 try without "anti donut hole" score;
@@ -1056,7 +1073,11 @@ public:
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         // TODO 20261008 try turning off manifold for per_boid_centroid_mode
 //        double m = centroidManifoldScore();
-        double m = EF::per_boid_centroid_mode ? 1 : centroidManifoldScore();
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20261109 try bringing back manifold
+//        double m = EF::per_boid_centroid_mode ? 1 : centroidManifoldScore();
+        double m = centroidManifoldScore();
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~

@@ -567,6 +567,15 @@ LazyPredator::FunctionSet static_ga_fs_ =
                 {"Real_0_100", "murmCenterStrength"},
                 //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+                // TODO 20261110 make murmManifoldStrength an evolvable param
+                // How much force toward local manifold.
+                {"Real_0_100", "murmManifoldStrength"},
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+                //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~
+                // ADD NEW PARAMETER HERE
+                //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~
             }),
 
             // Evaluation function, which runs a flock simulation with the given

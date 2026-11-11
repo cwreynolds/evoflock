@@ -484,8 +484,23 @@ public:
 //
 //            }
 
-            combined_steering += (steerTowardManifold() *
-                                  (100 * fp().weightRelManifold()));
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            // TODO 20261110 when I tried this last night it paradoxically got
+            //               centroidManifoldScore()=0.649776
+            //               with weightRelManifold()=0.056
+            //               trying to force it to use steerTowardManifold()
+            
+//            combined_steering += (steerTowardManifold() *
+//                                  (100 * fp().weightRelManifold()));
+
+//            combined_steering += steerTowardManifold() * 50; // INLINE CONST!!!!!!
+
+            // TODO 20261110 now use new evolvable param
+            
+            Vec3 stm = steerTowardManifold() * fp().murmManifoldStrength();
+            combined_steering += stm;
+
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
             //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

@@ -995,7 +995,7 @@ public:
         // TODO 20261107 try without "anti donut hole" score;
 
 //        xxxTrackDonutHoleAxisChanges();
-        xxxTrackDonutHoleAxisChanges();
+//        xxxTrackDonutHoleAxisChanges();
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
@@ -1019,9 +1019,14 @@ public:
         
         shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
         double flock_volume = flock_sphere.volume();
-        double flock_density = boids().size() / flock_volume; //boids per m³
-        double cubic_meter_per_boid = 1 / flock_density;
-        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20261110 make murmManifoldStrength an evolvable param
+//        double flock_density = boids().size() / flock_volume; //boids per m³
+//        double cubic_meter_per_boid = 1 / flock_density;
+        double density = boids().size() / flock_volume; //boids per m³
+        double cubic_meter_per_boid = 1 / density;
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
 //        double score = parameterToWeightWithRamps(cubic_meter_per_boid,
 //                                                  {0, 500, 1500, 2000},
 //                                                  {0,   1,    1,    0});
@@ -1029,17 +1034,38 @@ public:
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20261107 I think I having a hard time adjusting hyperparameters
 
-        double score = parameterToWeightWithRamps(cubic_meter_per_boid,
-//                                                {0, 300, 500, 1000, 1200},
-                                                  {0, 300, 500,  700,  900},
-                                                  {0,   0,   1,    1,    0});
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20261110 make murmManifoldStrength an evolvable param
+
+//            double score = parameterToWeightWithRamps(cubic_meter_per_boid,
+//    //                                                {0, 300, 500, 1000, 1200},
+//                                                      {0, 300, 500,  700,  900},
+//                                                      {0,   0,   1,    1,    0});
+        
+        // XXX 1/300 = 0.0033
+        // XXX 1/500 = 0.0020
+        // XXX 1/700 = 0.0014
+        // XXX 1/900 = 0.0011
+
+//        std::vector<double> cmpb      = {0, 300, 500,  700,  900};
+//        std::vector<double> scores    = {0,   0,   1,    1,    0};
+        
+//        std::vector<double> densities = {0, 0.0011, 0.0014, 0.0020, 0.0033};
+//        std::vector<double> scores    = {0, 0,      1,      1,      0};
+
+        std::vector<double> densities = {0, 0.0010, 0.0020, 0.0040, 0.0050};
+        std::vector<double> scores    = {0, 0,      1,      1,      0};
+        double score = parameterToWeightWithRamps(density, densities, scores);
+
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         if ((clock().frameCounter() % 100) == 99)
         {
             std::cout << "    " << clock().frameCounter();
-            std::cout << ": flock density = " << flock_density;
+            std::cout << ": flock density = " << density;
             std::cout << "  m³ per boid = " << cubic_meter_per_boid;
             std::cout << "  score = " << score;
             std::cout << std::endl;
@@ -1067,7 +1093,8 @@ public:
         // TODO 20261107 restore "anti donut hole" score, but less strict
 //        double a = centroidAntiDonutScore();
 //        double a = 1;
-        double a = centroidAntiDonutScore();
+//        double a = centroidAntiDonutScore();
+        double a = 1;
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~

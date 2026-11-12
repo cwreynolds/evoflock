@@ -107,6 +107,7 @@
 		841F3D632B4A1C8D00483276 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		841F3D642B4C73A500483276 /* Utilities.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utilities.h; sourceTree = "<group>"; };
 		843278062B50594E00CF4AEC /* LocalSpace.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalSpace.h; sourceTree = "<group>"; };
+		8442810E30A655750085C9CF /* EvoFlock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EvoFlock.h; sourceTree = "<group>"; };
 		8443E3F12F63A07E00FAAA03 /* evo_update.pages */ = {isa = PBXFileReference; lastKnownFileType = file; path = evo_update.pages; sourceTree = "<group>"; };
 		8443E3F22F63A07E00FAAA03 /* evo_update.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = evo_update.pdf; sourceTree = "<group>"; };
 		8443E3F32F63A07E00FAAA03 /* MOF_HV.pages */ = {isa = PBXFileReference; lastKnownFileType = file; path = MOF_HV.pages; sourceTree = "<group>"; };
@@ -310,6 +311,7 @@
 		841F3D4C2B49E90000483276 = {
 			isa = PBXGroup;
 			children = (
+				8442810E30A655750085C9CF /* EvoFlock.h */,
 				848BC33C2B69856700509CE5 /* flock.h */,
 				847454BF2B65BE9C00214306 /* Boid.h */,
 				845F845D2D90E397000BF13C /* FlockParameters.h */,
@@ -512,7 +514,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastUpgradeCheck = 1520;
+				LastUpgradeCheck = 2720;
 				TargetAttributes = {
 					841F3D542B49E90000483276 = {
 						CreatedOnToolsVersion = 15.1;
@@ -610,6 +612,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"/usr/local/include/eigen-3.4.0",
 					"/Users/cwr/Documents/code/open3d-devel-darwin-arm64-0.18.0+c219d82/include/open3d/3rdparty",
@@ -673,6 +676,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = "";
 				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					"/usr/local/include/eigen-3.4.0",
 					"/Users/cwr/Documents/code/open3d-devel-darwin-arm64-0.18.0+c219d82/include/open3d/3rdparty",
@@ -688,6 +692,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib/;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					/usr/local/include,
@@ -705,6 +710,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib/;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = (
 					/usr/local/include,

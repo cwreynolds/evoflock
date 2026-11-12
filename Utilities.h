@@ -26,6 +26,10 @@
 #include <mutex>
 #include <filesystem>
 #include <set>
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// TODO 20261112 new OS, new Xcode, new everything.
+#include <numeric>  // for std::reduce
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 namespace fs = std::filesystem;
 class Vec3;
 

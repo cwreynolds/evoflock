@@ -1053,11 +1053,21 @@ public:
 //        std::vector<double> densities = {0, 0.0011, 0.0014, 0.0020, 0.0033};
 //        std::vector<double> scores    = {0, 0,      1,      1,      0};
 
-        std::vector<double> densities = {0, 0.0010, 0.0020, 0.0040, 0.0050};
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+        // TODO 20261111 overnight run was not dense enough: 0.002 to 0.003
+        
+//        std::vector<double> densities = {0, 0.0010, 0.0020, 0.0040, 0.0050};
+//        std::vector<double> scores    = {0, 0,      1,      1,      0};
+//        double score = parameterToWeightWithRamps(density, densities, scores);
+
+        
+//      std::vector<double> densities = {0, 0.0010, 0.0020, 0.0040, 0.0050};
+        std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
         std::vector<double> scores    = {0, 0,      1,      1,      0};
         double score = parameterToWeightWithRamps(density, densities, scores);
 
-        
+        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~

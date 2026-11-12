@@ -1296,6 +1296,10 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
                             49.2543, 1.85476, 55.7016, 0.0949222, 0.979381,
                             0.191004, 36.7506, -0.525939, 0.483185, 92.7727});
         
+        // Tuesday day run: pretty nice motion, but not dense enough, final
+        // fit = 0.41, planning to try one with adjusted density score
+        
+        
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

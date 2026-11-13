@@ -994,8 +994,13 @@ public:
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         // TODO 20261107 try without "anti donut hole" score;
 
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261112 bring back anti-donut
+
 //        xxxTrackDonutHoleAxisChanges();
-//        xxxTrackDonutHoleAxisChanges();
+        xxxTrackDonutHoleAxisChanges();
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
@@ -1060,11 +1065,20 @@ public:
 //        std::vector<double> scores    = {0, 0,      1,      1,      0};
 //        double score = parameterToWeightWithRamps(density, densities, scores);
 
-        
-//      std::vector<double> densities = {0, 0.0010, 0.0020, 0.0040, 0.0050};
-        std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261112 bring back anti-donut
+
+//    //      std::vector<double> densities = {0, 0.0010, 0.0020, 0.0040, 0.0050};
+//            std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
+//            std::vector<double> scores    = {0, 0,      1,      1,      0};
+//            double score = parameterToWeightWithRamps(density, densities, scores);
+
+//      std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
+        std::vector<double> densities = {0, 0.0035, 0.0045, 0.0055, 0.0065};
         std::vector<double> scores    = {0, 0,      1,      1,      0};
         double score = parameterToWeightWithRamps(density, densities, scores);
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -1104,7 +1118,11 @@ public:
 //        double a = centroidAntiDonutScore();
 //        double a = 1;
 //        double a = centroidAntiDonutScore();
-        double a = 1;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261112 bring back anti-donut
+//        double a = 1;
+        double a = centroidAntiDonutScore();
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
         
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~

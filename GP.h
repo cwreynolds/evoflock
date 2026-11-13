@@ -506,6 +506,7 @@ LazyPredator::FunctionSet static_ga_fs_ =
         { "Real_0_100",  0.0, 100.0, jiggle_scale },
         { "Real_m1_p1", -1.0,  +1.0, jiggle_scale },
         { "Real_1_2",    1.0,   2.0, jiggle_scale },
+        { "Real_1_10",   1.0,  10.0, jiggle_scale },
     },
     {
         {
@@ -571,6 +572,14 @@ LazyPredator::FunctionSet static_ga_fs_ =
                 // TODO 20261110 make murmManifoldStrength an evolvable param
                 // How much force toward local manifold.
                 {"Real_0_100", "murmManifoldStrength"},
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+                // TODO 20261112 add evolvable params for Boid::updateEstimatedCentroid()
+                // murmCentroidSamples use nearest of this many samples
+                {"Real_1_10", "murmCentroidSamples"},
+                // murmCentroidSmooth smoothness for time series of centroids.
+                {"Real_0_1", "murmCentroidSmooth"},
                 //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
                 //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~

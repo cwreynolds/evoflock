@@ -134,7 +134,13 @@ public:
         // TODO 20261110 make murmManifoldStrength an evolvable param
         50,    // murmManifoldStrength how much force toward local manifold
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20261112 add evolvable params for Boid::updateEstimatedCentroid()
+        2,    // murmCentroidSamples use nearest of this many samples
+        0.95, // murmCentroidSmooth smoothness for time series of centroids.
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        
         //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~
         // ADD NEW PARAMETER HERE
         //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~
@@ -237,6 +243,14 @@ public:
     const double& murmManifoldStrength() const { return tuning_parameters.at(25); }
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20261112 add evolvable params for Boid::updateEstimatedCentroid()
+    // murmCentroidSamples use nearest of this many samples
+    const double& murmCentroidSamples() const {return tuning_parameters.at(26);}
+    // murmCentroidSmooth smoothness for time series of centroids.
+    const double& murmCentroidSmooth() const {return tuning_parameters.at(27);}
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
     //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~
     // ADD NEW PARAMETER HERE
     //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~
@@ -336,6 +350,14 @@ public:
         indent(); debugPrint(murmManifoldStrength());
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20261112 add evolvable params for Boid::updateEstimatedCentroid()
+        // murmCentroidSamples use nearest of this many samples
+        indent(); debugPrint(murmCentroidSamples());
+        // murmCentroidSmooth smoothness for time series of centroids.
+        indent(); debugPrint(murmCentroidSmooth());
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~
         // ADD NEW PARAMETER HERE
         //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~
@@ -411,6 +433,14 @@ public:
             {"murmManifoldStrength",  [&](){ return murmManifoldStrength(); }},
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
             
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20261112 add evolvable params for Boid::updateEstimatedCentroid()
+            // murmCentroidSamples use nearest of this many samples
+            {"murmCentroidSamples",  [&](){ return murmCentroidSamples(); }},
+            // murmCentroidSmooth smoothness for time series of centroids.
+            {"murmCentroidSmooth",  [&](){ return murmCentroidSmooth(); }},
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
             //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~
             // ADD NEW PARAMETER HERE
             //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~

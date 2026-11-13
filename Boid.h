@@ -785,23 +785,49 @@ public:
 //            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 //        }
 
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+    // TODO 20261112 add evolvable params for Boid::updateEstimatedCentroid()
+
+//        void updateEstimatedCentroid()
+//        {
+//            Vec3 nearest;
+//            double nearest_distance = std::numeric_limits<double>::infinity();
+//    //        size_t samples = 3;
+//    //        size_t samples = 5;
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//            // TODO 20261107 updateEstimatedCentroid() less focus on nearby neighbors
+//
+//    //        size_t samples = 4;
+//    //        size_t samples = 2;
+//    //        size_t samples = 3;
+//            size_t samples = 2;
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//
+//            for (size_t i = 0; i < samples; i++)
+//            {
+//                int sample_index = EF::RS().randomN(flock_boids().size());
+//                Boid& sample_boid = *(flock_boids().at(sample_index));
+//                Vec3 sb_pos = sample_boid.position();
+//                double distance = (position() - sb_pos).length();
+//                if (nearest_distance > distance)
+//                {
+//                    nearest_distance = distance;
+//                    nearest = sb_pos;
+//                }
+//            }
+//            double smoothness = 0.95;
+//            setCentroid(centroid_memory_.blend(nearest, smoothness));
+//        }
+
     void updateEstimatedCentroid()
     {
         Vec3 nearest;
         double nearest_distance = std::numeric_limits<double>::infinity();
-//        size_t samples = 3;
-//        size_t samples = 5;
-        
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20261107 updateEstimatedCentroid() less focus on nearby neighbors
-
-//        size_t samples = 4;
 //        size_t samples = 2;
-//        size_t samples = 3;
-        size_t samples = 2;
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
+//        size_t samples = fp().murmCentroidSamples();
+        size_t samples = std::round(fp().murmCentroidSamples());
         for (size_t i = 0; i < samples; i++)
         {
             int sample_index = EF::RS().randomN(flock_boids().size());
@@ -814,9 +840,12 @@ public:
                 nearest = sb_pos;
             }
         }
-        double smoothness = 0.95;
+//        double smoothness = 0.95;
+        double smoothness = fp().murmCentroidSmooth();
         setCentroid(centroid_memory_.blend(nearest, smoothness));
     }
+
+    //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
     //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 

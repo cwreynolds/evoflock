@@ -1283,22 +1283,31 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     6.17728, 34.56, 1.93899, 26.0569, 0.9977,
         //                     0.705353, 0.578684, 36.7994, -0.61614,
         //                     0.731924, 95.8165});
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20261109_ga_murm_add_back_manifold with bigger flock
-        
+                
         // Saved best FP values from run 20261109_ga_murm_add_back_manifold
         // (looks good)
         // (fitness seemed low overall, maybe anti-donut is unneeded?)
-        FlockParameters fp({72.4335, 93.1421, 55.199, 74.4253, 1.25694,
-                            38.6123, 68.3351, 2.13869, 12.8475, 33.0869,
-                            -0.749446, -0.798531, 0.78904, 65.3191, 5.84799,
-                            49.2543, 1.85476, 55.7016, 0.0949222, 0.979381,
-                            0.191004, 36.7506, -0.525939, 0.483185, 92.7727});
+        // FlockParameters fp({72.4335, 93.1421, 55.199, 74.4253, 1.25694,
+        //                     38.6123, 68.3351, 2.13869, 12.8475, 33.0869,
+        //                     -0.749446, -0.798531, 0.78904, 65.3191, 5.84799,
+        //                     49.2543, 1.85476, 55.7016, 0.0949222, 0.979381,
+        //                     0.191004, 36.7506, -0.525939, 0.483185, 92.7727});
         
         // Tuesday day run: pretty nice motion, but not dense enough, final
         // fit = 0.41, planning to try one with adjusted density score
         
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261113_ga_murm_no_manifold with bigger flock
+        
+        // Saved best FP values from run 20261113_ga_murm_no_manifold
+        // (looks good)
+        // ()
+        FlockParameters fp({95.5086, 65.5316, 49.286, 40.7364, 27.129,
+                            49.6726, 77.638, 2.82145, 80.6249, 86.0448,
+                            -0.483862, -0.354051, 0.356691, 30.2889,
+                            9.22137, 14.2588, 1.06187, 58.1826, 0.881011,
+                            0.382762, 0.652778, 29.8308, -0.60443,
+                            0.278795, 94.883, 6.46374, 2.42339, 0.760073});
         
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1333,14 +1342,19 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 //    //        if (murmuration_mode) { fp.centerMaxDist() = 80; }
 //            if (murmuration_mode) { fp.centerMaxDist() = 60; }
 
-        if (murmuration_mode)
-        {
-            override_boids_per_flock = 2000;
-            override_skip_think = 0;
-//            fp.centerMaxDist() = 60;
-//            fp.centerMaxDist() = fp.sphereRadius(); // aka 50
-            fp.centerMaxDist() = fp.sphereRadius() * 0.8; // aka 40
-        }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261114 smaller pop for murm in viz_prev
+
+//            if (murmuration_mode)
+//            {
+//                override_boids_per_flock = 2000;
+//                override_skip_think = 0;
+//    //            fp.centerMaxDist() = 60;
+//    //            fp.centerMaxDist() = fp.sphereRadius(); // aka 50
+//                fp.centerMaxDist() = fp.sphereRadius() * 0.8; // aka 40
+//            }
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 

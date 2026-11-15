@@ -510,9 +510,15 @@ private:
                             EF::override_boids_per_flock :
                             (EF::visualize_previous_results_mode ?
                              
+                             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                             // TODO 20261114 smaller pop for murm in viz_prev
+                             
                              // For visualizing previous results.
                              // (Bigger for murmurations.)
-                             (EF::murmuration_mode ? 2000 : 1400) :
+//                             (EF::murmuration_mode ? 2000 : 1400) :
+                             (EF::murmuration_mode ? 1000 : 1400) :
+
+                             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
                              // Normal, for evolution runs.
                              // (Bigger for murmurations.)

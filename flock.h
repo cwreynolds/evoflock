@@ -619,7 +619,13 @@ public:
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20261108 jiggle_threshold from 0.10 to 0.05
 //        double jiggle_threshold = 0.10;  // in radians
-        double jiggle_threshold = 0.05;  // in radians
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20261114 smaller pop for murm in viz_prev
+
+//        double jiggle_threshold = 0.05;  // in radians
+        double jiggle_threshold = 0.10;  // in radians
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         bool enough_jiggle = delta_axis_angle > jiggle_threshold;
         if (enough_jiggle) { total_anti_donut_good_steps_++; }
@@ -891,14 +897,23 @@ public:
             for (auto b : boids()) {b->updateEstimatedCentroid();}
             
             
-            // TODO QQQ very temp experiment
-            // set flock's centroid to average of boid centroids
-            Vec3 sum_of_boid_centroids;
-//            for (auto b : boids()) { sum_of_boid_centroids += b->centroid(); }
-            for (auto b : boids()) { sum_of_boid_centroids += b->centroid(); }
-//            centroid_ = sum_of_boid_centroids / boids().size();
-            centroid_of_centroids_ = sum_of_boid_centroids / boids().size();
+            //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+            // TODO 20261113 turn off manifold, allow slightly lower density
+
+//                // TODO QQQ very temp experiment
+//                // set flock's centroid to average of boid centroids
+//                Vec3 sum_of_boid_centroids;
+//    //            for (auto b : boids()) { sum_of_boid_centroids += b->centroid(); }
+//                for (auto b : boids()) { sum_of_boid_centroids += b->centroid(); }
+//    //            centroid_ = sum_of_boid_centroids / boids().size();
+//                centroid_of_centroids_ = sum_of_boid_centroids / boids().size();
             
+            Vec3 sum_of_boid_positions;
+            for (auto b : boids()) { sum_of_boid_positions += b->position(); }
+            centroid_of_centroids_ = sum_of_boid_positions / boids().size();
+
+            //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+
             
             //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
             // TODO 20261021 prototype flock density determination
@@ -1073,10 +1088,39 @@ public:
 //            std::vector<double> scores    = {0, 0,      1,      1,      0};
 //            double score = parameterToWeightWithRamps(density, densities, scores);
 
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+        // TODO 20261113 turn off manifold, allow slightly lower density
+
+//    //      std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
+//            std::vector<double> densities = {0, 0.0035, 0.0045, 0.0055, 0.0065};
+//            std::vector<double> scores    = {0, 0,      1,      1,      0};
+//            double score = parameterToWeightWithRamps(density, densities, scores);
+
+//    //      std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
+//    //      std::vector<double> densities = {0, 0.0035, 0.0045, 0.0055, 0.0065};
+//            std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+//            std::vector<double> scores    = {0, 0,      1,      1,      0};
+//            double score = parameterToWeightWithRamps(density, densities, scores);
+
+        
+        //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
+        // TODO 20261114 increase low end of target range -- so increase density
+        
+//            // TODO 20261113 at 10:15pm:
+//    //      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+//            std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
+//            std::vector<double> scores    = {0, 0,      1,      1,      0};
+//            double score = parameterToWeightWithRamps(density, densities, scores);
+
+//      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
 //      std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
-        std::vector<double> densities = {0, 0.0035, 0.0045, 0.0055, 0.0065};
+        std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
         std::vector<double> scores    = {0, 0,      1,      1,      0};
         double score = parameterToWeightWithRamps(density, densities, scores);
+
+        //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
+
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1131,7 +1175,15 @@ public:
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         // TODO 20261109 try bringing back manifold
 //        double m = EF::per_boid_centroid_mode ? 1 : centroidManifoldScore();
-        double m = centroidManifoldScore();
+        
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+        // TODO 20261113 turn off manifold, allow slightly lower density
+        
+//        double m = centroidManifoldScore();
+        double m = 1;
+
+        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         

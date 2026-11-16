@@ -191,14 +191,18 @@ public:
 //                draw().cameraLookFrom() = {60, 60, 60};
                 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+                // TODO 20261115 add FP::murmCentroidBlend()
+
                 //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
                 // TODO 20261019 debug murmurations "init toward origin"
-                Vec3 heading = selectedBoid()->forward() * 20;
-                selectedBoid()->annotationLineOffset(heading, Color::red(), 0.1);
-//                debugPrint(selectedBoid()->speed());
+//                    Vec3 heading = selectedBoid()->forward() * 20;
+//                    selectedBoid()->annotationLineOffset(heading, Color::red(), 0.1);
+//    //                debugPrint(selectedBoid()->speed());
                 //~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~    ~
 
-                
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
                 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 
                 //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
@@ -1295,36 +1299,78 @@ public:
 //            return (distance < centroidMaxDistance()) ? 1 : 0;
 //        }
 
-    double perBoidCentroidDistanceScore(Boid* boid) const
-    {
-//    //        Vec3 center = util::interpolate(0.3,
-//            Vec3 center = util::interpolate(0.7,
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20261115 add FP::murmCentroidBlend()
+
+//        double perBoidCentroidDistanceScore(Boid* boid) const
+//        {
+//    //    //        Vec3 center = util::interpolate(0.3,
+//    //            Vec3 center = util::interpolate(0.7,
+//    //                                            boid->centroid(),
+//    //                                            centroidOfCentroids());
+//
+//            // TODO 20261017 should be subject evolutionary optimization.
+//    //        double centroid_blend = 0.3;
+//    //        double centroid_blend = 0.7;
+//            double centroid_blend = 0.6;
+//            Vec3 center = util::interpolate(centroid_blend,
 //                                            boid->centroid(),
 //                                            centroidOfCentroids());
-      
-        // TODO 20261017 should be subject evolutionary optimization.
-//        double centroid_blend = 0.3;
-//        double centroid_blend = 0.7;
-        double centroid_blend = 0.6;
-        Vec3 center = util::interpolate(centroid_blend,
+//
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//            // TODO 20261016 change centroid weighting from 0.3 to 0.7
+//
+//            if (boid == selectedBoid())
+//            {
+//                Vec3 bp = boid->position();
+//                draw().addAnnotationLine(bp, center, Color::cyan(), 0.05);
+//                draw().addAnnotationLine(bp, centroidOfCentroids(), Color::blue(), 0.05);
+//            }
+//            //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
+//
+//
+//            double distance = (boid->position() - center).length();
+//            return (distance < centroidMaxDistance()) ? 1 : 0;
+//        }
+    
+    double perBoidCentroidDistanceScore(Boid* boid) const
+    {
+//        // TODO 20261017 should be subject evolutionary optimization.
+//        double centroid_blend = 0.6;
+//        Vec3 center = util::interpolate(centroid_blend,
+//                                        boid->centroid(),
+//                                        centroidOfCentroids());
+        
+        // Blend between flock centroid and per-boid estimated centroid.
+        Vec3 center = util::interpolate(fp().murmCentroidBlend(),
                                         boid->centroid(),
                                         centroidOfCentroids());
 
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
         // TODO 20261016 change centroid weighting from 0.3 to 0.7
+//        if (boid == selectedBoid())
         
-        if (boid == selectedBoid())
+        if ((boid == selectedBoid()) and
+            EF::murmuration_mode and
+            EF::per_boid_centroid_mode)
+
         {
-            Vec3 bp = boid->position();
-            draw().addAnnotationLine(bp, center, Color::cyan(), 0.05);
-            draw().addAnnotationLine(bp, centroidOfCentroids(), Color::blue(), 0.05);
+//            Vec3 bp = boid->position();
+//            draw().addAnnotationLine(bp, center, Color::cyan(), 0.05);
+//            draw().addAnnotationLine(bp, centroidOfCentroids(), Color::blue(), 0.05);
+//            draw().addAnnotationLine(bp, boid->centroid(), Color::black(), 0.05);
+            boid->annotationLineToPoint(center, Color::cyan(), 0.05);
+            boid->annotationLineToPoint(centroidOfCentroids(), Color::blue(), 0.05);
+            boid->annotationLineToPoint(boid->centroid(), Color::black(), 0.05);
         }
         //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
-
         
         double distance = (boid->position() - center).length();
         return (distance < centroidMaxDistance()) ? 1 : 0;
     }
+
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

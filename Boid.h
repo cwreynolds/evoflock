@@ -430,11 +430,17 @@ public:
 //        debugPrint(EF::murmuration_mode)
 //        debugPrint(EF::per_boid_centroid_mode)
 
-        if (isSelected() and EF::murmuration_mode and EF::per_boid_centroid_mode)
-        {
-//            debugPrint(centroid())
-            annotationLineToPoint(centroid(), Color::black(), 0.05);
-        }
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20261115 add FP::murmCentroidBlend()
+
+//            if (isSelected() and EF::murmuration_mode and EF::per_boid_centroid_mode)
+//            {
+//    //            debugPrint(centroid())
+//                annotationLineToPoint(centroid(), Color::black(), 0.05);
+//            }
+        
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if (EF::usingGA())
         {
@@ -877,6 +883,50 @@ public:
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~  ~~
     // TODO 20261106 make const params in steerTowardCentroid_v3 evolvable.
+    
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+    // TODO 20261115 add FP::murmCentroidBlend()
+
+//        // Steering force for global cohesion to centroid, for EF::murmuration_mode.
+//        Vec3 steerTowardCentroid_v3() const
+//        {
+//            Vec3 centroid_steer;
+//            if (EF::use_centroid_objective)
+//            {
+//                Vec3 to_center = centroid() - position();
+//                auto [unit_to_center, distance] = to_center.normalize_and_length();
+//
+//                // Abstract normalized measure of how far from murmuration centroid.
+//    //            double max = centroidMaxDistance();
+//                double max = fp().murmMaxDistance();
+//
+//                double min = max * fp().murmMinDistFrac();
+//
+//                // When heading AWAY from centroid, or too far away.
+//    //            bool heading_away = unit_to_center.dot(forward()) < 0.92; //cos(22°)
+//                bool heading_away = (unit_to_center.dot(forward()) <
+//                                     fp().murmHeadingAway());
+//
+//
+//                if (heading_away or (distance > max))
+//                {
+//                    // 0 from centroid to 66% of max, then ramping up to 100% at max.
+//    //                double farness = util::remap_interval_clip(distance,
+//    //                                                           max * 0.66, max,
+//    //                                                           0,          1);
+//    //                double farness = util::remap_interval_clip(distance,
+//    //                                                           min, max,
+//    //                                                           0,   1);
+//                    double farness = util::remap_interval_clip(distance,min,max,0,1);
+//
+//                    // Square farness and scale it by evolved strength parameter.
+//    //                double weight = std::pow(farness, 2) * fp().centeringStrength();
+//                    double weight = std::pow(farness, 2) * fp().murmCenterStrength();
+//                    centroid_steer = unit_to_center * weight;
+//                }
+//            }
+//            return centroid_steer;
+//        }
 
     // Steering force for global cohesion to centroid, for EF::murmuration_mode.
     Vec3 steerTowardCentroid_v3() const
@@ -885,33 +935,25 @@ public:
         if (EF::use_centroid_objective)
         {
             Vec3 to_center = centroid() - position();
-            auto [unit_to_center, distance] = to_center.normalize_and_length();
+            auto [unit_to_center, dist] = to_center.normalize_and_length();
 
             // Abstract normalized measure of how far from murmuration centroid.
-//            double max = centroidMaxDistance();
             double max = fp().murmMaxDistance();
             
             double min = max * fp().murmMinDistFrac();
             
             // When heading AWAY from centroid, or too far away.
-//            bool heading_away = unit_to_center.dot(forward()) < 0.92; //cos(22°)
-            bool heading_away = (unit_to_center.dot(forward()) <
-                                 fp().murmHeadingAway());
+//            bool heading_away = (unit_to_center.dot(forward()) <
+//                                 fp().murmHeadingAway());
+            double toward_centroid_ness = unit_to_center.dot(forward());
+            bool heading_away = toward_centroid_ness < fp().murmHeadingAway();
 
-            
-            if (heading_away or (distance > max))
+            // Steer toward centroid if boid is heading away or further than max.
+            if (heading_away or (dist > max))
             {
-                // 0 from centroid to 66% of max, then ramping up to 100% at max.
-//                double farness = util::remap_interval_clip(distance,
-//                                                           max * 0.66, max,
-//                                                           0,          1);
-//                double farness = util::remap_interval_clip(distance,
-//                                                           min, max,
-//                                                           0,   1);
-                double farness = util::remap_interval_clip(distance,min,max,0,1);
-
+                // 0 from centroid to min, then ramping up to 1 at max.
+                double farness = util::remap_interval_clip(dist, min, max, 0, 1);
                 // Square farness and scale it by evolved strength parameter.
-//                double weight = std::pow(farness, 2) * fp().centeringStrength();
                 double weight = std::pow(farness, 2) * fp().murmCenterStrength();
                 centroid_steer = unit_to_center * weight;
             }
@@ -919,6 +961,7 @@ public:
         return centroid_steer;
     }
 
+    //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
     //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~  ~~
 

@@ -582,6 +582,12 @@ LazyPredator::FunctionSet static_ga_fs_ =
                 {"Real_0_1", "murmCentroidSmooth"},
                 //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+                // TODO 20261115 add FP::murmCentroidBlend()
+                // murmCentroidBlend to blend flock centroid and per-boid estimate.
+                {"Real_0_1", "murmCentroidBlend"},
+                //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+
                 //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~
                 // ADD NEW PARAMETER HERE
                 //~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~ ~~ ~~~

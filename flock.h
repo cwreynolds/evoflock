@@ -758,12 +758,22 @@ public:
     // Called each simulation step, records stats for the separation score.
     void recordSeparationScorePerStep()
     {
-        bool mm = EF::murmuration_mode;
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261116 does this tweak actually help? Try without it.
+        
+//        bool mm = EF::murmuration_mode;
+//        // Piecewise linear function of distance to score
+//        std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
+//        std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
+//        // Tiny tweak for murmuration mode. Test if this can always be used.
+//        if (mm) {           d = {0.0, 1.5, 2.0, 5.0, 6.0}; }
+  
+//        bool mm = EF::murmuration_mode;
         // Piecewise linear function of distance to score
         std::vector<double> d = {0.0, 1.5, 2.0, 4.0, 6.0};
         std::vector<double> s = {0.0, 0.0, 1.0, 1.0, 0.0};
-        // Tiny tweak for murmuration mode. Test if this can always be used.
-        if (mm) {           d = {0.0, 1.5, 2.0, 5.0, 6.0}; }
+//        // Tiny tweak for murmuration mode. Test if this can always be used.
+//        if (mm) {           d = {0.0, 1.5, 2.0, 5.0, 6.0}; }
 
         
         for (auto b : boids())
@@ -771,11 +781,13 @@ public:
             double distance = b->distanceToNearestNeighbor();
             double score = parameterToWeightWithRamps(distance, d, s);
             b->xxx_temp_separation_score = score;  // temp for annotation
-            if ((not mm) or b->roughlyParallelNearestNeighbor())
-            {
-                separation_score_sum_ += score;
-            }
+//            if ((not mm) or b->roughlyParallelNearestNeighbor())
+//            {
+//                separation_score_sum_ += score;
+//            }
+            separation_score_sum_ += score;
         }
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 
     // Return a unit fitness component: maintaining proper separation distance.

@@ -37,8 +37,8 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global switch to enable/disable multithreading.
 inline static bool enable_multithreading = true;
@@ -1318,17 +1318,35 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     0.0624437, 0.818934, 26.4096, -0.608411,
         //                     0.791554, 85.4966, 6.14235, 2.04138, 0.860017});
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20261115_ga_murm_add_murm_cent_blend with bigger flock
-        
         // Saved best FP values from run 20261115_ga_murm_add_murm_cent_blend
         // (Pretty good mixing/swirling, too much tube rolling (donut))
-        FlockParameters fp({93.6141, 99.2932, 55.8522, 80.1465, 25.8731,
-                            51.9215, 87.2523, 2.21912, 14.4294, 54.6644,
-                            -0.529816, 0.501047, 0.571011, 13.2458, 9.07604,
-                            41.1711, 1.76539, 4.82892, 0.473365, 0.494241,
-                            0.220398, 26.201, -0.593077, 0.79946, 96.5311,
-                            2.50256, 1.91048, 0.962399, 0.572441});
+        // FlockParameters fp({93.6141, 99.2932, 55.8522, 80.1465, 25.8731,
+        //                     51.9215, 87.2523, 2.21912, 14.4294, 54.6644,
+        //                     -0.529816, 0.501047, 0.571011, 13.2458, 9.07604,
+        //                     41.1711, 1.76539, 4.82892, 0.473365, 0.494241,
+        //                     0.220398, 26.201, -0.593077, 0.79946, 96.5311,
+        //                     2.50256, 1.91048, 0.962399, 0.572441});
+
+        // Saved best FP values from run 20261116_ga_murm_remove_parallel_for_sep
+        // (completely random spherical shell of boids, need enforce alignment)
+        // FlockParameters fp({95.7047, 80.0163, 56.5783, 4.26553, 65.6995,
+        //                     83.3435, 82.0458, 23.3434, 71.7315, 69.6914,
+        //                     0.642205, 0.882844, 0.609118, 99.1072, 7.64005,
+        //                     49.5212, 1.60538, 19.1325, 0.705932, 0.300515,
+        //                     0.469027, 25.8952, -0.204144, 0.128773, 88.0078,
+        //                     0.717679, 3.31005, 0.855247, 0.357597});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261117_ga_murm_cosine_not_binary with bigger flock
+        
+        // Saved best FP values from run 20261117_ga_murm_cosine_not_binary
+        // (better, but still a lot of random-sphere, then tiny bit of "snakes")
+        FlockParameters fp({70.5284, 78.6859, 66.3886, 21.0028, 58.0601,
+                            41.4142, 46.1101, 2.98715, 79.7813, 74.6732,
+                            -0.100167, 0.0341406, 0.438288, 89.0785,
+                            5.72062, 49.1296, 1.47431, 6.38622, 0.208377,
+                            0.349596, 0.598369, 32.0847, -0.22594, 0.158459,
+                            84.3349, 4.90907, 2.26532, 0.807427, 0.0544653});
 
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

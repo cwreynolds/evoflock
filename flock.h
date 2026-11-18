@@ -775,18 +775,48 @@ public:
 //        // Tiny tweak for murmuration mode. Test if this can always be used.
 //        if (mm) {           d = {0.0, 1.5, 2.0, 5.0, 6.0}; }
 
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20261117 restore require alignment recordSeparationScorePerStep()
         
+//            for (auto b : boids())
+//            {
+//                double distance = b->distanceToNearestNeighbor();
+//                double score = parameterToWeightWithRamps(distance, d, s);
+//                b->xxx_temp_separation_score = score;  // temp for annotation
+//    //            if ((not mm) or b->roughlyParallelNearestNeighbor())
+//    //            {
+//    //                separation_score_sum_ += score;
+//    //            }
+//                separation_score_sum_ += score;
+//            }
+      
         for (auto b : boids())
         {
             double distance = b->distanceToNearestNeighbor();
             double score = parameterToWeightWithRamps(distance, d, s);
             b->xxx_temp_separation_score = score;  // temp for annotation
-//            if ((not mm) or b->roughlyParallelNearestNeighbor())
-//            {
+            
+//    //            if ((not mm) or b->roughlyParallelNearestNeighbor())
+//    //            {
+//    //                separation_score_sum_ += score;
+//    //            }
 //                separation_score_sum_ += score;
-//            }
+      
+            // TODO 20261117 note roughlyParallelNearestNeighbor() now unused.
+            
+            if (EF::murmuration_mode)
+            {
+                Vec3 nn_forward = b->nearestNeighbor().forward();
+                double dot_forwards = Vec3::dot(b->forward(), nn_forward);
+                score *= util::remap_interval(dot_forwards, -1, 1, 0, 1) ;
+            }
+            
             separation_score_sum_ += score;
+
         }
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     }
 

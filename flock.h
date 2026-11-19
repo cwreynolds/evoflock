@@ -790,30 +790,52 @@ public:
 //                separation_score_sum_ += score;
 //            }
       
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+        // TODO 20261118 zero sep score if align cos is < 0, ramp to 1 at align
+        
+//            for (auto b : boids())
+//            {
+//                double distance = b->distanceToNearestNeighbor();
+//                double score = parameterToWeightWithRamps(distance, d, s);
+//                b->xxx_temp_separation_score = score;  // temp for annotation
+//
+//    //    //            if ((not mm) or b->roughlyParallelNearestNeighbor())
+//    //    //            {
+//    //    //                separation_score_sum_ += score;
+//    //    //            }
+//    //                separation_score_sum_ += score;
+//
+//                // TODO 20261117 note roughlyParallelNearestNeighbor() now unused.
+//
+//                if (EF::murmuration_mode)
+//                {
+//                    Vec3 nn_forward = b->nearestNeighbor().forward();
+//                    double dot_forwards = Vec3::dot(b->forward(), nn_forward);
+//                    score *= util::remap_interval(dot_forwards, -1, 1, 0, 1) ;
+//                }
+//
+//                separation_score_sum_ += score;
+//
+//            }
+
+        // TODO 20261117 note roughlyParallelNearestNeighbor() now unused.
         for (auto b : boids())
         {
             double distance = b->distanceToNearestNeighbor();
             double score = parameterToWeightWithRamps(distance, d, s);
-            b->xxx_temp_separation_score = score;  // temp for annotation
-            
-//    //            if ((not mm) or b->roughlyParallelNearestNeighbor())
-//    //            {
-//    //                separation_score_sum_ += score;
-//    //            }
-//                separation_score_sum_ += score;
-      
-            // TODO 20261117 note roughlyParallelNearestNeighbor() now unused.
-            
             if (EF::murmuration_mode)
             {
                 Vec3 nn_forward = b->nearestNeighbor().forward();
-                double dot_forwards = Vec3::dot(b->forward(), nn_forward);
-                score *= util::remap_interval(dot_forwards, -1, 1, 0, 1) ;
+//                double dot_forwards = Vec3::dot(b->forward(), nn_forward);
+//                score *= util::remap_interval(dot_forwards, -1, 1, 0, 1) ;
+                score *= util::clip01(Vec3::dot(b->forward(), nn_forward));
             }
-            
             separation_score_sum_ += score;
 
+            b->xxx_temp_separation_score = score;  // temp for annotation
         }
+
+        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
         //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
@@ -1158,11 +1180,21 @@ public:
 //            std::vector<double> scores    = {0, 0,      1,      1,      0};
 //            double score = parameterToWeightWithRamps(density, densities, scores);
 
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20261117 try reducing density
+        
+//    //      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+//    //      std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
+//            std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+//            std::vector<double> scores    = {0, 0,      1,      1,      0};
+//            double score = parameterToWeightWithRamps(density, densities, scores);
+
 //      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
-//      std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
-        std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+        std::vector<double> densities = {0, 0.0020, 0.0030, 0.0055, 0.0065};
         std::vector<double> scores    = {0, 0,      1,      1,      0};
         double score = parameterToWeightWithRamps(density, densities, scores);
+
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
 
         //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
 

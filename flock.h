@@ -1476,15 +1476,40 @@ public:
         return sum_of_speed_scores_over_all_boid_steps_ / boidStepPerSim();
     }
 
+    //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
+    // TODO 20261120 bring back curvature objective to REDUCE it.
+
+//    // Compute average curvature per boid step, then remap for scoring.
+//    double curvatureScore() const
+//    {
+//        double average_curvature = sum_curvature_ / boidStepPerSim();
+//        double max_penalty = EF::murmuration_mode ? 0.1 : 0.2;
+//        return util::remap_interval_clip(average_curvature,
+//                                         0, 0.1,
+//                                         1 - max_penalty, 1);
+//    }
+  
     // Compute average curvature per boid step, then remap for scoring.
     double curvatureScore() const
     {
+        double score = 0;
         double average_curvature = sum_curvature_ / boidStepPerSim();
-        double max_penalty = EF::murmuration_mode ? 0.1 : 0.2;
-        return util::remap_interval_clip(average_curvature,
-                                         0, 0.1,
-                                         1 - max_penalty, 1);
+        double max_penalty = 0.2;
+        if (EF::murmuration_mode)
+        {
+            double max_curvature = 0.5;  // 0.075 in previous too-curvy version
+            score = average_curvature < max_curvature ? 1 : 1 - max_penalty;
+        }
+        else
+        {
+            score =  util::remap_interval_clip(average_curvature,
+                                               0, 0.1,
+                                               1 - max_penalty, 1);
+        }
+        return score;
     }
+
+    //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
 
     // Accumulators for alignment score.
     // TODO Relocate in file?

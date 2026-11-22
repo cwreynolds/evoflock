@@ -1095,6 +1095,135 @@ public:
     
     double total_density_score_ = 0;
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // TODO 20261121 after add curvature, increase density
+    
+//        void recordPerStepDensityScore()
+//        {
+//            double max_flock_radius = 0;
+//            for (auto b : boids())
+//            {
+//                // distance from boid to flock's centroidOfCentroids().
+//                double bcd = (b->position() - centroidOfCentroids()).length();
+//                if (max_flock_radius < bcd) { max_flock_radius = bcd; }
+//            }
+//
+//            shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
+//            double flock_volume = flock_sphere.volume();
+//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//            // TODO 20261110 make murmManifoldStrength an evolvable param
+//    //        double flock_density = boids().size() / flock_volume; //boids per m³
+//    //        double cubic_meter_per_boid = 1 / flock_density;
+//            double density = boids().size() / flock_volume; //boids per m³
+//            double cubic_meter_per_boid = 1 / density;
+//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//
+//    //        double score = parameterToWeightWithRamps(cubic_meter_per_boid,
+//    //                                                  {0, 500, 1500, 2000},
+//    //                                                  {0,   1,    1,    0});
+//
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//            // TODO 20261107 I think I having a hard time adjusting hyperparameters
+//
+//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//            // TODO 20261110 make murmManifoldStrength an evolvable param
+//
+//    //            double score = parameterToWeightWithRamps(cubic_meter_per_boid,
+//    //    //                                                {0, 300, 500, 1000, 1200},
+//    //                                                      {0, 300, 500,  700,  900},
+//    //                                                      {0,   0,   1,    1,    0});
+//
+//            // XXX 1/300 = 0.0033
+//            // XXX 1/500 = 0.0020
+//            // XXX 1/700 = 0.0014
+//            // XXX 1/900 = 0.0011
+//
+//    //        std::vector<double> cmpb      = {0, 300, 500,  700,  900};
+//    //        std::vector<double> scores    = {0,   0,   1,    1,    0};
+//
+//    //        std::vector<double> densities = {0, 0.0011, 0.0014, 0.0020, 0.0033};
+//    //        std::vector<double> scores    = {0, 0,      1,      1,      0};
+//
+//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//            // TODO 20261111 overnight run was not dense enough: 0.002 to 0.003
+//
+//    //        std::vector<double> densities = {0, 0.0010, 0.0020, 0.0040, 0.0050};
+//    //        std::vector<double> scores    = {0, 0,      1,      1,      0};
+//    //        double score = parameterToWeightWithRamps(density, densities, scores);
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//            // TODO 20261112 bring back anti-donut
+//
+//    //    //      std::vector<double> densities = {0, 0.0010, 0.0020, 0.0040, 0.0050};
+//    //            std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
+//    //            std::vector<double> scores    = {0, 0,      1,      1,      0};
+//    //            double score = parameterToWeightWithRamps(density, densities, scores);
+//
+//            //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+//            // TODO 20261113 turn off manifold, allow slightly lower density
+//
+//    //    //      std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
+//    //            std::vector<double> densities = {0, 0.0035, 0.0045, 0.0055, 0.0065};
+//    //            std::vector<double> scores    = {0, 0,      1,      1,      0};
+//    //            double score = parameterToWeightWithRamps(density, densities, scores);
+//
+//    //    //      std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
+//    //    //      std::vector<double> densities = {0, 0.0035, 0.0045, 0.0055, 0.0065};
+//    //            std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+//    //            std::vector<double> scores    = {0, 0,      1,      1,      0};
+//    //            double score = parameterToWeightWithRamps(density, densities, scores);
+//
+//
+//            //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
+//            // TODO 20261114 increase low end of target range -- so increase density
+//
+//    //            // TODO 20261113 at 10:15pm:
+//    //    //      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+//    //            std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
+//    //            std::vector<double> scores    = {0, 0,      1,      1,      0};
+//    //            double score = parameterToWeightWithRamps(density, densities, scores);
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//            // TODO 20261117 try reducing density
+//
+//    //    //      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+//    //    //      std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
+//    //            std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+//    //            std::vector<double> scores    = {0, 0,      1,      1,      0};
+//    //            double score = parameterToWeightWithRamps(density, densities, scores);
+//
+//    //      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+//            std::vector<double> densities = {0, 0.0020, 0.0030, 0.0055, 0.0065};
+//            std::vector<double> scores    = {0, 0,      1,      1,      0};
+//            double score = parameterToWeightWithRamps(density, densities, scores);
+//
+//            //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+//
+//            //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
+//
+//            //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
+//
+//            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//            //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+//
+//            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+//
+//            if ((clock().frameCounter() % 100) == 99)
+//            {
+//                std::cout << "    " << clock().frameCounter();
+//                std::cout << ": flock density = " << density;
+//                std::cout << "  m³ per boid = " << cubic_meter_per_boid;
+//                std::cout << "  score = " << score;
+//                std::cout << std::endl;
+//            }
+//
+//            total_density_score_ += score;
+//        }
+
+    
     void recordPerStepDensityScore()
     {
         double max_flock_radius = 0;
@@ -1104,110 +1233,16 @@ public:
             double bcd = (b->position() - centroidOfCentroids()).length();
             if (max_flock_radius < bcd) { max_flock_radius = bcd; }
         }
-        
         shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
         double flock_volume = flock_sphere.volume();
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20261110 make murmManifoldStrength an evolvable param
-//        double flock_density = boids().size() / flock_volume; //boids per m³
-//        double cubic_meter_per_boid = 1 / flock_density;
         double density = boids().size() / flock_volume; //boids per m³
         double cubic_meter_per_boid = 1 / density;
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-//        double score = parameterToWeightWithRamps(cubic_meter_per_boid,
-//                                                  {0, 500, 1500, 2000},
-//                                                  {0,   1,    1,    0});
-        
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20261107 I think I having a hard time adjusting hyperparameters
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20261110 make murmManifoldStrength an evolvable param
-
-//            double score = parameterToWeightWithRamps(cubic_meter_per_boid,
-//    //                                                {0, 300, 500, 1000, 1200},
-//                                                      {0, 300, 500,  700,  900},
-//                                                      {0,   0,   1,    1,    0});
-        
-        // XXX 1/300 = 0.0033
-        // XXX 1/500 = 0.0020
-        // XXX 1/700 = 0.0014
-        // XXX 1/900 = 0.0011
-
-//        std::vector<double> cmpb      = {0, 300, 500,  700,  900};
-//        std::vector<double> scores    = {0,   0,   1,    1,    0};
-        
-//        std::vector<double> densities = {0, 0.0011, 0.0014, 0.0020, 0.0033};
-//        std::vector<double> scores    = {0, 0,      1,      1,      0};
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20261111 overnight run was not dense enough: 0.002 to 0.003
-        
-//        std::vector<double> densities = {0, 0.0010, 0.0020, 0.0040, 0.0050};
-//        std::vector<double> scores    = {0, 0,      1,      1,      0};
-//        double score = parameterToWeightWithRamps(density, densities, scores);
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20261112 bring back anti-donut
-
-//    //      std::vector<double> densities = {0, 0.0010, 0.0020, 0.0040, 0.0050};
-//            std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
-//            std::vector<double> scores    = {0, 0,      1,      1,      0};
-//            double score = parameterToWeightWithRamps(density, densities, scores);
-
-        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-        // TODO 20261113 turn off manifold, allow slightly lower density
-
-//    //      std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
-//            std::vector<double> densities = {0, 0.0035, 0.0045, 0.0055, 0.0065};
-//            std::vector<double> scores    = {0, 0,      1,      1,      0};
-//            double score = parameterToWeightWithRamps(density, densities, scores);
-
-//    //      std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
-//    //      std::vector<double> densities = {0, 0.0035, 0.0045, 0.0055, 0.0065};
-//            std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
-//            std::vector<double> scores    = {0, 0,      1,      1,      0};
-//            double score = parameterToWeightWithRamps(density, densities, scores);
-
-        
-        //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
-        // TODO 20261114 increase low end of target range -- so increase density
-        
-//            // TODO 20261113 at 10:15pm:
-//    //      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
-//            std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
-//            std::vector<double> scores    = {0, 0,      1,      1,      0};
-//            double score = parameterToWeightWithRamps(density, densities, scores);
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20261117 try reducing density
-        
-//    //      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
-//    //      std::vector<double> densities = {0, 0.0025, 0.0035, 0.0055, 0.0065};
-//            std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
-//            std::vector<double> scores    = {0, 0,      1,      1,      0};
-//            double score = parameterToWeightWithRamps(density, densities, scores);
 
 //      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
-        std::vector<double> densities = {0, 0.0020, 0.0030, 0.0055, 0.0065};
+//      std::vector<double> densities = {0, 0.0020, 0.0030, 0.0055, 0.0065};
+        std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
         std::vector<double> scores    = {0, 0,      1,      1,      0};
         double score = parameterToWeightWithRamps(density, densities, scores);
-
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-
-        //~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~   ~~
-
-        //~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~ ~~~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
         if ((clock().frameCounter() % 100) == 99)
         {
             std::cout << "    " << clock().frameCounter();
@@ -1216,10 +1251,11 @@ public:
             std::cout << "  score = " << score;
             std::cout << std::endl;
         }
-
         total_density_score_ += score;
     }
     
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     double densityScore() const
     {
         return total_density_score_ / max_simulation_steps();
@@ -1497,8 +1533,16 @@ public:
         double max_penalty = 0.2;
         if (EF::murmuration_mode)
         {
-            double max_curvature = 0.5;  // 0.075 in previous too-curvy version
-            score = average_curvature < max_curvature ? 1 : 1 - max_penalty;
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+            // TODO 20261120 oops that version was always either 0.8 or 1.0
+//            double max_curvature = 0.5;  // 0.075 in previous too-curvy version
+//            score = average_curvature < max_curvature ? 1 : 1 - max_penalty;
+
+            score =  util::remap_interval_clip(average_curvature,
+                                               0.05, 0.09,
+                                               1, 1 - max_penalty);
+
+            //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
         }
         else
         {

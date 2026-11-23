@@ -37,8 +37,8 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global switch to enable/disable multithreading.
 inline static bool enable_multithreading = true;
@@ -1370,17 +1370,26 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     0.795022, 0.657832, 23.7388, -0.534055, 0.719416,
         //                     99.2499, 17.7547, 3.43005, 0.85161, 0.325657});
 
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20261120_ga_murm_reduce_curvature with bigger flock
-        
         // Saved best FP values from run 20261120_ga_murm_reduce_curvature
         // (good, goes to ropey/snakey but with interesting bends and changes)
-        FlockParameters fp({92.5399, 97.5241, 69.2167, 34.8476, 29.9224,
-                            83.4871, 53.7444, 2.68785, 30.1802, 57.3849,
-                            -0.126073, -0.81021, 0.391499, 10.0633,
-                            3.47906, 23.0806, 1.62226, 32.0154, 0.677806,
-                            0.19114, 0.50008, 32.1087, -0.206445, 0.352328,
-                            80.933, 3.77664, 2.36929, 0.874254, 0.220773});
+        // FlockParameters fp({92.5399, 97.5241, 69.2167, 34.8476, 29.9224,
+        //                     83.4871, 53.7444, 2.68785, 30.1802, 57.3849,
+        //                     -0.126073, -0.81021, 0.391499, 10.0633,
+        //                     3.47906, 23.0806, 1.62226, 32.0154, 0.677806,
+        //                     0.19114, 0.50008, 32.1087, -0.206445, 0.352328,
+        //                     80.933, 3.77664, 2.36929, 0.874254, 0.220773});
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261121_ga_murm_increase_density with bigger flock
+        
+        // Saved best FP values from run 20261121_ga_murm_increase_density
+        // (low fitness, a disordered sphere surface, uninteresting, no swoop)
+        FlockParameters fp({70.1896, 64.3935, 84.1653, 25.6238, 85.3104,
+                            51.1274, 92.569, 86.6726, 39.9145, 88.9641,
+                            0.0910838, 0.677095, 0.50268, 82.7716, 4.59453,
+                            40.431, 1.51021, 16.3202, 0.63364, 0.816954,
+                            0.834741, 28.6234, 0.057396, 0.151569, 97.0001,
+                            1.12415, 2.99365, 0.749013, 0.0355546});
         
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

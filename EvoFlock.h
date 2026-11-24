@@ -37,8 +37,8 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-//inline static bool visualize_previous_results_mode = false;
-inline static bool visualize_previous_results_mode = true;
+inline static bool visualize_previous_results_mode = false;
+//inline static bool visualize_previous_results_mode = true;
 
 // Global switch to enable/disable multithreading.
 inline static bool enable_multithreading = true;
@@ -255,8 +255,14 @@ void runOneFlockEvolution()
         //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
         // TODO 20261120 bring back curvature objective to REDUCE it.
         
+        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
+        // TODO 20261123 revert to 20261118_ga_murm_sep_weighted_align
+        
 //        use_curvature_objective = false;
-        use_curvature_objective = true;
+//        use_curvature_objective = true;
+        use_curvature_objective = false;
+
+        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
 
         //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
 

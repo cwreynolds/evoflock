@@ -1240,7 +1240,11 @@ public:
 
 //      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
 //      std::vector<double> densities = {0, 0.0020, 0.0030, 0.0055, 0.0065};
-        std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
+        // TODO 20261123 revert to 20261118_ga_murm_sep_weighted_align
+//      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+        std::vector<double> densities = {0, 0.0020, 0.0030, 0.0055, 0.0065};
+        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
         std::vector<double> scores    = {0, 0,      1,      1,      0};
         double score = parameterToWeightWithRamps(density, densities, scores);
         if ((clock().frameCounter() % 100) == 99)

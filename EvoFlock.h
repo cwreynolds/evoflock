@@ -37,8 +37,8 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global switch to enable/disable multithreading.
 inline static bool enable_multithreading = true;
@@ -86,9 +86,15 @@ inline static int override_skip_think = -1;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20260827 revert back to "basic flocking" for regression testing
 
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
+// TODO 20261124 revert back to "basic flocking" for regression testing
+
 // Special mode for simulating murmurations.
 //inline static bool murmuration_mode = false;
-inline static bool murmuration_mode = true;
+//inline static bool murmuration_mode = true;
+inline static bool murmuration_mode = false;
+
+//~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1385,17 +1391,36 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //                     0.19114, 0.50008, 32.1087, -0.206445, 0.352328,
         //                     80.933, 3.77664, 2.36929, 0.874254, 0.220773});
         
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20261121_ga_murm_increase_density with bigger flock
-        
         // Saved best FP values from run 20261121_ga_murm_increase_density
         // (low fitness, a disordered sphere surface, uninteresting, no swoop)
-        FlockParameters fp({70.1896, 64.3935, 84.1653, 25.6238, 85.3104,
-                            51.1274, 92.569, 86.6726, 39.9145, 88.9641,
-                            0.0910838, 0.677095, 0.50268, 82.7716, 4.59453,
-                            40.431, 1.51021, 16.3202, 0.63364, 0.816954,
-                            0.834741, 28.6234, 0.057396, 0.151569, 97.0001,
-                            1.12415, 2.99365, 0.749013, 0.0355546});
+        // FlockParameters fp({70.1896, 64.3935, 84.1653, 25.6238, 85.3104,
+        //                     51.1274, 92.569, 86.6726, 39.9145, 88.9641,
+        //                     0.0910838, 0.677095, 0.50268, 82.7716, 4.59453,
+        //                     40.431, 1.51021, 16.3202, 0.63364, 0.816954,
+        //                     0.834741, 28.6234, 0.057396, 0.151569, 97.0001,
+        //                     1.12415, 2.99365, 0.749013, 0.0355546});
+        
+        // Saved best FP values from run 20261123_ga_murm_revert_to_last_week
+        // (Tried to get back to 20261118 before moving on to predator version,
+        //  good, not great, a bit of donut-ing and ropey/snakey.)
+        // FlockParameters fp({88.9157, 98.2943, 77.1271, 54.1137, 44.1419,
+        //                     44.7891, 57.0735, 2.54742, 43.2011, 89.0351,
+        //                     -0.333717, 0.319527, 0.316954, 21.2356, 3.50943,
+        //                     3.39, 1.17779, 59.6066, 0.0163912, 0.962508,
+        //                     0.0102652, 22.7495, -0.186785, 0.392854, 88.791,
+        //                     2.19698, 4.35782, 0.901701, 0.522509});
+        
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261124_ga_murm_regress_to_pre_murm with bigger flock
+        
+        // Saved best FP values from run 20261124_ga_murm_regress_to_pre_murm
+        // (Ran EF boids classic. Got best EOR fitness of 0.91 !)
+        FlockParameters fp({85.2534, 77.1774, 35.0879, 28.1128, 6.85523,
+                            81.6045, 61.9496, 2.26453, 76.7931, 75.873,
+                            -0.881732, -0.417548, 0.197702, 1.15667,
+                            0.892095, 24.6748, 1.74948, 70.5379, 0.743294,
+                            0.832747, 0.16366, 1.12499, -0.573124, 0.590733,
+                            60.4566, 60.1125, 7.01679, 0.564825, 0.854142});
         
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

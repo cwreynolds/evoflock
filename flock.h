@@ -157,6 +157,12 @@ public:
             if (EF::use_centroid_objective) { draw().addAnnotationAxes({}); }
 
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            // TODO 20261124 WIP EF::predator_mode
+            if (EF::predator_mode) { draw().addAnnotationAxes({}); }
+            //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+            
             draw().addAnnotationsToAnimatedFrame();
             draw().aimAgent() = *selectedBoid();
             //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -336,6 +342,40 @@ public:
             // Early return for murmuration_mode
             return LocalSpace::fromTo(position, position + heading);
         }
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20261124 WIP EF::predator_mode
+        
+//            if (EF::predator_mode)
+//            {
+//    //            Vec3 heading = Vec3(1,
+//    //                                rs.frandom2(-1, 1),
+//    //                                rs.frandom2(-1, 1)).normalize();
+//                Vec3 heading = rs.random_unit_vector();
+//                Vec3 position = rs.random_point_in_unit_radius_sphere() * radius;
+//                // Early return for predator_mode
+//                return LocalSpace::fromTo(position, position + heading);
+//            }
+        
+        
+        if (EF::predator_mode)
+        {
+            Vec3 heading = rs.random_unit_vector();
+            
+            // perhaps I want to use a density objective like in murm?
+//            Vec3 position = rs.random_point_in_unit_radius_sphere() * radius;
+//            Vec3 position = rs.random_point_in_unit_radius_sphere() * 30;
+//            Vec3 position = rs.random_point_in_unit_radius_sphere() * 20;
+//            Vec3 position = rs.random_point_in_unit_radius_sphere() * 10;
+//            Vec3 position = rs.random_point_in_unit_radius_sphere() * 30;
+//            Vec3 position = rs.random_point_in_unit_radius_sphere() * 40;
+            Vec3 position = rs.random_point_in_unit_radius_sphere() * 35;
+
+            // Early return for predator_mode
+            return LocalSpace::fromTo(position, position + heading);
+        }
+
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
         return LocalSpace::fromTo(pointOutsideObstacles(), initForward());
     }
@@ -506,10 +546,11 @@ public:
         if (EF::use_curvature_objective) { collectCurvatureStats();        }
         if (EF::use_alignment_objective) { recordAlignmentScorePerStep();  }
         if (EF::use_cluster_objective  ) { recordClusterScorePerStep();    }
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260413 current flock centroid, and velocity
-        if (EF::use_centroid_objective)  { recordCentroid(time_step); }
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        if (EF::use_centroid_objective ) { recordCentroid(time_step); }
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        // TODO 20261125 new, more formal, density objective for predator_mode
+        if (EF::use_density_objective  ) { recordPerStepDensityScore(); }
+        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1223,6 +1264,42 @@ public:
 //            total_density_score_ += score;
 //        }
 
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20261125 new, more formal, density objective for predator_mode
+
+//        void recordPerStepDensityScore()
+//        {
+//            double max_flock_radius = 0;
+//            for (auto b : boids())
+//            {
+//                // distance from boid to flock's centroidOfCentroids().
+//                double bcd = (b->position() - centroidOfCentroids()).length();
+//                if (max_flock_radius < bcd) { max_flock_radius = bcd; }
+//            }
+//            shape::Sphere flock_sphere(centroidOfCentroids(), max_flock_radius);
+//            double flock_volume = flock_sphere.volume();
+//            double density = boids().size() / flock_volume; //boids per m³
+//            double cubic_meter_per_boid = 1 / density;
+//
+//    //      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+//    //      std::vector<double> densities = {0, 0.0020, 0.0030, 0.0055, 0.0065};
+//            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
+//            // TODO 20261123 revert to 20261118_ga_murm_sep_weighted_align
+//    //      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
+//            std::vector<double> densities = {0, 0.0020, 0.0030, 0.0055, 0.0065};
+//            //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
+//            std::vector<double> scores    = {0, 0,      1,      1,      0};
+//            double score = parameterToWeightWithRamps(density, densities, scores);
+//            if ((clock().frameCounter() % 100) == 99)
+//            {
+//                std::cout << "    " << clock().frameCounter();
+//                std::cout << ": flock density = " << density;
+//                std::cout << "  m³ per boid = " << cubic_meter_per_boid;
+//                std::cout << "  score = " << score;
+//                std::cout << std::endl;
+//            }
+//            total_density_score_ += score;
+//        }
     
     void recordPerStepDensityScore()
     {
@@ -1237,17 +1314,34 @@ public:
         double flock_volume = flock_sphere.volume();
         double density = boids().size() / flock_volume; //boids per m³
         double cubic_meter_per_boid = 1 / density;
-
-//      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
-//      std::vector<double> densities = {0, 0.0020, 0.0030, 0.0055, 0.0065};
-        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
-        // TODO 20261123 revert to 20261118_ga_murm_sep_weighted_align
-//      std::vector<double> densities = {0, 0.0030, 0.0040, 0.0055, 0.0065};
         std::vector<double> densities = {0, 0.0020, 0.0030, 0.0055, 0.0065};
-        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
         std::vector<double> scores    = {0, 0,      1,      1,      0};
+
+//        debugPrint(density)
+
+        if (EF::predator_mode)
+        {
+            // QQQ oh, fewer boids, so the densities are much lower
+//            double target_density = 0.0040;
+//            double target_density = 0.0400;
+//            double target_density = 0.0004;
+//            double target_density = 0.0040;
+            double target_density = 0.0020;
+            densities =
+            {
+                0,
+                target_density * 0.6,
+                target_density * 0.8,
+                target_density * 1.2,
+                target_density * 1.4
+            };
+        }
+//        debugPrint(util::vec_to_string(densities))
+
         double score = parameterToWeightWithRamps(density, densities, scores);
-        if ((clock().frameCounter() % 100) == 99)
+        
+//        if ((clock().frameCounter() % 100) == 99)
+        if (clock().frameCounter() == 499)
         {
             std::cout << "    " << clock().frameCounter();
             std::cout << ": flock density = " << density;
@@ -1255,9 +1349,24 @@ public:
             std::cout << "  score = " << score;
             std::cout << std::endl;
         }
-        total_density_score_ += score;
+
+//        total_density_score_ += score;
+
+        total_density_score_ += (EF::predator_mode ?
+//                                 util::remap_interval(score, 0, 1, 0.8, 1) :
+//                                 util::remap_interval(score, 0, 1, 0.6, 1) :
+                                 util::remap_interval(score, 0, 1, 0.8, 1) :
+                                 score);
+
+        
+//        debugPrint(score)
+//        debugPrint(total_density_score_)
+
     }
+
     
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     double densityScore() const
@@ -1853,8 +1962,6 @@ public:
             if (name == os.at(i).name()) { index = i; }
         }
         bool obstacle_set_name_found = index >= 0;
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260413 current flock centroid, and velocity
         if (not obstacle_set_name_found)
         {
             std::cout << "Obstacle set name: " << name;
@@ -1865,7 +1972,6 @@ public:
             }
         }
         assert(obstacle_set_name_found);
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
         return index;
     }
 

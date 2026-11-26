@@ -37,8 +37,8 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-//inline static bool visualize_previous_results_mode = false;
-inline static bool visualize_previous_results_mode = true;
+inline static bool visualize_previous_results_mode = false;
+//inline static bool visualize_previous_results_mode = true;
 
 // Global switch to enable/disable multithreading.
 inline static bool enable_multithreading = true;
@@ -53,10 +53,14 @@ inline static bool use_speed_objective     = true;
 inline static bool use_curvature_objective = true;
 inline static bool use_alignment_objective = true;
 inline static bool use_cluster_objective   = true;
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-// TODO 20260413 current flock centroid, and velocity
 inline static bool use_centroid_objective  = true;
-//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20261125 new, more formal, density objective for predator_mode
+//               replaces the very ad hoc one used in predator_mode.
+inline static bool use_density_objective  = true;
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
 
 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 // TODO 20260428 move temp murmuration parameters to EF
@@ -97,6 +101,16 @@ inline static bool murmuration_mode = false;
 //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20261124 WIP EF::predator_mode
+
+// Special mode for flocking based on predator avoidance.
+inline static bool predator_mode = true;
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // TODO 20261005 experimenting with per-boid-centroid
@@ -189,53 +203,32 @@ void checkCompatibilityFpVsGpFunc()
                                      "FlockParameters:");
 }
 
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+// TODO 20261125 new, more formal, density objective for predator_mode
+
+// Formalize the ad hoc nature of "major modes". Originally EF was built to
+// optimize parameters for "classic boids". Then I added murmuration_mode to
+// control optional behavior for modeling murmurations. On Nov 24 2026 I pivoted
+// to experimenting with predator_mode for murmurations. This function asserts
+// that those or future mode switches are mutually consistent.
+void assertConsistantMajorModes()
+{
+    assert(not (murmuration_mode and predator_mode));
+}
+
+//~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
 void runOneFlockEvolution()
 {
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20261028 make FlockParameters expose a VecOfStrings of param names.
-
-//    FlockParameters().print();
-
-    // Before any changes:
-    //
-    //    FlockParameters object containing these values:
-    //    7 constant parameters:
-    //    bodyDiameter() = 1
-    //    sphereRadius() = 50
-    //    sphereCenter() = Vec3(0, 0, 0)
-    //    maxSimulationSteps() = 500
-    //    boidsPerFlock() = 1000
-    //    useObstacleSet() = NoObstacles
-    //    getFPS() = 30
-    //    21 parameters to be optimized:
-    //    maxForce() = 100
-    //    weightForward() = 4
-    //    weightSeparate() = 40
-    //    weightAlign() = 45
-    //    weightCohere() = 35
-    //    weightAvoidPredict() = 85
-    //    weightAvoidStatic() = 55
-    //    maxDistSeparate() = 15
-    //    maxDistAlign() = 40
-    //    maxDistCohere() = 40
-    //    angleSeparate() = -1
-    //    angleAlign() = 0.6
-    //    angleCohere() = -0.4
-    //    flyAwayMaxDist() = 10
-    //    minTimeToCollide() = 1.4
-    //    centerMaxDist() = 40
-    //    centerExponent() = 0
-    //    centeringStrength() = 90
-    //    centerInNess() = 0.707
-    //    centerSlowing() = 0.5
-    //    centerCentering() = 0.5
-
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-
     // Does this run use GA (genetic algorithm) or GP (genetic programming)?
     EF::setUsingGA();
     // EF::setUsingGP();
     std::cout << "Evolution mode: " << (EF::usingGP()?"GP":"GA") << std::endl;
+    
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    // TODO 20261125 new, more formal, density objective for predator_mode
+
+    assertConsistantMajorModes();
     
     // Select which objectives to enable, based on other mode flags.
     if (murmuration_mode)
@@ -243,77 +236,22 @@ void runOneFlockEvolution()
         use_avoid_objective     = true;
         use_separate_objective  = true;
         use_speed_objective     = true;
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260515 try turning off curvature_objective
-        //               (was seeing too much tornado)
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260524 bring back curvature
-
-//        use_curvature_objective = true;
-//        use_curvature_objective = false;
-        
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20260618 change initial position to be throughout centroid
-
-//        use_curvature_objective = true;
-        
-        //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
-        // TODO 20261120 bring back curvature objective to REDUCE it.
-        
-        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
-        // TODO 20261123 revert to 20261118_ga_murm_sep_weighted_align
-        
-//        use_curvature_objective = false;
-//        use_curvature_objective = true;
         use_curvature_objective = false;
-
-        //~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~~ ~~~~
-
-        //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
-        // TODO 20260508 try adding in alignment objective for murmuration_mode.
-//        use_alignment_objective = false;
-//        use_alignment_objective = true;
-        // TODO 20260509 why did that get so slow? reverting to retest speed.
         use_alignment_objective = false;
-        //~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~   ~
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-        // TODO 20260524 maybe use_cluster_objective is more of a distraction?
-//        use_cluster_objective   = true;
-//        use_cluster_objective   = false;
-        // or not...
-        
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260805 try murm without cluster and centroid objective
-//        use_cluster_objective   = true;
         use_cluster_objective   = false;
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        
-        //~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~  ~~
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~
-        // TODO 20260413 current flock centroid, and velocity
-
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-        // TODO 20260805 try murm without cluster and centroid objective
-//        use_centroid_objective  = true;
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        // TODO 20260806 ok, try putting back centroid objective & behavior
-//        use_centroid_objective  = false;
         use_centroid_objective  = true;
-        //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
-        //~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~
+        use_density_objective   = false;  // ad hoc use in murmuration_mode
+    }
+    else if (predator_mode)
+    {
+        use_avoid_objective     = true;
+        use_separate_objective  = true;
+        use_speed_objective     = true;
+        use_curvature_objective = false;
+        use_alignment_objective = false;
+        use_cluster_objective   = false;
+        use_centroid_objective  = false;
+        use_density_objective   = true;
     }
     else
     {
@@ -323,14 +261,10 @@ void runOneFlockEvolution()
         use_curvature_objective = false;
         use_alignment_objective = false;
         use_cluster_objective   = false;
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-        // TODO 20260413 current flock centroid, and velocity
         use_centroid_objective  = false;
-        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        use_density_objective   = false;
     }
 
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    // TODO 20260413 current flock centroid, and velocity
     debugPrint(murmuration_mode);
     debugPrint(use_avoid_objective);
     debugPrint(use_separate_objective);
@@ -339,8 +273,10 @@ void runOneFlockEvolution()
     debugPrint(use_alignment_objective);
     debugPrint(use_cluster_objective);
     debugPrint(use_centroid_objective);
-    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
-    
+    debugPrint(use_density_objective);
+
+    //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
     checkCompatibilityFpVsGpFunc();  // Second call if unit tests not run.
 
     // Set likelihood of crossover versus hoist (on a randomly selected parent).
@@ -1413,15 +1349,18 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         // TODO 20261124_ga_murm_regress_to_pre_murm with bigger flock
         
-        // Saved best FP values from run 20261124_ga_murm_regress_to_pre_murm
-        // (Ran EF boids classic. Got best EOR fitness of 0.91 !)
-        FlockParameters fp({85.2534, 77.1774, 35.0879, 28.1128, 6.85523,
-                            81.6045, 61.9496, 2.26453, 76.7931, 75.873,
-                            -0.881732, -0.417548, 0.197702, 1.15667,
-                            0.892095, 24.6748, 1.74948, 70.5379, 0.743294,
-                            0.832747, 0.16366, 1.12499, -0.573124, 0.590733,
-                            60.4566, 60.1125, 7.01679, 0.564825, 0.854142});
+//        // Saved best FP values from run 20261124_ga_murm_regress_to_pre_murm
+//        // (Ran EF boids classic. Got best EOR fitness of 0.91 !)
+//        FlockParameters fp({85.2534, 77.1774, 35.0879, 28.1128, 6.85523,
+//                            81.6045, 61.9496, 2.26453, 76.7931, 75.873,
+//                            -0.881732, -0.417548, 0.197702, 1.15667,
+//                            0.892095, 24.6748, 1.74948, 70.5379, 0.743294,
+//                            0.832747, 0.16366, 1.12499, -0.573124, 0.590733,
+//                            60.4566, 60.1125, 7.01679, 0.564825, 0.854142});
         
+        // TODO 20261125 DELETEME very temp
+        FlockParameters fp({88.3406, 94.3999, 30.5124, 12.7643, 87.4408, 56.9735, 14.4773, 71.1067, 41.2088, 14.7258, 0.689987, 0.754783, -0.83523, 42.9235, 9.35447, 4.82655, 1.42681, 23.9818, 0.456431, 0.283432, 0.722452, 35.7713, -0.899703, 0.224261, 45.6759, 24.4208, 2.63532, 0.0593294, 0.479119});
+
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

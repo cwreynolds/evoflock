@@ -37,8 +37,8 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-inline static bool visualize_previous_results_mode = false;
-//inline static bool visualize_previous_results_mode = true;
+//inline static bool visualize_previous_results_mode = false;
+inline static bool visualize_previous_results_mode = true;
 
 // Global switch to enable/disable multithreading.
 inline static bool enable_multithreading = true;
@@ -211,7 +211,7 @@ void checkCompatibilityFpVsGpFunc()
 // control optional behavior for modeling murmurations. On Nov 24 2026 I pivoted
 // to experimenting with predator_mode for murmurations. This function asserts
 // that those or future mode switches are mutually consistent.
-void assertConsistantMajorModes()
+void assertConsistentMajorModes()
 {
     assert(not (murmuration_mode and predator_mode));
 }
@@ -228,7 +228,7 @@ void runOneFlockEvolution()
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
     // TODO 20261125 new, more formal, density objective for predator_mode
 
-    assertConsistantMajorModes();
+    assertConsistentMajorModes();
     
     // Select which objectives to enable, based on other mode flags.
     if (murmuration_mode)
@@ -248,7 +248,8 @@ void runOneFlockEvolution()
         use_separate_objective  = true;
         use_speed_objective     = true;
         use_curvature_objective = false;
-        use_alignment_objective = false;
+//        use_alignment_objective = false;
+        use_alignment_objective = true;
         use_cluster_objective   = false;
         use_centroid_objective  = false;
         use_density_objective   = true;
@@ -1358,8 +1359,27 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 //                            0.832747, 0.16366, 1.12499, -0.573124, 0.590733,
 //                            60.4566, 60.1125, 7.01679, 0.564825, 0.854142});
         
-        // TODO 20261125 DELETEME very temp
-        FlockParameters fp({88.3406, 94.3999, 30.5124, 12.7643, 87.4408, 56.9735, 14.4773, 71.1067, 41.2088, 14.7258, 0.689987, 0.754783, -0.83523, 42.9235, 9.35447, 4.82655, 1.42681, 23.9818, 0.456431, 0.283432, 0.722452, 35.7713, -0.899703, 0.224261, 45.6759, 24.4208, 2.63532, 0.0593294, 0.479119});
+//        // TODO 20261125 DELETEME very temp
+//        // Wednesday, Nov 25, 5:06pm
+//        // (nice subflock organization, but they quickly dispersed apart)
+//        FlockParameters fp({99.3574, 97.6715, 47.1666, 92.8453, 30.0783, 13.8351, 43.7082, 2.79164, 6.99293, 20.2996, -0.363409, -0.892245, 0.222281, 38.2295, 9.99194, 11.4718, 1.11338, 52.419, 0.0415676, 0.198323, 0.107806, 32.5757, -0.899263, 0.282885, 8.65499, 24.5704, 9.59706, 0.0798944, 0.22907});
+
+//        // TODO 20261125 DELETEME very temp
+//        // Wednesday, Nov 25, 11:20pm
+//        // (stayed near origin but just a disorganized ball)
+//        FlockParameters fp({94.5348, 94.4229, 57.9275, 7.50517, 97.6739, 67.6306, 82.2362, 56.0589, 93.394, 76.127, 0.530668, 0.99582, -0.955751, 64.6943, 5.61532, 13.8964, 1.90613, 50.3162, 0.153449, 0.243184, 0.535052, 40.6648, -0.0318264, 0.938856, 7.94958, 53.5357, 6.97967, 0.0440484, 0.835467});
+
+        //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // TODO 20261126_ga_murm_density_and_align with bigger flock
+        
+        // Saved best FP values from run 20261124_ga_murm_regress_to_pre_murm
+        // (not bad, good cohesion, non-boring, stays near origin)
+        FlockParameters fp({94.6231, 87.0968, 48.6104, 85.3298, 30.1673,
+                            93.0652, 8.31636, 2.84543, 78.2942, 60.7959,
+                            -0.141169, -0.969641, 0.664529, 55.2696,
+                            0.533494, 4.03134, 1.10311, 96.4217, 0.703451,
+                            0.9619, 0.777942, 22.7816, 0.912327, 0.199185,
+                            43.1046, 7.52689, 3.62254, 0.462131, 0.553217});
 
         // TODO visualize_previous_results_mode
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

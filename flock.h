@@ -1355,7 +1355,10 @@ public:
         total_density_score_ += (EF::predator_mode ?
 //                                 util::remap_interval(score, 0, 1, 0.8, 1) :
 //                                 util::remap_interval(score, 0, 1, 0.6, 1) :
-                                 util::remap_interval(score, 0, 1, 0.8, 1) :
+                                 
+//                                 util::remap_interval(score, 0, 1, 0.8, 1) :
+                                 util::remap_interval(score, 0, 1, 0.7, 1) :
+
                                  score);
 
         

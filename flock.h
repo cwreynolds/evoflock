@@ -551,6 +551,12 @@ public:
         // TODO 20261125 new, more formal, density objective for predator_mode
         if (EF::use_density_objective  ) { recordPerStepDensityScore(); }
         //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~
+        
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+        // TODO 20261127 WIP on "isolated boid" for predator_mode
+        if (EF::use_isolation_objective) { recordIsolationScorePerStep(); }
+        //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     }
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1785,6 +1791,44 @@ public:
         for_all_boids(enforce_one_boid_do_not_count);
     }
     
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261127 WIP on "isolated boid" for predator_mode
+    
+    // TODO I was also thinking about a neighborhood density metric:
+    //      find a bounding sphere for the 7 neighbors and return its density.
+
+    double total_isolated_score_ = 0;
+
+    void recordIsolationScorePerStep()
+    {
+        double isolation_threshold = 10;  // QQQ raw inline constant !!!
+        for (auto boid : boids())
+        {
+            Vec3 nnp = boid->nearestNeighbor().position();
+            double nnd = (boid->position() - nnp).length();
+            if (nnd > isolation_threshold) { total_isolated_score_++; }
+            if (nnd > isolation_threshold)
+            {
+                draw().addAnnotationLine(nnp, boid->position(), Color(0.5));
+            }
+        }
+    }
+    
+//    double isolationScore() const
+//    {
+//        return 1 - (total_isolated_score_ / boidStepPerSim());
+//    }
+    
+    double isolationScore() const
+    {
+        double fraction_bad = total_isolated_score_ / boidStepPerSim();
+        double fraction_good = 1 - fraction_bad;
+        return std::pow(fraction_good, 10);
+    }
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     // TODO 20260905 try using more threads when using 10x pop for murmuration
 

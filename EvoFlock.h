@@ -37,8 +37,8 @@ inline void setRS(RandomSequence& rs) { rs_ = &rs; }
 inline RandomSequence& RS(){ return *rs_; }
 
 // No evo. Replay previous results in visualizePreviouslyLoggedFlockParameters.
-//inline static bool visualize_previous_results_mode = false;
-inline static bool visualize_previous_results_mode = true;
+inline static bool visualize_previous_results_mode = false;
+//inline static bool visualize_previous_results_mode = true;
 
 // Global switch to enable/disable multithreading.
 inline static bool enable_multithreading = true;
@@ -61,6 +61,14 @@ inline static bool use_centroid_objective  = true;
 inline static bool use_density_objective  = true;
 
 //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+// TODO 20261127 WIP on "isolated boid" for predator_mode
+inline static bool use_isolation_objective  = true;
+//~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+
+
 
 //~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~  ~
 // TODO 20260428 move temp murmuration parameters to EF
@@ -241,6 +249,7 @@ void runOneFlockEvolution()
         use_cluster_objective   = false;
         use_centroid_objective  = true;
         use_density_objective   = false;  // ad hoc use in murmuration_mode
+        use_isolation_objective = false;
     }
     else if (predator_mode)
     {
@@ -253,6 +262,7 @@ void runOneFlockEvolution()
         use_cluster_objective   = false;
         use_centroid_objective  = false;
         use_density_objective   = true;
+        use_isolation_objective = true;
     }
     else
     {
@@ -264,6 +274,7 @@ void runOneFlockEvolution()
         use_cluster_objective   = false;
         use_centroid_objective  = false;
         use_density_objective   = false;
+        use_isolation_objective = false;
     }
 
     debugPrint(murmuration_mode);
@@ -1370,9 +1381,9 @@ void visualizePreviouslyLoggedFlockParameters(const LP::FunctionSet& fs)
 //        FlockParameters fp({94.5348, 94.4229, 57.9275, 7.50517, 97.6739, 67.6306, 82.2362, 56.0589, 93.394, 76.127, 0.530668, 0.99582, -0.955751, 64.6943, 5.61532, 13.8964, 1.90613, 50.3162, 0.153449, 0.243184, 0.535052, 40.6648, -0.0318264, 0.938856, 7.94958, 53.5357, 6.97967, 0.0440484, 0.835467});
 
         //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        // TODO 20261126_ga_murm_density_and_align with bigger flock
+        // TODO 20261126_ga_pred_density_and_align with bigger flock
         
-        // Saved best FP values from run 20261124_ga_murm_regress_to_pre_murm
+        // Saved best FP values from run 20261126_ga_pred_density_and_align
         // (not bad, good cohesion, non-boring, stays near origin)
         FlockParameters fp({94.6231, 87.0968, 48.6104, 85.3298, 30.1673,
                             93.0652, 8.31636, 2.84543, 78.2942, 60.7959,

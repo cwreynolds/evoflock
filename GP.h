@@ -67,6 +67,12 @@ inline VecOfStrings mof_names()
     // TODO 20261125 new, more formal, density objective for predator_mode
     if (EF::use_density_objective)   { strings.push_back("density"); }
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+    
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261127 WIP on "isolated boid" for predator_mode
+    if (EF::use_isolation_objective) { strings.push_back("isolation"); }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    
     return strings;
 }
 
@@ -89,6 +95,11 @@ inline MOF multiObjectiveFitnessOfFlock(const Flock& flock)
     // TODO 20261125 new, more formal, density objective for predator_mode
     if (EF::use_density_objective)   { a(flock.densityScore()); }
     //~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~ ~~
+
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
+    // TODO 20261127 WIP on "isolated boid" for predator_mode
+    if (EF::use_isolation_objective) { a(flock.isolationScore()); }
+    //~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~~ ~~
 
     return MOF(o, mof_names());
 }
